@@ -46,8 +46,8 @@
 }
 
 button[monaButton] {
-    min-width: var(--mona-component-height); // default is square
-    min-height: var(--mona-component-height);
+    min-width: var(--mona-input-height); // default is square
+    min-height: var(--mona-input-height);
     padding: 0 10px;
     background-color: var(--mona-background);
     color: var(--mona-text);

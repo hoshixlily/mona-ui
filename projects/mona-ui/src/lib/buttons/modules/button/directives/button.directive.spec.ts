@@ -26,4 +26,12 @@ describe("ButtonDirective", () => {
     it("should contain text TEST BUTTON", () => {
         expect(spectator.element).toHaveText("TEST BUTTON");
     });
+
+    it("should emit selectedChange", () => {
+        const outputSpy = spyOn(spectator.directive.selectedChange, "emit");
+        spectator.setInput("toggleable", true);
+        spectator.setInput("selected", true);
+        spectator.click();
+        expect(outputSpy).toHaveBeenCalledWith(false);
+    });
 });
