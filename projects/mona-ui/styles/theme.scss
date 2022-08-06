@@ -1,0 +1,78 @@
+@import '~@angular/cdk/overlay-prebuilt.css';
+
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+* {
+    font-size: 12px;
+    font-weight: 600;
+}
+
+@mixin active-background {
+    &:active {
+        filter: brightness(90%);
+    }
+}
+
+@mixin background-transition {
+    &, &:hover, &:focus {
+        transition: filter 0.1s ease-in-out;
+    }
+}
+
+@mixin disabed {
+    &.disabled {
+        pointer-events: none;
+        opacity: 0.5;
+        filter: brightness(88%);
+    }
+}
+
+@mixin focus-shadow {
+    &:focus, &:focus-within {
+        box-shadow: 0 0 0 1px var(--mona-shadow-color);
+    }
+}
+
+@mixin hover-background {
+    &:hover {
+        filter: brightness(95%);
+    }
+}
+
+button[monaButton] {
+    min-width: var(--mona-component-height); // default is square
+    min-height: var(--mona-component-height);
+    padding: 0 10px;
+    background-color: var(--mona-background);
+    color: var(--mona-text);
+    border: 1px solid var(--mona-border-color);
+    outline: none;
+
+    &.primary {
+        background-color: var(--mona-primary);
+        color: var(--mona-background);
+        border: 1px solid var(--mona-primary);
+        &.selected {
+            background-color: var(--mona-primary-dark);
+            color: var(--mona-background-light);
+        }
+    }
+
+    &.selected {
+        background: var(--mona-primary);
+        color: var(--mona-background);
+    }
+
+    @include disabed;
+    @include background-transition;
+    @include hover-background;
+    @include active-background;
+    //@include focus-shadow;
+
+}
