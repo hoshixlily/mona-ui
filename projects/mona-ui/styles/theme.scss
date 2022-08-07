@@ -100,6 +100,6 @@ mona-button-group button[monaButton] {
     background-color: var(--mona-background);
     color: var(--mona-text);
     border: 1px solid var(--mona-border-color);
-    padding: 10px;
-    box-shadow: 0 5px 10px -3px var(--mona-shadow-color);
+    padding: 8px 10px;
+    box-shadow: var(--mona-popup-shadow);
 }

@@ -1,10 +1,10 @@
 import { Observable, of, Subject } from "rxjs";
 import { OverlayRef } from "@angular/cdk/overlay";
 
-export class PopupRef<T = void> {
+export class PopupRef<T = unknown> {
     private closed$: Subject<T | undefined> = new Subject<T | undefined>();
 
-    public constructor(private readonly overlayRef: OverlayRef) {}
+    public constructor(public readonly overlayRef: OverlayRef) {}
 
     public close(result?: T): void {
         this.overlayRef.dispose();

@@ -1,5 +1,5 @@
 import { Component, ElementRef, TemplateRef, ViewChild } from "@angular/core";
-import { PopupService } from "mona-ui";
+import { PopupService, PopupRef, PopupSettings } from "mona-ui";
 import { take } from "rxjs";
 import { TestComponentComponent } from "./test-component/test-component.component";
 
@@ -28,17 +28,30 @@ export class AppComponent {
         console.log(`Button selected: ${selected}`);
     }
 
-    public openPopup(): void {
-        const ref = this.popupService.create({
-            anchor: this.testButtonRef,
-            content: this.popupContentTemplate,
-            popupClass: "popup-noselect",
-            hasBackdrop: false
-        });
-        ref.closed.pipe(take(1)).subscribe(result => console.log(result));
+    public onPopupClosed(): void {
+        console.log("Popup closed");
     }
 
-    public openPopup2(): void {
+    public onPopupOpened(ref: PopupRef): void {
+        console.log("Popup opened: ", ref);
+    }
+
+    public openPopup(event: MouseEvent): void {
+        event.stopPropagation();
+        const popupSettings: PopupSettings = {
+            anchor: this.testButtonRef,
+            closeOnEscape: false,
+            content: this.popupContentTemplate,
+            popupClass: "popup-noselect",
+            hasBackdrop: false,
+            width: this.testButtonRef.nativeElement.getBoundingClientRect().width,
+            offset: { vertical: 0.5 }
+        };
+        this.popupService.create(popupSettings);
+    }
+
+    public openPopup2(event: MouseEvent): void {
+        event.stopPropagation();
         const ref = this.popupService.create({
             anchor: this.italicButtonRef,
             content: TestComponentComponent,

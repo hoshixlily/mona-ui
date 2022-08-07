@@ -1,4 +1,4 @@
-import { ApplicationRef, ComponentFactoryResolver, Injectable, Injector, TemplateRef } from "@angular/core";
+import { ApplicationRef, Injectable, Injector, NgZone, OnDestroy, Renderer2, TemplateRef } from "@angular/core";
 import { PopupSettings } from "../models/PopupSettings";
 import { Overlay } from "@angular/cdk/overlay";
 import { ComponentPortal, TemplatePortal } from "@angular/cdk/portal";
@@ -6,16 +6,21 @@ import { PopupAnchorDirective } from "../directives/popup-anchor.directive";
 import { PopupRef } from "../models/PopupRef";
 import { PopupInjectionToken } from "../models/PopupInjectionToken";
 import { DefaultPositions } from "../models/DefaultPositions";
-import { take } from "rxjs";
+import { Subject, take, takeUntil } from "rxjs";
 
 @Injectable()
-export class PopupService {
+export class PopupService implements OnDestroy {
     public static popupAnchorDirective: PopupAnchorDirective;
+    private readonly outsideEventsToClose = ["click", "mousedown", "dblclick", "contextmenu", "auxclick"];
+    private readonly serviceDestroy$: Subject<void> = new Subject<void>();
     private lastPopupRef: PopupRef | null = null;
+
     public constructor(
         private readonly applicationRef: ApplicationRef,
         private readonly injector: Injector,
-        private readonly overlay: Overlay
+        private readonly overlay: Overlay,
+        private readonly renderer: Renderer2,
+        private readonly zone: NgZone
     ) {}
 
     public create(settings: PopupSettings): PopupRef {
@@ -34,6 +39,12 @@ export class PopupService {
         const overlayRef = this.overlay.create({
             positionStrategy,
             hasBackdrop: settings.hasBackdrop ?? true,
+            height: settings.height,
+            maxHeight: settings.maxHeight,
+            maxWidth: settings.maxWidth,
+            minHeight: settings.minHeight,
+            minWidth: settings.minWidth,
+            width: settings.width,
             panelClass,
             backdropClass: "transparent"
         });
@@ -75,20 +86,39 @@ export class PopupService {
                     this.lastPopupRef = null;
                 });
         } else {
-            const subscription = overlayRef.outsidePointerEvents().subscribe(event => {
-                if (
-                    event.type === "click" ||
-                    event.type === "mousedown" ||
-                    event.type === "dblclick" ||
-                    event.type === "contextmenu" ||
-                    event.type === "auxclick"
-                ) {
-                    popupRef.close();
-                    this.lastPopupRef = null;
-                    subscription.unsubscribe();
-                }
-            });
+            const subscription = overlayRef
+                .outsidePointerEvents()
+                .pipe(takeUntil(this.serviceDestroy$))
+                .subscribe(event => {
+                    if (this.outsideEventsToClose.includes(event.type)) {
+                        popupRef.close(event);
+                        this.lastPopupRef = null;
+                        subscription.unsubscribe();
+                    }
+                });
         }
+        this.setEventListeners(settings);
         return popupRef;
+    }
+
+    public ngOnDestroy(): void {
+        this.serviceDestroy$.next();
+        this.serviceDestroy$.complete();
+    }
+
+    private setEventListeners(settings: PopupSettings): void {
+        this.zone.runOutsideAngular(() => {
+            if (settings.closeOnEscape ?? true) {
+                const keydownListenerRef = this.renderer.listen(document, "keydown", (event: KeyboardEvent) => {
+                    if (event.key === "Escape") {
+                        this.zone.run(() => {
+                            this.lastPopupRef?.close();
+                            this.lastPopupRef = null;
+                            keydownListenerRef();
+                        });
+                    }
+                });
+            }
+        });
     }
 }

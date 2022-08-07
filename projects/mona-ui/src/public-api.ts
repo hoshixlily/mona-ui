@@ -12,9 +12,9 @@ export * from "./lib/buttons/buttons.module";
 /** Popup */
 export * from "./lib/popup/models/PopupRef";
 export * from "./lib/popup/models/PopupSettings";
-export * from "./lib/popup/directives/popup-anchor.directive";
 export * from "./lib/popup/services/popup.service";
-// export * from "./lib/popup/components/popup/popup.component";
+export * from "./lib/popup/directives/popup-anchor.directive";
+export * from "./lib/popup/components/popup/popup.component";
 export * from "./lib/popup/popup.module";
 
 export * from "./lib/mona-ui.module";

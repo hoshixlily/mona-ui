@@ -1,14 +1,24 @@
 <div class="wrapper">
     <button monaButton [disabled]="false" [primary]="false" [selected]="false" [toggleable]="false"
-            (selectedChange)="onButtonSelectedChange($event)" (click)="openPopup()" #testButtonRef>Test Button
+            (selectedChange)="onButtonSelectedChange($event)" (click)="openPopup($event)" #testButtonRef>Test Button
     </button>
 
     <div style="margin-top: 10px;">
         <mona-button-group selection="multiple">
             <button monaButton [toggleable]="true">B</button>
-            <button monaButton [toggleable]="true" (click)="openPopup2()" #italicButtonRef>I</button>
+            <button monaButton [toggleable]="true" (click)="openPopup2($event)" #italicButtonRef>I</button>
             <button monaButton [toggleable]="true">U</button>
         </mona-button-group>
+    </div>
+
+    <div>
+        <button monaButton #popupComponentAnchor>Popup Component Anchor</button>
+        <mona-popup [anchor]="popupComponentAnchor" trigger="click" [width]="popupComponentAnchor.offsetWidth" [offset]="{vertical: 0.5}"
+            (close)="onPopupClosed()" (open)="onPopupOpened($event)">
+            <ng-template>
+                <span style="color: #f0c420;">Moonlight Sonata</span>
+            </ng-template>
+        </mona-popup>
     </div>
 </div>
 
