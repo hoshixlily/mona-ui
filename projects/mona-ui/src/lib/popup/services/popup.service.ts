@@ -1,4 +1,13 @@
-import { ApplicationRef, Injectable, Injector, NgZone, OnDestroy, Renderer2, TemplateRef } from "@angular/core";
+import {
+    ApplicationRef,
+    Injectable,
+    Injector,
+    NgZone,
+    OnDestroy,
+    Renderer2,
+    RendererFactory2,
+    TemplateRef
+} from "@angular/core";
 import { PopupSettings } from "../models/PopupSettings";
 import { Overlay } from "@angular/cdk/overlay";
 import { ComponentPortal, TemplatePortal } from "@angular/cdk/portal";
@@ -8,20 +17,25 @@ import { PopupInjectionToken } from "../models/PopupInjectionToken";
 import { DefaultPositions } from "../models/DefaultPositions";
 import { Subject, take, takeUntil } from "rxjs";
 
-@Injectable()
+@Injectable({
+    providedIn: "root"
+})
 export class PopupService implements OnDestroy {
     public static popupAnchorDirective: PopupAnchorDirective;
     private readonly outsideEventsToClose = ["click", "mousedown", "dblclick", "contextmenu", "auxclick"];
     private readonly serviceDestroy$: Subject<void> = new Subject<void>();
     private lastPopupRef: PopupRef | null = null;
+    private renderer: Renderer2;
 
     public constructor(
         private readonly applicationRef: ApplicationRef,
         private readonly injector: Injector,
         private readonly overlay: Overlay,
-        private readonly renderer: Renderer2,
+        private readonly rendererFactory: RendererFactory2,
         private readonly zone: NgZone
-    ) {}
+    ) {
+        this.renderer = rendererFactory.createRenderer(null, null);
+    }
 
     public create(settings: PopupSettings): PopupRef {
         const positionStrategy = this.overlay
@@ -50,14 +64,14 @@ export class PopupService implements OnDestroy {
         });
 
         const popupRef = new PopupRef(overlayRef);
-        this.lastPopupRef?.close();
+        // this.lastPopupRef?.close();
         this.lastPopupRef = popupRef;
 
         const injector = Injector.create({
             parent: this.injector,
             providers: [
                 { provide: PopupRef, useValue: popupRef },
-                { provide: PopupInjectionToken, useValue: settings }
+                { provide: PopupInjectionToken, useValue: settings.data }
             ]
         });
 

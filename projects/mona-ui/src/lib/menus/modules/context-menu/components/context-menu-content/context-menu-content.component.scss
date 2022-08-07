@@ -1,0 +1,7 @@
+ul {
+    width: 100%;
+    list-style: none;
+    & li {
+        height: var(--mona-input-height);
+    }
+}

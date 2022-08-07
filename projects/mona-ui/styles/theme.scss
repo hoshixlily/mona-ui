@@ -95,6 +95,20 @@ mona-button-group button[monaButton] {
 }
 
 
+/** Menu */
+/** Context Menu */
+.mona-contextmenu-content {
+    user-select: none;
+    padding: 0 !important;
+}
+
+.mona-contextmenu-item {
+    @include hover-background;
+    @include active-background;
+    @include background-transition;
+}
+
+
 /** Popup */
 .mona-popup-content {
     background-color: var(--mona-background);

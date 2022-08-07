@@ -20,6 +20,20 @@
             </ng-template>
         </mona-popup>
     </div>
+
+    <div>
+        <mona-split-button>
+            <span style="color: mediumvioletred">Split Button</span>
+        </mona-split-button>
+    </div>
+
+    <div>
+        <button monaButton #contextMenuAnchor>
+            <span style="color: lightcoral;">Context Menu Target</span>
+        </button>
+        <mona-contextmenu [target]="contextMenuAnchor"></mona-contextmenu>
+    </div>
+
 </div>
 
 <ng-template #popupContentTemplate>

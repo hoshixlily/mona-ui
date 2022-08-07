@@ -98,6 +98,7 @@ export class PopupComponent implements OnInit, OnDestroy, AfterViewInit {
             anchor: this.anchor,
             closeOnEscape: this.closeOnEscape,
             content: this.contentTemplate,
+            hasBackdrop: false,
             height: this.height,
             maxHeight: this.maxHeight,
             maxWidth: this.maxWidth,

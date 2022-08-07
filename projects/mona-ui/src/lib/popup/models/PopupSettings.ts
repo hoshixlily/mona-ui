@@ -28,6 +28,11 @@ export interface PopupSettings<T = unknown, C = void> {
     closeOnEscape?: boolean;
 
     /**
+     * Optional data to pass to the popup context.
+     */
+    data?: T;
+
+    /**
      * Whether the popup will have a backdrop.
      * Default: true.
      */

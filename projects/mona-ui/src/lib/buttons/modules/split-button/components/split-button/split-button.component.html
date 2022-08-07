@@ -1,0 +1,13 @@
+<div class="mona-split-button" #wrapperElementRef>
+    <button monaButton #mainButton>
+        <ng-content></ng-content>
+    </button>
+    <button monaButton #menuButton>
+        <span>v</span>
+    </button>
+    <mona-popup [anchor]="menuButton" [width]="wrapperElementRef.offsetWidth" [offset]="popupOffset" *ngIf="popupWidth > 0">
+        <ng-template>
+            <span style="color: teal;">Menu Items </span>
+        </ng-template>
+    </mona-popup>
+</div>
