@@ -6,6 +6,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    font-family: 'Roboto', sans-serif;
 }
 
 * {
@@ -15,13 +16,13 @@
 
 @mixin active-background {
     &:active {
-        filter: brightness(90%);
+        background-color: var(--mona-background-darker);
     }
 }
 
 @mixin background-transition {
     &, &:hover, &:focus {
-        transition: filter 0.1s ease-in-out;
+        transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
     }
 }
 
@@ -29,7 +30,7 @@
     &.disabled {
         pointer-events: none;
         opacity: 0.5;
-        filter: brightness(88%);
+        background-color: var(--mona-background-dark);
     }
 }
 
@@ -41,10 +42,14 @@
 
 @mixin hover-background {
     &:hover {
-        filter: brightness(95%);
+        background-color: var(--mona-background-dark);
     }
 }
 
+
+/** Buttons */
+
+/** Button */
 button[monaButton] {
     min-width: var(--mona-input-height); // default is square
     min-height: var(--mona-input-height);
@@ -53,6 +58,7 @@ button[monaButton] {
     color: var(--mona-text);
     border: 1px solid var(--mona-border-color);
     outline: none;
+    user-select: none;
 
     &.primary {
         background-color: var(--mona-primary);
@@ -71,8 +77,29 @@ button[monaButton] {
 
     @include disabed;
     @include background-transition;
-    @include hover-background;
-    @include active-background;
+
+    &:not(.selected) {
+        @include hover-background;
+        @include active-background;
+    }
+
     //@include focus-shadow;
 
+}
+
+/** Button Group */
+mona-button-group button[monaButton] {
+    &:not(:last-child) {
+        border-right: none;
+    }
+}
+
+
+/** Popup */
+.mona-popup-content {
+    background-color: var(--mona-background);
+    color: var(--mona-text);
+    border: 1px solid var(--mona-border-color);
+    padding: 10px;
+    box-shadow: 0 5px 10px -3px var(--mona-shadow-color);
 }

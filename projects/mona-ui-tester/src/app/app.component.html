@@ -1,3 +1,23 @@
 <div class="wrapper">
-    <button monaButton [disabled]="false" [primary]="false" [selected]="false" [toggleable]="true" (selectedChange)="onButtonSelectedChange($event)">Test Button</button>
+    <button monaButton [disabled]="false" [primary]="false" [selected]="false" [toggleable]="false"
+            (selectedChange)="onButtonSelectedChange($event)" (click)="openPopup()" #testButtonRef>Test Button
+    </button>
+
+    <div style="margin-top: 10px;">
+        <mona-button-group selection="multiple">
+            <button monaButton [toggleable]="true">B</button>
+            <button monaButton [toggleable]="true" (click)="openPopup2()" #italicButtonRef>I</button>
+            <button monaButton [toggleable]="true">U</button>
+        </mona-button-group>
+    </div>
 </div>
+
+<ng-template #popupContentTemplate>
+    <p>Popup Content</p>
+</ng-template>
+
+<ng-template #popupContentTemplate2>
+    <span style="color: deeppink;">Pink Text Popup Template</span>
+</ng-template>
+
+<div monaPopupAnchor></div>
