@@ -36,13 +36,14 @@
         </button>
         <mona-contextmenu [target]="contextMenuAnchor">
             <mona-menu-item text="File"></mona-menu-item>
+            <mona-menu-item [divider]="true"></mona-menu-item>
             <mona-menu-item text="Edit" [disabled]="true">
                 <mona-menu-item text="Undo" (menuClick)="print('Undo clicked.')"></mona-menu-item>
                 <mona-menu-item text="Redo"></mona-menu-item>
             </mona-menu-item>
-            <mona-menu-item text="View" (menuClick)="print('View clicked.')"></mona-menu-item>
+            <mona-menu-item text="View"  (menuClick)="print('View clicked.')"></mona-menu-item>
             <mona-menu-item [divider]="true"></mona-menu-item>
-            <mona-menu-item text="Search">
+            <mona-menu-item text="Search" [visible]="contextMenuItemVisible">
                 <mona-menu-item text="Find">
                     <mona-menu-item text="Find Next" [disabled]="true"></mona-menu-item>
                     <mona-menu-item text="Find Previous" [disabled]="false" (menuClick)="print('Find Previous clicked.')"></mona-menu-item>

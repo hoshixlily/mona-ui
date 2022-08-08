@@ -4,4 +4,5 @@ export interface MenuItem {
     menuClick?: () => void;
     subMenuItems?: MenuItem[];
     text?: string;
+    visible?: boolean;
 }

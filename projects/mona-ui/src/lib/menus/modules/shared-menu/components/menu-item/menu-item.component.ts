@@ -23,7 +23,8 @@ export class MenuItemComponent implements OnInit, AfterContentInit, OnDestroy {
         disabled: false,
         divider: false,
         subMenuItems: [],
-        text: ""
+        text: "",
+        visible: true
     };
 
     @Input()
@@ -45,6 +46,11 @@ export class MenuItemComponent implements OnInit, AfterContentInit, OnDestroy {
     @Input()
     public set text(text: string) {
         this.menuItem.text = text;
+    }
+
+    @Input()
+    public set visible(visible: boolean) {
+        this.menuItem.visible = visible;
     }
 
     public constructor() {}
