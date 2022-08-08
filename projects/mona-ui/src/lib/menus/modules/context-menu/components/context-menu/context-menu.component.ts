@@ -32,10 +32,11 @@ export class ContextMenuComponent implements OnInit, OnDestroy, AfterContentInit
     private submenuCloseNotifier: Subject<void> = new Subject();
     private targetListener: () => void = () => void 0;
 
-    public menuItems: MenuItem[] = [];
-
     @ContentChildren(MenuItemComponent)
     public menuItemComponents: QueryList<MenuItemComponent> = new QueryList<MenuItemComponent>();
+
+    @Input()
+    public menuItems: MenuItem[] = [];
 
     @Input()
     public minWidth?: number | string;
@@ -59,8 +60,10 @@ export class ContextMenuComponent implements OnInit, OnDestroy, AfterContentInit
     ) {}
 
     public ngAfterContentInit(): void {
+        if (this.menuItems.length !== 0) {
+            return;
+        }
         this.menuItems = this.menuItemComponents.map(m => m.getMenuItem()) ?? [];
-        console.log(this.menuItems);
     }
 
     public ngOnDestroy(): void {

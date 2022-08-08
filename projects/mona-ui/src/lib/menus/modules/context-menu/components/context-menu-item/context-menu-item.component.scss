@@ -5,12 +5,19 @@ div.mona-contextmenu-item {
     align-items: center;
 
     &-icon {
-        padding: 0 0 0 4px;
+        width: var(--mona-input-height);
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 
     &-text {
         padding: 0 10px;
         flex: 1;
+        &.icon-visible {
+            padding-left: 0;
+        }
     }
 
     &-link {

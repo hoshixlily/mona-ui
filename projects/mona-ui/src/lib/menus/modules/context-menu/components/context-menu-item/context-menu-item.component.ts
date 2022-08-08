@@ -12,6 +12,12 @@ export class ContextMenuItemComponent implements OnInit, OnDestroy {
     public readonly starIcon: IconDefinition = faStar;
 
     @Input()
+    public iconSpaceVisible: boolean = false;
+
+    @Input()
+    public linkSpaceVisible: boolean = false;
+
+    @Input()
     public menuItem!: MenuItem;
 
     @Input()

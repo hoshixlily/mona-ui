@@ -25,8 +25,14 @@
     </div>
 
     <div>
-        <mona-split-button>
-            <span style="color: mediumvioletred">Split Button</span>
+        <mona-split-button (buttonClick)="print('Split Button Main Button Clicked.')" [disabled]="false">
+            <span>Split Button</span>
+            <mona-menu-item text="Split Menu I"></mona-menu-item>
+            <mona-menu-item text="Split Menu II" iconClass="fa fa-file">
+                <mona-menu-item text="Split Menu II I"></mona-menu-item>
+                <mona-menu-item text="Split Menu II II" (menuClick)="print('SMIIII')"></mona-menu-item>
+            </mona-menu-item>
+            <mona-menu-item text="Split Menu III" iconClass="fa fa-search"></mona-menu-item>
         </mona-split-button>
     </div>
 
@@ -37,7 +43,7 @@
         <mona-contextmenu [target]="contextMenuAnchor">
             <mona-menu-item text="File">
                 <ng-template monaMenuItemTextTemplate let-menuItem>
-                    <span style="color: mediumseagreen;">F {{menuItem.text}}</span>
+                    <span style="color: mediumseagreen;">File</span>
                 </ng-template>
             </mona-menu-item>
             <mona-menu-item [divider]="true"></mona-menu-item>
@@ -45,12 +51,16 @@
                 <mona-menu-item text="Undo" (menuClick)="print('Undo clicked.')"></mona-menu-item>
                 <mona-menu-item text="Redo"></mona-menu-item>
             </mona-menu-item>
-            <mona-menu-item text="View"  (menuClick)="print('View clicked.')"></mona-menu-item>
+            <mona-menu-item text="View"  (menuClick)="print('View clicked.')">
+                <ng-template monaMenuItemIconTemplate>
+                    <span style="color: deeppink; font-size: 16px;">♫</span>
+                </ng-template>
+            </mona-menu-item>
             <mona-menu-item [divider]="true"></mona-menu-item>
-            <mona-menu-item text="Search" [visible]="contextMenuItemVisible">
+            <mona-menu-item text="Search" [visible]="contextMenuItemVisible" iconClass="fa fa-star">
                 <mona-menu-item text="Find">
-                    <mona-menu-item text="Find Next" [disabled]="true"></mona-menu-item>
-                    <mona-menu-item text="Find Previous" [disabled]="false" (menuClick)="print('Find Previous clicked.')"></mona-menu-item>
+                    <mona-menu-item text="Find Next" [disabled]="true" iconClass="fa fa-arrow-right"></mona-menu-item>
+                    <mona-menu-item text="Find Previous" [disabled]="false" iconClass="fa fa-arrow-left" (menuClick)="print('Find Previous clicked.')"></mona-menu-item>
                 </mona-menu-item>
                 <mona-menu-item text="Replace"></mona-menu-item>
             </mona-menu-item>

@@ -13,6 +13,7 @@ import {
 import { MenuItem } from "../../../context-menu/models/MenuItem";
 import { Subject, takeUntil } from "rxjs";
 import { MenuItemTextTemplateDirective } from "../../directives/menu-item-text-template.directive";
+import { MenuItemIconTemplateDirective } from "../../directives/menu-item-icon-template.directive";
 
 @Component({
     selector: "mona-menu-item",
@@ -30,6 +31,11 @@ export class MenuItemComponent implements OnInit, AfterContentInit, OnDestroy {
     };
 
     @Input()
+    public set data(data: unknown) {
+        this.menuItem.data = data;
+    }
+
+    @Input()
     public set disabled(disabled: boolean) {
         this.menuItem.disabled = disabled;
     }
@@ -38,6 +44,13 @@ export class MenuItemComponent implements OnInit, AfterContentInit, OnDestroy {
     public set divider(divider: boolean) {
         this.menuItem.divider = divider;
     }
+
+    @Input() set iconClass(iconClass: string) {
+        this.menuItem.iconClass = iconClass;
+    }
+
+    @ContentChildren(MenuItemIconTemplateDirective, { read: TemplateRef, descendants: false })
+    public iconTemplate: QueryList<TemplateRef<void>> = new QueryList<TemplateRef<void>>();
 
     @Output()
     public menuClick: EventEmitter<void> = new EventEmitter<void>();
@@ -61,6 +74,7 @@ export class MenuItemComponent implements OnInit, AfterContentInit, OnDestroy {
     public constructor() {}
 
     public getMenuItem(): MenuItem {
+        this.menuItem.iconTemplate = this.iconTemplate.get(0);
         this.menuItem.menuClick = (): void => this.menuClick.emit();
         this.menuItem.subMenuItems = this.submenuItems.map(si => si.getMenuItem());
         this.menuItem.textTemplate = this.textTemplate.get(0);

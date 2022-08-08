@@ -15,6 +15,8 @@ export class ContextMenuContentComponent implements OnInit, OnDestroy {
     private submenuCloseNotifier: Subject<void> = new Subject();
     public currentMenuItem: MenuItem | null = null;
     public hoveredListElement: HTMLLIElement | null = null;
+    public iconSpaceVisible: boolean = false;
+    public linkSpaceVisible: boolean = false;
     public menuPopupRef: PopupRef | null = null;
 
     public constructor(
@@ -27,7 +29,12 @@ export class ContextMenuContentComponent implements OnInit, OnDestroy {
         this.submenuCloseNotifier.complete();
     }
 
-    public ngOnInit(): void {}
+    public ngOnInit(): void {
+        this.iconSpaceVisible = this.contextMenuData.menuItems.some(mi => mi.iconClass || mi.iconTemplate);
+        this.linkSpaceVisible = this.contextMenuData.menuItems.some(
+            mi => mi.subMenuItems && mi.subMenuItems.length > 0
+        );
+    }
 
     public onListItemClick(event: MouseEvent, menuItem: MenuItem): void {
         if (menuItem.disabled || menuItem.divider || (menuItem.subMenuItems && menuItem.subMenuItems.length > 0)) {

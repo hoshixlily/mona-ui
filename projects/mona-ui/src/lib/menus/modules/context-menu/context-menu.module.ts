@@ -8,10 +8,11 @@ import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { MenuItemComponent } from "../shared-menu/components/menu-item/menu-item.component";
 import { SharedMenuModule } from "../shared-menu/shared-menu.module";
 import { MenuItemTextTemplateDirective } from "../shared-menu/directives/menu-item-text-template.directive";
+import { MenuItemIconTemplateDirective } from "../shared-menu/directives/menu-item-icon-template.directive";
 
 @NgModule({
     declarations: [ContextMenuComponent, ContextMenuContentComponent, ContextMenuItemComponent],
     imports: [CommonModule, PopupModule, FontAwesomeModule, SharedMenuModule],
-    exports: [ContextMenuComponent, MenuItemComponent, MenuItemTextTemplateDirective]
+    exports: [ContextMenuComponent, MenuItemComponent, MenuItemTextTemplateDirective, MenuItemIconTemplateDirective]
 })
 export class ContextMenuModule {}

@@ -14,7 +14,7 @@ export * from "./lib/buttons/buttons.module";
 /** Menus */
 // export * from "./lib/menus/models/MenuItem";
 export * from "./lib/menus/modules/shared-menu/components/menu-item/menu-item.component";
-// export * from "./lib/menus/modules/shared-menu/directives/menu-item-icon-template.directive";
+export * from "./lib/menus/modules/shared-menu/directives/menu-item-icon-template.directive";
 // export * from "./lib/menus/modules/shared-menu/directives/menu-item-link-template.directive";
 export * from "./lib/menus/modules/shared-menu/directives/menu-item-text-template.directive";
 export * from "./lib/menus/modules/context-menu/components/context-menu/context-menu.component";

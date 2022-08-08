@@ -64,9 +64,12 @@
                             "projects/mona-ui-tester/src/assets"
                         ],
                         "styles": [
+                            "node_modules/@fortawesome/fontawesome-free/css/all.css",
                             "projects/mona-ui-tester/src/styles.scss"
                         ],
-                        "scripts": []
+                        "scripts": [
+                            "node_modules/@fortawesome/fontawesome-free/js/all.js"
+                        ]
                     },
                     "configurations": {
                         "production": {

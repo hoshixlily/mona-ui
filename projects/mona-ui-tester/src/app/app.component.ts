@@ -67,7 +67,6 @@ export class AppComponent implements OnInit {
             hasBackdrop: false,
             offset: { horizontal: 0, vertical: 10 }
         });
-        ref.closed.pipe(take(1)).subscribe(result => console.log(result));
     }
 
     public print(value: unknown): void {
