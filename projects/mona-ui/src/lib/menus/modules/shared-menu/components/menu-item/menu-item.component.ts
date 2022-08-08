@@ -7,10 +7,12 @@ import {
     OnDestroy,
     OnInit,
     Output,
-    QueryList
+    QueryList,
+    TemplateRef
 } from "@angular/core";
 import { MenuItem } from "../../../context-menu/models/MenuItem";
 import { Subject, takeUntil } from "rxjs";
+import { MenuItemTextTemplateDirective } from "../../directives/menu-item-text-template.directive";
 
 @Component({
     selector: "mona-menu-item",
@@ -48,6 +50,9 @@ export class MenuItemComponent implements OnInit, AfterContentInit, OnDestroy {
         this.menuItem.text = text;
     }
 
+    @ContentChildren(MenuItemTextTemplateDirective, { read: TemplateRef, descendants: false })
+    public textTemplate: QueryList<TemplateRef<void>> = new QueryList<TemplateRef<void>>();
+
     @Input()
     public set visible(visible: boolean) {
         this.menuItem.visible = visible;
@@ -58,6 +63,7 @@ export class MenuItemComponent implements OnInit, AfterContentInit, OnDestroy {
     public getMenuItem(): MenuItem {
         this.menuItem.menuClick = (): void => this.menuClick.emit();
         this.menuItem.subMenuItems = this.submenuItems.map(si => si.getMenuItem());
+        this.menuItem.textTemplate = this.textTemplate.get(0);
         return this.menuItem;
     }
 

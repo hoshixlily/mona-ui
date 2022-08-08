@@ -35,7 +35,11 @@
             <span style="color: lightcoral;">Context Menu Target</span>
         </button>
         <mona-contextmenu [target]="contextMenuAnchor">
-            <mona-menu-item text="File"></mona-menu-item>
+            <mona-menu-item text="File">
+                <ng-template monaMenuItemTextTemplate let-menuItem>
+                    <span style="color: mediumseagreen;">F {{menuItem.text}}</span>
+                </ng-template>
+            </mona-menu-item>
             <mona-menu-item [divider]="true"></mona-menu-item>
             <mona-menu-item text="Edit" [disabled]="true">
                 <mona-menu-item text="Undo" (menuClick)="print('Undo clicked.')"></mona-menu-item>

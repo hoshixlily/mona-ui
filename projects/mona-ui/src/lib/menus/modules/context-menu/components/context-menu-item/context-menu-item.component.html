@@ -2,7 +2,9 @@
     <div class="mona-contextmenu-item-icon">
     </div>
     <div class="mona-contextmenu-item-text">
-        <span>{{menuItem.text}}</span>
+        <span *ngIf="!menuItem?.textTemplate">{{menuItem.text}}</span>
+        <ng-container [ngTemplateOutlet]="menuItem?.textTemplate ?? null" [ngTemplateOutletContext]="{$implicit: menuItem}"
+                      *ngIf="menuItem?.textTemplate"></ng-container>
     </div>
     <div class="mona-contextmenu-item-link" *ngIf="menuItem.subMenuItems && menuItem.subMenuItems.length !== 0">
         <span>&rsaquo;</span>
