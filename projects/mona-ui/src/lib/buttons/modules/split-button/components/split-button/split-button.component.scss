@@ -12,5 +12,13 @@ div.mona-split-button {
         &:first-child {
             border-right: 1px solid var(--mona-border-color);
         }
+        &:nth-child(2) {
+            & > span {
+                font-size: 18px;
+                display: inline-block;
+                transform-origin: center;
+                transform: rotate(90deg);
+            }
+        }
     }
 }

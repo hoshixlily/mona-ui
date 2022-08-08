@@ -1,6 +1,8 @@
 <ul class="mona-contextmenu-list">
     <ng-container *ngFor="let menuItem of contextMenuData.menuItems">
-        <li (mouseenter)="onListItemMouseEntered($event, menuItem)" (mouseleave)="onListItemMouseLeft($event)">
+        <li class="mona-contextmenu-list-item" [ngClass]="{'disabled': menuItem.disabled, 'divider': menuItem.divider}"
+            (mouseenter)="onListItemMouseEnter($event, menuItem)" (mouseleave)="onListItemMouseLeave($event)"
+            (click)="onListItemClick($event, menuItem)">
             <mona-contextmenu-item [menuItem]="menuItem"></mona-contextmenu-item>
         </li>
     </ng-container>

@@ -1,7 +1,12 @@
-<div class="mona-contextmenu-item">
-    <div></div>
-    <div>
+<div class="mona-contextmenu-item" *ngIf="!menuItem.divider">
+    <div class="mona-contextmenu-item-icon">
+    </div>
+    <div class="mona-contextmenu-item-text">
         <span>{{menuItem.text}}</span>
     </div>
-    <div></div>
+    <div class="mona-contextmenu-item-link" *ngIf="menuItem.subMenuItems && menuItem.subMenuItems.length !== 0">
+        <span>&rsaquo;</span>
+    </div>
 </div>
+
+<span *ngIf="menuItem.divider" class="divider"></span>

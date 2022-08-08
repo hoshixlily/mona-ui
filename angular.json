@@ -64,7 +64,6 @@
                             "projects/mona-ui-tester/src/assets"
                         ],
                         "styles": [
-                            "dist/mona-ui/styles/mona-light.scss",
                             "projects/mona-ui-tester/src/styles.scss"
                         ],
                         "scripts": []

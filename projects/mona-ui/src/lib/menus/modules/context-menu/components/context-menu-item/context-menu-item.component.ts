@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { MenuItem } from "../../models/MenuItem";
+import { faStar, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 
 @Component({
     selector: "mona-contextmenu-item",
@@ -7,11 +8,11 @@ import { MenuItem } from "../../models/MenuItem";
     styleUrls: ["./context-menu-item.component.scss"]
 })
 export class ContextMenuItemComponent implements OnInit {
+    public readonly starIcon: IconDefinition = faStar;
+
     @Input()
     public menuItem!: MenuItem;
 
     public constructor() {}
-    public ngOnInit(): void {
-        console.log(this.menuItem);
-    }
+    public ngOnInit(): void {}
 }

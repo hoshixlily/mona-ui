@@ -61,4 +61,8 @@ export class AppComponent {
         });
         ref.closed.pipe(take(1)).subscribe(result => console.log(result));
     }
+
+    public print(value: unknown): void {
+        console.log(value);
+    }
 }

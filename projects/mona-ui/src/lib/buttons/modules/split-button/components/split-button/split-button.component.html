@@ -3,11 +3,14 @@
         <ng-content></ng-content>
     </button>
     <button monaButton #menuButton>
-        <span>v</span>
+        <span>&rsaquo;</span>
     </button>
-    <mona-popup [anchor]="menuButton" [width]="wrapperElementRef.offsetWidth" [offset]="popupOffset" *ngIf="popupWidth > 0">
-        <ng-template>
-            <span style="color: teal;">Menu Items </span>
-        </ng-template>
-    </mona-popup>
+    <mona-contextmenu [target]="menuButton" trigger="click" [minWidth]="popupWidth" [offset]="popupOffset" #contextMenuComponent>
+
+    </mona-contextmenu>
+<!--    <mona-popup [anchor]="menuButton" [width]="wrapperElementRef.offsetWidth" [offset]="popupOffset" *ngIf="popupWidth > 0">-->
+<!--        <ng-template>-->
+<!--            <span style="color: teal;">Menu Items </span>-->
+<!--        </ng-template>-->
+<!--    </mona-popup>-->
 </div>

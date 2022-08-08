@@ -29,17 +29,31 @@ export class ContextMenuContentComponent implements OnInit, OnDestroy {
 
     public ngOnInit(): void {}
 
-    public onListItemMouseEntered(event: MouseEvent, menuItem: MenuItem): void {
+    public onListItemClick(event: MouseEvent, menuItem: MenuItem): void {
+        if (menuItem.disabled || menuItem.divider || (menuItem.subMenuItems && menuItem.subMenuItems.length > 0)) {
+            return;
+        }
+        menuItem.menuClick?.();
+        this.contextMenuData.menuClick?.next(menuItem);
+    }
+
+    public onListItemMouseEnter(event: MouseEvent, menuItem: MenuItem): void {
+        if (
+            this.currentMenuItem !== menuItem &&
+            this.currentMenuItem?.subMenuItems &&
+            this.currentMenuItem.subMenuItems.length > 0
+        ) {
+            this.submenuCloseNotifier.next();
+        }
         this.hoveredListElement = event.target as HTMLLIElement;
         this.currentMenuItem = menuItem;
         this.menuPopupRef?.close();
-        this.submenuCloseNotifier.next();
         if (this.currentMenuItem.subMenuItems && this.currentMenuItem.subMenuItems.length > 0) {
             this.create();
         }
     }
 
-    public onListItemMouseLeft(event: MouseEvent): void {
+    public onListItemMouseLeave(event: MouseEvent): void {
         this.submenuCloseNotifier.next();
     }
 
@@ -50,6 +64,7 @@ export class ContextMenuContentComponent implements OnInit, OnDestroy {
                 anchor: this.hoveredListElement,
                 content: ContextMenuContentComponent,
                 data: {
+                    menuClick: this.contextMenuData.menuClick,
                     menuItems: this.currentMenuItem.subMenuItems ?? [],
                     parentClose: this.submenuCloseNotifier
                 } as ContextMenuInjectorData,
@@ -60,7 +75,7 @@ export class ContextMenuContentComponent implements OnInit, OnDestroy {
                 const subscription = this.contextMenuData.parentClose.subscribe(() => {
                     this.menuPopupRef?.close();
                     this.submenuCloseNotifier.next();
-                    // subscription.unsubscribe();
+                    subscription.unsubscribe();
                 });
             }
         }
