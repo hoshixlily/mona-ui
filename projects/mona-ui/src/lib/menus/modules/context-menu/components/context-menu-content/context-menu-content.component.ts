@@ -1,19 +1,17 @@
-import { Component, Inject, OnDestroy, OnInit } from "@angular/core";
+import { AfterViewInit, Component, ElementRef, Inject, OnDestroy, OnInit } from "@angular/core";
 import { ContextMenuInjectorData } from "../../models/ContextMenuInjectorData";
 import { PopupInjectionToken } from "../../../../../popup/models/PopupInjectionToken";
 import { ContextMenuService } from "../../services/context-menu.service";
 import { MenuItem } from "../../models/MenuItem";
 import { PopupRef } from "../../../../../popup/models/PopupRef";
-import { Subject } from "rxjs";
 
 @Component({
     selector: "mona-contextmenu-content",
     templateUrl: "./context-menu-content.component.html",
     styleUrls: ["./context-menu-content.component.scss"]
 })
-export class ContextMenuContentComponent implements OnInit, OnDestroy {
+export class ContextMenuContentComponent implements OnInit, OnDestroy, AfterViewInit {
     private contextMenuInjectorData: Partial<ContextMenuInjectorData> = {};
-    private submenuCloseNotifier: Subject<void> = new Subject();
     public currentMenuItem: MenuItem | null = null;
     public iconSpaceVisible: boolean = false;
     public linkSpaceVisible: boolean = false;
@@ -21,13 +19,15 @@ export class ContextMenuContentComponent implements OnInit, OnDestroy {
 
     public constructor(
         @Inject(PopupInjectionToken) public contextMenuData: ContextMenuInjectorData,
-        private readonly contextMenuService: ContextMenuService
+        private readonly contextMenuService: ContextMenuService,
+        private readonly elementRef: ElementRef<HTMLElement>
     ) {}
 
-    public ngOnDestroy(): void {
-        this.submenuCloseNotifier.next();
-        this.submenuCloseNotifier.complete();
+    public ngAfterViewInit(): void {
+        this.focus();
     }
+
+    public ngOnDestroy(): void {}
 
     public ngOnInit(): void {
         this.iconSpaceVisible = this.contextMenuData.menuItems.some(mi => mi.iconClass || mi.iconTemplate);
@@ -45,22 +45,11 @@ export class ContextMenuContentComponent implements OnInit, OnDestroy {
     }
 
     public onListItemMouseEnter(event: MouseEvent, menuItem: MenuItem): void {
-        if (
-            this.currentMenuItem !== menuItem &&
-            this.currentMenuItem?.subMenuItems &&
-            this.currentMenuItem.subMenuItems.length > 0
-        ) {
-            this.submenuCloseNotifier.next();
-        }
         this.currentMenuItem = menuItem;
         this.menuPopupRef?.close();
         if (this.currentMenuItem.subMenuItems && this.currentMenuItem.subMenuItems.length > 0) {
             this.create(event.target as HTMLElement, this.currentMenuItem);
         }
-    }
-
-    public onListItemMouseLeave(event: MouseEvent): void {
-        this.submenuCloseNotifier.next();
     }
 
     private create(anchor: HTMLElement, menuItem: MenuItem): void {
@@ -78,9 +67,13 @@ export class ContextMenuContentComponent implements OnInit, OnDestroy {
         if (this.contextMenuData.parentMenuRef) {
             const subscription = this.contextMenuData.parentMenuRef.closed.subscribe(() => {
                 this.menuPopupRef?.close();
-                this.submenuCloseNotifier.next();
                 subscription.unsubscribe();
             });
         }
+    }
+
+    private focus(): void {
+        const listElement = this.elementRef.nativeElement.querySelector("ul:first-child") as HTMLUListElement;
+        listElement?.focus();
     }
 }

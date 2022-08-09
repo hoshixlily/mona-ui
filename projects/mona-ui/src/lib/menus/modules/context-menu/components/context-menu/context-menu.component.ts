@@ -123,9 +123,8 @@ export class ContextMenuComponent implements OnInit, OnDestroy, AfterContentInit
                 this.renderer.listen(window, "click", this.onOutsideClick.bind(this)),
                 this.renderer.listen(window, "contextmenu", this.onOutsideClick.bind(this)),
                 this.renderer.listen(window, "auxclick", this.onOutsideClick.bind(this)),
-                this.renderer.listen(window, "keydown.esc", () => {
-                    this.contextMenuRef?.close();
-                })
+                this.renderer.listen(window, "keydown.esc", () => this.contextMenuRef?.close())
+                // this.renderer.listen(document, "focusout", () => this.contextMenuRef?.close())
             ];
         });
 
