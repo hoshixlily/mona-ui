@@ -1,18 +1,18 @@
 import { Observable, of, Subject } from "rxjs";
 import { OverlayRef } from "@angular/cdk/overlay";
 
-export class PopupRef<T = unknown> {
-    private closed$: Subject<T | undefined> = new Subject<T | undefined>();
+export class PopupRef<T = unknown, R = unknown> {
+    private closed$: Subject<R | undefined> = new Subject<R | undefined>();
 
     public constructor(public readonly overlayRef: OverlayRef) {}
 
-    public close(result?: T): void {
+    public close(result?: R): void {
         this.overlayRef.dispose();
         this.closed$.next(result);
         this.closed$.complete();
     }
 
-    public get closed(): Observable<T | null> {
-        return (this.closed$.asObservable() as Observable<T>) ?? of(null);
+    public get closed(): Observable<R | null> {
+        return (this.closed$.asObservable() as Observable<R>) ?? of(null);
     }
 }

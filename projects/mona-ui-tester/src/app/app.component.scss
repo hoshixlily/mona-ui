@@ -4,4 +4,7 @@ div.wrapper {
     display: flex;
     align-items: center;
     justify-content: center;
+    & > div {
+        margin: 5px;
+    }
 }

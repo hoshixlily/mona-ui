@@ -1,0 +1,18 @@
+<div class="mona-contextmenu-item" *ngIf="!menuItem.divider">
+    <div class="mona-contextmenu-item-icon" *ngIf="iconSpaceVisible">
+        <span [ngClass]="menuItem.iconClass" *ngIf="menuItem.iconClass && !menuItem.iconTemplate"></span>
+        <ng-container [ngTemplateOutlet]="menuItem?.iconTemplate ?? null" [ngTemplateOutletContext]="{$implicit: menuItem}"
+                      *ngIf="menuItem?.iconTemplate"></ng-container>
+    </div>
+    <div class="mona-contextmenu-item-text" [ngClass]="{'icon-visible': iconSpaceVisible}">
+        <span *ngIf="!menuItem?.textTemplate">{{menuItem.text}}</span>
+        <ng-container [ngTemplateOutlet]="menuItem?.textTemplate ?? null"
+                      [ngTemplateOutletContext]="{$implicit: menuItem}"
+                      *ngIf="menuItem?.textTemplate"></ng-container>
+    </div>
+    <div class="mona-contextmenu-item-link" *ngIf="linkSpaceVisible">
+        <span *ngIf="menuItem.subMenuItems && menuItem.subMenuItems.length !== 0">&rsaquo;</span>
+    </div>
+</div>
+
+<span *ngIf="menuItem.divider" class="divider"></span>

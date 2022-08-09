@@ -1,9 +1,12 @@
 <div class="wrapper">
-    <button monaButton [disabled]="false" [primary]="false" [selected]="false" [toggleable]="false"
-            (selectedChange)="onButtonSelectedChange($event)" (click)="openPopup($event)" #testButtonRef>Test Button
-    </button>
 
-    <div style="margin-top: 10px;">
+    <div>
+        <button monaButton [disabled]="false" [primary]="false" [selected]="false" [toggleable]="false"
+                (selectedChange)="onButtonSelectedChange($event)" (click)="openPopup($event)" #testButtonRef>Test Button
+        </button>
+    </div>
+
+    <div>
         <mona-button-group selection="multiple">
             <button monaButton [toggleable]="true">B</button>
             <button monaButton [toggleable]="true" (click)="openPopup2($event)" #italicButtonRef>I</button>
@@ -20,6 +23,50 @@
             </ng-template>
         </mona-popup>
     </div>
+
+    <div>
+        <mona-split-button (buttonClick)="print('Split Button Main Button Clicked.')" [disabled]="false">
+            <span>Split Button</span>
+            <mona-menu-item text="Split Menu I"></mona-menu-item>
+            <mona-menu-item text="Split Menu II" iconClass="fa fa-file">
+                <mona-menu-item text="Split Menu II I"></mona-menu-item>
+                <mona-menu-item text="Split Menu II II" (menuClick)="print('SMIIII')"></mona-menu-item>
+            </mona-menu-item>
+            <mona-menu-item text="Split Menu III" iconClass="fa fa-search"></mona-menu-item>
+        </mona-split-button>
+    </div>
+
+    <div>
+        <button monaButton #contextMenuAnchor>
+            <span style="color: lightcoral;">Context Menu Target</span>
+        </button>
+        <mona-contextmenu [target]="contextMenuAnchor">
+            <mona-menu-item text="File">
+                <ng-template monaMenuItemTextTemplate let-menuItem>
+                    <span style="color: mediumseagreen;">File</span>
+                </ng-template>
+            </mona-menu-item>
+            <mona-menu-item [divider]="true"></mona-menu-item>
+            <mona-menu-item text="Edit" [disabled]="false">
+                <mona-menu-item text="Undo" (menuClick)="print('Undo clicked.')"></mona-menu-item>
+                <mona-menu-item text="Redo"></mona-menu-item>
+            </mona-menu-item>
+            <mona-menu-item text="View"  (menuClick)="print('View clicked.')">
+                <ng-template monaMenuItemIconTemplate>
+                    <span style="color: deeppink; font-size: 16px;">♫</span>
+                </ng-template>
+            </mona-menu-item>
+            <mona-menu-item [divider]="true"></mona-menu-item>
+            <mona-menu-item text="Search" [visible]="contextMenuItemVisible" iconClass="fa fa-star">
+                <mona-menu-item text="Find">
+                    <mona-menu-item text="Find Next" [disabled]="true" iconClass="fa fa-arrow-right"></mona-menu-item>
+                    <mona-menu-item text="Find Previous" [disabled]="false" iconClass="fa fa-arrow-left" (menuClick)="print('Find Previous clicked.')"></mona-menu-item>
+                </mona-menu-item>
+                <mona-menu-item text="Replace"></mona-menu-item>
+            </mona-menu-item>
+        </mona-contextmenu>
+    </div>
+
 </div>
 
 <ng-template #popupContentTemplate>

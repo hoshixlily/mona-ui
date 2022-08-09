@@ -1,0 +1,11 @@
+<div class="mona-split-button" #wrapperElementRef>
+    <button monaButton (click)="buttonClick.emit()" [disabled]="disabled" #mainButton>
+        <ng-content></ng-content>
+    </button>
+    <button monaButton [disabled]="disabled" #menuButton>
+        <span>&rsaquo;</span>
+    </button>
+    <mona-contextmenu [target]="menuButton" trigger="click" [minWidth]="popupWidth" [offset]="popupOffset"
+                      [menuItems]="menuItems" #contextMenuComponent ></mona-contextmenu>
+
+</div>

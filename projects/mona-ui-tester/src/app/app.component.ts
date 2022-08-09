@@ -1,4 +1,4 @@
-import { Component, ElementRef, TemplateRef, ViewChild } from "@angular/core";
+import { Component, ElementRef, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { PopupService, PopupRef, PopupSettings } from "mona-ui";
 import { take } from "rxjs";
 import { TestComponentComponent } from "./test-component/test-component.component";
@@ -9,7 +9,9 @@ import { TestComponentComponent } from "./test-component/test-component.componen
     styleUrls: ["./app.component.scss"],
     providers: [PopupService]
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
+    public contextMenuItemVisible: boolean = true;
+
     @ViewChild("italicButtonRef", { read: ElementRef })
     public italicButtonRef!: ElementRef<HTMLButtonElement>;
 
@@ -23,6 +25,12 @@ export class AppComponent {
     public testButtonRef!: ElementRef<HTMLButtonElement>;
 
     public constructor(public readonly popupService: PopupService) {}
+
+    public ngOnInit(): void {
+        // window.setInterval(() => {
+        //     this.contextMenuItemVisible = !this.contextMenuItemVisible;
+        // }, 3000);
+    }
 
     public onButtonSelectedChange(selected: boolean): void {
         console.log(`Button selected: ${selected}`);
@@ -59,6 +67,9 @@ export class AppComponent {
             hasBackdrop: false,
             offset: { horizontal: 0, vertical: 10 }
         });
-        ref.closed.pipe(take(1)).subscribe(result => console.log(result));
+    }
+
+    public print(value: unknown): void {
+        console.log(value);
     }
 }

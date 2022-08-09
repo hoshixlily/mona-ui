@@ -28,6 +28,17 @@ export interface PopupSettings<T = unknown, C = void> {
     closeOnEscape?: boolean;
 
     /**
+     * Whether the popup will be closed when the user clicks outside of it.
+     * @type {boolean}
+     */
+    closeOnOutsideClick?: boolean;
+
+    /**
+     * Optional data to pass to the popup context.
+     */
+    data?: T;
+
+    /**
      * Whether the popup will have a backdrop.
      * Default: true.
      */

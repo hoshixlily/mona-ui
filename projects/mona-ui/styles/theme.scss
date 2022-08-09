@@ -9,11 +9,6 @@
     font-family: 'Roboto', sans-serif;
 }
 
-* {
-    font-size: 12px;
-    font-weight: 600;
-}
-
 @mixin active-background {
     &:active {
         background-color: var(--mona-background-darker);
@@ -26,12 +21,10 @@
     }
 }
 
-@mixin disabed {
-    &.disabled {
-        pointer-events: none;
-        opacity: 0.5;
-        background-color: var(--mona-background-dark);
-    }
+@mixin disabled {
+    pointer-events: none;
+    opacity: 0.5;
+    background-color: var(--mona-background-dark);
 }
 
 @mixin focus-shadow {
@@ -47,6 +40,14 @@
 }
 
 
+/** General **/
+//[class^="mona-"] {
+//    &, & * {
+//        font-size: 1.2rem;
+//    }
+//}
+
+
 /** Buttons */
 
 /** Button */
@@ -59,6 +60,7 @@ button[monaButton] {
     border: 1px solid var(--mona-border-color);
     outline: none;
     user-select: none;
+    //font-size: 1.2rem;
 
     &.primary {
         background-color: var(--mona-primary);
@@ -75,7 +77,10 @@ button[monaButton] {
         color: var(--mona-background);
     }
 
-    @include disabed;
+    &.disabled {
+        @include disabled;
+    }
+
     @include background-transition;
 
     &:not(.selected) {
@@ -91,6 +96,30 @@ button[monaButton] {
 mona-button-group button[monaButton] {
     &:not(:last-child) {
         border-right: none;
+    }
+}
+
+
+/** Menu */
+/** Context Menu */
+.mona-contextmenu-content {
+    user-select: none;
+    padding: 4px 0 !important;
+}
+
+.mona-contextmenu-item {
+    @include hover-background;
+    @include active-background;
+    @include background-transition;
+}
+
+.mona-contextmenu-list-item {
+    &.disabled {
+        @include disabled;
+        background-color: inherit;
+    }
+    &.focused {
+        background-color: var(--mona-background-dark);
     }
 }
 

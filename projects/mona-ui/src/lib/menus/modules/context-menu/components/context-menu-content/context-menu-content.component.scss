@@ -1,0 +1,16 @@
+:host {
+    width: 100%;
+}
+
+ul {
+    width: 100%;
+    list-style: none;
+    outline: none;
+    & li {
+        height: var(--mona-input-height);
+        &.divider {
+            height: auto;
+            pointer-events: none;
+        }
+    }
+}
