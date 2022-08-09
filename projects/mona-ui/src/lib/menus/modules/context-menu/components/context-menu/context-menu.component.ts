@@ -31,7 +31,6 @@ export class ContextMenuComponent implements OnInit, OnDestroy, AfterContentInit
     private contextMenuRef: PopupRef | null = null;
     private menuClickNotifier: Subject<MenuItem> = new Subject<MenuItem>();
     private precise: boolean = true;
-    private submenuCloseNotifier: Subject<void> = new Subject();
     private targetListener: () => void = () => void 0;
     private windowEventListenerRefs: Array<() => void> = [];
 
@@ -73,8 +72,6 @@ export class ContextMenuComponent implements OnInit, OnDestroy, AfterContentInit
     public ngOnDestroy(): void {
         this.targetListener?.();
         this.windowEventListenerRefs.forEach(ref => ref());
-        this.submenuCloseNotifier.next();
-        this.submenuCloseNotifier.complete();
         this.componentDestroy$.next();
         this.componentDestroy$.complete();
     }
@@ -101,11 +98,6 @@ export class ContextMenuComponent implements OnInit, OnDestroy, AfterContentInit
             width: this.width
         });
         this.contextMenuInjectorData.parentMenuRef = this.contextMenuRef;
-        const subscription = this.contextMenuRef.closed.subscribe(() => {
-            this.submenuCloseNotifier.next();
-            this.submenuCloseNotifier.complete();
-            subscription.unsubscribe();
-        });
     }
 
     private onOutsideClick(event: MouseEvent): void {
@@ -130,7 +122,10 @@ export class ContextMenuComponent implements OnInit, OnDestroy, AfterContentInit
             this.windowEventListenerRefs = [
                 this.renderer.listen(window, "click", this.onOutsideClick.bind(this)),
                 this.renderer.listen(window, "contextmenu", this.onOutsideClick.bind(this)),
-                this.renderer.listen(window, "auxclick", this.onOutsideClick.bind(this))
+                this.renderer.listen(window, "auxclick", this.onOutsideClick.bind(this)),
+                this.renderer.listen(window, "keydown.esc", () => {
+                    this.contextMenuRef?.close();
+                })
             ];
         });
 
