@@ -27,7 +27,7 @@ import { MenuItemComponent } from "../../../shared-menu/components/menu-item/men
 })
 export class ContextMenuComponent implements OnInit, OnDestroy, AfterContentInit {
     private readonly componentDestroy$: Subject<void> = new Subject<void>();
-    private contextMenuInjectorData: Partial<ContextMenuInjectorData> = {};
+    private contextMenuInjectorData: Partial<ContextMenuInjectorData> = { isRoot: true };
     private contextMenuRef: PopupRef | null = null;
     private menuClickNotifier: Subject<MenuItem> = new Subject<MenuItem>();
     private precise: boolean = true;

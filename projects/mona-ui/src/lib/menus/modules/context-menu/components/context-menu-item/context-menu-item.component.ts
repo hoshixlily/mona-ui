@@ -1,14 +1,15 @@
-import { Component, Input, OnDestroy, OnInit } from "@angular/core";
+import { Component, ElementRef, Input, OnDestroy, OnInit } from "@angular/core";
 import { MenuItem } from "../../models/MenuItem";
 import { faStar, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { PopupRef } from "../../../../../popup/models/PopupRef";
+import { Highlightable } from "@angular/cdk/a11y";
 
 @Component({
     selector: "mona-contextmenu-item",
     templateUrl: "./context-menu-item.component.html",
     styleUrls: ["./context-menu-item.component.scss"]
 })
-export class ContextMenuItemComponent implements OnInit, OnDestroy {
+export class ContextMenuItemComponent implements OnInit, OnDestroy, Highlightable {
     public readonly starIcon: IconDefinition = faStar;
 
     @Input()
@@ -23,9 +24,12 @@ export class ContextMenuItemComponent implements OnInit, OnDestroy {
     @Input()
     public submenuPopupRef?: PopupRef | null;
 
-    public constructor() {}
+    public constructor(public readonly elementRef: ElementRef<HTMLElement>) {}
     public ngOnDestroy(): void {
         this.submenuPopupRef?.close();
     }
     public ngOnInit(): void {}
+
+    public setActiveStyles(): void {}
+    public setInactiveStyles(): void {}
 }
