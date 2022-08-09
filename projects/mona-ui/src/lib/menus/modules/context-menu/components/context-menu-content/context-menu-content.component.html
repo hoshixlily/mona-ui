@@ -1,10 +1,10 @@
-<ul class="mona-contextmenu-list" tabindex="0">
+<ul class="mona-contextmenu-list">
     <ng-container *ngFor="let menuItem of contextMenuData.menuItems">
-        <li class="mona-contextmenu-list-item" [ngClass]="{'disabled': menuItem.disabled, 'divider': menuItem.divider, 'focused': menuItem.focused}"
-            (mouseenter)="onListItemMouseEnter($event, menuItem)" (mouseleave)="onListItemMouseLeave($event, menuItem)"
+        <li class="mona-contextmenu-list-item" [ngClass]="{'disabled': menuItem.disabled, 'divider': menuItem.divider}"
+            (mouseenter)="onListItemMouseEnter($event, menuItem)" (mouseleave)="onListItemMouseLeave($event)"
             (click)="onListItemClick($event, menuItem)" *ngIf="menuItem.visible">
             <mona-contextmenu-item [menuItem]="menuItem" [iconSpaceVisible]="iconSpaceVisible" [linkSpaceVisible]="linkSpaceVisible"
-                                   [submenuPopupRef]="menuPopupRef" [attr.tabindex]="0" *ngIf="menuItem.visible"></mona-contextmenu-item>
+                                   [submenuPopupRef]="menuPopupRef" *ngIf="menuItem.visible"></mona-contextmenu-item>
         </li>
     </ng-container>
 </ul>

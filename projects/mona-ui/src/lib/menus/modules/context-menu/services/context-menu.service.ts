@@ -8,7 +8,6 @@ import { ConnectedPosition } from "@angular/cdk/overlay";
     providedIn: "root"
 })
 export class ContextMenuService {
-    public currentContextMenuContentId: string = "";
     public readonly defaultSubMenuPositions: ConnectedPosition[] = [
         {
             originX: "end",

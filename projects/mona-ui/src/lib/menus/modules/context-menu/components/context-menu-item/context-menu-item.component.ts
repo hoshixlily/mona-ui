@@ -1,15 +1,14 @@
-import { Component, ElementRef, Input, OnDestroy, OnInit } from "@angular/core";
+import { Component, Input, OnDestroy, OnInit } from "@angular/core";
+import { MenuItem } from "../../models/MenuItem";
 import { faStar, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { PopupRef } from "../../../../../popup/models/PopupRef";
-import { Highlightable } from "@angular/cdk/a11y";
-import { ContextMenuItem } from "../../models/ContextMenuItem";
 
 @Component({
     selector: "mona-contextmenu-item",
     templateUrl: "./context-menu-item.component.html",
     styleUrls: ["./context-menu-item.component.scss"]
 })
-export class ContextMenuItemComponent implements OnInit, OnDestroy, Highlightable {
+export class ContextMenuItemComponent implements OnInit, OnDestroy {
     public readonly starIcon: IconDefinition = faStar;
 
     @Input()
@@ -19,26 +18,14 @@ export class ContextMenuItemComponent implements OnInit, OnDestroy, Highlightabl
     public linkSpaceVisible: boolean = false;
 
     @Input()
-    public menuItem!: ContextMenuItem;
+    public menuItem!: MenuItem;
 
     @Input()
     public submenuPopupRef?: PopupRef | null;
 
-    public constructor(public readonly elementRef: ElementRef) {}
+    public constructor() {}
     public ngOnDestroy(): void {
         this.submenuPopupRef?.close();
     }
     public ngOnInit(): void {}
-
-    public setActiveStyles(): void {
-        if (this.menuItem && !this.menuItem.disabled) {
-            this.menuItem.focused = true;
-        }
-    }
-
-    public setInactiveStyles(): void {
-        if (this.menuItem) {
-            this.menuItem.focused = false;
-        }
-    }
 }
