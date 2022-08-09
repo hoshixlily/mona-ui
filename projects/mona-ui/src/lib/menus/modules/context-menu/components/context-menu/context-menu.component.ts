@@ -2,6 +2,7 @@ import {
     AfterContentInit,
     Component,
     ContentChildren,
+    ElementRef,
     Input,
     NgZone,
     OnDestroy,
@@ -26,11 +27,13 @@ import { MenuItemComponent } from "../../../shared-menu/components/menu-item/men
 })
 export class ContextMenuComponent implements OnInit, OnDestroy, AfterContentInit {
     private readonly componentDestroy$: Subject<void> = new Subject<void>();
+    private contextMenuInjectorData: Partial<ContextMenuInjectorData> = {};
     private contextMenuRef: PopupRef | null = null;
     private menuClickNotifier: Subject<MenuItem> = new Subject<MenuItem>();
     private precise: boolean = true;
     private submenuCloseNotifier: Subject<void> = new Subject();
     private targetListener: () => void = () => void 0;
+    private windowEventListenerRefs: Array<() => void> = [];
 
     @ContentChildren(MenuItemComponent)
     public menuItemComponents: QueryList<MenuItemComponent> = new QueryList<MenuItemComponent>();
@@ -55,6 +58,7 @@ export class ContextMenuComponent implements OnInit, OnDestroy, AfterContentInit
 
     public constructor(
         private readonly contextMenuService: ContextMenuService,
+        private readonly elementRef: ElementRef,
         private readonly renderer: Renderer2,
         private zone: NgZone
     ) {}
@@ -68,6 +72,7 @@ export class ContextMenuComponent implements OnInit, OnDestroy, AfterContentInit
 
     public ngOnDestroy(): void {
         this.targetListener?.();
+        this.windowEventListenerRefs.forEach(ref => ref());
         this.submenuCloseNotifier.next();
         this.submenuCloseNotifier.complete();
         this.componentDestroy$.next();
@@ -83,19 +88,34 @@ export class ContextMenuComponent implements OnInit, OnDestroy, AfterContentInit
     }
 
     private create(event: PointerEvent): void {
+        this.contextMenuInjectorData.menuClick = this.menuClickNotifier;
+        this.contextMenuInjectorData.menuItems = this.menuItems;
         this.contextMenuRef = this.contextMenuService.open({
             anchor: this.precise ? { x: event.x, y: event.y } : this.target,
+            closeOnOutsideClick: false,
             content: ContextMenuContentComponent,
-            data: {
-                menuClick: this.menuClickNotifier,
-                menuItems: this.menuItems,
-                parentClose: this.submenuCloseNotifier
-            } as ContextMenuInjectorData,
+            data: this.contextMenuInjectorData,
             minWidth: this.minWidth,
             offset: this.offset,
             popupClass: ["mona-contextmenu-content"],
             width: this.width
         });
+        this.contextMenuInjectorData.parentMenuRef = this.contextMenuRef;
+        const subscription = this.contextMenuRef.closed.subscribe(() => {
+            this.submenuCloseNotifier.next();
+            this.submenuCloseNotifier.complete();
+            subscription.unsubscribe();
+        });
+    }
+
+    private onOutsideClick(event: MouseEvent): void {
+        if (!this.contextMenuRef) {
+            return;
+        }
+        if (this.contextMenuRef.overlayRef.overlayElement?.contains(event.target as HTMLElement)) {
+            return;
+        }
+        this.contextMenuRef.close();
     }
 
     private setEventListeners(): void {
@@ -107,17 +127,15 @@ export class ContextMenuComponent implements OnInit, OnDestroy, AfterContentInit
                     this.create(event);
                 });
             });
+            this.windowEventListenerRefs = [
+                this.renderer.listen(window, "click", this.onOutsideClick.bind(this)),
+                this.renderer.listen(window, "contextmenu", this.onOutsideClick.bind(this)),
+                this.renderer.listen(window, "auxclick", this.onOutsideClick.bind(this))
+            ];
         });
-        if (this.contextMenuRef) {
-            this.contextMenuRef.closed.subscribe(() => {
-                this.submenuCloseNotifier.next();
-                this.submenuCloseNotifier.complete();
-                this.targetListener();
-            });
-        }
+
         this.menuClickNotifier.pipe(takeUntil(this.componentDestroy$)).subscribe(() => {
             this.contextMenuRef?.close();
-            this.submenuCloseNotifier.next();
         });
     }
 }

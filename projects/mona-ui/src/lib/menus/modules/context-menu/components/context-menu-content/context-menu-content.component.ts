@@ -12,9 +12,9 @@ import { Subject } from "rxjs";
     styleUrls: ["./context-menu-content.component.scss"]
 })
 export class ContextMenuContentComponent implements OnInit, OnDestroy {
+    private contextMenuInjectorData: Partial<ContextMenuInjectorData> = {};
     private submenuCloseNotifier: Subject<void> = new Subject();
     public currentMenuItem: MenuItem | null = null;
-    public hoveredListElement: HTMLLIElement | null = null;
     public iconSpaceVisible: boolean = false;
     public linkSpaceVisible: boolean = false;
     public menuPopupRef: PopupRef | null = null;
@@ -52,11 +52,10 @@ export class ContextMenuContentComponent implements OnInit, OnDestroy {
         ) {
             this.submenuCloseNotifier.next();
         }
-        this.hoveredListElement = event.target as HTMLLIElement;
         this.currentMenuItem = menuItem;
         this.menuPopupRef?.close();
         if (this.currentMenuItem.subMenuItems && this.currentMenuItem.subMenuItems.length > 0) {
-            this.create();
+            this.create(event.target as HTMLElement, this.currentMenuItem);
         }
     }
 
@@ -64,27 +63,24 @@ export class ContextMenuContentComponent implements OnInit, OnDestroy {
         this.submenuCloseNotifier.next();
     }
 
-    private create(): void {
-        this.menuPopupRef?.close();
-        if (this.hoveredListElement && this.currentMenuItem) {
-            this.menuPopupRef = this.contextMenuService.open({
-                anchor: this.hoveredListElement,
-                content: ContextMenuContentComponent,
-                data: {
-                    menuClick: this.contextMenuData.menuClick,
-                    menuItems: this.currentMenuItem.subMenuItems ?? [],
-                    parentClose: this.submenuCloseNotifier
-                } as ContextMenuInjectorData,
-                positions: this.contextMenuService.defaultSubMenuPositions,
-                popupClass: ["mona-contextmenu-content"]
+    private create(anchor: HTMLElement, menuItem: MenuItem): void {
+        this.contextMenuInjectorData.menuItems = menuItem.subMenuItems;
+        this.contextMenuInjectorData.menuClick = this.contextMenuData.menuClick;
+        this.menuPopupRef = this.contextMenuService.open({
+            anchor,
+            closeOnOutsideClick: false,
+            content: ContextMenuContentComponent,
+            data: this.contextMenuInjectorData,
+            positions: this.contextMenuService.defaultSubMenuPositions,
+            popupClass: ["mona-contextmenu-content"]
+        });
+        this.contextMenuInjectorData.parentMenuRef = this.menuPopupRef;
+        if (this.contextMenuData.parentMenuRef) {
+            const subscription = this.contextMenuData.parentMenuRef.closed.subscribe(() => {
+                this.menuPopupRef?.close();
+                this.submenuCloseNotifier.next();
+                subscription.unsubscribe();
             });
-            if (this.contextMenuData.parentClose) {
-                const subscription = this.contextMenuData.parentClose.subscribe(() => {
-                    this.menuPopupRef?.close();
-                    this.submenuCloseNotifier.next();
-                    subscription.unsubscribe();
-                });
-            }
         }
     }
 }

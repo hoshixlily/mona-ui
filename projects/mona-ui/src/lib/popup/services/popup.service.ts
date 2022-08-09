@@ -100,16 +100,18 @@ export class PopupService implements OnDestroy {
                     this.lastPopupRef = null;
                 });
         } else {
-            const subscription = overlayRef
-                .outsidePointerEvents()
-                .pipe(takeUntil(this.serviceDestroy$))
-                .subscribe(event => {
-                    if (this.outsideEventsToClose.includes(event.type)) {
-                        popupRef.close(event);
-                        this.lastPopupRef = null;
-                        subscription.unsubscribe();
-                    }
-                });
+            if (settings.closeOnOutsideClick ?? true) {
+                const subscription = overlayRef
+                    .outsidePointerEvents()
+                    .pipe(takeUntil(this.serviceDestroy$))
+                    .subscribe(event => {
+                        if (this.outsideEventsToClose.includes(event.type)) {
+                            popupRef.close(event);
+                            this.lastPopupRef = null;
+                            subscription.unsubscribe();
+                        }
+                    });
+            }
         }
         this.setEventListeners(settings);
         return popupRef;
