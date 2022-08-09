@@ -52,7 +52,7 @@ export class ContextMenuContentComponent implements OnInit, OnDestroy, AfterView
             .skipPredicate(mi => !!mi.menuItem.disabled || !!mi.menuItem.divider);
         this.setEventListeners();
         this.focus();
-        if (!this.contextMenuData.isRoot) {
+        if (!this.contextMenuData.isRoot && this.contextMenuData.viaKeyboard) {
             this.keyManager.setFirstItemActive();
             this.cdr.detectChanges();
         }
@@ -83,7 +83,7 @@ export class ContextMenuContentComponent implements OnInit, OnDestroy, AfterView
         }
     }
 
-    private create(anchor: HTMLElement, menuItem: MenuItem): void {
+    private create(anchor: HTMLElement, menuItem: MenuItem, viaKeyboard?: boolean): void {
         this.contextMenuInjectorData.menuItems = menuItem.subMenuItems;
         this.contextMenuInjectorData.menuClick = this.contextMenuData.menuClick;
         this.menuPopupRef = this.contextMenuService.open({
@@ -95,6 +95,7 @@ export class ContextMenuContentComponent implements OnInit, OnDestroy, AfterView
             popupClass: ["mona-contextmenu-content"]
         });
         this.contextMenuInjectorData.parentMenuRef = this.menuPopupRef;
+        this.contextMenuInjectorData.viaKeyboard = viaKeyboard;
         this.contextMenuInjectorData.subMenuClose = new Subject<void>();
         if (this.contextMenuData.parentMenuRef) {
             const subscription = this.contextMenuData.parentMenuRef.closed.subscribe(() => {
@@ -149,7 +150,8 @@ export class ContextMenuContentComponent implements OnInit, OnDestroy, AfterView
                                 if (this.keyManager.activeItem) {
                                     this.create(
                                         this.keyManager.activeItem.elementRef.nativeElement,
-                                        this.keyManager.activeItem.menuItem
+                                        this.keyManager.activeItem.menuItem,
+                                        true
                                     );
                                 }
                             });

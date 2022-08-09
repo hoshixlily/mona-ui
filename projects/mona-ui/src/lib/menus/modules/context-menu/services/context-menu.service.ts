@@ -38,10 +38,9 @@ export class ContextMenuService {
     public constructor(public readonly popupService: PopupService) {}
 
     public open(settings: ContextMenuSettings): PopupRef {
-        const popupRef = this.popupService.create({
+        return this.popupService.create({
             ...settings,
             hasBackdrop: false
         });
-        return popupRef;
     }
 }
