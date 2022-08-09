@@ -118,6 +118,9 @@ mona-button-group button[monaButton] {
         @include disabled;
         background-color: inherit;
     }
+    &.focused {
+        background-color: var(--mona-background-dark);
+    }
 }
 
 

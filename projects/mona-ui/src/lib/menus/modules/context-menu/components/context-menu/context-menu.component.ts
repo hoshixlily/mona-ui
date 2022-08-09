@@ -18,6 +18,7 @@ import { PopupRef } from "../../../../../popup/models/PopupRef";
 import { Subject, takeUntil } from "rxjs";
 import { PopupOffset } from "../../../../../popup/models/PopupOffset";
 import { MenuItemComponent } from "../../../shared-menu/components/menu-item/menu-item.component";
+import { ContextMenuItem } from "../../models/ContextMenuItem";
 
 @Component({
     selector: "mona-contextmenu",
@@ -27,9 +28,11 @@ import { MenuItemComponent } from "../../../shared-menu/components/menu-item/men
 export class ContextMenuComponent implements OnInit, OnDestroy, AfterContentInit {
     private readonly componentDestroy$: Subject<void> = new Subject<void>();
     private contextMenuRef: PopupRef | null = null;
-    private menuClickNotifier: Subject<MenuItem> = new Subject<MenuItem>();
+    private keyupListener: () => void = () => void 0;
+    private menuClickNotifier: Subject<ContextMenuItem> = new Subject<ContextMenuItem>();
+    private menuItemList: ContextMenuItem[] = [];
+    private parentMenuCloseNotifier: Subject<void> = new Subject();
     private precise: boolean = true;
-    private submenuCloseNotifier: Subject<void> = new Subject();
     private targetListener: () => void = () => void 0;
 
     @ContentChildren(MenuItemComponent)
@@ -61,15 +64,19 @@ export class ContextMenuComponent implements OnInit, OnDestroy, AfterContentInit
 
     public ngAfterContentInit(): void {
         if (this.menuItems.length !== 0) {
+            this.menuItemList = this.processMenuItems(this.menuItems);
+            console.log(this.menuItemList);
             return;
         }
-        this.menuItems = this.menuItemComponents.map(m => m.getMenuItem()) ?? [];
+        const items = this.menuItemComponents.map<ContextMenuItem>(m => m.getMenuItem());
+        this.menuItemList = this.processMenuItems(items);
+        console.log(this.menuItemList);
     }
 
     public ngOnDestroy(): void {
         this.targetListener?.();
-        this.submenuCloseNotifier.next();
-        this.submenuCloseNotifier.complete();
+        this.parentMenuCloseNotifier.next();
+        this.parentMenuCloseNotifier.complete();
         this.componentDestroy$.next();
         this.componentDestroy$.complete();
     }
@@ -88,14 +95,44 @@ export class ContextMenuComponent implements OnInit, OnDestroy, AfterContentInit
             content: ContextMenuContentComponent,
             data: {
                 menuClick: this.menuClickNotifier,
-                menuItems: this.menuItems,
-                parentClose: this.submenuCloseNotifier
+                menuItems: this.menuItemList,
+                parentClose: this.parentMenuCloseNotifier
             } as ContextMenuInjectorData,
             minWidth: this.minWidth,
             offset: this.offset,
             popupClass: ["mona-contextmenu-content"],
             width: this.width
         });
+        this.contextMenuRef.closed.subscribe(() => {
+            this.parentMenuCloseNotifier.next();
+            this.parentMenuCloseNotifier.complete();
+            this.keyupListener();
+            this.traverseMenuItems(this.menuItemList, (menuItem: ContextMenuItem) => {
+                menuItem.focused = false;
+            });
+        });
+    }
+
+    private processMenuItems(menuItems: MenuItem[]): ContextMenuItem[] {
+        if (!menuItems || menuItems.length === 0) {
+            return [];
+        }
+        const items: ContextMenuItem[] = [];
+        for (const item of menuItems) {
+            if (item.subMenuItems && item.subMenuItems.length > 0) {
+                items.push({
+                    ...item,
+                    focused: false,
+                    subMenuItems: this.processMenuItems(item.subMenuItems)
+                });
+            } else {
+                items.push({
+                    ...item,
+                    focused: false
+                });
+            }
+        }
+        return items;
     }
 
     private setEventListeners(): void {
@@ -107,17 +144,26 @@ export class ContextMenuComponent implements OnInit, OnDestroy, AfterContentInit
                     this.create(event);
                 });
             });
-        });
-        if (this.contextMenuRef) {
-            this.contextMenuRef.closed.subscribe(() => {
-                this.submenuCloseNotifier.next();
-                this.submenuCloseNotifier.complete();
-                this.targetListener();
+            this.keyupListener = this.renderer.listen("document", "keyup", (event: KeyboardEvent) => {
+                if (event.key === "Escape") {
+                    this.zone.run(() => {
+                        this.contextMenuRef?.close();
+                    });
+                }
             });
-        }
+        });
         this.menuClickNotifier.pipe(takeUntil(this.componentDestroy$)).subscribe(() => {
             this.contextMenuRef?.close();
-            this.submenuCloseNotifier.next();
+            this.parentMenuCloseNotifier.next();
         });
+    }
+
+    private traverseMenuItems(menuItems: ContextMenuItem[], action: (menuItem: ContextMenuItem) => void): void {
+        for (const menuItem of menuItems) {
+            action(menuItem);
+            if (menuItem.subMenuItems && menuItem.subMenuItems.length > 0) {
+                this.traverseMenuItems(menuItem.subMenuItems, action);
+            }
+        }
     }
 }
