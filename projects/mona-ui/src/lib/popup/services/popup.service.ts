@@ -1,13 +1,4 @@
-import {
-    ApplicationRef,
-    Injectable,
-    Injector,
-    NgZone,
-    OnDestroy,
-    Renderer2,
-    RendererFactory2,
-    TemplateRef
-} from "@angular/core";
+import { Injectable, Injector, NgZone, OnDestroy, Renderer2, RendererFactory2, TemplateRef } from "@angular/core";
 import { PopupSettings } from "../models/PopupSettings";
 import { Overlay } from "@angular/cdk/overlay";
 import { ComponentPortal, TemplatePortal } from "@angular/cdk/portal";
@@ -28,7 +19,6 @@ export class PopupService implements OnDestroy {
     private renderer: Renderer2;
 
     public constructor(
-        private readonly applicationRef: ApplicationRef,
         private readonly injector: Injector,
         private readonly overlay: Overlay,
         private readonly rendererFactory: RendererFactory2,
