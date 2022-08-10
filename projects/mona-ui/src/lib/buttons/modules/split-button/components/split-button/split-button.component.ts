@@ -3,6 +3,7 @@ import {
     AfterViewInit,
     ChangeDetectorRef,
     Component,
+    ContentChild,
     ContentChildren,
     ElementRef,
     EventEmitter,
@@ -11,6 +12,7 @@ import {
     OnInit,
     Output,
     QueryList,
+    TemplateRef,
     ViewChild
 } from "@angular/core";
 import { PopupOffset } from "../../../../../popup/models/PopupOffset";
@@ -18,6 +20,7 @@ import { ContextMenuComponent } from "../../../../../menus/modules/context-menu/
 import { MenuItemComponent } from "../../../../../menus/modules/shared-menu/components/menu-item/menu-item.component";
 import { MenuItem } from "../../../../../menus/modules/context-menu/models/MenuItem";
 import { Subject, takeUntil } from "rxjs";
+import { SplitButtonTextTemplateDirective } from "../../directives/split-button-text-template.directive";
 
 @Component({
     selector: "mona-split-button",
@@ -48,6 +51,12 @@ export class SplitButtonComponent implements OnInit, AfterViewInit, AfterContent
     @ContentChildren(MenuItemComponent)
     public menuItemComponents: QueryList<MenuItemComponent> = new QueryList<MenuItemComponent>();
 
+    @Input()
+    public text: string = "";
+
+    @ContentChild(SplitButtonTextTemplateDirective, { read: TemplateRef })
+    public textTemplate: TemplateRef<void> | null = null;
+
     @ViewChild("wrapperElementRef")
     private readonly wrapperElementRef!: ElementRef<HTMLDivElement>;
 
@@ -62,7 +71,7 @@ export class SplitButtonComponent implements OnInit, AfterViewInit, AfterContent
 
     public ngAfterViewInit(): void {
         this.popupWidth = this.wrapperElementRef.nativeElement.getBoundingClientRect().width - 1;
-        this.popupOffset.horizontal = -this.mainButtonElementRef.nativeElement.offsetWidth - 1;
+        this.popupOffset.horizontal = -this.mainButtonElementRef.nativeElement.offsetWidth - 2;
         this.contextMenuComponent.setPrecise(false);
         this.cdr.detectChanges();
     }
