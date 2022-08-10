@@ -4,10 +4,11 @@ import { SplitButtonComponent } from "./components/split-button/split-button.com
 import { PopupModule } from "../../../popup/popup.module";
 import { ContextMenuModule } from "../../../menus/modules/context-menu/context-menu.module";
 import { ButtonModule } from "../button/button.module";
+import { SplitButtonTextTemplateDirective } from "./directives/split-button-text-template.directive";
 
 @NgModule({
-    declarations: [SplitButtonComponent],
+    declarations: [SplitButtonComponent, SplitButtonTextTemplateDirective],
     imports: [CommonModule, PopupModule, ContextMenuModule, ButtonModule],
-    exports: [SplitButtonComponent]
+    exports: [SplitButtonComponent, SplitButtonTextTemplateDirective]
 })
 export class SplitButtonModule {}

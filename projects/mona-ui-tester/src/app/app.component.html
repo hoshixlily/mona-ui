@@ -25,8 +25,10 @@
     </div>
 
     <div>
-        <mona-split-button (buttonClick)="print('Split Button Main Button Clicked.')" [disabled]="false">
-            <span>Split Button</span>
+        <mona-split-button text="Split Button" (buttonClick)="print('Split Button Main Button Clicked.')" [disabled]="false">
+            <ng-template monaSplitButtonTextTemplate>
+                <span style="color: mediumspringgreen;">Split Button</span>
+            </ng-template>
             <mona-menu-item text="Split Menu I"></mona-menu-item>
             <mona-menu-item text="Split Menu II" iconClass="fa fa-file">
                 <mona-menu-item text="Split Menu II I"></mona-menu-item>
@@ -56,6 +58,11 @@
                     <span style="color: deeppink; font-size: 16px;">♫</span>
                 </ng-template>
             </mona-menu-item>
+            <mona-menu-item [divider]="true"></mona-menu-item>
+            <mona-menu-item text="Cut"></mona-menu-item>
+            <mona-menu-item text="Copy"></mona-menu-item>
+            <mona-menu-item text="Paste"></mona-menu-item>
+            <mona-menu-item text="Select All"></mona-menu-item>
             <mona-menu-item [divider]="true"></mona-menu-item>
             <mona-menu-item text="Search" [visible]="contextMenuItemVisible" iconClass="fa fa-star">
                 <mona-menu-item text="Find">

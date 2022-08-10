@@ -9,6 +9,14 @@ html, body {
     font-size: 12px;
 }
 
+body {
+    font-family: Helvetica Neue,Helvetica,Arial,sans-serif;
+}
+
+button[monaButton] {
+    font-weight: 600;
+    font-size: 12px;
+}
 
 .popup-noselect {
     user-select: none;

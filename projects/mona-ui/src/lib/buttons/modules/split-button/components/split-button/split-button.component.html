@@ -1,11 +1,11 @@
 <div class="mona-split-button" #wrapperElementRef>
-    <button monaButton (click)="buttonClick.emit()" [disabled]="disabled" #mainButton>
-        <ng-content></ng-content>
+    <button monaButton (click)="buttonClick.emit()" [disabled]="disabled" tabindex="0" #mainButton>
+        <span class="mona-slit-button-text" *ngIf="!textTemplate">{{text}}</span>
+        <ng-container [ngTemplateOutlet]="textTemplate" *ngIf="textTemplate"></ng-container>
     </button>
-    <button monaButton [disabled]="disabled" #menuButton>
+    <button monaButton [disabled]="disabled" tabindex="0" #menuButton>
         <span>&rsaquo;</span>
     </button>
     <mona-contextmenu [target]="menuButton" trigger="click" [minWidth]="popupWidth" [offset]="popupOffset"
                       [menuItems]="menuItems" #contextMenuComponent ></mona-contextmenu>
-
 </div>
