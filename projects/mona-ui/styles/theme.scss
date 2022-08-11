@@ -27,10 +27,21 @@
     background-color: var(--mona-background-dark);
 }
 
+@mixin focus-transition {
+    &:focus, &:focus-within {
+        transition: box-shadow 0.15s ease-in-out;
+    }
+}
+
 @mixin focus-shadow {
     &:focus, &:focus-within {
-        box-shadow: 0 0 0 1px var(--mona-shadow-color);
+        box-shadow: 0 0 2px 0 var(--mona-shadow-color);
     }
+}
+
+@mixin focus-styles {
+    @include focus-shadow;
+    @include focus-transition;
 }
 
 @mixin hover-background {
@@ -41,11 +52,13 @@
 
 
 /** General **/
-//[class^="mona-"] {
-//    &, & * {
-//        font-size: 1.2rem;
-//    }
-//}
+span.mona-close-icon {
+    //content: "x";
+    //font-size: 12px;
+    //background-color: var(--mona-background-darker);
+    //border-radius: 50%;
+    //border: 1px solid transparent;
+}
 
 
 /** Buttons */
@@ -88,7 +101,7 @@ button[monaButton] {
         @include active-background;
     }
 
-    //@include focus-shadow;
+    @include focus-styles;
 
 }
 
@@ -96,6 +109,30 @@ button[monaButton] {
 mona-button-group button[monaButton] {
     &:not(:last-child) {
         border-right: none;
+    }
+}
+
+/** Chip */
+.mona-chip {
+    background-color: var(--mona-background);
+    color: var(--mona-text);
+    border: 1px solid var(--mona-border-color);
+    @include focus-styles;
+}
+
+.mona-chip-close {
+    background-color: var(--mona-background-dark);
+    color: var(--mona-text);
+    border-left: 1px solid var(--mona-border-color);
+    font-size: 14px;
+
+    @include background-transition;
+
+    &:hover {
+        background-color: var(--mona-background-darker);
+    }
+    &:active {
+        background-color: var(--mona-background-darker-2);
     }
 }
 
