@@ -4,6 +4,7 @@ div.mona-chip {
     cursor: pointer;
     user-select: none;
     outline: none;
+    box-sizing: content-box;
 }
 
 div.mona-chip-content {
@@ -20,9 +21,10 @@ div.mona-chip-close {
     justify-content: center;
     height: 100%;
     width: calc(var(--mona-input-height) - 4px);
-    padding: 4px 5px 5px;
+    padding: 5px;
 }
 
 span.mona-chip-close-icon {
     font-weight: bold;
+    font-size: 15px;
 }

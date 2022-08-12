@@ -117,6 +117,11 @@ mona-button-group button[monaButton] {
     background-color: var(--mona-background);
     color: var(--mona-text);
     border: 1px solid var(--mona-border-color);
+
+    &.disabled {
+        @include disabled;
+    }
+
     @include focus-styles;
 }
 
@@ -146,8 +151,10 @@ mona-button-group button[monaButton] {
 
 .mona-contextmenu-item {
     @include hover-background;
-    @include active-background;
     @include background-transition;
+    &:active {
+        background-color: var(--mona-primary);
+    }
 }
 
 .mona-contextmenu-list-item {

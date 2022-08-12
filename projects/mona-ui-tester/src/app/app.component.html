@@ -39,7 +39,7 @@
     </div>
 
     <div>
-        <button monaButton #contextMenuAnchor>
+        <button monaButton [disabled]="false" [toggleable]="true" #contextMenuAnchor>
             <span style="color: lightcoral;">Context Menu Target</span>
         </button>
         <mona-contextmenu [target]="contextMenuAnchor">
@@ -61,7 +61,7 @@
             <mona-menu-item [divider]="true"></mona-menu-item>
             <mona-menu-item text="Cut"></mona-menu-item>
             <mona-menu-item text="Copy"></mona-menu-item>
-            <mona-menu-item text="Paste"></mona-menu-item>
+            <mona-menu-item text="Paste" [disabled]="true"></mona-menu-item>
             <mona-menu-item text="Select All"></mona-menu-item>
             <mona-menu-item [divider]="true"></mona-menu-item>
             <mona-menu-item text="Search" [visible]="contextMenuItemVisible" iconClass="fa fa-star">
@@ -75,8 +75,8 @@
     </div>
 
     <div style="display: flex;">
-        <mona-chip label="Chip I" [removable]="true" style="margin-right: 5px;"></mona-chip>
-        <mona-chip>
+        <mona-chip label="Chip I" [disabled]="false" [removable]="true" style="margin-right: 5px;"></mona-chip>
+        <mona-chip [disabled]="true">
             <span style="color: deeppink; font-weight: 600;">Chip Content</span>
         </mona-chip>
         <mona-chip style="margin-left: 5px;" [removable]="true">

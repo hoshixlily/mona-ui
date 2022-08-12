@@ -7,6 +7,9 @@ import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 })
 export class ChipComponent implements OnInit {
     @Input()
+    public disabled: boolean = false;
+
+    @Input()
     public label: string = "";
 
     @Input()
