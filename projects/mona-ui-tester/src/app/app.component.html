@@ -39,7 +39,7 @@
     </div>
 
     <div>
-        <button monaButton #contextMenuAnchor>
+        <button monaButton [disabled]="false" [toggleable]="true" #contextMenuAnchor>
             <span style="color: lightcoral;">Context Menu Target</span>
         </button>
         <mona-contextmenu [target]="contextMenuAnchor">
@@ -61,7 +61,7 @@
             <mona-menu-item [divider]="true"></mona-menu-item>
             <mona-menu-item text="Cut"></mona-menu-item>
             <mona-menu-item text="Copy"></mona-menu-item>
-            <mona-menu-item text="Paste"></mona-menu-item>
+            <mona-menu-item text="Paste" [disabled]="true"></mona-menu-item>
             <mona-menu-item text="Select All"></mona-menu-item>
             <mona-menu-item [divider]="true"></mona-menu-item>
             <mona-menu-item text="Search" [visible]="contextMenuItemVisible" iconClass="fa fa-star">
@@ -72,6 +72,21 @@
                 <mona-menu-item text="Replace"></mona-menu-item>
             </mona-menu-item>
         </mona-contextmenu>
+    </div>
+
+    <div style="display: flex;">
+        <mona-chip label="Chip I" [disabled]="false" [removable]="true" style="margin-right: 5px;"></mona-chip>
+        <mona-chip [disabled]="true">
+            <span style="color: deeppink; font-weight: 600;">Chip Content</span>
+        </mona-chip>
+        <mona-chip style="margin-left: 5px;" [removable]="true">
+            <div style="width: 100%; height: 100%; display: flex; align-items: center;">
+                <div style="background: var(--mona-background-dark); border-right: 1px solid var(--mona-border-color); height: 100%; width: 23px; display: flex; align-items: center; justify-content: center; margin-left: -10px;">
+                    <span class="fa fa-user-alt" style="margin-left: 2px;"></span>
+                </div>
+                <span style="margin-left: 4px;">Username</span>
+            </div>
+        </mona-chip>
     </div>
 
 </div>

@@ -54,7 +54,6 @@ export class PopupService implements OnDestroy {
         });
 
         const popupRef = new PopupRef(overlayRef);
-        // this.lastPopupRef?.close();
         this.lastPopupRef = popupRef;
 
         const injector = Injector.create({

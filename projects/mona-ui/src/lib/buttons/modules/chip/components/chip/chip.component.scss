@@ -1,0 +1,30 @@
+div.mona-chip {
+    display: flex;
+    height: calc(var(--mona-input-height) - 4px);
+    cursor: pointer;
+    user-select: none;
+    outline: none;
+    box-sizing: content-box;
+}
+
+div.mona-chip-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0 8px;
+}
+
+div.mona-chip-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: calc(var(--mona-input-height) - 4px);
+    padding: 5px;
+}
+
+span.mona-chip-close-icon {
+    font-weight: bold;
+    font-size: 15px;
+}
