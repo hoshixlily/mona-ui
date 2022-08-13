@@ -52,13 +52,6 @@
 
 
 /** General **/
-span.mona-close-icon {
-    //content: "x";
-    //font-size: 12px;
-    //background-color: var(--mona-background-darker);
-    //border-radius: 50%;
-    //border: 1px solid transparent;
-}
 
 
 /** Buttons */
@@ -140,6 +133,82 @@ mona-button-group button[monaButton] {
         background-color: var(--mona-background-darker-2);
     }
 }
+
+
+/** Dropdowns */
+
+.mona-dropdown {
+    width: 100%;
+}
+
+.mona-dropdown-popup-content {
+    user-select: none;
+    padding: 0 !important;
+    overflow: auto;
+}
+
+ul.mona-dropdown-items-list {
+    list-style: none;
+    user-select: none;
+    width: 100%;
+    & li {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 4px 8px;
+        line-height: 1.42857143;
+        white-space: nowrap;
+        overflow: hidden;
+        cursor: pointer;
+        @include background-transition;
+        @include hover-background;
+
+        &:active {
+            background-color: var(--mona-primary);
+        }
+    }
+}
+
+li.mona-dropdown-list-group-header {
+    pointer-events: none;
+    font-weight: bold;
+    background-color: var(--mona-background-dark);
+    border-top: 1px solid var(--mona-border-color);
+    border-bottom: 0.5px solid var(--mona-border-color);
+}
+
+div.mona-dropdown-list-menu {
+    width: var(--mona-input-height);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    //border-left: 1px solid var(--mona-border-color);
+}
+
+span.mona-dropdown-icon {
+    font-size: 18px;
+    display: inline-block;
+    transform-origin: center;
+    transform: rotate(90deg);
+    color: var(--mona-text);
+    &::before {
+        content: '\203A';
+    }
+}
+
+/** Dropdown List */
+.mona-dropdown-list {
+    background-color: var(--mona-background);
+    border: 1px solid var(--mona-border-color);
+
+    @include hover-background;
+    @include focus-shadow;
+}
+
+.mona-dropdown-list-value {
+    color: var(--mona-text);
+}
+
 
 
 /** Menu */

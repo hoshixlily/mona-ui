@@ -17,7 +17,7 @@
     <div>
         <button monaButton #popupComponentAnchor>Popup Component Anchor</button>
         <mona-popup [anchor]="popupComponentAnchor" trigger="click" [width]="popupComponentAnchor.offsetWidth" [offset]="{vertical: 0.5}"
-            (close)="onPopupClosed()" (open)="onPopupOpened($event)">
+                    (close)="onPopupClose()" (open)="onPopupOpen($event)">
             <ng-template>
                 <span style="color: #f0c420;">Moonlight Sonata</span>
             </ng-template>
@@ -87,6 +87,21 @@
                 <span style="margin-left: 4px;">Username</span>
             </div>
         </mona-chip>
+    </div>
+
+    <div>
+        <mona-drop-down-list [data]="dropdownListDataItems" groupField="group" textField="text" valueField="value" [value]="dropdownListDataItems[1]" (valueChange)="onDropDownValueChange($event)">
+            <ng-template monaDropDownListItemTemplate let-dataItem>
+                <span style="color: limegreen;" *ngIf="dataItem.value <= 3">{{dataItem.text}}</span>
+                <span style="color: mediumvioletred;" *ngIf="dataItem.value > 3">{{dataItem.text}}</span>
+            </ng-template>
+            <ng-template monaDropDownListValueTemplate let-dataItem>
+                <span style="color: darkorange; font-weight: 600;">{{dataItem.text}}</span>
+            </ng-template>
+            <ng-template monaDropDownListGroupTemplate let-group>
+                <span style="color: crimson; font-weight: bold;">{{group}}</span>
+            </ng-template>
+        </mona-drop-down-list>
     </div>
 
 </div>

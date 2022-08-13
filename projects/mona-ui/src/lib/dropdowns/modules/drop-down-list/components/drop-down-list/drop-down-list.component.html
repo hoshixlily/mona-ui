@@ -1,0 +1,35 @@
+<div class="mona-dropdown mona-dropdown-list" [attr.tabindex]="disabled ? -1 : 0"
+     (click)="openDropdown()"
+     #dropdownWrapper>
+    <div class="mona-dropdown-list-value">
+        <ng-container *ngIf="!valueTemplate">
+            <span>{{selectedItem?.text}}</span>
+        </ng-container>
+        <ng-container *ngIf="valueTemplate">
+            <ng-container [ngTemplateOutlet]="valueTemplate" [ngTemplateOutletContext]="{$implicit: selectedItem?.data}"></ng-container>
+        </ng-container>
+    </div>
+    <div class="mona-dropdown-list-menu">
+        <span class="mona-dropdown-icon"></span>
+    </div>
+</div>
+
+<ng-template #dropdownPopupTemplate>
+    <ul class="mona-dropdown-items-list">
+        <ng-container *ngFor="let group of dropdownData">
+            <ng-container>
+                <ng-container *ngIf="!groupTemplate">
+                    <li class="mona-dropdown-list-group-header" *ngIf="group.key">{{group.key}}</li>
+                </ng-container>
+                <ng-container *ngIf="groupTemplate">
+                    <li class="mona-dropdown-list-group-header">
+                        <ng-container [ngTemplateOutlet]="groupTemplate" [ngTemplateOutletContext]="{$implicit: group.key}"></ng-container>
+                    </li>
+                </ng-container>
+            </ng-container>
+            <li *ngFor="let item of group.source" (click)="onDropDownItemClick(item)">
+                <mona-drop-down-list-item [dataItem]="item" [itemTemplate]="itemTemplate"></mona-drop-down-list-item>
+            </li>
+        </ng-container>
+    </ul>
+</ng-template>

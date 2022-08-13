@@ -12,6 +12,14 @@ import { TestComponentComponent } from "./test-component/test-component.componen
 export class AppComponent implements OnInit {
     public contextMenuItemVisible: boolean = true;
 
+    public dropdownListDataItems: any[] = [
+        { text: "Item 1", value: 1, group: "Artistic" },
+        { text: "Item 2", value: 2, group: "Bizarre" },
+        { text: "Item 3", value: 3, group: "Curious" },
+        { text: "Item 4", value: 4, group: "Artistic" },
+        { text: "Item 5", value: 5, group: "Artistic" }
+    ];
+
     @ViewChild("italicButtonRef", { read: ElementRef })
     public italicButtonRef!: ElementRef<HTMLButtonElement>;
 
@@ -36,11 +44,16 @@ export class AppComponent implements OnInit {
         console.log(`Button selected: ${selected}`);
     }
 
-    public onPopupClosed(): void {
+    public onDropDownValueChange(value: unknown): void {
+        console.log(`Dropdown value changed`);
+        console.log(value);
+    }
+
+    public onPopupClose(): void {
         console.log("Popup closed");
     }
 
-    public onPopupOpened(ref: PopupRef): void {
+    public onPopupOpen(ref: PopupRef): void {
         console.log("Popup opened: ", ref);
     }
 

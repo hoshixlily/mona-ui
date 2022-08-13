@@ -14,6 +14,14 @@ export * from "./lib/buttons/modules/split-button/components/split-button/split-
 export * from "./lib/buttons/modules/split-button/split-button.module";
 export * from "./lib/buttons/buttons.module";
 
+/** Dropdowns */
+export * from "./lib/dropdowns/modules/drop-down-list/directives/drop-down-list-group-template.directive";
+export * from "./lib/dropdowns/modules/drop-down-list/directives/drop-down-list-item-template.directive";
+export * from "./lib/dropdowns/modules/drop-down-list/directives/drop-down-list-value-template.directive";
+export * from "./lib/dropdowns/modules/drop-down-list/components/drop-down-list/drop-down-list.component";
+export * from "./lib/dropdowns/modules/drop-down-list/drop-down-list.module";
+export * from "./lib/dropdowns/drop-downs.module";
+
 /** Menus */
 // export * from "./lib/menus/models/MenuItem";
 export * from "./lib/menus/modules/shared-menu/components/menu-item/menu-item.component";
