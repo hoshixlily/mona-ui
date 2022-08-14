@@ -16,7 +16,8 @@
 
     <div>
         <button monaButton #popupComponentAnchor>Popup Component Anchor</button>
-        <mona-popup [anchor]="popupComponentAnchor" trigger="click" [width]="popupComponentAnchor.offsetWidth" [offset]="{vertical: 0.5}"
+        <mona-popup [anchor]="popupComponentAnchor" trigger="click" [width]="popupComponentAnchor.offsetWidth"
+                    [offset]="{vertical: 0.5}"
                     (close)="onPopupClose()" (open)="onPopupOpen($event)">
             <ng-template>
                 <span style="color: #f0c420;">Moonlight Sonata</span>
@@ -25,7 +26,8 @@
     </div>
 
     <div>
-        <mona-split-button text="Split Button" (buttonClick)="print('Split Button Main Button Clicked.')" [disabled]="false">
+        <mona-split-button text="Split Button" (buttonClick)="print('Split Button Main Button Clicked.')"
+                           [disabled]="false">
             <ng-template monaSplitButtonTextTemplate>
                 <span style="color: mediumspringgreen;">Split Button</span>
             </ng-template>
@@ -53,7 +55,7 @@
                 <mona-menu-item text="Undo" (menuClick)="print('Undo clicked.')"></mona-menu-item>
                 <mona-menu-item text="Redo"></mona-menu-item>
             </mona-menu-item>
-            <mona-menu-item text="View"  (menuClick)="print('View clicked.')">
+            <mona-menu-item text="View" (menuClick)="print('View clicked.')">
                 <ng-template monaMenuItemIconTemplate>
                     <span style="color: deeppink; font-size: 16px;">♫</span>
                 </ng-template>
@@ -67,7 +69,8 @@
             <mona-menu-item text="Search" [visible]="contextMenuItemVisible" iconClass="fa fa-star">
                 <mona-menu-item text="Find">
                     <mona-menu-item text="Find Next" [disabled]="true" iconClass="fa fa-arrow-right"></mona-menu-item>
-                    <mona-menu-item text="Find Previous" [disabled]="false" iconClass="fa fa-arrow-left" (menuClick)="print('Find Previous clicked.')"></mona-menu-item>
+                    <mona-menu-item text="Find Previous" [disabled]="false" iconClass="fa fa-arrow-left"
+                                    (menuClick)="print('Find Previous clicked.')"></mona-menu-item>
                 </mona-menu-item>
                 <mona-menu-item text="Replace"></mona-menu-item>
             </mona-menu-item>
@@ -81,7 +84,8 @@
         </mona-chip>
         <mona-chip style="margin-left: 5px;" [removable]="true">
             <div style="width: 100%; height: 100%; display: flex; align-items: center;">
-                <div style="background: var(--mona-background-dark); border-right: 1px solid var(--mona-border-color); height: 100%; width: 23px; display: flex; align-items: center; justify-content: center; margin-left: -10px;">
+                <div
+                    style="background: var(--mona-background-dark); border-right: 1px solid var(--mona-border-color); height: 100%; width: 23px; display: flex; align-items: center; justify-content: center; margin-left: -9px;">
                     <span class="fa fa-user-alt" style="margin-left: 2px;"></span>
                 </div>
                 <span style="margin-left: 4px;">Username</span>
@@ -90,17 +94,19 @@
     </div>
 
     <div>
-        <mona-drop-down-list [data]="dropdownListDataItems" groupField="group" textField="text" valueField="value" [value]="dropdownListDataItems[1]" (valueChange)="onDropDownValueChange($event)">
-            <ng-template monaDropDownListItemTemplate let-dataItem>
-                <span style="color: limegreen;" *ngIf="dataItem.value <= 3">{{dataItem.text}}</span>
-                <span style="color: mediumvioletred;" *ngIf="dataItem.value > 3">{{dataItem.text}}</span>
-            </ng-template>
-            <ng-template monaDropDownListValueTemplate let-dataItem>
-                <span style="color: darkorange; font-weight: 600;">{{dataItem.text}}</span>
-            </ng-template>
-            <ng-template monaDropDownListGroupTemplate let-group>
-                <span style="color: crimson; font-weight: bold;">{{group}}</span>
-            </ng-template>
+        <mona-drop-down-list [data]="dropdownListDataItems" groupField="group" textField="text" valueField="value"
+                             [itemDisabler]="'disabled'"
+                             [value]="dropdownListDataItems[1]" (valueChange)="onDropDownValueChange($event)" style="width: 150px;">
+<!--            <ng-template monaDropDownListItemTemplate let-dataItem>-->
+<!--                <span style="color: limegreen;" *ngIf="dataItem.value <= 3">{{dataItem.text}}</span>-->
+<!--                <span style="color: mediumvioletred;" *ngIf="dataItem.value > 3">{{dataItem.text}}</span>-->
+<!--            </ng-template>-->
+<!--            <ng-template monaDropDownListValueTemplate let-dataItem>-->
+<!--                <span style="color: darkorange; font-weight: 600;">{{dataItem?.text}}</span>-->
+<!--            </ng-template>-->
+<!--            <ng-template monaDropDownListGroupTemplate let-group>-->
+<!--                <span style="color: crimson; font-weight: bold;">{{group}}</span>-->
+<!--            </ng-template>-->
         </mona-drop-down-list>
     </div>
 

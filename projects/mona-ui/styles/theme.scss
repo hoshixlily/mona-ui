@@ -141,10 +141,21 @@ mona-button-group button[monaButton] {
     width: 100%;
 }
 
+.mona-dropdown-no-data {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100px;
+    font-size: 14px;
+    color: var(--mona-disabled-color);
+}
+
 .mona-dropdown-popup-content {
     user-select: none;
     padding: 0 !important;
-    overflow: auto;
+    overflow: hidden auto;
+    border-top: 1px solid transparent !important;
+    max-height: 200px;
 }
 
 ul.mona-dropdown-items-list {
@@ -165,6 +176,14 @@ ul.mona-dropdown-items-list {
 
         &:active {
             background-color: var(--mona-primary);
+        }
+
+        &.mona-selected {
+            background-color: var(--mona-primary);
+        }
+
+        &.mona-disabled {
+            @include disabled;
         }
     }
 }
