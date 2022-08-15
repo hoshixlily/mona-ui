@@ -22,6 +22,11 @@ export * from "./lib/dropdowns/modules/drop-down-list/components/drop-down-list/
 export * from "./lib/dropdowns/modules/drop-down-list/drop-down-list.module";
 export * from "./lib/dropdowns/drop-downs.module";
 
+/** Inputs */
+export * from "./lib/inputs/modules/text-box/directives/text-box.directive";
+export * from "./lib/inputs/modules/text-box/text-box.module";
+export * from "./lib/inputs/inputs.module";
+
 /** Menus */
 // export * from "./lib/menus/models/MenuItem";
 export * from "./lib/menus/modules/shared-menu/components/menu-item/menu-item.component";
