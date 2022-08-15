@@ -1,0 +1,27 @@
+div.mona-text-box {
+    height: var(--mona-input-height);
+    display: flex;
+    & > [monaTextBox] {
+        border: none;
+        height: 100%;
+        width: 100%;
+        &:active, &:focus, &:focus-within {
+            box-shadow: none;
+        }
+    }
+}
+
+span.mona-text-box-prefix,
+span.mona-text-box-suffix {
+    min-width: var(--mona-input-height);
+    max-width: var(--mona-input-height);
+    height: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--mona-foreground);
+    &.disabled {
+        background-color: var(--mona-disabled-background);
+        color: var(--mona-disabled-color);
+    }
+}

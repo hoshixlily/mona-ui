@@ -231,6 +231,9 @@ span.mona-dropdown-icon {
 
 
 /** Inputs */
+
+/** Text Box */
+
 input[monaTextBox] {
     height: var(--mona-input-height);
     padding: 2px 4px;
@@ -246,6 +249,21 @@ input[monaTextBox] {
     }
     &[disabled] {
         @include disabled;
+    }
+}
+
+.mona-text-box {
+    background-color: var(--mona-background);
+    border: 1px solid var(--mona-default-border-color);
+    &:active, &:focus, &:focus-within {
+        box-shadow: 0 0 10px -3px var(--mona-shadow-color);
+    }
+    & span.mona-text-box-prefix,
+    & span.mona-text-box-suffix {
+        color: var(--mona-text);
+        &.mona-disabled {
+            @include disabled;
+        }
     }
 }
 
