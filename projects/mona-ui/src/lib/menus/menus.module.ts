@@ -4,7 +4,7 @@ import { ContextMenuModule } from "./modules/context-menu/context-menu.module";
 
 @NgModule({
     declarations: [],
-    imports: [CommonModule],
+    imports: [],
     exports: [ContextMenuModule]
 })
 export class MenusModule {}

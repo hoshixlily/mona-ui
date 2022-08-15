@@ -7,7 +7,7 @@ import { ChipModule } from "./modules/chip/chip.module";
 
 @NgModule({
     declarations: [],
-    imports: [CommonModule],
+    imports: [],
     exports: [ButtonModule, ButtonGroupModule, SplitButtonModule, ChipModule]
 })
 export class ButtonsModule {}
