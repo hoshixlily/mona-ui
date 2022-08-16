@@ -9,6 +9,12 @@
     font-family: 'Roboto', sans-serif;
 }
 
+*::selection,
+*::-moz-selection {
+    background-color: var(--mona-primary-dark) !important;
+    color: var(--mona-text) !important;
+}
+
 @mixin active-background {
     &:active {
         background-color: var(--mona-background-darker);
@@ -231,6 +237,68 @@ span.mona-dropdown-icon {
 
 
 /** Inputs */
+
+/** Check Box */
+input[type="checkbox"][monaCheckBox] {
+    display: none;
+    & + label {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        color: var(--mona-text);
+        font-size: 1.2rem;
+        user-select: none;
+        &:before {
+            content: "\2714";
+            background-color: var(--mona-background);
+            border: 1px solid var(--mona-border-color);
+            border-radius: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: calc(var(--mona-input-height) - 8px);
+            height: calc(var(--mona-input-height) - 8px);
+            margin-right: 4px;
+            vertical-align: middle;
+            color: transparent;
+            transition:background-color 0.15s ease-out, color 0.15s ease-out;
+        }
+        &:active:before:not(:disabled) {
+            box-shadow: 0 0 10px -3px var(--mona-shadow-color);
+        }
+    }
+    &:checked + label:before {
+        background-color: var(--mona-primary-dark);
+        color: var(--mona-text);
+        padding-bottom: 3px;
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+    &:disabled + label {
+        cursor: default;
+        pointer-events: none;
+        @include disabled;
+    }
+    &:disabled + label:before {
+        cursor: default;
+        pointer-events: none;
+        @include disabled;
+    }
+    &:checked:disabled + label:before {
+        background-color: var(--mona-disabled-color);
+        color: var(--mona-disabled-color);
+        @include disabled;
+    }
+    &:indeterminate + label:before {
+        content: " ";
+        background-color: var(--mona-primary);
+        color: var(--mona-background);
+        border: 3.5px solid var(--mona-background);
+    }
+    &:indeterminate:disabled + label:before {
+        @include disabled;
+    }
+}
 
 /** Text Area */
 textarea[monaTextArea] {
