@@ -232,6 +232,27 @@ span.mona-dropdown-icon {
 
 /** Inputs */
 
+/** Text Area */
+textarea[monaTextArea] {
+    padding: 4px;
+    background-color: var(--mona-background);
+    color: var(--mona-text);
+    border: 1px solid var(--mona-border-color);
+    outline: none;
+    min-height: var(--mona-input-height);
+    overflow: auto;
+    resize: both;
+    transition: box-shadow 0.15s ease-in-out;
+    &:focus:not(:disabled),
+    &:focus-within:not(:disabled),
+    &:active:not(:disabled) {
+        box-shadow: 0 0 10px -3px var(--mona-shadow-color);
+    }
+    &[disabled] {
+        @include disabled;
+    }
+}
+
 /** Text Box */
 
 input[monaTextBox] {
