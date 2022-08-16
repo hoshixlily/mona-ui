@@ -24,6 +24,8 @@ export * from "./lib/dropdowns/drop-downs.module";
 
 /** Inputs */
 export * from "./lib/inputs/modules/text-box/directives/text-box.directive";
+export * from "./lib/inputs/modules/text-box/directives/text-box-prefix-template.directive";
+export * from "./lib/inputs/modules/text-box/directives/text-box-suffix-template.directive";
 export * from "./lib/inputs/modules/text-box/components/text-box/text-box.component";
 export * from "./lib/inputs/modules/text-box/text-box.module";
 export * from "./lib/inputs/inputs.module";

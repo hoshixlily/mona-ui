@@ -19,9 +19,5 @@ span.mona-text-box-suffix {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    color: var(--mona-foreground);
-    &.disabled {
-        background-color: var(--mona-disabled-background);
-        color: var(--mona-disabled-color);
-    }
+
 }

@@ -6,6 +6,7 @@ import { AppComponent } from "./app.component";
 import { ButtonsModule, ContextMenuModule, DropDownsModule, PopupModule, InputsModule } from "mona-ui";
 import { TestComponentComponent } from "./test-component/test-component.component";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { FormsModule } from "@angular/forms";
 
 @NgModule({
     declarations: [AppComponent, TestComponentComponent],
@@ -17,7 +18,8 @@ import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
         InputsModule,
         PopupModule,
         ContextMenuModule,
-        FontAwesomeModule
+        FontAwesomeModule,
+        FormsModule
     ],
     bootstrap: [AppComponent]
 })

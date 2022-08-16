@@ -254,7 +254,8 @@ input[monaTextBox] {
 
 .mona-text-box {
     background-color: var(--mona-background);
-    border: 1px solid var(--mona-default-border-color);
+    border: 1px solid var(--mona-border-color);
+    transition: box-shadow 0.15s ease-in-out;
     &:active, &:focus, &:focus-within {
         box-shadow: 0 0 10px -3px var(--mona-shadow-color);
     }
@@ -264,6 +265,12 @@ input[monaTextBox] {
         &.mona-disabled {
             @include disabled;
         }
+    }
+    span.mona-text-box-prefix {
+        border-right: 1px solid var(--mona-border-color);
+    }
+    span.mona-text-box-suffix {
+        border-left: 1px solid var(--mona-border-color);
     }
 }
 
