@@ -95,7 +95,6 @@
 
     <div>
         <mona-drop-down-list [data]="dropdownListDataItems" groupField="group" textField="text" valueField="value"
-                             [itemDisabler]="'disabled'"
                              [value]="dropdownListDataItems[1]" (valueChange)="onDropDownValueChange($event)" style="width: 150px;">
 <!--            <ng-template monaDropDownListItemTemplate let-dataItem>-->
 <!--                <span style="color: limegreen;" *ngIf="dataItem.value <= 3">{{dataItem.text}}</span>-->
@@ -123,12 +122,18 @@
     </div>
 
     <div>
-        <textarea monaTextArea [ngModel]="textBoxValue" rows="4" style="width: 422px;"></textarea>
+        <textarea monaTextArea [(ngModel)]="textBoxValue" rows="4" style="width: 422px;"></textarea>
     </div>
 
     <div>
         <input type="checkbox" monaCheckBox id="checkbox1" [indeterminate]="true" />
-        <label for="checkbox1">Checkbox Label 1</label>
+        <label for="checkbox1" style="margin-right: 10px;">Checkbox Label 1</label>
+
+        <input type="radio" monaRadioButton id="radioButton1" name="A" [checked]="true" [disabled]="false" />
+        <label for="radioButton1">Radio Button Label 1</label>
+
+        <input type="radio" monaRadioButton id="radioButton2" name="A" />
+        <label for="radioButton2">Radio Button Label 2</label>
     </div>
 
 </div>

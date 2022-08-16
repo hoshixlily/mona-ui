@@ -25,6 +25,8 @@ export * from "./lib/dropdowns/drop-downs.module";
 /** Inputs */
 export * from "./lib/inputs/modules/check-box/directives/check-box.directive";
 export * from "./lib/inputs/modules/check-box/check-box.module";
+export * from "./lib/inputs/modules/radio-button/directives/radio-button.directive";
+export * from "./lib/inputs/modules/radio-button/radio-button.module";
 export * from "./lib/inputs/modules/text-area/directives/text-area.directive";
 export * from "./lib/inputs/modules/text-area/text-area.module";
 export * from "./lib/inputs/modules/text-box/directives/text-box.directive";
