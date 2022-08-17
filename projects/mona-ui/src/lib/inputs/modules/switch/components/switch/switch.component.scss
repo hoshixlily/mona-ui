@@ -1,0 +1,40 @@
+div.mona-switch {
+    position: relative;
+    width: calc(var(--mona-input-height) * 2);
+    height: var(--mona-input-height);
+    display: flex;
+    padding: 2px;
+    align-items: center;
+    cursor: pointer;
+    &, & * {
+        user-select: none;
+    }
+}
+
+span.mona-switch-label {
+    height: 100%;
+    flex: 1;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+span.mona-switch-handle {
+    height: calc(var(--mona-input-height) - 4px);
+    position: absolute;
+    width: calc(var(--mona-input-height) - 4px);
+    transition: left ease-out 200ms, background 200ms ease-in-out;
+    display: inline-flex;
+    &.mona-switch-on {
+        left: calc(100% - calc(var(--mona-input-height) - 2px));
+    }
+    &.mona-switch-off {
+        left: 2px;
+    }
+    &:active:not(.disabled),
+    &:focus-within:not(.disabled),
+    &:focus:not(.disabled){
+        box-shadow: var(--mona-active-shadow);
+    }
+}

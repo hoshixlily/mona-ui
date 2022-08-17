@@ -356,6 +356,31 @@ input[type="radio"][monaRadioButton] {
     }
 }
 
+/** Switch */
+.mona-switch {
+    background-color: var(--mona-background);
+    border: 1px solid var(--mona-border-color);
+    &.mona-switch-active {
+        & .mona-switch-handle {
+            background-color: var(--mona-primary);
+        }
+    }
+}
+
+.mona-switch-label {
+    color: var(--mona-text);
+}
+
+.mona-switch-handle {
+    background-color: var(--mona-background-darker);
+    border: 1px solid var(--mona-border-color);
+    &:active:not(:disabled),
+    &:focus-within:not(:disabled),
+    &:focus:not(:disabled) {
+        box-shadow: 0 0 10px -3px var(--mona-shadow-color);
+    }
+}
+
 /** Text Area */
 textarea[monaTextArea] {
     padding: 4px;

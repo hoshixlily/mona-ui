@@ -136,6 +136,17 @@
         <label for="radioButton2">Radio Button Label 2</label>
     </div>
 
+    <div>
+        <mona-switch labelOn="ON" labelOff="OFF" [ngModel]="switchValue" (ngModelChange)="onSwitchValueChange($event)">
+            <ng-template monaSwitchOffLabelTemplate>
+                <fa-icon [icon]="moonIcon" style="color: orange;"></fa-icon>
+            </ng-template>
+            <ng-template monaSwitchOnLabelTemplate>
+                <fa-icon [icon]="sunIcon" style="color: yellow;"></fa-icon>
+            </ng-template>
+        </mona-switch>
+    </div>
+
 </div>
 
 <ng-template #popupContentTemplate>
