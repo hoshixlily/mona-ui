@@ -2,6 +2,8 @@ import { Component, ElementRef, OnInit, TemplateRef, ViewChild } from "@angular/
 import { PopupService, PopupRef, PopupSettings } from "mona-ui";
 import { take } from "rxjs";
 import { TestComponentComponent } from "./test-component/test-component.component";
+import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
+import { faMoon, faSearch, faSnowflake, faSun } from "@fortawesome/free-solid-svg-icons";
 
 @Component({
     selector: "app-root",
@@ -10,7 +12,13 @@ import { TestComponentComponent } from "./test-component/test-component.componen
     providers: [PopupService]
 })
 export class AppComponent implements OnInit {
+    public readonly moonIcon: IconDefinition = faMoon;
+    public readonly searchIcon: IconDefinition = faSearch;
+    public readonly snowflakeIcon: IconDefinition = faSnowflake;
+    public readonly sunIcon: IconDefinition = faSun;
     public contextMenuItemVisible: boolean = true;
+    public switchValue: boolean = false;
+    public textBoxValue: string = "TEXT BOX VALUE";
 
     public dropdownListDataItems: any[] = [
         { text: "Item 1", value: 1, group: "Artistic", disabled: false },
@@ -57,6 +65,16 @@ export class AppComponent implements OnInit {
 
     public onPopupOpen(ref: PopupRef): void {
         console.log("Popup opened: ", ref);
+    }
+
+    public onSwitchValueChange(value: boolean): void {
+        console.log(value);
+        this.switchValue = value;
+    }
+
+    public onTextBoxValueChange(value: string): void {
+        console.log(value);
+        this.textBoxValue = value;
     }
 
     public openPopup(event: MouseEvent): void {

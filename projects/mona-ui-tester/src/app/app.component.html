@@ -85,7 +85,7 @@
         <mona-chip style="margin-left: 5px;" [removable]="true">
             <div style="width: 100%; height: 100%; display: flex; align-items: center;">
                 <div
-                    style="background: var(--mona-background-dark); border-right: 1px solid var(--mona-border-color); height: 100%; width: 23px; display: flex; align-items: center; justify-content: center; margin-left: -9px;">
+                    style="background: var(--mona-background-dark); border-right: 1px solid var(--mona-border-color); height: 100%; width: 25px; display: flex; align-items: center; justify-content: center; margin-left: -9px;">
                     <span class="fa fa-user-alt" style="margin-left: 2px;"></span>
                 </div>
                 <span style="margin-left: 4px;">Username</span>
@@ -95,7 +95,6 @@
 
     <div>
         <mona-drop-down-list [data]="dropdownListDataItems" groupField="group" textField="text" valueField="value"
-                             [itemDisabler]="'disabled'"
                              [value]="dropdownListDataItems[1]" (valueChange)="onDropDownValueChange($event)" style="width: 150px;">
 <!--            <ng-template monaDropDownListItemTemplate let-dataItem>-->
 <!--                <span style="color: limegreen;" *ngIf="dataItem.value <= 3">{{dataItem.text}}</span>-->
@@ -108,6 +107,44 @@
 <!--                <span style="color: crimson; font-weight: bold;">{{group}}</span>-->
 <!--            </ng-template>-->
         </mona-drop-down-list>
+    </div>
+
+    <div>
+        <input type="text" monaTextBox style="margin-right: 10px;" />
+        <mona-text-box [ngModel]="textBoxValue" (ngModelChange)="onTextBoxValueChange($event)">
+            <ng-template monaTextBoxPrefixTemplate>
+                <fa-icon [icon]="searchIcon"></fa-icon>
+            </ng-template>
+            <ng-template monaTextBoxSuffixTemplate>
+                <fa-icon [icon]="snowflakeIcon" style="color: lightblue;"></fa-icon>
+            </ng-template>
+        </mona-text-box>
+    </div>
+
+    <div>
+        <textarea monaTextArea [(ngModel)]="textBoxValue" rows="4" style="width: 422px;"></textarea>
+    </div>
+
+    <div>
+        <input type="checkbox" monaCheckBox id="checkbox1" [indeterminate]="true" />
+        <label for="checkbox1" style="margin-right: 10px;">Checkbox Label 1</label>
+
+        <input type="radio" monaRadioButton id="radioButton1" name="A" [checked]="true" [disabled]="false" />
+        <label for="radioButton1">Radio Button Label 1</label>
+
+        <input type="radio" monaRadioButton id="radioButton2" name="A" />
+        <label for="radioButton2">Radio Button Label 2</label>
+    </div>
+
+    <div>
+        <mona-switch labelOn="ON" labelOff="OFF" [ngModel]="switchValue" (ngModelChange)="onSwitchValueChange($event)">
+            <ng-template monaSwitchOffLabelTemplate>
+                <fa-icon [icon]="moonIcon" style="color: orange;"></fa-icon>
+            </ng-template>
+            <ng-template monaSwitchOnLabelTemplate>
+                <fa-icon [icon]="sunIcon" style="color: yellow;"></fa-icon>
+            </ng-template>
+        </mona-switch>
     </div>
 
 </div>

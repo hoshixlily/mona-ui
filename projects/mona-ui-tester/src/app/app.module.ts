@@ -1,22 +1,25 @@
 import { NgModule } from "@angular/core";
-import { BrowserModule } from "@angular/platform-browser";
 
 import { AppRoutingModule } from "./app-routing.module";
 import { AppComponent } from "./app.component";
-import { ButtonsModule, ContextMenuModule, DropDownsModule, PopupModule } from "mona-ui";
+import { ButtonsModule, ContextMenuModule, DropDownsModule, InputsModule, PopupModule } from "mona-ui";
 import { TestComponentComponent } from "./test-component/test-component.component";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { FormsModule } from "@angular/forms";
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 
 @NgModule({
     declarations: [AppComponent, TestComponentComponent],
     imports: [
-        BrowserModule,
+        BrowserAnimationsModule,
         AppRoutingModule,
         ButtonsModule,
         DropDownsModule,
+        InputsModule,
         PopupModule,
         ContextMenuModule,
-        FontAwesomeModule
+        FontAwesomeModule,
+        FormsModule
     ],
     bootstrap: [AppComponent]
 })
