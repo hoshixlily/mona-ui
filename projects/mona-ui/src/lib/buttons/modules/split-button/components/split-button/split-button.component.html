@@ -6,6 +6,6 @@
     <button monaButton [disabled]="disabled" tabindex="0" #menuButton>
         <span>&rsaquo;</span>
     </button>
-    <mona-contextmenu [target]="menuButton" trigger="click" [minWidth]="popupWidth" [offset]="popupOffset"
+    <mona-contextmenu [target]="menuButton" trigger="click" [minWidth]="popupWidth" [offset]="popupOffset" popupClass="mona-split-button-popup"
                       [menuItems]="menuItems" #contextMenuComponent ></mona-contextmenu>
 </div>

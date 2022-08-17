@@ -7,6 +7,7 @@ export interface ContextMenuInjectorData {
     menuClick?: Subject<MenuItem>;
     menuItems: MenuItem[];
     parentMenuRef?: PopupRef;
+    popupClass?: string | string[];
     subMenuClose?: Subject<void>;
     viaKeyboard?: boolean;
 }
