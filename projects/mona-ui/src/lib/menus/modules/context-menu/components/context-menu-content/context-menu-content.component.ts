@@ -86,13 +86,19 @@ export class ContextMenuContentComponent implements OnInit, OnDestroy, AfterView
     private create(anchor: HTMLElement, menuItem: MenuItem, viaKeyboard?: boolean): void {
         this.contextMenuInjectorData.menuItems = menuItem.subMenuItems;
         this.contextMenuInjectorData.menuClick = this.contextMenuData.menuClick;
+        const popupClasses = this.contextMenuData.popupClass
+            ? Array.isArray(this.contextMenuData.popupClass)
+                ? this.contextMenuData.popupClass
+                : [this.contextMenuData.popupClass]
+            : [];
+        this.contextMenuInjectorData.popupClass = popupClasses;
         this.menuPopupRef = this.contextMenuService.open({
             anchor,
             closeOnOutsideClick: false,
             content: ContextMenuContentComponent,
             data: this.contextMenuInjectorData,
             positions: this.contextMenuService.defaultSubMenuPositions,
-            popupClass: ["mona-contextmenu-content"]
+            popupClass: ["mona-contextmenu-content", ...popupClasses]
         });
         this.contextMenuInjectorData.parentMenuRef = this.menuPopupRef;
         this.contextMenuInjectorData.viaKeyboard = viaKeyboard;

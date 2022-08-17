@@ -141,6 +141,13 @@ mona-button-group button[monaButton] {
     }
 }
 
+/** Split Button */
+.mona-split-button-popup {
+    & ul li {
+        height: var(--mona-input-height) !important;
+    }
+}
+
 
 /** Dropdowns */
 
