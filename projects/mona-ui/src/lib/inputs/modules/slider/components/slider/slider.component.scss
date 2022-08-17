@@ -1,0 +1,52 @@
+div.mona-slider {
+    height: var(--mona-input-height);
+    position: relative;
+    &.mona-slider-horizontal {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        & div.mona-slider-track {
+            height: 8px;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+        & .mona-slider-highlight {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            border: none;
+            transition: right ease-out 0.15s;
+        }
+        & .mona-slider-handler {
+            position: absolute;
+            width: calc(var(--mona-input-height) - 16px);
+            height: calc(var(--mona-input-height) - 16px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            top: calc(var(--mona-input-height) / 2 - (var(--mona-input-height) - 16px) / 2);
+            z-index: 4;
+            transition: left ease-out 0.15s;
+        }
+        & .mona-slider-tick-list {
+            position: absolute;
+            display: grid;
+            grid-auto-flow: column;
+            grid-auto-columns: minmax(0, 1fr);
+            width: 100%;
+            height: calc(var(--mona-input-height) - 11px);
+        }
+        & span.mona-slider-tick {
+            display: inline-flex;
+            & > span {
+                width: 100%;
+                height: 100%;
+                z-index: 3;
+            }
+        }
+    }
+
+}

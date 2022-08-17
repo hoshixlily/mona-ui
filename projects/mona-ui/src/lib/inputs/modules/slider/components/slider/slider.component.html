@@ -1,0 +1,15 @@
+<div class="mona-slider mona-slider-horizontal">
+    <div class="mona-slider-track" #sliderTrackElement>
+        <div class="mona-slider-highlight" [ngStyle]="{'right': 'calc(100% - ' + handlerLeftPosition + 'px)'}"></div>
+    </div>
+    <div class="mona-slider-tick-list">
+        <ng-container *ngFor="let tx of [0,1,2,3,4,5,6,7,8,9,10]">
+            <span class="mona-slider-tick" #tickSpanElement>
+                <span (click)="onTickClick($event, tickSpanElement, sliderTrackElement, sliderHandlerElement)"
+                      (mousemove)="onTickMouseMove($event, tickSpanElement, sliderTrackElement, sliderHandlerElement)"></span>
+            </span>
+        </ng-container>
+    </div>
+    <div class="mona-slider-handler" [style.left.px]="handlerLeftPosition"
+         (mousedown)="onHandlerMouseDown()" #sliderHandlerElement></div>
+</div>

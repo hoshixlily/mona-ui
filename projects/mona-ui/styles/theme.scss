@@ -363,6 +363,31 @@ input[type="radio"][monaRadioButton] {
     }
 }
 
+/** Slider */
+.mona-slider {
+    & .mona-slider-highlight {
+        background-color: var(--mona-primary);
+    }
+    & .mona-slider-handler {
+        background-color: var(--mona-primary);
+        border: 1px solid var(--mona-border-color);
+    }
+    &.mona-slider-horizontal {
+        & .mona-slider-track {
+            background-color: var(--mona-background);
+            border: 1px solid var(--mona-border-color);
+        }
+        & .mona-slider-tick-list {
+            & span.mona-slider-tick {
+                border-left: 1px solid var(--mona-border-color);
+                &:last-child {
+                    border-right: 1px solid var(--mona-border-color);
+                }
+            }
+        }
+    }
+}
+
 /** Switch */
 .mona-switch {
     background-color: var(--mona-background);

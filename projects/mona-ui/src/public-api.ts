@@ -27,6 +27,8 @@ export * from "./lib/inputs/modules/check-box/directives/check-box.directive";
 export * from "./lib/inputs/modules/check-box/check-box.module";
 export * from "./lib/inputs/modules/radio-button/directives/radio-button.directive";
 export * from "./lib/inputs/modules/radio-button/radio-button.module";
+export * from "./lib/inputs/modules/slider/components/slider/slider.component";
+export * from "./lib/inputs/modules/slider/slider.module";
 export * from "./lib/inputs/modules/switch/directives/switch-off-label-template.directive";
 export * from "./lib/inputs/modules/switch/directives/switch-on-label-template.directive";
 export * from "./lib/inputs/modules/switch/components/switch/switch.component";
