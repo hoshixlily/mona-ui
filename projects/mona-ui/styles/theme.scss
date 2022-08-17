@@ -362,7 +362,7 @@ input[type="radio"][monaRadioButton] {
     border: 1px solid var(--mona-border-color);
     &.mona-switch-active {
         & .mona-switch-handle {
-            background-color: var(--mona-primary);
+            background-color: var(--mona-primary-dark);
         }
     }
 }
@@ -372,7 +372,7 @@ input[type="radio"][monaRadioButton] {
 }
 
 .mona-switch-handle {
-    background-color: var(--mona-background-darker);
+    background-color: var(--mona-background-light);
     border: 1px solid var(--mona-border-color);
     &:active:not(:disabled),
     &:focus-within:not(:disabled),
