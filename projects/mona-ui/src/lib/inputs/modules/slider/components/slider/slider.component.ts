@@ -1,24 +1,52 @@
 import {
     AfterViewInit,
-    ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
+    ContentChild,
     ElementRef,
+    Input,
     NgZone,
+    OnDestroy,
     OnInit,
-    Renderer2
+    Renderer2,
+    TemplateRef,
+    ViewChild
 } from "@angular/core";
-import { fromEvent } from "rxjs";
+import { fromEvent, Subject, takeUntil } from "rxjs";
+import { Action } from "../../../../../utils/Action";
+import { SliderTick } from "../../models/SliderTick";
+import { SliderTickValueTemplateDirective } from "../../directives/slider-tick-value-template.directive";
+import { SliderHandlerPositionData } from "../../models/SliderHandlerPositionData";
 
 @Component({
     selector: "mona-slider",
     templateUrl: "./slider.component.html",
-    styleUrls: ["./slider.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    styleUrls: ["./slider.component.scss"]
 })
-export class SliderComponent implements OnInit, AfterViewInit {
+export class SliderComponent implements OnInit, AfterViewInit, OnDestroy {
+    private readonly componentDestroy$: Subject<void> = new Subject();
+    private documentMouseMoveListener: Action | null = null;
     public dragging: boolean = false;
     public handlerLeftPosition: number = 0;
+    public ticks: SliderTick[] = [];
+
+    @Input()
+    public max: number = 100;
+
+    @Input()
+    public min: number = 0;
+
+    @Input()
+    public step: number = 10;
+
+    @ViewChild("tickListElement", { read: ElementRef })
+    private tickListElementRef!: ElementRef<HTMLDivElement>;
+
+    @ContentChild(SliderTickValueTemplateDirective, { read: TemplateRef })
+    public tickValueTemplate?: TemplateRef<void>;
+
+    @Input()
+    public value: number = 0;
 
     public constructor(
         private readonly elementRef: ElementRef<HTMLElement>,
@@ -35,7 +63,23 @@ export class SliderComponent implements OnInit, AfterViewInit {
         this.setEventListeners();
     }
 
-    public ngOnInit(): void {}
+    public ngOnDestroy(): void {
+        this.documentMouseMoveListener?.();
+        this.componentDestroy$.next();
+        this.componentDestroy$.complete();
+    }
+
+    public ngOnInit(): void {
+        let index = 0;
+        const tickCount = (this.max - this.min) / this.step + 1;
+        for (let tx = 0; tx < tickCount; tx++) {
+            this.ticks.push({
+                index: index,
+                value: this.min + index * this.step
+            });
+            index++;
+        }
+    }
 
     public onHandlerMouseDown(): void {
         if (this.dragging) {
@@ -46,17 +90,14 @@ export class SliderComponent implements OnInit, AfterViewInit {
     }
 
     public onTickClick(
-        event: MouseEvent,
         tickElement: HTMLSpanElement,
         sliderTrackElement: HTMLDivElement,
         sliderHandlerElement: HTMLDivElement
     ): void {
-        this.handlerLeftPosition = this.findHandlerPosition(
-            event,
-            tickElement,
-            sliderTrackElement,
-            sliderHandlerElement
-        );
+        const positionData = this.getHandlerPositionData(tickElement, sliderTrackElement, sliderHandlerElement);
+        this.handlerLeftPosition = positionData.position;
+        this.value = this.ticks[positionData.tickIndex].value;
+        console.log(this.value);
     }
 
     private findClosestTickElement(event: MouseEvent): HTMLSpanElement {
@@ -76,61 +117,66 @@ export class SliderComponent implements OnInit, AfterViewInit {
         return elements[index];
     }
 
-    private findHandlerPosition(
-        event: MouseEvent,
+    private getHandlerPositionData(
         tickElement: HTMLSpanElement,
         sliderTrackElement: HTMLDivElement,
         sliderHandlerElement: HTMLDivElement
-    ): number {
+    ): SliderHandlerPositionData {
         const rect = tickElement.getBoundingClientRect();
         const containerRect = sliderTrackElement.getBoundingClientRect();
         const handlerRect = sliderHandlerElement.getBoundingClientRect();
 
-        const distanceToLeft = Math.abs(rect.left - event.clientX);
-        const distanceToRight = Math.abs(rect.right - event.clientX);
+        const parentElement = tickElement.parentNode;
+        const tickElementIndex = Array.from(parentElement?.children ?? []).indexOf(tickElement);
 
-        if (distanceToLeft > distanceToRight) {
-            return rect.right - containerRect.left - handlerRect.width / 2;
+        const tickIndex = Math.ceil(tickElementIndex / 2);
+
+        let position: number;
+        if (tickElementIndex % 2 !== 0) {
+            position = rect.right - containerRect.left - handlerRect.width / 2;
         } else {
             const siblingRect = tickElement.previousElementSibling?.getBoundingClientRect();
             if (siblingRect) {
-                return siblingRect.right - containerRect.left - handlerRect.width / 2;
+                position = siblingRect.right - containerRect.left - handlerRect.width / 2;
             } else {
-                return (-1 * handlerRect.width) / 2;
+                position = (-1 * handlerRect.width) / 2;
             }
         }
+
+        return { position, tickIndex };
     }
 
     private setEventListeners(): void {
         this.zone.runOutsideAngular(() => {
-            this.renderer.listen(document, "mousemove", (event: MouseEvent) => {
+            this.documentMouseMoveListener = this.renderer.listen(document, "mousemove", (event: MouseEvent) => {
                 if (!this.dragging) {
                     return;
                 }
                 const tickElement = this.findClosestTickElement(event);
-                const position = this.findHandlerPosition(
-                    event,
+                const positionData = this.getHandlerPositionData(
                     tickElement.parentElement as HTMLSpanElement,
                     this.elementRef.nativeElement.querySelector(".mona-slider-track") as HTMLDivElement,
                     this.elementRef.nativeElement.querySelector(".mona-slider-handler") as HTMLDivElement
                 );
-                if (position !== this.handlerLeftPosition) {
+                if (positionData.position !== this.handlerLeftPosition) {
                     this.zone.run(() => {
-                        this.handlerLeftPosition = position;
-                        this.cdr.detectChanges();
+                        this.handlerLeftPosition = positionData.position;
+                        this.value = this.ticks[positionData.tickIndex].value;
+                        console.log("Slider value: ", this.value);
                     });
                 }
             });
-            fromEvent(document, "mouseup").subscribe(() => {
-                if (!this.dragging) {
-                    return;
-                }
-                this.zone.run(() => {
-                    this.dragging = false;
-                    document.documentElement.style.removeProperty("user-select");
-                    console.log("dragging", this.dragging);
+            fromEvent(document, "mouseup")
+                .pipe(takeUntil(this.componentDestroy$))
+                .subscribe(() => {
+                    if (!this.dragging) {
+                        return;
+                    }
+                    this.zone.run(() => {
+                        this.dragging = false;
+                        document.documentElement.style.removeProperty("user-select");
+                    });
                 });
-            });
         });
     }
 }

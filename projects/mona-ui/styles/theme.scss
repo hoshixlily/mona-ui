@@ -333,7 +333,7 @@ input[type="radio"][monaRadioButton] {
             margin-right: 4px;
             vertical-align: middle;
             color: transparent;
-            transition: all 0.15s ease-out, border 0s linear;
+            transition: all 0.15s ease-out, border 0.15s ease-out;
         }
         &:active:before:not(:disabled) {
             box-shadow: 0 0 10px -3px var(--mona-shadow-color);
@@ -379,10 +379,20 @@ input[type="radio"][monaRadioButton] {
         }
         & .mona-slider-tick-list {
             & span.mona-slider-tick {
-                border-left: 1px solid var(--mona-border-color);
+                &:first-child {
+                    border-left: 1px solid var(--mona-border-color);
+                }
                 &:last-child {
                     border-right: 1px solid var(--mona-border-color);
                 }
+                &:nth-child(even) {
+                    border-right: 1px solid var(--mona-border-color);
+                }
+            }
+        }
+        & .mona-slider-tick-label-list {
+            & span.mona-slider-tick-label {
+                color: var(--mona-text);
             }
         }
     }
