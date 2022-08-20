@@ -17,7 +17,8 @@ export class AppComponent implements OnInit {
     public readonly snowflakeIcon: IconDefinition = faSnowflake;
     public readonly sunIcon: IconDefinition = faSun;
     public contextMenuItemVisible: boolean = true;
-    public sliderValue: number = 1975;
+    public rangedSliderValues: [number, number] = [1995, 2140];
+    public sliderValue: number = 14;
     public switchValue: boolean = false;
     public textBoxValue: string = "TEXT BOX VALUE";
 
@@ -52,29 +53,39 @@ export class AppComponent implements OnInit {
     }
 
     public onButtonSelectedChange(selected: boolean): void {
-        console.log(`Button selected: ${selected}`);
+        // console.log(`Button selected: ${selected}`);
     }
 
     public onDropDownValueChange(value: unknown): void {
         // console.log(`Dropdown value changed`);
-        console.log(value);
+        // console.log(value);
     }
 
     public onPopupClose(): void {
-        console.log("Popup closed");
+        // console.log("Popup closed");
     }
 
     public onPopupOpen(ref: PopupRef): void {
-        console.log("Popup opened: ", ref);
+        // console.log("Popup opened: ", ref);
+    }
+
+    public onRangedSliderValueChange(value: [number, number]): void {
+        // console.log(value);
+        this.rangedSliderValues = value;
+    }
+
+    public onSliderValueChange(value: number): void {
+        // console.log(value);
+        this.sliderValue = value;
     }
 
     public onSwitchValueChange(value: boolean): void {
-        console.log(value);
+        // console.log(value);
         this.switchValue = value;
     }
 
     public onTextBoxValueChange(value: string): void {
-        console.log(value);
+        // console.log(value);
         this.textBoxValue = value;
     }
 

@@ -59,7 +59,11 @@
 
 
 /** General **/
-
+.mona-no-animation {
+    &, & * {
+        transition: none !important;
+    }
+}
 
 /** Buttons */
 

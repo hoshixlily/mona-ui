@@ -19,7 +19,7 @@ div.mona-slider {
             bottom: 0;
             right: 0;
             border: none;
-            transition: width ease-in-out 0.2s;
+            transition: width ease-in-out 0.05s;
             &.mona-dragging {
                 transition: none;
             }
@@ -33,7 +33,7 @@ div.mona-slider {
             justify-content: center;
             z-index: 4;
             outline: none;
-            transition: left ease-in-out 0.2s;
+            transition: left ease-in-out 0.05s;
             &.mona-dragging {
                 transition: none;
             }
@@ -78,6 +78,14 @@ div.mona-slider {
             height: calc(var(--mona-input-height) - 11px);
             display: flex;
             width: 0;
+        }
+    }
+
+    // TODO: Animation causes calculation errors due to delay in positioning.
+    // TODO: Check if this can be solved by using angular animations.
+    &.mona-slider-ranged {
+        &, & * {
+            transition: none !important;
         }
     }
 }
