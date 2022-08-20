@@ -405,6 +405,30 @@ input[type="radio"][monaRadioButton] {
             }
         }
     }
+    &.mona-slider-vertical {
+        & .mona-slider-track {
+            background-color: var(--mona-background);
+            border: 1px solid var(--mona-border-color);
+        }
+        & .mona-slider-tick-list {
+            & span.mona-slider-tick.mona-slider-tick-visible {
+                &:first-child {
+                    border-top: 1px solid var(--mona-border-color);
+                }
+                &:last-child {
+                    border-bottom: 1px solid var(--mona-border-color);
+                }
+                &:nth-child(even) {
+                    border-bottom: 1px solid var(--mona-border-color);
+                }
+            }
+        }
+        & .mona-slider-tick-label-list {
+            & span.mona-slider-tick-label {
+                color: var(--mona-text);
+            }
+        }
+    }
 }
 
 /** Switch */

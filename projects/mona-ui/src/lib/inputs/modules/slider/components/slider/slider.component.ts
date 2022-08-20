@@ -23,6 +23,7 @@ import { SliderTick } from "../../models/SliderTick";
 import { SliderTickValueTemplateDirective } from "../../directives/slider-tick-value-template.directive";
 import { SliderHandlerPositionData } from "../../models/SliderHandlerPositionData";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
+import { Orientation } from "../../../../../models/Orientation";
 
 type HandlerType = "primary" | "secondary";
 
@@ -55,8 +56,8 @@ export class SliderComponent implements OnInit, AfterViewInit, OnDestroy, OnChan
     private propagateChange: Action<number | [number, number]> | null = null;
     public activeHandlerType: HandlerType | null = null;
     public dragging: boolean = false;
-    public handlerLeftPosition: number = 0;
-    public handlerTwoLeftPosition: number = 0;
+    public handlerOnePosition: number = 0;
+    public handlerTwoPosition: number = 0;
     public handlerValues: [number, number] = [0, 0];
     public initialized: boolean = false;
     public ticks: SliderTick[] = [];
@@ -70,6 +71,9 @@ export class SliderComponent implements OnInit, AfterViewInit, OnDestroy, OnChan
 
     @Input()
     public min: number = 0;
+
+    @Input()
+    public orientation: Orientation = "horizontal";
 
     @Input()
     public ranged: boolean = false;
@@ -232,22 +236,42 @@ export class SliderComponent implements OnInit, AfterViewInit, OnDestroy, OnChan
     }
 
     private calculateTrackData(): void {
-        if (this.ranged) {
-            const rectOne = this.sliderHandlerElement.nativeElement.getBoundingClientRect();
-            const rectTwo = this.sliderHandlerElement2.nativeElement.getBoundingClientRect();
-            const width =
-                (Math.abs(rectOne.left - rectTwo.left) * 100.0) /
-                this.sliderTrackElementRef.nativeElement.getBoundingClientRect().width;
-            const firstRect = rectOne.left < rectTwo.left ? rectOne : rectTwo;
-            this.trackData = {
-                position: firstRect.left - this.sliderTrackElementRef.nativeElement.getBoundingClientRect().left,
-                size: width
-            };
+        if (this.orientation === "horizontal") {
+            if (this.ranged) {
+                const rectOne = this.sliderHandlerElement.nativeElement.getBoundingClientRect();
+                const rectTwo = this.sliderHandlerElement2.nativeElement.getBoundingClientRect();
+                const width =
+                    (Math.abs(rectOne.left - rectTwo.left) * 100.0) /
+                    this.sliderTrackElementRef.nativeElement.getBoundingClientRect().width;
+                const firstRect = rectOne.left < rectTwo.left ? rectOne : rectTwo;
+                this.trackData = {
+                    position: firstRect.left - this.sliderTrackElementRef.nativeElement.getBoundingClientRect().left,
+                    size: width
+                };
+            } else {
+                this.trackData = {
+                    position: 0,
+                    size: this.handlerOnePosition <= 0 ? 0 : this.handlerOnePosition
+                };
+            }
         } else {
-            this.trackData = {
-                position: 0,
-                size: this.handlerLeftPosition <= 0 ? 0 : this.handlerLeftPosition
-            };
+            if (this.ranged) {
+                const rectOne = this.sliderHandlerElement.nativeElement.getBoundingClientRect();
+                const rectTwo = this.sliderHandlerElement2.nativeElement.getBoundingClientRect();
+                const height =
+                    (Math.abs(rectOne.top - rectTwo.top) * 100.0) /
+                    this.sliderTrackElementRef.nativeElement.getBoundingClientRect().height;
+                const firstRect = rectOne.top < rectTwo.top ? rectOne : rectTwo;
+                this.trackData = {
+                    position: firstRect.top - this.sliderTrackElementRef.nativeElement.getBoundingClientRect().top,
+                    size: height
+                };
+            } else {
+                this.trackData = {
+                    position: 0,
+                    size: this.handlerOnePosition <= 0 ? 0 : this.handlerOnePosition
+                };
+            }
         }
     }
 
@@ -325,27 +349,39 @@ export class SliderComponent implements OnInit, AfterViewInit, OnDestroy, OnChan
         const rect = tickElement.getBoundingClientRect();
         const containerRect = this.sliderTrackElementRef.nativeElement.getBoundingClientRect();
         const handlerRect = sliderHandlerElement.getBoundingClientRect();
-
         const parentElement = tickElement.parentNode;
         const tickElementIndex = Array.from(parentElement?.children ?? []).indexOf(tickElement);
-
         const tickIndex = Math.ceil(tickElementIndex / 2);
-
         let position: number;
-        if (tickElementIndex % 2 !== 0) {
-            position = ((rect.right - containerRect.left - handlerRect.width / 2) * 100.0) / containerRect.width;
-        } else {
-            const siblingRect = tickElement.previousElementSibling?.getBoundingClientRect();
-            if (siblingRect) {
-                position =
-                    ((siblingRect.right - containerRect.left - (2 * handlerRect.width) / 2) * 100.0) /
-                    containerRect.width;
+        if (this.orientation === "horizontal") {
+            if (tickElementIndex % 2 !== 0) {
+                position = ((rect.right - containerRect.left - handlerRect.width / 2) * 100.0) / containerRect.width;
             } else {
-                position = (((-1 * handlerRect.width) / 2) * 100.0) / containerRect.width;
+                const siblingRect = tickElement.previousElementSibling?.getBoundingClientRect();
+                if (siblingRect) {
+                    position =
+                        ((siblingRect.right - containerRect.left - (2 * handlerRect.width) / 2) * 100.0) /
+                        containerRect.width;
+                } else {
+                    position = (((-1 * handlerRect.width) / 2) * 100.0) / containerRect.width;
+                }
             }
+            return { position, tickIndex };
+        } else {
+            if (tickElementIndex % 2 !== 0) {
+                position = ((rect.bottom - containerRect.top - handlerRect.height / 2) * 100.0) / containerRect.height;
+            } else {
+                const siblingRect = tickElement.previousElementSibling?.getBoundingClientRect();
+                if (siblingRect) {
+                    position =
+                        ((siblingRect.bottom - containerRect.top - (2 * handlerRect.height) / 2) * 100.0) /
+                        containerRect.height;
+                } else {
+                    position = (((-1 * handlerRect.height) / 2) * 100.0) / containerRect.height;
+                }
+            }
+            return { position, tickIndex };
         }
-
-        return { position, tickIndex };
     }
 
     private prepareTicks(): void {
@@ -372,7 +408,7 @@ export class SliderComponent implements OnInit, AfterViewInit, OnDestroy, OnChan
                         ? this.sliderHandlerElement.nativeElement
                         : this.sliderHandlerElement2.nativeElement
                 );
-                if (this.activeHandlerType === "primary" && positionData.position !== this.handlerLeftPosition) {
+                if (this.activeHandlerType === "primary" && positionData.position !== this.handlerOnePosition) {
                     this.zone.run(() => {
                         const value = this.ticks[positionData.tickIndex].value;
                         if (this.handlerValues[0] !== value) {
@@ -382,7 +418,7 @@ export class SliderComponent implements OnInit, AfterViewInit, OnDestroy, OnChan
                     });
                 } else if (
                     this.activeHandlerType === "secondary" &&
-                    positionData.position !== this.handlerTwoLeftPosition
+                    positionData.position !== this.handlerTwoPosition
                 ) {
                     this.zone.run(() => {
                         const value = this.ticks[positionData.tickIndex].value;
@@ -415,18 +451,34 @@ export class SliderComponent implements OnInit, AfterViewInit, OnDestroy, OnChan
 
     private setSliderValue(value: number, handlerType: HandlerType = "primary"): void {
         const sliderValue = Math.max(this.minValue, Math.min(this.maxValue, value));
-        if (handlerType === "primary") {
-            this.handlerLeftPosition =
-                ((sliderValue - this.minValue) * 100.0) / (this.maxValue - this.minValue) -
-                ((this.sliderHandlerElement.nativeElement.getBoundingClientRect().width / 2) * 100.0) /
-                    this.sliderTrackElementRef.nativeElement.getBoundingClientRect().width;
-            this.handlerValues[0] = sliderValue;
+        if (this.orientation === "horizontal") {
+            if (handlerType === "primary") {
+                this.handlerOnePosition =
+                    ((sliderValue - this.minValue) * 100.0) / (this.maxValue - this.minValue) -
+                    ((this.sliderHandlerElement.nativeElement.getBoundingClientRect().width / 2) * 100.0) /
+                        this.sliderTrackElementRef.nativeElement.getBoundingClientRect().width;
+                this.handlerValues[0] = sliderValue;
+            } else {
+                this.handlerTwoPosition =
+                    ((sliderValue - this.minValue) * 100.0) / (this.maxValue - this.minValue) -
+                    ((this.sliderHandlerElement2.nativeElement.getBoundingClientRect().width / 2) * 100.0) /
+                        this.sliderTrackElementRef.nativeElement.getBoundingClientRect().width;
+                this.handlerValues[1] = sliderValue;
+            }
         } else {
-            this.handlerTwoLeftPosition =
-                ((sliderValue - this.minValue) * 100.0) / (this.maxValue - this.minValue) -
-                ((this.sliderHandlerElement2.nativeElement.getBoundingClientRect().width / 2) * 100.0) /
-                    this.sliderTrackElementRef.nativeElement.getBoundingClientRect().width;
-            this.handlerValues[1] = sliderValue;
+            if (handlerType === "primary") {
+                this.handlerOnePosition =
+                    ((sliderValue - this.minValue) * 100.0) / (this.maxValue - this.minValue) -
+                    ((this.sliderHandlerElement.nativeElement.getBoundingClientRect().height / 2) * 100.0) /
+                        this.sliderTrackElementRef.nativeElement.getBoundingClientRect().height;
+                this.handlerValues[0] = sliderValue;
+            } else {
+                this.handlerTwoPosition =
+                    ((sliderValue - this.minValue) * 100.0) / (this.maxValue - this.minValue) -
+                    ((this.sliderHandlerElement2.nativeElement.getBoundingClientRect().height / 2) * 100.0) /
+                        this.sliderTrackElementRef.nativeElement.getBoundingClientRect().height;
+                this.handlerValues[1] = sliderValue;
+            }
         }
         window.setTimeout(() => {
             this.calculateTrackData();

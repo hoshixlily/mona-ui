@@ -1,8 +1,8 @@
 div.mona-slider {
-    height: calc(var(--mona-input-height) * 2);
     position: relative;
     user-select: none;
     &.mona-slider-horizontal {
+        height: calc(var(--mona-input-height) * 2);
         display: flex;
         align-items: center;
         cursor: pointer;
@@ -78,6 +78,90 @@ div.mona-slider {
             height: calc(var(--mona-input-height) - 11px);
             display: flex;
             width: 0;
+        }
+    }
+
+    &.mona-slider-vertical {
+        width: calc(var(--mona-input-height) * 2);
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        cursor: pointer;
+        & div.mona-slider-track {
+            width: 8px;
+            height: 100%;
+            position: relative;
+            z-index: 1;
+        }
+        & .mona-slider-highlight {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            right: 0;
+            border: none;
+            transition: height ease-in-out 0.05s;
+            &.mona-dragging {
+                transition: none;
+            }
+        }
+        & .mona-slider-handler {
+            position: absolute;
+            width: calc(var(--mona-input-height) - 12px);
+            height: calc(var(--mona-input-height) - 12px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 4;
+            outline: none;
+            transition: top ease-in-out 0.05s;
+            &.mona-dragging {
+                transition: none;
+            }
+        }
+
+        & .mona-slider-tick-list {
+            display: grid;
+            position: absolute;
+            grid-auto-flow: row;
+            grid-auto-rows: minmax(0, 1fr);
+            width: 100%;
+            height: 100%;
+            justify-content: center;
+        }
+
+        & span.mona-slider-tick {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: calc(var(--mona-input-height) - 12px);
+            & > span {
+                width: 100%;
+                height: 100%;
+                z-index: 3;
+                &.mona-dragging {
+                    width: calc(var(--mona-input-height) * 2);
+                }
+            }
+        }
+        & .mona-slider-tick-label-list {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            flex-direction: column;
+            align-items: flex-end;
+            display: flex;
+            justify-content: space-between;
+            user-select: none;
+        }
+
+        & span.mona-slider-tick-label {
+            position: relative;
+            align-items: center;
+            justify-content: center;
+            width: calc(var(--mona-input-height) - 11px);
+            display: flex;
+            height: 0;
         }
     }
 
