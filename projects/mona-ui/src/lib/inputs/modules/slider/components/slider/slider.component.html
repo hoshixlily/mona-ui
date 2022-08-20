@@ -1,14 +1,14 @@
 <div class="mona-slider mona-slider-horizontal">
     <div class="mona-slider-track" #sliderTrackElement>
-        <div class="mona-slider-highlight" [ngClass]="{'dragging': dragging}" [ngStyle]="{'right': 'calc(100% - ' + handlerLeftPosition + 'px)'}"></div>
+        <div class="mona-slider-highlight" [ngClass]="{'dragging': dragging}" [style.width.%]="handlerLeftPosition <= 0 ? 0 : handlerLeftPosition"></div>
     </div>
     <div class="mona-slider-tick-list" #tickListElement>
         <ng-container *ngFor="let tick of ticks; let tx = index;">
-            <span class="mona-slider-tick" #tickSpanElement *ngIf="tx !== 0">
+            <span class="mona-slider-tick" [ngClass]="{'mona-slider-tick-visible': showTicks}" #tickSpanElement *ngIf="tx !== 0">
                 <span [ngClass]="{'dragging': dragging}"
                     (click)="onTickClick(tickSpanElement, sliderTrackElement, sliderHandlerElement)"></span>
             </span>
-            <span class="mona-slider-tick" #tickSpanElement *ngIf="tx !== ticks.length - 1">
+            <span class="mona-slider-tick" [ngClass]="{'mona-slider-tick-visible': showTicks}" #tickSpanElement *ngIf="tx !== ticks.length - 1">
                 <span [ngClass]="{'dragging': dragging}"
                       (click)="onTickClick(tickSpanElement, sliderTrackElement, sliderHandlerElement)"></span>
             </span>
@@ -26,6 +26,6 @@
     </div>
     <div class="mona-slider-handler"
          [ngClass]="{'dragging': dragging}"
-         [style.left.px]="handlerLeftPosition === 0 ? sliderHandlerElement.clientWidth / -2 : handlerLeftPosition"
+         [style.left.%]="handlerLeftPosition === 0 ? (sliderHandlerElement.clientWidth / -2 * 100.0) / sliderTrackElement.clientWidth : handlerLeftPosition"
          (mousedown)="onHandlerMouseDown()" #sliderHandlerElement></div>
 </div>

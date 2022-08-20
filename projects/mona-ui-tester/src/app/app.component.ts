@@ -17,6 +17,7 @@ export class AppComponent implements OnInit {
     public readonly snowflakeIcon: IconDefinition = faSnowflake;
     public readonly sunIcon: IconDefinition = faSun;
     public contextMenuItemVisible: boolean = true;
+    public sliderValue: number = 77;
     public switchValue: boolean = false;
     public textBoxValue: string = "TEXT BOX VALUE";
 
