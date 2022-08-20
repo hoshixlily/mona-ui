@@ -337,7 +337,7 @@ input[type="radio"][monaRadioButton] {
             transition: all 0.15s ease-out, border 0.1s ease-out;
         }
         &:active:before:not(:disabled) {
-            box-shadow: 0 0 10px -3px var(--mona-shadow-color);
+            box-shadow: var(--mona-active-shadow);
         }
     }
     &:disabled + label {
@@ -372,6 +372,10 @@ input[type="radio"][monaRadioButton] {
     & .mona-slider-handler {
         background-color: var(--mona-primary);
         border: 1px solid var(--mona-border-color);
+        &:focus,
+        &:active {
+            box-shadow: var(--mona-active-shadow);
+        }
     }
     &.mona-slider-horizontal {
         & .mona-slider-track {

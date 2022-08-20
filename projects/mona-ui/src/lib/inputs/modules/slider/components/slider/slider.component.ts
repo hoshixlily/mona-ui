@@ -46,6 +46,9 @@ export class SliderComponent implements OnInit, AfterViewInit, OnDestroy, OnChan
     public ticks: SliderTick[] = [];
 
     @Input()
+    public labelStep: number = 3;
+
+    @Input()
     public max: number = 10;
 
     @Input()
@@ -85,7 +88,7 @@ export class SliderComponent implements OnInit, AfterViewInit, OnDestroy, OnChan
     }
 
     public ngOnChanges(changes: SimpleChanges): void {
-        if (changes["value"].currentValue != null && !changes["value"].isFirstChange()) {
+        if (changes["value"]?.currentValue != null && !changes["value"].isFirstChange()) {
             this.setSliderValue(changes["value"].currentValue);
         }
     }
@@ -99,6 +102,18 @@ export class SliderComponent implements OnInit, AfterViewInit, OnDestroy, OnChan
     public ngOnInit(): void {
         this.prepareTicks();
         this.value = Math.max(this.min, Math.min(this.max, this.value));
+    }
+
+    public onHandlerKeyDown(event: KeyboardEvent): void {
+        if (event.key === "ArrowLeft" || event.key === "ArrowDown") {
+            this.setSliderValue(Math.max(this.min, this.value - this.step));
+        } else if (event.key === "ArrowRight" || event.key === "ArrowUp") {
+            this.setSliderValue(Math.min(this.max, this.value + this.step));
+        } else if (event.key === "Home") {
+            this.setSliderValue(this.min);
+        } else if (event.key === "End") {
+            this.setSliderValue(this.max);
+        }
     }
 
     public onHandlerMouseDown(): void {

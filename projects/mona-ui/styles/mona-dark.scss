@@ -1,6 +1,7 @@
 @import "theme";
 
 :root {
+    --mona-active-shadow: 0 0 10px -3px var(--mona-shadow-color);
     --mona-background: #1C1D1F;
     --mona-background-dark: #161719;
     --mona-background-darker: #0B0C0E;
