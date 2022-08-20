@@ -32,8 +32,8 @@ interface HandlerData {
 }
 
 interface TrackData {
-    left: number;
-    width: number;
+    position: number;
+    size: number;
 }
 
 @Component({
@@ -60,7 +60,7 @@ export class SliderComponent implements OnInit, AfterViewInit, OnDestroy, OnChan
     public handlerValues: [number, number] = [0, 0];
     public initialized: boolean = false;
     public ticks: SliderTick[] = [];
-    public trackData: TrackData = { left: 0, width: 0 };
+    public trackData: TrackData = { position: 0, size: 0 };
 
     @Input()
     public labelStep: number = 1;
@@ -240,13 +240,13 @@ export class SliderComponent implements OnInit, AfterViewInit, OnDestroy, OnChan
                 this.sliderTrackElementRef.nativeElement.getBoundingClientRect().width;
             const firstRect = rectOne.left < rectTwo.left ? rectOne : rectTwo;
             this.trackData = {
-                left: firstRect.left - this.sliderTrackElementRef.nativeElement.getBoundingClientRect().left,
-                width
+                position: firstRect.left - this.sliderTrackElementRef.nativeElement.getBoundingClientRect().left,
+                size: width
             };
         } else {
             this.trackData = {
-                left: 0,
-                width: this.handlerLeftPosition <= 0 ? 0 : this.handlerLeftPosition
+                position: 0,
+                size: this.handlerLeftPosition <= 0 ? 0 : this.handlerLeftPosition
             };
         }
     }

@@ -1,7 +1,7 @@
 <div class="mona-slider mona-slider-horizontal" [ngClass]="{'mona-no-animation': !initialized, 'mona-slider-ranged': ranged}" (focus)="sliderHandlerElement.focus()">
     <div class="mona-slider-track" #sliderTrackElement>
-        <div class="mona-slider-highlight" [ngClass]="{'mona-dragging': dragging}" [style.width.%]="trackData.width"
-             [style.left.px]="trackData.left"></div>
+        <div class="mona-slider-highlight" [ngClass]="{'mona-dragging': dragging}" [style.width.%]="trackData.size"
+             [style.left.px]="trackData.position"></div>
     </div>
     <div class="mona-slider-tick-list" #tickListElement>
         <ng-container *ngFor="let tick of ticks; let tx = index;">
