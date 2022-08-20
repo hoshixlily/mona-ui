@@ -1,33 +1,43 @@
-<div class="mona-slider mona-slider-horizontal">
+<div class="mona-slider mona-slider-horizontal" [ngClass]="{'mona-no-animation': !initialized, 'mona-slider-ranged': ranged}" (focus)="sliderHandlerElement.focus()">
     <div class="mona-slider-track" #sliderTrackElement>
-        <div class="mona-slider-highlight" [ngClass]="{'mona-dragging': dragging}" [style.width.%]="handlerLeftPosition <= 0 ? 0 : handlerLeftPosition"></div>
+        <div class="mona-slider-highlight" [ngClass]="{'mona-dragging': dragging}" [style.width.%]="trackData.width"
+             [style.left.px]="trackData.left"></div>
     </div>
     <div class="mona-slider-tick-list" #tickListElement>
         <ng-container *ngFor="let tick of ticks; let tx = index;">
             <span class="mona-slider-tick" [ngClass]="{'mona-slider-tick-visible': showTicks}" #tickSpanElement *ngIf="tx !== 0">
                 <span [ngClass]="{'mona-dragging': dragging}"
-                    (click)="onTickClick(tickSpanElement, sliderTrackElement, sliderHandlerElement)"></span>
+                    (click)="onTickClick($event, tickSpanElement)"></span>
             </span>
             <span class="mona-slider-tick" [ngClass]="{'mona-slider-tick-visible': showTicks}" #tickSpanElement *ngIf="tx !== ticks.length - 1">
                 <span [ngClass]="{'mona-dragging': dragging}"
-                      (click)="onTickClick(tickSpanElement, sliderTrackElement, sliderHandlerElement)"></span>
+                      (click)="onTickClick($event, tickSpanElement)"></span>
             </span>
         </ng-container>
     </div>
     <div class="mona-slider-tick-label-list">
         <ng-container *ngFor="let tick of ticks; let tx = index;">
-            <span class="mona-slider-tick-label" *ngIf="tx % labelStep === 0">
-                <span *ngIf="!tickValueTemplate">{{tick.value}}</span>
-                <span *ngIf="tickValueTemplate">
+            <span class="mona-slider-tick-label" >
+                <span *ngIf="!tickValueTemplate && tx % labelStep === 0">{{tick.value}}</span>
+                <span *ngIf="tickValueTemplate && tx % labelStep === 0">
                     <ng-container *ngTemplateOutlet="tickValueTemplate; context: {$implicit: tick.value}"></ng-container>
                 </span>
             </span>
         </ng-container>
     </div>
-    <div class="mona-slider-handler"
+    <div class="mona-slider-handler mona-slider-handler-first"
          [ngClass]="{'mona-dragging': dragging}"
-         [style.left.%]="handlerLeftPosition === 0 ? (sliderHandlerElement.clientWidth / -2 * 100.0) / sliderTrackElement.clientWidth : handlerLeftPosition"
+         [style.left.%]="handlerLeftPosition"
+         [style.pointer-events]="dragging && activeHandlerType==='secondary' ? 'none' : 'auto'"
          [attr.tabindex]="0"
-         (keydown)="onHandlerKeyDown($event)"
-         (mousedown)="onHandlerMouseDown()" #sliderHandlerElement></div>
+         (keydown)="onHandlerKeyDown($event, 'primary')"
+         (mousedown)="onHandlerMouseDown('primary')" #sliderHandlerElement></div>
+
+    <div class="mona-slider-handler mona-slider-handler-second"
+         [ngClass]="{'mona-dragging': dragging}"
+         [style.left.%]="handlerTwoLeftPosition"
+         [style.pointer-events]="dragging && activeHandlerType==='primary' ? 'none' : 'auto'"
+         [attr.tabindex]="0"
+         (keydown)="onHandlerKeyDown($event, 'secondary')"
+         (mousedown)="onHandlerMouseDown('secondary')" #sliderHandlerElement2></div>
 </div>
