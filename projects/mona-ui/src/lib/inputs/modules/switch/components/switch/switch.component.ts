@@ -19,7 +19,7 @@ import { SwitchOnLabelTemplateDirective } from "../../directives/switch-on-label
     ]
 })
 export class SwitchComponent implements OnInit, ControlValueAccessor {
-    private propagateChange: Action<boolean, any> | null = null;
+    private propagateChange: Action<boolean> | null = null;
     public active: boolean = false;
 
     @Input()
