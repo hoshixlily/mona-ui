@@ -1,7 +1,7 @@
 <div class="mona-slider" [ngClass]="{'mona-no-animation': !initialized, 'mona-slider-ranged': ranged,
                                     'mona-slider-horizontal': orientation==='horizontal',
                                     'mona-slider-vertical': orientation==='vertical'}"
-     (focus)="sliderHandlerElement.focus()">
+     (focus)="sliderPrimaryHandlerElement.focus()">
     <div class="mona-slider-track" #sliderTrackElement>
         <div class="mona-slider-highlight" [ngClass]="{'mona-dragging': dragging}"
              [style.width.%]="orientation==='horizontal' ? trackData.size : undefined"
@@ -24,7 +24,7 @@
             </span>
         </ng-container>
     </div>
-    <div class="mona-slider-tick-label-list">
+    <div class="mona-slider-tick-label-list" [ngClass]="{'mona-position-before': labelPosition==='before', 'mona-position-after': labelPosition==='after'}">
         <ng-container *ngFor="let tick of ticks; let tx = index;">
             <span class="mona-slider-tick-label">
                 <span *ngIf="!tickValueTemplate && tx % labelStep === 0">{{tick.value}}</span>
@@ -35,21 +35,22 @@
             </span>
         </ng-container>
     </div>
+
     <div class="mona-slider-handler mona-slider-handler-first"
          [ngClass]="{'mona-dragging': dragging}"
          [style.left.%]="orientation === 'horizontal' ? handlerOnePosition : undefined"
-         [style.top.%]="orientation === 'vertical' ? handlerOnePosition : undefined"
-         [style.pointer-events]="dragging && activeHandlerType==='secondary' ? 'none' : 'auto'"
+         [style.bottom.%]="orientation === 'vertical' ? handlerOnePosition : undefined"
+         [style.pointer-events]="dragging && activeHandlerType==='secondary' ? 'none' : undefined"
          [attr.tabindex]="0"
          (keydown)="onHandlerKeyDown($event, 'primary')"
-         (mousedown)="onHandlerMouseDown('primary')" #sliderHandlerElement></div>
+         (mousedown)="onHandlerMouseDown('primary')" #sliderPrimaryHandlerElement></div>
 
     <div class="mona-slider-handler mona-slider-handler-second"
          [ngClass]="{'mona-dragging': dragging}"
          [style.left.%]="orientation === 'horizontal' ? handlerTwoPosition : undefined"
-         [style.top.%]="orientation === 'vertical' ? handlerTwoPosition : undefined"
-         [style.pointer-events]="dragging && activeHandlerType==='primary' ? 'none' : 'auto'"
+         [style.bottom.%]="orientation === 'vertical' ? handlerTwoPosition : undefined"
+         [style.pointer-events]="dragging && activeHandlerType==='primary' ? 'none' : undefined"
          [attr.tabindex]="0"
          (keydown)="onHandlerKeyDown($event, 'secondary')"
-         (mousedown)="onHandlerMouseDown('secondary')" #sliderHandlerElement2 style="background: darkorange" *ngIf="ranged"></div>
+         (mousedown)="onHandlerMouseDown('secondary')" #sliderSecondaryHandlerElement *ngIf="ranged"></div>
 </div>

@@ -17,7 +17,7 @@ export class AppComponent implements OnInit {
     public readonly snowflakeIcon: IconDefinition = faSnowflake;
     public readonly sunIcon: IconDefinition = faSun;
     public contextMenuItemVisible: boolean = true;
-    public rangedSliderValues: [number, number] = [1995, 2140];
+    public rangedSliderValues: [number, number] = [6, 22];
     public sliderValue: number = 14;
     public switchValue: boolean = false;
     public textBoxValue: string = "TEXT BOX VALUE";
@@ -69,9 +69,9 @@ export class AppComponent implements OnInit {
         // console.log("Popup opened: ", ref);
     }
 
-    public onRangedSliderValueChange(value: [number, number]): void {
+    public onRangedSliderValueChange(value: number | [number, number]): void {
         // console.log(value);
-        this.rangedSliderValues = value;
+        this.rangedSliderValues = value as [number, number];
     }
 
     public onSliderValueChange(value: number): void {
