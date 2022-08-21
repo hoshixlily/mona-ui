@@ -147,6 +147,19 @@
         </mona-switch>
     </div>
 
+    <div style="display: flex; flex-direction: column; z-index: 100;">
+        <mona-slider style="width: 200px;" [value]="7"></mona-slider>
+        <mona-slider [labelStep]="1" [value]="rangedSliderValues" orientation="horizontal" labelPosition="after"  (valueChange)="onRangedSliderValueChange($event)" [ranged]="true" style="width: 500px;" [min]="0" [max]="24" [step]="1">
+            <ng-template monaSliderTickValueTemplate let-value>
+                <fa-icon [icon]="moonIcon" *ngIf="value < 6 || value > 22" style="color: mediumpurple;"></fa-icon>
+                <fa-icon [icon]="sunIcon" *ngIf="value >= 6 && value <= 22" style="color: #fafd0f;"></fa-icon>
+            </ng-template>
+        </mona-slider>
+
+<!--        <input type="number" [(ngModel)]="sliderValue" />-->
+<!--        <mona-slider style="width: 125px;"></mona-slider>-->
+    </div>
+
 </div>
 
 <ng-template #popupContentTemplate>

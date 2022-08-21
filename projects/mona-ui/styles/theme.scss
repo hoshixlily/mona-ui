@@ -59,7 +59,11 @@
 
 
 /** General **/
-
+.mona-no-animation {
+    &, & * {
+        transition: none !important;
+    }
+}
 
 /** Buttons */
 
@@ -254,7 +258,7 @@ input[type="checkbox"][monaCheckBox] {
         align-items: center;
         cursor: pointer;
         color: var(--mona-text);
-        font-size: 1.2rem;
+        font-size: 1.1rem;
         user-select: none;
         &:before {
             content: "\2714";
@@ -278,7 +282,8 @@ input[type="checkbox"][monaCheckBox] {
     &:checked + label:before {
         background-color: var(--mona-primary-dark);
         color: var(--mona-text);
-        padding-bottom: 3px;
+        padding-bottom: 2px;
+        padding-right: 1px;
         font-weight: bold;
         font-size: 1.1rem;
     }
@@ -318,7 +323,7 @@ input[type="radio"][monaRadioButton] {
         align-items: center;
         cursor: pointer;
         color: var(--mona-text);
-        font-size: 1.2rem;
+        font-size: 1.1rem;
         user-select: none;
         &:before {
             content: " ";
@@ -333,10 +338,10 @@ input[type="radio"][monaRadioButton] {
             margin-right: 4px;
             vertical-align: middle;
             color: transparent;
-            transition: all 0.15s ease-out, border 0s linear;
+            transition: all 0.15s ease-out, border 0.1s ease-out;
         }
         &:active:before:not(:disabled) {
-            box-shadow: 0 0 10px -3px var(--mona-shadow-color);
+            box-shadow: var(--mona-active-shadow);
         }
     }
     &:disabled + label {
@@ -360,6 +365,69 @@ input[type="radio"][monaRadioButton] {
         @include disabled;
         background-color: var(--mona-primary-dark);
         border: 3px solid var(--mona-border-color);
+    }
+}
+
+/** Slider */
+.mona-slider {
+    & .mona-slider-highlight {
+        background-color: var(--mona-primary);
+    }
+    & .mona-slider-handler {
+        background-color: var(--mona-primary);
+        border: 1px solid var(--mona-border-color);
+        &:focus,
+        &:active {
+            box-shadow: var(--mona-active-shadow);
+        }
+    }
+    &.mona-slider-horizontal {
+        & .mona-slider-track {
+            background-color: var(--mona-background);
+            border: 1px solid var(--mona-border-color);
+        }
+        & .mona-slider-tick-list {
+            & span.mona-slider-tick.mona-slider-tick-visible {
+                &:first-child {
+                    border-left: 1px solid var(--mona-border-color);
+                }
+                &:last-child {
+                    border-right: 1px solid var(--mona-border-color);
+                }
+                &:nth-child(even) {
+                    border-right: 1px solid var(--mona-border-color);
+                }
+            }
+        }
+        & .mona-slider-tick-label-list {
+            & span.mona-slider-tick-label {
+                color: var(--mona-text);
+            }
+        }
+    }
+    &.mona-slider-vertical {
+        & .mona-slider-track {
+            background-color: var(--mona-background);
+            border: 1px solid var(--mona-border-color);
+        }
+        & .mona-slider-tick-list {
+            & span.mona-slider-tick.mona-slider-tick-visible {
+                &:first-child {
+                    border-top: 1px solid var(--mona-border-color);
+                }
+                &:last-child {
+                    border-bottom: 1px solid var(--mona-border-color);
+                }
+                &:nth-child(even) {
+                    border-bottom: 1px solid var(--mona-border-color);
+                }
+            }
+        }
+        & .mona-slider-tick-label-list {
+            & span.mona-slider-tick-label {
+                color: var(--mona-text);
+            }
+        }
     }
 }
 
