@@ -43,14 +43,6 @@ div.mona-numeric-text-box-spinners {
             box-shadow: none;
         }
 
-        & > span {
-            transform-origin: center;
-            font-weight: bold;
-            font-size: 1.4rem;
-            display: inline-flex;
-            width: 100%;
-            align-items: center;
-            padding-bottom: 1px;
-        }
+        cursor: pointer;
     }
 }

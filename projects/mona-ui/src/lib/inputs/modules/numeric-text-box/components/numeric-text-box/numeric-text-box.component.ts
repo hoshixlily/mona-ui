@@ -1,16 +1,35 @@
-import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from "@angular/core";
+import {
+    Component,
+    ElementRef,
+    EventEmitter,
+    forwardRef,
+    Input,
+    OnDestroy,
+    OnInit,
+    Output,
+    ViewChild
+} from "@angular/core";
 import { delay, interval, Subject, takeUntil } from "rxjs";
 import { FocusMonitor, FocusOrigin } from "@angular/cdk/a11y";
 import { Action } from "../../../../../utils/Action";
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
+import { faChevronDown, faChevronUp, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 
 type Sign = "-" | "+";
 
 @Component({
     selector: "mona-numeric-text-box",
     templateUrl: "./numeric-text-box.component.html",
-    styleUrls: ["./numeric-text-box.component.scss"]
+    styleUrls: ["./numeric-text-box.component.scss"],
+    providers: [
+        {
+            provide: NG_VALUE_ACCESSOR,
+            useExisting: forwardRef(() => NumericTextBoxComponent),
+            multi: true
+        }
+    ]
 })
-export class NumericTextBoxComponent implements OnInit, OnDestroy {
+export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueAccessor {
     private readonly componentDestroy$: Subject<void> = new Subject<void>();
     private readonly specialKeys: string[] = [
         "Backspace",
@@ -24,6 +43,9 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy {
         "Delete",
         "Escaped"
     ];
+    private propagateChange: Action<number> | null = null;
+    public readonly decreaseIcon: IconDefinition = faChevronDown;
+    public readonly increaseIcon: IconDefinition = faChevronUp;
     public spin$: Subject<Sign> = new Subject<Sign>();
     public spinStop$: Subject<void> = new Subject<void>();
     public value$: Subject<string> = new Subject<string>();
@@ -174,6 +196,19 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy {
         const pastedData = event.clipboardData?.getData("Text");
         if (!pastedData || !NumericTextBoxComponent.isNumeric(pastedData)) {
             event.preventDefault();
+        }
+    }
+
+    public registerOnChange(fn: any) {
+        this.propagateChange = fn;
+    }
+
+    public registerOnTouched(fn: any) {}
+
+    public writeValue(obj: number) {
+        if (obj !== undefined) {
+            this.value = obj;
+            this.visibleValue = this.formatter(this.value) ?? "";
         }
     }
 
