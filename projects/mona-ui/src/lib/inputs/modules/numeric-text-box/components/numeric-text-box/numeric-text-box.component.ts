@@ -43,7 +43,7 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
         "Delete",
         "Escaped"
     ];
-    private propagateChange: Action<number> | null = null;
+    private propagateChange: Action<number | null> | null = null;
     public readonly decreaseIcon: IconDefinition = faChevronDown;
     public readonly increaseIcon: IconDefinition = faChevronUp;
     public spin$: Subject<Sign> = new Subject<Sign>();
@@ -264,7 +264,7 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
             } else {
                 this.increase();
             }
-            interval(50)
+            interval(100)
                 .pipe(delay(300), takeUntil(this.spinStop$))
                 .subscribe(() => {
                     if (sign === "-") {
@@ -279,5 +279,6 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
     private updateValue(value: string): void {
         this.value = NumericTextBoxComponent.isNumeric(value) ? parseFloat(value) : null;
         this.visibleValue = this.value == null ? "" : this.value;
+        this.propagateChange?.(this.value);
     }
 }
