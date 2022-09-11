@@ -1,0 +1,12 @@
+<div class="mona-numeric-text-box">
+    <input  monaTextBox [ngModel]="visibleValue" (ngModelChange)="value$.next($event)" (keydown)="onKeydown($event)" (paste)="onPaste($event)" (wheel)="onMouseWheel($event)"
+            autocomplete="off" tabindex="0" #valueTextBox>
+    <div class="mona-numeric-text-box-spinners">
+        <button monaButton (mousedown)="spin$.next('+')" (mouseup)="spinStop$.next()">
+<!--            <span>&rsaquo;</span>-->
+        </button>
+        <button monaButton (mousedown)="spin$.next('-')" (mouseup)="spinStop$.next()">
+<!--            <span>‹</span>-->
+        </button>
+    </div>
+</div>

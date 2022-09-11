@@ -1,0 +1,56 @@
+div.mona-numeric-text-box {
+    height: var(--mona-input-height);
+    display: flex;
+    & > [monaTextBox] {
+        width: 100%;
+        height: 100%;
+        border: none;
+    }
+}
+
+div.mona-numeric-text-box-spinners {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    border-left: 1px solid var(--mona-border-color);
+    & > [monaButton] {
+        min-height: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-right: none;
+        border-left: none;
+        flex: 1 1 50%;
+
+        &:first-child {
+            border-top: none;
+            //height: calc(var(--mona-input-height) / 2 - 1px);
+            & > span {
+                transform: rotate(270deg);
+            }
+        }
+
+        &:last-child {
+            border-bottom: none;
+            border-top: none;
+            //height: calc(var(--mona-input-height) / 2 - 1px);
+            & > span {
+                transform: rotate(270deg);
+            }
+        }
+
+        &:active, &:focus, &:focus-within {
+            box-shadow: none;
+        }
+
+        & > span {
+            transform-origin: center;
+            font-weight: bold;
+            font-size: 1.4rem;
+            display: inline-flex;
+            width: 100%;
+            align-items: center;
+            padding-bottom: 1px;
+        }
+    }
+}
