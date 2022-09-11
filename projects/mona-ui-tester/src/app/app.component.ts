@@ -17,6 +17,7 @@ export class AppComponent implements OnInit {
     public readonly snowflakeIcon: IconDefinition = faSnowflake;
     public readonly sunIcon: IconDefinition = faSun;
     public contextMenuItemVisible: boolean = true;
+    public numericTextBoxValue: number = 629;
     public rangedSliderValues: [number, number] = [6, 22];
     public sliderValue: number = 14;
     public switchValue: boolean = false;
@@ -51,6 +52,8 @@ export class AppComponent implements OnInit {
         //     this.contextMenuItemVisible = !this.contextMenuItemVisible;
         // }, 3000);
     }
+
+    public numericTextBoxFormatter = (value: number | null): string => (value != null ? `${value} °C` : "");
 
     public onButtonSelectedChange(selected: boolean): void {
         // console.log(`Button selected: ${selected}`);

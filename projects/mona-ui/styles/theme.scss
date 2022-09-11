@@ -57,7 +57,6 @@
     }
 }
 
-
 /** General **/
 .mona-no-animation {
     &, & * {
@@ -312,6 +311,18 @@ input[type="checkbox"][monaCheckBox] {
     &:indeterminate:disabled + label:before {
         @include disabled;
         border: 3px solid var(--mona-border-color);
+    }
+}
+
+/** Numeric Text Box */
+.mona-numeric-text-box {
+    background-color: var(--mona-background);
+    border: 1px solid var(--mona-border-color);
+    &:active, &:focus, &:focus-within {
+       box-shadow: var(--mona-active-shadow);
+    }
+    &.mona-disabled {
+        @include disabled;
     }
 }
 
