@@ -55,6 +55,9 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
     public decimals?: number = 0;
 
     @Input()
+    public disabled: boolean = false;
+
+    @Input()
     public formatter: Action<number | null, string> = (value: number | null): string =>
         value?.toFixed(this.decimals ?? 2) ?? "";
 
@@ -63,6 +66,9 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
 
     @Input()
     public min?: number;
+
+    @Input()
+    public readonly: boolean = false;
 
     @Input()
     public step: number = 0.1;
@@ -277,6 +283,9 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
     }
 
     private updateValue(value: string): void {
+        if (this.readonly) {
+            return;
+        }
         this.value = NumericTextBoxComponent.isNumeric(value) ? parseFloat(value) : null;
         this.visibleValue = this.value == null ? "" : this.value;
         this.propagateChange?.(this.value);

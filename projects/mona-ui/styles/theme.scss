@@ -321,6 +321,9 @@ input[type="checkbox"][monaCheckBox] {
     &:active, &:focus, &:focus-within {
        box-shadow: var(--mona-active-shadow);
     }
+    &.mona-disabled {
+        @include disabled;
+    }
 }
 
 /** Radio Button */

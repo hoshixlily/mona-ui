@@ -21,10 +21,14 @@ div.mona-numeric-text-box-spinners {
         border-right: none;
         border-left: none;
         flex: 1 1 50%;
+        font-size: 10px;
+
+        & fa-icon {
+            display: flex;
+        }
 
         &:first-child {
             border-top: none;
-            //height: calc(var(--mona-input-height) / 2 - 1px);
             & > span {
                 transform: rotate(270deg);
             }
@@ -33,7 +37,6 @@ div.mona-numeric-text-box-spinners {
         &:last-child {
             border-bottom: none;
             border-top: none;
-            //height: calc(var(--mona-input-height) / 2 - 1px);
             & > span {
                 transform: rotate(270deg);
             }
