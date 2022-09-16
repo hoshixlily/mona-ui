@@ -7,6 +7,7 @@
     padding: 0;
     box-sizing: border-box;
     font-family: 'Roboto', sans-serif;
+    font-weight: 400;
 }
 
 *::selection,
@@ -62,6 +63,19 @@
     &, & * {
         transition: none !important;
     }
+}
+
+/** Shared */
+.mona-input-selector {
+    width: auto;
+    height: var(--mona-input-height);
+    border: 1px solid var(--mona-border);
+    background: var(--mona-background);
+    color: var(--mona-text);
+    cursor: pointer;
+    @include hover-background;
+    @include active-background;
+    @include focus-shadow;
 }
 
 /** Buttons */
@@ -312,6 +326,41 @@ input[type="checkbox"][monaCheckBox] {
         @include disabled;
         border: 3px solid var(--mona-border-color);
     }
+}
+
+/** Color Palette */
+.mona-color-palette {
+    //background-color: var(--mona-background);
+    //border: 1px solid var(--mona-border-color);
+    & > div.mona-color-cell {
+        border: 2px solid black;
+        &.mona-selected {
+            border: 1px solid lightgray;
+            width: calc(100% + 2px);
+            height: calc(100% + 2px);
+            margin-left: -1px;
+            margin-top: -1px;
+        }
+        &:hover:not(.mona-selected) {
+            border: 1px solid black;
+        }
+    }
+}
+
+/** Color Picker */
+.mona-color-picker {
+    border: 1px solid var(--mona-border-color);
+    background: var(--mona-background);
+    & > div:first-child {
+        border: 1px solid black;
+    }
+    & > button {
+        color: var(--mona-text);
+    }
+}
+
+.mona-color-picker-popup {
+    padding: 2px !important;
 }
 
 /** Numeric Text Box */

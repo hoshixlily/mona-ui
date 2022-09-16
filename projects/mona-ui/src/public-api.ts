@@ -26,6 +26,12 @@ export * from "./lib/dropdowns/drop-downs.module";
 export * from "./lib/inputs/modules/check-box/directives/check-box.directive";
 export * from "./lib/inputs/modules/check-box/check-box.module";
 
+export * from "./lib/inputs/modules/color-palette/components/color-palette/color-palette.component";
+export * from "./lib/inputs/modules/color-palette/color-palette.module";
+
+export * from "./lib/inputs/modules/color-picker/components/color-picker/color-picker.component";
+export * from "./lib/inputs/modules/color-picker/color-picker.module";
+
 export * from "./lib/inputs/modules/numeric-text-box/components/numeric-text-box/numeric-text-box.component";
 export * from "./lib/inputs/modules/numeric-text-box/numeric-text-box.module";
 

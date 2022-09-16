@@ -148,7 +148,7 @@
     </div>
 
     <div style="display: flex; flex-direction: column; z-index: 100;">
-        <mona-slider style="width: 200px;" [value]="7"></mona-slider>
+        <mona-slider style="width: 200px;" [(ngModel)]="sliderValue"></mona-slider>
         <mona-slider [labelStep]="1" [value]="rangedSliderValues" orientation="horizontal" labelPosition="after"  (valueChange)="onRangedSliderValueChange($event)" [ranged]="true" style="width: 500px;" [min]="0" [max]="24" [step]="1">
             <ng-template monaSliderTickValueTemplate let-value>
                 <fa-icon [icon]="moonIcon" *ngIf="value < 6 || value > 22" style="color: mediumpurple;"></fa-icon>
@@ -158,6 +158,11 @@
 
         <mona-numeric-text-box [readonly]="true" [min]="-4" [step]="0.7" [(ngModel)]="numericTextBoxValue" [formatter]="numericTextBoxFormatter" style="margin-top: 10px; width: 200px;"></mona-numeric-text-box>
 
+    </div>
+
+    <div>
+        <mona-color-palette [palette]="colorPalette" [columns]="sliderValue" [tileSize]="27" [ngModel]="colorPaletteValue" (ngModelChange)="print($event)"></mona-color-palette>
+        <mona-color-picker [palette]="colorPalette" style="margin-left: 30px;"></mona-color-picker>
     </div>
 
 </div>
