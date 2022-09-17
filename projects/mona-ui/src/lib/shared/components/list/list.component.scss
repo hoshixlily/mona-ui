@@ -1,16 +1,23 @@
-div.mona-list {
-    display: flex;
+ul.mona-list {
+    list-style: none;
     user-select: none;
-    cursor: pointer;
+    width: 100%;
     outline: none;
-    height: var(--mona-input-height);
+    & li {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 4px 8px;
+        line-height: 1.42857143;
+        white-space: nowrap;
+        overflow: hidden;
+        cursor: pointer;
+
+    }
 }
 
-div.mona-list-value {
-    display: flex;
-    align-items: center;
-    white-space: nowrap;
-    padding: 0 8px;
-    flex: 1;
-}
+li.mona-list-group-header {
+    pointer-events: none;
+    font-weight: bold;
 
+}

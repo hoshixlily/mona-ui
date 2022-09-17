@@ -160,6 +160,14 @@
 <!--        <mona-slider style="width: 125px;"></mona-slider>-->
     </div>
 
+    <div>
+        <mona-list [data]="dropdownListDataItems" textField="text" valueField="value" groupField="group" selectionMode="multiple" (valueChange)="print($event)">
+            <ng-template monaListItemTemplate let-dataItem>
+                <span style="color: tomato; font-weight: bold;">{{dataItem.text}}</span>
+            </ng-template>
+        </mona-list>
+    </div>
+
 </div>
 
 <ng-template #popupContentTemplate>

@@ -65,6 +65,40 @@
     }
 }
 
+/** Shared Components **/
+ul.mona-list {
+    background: var(--mona-background);
+    border: 1px solid var(--mona-border);
+    & li {
+        @include background-transition;
+        @include hover-background;
+        color: var(--mona-text);
+
+        &:active:not(.mona-selected) {
+            @include active-background;
+        }
+
+        &.mona-selected {
+            background-color: var(--mona-primary);
+        }
+
+        &.mona-highlighted:not(.mona-selected) {
+            //@include hover-background;
+            border: 1px solid darkgray;
+        }
+
+        &.mona-disabled {
+            @include disabled;
+        }
+    }
+}
+
+li.mona-list-group-header {
+    background-color: var(--mona-background-dark);
+    border-top: 1px solid var(--mona-border-color);
+    border-bottom: 0.5px solid var(--mona-border-color);
+}
+
 /** Buttons */
 
 /** Button */

@@ -1,4 +1,4 @@
-<ul class="mona-list">
+<ul class="mona-list" [attr.tabindex]="0">
     <ng-container *ngIf="listData.length !== 0; else emptyTemplate;">
         <ng-container *ngFor="let group of listData">
             <ng-container>
@@ -13,7 +13,7 @@
                 </ng-container>
             </ng-container>
             <li class="mona-list-item" *ngFor="let item of group.source"
-                [ngClass]="{'mona-selected': item.value === selectedItem?.value, 'mona-disabled': item.disabled}"
+                [ngClass]="{'mona-selected': item.selected, 'mona-highlighted': item === highlightedItem, 'mona-disabled': item.disabled}"
                 (click)="onDropDownItemClick(item)">
                 <mona-list-item [item]="item" [itemTemplate]="itemTemplate" ></mona-list-item>
             </li>
