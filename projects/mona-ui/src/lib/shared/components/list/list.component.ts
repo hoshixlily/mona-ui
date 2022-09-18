@@ -38,6 +38,9 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
     public highlightedItem: ListItem | null = null;
 
     @Input()
+    public data: List<Group<string, ListItem>> = new List<Group<string, ListItem>>();
+
+    @Input()
     public disabled: boolean = false;
 
     @Input()
@@ -50,7 +53,7 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
     public set itemDisabler(disabler: Action<any, boolean> | string | null) {
         this.disabler = ListComponent.getDisabler(disabler);
         if (this.disabler) {
-            ListComponent.updateDisabledState(this.listData, this.disabler);
+            ListComponent.updateDisabledState(this.data, this.disabler);
         }
     }
 
@@ -59,9 +62,6 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
 
     @ViewChildren(ListItemComponent)
     public listItemComponents: QueryList<ListItemComponent> = new QueryList<ListItemComponent>();
-
-    @Input()
-    public listData: List<Group<string, ListItem>> = new List<Group<string, ListItem>>();
 
     @Output()
     public selectionChange: EventEmitter<ListItem> = new EventEmitter<ListItem>();
@@ -102,7 +102,7 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
                                 value: options.valueField ? d[options.valueField] : d
                             } as ListItem;
                         })
-                        .toIndexableList();
+                        .toList();
                     return new Group(g.key, items);
                 })
                 .orderBy(g => g.key)
@@ -180,7 +180,7 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
     public onDropDownItemSelect(item: ListItem, via: "navigation" | "selection" = "selection"): void {
         if (this.selectionMode === "single") {
             if (this.selectedValues.length !== 0) {
-                for (const listItem of this.listData.selectMany(g => g.source)) {
+                for (const listItem of this.data.selectMany(g => g.source)) {
                     listItem.selected = false;
                 }
             }
@@ -207,7 +207,7 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     private highlightFirstItem(): void {
-        this.highlightedItem = ListComponent.findFirstNonDisabledItem(this.listData);
+        this.highlightedItem = ListComponent.findFirstNonDisabledItem(this.data);
         if (this.highlightedItem) {
             this.setKeyManagerActiveItem(this.highlightedItem);
         }
@@ -229,7 +229,7 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
 
     private highlightNextItem(): void {
         if (this.highlightedItem) {
-            const nextItem = ListComponent.findNextNotDisabledItem(this.listData, this.highlightedItem);
+            const nextItem = ListComponent.findNextNotDisabledItem(this.data, this.highlightedItem);
             if (nextItem) {
                 this.highlightedItem = nextItem;
                 this.setKeyManagerActiveItem(this.highlightedItem);
@@ -239,7 +239,7 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
 
     private highlightPreviousItem(): void {
         if (this.highlightedItem) {
-            const previousItem = ListComponent.findPrevNotDisabledItem(this.listData, this.highlightedItem);
+            const previousItem = ListComponent.findPrevNotDisabledItem(this.data, this.highlightedItem);
             if (previousItem) {
                 this.highlightedItem = previousItem;
                 this.setKeyManagerActiveItem(previousItem);
@@ -299,7 +299,7 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     private updateSelectedValues(): void {
-        for (const item of this.listData.selectMany(g => g.source)) {
+        for (const item of this.data.selectMany(g => g.source)) {
             item.selected = this.selectedValues.includes(item);
         }
     }

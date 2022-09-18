@@ -1,7 +1,7 @@
 <ul class="mona-list" [attr.tabindex]="0">
-    <ng-container *ngIf="listData.length !== 0; else emptyTemplate;">
-        <ng-container *ngFor="let group of listData">
-            <ng-container>
+    <ng-container *ngIf="data.length !== 0; else emptyTemplate;">
+        <ng-container *ngFor="let group of data">
+            <ng-container *ngIf="$any(group.source).length !== 0">
                 <ng-container *ngIf="!groupTemplate">
                     <li class="mona-list-group-header" *ngIf="group.key">{{group.key}}</li>
                 </ng-container>

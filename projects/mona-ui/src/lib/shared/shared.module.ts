@@ -4,13 +4,14 @@ import { ListComponent } from "./components/list/list.component";
 import { ListItemComponent } from "./components/list-item/list-item.component";
 import { ListGroupTemplateDirective } from "./directives/list-group-template.directive";
 import { ListItemTemplateDirective } from "./directives/list-item-template.directive";
+import {TypeCastPipe} from "../pipes/type-cast.pipe";
 
 /**
  * Internal use only. Do not export.
  */
 @NgModule({
     declarations: [ListComponent, ListItemComponent, ListGroupTemplateDirective, ListItemTemplateDirective],
-    imports: [CommonModule],
+    imports: [CommonModule, TypeCastPipe],
     exports: [ListComponent, ListItemComponent, ListGroupTemplateDirective, ListItemTemplateDirective]
 })
 export class SharedModule {}

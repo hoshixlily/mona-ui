@@ -16,7 +16,7 @@
 </div>
 
 <ng-template #dropdownPopupTemplate>
-    <mona-list [listData]="listData" [textField]="textField" [valueField]="valueField" [groupField]="groupField" [itemDisabler]="itemDisabler"
+    <mona-list [data]="viewData" [textField]="textField" [valueField]="valueField" [groupField]="groupField" [itemDisabler]="itemDisabler"
                [value]="selectedListItems" (valueChange)="onSelectedListItemsChange($event)">
         <ng-container *ngIf="itemTemplate">
             <ng-template monaListItemTemplate let-dataItem let-listItem="listItem">

@@ -36,6 +36,7 @@ export class DropDownListComponent implements OnInit, OnDestroy, AfterViewInit {
     public listData: List<Group<string, ListItem>> = new List();
     public popupRef: PopupRef | null = null;
     public selectedListItems: ListItem[] = [];
+    public viewData: List<Group<string, ListItem>> = new List();
 
     @Input()
     public data: Iterable<any> = [];
@@ -97,7 +98,7 @@ export class DropDownListComponent implements OnInit, OnDestroy, AfterViewInit {
             valueField: this.valueField
         });
         if (this.value) {
-            const listItem = this.listData.selectMany(g => g.source).firstOrDefault(i => i.data === this.value);
+            const listItem = this.viewData.selectMany(g => g.source).firstOrDefault(i => i.data === this.value);
             this.selectedListItems = listItem && !listItem.disabled ? [listItem] : [];
         }
         this.setEventListeners();
@@ -152,7 +153,7 @@ export class DropDownListComponent implements OnInit, OnDestroy, AfterViewInit {
                 e.stopPropagation();
                 const event = e as KeyboardEvent;
                 if (event.key === "ArrowDown") {
-                    const nextItem = ListComponent.findNextNotDisabledItem(this.listData, this.selectedListItems[0]);
+                    const nextItem = ListComponent.findNextNotDisabledItem(this.viewData, this.selectedListItems[0]);
                     if (nextItem) {
                         this.selectedListItems = [nextItem];
                         this.value = nextItem.data;
@@ -160,7 +161,7 @@ export class DropDownListComponent implements OnInit, OnDestroy, AfterViewInit {
                     }
                 } else if (event.key === "ArrowUp") {
                     const previousItem = ListComponent.findPrevNotDisabledItem(
-                        this.listData,
+                        this.viewData,
                         this.selectedListItems[0]
                     );
                     if (previousItem) {

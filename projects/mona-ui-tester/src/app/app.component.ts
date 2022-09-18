@@ -64,11 +64,11 @@ export class AppComponent implements OnInit {
 
     public contextMenuItemVisible: boolean = true;
     public dropdownListDataItems: any[] = [
-        { text: "Item 1", value: 1, group: "Artistic", active: false },
-        { text: "Item 2", value: 2, group: "Bizarre", active: true },
-        { text: "Item 3", value: 3, group: "Curious", active: false },
-        { text: "Item 4", value: 4, group: "Artistic", active: false },
-        { text: "Item 5", value: 5, group: "Artistic", active: true }
+        { text: "Cherry", value: 1, group: "Fruit", active: false },
+        { text: "Cabbage", value: 2, group: "Vegetable", active: true },
+        { text: "Grilled Meat", value: 3, group: "Food", active: false },
+        { text: "Plum", value: 4, group: "Fruit", active: false },
+        { text: "Banana", value: 5, group: "Fruit", active: true }
     ];
     public numericTextBoxValue: number = 629;
     public rangedSliderValues: [number, number] = [12, 18];
@@ -76,6 +76,7 @@ export class AppComponent implements OnInit {
     public sliderValue: number = 8;
     public switchValue: boolean = false;
     public textBoxValue: string = "TEXT BOX VALUE";
+    public textBoxValue2: string = "a";
 
     @ViewChild("italicButtonRef", { read: ElementRef })
     public italicButtonRef!: ElementRef<HTMLButtonElement>;
