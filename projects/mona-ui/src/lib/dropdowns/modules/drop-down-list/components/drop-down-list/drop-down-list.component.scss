@@ -1,16 +1,3 @@
 div.mona-dropdown-list {
-    display: flex;
     user-select: none;
-    cursor: pointer;
-    outline: none;
-    height: var(--mona-input-height);
 }
-
-div.mona-dropdown-list-value {
-    display: flex;
-    align-items: center;
-    white-space: nowrap;
-    padding: 0 8px;
-    flex: 1;
-}
-
