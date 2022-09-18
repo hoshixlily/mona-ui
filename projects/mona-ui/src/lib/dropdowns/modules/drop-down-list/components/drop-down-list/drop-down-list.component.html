@@ -1,4 +1,5 @@
 <div class="mona-dropdown mona-dropdown-list mona-input-selector" [attr.tabindex]="disabled ? -1 : 0"
+     [ngClass]="{'mona-disabled': disabled}"
      (click)="open()"
      #dropdownWrapper>
     <div class="mona-input-selector-value">

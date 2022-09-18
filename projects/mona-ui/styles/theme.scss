@@ -226,6 +226,12 @@ mona-button-group button[monaButton] {
     width: 100%;
 }
 
+.mona-dropdown-list {
+    &.mona-disabled {
+        @include disabled;
+    }
+}
+
 .mona-dropdown-no-data {
     display: flex;
     align-items: center;
