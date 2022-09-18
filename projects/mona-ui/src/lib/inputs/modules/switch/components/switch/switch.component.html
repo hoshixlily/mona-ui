@@ -1,0 +1,15 @@
+<div class="mona-switch" [ngClass]="{'mona-switch-active': active}" (click)="toggle($event)">
+    <span class="mona-switch-label mona-switch-on">
+        <span *ngIf="active && !onLabelTemplate" @fadeInOut>{{labelOn}}</span>
+        <span *ngIf="active && onLabelTemplate" @fadeInOut>
+            <ng-template [ngTemplateOutlet]="onLabelTemplate"></ng-template>
+        </span>
+    </span>
+    <span class="mona-switch-label mona-switch-off">
+        <span *ngIf="!active && !offLabelTemplate" @fadeInOut>{{labelOff}}</span>
+        <span *ngIf="!active && offLabelTemplate" @fadeInOut>
+            <ng-template [ngTemplateOutlet]="offLabelTemplate"></ng-template>
+        </span>
+    </span>
+    <span class="mona-switch-handle" [ngClass]="{'mona-switch-on': active, 'mona-switch-off': !active}"></span>
+</div>

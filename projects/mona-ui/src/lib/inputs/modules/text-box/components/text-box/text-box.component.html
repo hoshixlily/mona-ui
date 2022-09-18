@@ -1,0 +1,9 @@
+<div class="mona-text-box">
+    <span class="mona-text-box-prefix" *ngIf="prefixTemplate">
+        <ng-container *ngTemplateOutlet="prefixTemplate"></ng-container>
+    </span>
+    <input [disabled]="disabled" [ngModel]="value" (ngModelChange)="onValueChange($event)" (blur)="inputBlur.emit($event)" (focus)="inputFocus.emit($event)" monaTextBox />
+    <span class="mona-text-box-suffix" *ngIf="suffixTemplate">
+        <ng-container *ngTemplateOutlet="suffixTemplate"></ng-container>
+    </span>
+</div>

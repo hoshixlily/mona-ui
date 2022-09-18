@@ -7,7 +7,7 @@ ul {
     list-style: none;
     outline: none;
     & li {
-        height: var(--mona-input-height);
+        height: calc(var(--mona-input-height) - 4px);
         &.divider {
             height: auto;
             pointer-events: none;

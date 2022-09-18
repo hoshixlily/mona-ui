@@ -47,6 +47,9 @@ export class ContextMenuComponent implements OnInit, OnDestroy, AfterContentInit
     public offset?: PopupOffset;
 
     @Input()
+    public popupClass: string | string[] = [];
+
+    @Input()
     public target!: FlexibleConnectedPositionStrategyOrigin;
 
     @Input()
@@ -87,6 +90,7 @@ export class ContextMenuComponent implements OnInit, OnDestroy, AfterContentInit
     private create(event: PointerEvent): void {
         this.contextMenuInjectorData.menuClick = this.menuClickNotifier;
         this.contextMenuInjectorData.menuItems = this.menuItems;
+        this.contextMenuInjectorData.popupClass = this.popupClass;
         this.contextMenuRef = this.contextMenuService.open({
             anchor: this.precise ? { x: event.x, y: event.y } : this.target,
             closeOnOutsideClick: false,
@@ -94,7 +98,9 @@ export class ContextMenuComponent implements OnInit, OnDestroy, AfterContentInit
             data: this.contextMenuInjectorData,
             minWidth: this.minWidth,
             offset: this.offset,
-            popupClass: ["mona-contextmenu-content"],
+            popupClass: Array.isArray(this.popupClass)
+                ? ["mona-contextmenu-content", ...this.popupClass]
+                : ["mona-contextmenu-content", this.popupClass],
             width: this.width
         });
         this.contextMenuInjectorData.parentMenuRef = this.contextMenuRef;

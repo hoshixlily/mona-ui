@@ -9,6 +9,12 @@
     font-family: 'Roboto', sans-serif;
 }
 
+*::selection,
+*::-moz-selection {
+    background-color: var(--mona-primary-dark) !important;
+    color: var(--mona-text) !important;
+}
+
 @mixin active-background {
     &:active {
         background-color: var(--mona-background-darker);
@@ -24,6 +30,7 @@
 @mixin disabled {
     pointer-events: none;
     opacity: 0.5;
+    cursor: default;
     background-color: var(--mona-background-dark);
 }
 
@@ -52,7 +59,11 @@
 
 
 /** General **/
-
+.mona-no-animation {
+    &, & * {
+        transition: none !important;
+    }
+}
 
 /** Buttons */
 
@@ -131,6 +142,13 @@ mona-button-group button[monaButton] {
     }
     &:active {
         background-color: var(--mona-background-darker-2);
+    }
+}
+
+/** Split Button */
+.mona-split-button-popup {
+    & ul li {
+        height: var(--mona-input-height) !important;
     }
 }
 
@@ -228,6 +246,278 @@ span.mona-dropdown-icon {
     color: var(--mona-text);
 }
 
+
+
+/** Inputs */
+
+/** Check Box */
+input[type="checkbox"][monaCheckBox] {
+    display: none;
+    & + label {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        color: var(--mona-text);
+        font-size: 1.1rem;
+        user-select: none;
+        &:before {
+            content: "\2714";
+            background-color: var(--mona-background);
+            border: 1px solid var(--mona-border-color);
+            border-radius: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: calc(var(--mona-input-height) - 8px);
+            height: calc(var(--mona-input-height) - 8px);
+            margin-right: 4px;
+            vertical-align: middle;
+            color: transparent;
+            transition:background-color 0.15s ease-out, color 0.15s ease-out, border 0.15s ease-out;
+        }
+        &:active:before:not(:disabled) {
+            box-shadow: 0 0 10px -3px var(--mona-shadow-color);
+        }
+    }
+    &:checked + label:before {
+        background-color: var(--mona-primary-dark);
+        color: var(--mona-text);
+        padding-bottom: 2px;
+        padding-right: 1px;
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+    &:disabled + label {
+        cursor: default;
+        pointer-events: none;
+    }
+    &:disabled + label:before {
+        cursor: default;
+        pointer-events: none;
+        @include disabled;
+        border: 1px solid var(--mona-border-color);
+    }
+    &:checked:disabled + label:before {
+        background-color: var(--mona-disabled-color);
+        color: var(--mona-disabled-color);
+        @include disabled;
+        border: 1px solid var(--mona-border-color);
+    }
+    &:indeterminate + label:before {
+        content: " ";
+        background-color: var(--mona-primary);
+        color: var(--mona-background);
+        border: 3px solid var(--mona-background);
+    }
+    &:indeterminate:disabled + label:before {
+        @include disabled;
+        border: 3px solid var(--mona-border-color);
+    }
+}
+
+/** Radio Button */
+input[type="radio"][monaRadioButton] {
+    display: none;
+    & + label {
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        color: var(--mona-text);
+        font-size: 1.1rem;
+        user-select: none;
+        &:before {
+            content: " ";
+            background-color: var(--mona-background);
+            border: 3px solid var(--mona-background);
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: calc(var(--mona-input-height) - 8px);
+            height: calc(var(--mona-input-height) - 8px);
+            margin-right: 4px;
+            vertical-align: middle;
+            color: transparent;
+            transition: all 0.15s ease-out, border 0.1s ease-out;
+        }
+        &:active:before:not(:disabled) {
+            box-shadow: var(--mona-active-shadow);
+        }
+    }
+    &:disabled + label {
+        cursor: default;
+        pointer-events: none;
+    }
+    &:disabled + label:before {
+        @include disabled;
+        border: 3px solid var(--mona-border-color);
+    }
+    &:not(:disabled) + label:before {
+        border: 1px solid var(--mona-border-color);
+    }
+    &:checked + label:before {
+        content: " ";
+        background-color: var(--mona-primary-dark);
+        color: var(--mona-text);
+        border-width: 3px;
+    }
+    &:checked:disabled + label:before {
+        @include disabled;
+        background-color: var(--mona-primary-dark);
+        border: 3px solid var(--mona-border-color);
+    }
+}
+
+/** Slider */
+.mona-slider {
+    & .mona-slider-highlight {
+        background-color: var(--mona-primary);
+    }
+    & .mona-slider-handler {
+        background-color: var(--mona-primary);
+        border: 1px solid var(--mona-border-color);
+        &:focus,
+        &:active {
+            box-shadow: var(--mona-active-shadow);
+        }
+    }
+    &.mona-slider-horizontal {
+        & .mona-slider-track {
+            background-color: var(--mona-background);
+            border: 1px solid var(--mona-border-color);
+        }
+        & .mona-slider-tick-list {
+            & span.mona-slider-tick.mona-slider-tick-visible {
+                &:first-child {
+                    border-left: 1px solid var(--mona-border-color);
+                }
+                &:last-child {
+                    border-right: 1px solid var(--mona-border-color);
+                }
+                &:nth-child(even) {
+                    border-right: 1px solid var(--mona-border-color);
+                }
+            }
+        }
+        & .mona-slider-tick-label-list {
+            & span.mona-slider-tick-label {
+                color: var(--mona-text);
+            }
+        }
+    }
+    &.mona-slider-vertical {
+        & .mona-slider-track {
+            background-color: var(--mona-background);
+            border: 1px solid var(--mona-border-color);
+        }
+        & .mona-slider-tick-list {
+            & span.mona-slider-tick.mona-slider-tick-visible {
+                &:first-child {
+                    border-top: 1px solid var(--mona-border-color);
+                }
+                &:last-child {
+                    border-bottom: 1px solid var(--mona-border-color);
+                }
+                &:nth-child(even) {
+                    border-bottom: 1px solid var(--mona-border-color);
+                }
+            }
+        }
+        & .mona-slider-tick-label-list {
+            & span.mona-slider-tick-label {
+                color: var(--mona-text);
+            }
+        }
+    }
+}
+
+/** Switch */
+.mona-switch {
+    background-color: var(--mona-background);
+    border: 1px solid var(--mona-border-color);
+    &.mona-switch-active {
+        & .mona-switch-handle {
+            background-color: var(--mona-primary-dark);
+        }
+    }
+}
+
+.mona-switch-label {
+    color: var(--mona-text);
+}
+
+.mona-switch-handle {
+    background-color: var(--mona-background-light);
+    border: 1px solid var(--mona-border-color);
+    &:active:not(:disabled),
+    &:focus-within:not(:disabled),
+    &:focus:not(:disabled) {
+        box-shadow: 0 0 10px -3px var(--mona-shadow-color);
+    }
+}
+
+/** Text Area */
+textarea[monaTextArea] {
+    padding: 4px;
+    background-color: var(--mona-background);
+    color: var(--mona-text);
+    border: 1px solid var(--mona-border-color);
+    outline: none;
+    min-height: var(--mona-input-height);
+    overflow: auto;
+    resize: both;
+    transition: box-shadow 0.15s ease-in-out;
+    &:focus:not(:disabled),
+    &:focus-within:not(:disabled),
+    &:active:not(:disabled) {
+        box-shadow: 0 0 10px -3px var(--mona-shadow-color);
+    }
+    &[disabled] {
+        @include disabled;
+    }
+}
+
+/** Text Box */
+
+input[monaTextBox] {
+    height: var(--mona-input-height);
+    padding: 2px 4px;
+    border: 1px solid var(--mona-border-color);
+    outline: none;
+    background-color: var(--mona-background);
+    color: var(--mona-text);
+    transition: box-shadow 0.15s ease-in-out;
+    &:focus:not(:disabled),
+    &:focus-within:not(:disabled),
+    &:active:not(:disabled) {
+        box-shadow: 0 0 10px -3px var(--mona-shadow-color);
+    }
+    &[disabled] {
+        @include disabled;
+    }
+}
+
+.mona-text-box {
+    background-color: var(--mona-background);
+    border: 1px solid var(--mona-border-color);
+    transition: box-shadow 0.15s ease-in-out;
+    &:active, &:focus, &:focus-within {
+        box-shadow: 0 0 10px -3px var(--mona-shadow-color);
+    }
+    & span.mona-text-box-prefix,
+    & span.mona-text-box-suffix {
+        color: var(--mona-text);
+        &.mona-disabled {
+            @include disabled;
+        }
+    }
+    span.mona-text-box-prefix {
+        border-right: 1px solid var(--mona-border-color);
+    }
+    span.mona-text-box-suffix {
+        border-left: 1px solid var(--mona-border-color);
+    }
+}
 
 
 /** Menu */
