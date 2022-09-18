@@ -94,11 +94,12 @@
     </div>
 
     <div>
-        <mona-drop-down-list [data]="dropdownListDataItems" groupField="group" textField="text" valueField="value"
-                             [value]="dropdownListDataItems[1]" (valueChange)="onDropDownValueChange($event)" style="width: 150px;">
-<!--            <ng-template monaDropDownListItemTemplate let-dataItem>-->
-<!--                <span style="color: limegreen;" *ngIf="dataItem.value <= 3">{{dataItem.text}}</span>-->
-<!--                <span style="color: mediumvioletred;" *ngIf="dataItem.value > 3">{{dataItem.text}}</span>-->
+        <mona-drop-down-list [data]="dropdownListDataItems" groupField="group" textField="text" valueField="value" [itemDisabler]="'active'"
+                             [value]="selectedDropdownListDataItem" (valueChange)="onDropDownValueChange($event)" style="width: 150px;">
+<!--            <ng-template monaDropDownListItemTemplate let-dataItem let-listItem="listItem">-->
+<!--                <span style="color: deeppink;" *ngIf="!listItem.disabled && dataItem.value <= 3">{{dataItem.text}}</span>-->
+<!--                <span style="color: deepskyblue;" *ngIf="!listItem.disabled && dataItem.value > 3">{{dataItem.text}}</span>-->
+<!--                <span *ngIf="listItem.disabled" style="opacity: 0.5">{{dataItem.text}}</span>-->
 <!--            </ng-template>-->
 <!--            <ng-template monaDropDownListValueTemplate let-dataItem>-->
 <!--                <span style="color: darkorange; font-weight: 600;">{{dataItem?.text}}</span>-->
@@ -159,6 +160,14 @@
         <mona-numeric-text-box [readonly]="true" [min]="-4" [step]="0.7" [(ngModel)]="numericTextBoxValue" [formatter]="numericTextBoxFormatter" style="margin-top: 10px; width: 200px;"></mona-numeric-text-box>
 
     </div>
+
+<!--    <div>-->
+<!--        <mona-list [data]="dropdownListDataItems" textField="text" valueField="value" groupField="group" selectionMode="multiple" (valueChange)="print($event)">-->
+<!--            <ng-template monaListItemTemplate let-dataItem>-->
+<!--                <span style="color: tomato; font-weight: bold;">{{dataItem.text}}</span>-->
+<!--            </ng-template>-->
+<!--        </mona-list>-->
+<!--    </div>-->
 
 </div>
 
