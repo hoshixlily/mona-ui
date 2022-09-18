@@ -25,22 +25,37 @@ export * from "./lib/dropdowns/drop-downs.module";
 /** Inputs */
 export * from "./lib/inputs/modules/check-box/directives/check-box.directive";
 export * from "./lib/inputs/modules/check-box/check-box.module";
+
+export * from "./lib/inputs/modules/color-palette/components/color-palette/color-palette.component";
+export * from "./lib/inputs/modules/color-palette/color-palette.module";
+
+export * from "./lib/inputs/modules/color-picker/components/color-picker/color-picker.component";
+export * from "./lib/inputs/modules/color-picker/color-picker.module";
+
+export * from "./lib/inputs/modules/numeric-text-box/components/numeric-text-box/numeric-text-box.component";
+export * from "./lib/inputs/modules/numeric-text-box/numeric-text-box.module";
+
 export * from "./lib/inputs/modules/radio-button/directives/radio-button.directive";
 export * from "./lib/inputs/modules/radio-button/radio-button.module";
+
 export * from "./lib/inputs/modules/slider/directives/slider-tick-value-template.directive";
 export * from "./lib/inputs/modules/slider/components/slider/slider.component";
 export * from "./lib/inputs/modules/slider/slider.module";
+
 export * from "./lib/inputs/modules/switch/directives/switch-off-label-template.directive";
 export * from "./lib/inputs/modules/switch/directives/switch-on-label-template.directive";
 export * from "./lib/inputs/modules/switch/components/switch/switch.component";
 export * from "./lib/inputs/modules/switch/switch.module";
+
 export * from "./lib/inputs/modules/text-area/directives/text-area.directive";
 export * from "./lib/inputs/modules/text-area/text-area.module";
+
 export * from "./lib/inputs/modules/text-box/directives/text-box.directive";
 export * from "./lib/inputs/modules/text-box/directives/text-box-prefix-template.directive";
 export * from "./lib/inputs/modules/text-box/directives/text-box-suffix-template.directive";
 export * from "./lib/inputs/modules/text-box/components/text-box/text-box.component";
 export * from "./lib/inputs/modules/text-box/text-box.module";
+
 export * from "./lib/inputs/inputs.module";
 
 /** Menus */
