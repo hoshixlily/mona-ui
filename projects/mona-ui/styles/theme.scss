@@ -65,7 +65,45 @@
     }
 }
 
-/** Shared */
+/** Shared Components **/
+ul.mona-list {
+    background: var(--mona-background);
+    border: 1px solid var(--mona-border);
+    & li {
+        @include hover-background;
+        color: var(--mona-text);
+
+        &:active:not(.mona-selected) {
+            @include active-background;
+        }
+
+        &.mona-selected {
+            background-color: var(--mona-primary);
+        }
+
+        // TODO: Update this to a better visual style
+        &.mona-highlighted:not(.mona-selected) {
+            //@include hover-background;
+            border: 1px solid darkgray;
+        }
+
+        &.mona-disabled {
+            @include disabled;
+        }
+    }
+}
+
+li.mona-list-group-header {
+    background-color: var(--mona-background-dark);
+    border-top: 1px solid var(--mona-border-color);
+    border-bottom: 0.5px solid var(--mona-border-color);
+}
+
+.mona-list-popup-content {
+    padding: 0 !important;
+    border-top: none !important;
+
+
 .mona-input-selector {
     width: auto;
     height: var(--mona-input-height);
@@ -186,45 +224,7 @@ mona-button-group button[monaButton] {
     padding: 0 !important;
     overflow: hidden auto;
     border-top: 1px solid transparent !important;
-    max-height: 200px;
-}
-
-ul.mona-dropdown-items-list {
-    list-style: none;
-    user-select: none;
-    width: 100%;
-    & li {
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-        padding: 4px 8px;
-        line-height: 1.42857143;
-        white-space: nowrap;
-        overflow: hidden;
-        cursor: pointer;
-        @include background-transition;
-        @include hover-background;
-
-        &:active {
-            background-color: var(--mona-primary);
-        }
-
-        &.mona-selected {
-            background-color: var(--mona-primary);
-        }
-
-        &.mona-disabled {
-            @include disabled;
-        }
-    }
-}
-
-li.mona-dropdown-list-group-header {
-    pointer-events: none;
-    font-weight: bold;
-    background-color: var(--mona-background-dark);
-    border-top: 1px solid var(--mona-border-color);
-    border-bottom: 0.5px solid var(--mona-border-color);
+    max-height: 250px;
 }
 
 div.mona-dropdown-list-menu {
@@ -232,18 +232,7 @@ div.mona-dropdown-list-menu {
     display: flex;
     align-items: center;
     justify-content: center;
-    //border-left: 1px solid var(--mona-border-color);
-}
-
-span.mona-dropdown-icon {
-    font-size: 18px;
-    display: inline-block;
-    transform-origin: center;
-    transform: rotate(90deg);
     color: var(--mona-text);
-    &::before {
-        content: '\203A';
-    }
 }
 
 /** Dropdown List */
@@ -258,8 +247,6 @@ span.mona-dropdown-icon {
 .mona-dropdown-list-value {
     color: var(--mona-text);
 }
-
-
 
 /** Inputs */
 

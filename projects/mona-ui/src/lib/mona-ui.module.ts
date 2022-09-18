@@ -6,6 +6,7 @@ import { DropDownsModule } from "./dropdowns/drop-downs.module";
 import { InputsModule } from "./inputs/inputs.module";
 
 @NgModule({
-    exports: [ButtonsModule, DropDownsModule, InputsModule, MenusModule, PopupModule]
+    exports: [ButtonsModule, DropDownsModule, InputsModule, MenusModule, PopupModule],
+    declarations: []
 })
 export class MonaUiModule {}

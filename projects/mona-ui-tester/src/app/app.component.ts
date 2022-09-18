@@ -62,19 +62,19 @@ export class AppComponent implements OnInit {
     public colorPaletteValue: string = "#fb9a99";
 
     public contextMenuItemVisible: boolean = true;
+    public dropdownListDataItems: any[] = [
+        { text: "Item 1", value: 1, group: "Artistic", active: false },
+        { text: "Item 2", value: 2, group: "Bizarre", active: true },
+        { text: "Item 3", value: 3, group: "Curious", active: false },
+        { text: "Item 4", value: 4, group: "Artistic", active: false },
+        { text: "Item 5", value: 5, group: "Artistic", active: true }
+    ];
     public numericTextBoxValue: number = 629;
     public rangedSliderValues: [number, number] = [6, 22];
+    public selectedDropdownListDataItem: any;
     public sliderValue: number = 14;
     public switchValue: boolean = false;
     public textBoxValue: string = "TEXT BOX VALUE";
-
-    public dropdownListDataItems: any[] = [
-        { text: "Item 1", value: 1, group: "Artistic", disabled: false },
-        { text: "Item 2", value: 2, group: "Bizarre", disabled: true },
-        { text: "Item 3", value: 3, group: "Curious", disabled: true },
-        { text: "Item 4", value: 4, group: "Artistic", disabled: false },
-        { text: "Item 5", value: 5, group: "Artistic", disabled: true }
-    ];
 
     @ViewChild("italicButtonRef", { read: ElementRef })
     public italicButtonRef!: ElementRef<HTMLButtonElement>;
@@ -93,6 +93,7 @@ export class AppComponent implements OnInit {
     public dropdownItemDisabler = (item: any): boolean => item.value % 2 === 0;
 
     public ngOnInit(): void {
+        this.selectedDropdownListDataItem = this.dropdownListDataItems[2];
         // window.setInterval(() => {
         //     this.contextMenuItemVisible = !this.contextMenuItemVisible;
         // }, 3000);
@@ -105,6 +106,7 @@ export class AppComponent implements OnInit {
     }
 
     public onDropDownValueChange(value: unknown): void {
+        this.selectedDropdownListDataItem = value;
         // console.log(`Dropdown value changed`);
         // console.log(value);
     }

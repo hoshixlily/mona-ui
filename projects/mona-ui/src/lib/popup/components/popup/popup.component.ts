@@ -17,6 +17,7 @@ import { FlexibleConnectedPositionStrategyOrigin } from "@angular/cdk/overlay";
 import { PopupSettings } from "../../models/PopupSettings";
 import { PopupOffset } from "../../models/PopupOffset";
 import { PopupService } from "../../services/popup.service";
+import { Element } from "@angular/compiler";
 
 @Component({
     selector: "mona-popup",
@@ -125,7 +126,7 @@ export class PopupComponent implements OnInit, OnDestroy, AfterViewInit {
         this.zone.runOutsideAngular(() => {
             this.popupTriggerListener = this.renderer.listen(target, this.trigger, (event: Event) => {
                 event.preventDefault();
-                if (pointAnchor && this.popupOpened) {
+                if (this.popupOpened) {
                     this.popupOpened = false;
                     return;
                 }
@@ -135,7 +136,10 @@ export class PopupComponent implements OnInit, OnDestroy, AfterViewInit {
                         this.popupRef = null;
                         this.close.emit();
                         subscription.unsubscribe();
-                        if (result instanceof PointerEvent && pointAnchor && result.type !== this.trigger) {
+                        if (result instanceof PointerEvent && result.type === this.trigger) {
+                            this.popupOpened =
+                                target instanceof HTMLElement && target.contains(result.target as HTMLElement);
+                        } else if (result instanceof PointerEvent && pointAnchor && result.type !== this.trigger) {
                             this.popupOpened = false;
                         }
                     });
