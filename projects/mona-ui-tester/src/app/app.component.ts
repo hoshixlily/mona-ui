@@ -71,9 +71,9 @@ export class AppComponent implements OnInit {
         { text: "Item 5", value: 5, group: "Artistic", active: true }
     ];
     public numericTextBoxValue: number = 629;
-    public rangedSliderValues: [number, number] = [6, 22];
+    public rangedSliderValues: [number, number] = [12, 18];
     public selectedDropdownListDataItem: any;
-    public sliderValue: number = 14;
+    public sliderValue: number = 8;
     public switchValue: boolean = false;
     public textBoxValue: string = "TEXT BOX VALUE";
 
@@ -125,13 +125,13 @@ export class AppComponent implements OnInit {
         // console.log("Popup opened: ", ref);
     }
 
-    public onRangedSliderValueChange(value: number | [number, number]): void {
-        // console.log(value);
-        this.rangedSliderValues = value as [number, number];
+    public onRangedSliderValueChange(value: [number, number]): void {
+        console.log(value);
+        this.rangedSliderValues = value;
     }
 
     public onSliderValueChange(value: number): void {
-        // console.log(value);
+        console.log(value);
         this.sliderValue = value;
     }
 

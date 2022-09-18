@@ -111,7 +111,6 @@ export class DropDownListComponent implements OnInit, OnDestroy, AfterViewInit {
             this.popupRef?.close();
             this.popupRef = null;
         }
-        console.log("onSelectedListItemsChange", event);
     }
 
     public open(): void {
