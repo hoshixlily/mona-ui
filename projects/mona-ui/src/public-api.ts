@@ -38,6 +38,8 @@ export * from "./lib/inputs/modules/numeric-text-box/numeric-text-box.module";
 export * from "./lib/inputs/modules/radio-button/directives/radio-button.directive";
 export * from "./lib/inputs/modules/radio-button/radio-button.module";
 
+export * from "./lib/inputs/modules/slider/components/range-slider/range-slider.component";
+
 export * from "./lib/inputs/modules/slider/directives/slider-tick-value-template.directive";
 export * from "./lib/inputs/modules/slider/components/slider/slider.component";
 export * from "./lib/inputs/modules/slider/slider.module";
