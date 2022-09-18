@@ -5,6 +5,9 @@ import { ListItemComponent } from "./components/list-item/list-item.component";
 import { ListGroupTemplateDirective } from "./directives/list-group-template.directive";
 import { ListItemTemplateDirective } from "./directives/list-item-template.directive";
 
+/**
+ * Internal use only. Do not export.
+ */
 @NgModule({
     declarations: [ListComponent, ListItemComponent, ListGroupTemplateDirective, ListItemTemplateDirective],
     imports: [CommonModule],

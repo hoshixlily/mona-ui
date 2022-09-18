@@ -21,6 +21,7 @@ import { MenuItemComponent } from "../../../../../menus/modules/shared-menu/comp
 import { MenuItem } from "../../../../../menus/modules/context-menu/models/MenuItem";
 import { Subject, takeUntil } from "rxjs";
 import { SplitButtonTextTemplateDirective } from "../../directives/split-button-text-template.directive";
+import { faChevronDown, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 
 @Component({
     selector: "mona-split-button",
@@ -29,6 +30,7 @@ import { SplitButtonTextTemplateDirective } from "../../directives/split-button-
 })
 export class SplitButtonComponent implements OnInit, AfterViewInit, AfterContentInit, OnDestroy {
     private readonly componentDestroy$: Subject<void> = new Subject<void>();
+    public readonly menuIcon: IconDefinition = faChevronDown;
     public menuItems: MenuItem[] = [];
     public popupOffset: PopupOffset = {
         horizontal: 0,

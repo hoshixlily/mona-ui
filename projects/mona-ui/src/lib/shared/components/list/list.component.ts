@@ -6,7 +6,6 @@ import {
     ElementRef,
     EventEmitter,
     Input,
-    NgZone,
     OnDestroy,
     OnInit,
     Output,
@@ -23,6 +22,8 @@ import { ListItem } from "../../data/ListItem";
 import { ListGroupTemplateDirective } from "../../directives/list-group-template.directive";
 import { ListItemTemplateDirective } from "../../directives/list-item-template.directive";
 import { SelectionMode } from "../../../models/SelectionMode";
+import { ValueChangeEvent } from "../../data/ValueChangeEvent";
+import { ListDataCreationOptions } from "../../data/ListDataCreationOptions";
 
 @Component({
     selector: "mona-list",
@@ -31,16 +32,10 @@ import { SelectionMode } from "../../../models/SelectionMode";
 })
 export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
     private readonly componentDestroy$: Subject<void> = new Subject<void>();
-    private disabler?: Action<ListItem, boolean>;
-    private itemCount: number = 0;
+    private disabler?: Action<ListItem, boolean> | null = null;
     private keyManager!: ActiveDescendantKeyManager<ListItemComponent>;
+    private selectedValues: ListItem[] = [];
     public highlightedItem: ListItem | null = null;
-    public listData: List<Group<string, ListItem>> = new List<Group<string, ListItem>>();
-
-    @Input()
-    public set data(data: Iterable<any>) {
-        this.processDropdownData(data);
-    }
 
     @Input()
     public disabled: boolean = false;
@@ -52,13 +47,11 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
     public groupTemplate?: TemplateRef<void>;
 
     @Input()
-    public set itemDisabler(disabler: Action<any, boolean> | string) {
-        if (typeof disabler === "string") {
-            this.disabler = (item: any) => !!item?.[disabler] ?? false;
-        } else {
-            this.disabler = disabler;
+    public set itemDisabler(disabler: Action<any, boolean> | string | null) {
+        this.disabler = ListComponent.getDisabler(disabler);
+        if (this.disabler) {
+            ListComponent.updateDisabledState(this.listData, this.disabler);
         }
-        // this.updateDisabledState();
     }
 
     @ContentChild(ListItemTemplateDirective, { read: TemplateRef })
@@ -66,6 +59,9 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
 
     @ViewChildren(ListItemComponent)
     public listItemComponents: QueryList<ListItemComponent> = new QueryList<ListItemComponent>();
+
+    @Input()
+    public listData: List<Group<string, ListItem>> = new List<Group<string, ListItem>>();
 
     @Output()
     public selectionChange: EventEmitter<ListItem> = new EventEmitter<ListItem>();
@@ -77,109 +73,33 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
     public textField?: string;
 
     @Input()
-    public value: ListItem[] = [];
+    public set value(value: ListItem[]) {
+        this.selectedValues = value;
+        this.updateSelectedValues();
+    }
 
     @Output()
-    public valueChange: EventEmitter<ListItem[]> = new EventEmitter<ListItem[]>();
+    public valueChange: EventEmitter<ValueChangeEvent> = new EventEmitter<ValueChangeEvent>();
 
     @Input()
     public valueField?: string;
 
-    public constructor(
-        private readonly cdr: ChangeDetectorRef,
-        private readonly elementRef: ElementRef<HTMLElement>,
-        private readonly zone: NgZone
-    ) {}
+    public constructor(private readonly cdr: ChangeDetectorRef, private readonly elementRef: ElementRef<HTMLElement>) {}
 
-    public ngAfterViewInit(): void {
-        this.keyManager = new ActiveDescendantKeyManager<ListItemComponent>(this.listItemComponents).skipPredicate(
-            li => !!li.item?.disabled
-        );
-        // this.elemenRef.nativeElement.tabIndex = 0;
-        this.setEventListeners();
-    }
-
-    public ngOnDestroy(): void {
-        this.componentDestroy$.next();
-        this.componentDestroy$.complete();
-    }
-
-    public ngOnInit(): void {
-        if (this.selectionMode === "single") {
-            if (this.value.length !== 0) {
-                for (const item of this.listData.selectMany(g => g.source)) {
-                    item.selected = this.value[0] === item;
-                }
-            }
-        } else {
-            for (const item of this.listData.selectMany(g => g.source)) {
-                item.selected = this.value.includes(item);
-            }
-        }
-    }
-
-    public onDropDownItemClick(item: ListItem): void {
-        if (this.selectionMode === "single") {
-            if (this.value.length !== 0) {
-                for (const listItem of this.listData.selectMany(g => g.source)) {
-                    listItem.selected = false;
-                }
-            }
-            item.selected = true;
-            this.value = [item];
-            this.valueChange.emit(this.value);
-        } else {
-            if (this.value.includes(item)) {
-                item.selected = false;
-                this.value = this.value.filter(d => d !== item);
-            } else {
-                item.selected = true;
-                this.value = [...this.value, item];
-            }
-            this.valueChange.emit(this.value);
-        }
-        this.highlightedItem = item;
-    }
-
-    private findFirstNonDisabledItem(): ListItem | null {
-        return this.listData.selectMany(g => g.source).firstOrDefault(d => !d.disabled);
-    }
-
-    private findNextNotDisabledItem(item: ListItem): ListItem | null {
-        return this.listData
-            .selectMany(d => d.source)
-            .skipWhile(d => d !== item)
-            .skip(1)
-            .skipWhile(d => !!d.disabled)
-            .firstOrDefault();
-    }
-
-    private findPrevNotDisabledItem(item: ListItem): ListItem | null {
-        return this.listData
-            .selectMany(d => d.source)
-            .reverse()
-            .skipWhile(d => d !== item)
-            .skip(1)
-            .skipWhile(d => !!d.disabled)
-            .firstOrDefault();
-    }
-
-    private processDropdownData(data: Iterable<any>): void {
-        this.listData.clear();
+    public static createListData(options: ListDataCreationOptions): List<Group<string, ListItem>> {
+        let data: List<Group<string, ListItem>> = new List<Group<string, ListItem>>();
         let index = 0;
-        if (this.groupField) {
-            this.listData = Enumerable.from(data)
-                .groupBy(d => d[this.groupField as string])
+        if (options.groupField) {
+            data = Enumerable.from(options.data)
+                .groupBy(d => d[options.groupField as string])
                 .select(g => {
                     const items = g.source
                         .select(d => {
-                            this.itemCount++;
                             return {
                                 data: d,
                                 index: index++,
-                                selected: this.value.map(v => v.data).includes(d),
-                                text: this.textField ? d[this.textField] : d,
-                                value: this.valueField ? d[this.valueField] : d
+                                text: options.textField ? d[options.textField] : d,
+                                value: options.valueField ? d[options.valueField] : d
                             } as ListItem;
                         })
                         .toIndexableList();
@@ -188,100 +108,146 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
                 .orderBy(g => g.key)
                 .toList();
         } else {
-            const items = Enumerable.from(data)
+            const items = Enumerable.from(options.data)
                 .select(d => {
-                    this.itemCount++;
                     return {
                         data: d,
                         index: index++,
-                        selected: this.value.map(v => v.data).includes(d),
-                        text: this.textField ? d[this.textField] : d,
-                        value: this.valueField ? d[this.valueField] : d
+                        text: options.textField ? d[options.textField as string] : d,
+                        value: options.valueField ? d[options.valueField as string] : d
                     } as ListItem;
                 })
                 .toList();
-            this.listData.add(new Group<string, any>("", items));
+            data.add(new Group<string, any>("", items));
         }
-        this.updateDisabledState();
+        if (options.disabler) {
+            ListComponent.updateDisabledState(data, options.disabler);
+        }
+        return data;
+    }
+
+    public static findFirstNonDisabledItem(listData: List<Group<string, ListItem>>): ListItem | null {
+        return listData.selectMany(g => g.source).firstOrDefault(d => !d.disabled);
+    }
+
+    public static findNextNotDisabledItem(listData: List<Group<string, ListItem>>, item: ListItem): ListItem | null {
+        return listData
+            .selectMany(d => d.source)
+            .skipWhile(d => d !== item)
+            .skip(1)
+            .skipWhile(d => !!d.disabled)
+            .firstOrDefault();
+    }
+
+    public static findPrevNotDisabledItem(listData: List<Group<string, ListItem>>, item: ListItem): ListItem | null {
+        return listData
+            .selectMany(d => d.source)
+            .reverse()
+            .skipWhile(d => d !== item)
+            .skip(1)
+            .skipWhile(d => !!d.disabled)
+            .firstOrDefault();
+    }
+
+    public static getDisabler(disabler: Action<any, boolean> | string | null): Action<ListItem, boolean> | null {
+        return typeof disabler === "string" ? (item: any) => !!item?.[disabler] ?? false : disabler;
+    }
+
+    public static updateDisabledState(
+        listData: List<Group<string, ListItem>>,
+        disabler: Action<ListItem, boolean>
+    ): void {
+        for (const item of listData.selectMany(g => g.source)) {
+            item.disabled = disabler(item.data);
+        }
+    }
+
+    public ngAfterViewInit(): void {
+        this.keyManager = new ActiveDescendantKeyManager<ListItemComponent>(this.listItemComponents).skipPredicate(
+            li => !!li.item?.disabled
+        );
+        this.highlightInitialSelectedItem();
+        this.setEventListeners();
+    }
+
+    public ngOnDestroy(): void {
+        this.componentDestroy$.next();
+        this.componentDestroy$.complete();
+    }
+
+    public ngOnInit(): void {}
+
+    public onDropDownItemSelect(item: ListItem, via: "navigation" | "selection" = "selection"): void {
+        if (this.selectionMode === "single") {
+            if (this.selectedValues.length !== 0) {
+                for (const listItem of this.listData.selectMany(g => g.source)) {
+                    listItem.selected = false;
+                }
+            }
+            item.selected = true;
+            this.selectedValues = [item];
+            this.valueChange.emit({
+                value: this.selectedValues,
+                via
+            });
+        } else {
+            if (this.selectedValues.includes(item)) {
+                item.selected = false;
+                this.selectedValues = this.selectedValues.filter(d => d !== item);
+            } else {
+                item.selected = true;
+                this.selectedValues = [...this.selectedValues, item];
+            }
+            this.valueChange.emit({
+                value: this.selectedValues,
+                via
+            });
+        }
+        this.highlightedItem = item;
     }
 
     private highlightFirstItem(): void {
-        this.highlightedItem = this.findFirstNonDisabledItem();
+        this.highlightedItem = ListComponent.findFirstNonDisabledItem(this.listData);
         if (this.highlightedItem) {
             this.setKeyManagerActiveItem(this.highlightedItem);
+        }
+    }
+
+    private highlightInitialSelectedItem(): void {
+        if (this.selectedValues.length > 0) {
             if (this.selectionMode === "single") {
-                this.onDropDownItemClick(this.highlightedItem);
+                this.highlightedItem = this.selectedValues[this.selectedValues.length - 1];
+                this.setKeyManagerActiveItem(this.highlightedItem);
+            } else {
+                this.highlightedItem = this.selectedValues[this.selectedValues.length - 1];
+                this.setKeyManagerActiveItem(this.highlightedItem);
             }
-            this.cdr.detectChanges();
+        } else {
+            this.highlightFirstItem();
         }
     }
 
     private highlightNextItem(): void {
         if (this.highlightedItem) {
-            const nextItem = this.findNextNotDisabledItem(this.highlightedItem);
+            const nextItem = ListComponent.findNextNotDisabledItem(this.listData, this.highlightedItem);
             if (nextItem) {
                 this.highlightedItem = nextItem;
                 this.setKeyManagerActiveItem(this.highlightedItem);
-                if (this.selectionMode === "single") {
-                    this.onDropDownItemClick(this.highlightedItem);
-                }
-                this.cdr.detectChanges();
             }
         }
     }
 
     private highlightPreviousItem(): void {
         if (this.highlightedItem) {
-            const previousItem = this.findPrevNotDisabledItem(this.highlightedItem);
+            const previousItem = ListComponent.findPrevNotDisabledItem(this.listData, this.highlightedItem);
             if (previousItem) {
                 this.highlightedItem = previousItem;
                 this.setKeyManagerActiveItem(previousItem);
-                if (this.selectionMode === "single") {
-                    this.onDropDownItemClick(this.highlightedItem);
-                }
-                this.cdr.detectChanges();
             }
         }
     }
 
     private setEventListeners(): void {
-        // this.zone.runOutsideAngular(() => {
-        // fromEvent<KeyboardEvent>(document, "keydown")
-        //     .pipe(
-        //         takeUntil(this.componentDestroy$),
-        //         filter(() => !this.disabled),
-        //         filter(e => e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === "Enter")
-        //     )
-        //     .subscribe(e => {
-        //         e.preventDefault();
-        //         if (e.key === "ArrowDown") {
-        //             this.zone.run(() => {
-        //                 if (!this.highlightedItem) {
-        //                     this.highlightFirstItem();
-        //                 } else {
-        //                     this.highlightNextItem();
-        //                 }
-        //             });
-        //         } else if (e.key === "ArrowUp") {
-        //             this.zone.run(() => {
-        //                 if (this.highlightedItem) {
-        //                     this.highlightPreviousItem();
-        //                 }
-        //             });
-        //         } else if (e.key === "Enter") {
-        //             this.zone.run(() => {
-        //                 if (this.keyManager.activeItem?.item) {
-        //                     if (this.keyManager.activeItem?.item) {
-        //                         this.onDropDownItemClick(this.keyManager.activeItem?.item);
-        //                     }
-        //                 }
-        //             });
-        //         } else {
-        //             this.zone.run(() => {
-        //                 this.keyManager.onKeydown(e);
-        //             });
-        //         }
-        //     });
         fromEvent(this.elementRef.nativeElement, "keydown")
             .pipe(
                 takeUntil(this.componentDestroy$),
@@ -295,28 +261,30 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
                 e.preventDefault();
                 const event = e as KeyboardEvent;
                 if (event.key === "ArrowDown") {
-                    // this.zone.run(() => {
                     if (!this.highlightedItem) {
                         this.highlightFirstItem();
+                        if (this.selectionMode === "single" && this.highlightedItem) {
+                            this.onDropDownItemSelect(this.highlightedItem, "navigation");
+                        }
                     } else {
                         this.highlightNextItem();
+                        if (this.selectionMode === "single") {
+                            this.onDropDownItemSelect(this.highlightedItem, "navigation");
+                        }
                     }
-                    // });
                 } else if (event.key === "ArrowUp") {
-                    // this.zone.run(() => {
                     if (this.highlightedItem) {
                         this.highlightPreviousItem();
+                        if (this.selectionMode === "single") {
+                            this.onDropDownItemSelect(this.highlightedItem, "navigation");
+                        }
                     }
-                    // });
                 } else if (event.key === "Enter") {
-                    // this.zone.run(() => {
                     if (this.keyManager.activeItem?.item) {
-                        this.onDropDownItemClick(this.keyManager.activeItem?.item);
+                        this.onDropDownItemSelect(this.keyManager.activeItem?.item, "selection");
                     }
-                    // });
                 }
             });
-        // });
     }
 
     private setKeyManagerActiveItem(item: ListItemComponent | ListItem): void {
@@ -330,11 +298,9 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
         }
     }
 
-    private updateDisabledState(): void {
-        if (this.disabler) {
-            for (const item of this.listData.selectMany(g => g.source)) {
-                item.disabled = this.disabler(item);
-            }
+    private updateSelectedValues(): void {
+        for (const item of this.listData.selectMany(g => g.source)) {
+            item.selected = this.selectedValues.includes(item);
         }
     }
 }
