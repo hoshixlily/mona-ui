@@ -1,6 +1,5 @@
 import { Component, ElementRef, OnInit, TemplateRef, ViewChild } from "@angular/core";
-import { PopupService, PopupRef, PopupSettings } from "mona-ui";
-import { take } from "rxjs";
+import { PopupRef, PopupService, PopupSettings } from "mona-ui";
 import { TestComponentComponent } from "./test-component/test-component.component";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { faMoon, faSearch, faSnowflake, faSun } from "@fortawesome/free-solid-svg-icons";
@@ -16,6 +15,53 @@ export class AppComponent implements OnInit {
     public readonly searchIcon: IconDefinition = faSearch;
     public readonly snowflakeIcon: IconDefinition = faSnowflake;
     public readonly sunIcon: IconDefinition = faSun;
+
+    public colorPalette: string[] = [
+        "#263400",
+        "#d61dff",
+        "#009700",
+        "#003ef0",
+        "#c1ca5a",
+        "#004dcf",
+        "#3e6f00",
+        "#d444c6",
+        "#002b00",
+        "#ff007f",
+        "#008981",
+        "#c4000c",
+        "#00c9ff",
+        "#c32f00",
+        "#0086fc",
+        "#ff6134",
+        "#00369b",
+        "#ffbe73",
+        "#002b7c",
+        "#ce773a",
+        "#ab8bff",
+        "#514700",
+        "#dbbfff",
+        "#003819",
+        "#97001f",
+        "#c8ebff",
+        "#4d0000",
+        "#f5ecf2",
+        "#001c1c",
+        "#ffd4c2",
+        "#00281c",
+        "#bd4b75",
+        "#00331f",
+        "#80519a",
+        "#302d00",
+        "#0078bb",
+        "#481100",
+        "#a37b5f",
+        "#4d162f",
+        "#57503a"
+    ];
+
+    public colorPaletteValue: string = "#fb9a99";
+    public colorPickerValue: string | null = "#0086fc";
+
     public contextMenuItemVisible: boolean = true;
     public dropdownListDataItems: any[] = [
         { text: "Item 1", value: 1, group: "Artistic", active: false },
@@ -58,6 +104,11 @@ export class AppComponent implements OnInit {
 
     public onButtonSelectedChange(selected: boolean): void {
         // console.log(`Button selected: ${selected}`);
+    }
+
+    public onColorPickerValueChange(value: string | null): void {
+        this.colorPickerValue = value;
+        console.log(value);
     }
 
     public onDropDownValueChange(value: unknown): void {

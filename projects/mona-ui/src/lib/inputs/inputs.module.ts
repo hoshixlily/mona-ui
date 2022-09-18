@@ -7,12 +7,16 @@ import { RadioButtonModule } from "./modules/radio-button/radio-button.module";
 import { SwitchModule } from "./modules/switch/switch.module";
 import { SliderModule } from "./modules/slider/slider.module";
 import { NumericTextBoxModule } from "./modules/numeric-text-box/numeric-text-box.module";
+import { ColorPaletteModule } from "./modules/color-palette/color-palette.module";
+import { ColorPickerModule } from "./modules/color-picker/color-picker.module";
 
 @NgModule({
     declarations: [],
     imports: [CommonModule],
     exports: [
         CheckBoxModule,
+        ColorPaletteModule,
+        ColorPickerModule,
         NumericTextBoxModule,
         RadioButtonModule,
         SliderModule,

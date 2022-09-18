@@ -7,6 +7,7 @@
     padding: 0;
     box-sizing: border-box;
     font-family: 'Roboto', sans-serif;
+    font-weight: 400;
 }
 
 *::selection,
@@ -65,6 +66,37 @@
 }
 
 /** Shared Components **/
+.mona-input-selector {
+    width: auto;
+    height: var(--mona-input-height);
+    border: 1px solid var(--mona-border);
+    background: var(--mona-background);
+    color: var(--mona-text);
+    cursor: pointer;
+    display: flex;
+    outline: none;
+    @include hover-background;
+    @include active-background;
+    @include focus-shadow;
+}
+
+.mona-input-selector-value {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    padding: 0 8px;
+    flex: 1;
+}
+
+.mona-input-selector-icon {
+    width: var(--mona-input-height);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--mona-text);
+}
+
+
 ul.mona-list {
     background: var(--mona-background);
     border: 1px solid var(--mona-border);
@@ -82,7 +114,6 @@ ul.mona-list {
 
         // TODO: Update this to a better visual style
         &.mona-highlighted:not(.mona-selected) {
-            //@include hover-background;
             border: 1px solid darkgray;
         }
 
@@ -102,6 +133,8 @@ li.mona-list-group-header {
     padding: 0 !important;
     border-top: none !important;
 }
+
+
 
 /** Buttons */
 
@@ -214,27 +247,6 @@ mona-button-group button[monaButton] {
     max-height: 250px;
 }
 
-div.mona-dropdown-list-menu {
-    width: var(--mona-input-height);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--mona-text);
-}
-
-/** Dropdown List */
-.mona-dropdown-list {
-    background-color: var(--mona-background);
-    border: 1px solid var(--mona-border-color);
-
-    @include hover-background;
-    @include focus-shadow;
-}
-
-.mona-dropdown-list-value {
-    color: var(--mona-text);
-}
-
 /** Inputs */
 
 /** Check Box */
@@ -300,6 +312,41 @@ input[type="checkbox"][monaCheckBox] {
         @include disabled;
         border: 3px solid var(--mona-border-color);
     }
+}
+
+/** Color Palette */
+.mona-color-palette {
+    //background-color: var(--mona-background);
+    //border: 1px solid var(--mona-border-color);
+    & > div.mona-color-cell {
+        border: 2px solid black;
+        &.mona-selected {
+            border: 1px solid lightgray;
+            width: calc(100% + 2px);
+            height: calc(100% + 2px);
+            margin-left: -1px;
+            margin-top: -1px;
+        }
+        &:hover:not(.mona-selected) {
+            border: 1px solid black;
+        }
+    }
+}
+
+/** Color Picker */
+.mona-color-picker {
+    border: 1px solid var(--mona-border-color);
+    background: var(--mona-background);
+    & > div:first-child {
+        border: 1px solid black;
+    }
+    & > button {
+        color: var(--mona-text);
+    }
+}
+
+.mona-color-picker-popup {
+    padding: 2px !important;
 }
 
 /** Numeric Text Box */
