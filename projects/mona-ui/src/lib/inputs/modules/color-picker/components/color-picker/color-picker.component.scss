@@ -1,0 +1,16 @@
+.mona-color-picker {
+    height: var(--mona-input-height);
+    display: flex;
+    align-items: center;
+    & > div {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    & > div:first-child {
+        display: flex;
+        width: calc(var(--mona-input-height) - 8px);
+        height: calc(var(--mona-input-height) - 8px);
+        margin-left: 4px;
+    }
+}
