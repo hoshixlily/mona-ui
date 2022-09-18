@@ -7,6 +7,8 @@ import { DropDownListGroupTemplateDirective } from "./directives/drop-down-list-
 import { PopupModule } from "../../../popup/popup.module";
 import { SharedModule } from "../../../shared/shared.module";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { TextBoxModule } from "../../../inputs/modules/text-box/text-box.module";
+import { FormsModule } from "@angular/forms";
 
 @NgModule({
     declarations: [
@@ -15,7 +17,7 @@ import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
         DropDownListValueTemplateDirective,
         DropDownListGroupTemplateDirective
     ],
-    imports: [CommonModule, PopupModule, SharedModule, FontAwesomeModule],
+    imports: [CommonModule, PopupModule, SharedModule, FontAwesomeModule, TextBoxModule, FormsModule],
     exports: [
         DropDownListComponent,
         DropDownListGroupTemplateDirective,

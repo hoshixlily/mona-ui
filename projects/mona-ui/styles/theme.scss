@@ -69,7 +69,7 @@
 .mona-input-selector {
     width: auto;
     height: var(--mona-input-height);
-    border: 1px solid var(--mona-border);
+    border: 1px solid var(--mona-border-color);
     background: var(--mona-background);
     color: var(--mona-text);
     cursor: pointer;
@@ -98,8 +98,7 @@
 
 
 ul.mona-list {
-    background: var(--mona-background);
-    border: 1px solid var(--mona-border);
+    //background: var(--mona-background);
     & li {
         @include hover-background;
         color: var(--mona-text);
@@ -134,8 +133,6 @@ li.mona-list-group-header {
     border-top: none !important;
 }
 
-
-
 /** Buttons */
 
 /** Button */
@@ -148,7 +145,6 @@ button[monaButton] {
     border: 1px solid var(--mona-border-color);
     outline: none;
     user-select: none;
-    //font-size: 1.2rem;
 
     &.primary {
         background-color: var(--mona-primary);
@@ -240,11 +236,21 @@ mona-button-group button[monaButton] {
 }
 
 .mona-dropdown-popup-content {
+    flex-direction: column;
     user-select: none;
     padding: 0 !important;
     overflow: hidden auto;
     border-top: 1px solid transparent !important;
     max-height: 250px;
+
+    & mona-text-box.filter-box {
+        & div.mona-text-box {
+            border: none;
+            & > span {
+                border-right: none;
+            }
+        }
+    }
 }
 
 /** Inputs */

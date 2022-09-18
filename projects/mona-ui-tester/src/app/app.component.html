@@ -94,19 +94,19 @@
     </div>
 
     <div>
-        <mona-drop-down-list [data]="dropdownListDataItems" groupField="group" textField="text" valueField="value" [itemDisabler]="'active'"
+        <mona-drop-down-list [data]="dropdownListDataItems" groupField="group" textField="text" valueField="value" itemDisabler="active" [filterable]="true"
                              [value]="selectedDropdownListDataItem" (valueChange)="onDropDownValueChange($event)" style="width: 150px;">
 <!--            <ng-template monaDropDownListItemTemplate let-dataItem let-listItem="listItem">-->
 <!--                <span style="color: deeppink;" *ngIf="!listItem.disabled && dataItem.value <= 3">{{dataItem.text}}</span>-->
 <!--                <span style="color: deepskyblue;" *ngIf="!listItem.disabled && dataItem.value > 3">{{dataItem.text}}</span>-->
 <!--                <span *ngIf="listItem.disabled" style="opacity: 0.5">{{dataItem.text}}</span>-->
 <!--            </ng-template>-->
-<!--            <ng-template monaDropDownListValueTemplate let-dataItem>-->
-<!--                <span style="color: darkorange; font-weight: 600;">{{dataItem?.text}}</span>-->
-<!--            </ng-template>-->
-<!--            <ng-template monaDropDownListGroupTemplate let-group>-->
-<!--                <span style="color: crimson; font-weight: bold;">{{group}}</span>-->
-<!--            </ng-template>-->
+            <ng-template monaDropDownListValueTemplate let-dataItem>
+                <span style="color: darkorange; font-weight: 600;">{{dataItem?.text}}</span>
+            </ng-template>
+            <ng-template monaDropDownListGroupTemplate let-group>
+                <span style="color: crimson; font-weight: bold;">{{group}}</span>
+            </ng-template>
         </mona-drop-down-list>
     </div>
 

@@ -114,7 +114,7 @@ export class AppComponent implements OnInit {
 
     public onDropDownValueChange(value: unknown): void {
         this.selectedDropdownListDataItem = value;
-        // console.log(`Dropdown value changed`);
+        console.log(`Dropdown value changed`, value);
         // console.log(value);
     }
 
