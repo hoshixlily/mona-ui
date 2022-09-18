@@ -1,7 +1,7 @@
-<div class="mona-dropdown mona-dropdown-list" [attr.tabindex]="disabled ? -1 : 0"
+<div class="mona-dropdown mona-dropdown-list mona-input-selector" [attr.tabindex]="disabled ? -1 : 0"
      (click)="open()" (keydown.enter)="open()"
      #dropdownWrapper>
-    <div class="mona-dropdown-list-value">
+    <div class="mona-input-selector-value">
         <ng-container *ngIf="!valueTemplate">
             <span>{{selectedListItems[0]?.text ?? value}}</span>
         </ng-container>
@@ -10,7 +10,7 @@
                           [ngTemplateOutletContext]="{$implicit: selectedListItems[0]?.data ?? value, listItem: selectedListItems[0]}"></ng-container>
         </ng-container>
     </div>
-    <div class="mona-dropdown-list-menu">
+    <div class="mona-input-selector-icon">
         <fa-icon [icon]="dropdownIcon"></fa-icon>
     </div>
 </div>

@@ -163,7 +163,7 @@
 
     <div>
         <mona-color-palette [palette]="colorPalette" [columns]="sliderValue" [tileSize]="27" [ngModel]="colorPaletteValue" (ngModelChange)="print($event)"></mona-color-palette>
-        <mona-color-picker [palette]="colorPalette" style="margin-left: 30px;"></mona-color-picker>
+        <mona-color-picker [palette]="colorPalette" [ngModel]="colorPickerValue" (ngModelChange)="onColorPickerValueChange($event)" style="margin-left: 30px;"></mona-color-picker>
     </div>
 
 <!--    <div>-->

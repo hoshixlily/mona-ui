@@ -1,7 +1,7 @@
 import { Component, EventEmitter, forwardRef, Input, OnInit, Output } from "@angular/core";
-import { Dictionary, KeyValuePair } from "@mirei/ts-collections";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { Action } from "../../../../../utils/Action";
+import { take, timer } from "rxjs";
 
 @Component({
     selector: "mona-color-palette",
@@ -17,20 +17,15 @@ import { Action } from "../../../../../utils/Action";
 })
 export class ColorPaletteComponent implements OnInit, ControlValueAccessor {
     private propagateChange: Action<string | null> | null = null;
-    public colorMap: Dictionary<number, string> = new Dictionary<number, string>();
-    public selectedColor: KeyValuePair<number, string> | null = null;
+    public colors: string[] = [];
+    public selectedColor: string | null = null;
 
     @Input()
     public columns: number = 8;
 
     @Input()
     public set palette(palette: Iterable<string>) {
-        this.colorMap.clear();
-        let i = 0;
-        for (const color of palette) {
-            this.colorMap.add(i, color);
-            i++;
-        }
+        this.colors = Array.from(palette);
     }
 
     @Input()
@@ -39,7 +34,7 @@ export class ColorPaletteComponent implements OnInit, ControlValueAccessor {
     @Input()
     public set value(value: string | null) {
         if (value) {
-            this.selectedColor = this.colorMap.firstOrDefault(x => x.value === value);
+            this.selectedColor = this.colors.find(c => c === value) ?? null;
         } else {
             this.selectedColor = null;
         }
@@ -52,16 +47,16 @@ export class ColorPaletteComponent implements OnInit, ControlValueAccessor {
 
     public ngOnInit(): void {}
 
-    public onColorSelect(color: KeyValuePair<number, string>): void {
-        if (this.selectedColor?.key === color.key) {
+    public onColorSelect(color: string): void {
+        if (this.selectedColor === color) {
             this.selectedColor = null;
             this.propagateChange?.(null);
             this.valueChange.emit(null);
             return;
         }
         this.selectedColor = color;
-        this.valueChange.emit(color.value);
-        this.propagateChange?.(color.value);
+        this.valueChange.emit(color);
+        this.propagateChange?.(color);
     }
 
     public registerOnChange(fn: any): void {
@@ -73,6 +68,6 @@ export class ColorPaletteComponent implements OnInit, ControlValueAccessor {
     }
 
     public writeValue(obj: string | null): void {
-        this.selectedColor = this.colorMap.firstOrDefault(x => x.value === obj);
+        this.selectedColor = this.colors.find(c => c === obj) ?? null;
     }
 }

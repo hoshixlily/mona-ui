@@ -60,6 +60,7 @@ export class AppComponent implements OnInit {
     ];
 
     public colorPaletteValue: string = "#fb9a99";
+    public colorPickerValue: string | null = "#0086fc";
 
     public contextMenuItemVisible: boolean = true;
     public dropdownListDataItems: any[] = [
@@ -103,6 +104,11 @@ export class AppComponent implements OnInit {
 
     public onButtonSelectedChange(selected: boolean): void {
         // console.log(`Button selected: ${selected}`);
+    }
+
+    public onColorPickerValueChange(value: string | null): void {
+        this.colorPickerValue = value;
+        console.log(value);
     }
 
     public onDropDownValueChange(value: unknown): void {

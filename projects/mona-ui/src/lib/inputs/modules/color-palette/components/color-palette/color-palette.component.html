@@ -1,7 +1,7 @@
 <div class="mona-color-palette" [style.grid-template-columns]="'repeat('+columns+', minmax('+tileSize+'px, 1fr))'"
      [style.grid-auto-rows]="tileSize+'px'">
-    <ng-container *ngFor="let color of colorMap">
-        <div class="mona-color-cell" [ngClass]="{'mona-selected': color.key===selectedColor?.key}"
-             [style.background-color]="color.value" (click)="onColorSelect(color)"></div>
+    <ng-container *ngFor="let color of colors">
+        <div class="mona-color-cell" [ngClass]="{'mona-selected': color===selectedColor}"
+             [style.background-color]="color" (click)="onColorSelect(color)"></div>
     </ng-container>
 </div>
