@@ -34,8 +34,7 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
     private readonly componentDestroy$: Subject<void> = new Subject<void>();
     private disabler?: Action<ListItem, boolean> | null = null;
     private keyManager!: ActiveDescendantKeyManager<ListItemComponent>;
-    private selectedValues: ListItem[] = [];
-    public highlightedItem: ListItem | null = null;
+    public selectedValues: ListItem[] = [];
 
     @Input()
     public data: List<Group<string, ListItem>> = new List<Group<string, ListItem>>();
@@ -45,6 +44,12 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
 
     @ContentChild(ListGroupTemplateDirective, { read: TemplateRef })
     public groupTemplate?: TemplateRef<void>;
+
+    @Input()
+    public highlightable: boolean = false;
+
+    @Input()
+    public highlightedItem: ListItem | null = null;
 
     @Input()
     public set itemDisabler(disabler: Action<any, boolean> | string | null) {
