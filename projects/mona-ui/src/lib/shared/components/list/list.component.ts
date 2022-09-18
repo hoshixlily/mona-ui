@@ -43,9 +43,6 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
     @Input()
     public disabled: boolean = false;
 
-    @Input()
-    public groupField?: string;
-
     @ContentChild(ListGroupTemplateDirective, { read: TemplateRef })
     public groupTemplate?: TemplateRef<void>;
 
@@ -70,9 +67,6 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
     public selectionMode: SelectionMode = "single";
 
     @Input()
-    public textField?: string;
-
-    @Input()
     public set value(value: ListItem[]) {
         this.selectedValues = value;
         this.updateSelectedValues();
@@ -80,9 +74,6 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
 
     @Output()
     public valueChange: EventEmitter<ValueChangeEvent> = new EventEmitter<ValueChangeEvent>();
-
-    @Input()
-    public valueField?: string;
 
     public constructor(private readonly cdr: ChangeDetectorRef, private readonly elementRef: ElementRef<HTMLElement>) {}
 

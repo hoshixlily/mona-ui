@@ -12,7 +12,7 @@ import {
     ViewChild
 } from "@angular/core";
 import { PopupRef } from "../../../../../popup/models/PopupRef";
-import { fromEvent, Subject, take, takeUntil } from "rxjs";
+import { debounceTime, fromEvent, mergeWith, Subject, take, takeUntil } from "rxjs";
 import { Group, List } from "@mirei/ts-collections";
 import { DropDownListItemTemplateDirective } from "../../directives/drop-down-list-item-template.directive";
 import { DropDownListValueTemplateDirective } from "../../directives/drop-down-list-value-template.directive";
@@ -23,7 +23,7 @@ import { ValueChangeEvent } from "../../../../../shared/data/ValueChangeEvent";
 import { ListComponent } from "../../../../../shared/components/list/list.component";
 import { PopupService } from "../../../../../popup/services/popup.service";
 import { ConnectionPositionPair } from "@angular/cdk/overlay";
-import { faChevronDown, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { faChevronDown, faSearch, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 
 @Component({
     selector: "mona-drop-down-list",
@@ -33,6 +33,10 @@ import { faChevronDown, IconDefinition } from "@fortawesome/free-solid-svg-icons
 export class DropDownListComponent implements OnInit, OnDestroy, AfterViewInit {
     private readonly componentDestroy$: Subject<void> = new Subject();
     public readonly dropdownIcon: IconDefinition = faChevronDown;
+    public readonly filterChange$: Subject<string> = new Subject();
+    public readonly filterKeydown$: Subject<Event> = new Subject();
+    public readonly filterIcon: IconDefinition = faSearch;
+    public filterText: string = "";
     public listData: List<Group<string, ListItem>> = new List();
     public popupRef: PopupRef | null = null;
     public selectedListItems: ListItem[] = [];
@@ -49,6 +53,9 @@ export class DropDownListComponent implements OnInit, OnDestroy, AfterViewInit {
 
     @ViewChild("dropdownWrapper")
     public dropdownWrapper!: ElementRef<HTMLDivElement>;
+
+    @Input()
+    public filterable: boolean = false;
 
     @Input()
     public groupField?: string;
@@ -97,11 +104,15 @@ export class DropDownListComponent implements OnInit, OnDestroy, AfterViewInit {
             textField: this.textField,
             valueField: this.valueField
         });
+
+        this.viewData = this.listData;
+
         if (this.value) {
             const listItem = this.viewData.selectMany(g => g.source).firstOrDefault(i => i.data === this.value);
             this.selectedListItems = listItem && !listItem.disabled ? [listItem] : [];
         }
         this.setEventListeners();
+        this.setSubscriptions();
     }
 
     public onSelectedListItemsChange(event: ValueChangeEvent): void {
@@ -139,20 +150,30 @@ export class DropDownListComponent implements OnInit, OnDestroy, AfterViewInit {
         }
         this.popupRef.closed.pipe(take(1)).subscribe(() => {
             this.popupRef = null;
+            this.filterChange$.next("");
             (this.elementRef.nativeElement.firstElementChild as HTMLElement)?.focus();
         });
     }
 
+    private filterListData(filter: string): void {
+        this.viewData = this.listData
+            .select(g => {
+                const items = g.source
+                    .where(i => (!filter ? true : i.text.toLowerCase().includes(filter.toLowerCase())))
+                    .toList();
+                return new Group(g.key, items);
+            })
+            .toList();
+    }
+
     private setEventListeners(): void {
         fromEvent(this.elementRef.nativeElement, "keydown")
-            .pipe(takeUntil(this.componentDestroy$))
+            .pipe(mergeWith(this.filterKeydown$), takeUntil(this.componentDestroy$))
             .subscribe((e: Event) => {
-                if (this.popupRef) {
-                    return;
-                }
                 e.stopPropagation();
                 const event = e as KeyboardEvent;
                 if (event.key === "ArrowDown") {
+                    e.preventDefault();
                     const nextItem = ListComponent.findNextNotDisabledItem(this.viewData, this.selectedListItems[0]);
                     if (nextItem) {
                         this.selectedListItems = [nextItem];
@@ -160,6 +181,7 @@ export class DropDownListComponent implements OnInit, OnDestroy, AfterViewInit {
                         this.valueChange.emit(this.value);
                     }
                 } else if (event.key === "ArrowUp") {
+                    e.preventDefault();
                     const previousItem = ListComponent.findPrevNotDisabledItem(
                         this.viewData,
                         this.selectedListItems[0]
@@ -169,7 +191,26 @@ export class DropDownListComponent implements OnInit, OnDestroy, AfterViewInit {
                         this.value = previousItem.data;
                         this.valueChange.emit(this.value);
                     }
+                } else if (event.key === "Enter") {
+                    if (this.elementRef.nativeElement.contains(event.target as HTMLElement)) {
+                        if (this.popupRef) {
+                            this.popupRef.close();
+                            this.popupRef = null;
+                        } else {
+                            this.open();
+                        }
+                    } else {
+                        this.popupRef?.close();
+                        this.popupRef = null;
+                    }
                 }
             });
+    }
+
+    private setSubscriptions(): void {
+        this.filterChange$.pipe(takeUntil(this.componentDestroy$), debounceTime(200)).subscribe(filter => {
+            this.filterText = filter;
+            this.filterListData(filter);
+        });
     }
 }
