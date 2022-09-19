@@ -126,6 +126,13 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
         return listData.selectMany(g => g.source).firstOrDefault(d => !d.disabled);
     }
 
+    public static findLastNonDisabledItem(listData: List<Group<string, ListItem>>): ListItem | null {
+        return listData
+            .selectMany(g => g.source)
+            .reverse()
+            .firstOrDefault(d => !d.disabled);
+    }
+
     public static findNextNotDisabledItem(listData: List<Group<string, ListItem>>, item: ListItem): ListItem | null {
         const count = listData.selectMany(d => d.source).count();
         return listData
@@ -246,43 +253,43 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     private setEventListeners(): void {
-        fromEvent(this.elementRef.nativeElement, "keydown")
-            .pipe(
-                takeUntil(this.componentDestroy$),
-                filter(() => !this.disabled),
-                filter((e: Event) => {
-                    const event = e as KeyboardEvent;
-                    return event.key === "ArrowDown" || event.key === "ArrowUp" || event.key === "Enter";
-                })
-            )
-            .subscribe(e => {
-                e.preventDefault();
-                const event = e as KeyboardEvent;
-                if (event.key === "ArrowDown") {
-                    if (!this.highlightedItem) {
-                        this.highlightFirstItem();
-                        if (this.selectionMode === "single" && this.highlightedItem) {
-                            this.onDropDownItemSelect(this.highlightedItem, "navigation");
-                        }
-                    } else {
-                        this.highlightNextItem();
-                        if (this.selectionMode === "single") {
-                            this.onDropDownItemSelect(this.highlightedItem, "navigation");
-                        }
-                    }
-                } else if (event.key === "ArrowUp") {
-                    if (this.highlightedItem) {
-                        this.highlightPreviousItem();
-                        if (this.selectionMode === "single") {
-                            this.onDropDownItemSelect(this.highlightedItem, "navigation");
-                        }
-                    }
-                } else if (event.key === "Enter") {
-                    if (this.keyManager.activeItem?.item) {
-                        this.onDropDownItemSelect(this.keyManager.activeItem?.item, "selection");
-                    }
-                }
-            });
+        // fromEvent(this.elementRef.nativeElement, "keydown")
+        //     .pipe(
+        //         takeUntil(this.componentDestroy$),
+        //         filter(() => !this.disabled),
+        //         filter((e: Event) => {
+        //             const event = e as KeyboardEvent;
+        //             return event.key === "ArrowDown" || event.key === "ArrowUp" || event.key === "Enter";
+        //         })
+        //     )
+        //     .subscribe(e => {
+        //         e.preventDefault();
+        //         const event = e as KeyboardEvent;
+        //         if (event.key === "ArrowDown") {
+        //             if (!this.highlightedItem) {
+        //                 this.highlightFirstItem();
+        //                 if (this.selectionMode === "single" && this.highlightedItem) {
+        //                     this.onDropDownItemSelect(this.highlightedItem, "navigation");
+        //                 }
+        //             } else {
+        //                 this.highlightNextItem();
+        //                 if (this.selectionMode === "single") {
+        //                     this.onDropDownItemSelect(this.highlightedItem, "navigation");
+        //                 }
+        //             }
+        //         } else if (event.key === "ArrowUp") {
+        //             if (this.highlightedItem) {
+        //                 this.highlightPreviousItem();
+        //                 if (this.selectionMode === "single") {
+        //                     this.onDropDownItemSelect(this.highlightedItem, "navigation");
+        //                 }
+        //             }
+        //         } else if (event.key === "Enter") {
+        //             if (this.keyManager.activeItem?.item) {
+        //                 this.onDropDownItemSelect(this.keyManager.activeItem?.item, "selection");
+        //             }
+        //         }
+        //     });
     }
 
     private setKeyManagerActiveItem(item: ListItemComponent | ListItem): void {

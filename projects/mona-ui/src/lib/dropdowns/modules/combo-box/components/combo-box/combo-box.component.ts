@@ -10,7 +10,7 @@ import {
     TemplateRef,
     ViewChild
 } from "@angular/core";
-import { debounce, debounceTime, EMPTY, fromEvent, of, Subject, take, takeUntil, timer } from "rxjs";
+import { debounce, debounceTime, fromEvent, of, Subject, take, takeUntil, timer } from "rxjs";
 import { Group, List } from "@mirei/ts-collections";
 import { ListItem } from "../../../../../shared/data/ListItem";
 import { PopupService } from "../../../../../popup/services/popup.service";
@@ -20,10 +20,9 @@ import { faChevronDown, IconDefinition } from "@fortawesome/free-solid-svg-icons
 import { ValueChangeEvent } from "../../../../../shared/data/ValueChangeEvent";
 import { PopupRef } from "../../../../../popup/models/PopupRef";
 import { ConnectionPositionPair } from "@angular/cdk/overlay";
-import { DropDownListGroupTemplateDirective } from "../../../drop-down-list/directives/drop-down-list-group-template.directive";
 import { ComboBoxGroupTemplateDirective } from "../../directives/combo-box-group-template.directive";
-import { DropDownListItemTemplateDirective } from "../../../drop-down-list/directives/drop-down-list-item-template.directive";
 import { ComboBoxItemTemplateDirective } from "../../directives/combo-box-item-template.directive";
+import { FocusMonitor } from "@angular/cdk/a11y";
 
 @Component({
     selector: "mona-combo-box",
@@ -83,6 +82,7 @@ export class ComboBoxComponent implements OnInit, OnDestroy {
 
     public constructor(
         private readonly elementRef: ElementRef<HTMLElement>,
+        private readonly focusMonitor: FocusMonitor,
         private readonly popupService: PopupService
     ) {}
 
@@ -100,7 +100,7 @@ export class ComboBoxComponent implements OnInit, OnDestroy {
             valueField: this.valueField
         });
 
-        this.viewData = this.listData;
+        this.viewData = this.listData.toList();
 
         if (this.value) {
             const listItem = this.viewData.selectMany(g => g.source).firstOrDefault(i => i.data === this.value);
@@ -113,8 +113,6 @@ export class ComboBoxComponent implements OnInit, OnDestroy {
 
     public onSelectedListItemsChange(event: ValueChangeEvent): void {
         this.selectedListItems = event.value;
-        this.value = this.selectedListItems.length > 0 ? this.selectedListItems[0].data : null;
-        this.valueChange.emit(this.value);
         if (event.via === "selection") {
             this.popupRef?.close();
             this.popupRef = null;
@@ -142,9 +140,19 @@ export class ComboBoxComponent implements OnInit, OnDestroy {
         });
         this.inputElement?.focus();
         this.popupRef.closed.pipe(take(1)).subscribe(() => {
+            if (this.value != null) {
+                if (this.value !== this.selectedListItems[0]?.data) {
+                    this.value = this.selectedListItems[0]?.data;
+                    this.valueChange.emit(this.value);
+                }
+            } else if (this.selectedListItems.length > 0) {
+                this.value = this.selectedListItems[0].data;
+                this.valueChange.emit(this.value);
+            }
             this.popupRef = null;
             this.filterChange$.next("");
             (this.elementRef.nativeElement.firstElementChild as HTMLElement)?.focus();
+            this.viewData = this.listData.toList();
         });
     }
 
@@ -164,12 +172,14 @@ export class ComboBoxComponent implements OnInit, OnDestroy {
             .pipe(takeUntil(this.componentDestroy$))
             .subscribe(e => {
                 this.inputElement?.focus();
+                this.viewData = this.listData.toList();
             });
-        fromEvent(this.elementRef.nativeElement, "focusout")
-            .pipe(takeUntil(this.componentDestroy$))
-            .subscribe(e => {
-                if (this.popupRef) {
-                    this.popupRef.close();
+        this.focusMonitor
+            .monitor(this.elementRef.nativeElement, true)
+            .pipe(takeUntil(this.componentDestroy$), debounceTime(150))
+            .subscribe(origin => {
+                if (!origin) {
+                    this.popupRef?.close();
                     this.popupRef = null;
                 }
             });
@@ -193,28 +203,34 @@ export class ComboBoxComponent implements OnInit, OnDestroy {
                     event.preventDefault();
                     const nextItem =
                         this.selectedListItems.length > 0
-                            ? ListComponent.findNextNotDisabledItem(this.viewData, this.selectedListItems[0])
+                            ? ListComponent.findNextNotDisabledItem(this.viewData, this.selectedListItems[0]) ??
+                              ListComponent.findFirstNonDisabledItem(this.viewData)
                             : this.highlightedItem && this.selectedListItems.length !== 0
                             ? ListComponent.findNextNotDisabledItem(this.viewData, this.highlightedItem)
                             : ListComponent.findFirstNonDisabledItem(this.viewData);
                     if (nextItem) {
                         this.selectedListItems = [nextItem];
-                        this.value = nextItem.data;
-                        this.valueChange.emit(this.value);
+                        if (!this.popupRef) {
+                            this.value = nextItem.data;
+                            this.valueChange.emit(this.value);
+                        }
                         this.valueText = nextItem.text;
                     }
                 } else if (event.key === "ArrowUp") {
                     event.preventDefault();
                     const previousItem =
                         this.selectedListItems.length > 0
-                            ? ListComponent.findPrevNotDisabledItem(this.viewData, this.selectedListItems[0])
+                            ? ListComponent.findPrevNotDisabledItem(this.viewData, this.selectedListItems[0]) ??
+                              ListComponent.findLastNonDisabledItem(this.viewData)
                             : this.highlightedItem && this.selectedListItems.length !== 0
                             ? ListComponent.findPrevNotDisabledItem(this.viewData, this.highlightedItem)
-                            : ListComponent.findFirstNonDisabledItem(this.viewData);
+                            : ListComponent.findLastNonDisabledItem(this.viewData);
                     if (previousItem) {
                         this.selectedListItems = [previousItem];
-                        this.value = previousItem.data;
-                        this.valueChange.emit(this.value);
+                        if (!this.popupRef) {
+                            this.value = previousItem.data;
+                            this.valueChange.emit(this.value);
+                        }
                         this.valueText = previousItem.text;
                     }
                 } else if (event.key === "Enter") {
@@ -226,7 +242,7 @@ export class ComboBoxComponent implements OnInit, OnDestroy {
                         const text = this.inputElement.value;
                         const textChanged = text !== this.valueText;
 
-                        if (this.filterable) {
+                        if (this.filterable && textChanged) {
                             this.filterListData(text);
                         }
 
@@ -237,14 +253,17 @@ export class ComboBoxComponent implements OnInit, OnDestroy {
                         if (item) {
                             this.selectedListItems = item && !item.disabled ? [item] : [];
 
-                            const newValue = this.selectedListItems.length > 0 ? this.selectedListItems[0].data : null;
-                            if (newValue !== this.value) {
-                                this.value = newValue;
-                                this.valueChange.emit(this.value);
+                            if (!this.popupRef) {
+                                const newValue =
+                                    this.selectedListItems.length > 0 ? this.selectedListItems[0].data : null;
+                                if (newValue !== this.value) {
+                                    this.value = newValue;
+                                    this.valueChange.emit(this.value);
+                                }
                             }
                         } else {
                             this.selectedListItems = [];
-                            if (this.value != null) {
+                            if (!this.popupRef && this.value != null) {
                                 this.value = null;
                                 this.valueChange.emit(this.value);
                             }
