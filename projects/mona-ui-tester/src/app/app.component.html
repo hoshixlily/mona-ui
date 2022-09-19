@@ -112,7 +112,12 @@
 
         <mona-combo-box [data]="dropdownListDataItems"
                         [value]="selectedComboBoxDataItem" (valueChange)="onComboBoxValueChange($event)"
-                        textField="text" valueField="text" groupField="group"></mona-combo-box>
+                        [filterable]="true"
+                        textField="text" valueField="text" groupField="group">
+            <ng-template monaComboBoxItemTemplate let-dataItem>
+                <span style="color: chocolate;">{{dataItem.text}}</span>
+            </ng-template>
+        </mona-combo-box>
     </div>
 
     <div>

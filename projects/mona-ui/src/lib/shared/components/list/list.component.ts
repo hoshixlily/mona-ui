@@ -127,20 +127,22 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     public static findNextNotDisabledItem(listData: List<Group<string, ListItem>>, item: ListItem): ListItem | null {
+        const count = listData.selectMany(d => d.source).count();
         return listData
             .selectMany(d => d.source)
             .skipWhile(d => d !== item)
-            .skip(1)
+            .skip(count === 1 ? 0 : 1)
             .skipWhile(d => !!d.disabled)
             .firstOrDefault();
     }
 
     public static findPrevNotDisabledItem(listData: List<Group<string, ListItem>>, item: ListItem): ListItem | null {
+        const count = listData.selectMany(d => d.source).count();
         return listData
             .selectMany(d => d.source)
             .reverse()
             .skipWhile(d => d !== item)
-            .skip(1)
+            .skip(count === 1 ? 0 : 1)
             .skipWhile(d => !!d.disabled)
             .firstOrDefault();
     }

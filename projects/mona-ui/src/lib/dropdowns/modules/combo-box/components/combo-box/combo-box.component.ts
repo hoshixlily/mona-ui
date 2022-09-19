@@ -1,5 +1,6 @@
 import {
     Component,
+    ContentChild,
     ElementRef,
     EventEmitter,
     Input,
@@ -9,7 +10,7 @@ import {
     TemplateRef,
     ViewChild
 } from "@angular/core";
-import { debounce, debounceTime, EMPTY, of, Subject, take, takeUntil, timer } from "rxjs";
+import { debounce, debounceTime, EMPTY, fromEvent, of, Subject, take, takeUntil, timer } from "rxjs";
 import { Group, List } from "@mirei/ts-collections";
 import { ListItem } from "../../../../../shared/data/ListItem";
 import { PopupService } from "../../../../../popup/services/popup.service";
@@ -19,6 +20,10 @@ import { faChevronDown, IconDefinition } from "@fortawesome/free-solid-svg-icons
 import { ValueChangeEvent } from "../../../../../shared/data/ValueChangeEvent";
 import { PopupRef } from "../../../../../popup/models/PopupRef";
 import { ConnectionPositionPair } from "@angular/cdk/overlay";
+import { DropDownListGroupTemplateDirective } from "../../../drop-down-list/directives/drop-down-list-group-template.directive";
+import { ComboBoxGroupTemplateDirective } from "../../directives/combo-box-group-template.directive";
+import { DropDownListItemTemplateDirective } from "../../../drop-down-list/directives/drop-down-list-item-template.directive";
+import { ComboBoxItemTemplateDirective } from "../../directives/combo-box-item-template.directive";
 
 @Component({
     selector: "mona-combo-box",
@@ -30,11 +35,11 @@ export class ComboBoxComponent implements OnInit, OnDestroy {
     private popupRef: PopupRef | null = null;
     public readonly dropdownIcon: IconDefinition = faChevronDown;
     public readonly filterChange$: Subject<string> = new Subject();
-    public readonly filterKeydown$: Subject<Event> = new Subject();
-    public filterText: string = "";
+    public readonly valueKeydown$: Subject<Event> = new Subject();
     public highlightedItem: ListItem | null = null;
     public listData: List<Group<string, ListItem>> = new List();
     public selectedListItems: ListItem[] = [];
+    public valueText: string = "";
     public viewData: List<Group<string, ListItem>> = new List();
 
     @ViewChild("comboboxPopupTemplate")
@@ -50,13 +55,18 @@ export class ComboBoxComponent implements OnInit, OnDestroy {
     public disabled: boolean = false;
 
     @Input()
+    public filterable: boolean = false;
+
+    @Input()
     public groupField?: string;
 
+    @ContentChild(ComboBoxGroupTemplateDirective, { read: TemplateRef })
     public groupTemplate?: TemplateRef<void>;
 
     @Input()
     public itemDisabler: Action<any, boolean> | string | null = null;
 
+    @ContentChild(ComboBoxItemTemplateDirective, { read: TemplateRef })
     public itemTemplate?: TemplateRef<void>;
 
     @Input()
@@ -98,6 +108,7 @@ export class ComboBoxComponent implements OnInit, OnDestroy {
         }
 
         this.setSubscriptions();
+        this.setEventListeners();
     }
 
     public onSelectedListItemsChange(event: ValueChangeEvent): void {
@@ -108,11 +119,10 @@ export class ComboBoxComponent implements OnInit, OnDestroy {
             this.popupRef?.close();
             this.popupRef = null;
         }
-        this.filterText = this.selectedListItems[0]?.text ?? "";
+        this.valueText = this.selectedListItems[0]?.text ?? "";
     }
 
     public open(): void {
-        // this.comboboxWrapper.nativeElement.focus();
         this.popupRef = this.popupService.create({
             anchor: this.comboboxWrapper,
             content: this.comboboxPopupTemplate,
@@ -130,7 +140,7 @@ export class ComboBoxComponent implements OnInit, OnDestroy {
                 )
             ]
         });
-        (this.elementRef.nativeElement.querySelector("input:first-child") as HTMLInputElement)?.focus();
+        this.inputElement?.focus();
         this.popupRef.closed.pipe(take(1)).subscribe(() => {
             this.popupRef = null;
             this.filterChange$.next("");
@@ -138,8 +148,35 @@ export class ComboBoxComponent implements OnInit, OnDestroy {
         });
     }
 
+    private filterListData(filter: string): void {
+        this.viewData = this.listData
+            .select(g => {
+                const items = g.source
+                    .where(i => (!filter ? true : i.text.toLowerCase().includes(filter.toLowerCase())))
+                    .toList();
+                return new Group(g.key, items);
+            })
+            .toList();
+    }
+
+    private setEventListeners(): void {
+        fromEvent(this.elementRef.nativeElement, "focusin")
+            .pipe(takeUntil(this.componentDestroy$))
+            .subscribe(e => {
+                this.inputElement?.focus();
+            });
+        fromEvent(this.elementRef.nativeElement, "focusout")
+            .pipe(takeUntil(this.componentDestroy$))
+            .subscribe(e => {
+                if (this.popupRef) {
+                    this.popupRef.close();
+                    this.popupRef = null;
+                }
+            });
+    }
+
     private setSubscriptions(): void {
-        this.filterKeydown$
+        this.valueKeydown$
             .pipe(
                 takeUntil(this.componentDestroy$),
                 debounce(e => {
@@ -157,47 +194,54 @@ export class ComboBoxComponent implements OnInit, OnDestroy {
                     const nextItem =
                         this.selectedListItems.length > 0
                             ? ListComponent.findNextNotDisabledItem(this.viewData, this.selectedListItems[0])
-                            : this.highlightedItem
+                            : this.highlightedItem && this.selectedListItems.length !== 0
                             ? ListComponent.findNextNotDisabledItem(this.viewData, this.highlightedItem)
                             : ListComponent.findFirstNonDisabledItem(this.viewData);
                     if (nextItem) {
                         this.selectedListItems = [nextItem];
                         this.value = nextItem.data;
                         this.valueChange.emit(this.value);
-                        this.filterText = nextItem.text;
+                        this.valueText = nextItem.text;
                     }
                 } else if (event.key === "ArrowUp") {
                     event.preventDefault();
                     const previousItem =
                         this.selectedListItems.length > 0
                             ? ListComponent.findPrevNotDisabledItem(this.viewData, this.selectedListItems[0])
-                            : this.highlightedItem
+                            : this.highlightedItem && this.selectedListItems.length !== 0
                             ? ListComponent.findPrevNotDisabledItem(this.viewData, this.highlightedItem)
                             : ListComponent.findFirstNonDisabledItem(this.viewData);
                     if (previousItem) {
                         this.selectedListItems = [previousItem];
                         this.value = previousItem.data;
                         this.valueChange.emit(this.value);
-                        this.filterText = previousItem.text;
+                        this.valueText = previousItem.text;
                     }
                 } else if (event.key === "Enter") {
                     event.preventDefault();
                     this.popupRef?.close();
                     this.popupRef = null;
                 } else {
-                    const textInput = this.elementRef.nativeElement.querySelector(
-                        "input:first-child"
-                    ) as HTMLInputElement;
-                    if (textInput) {
-                        if (!this.popupRef) {
+                    if (this.inputElement) {
+                        const text = this.inputElement.value;
+                        const textChanged = text !== this.valueText;
+
+                        if (this.filterable) {
+                            this.filterListData(text);
+                        }
+
+                        if (textChanged && !this.popupRef) {
                             this.open();
                         }
-                        const text = textInput.value;
                         const item = this.viewData.selectMany(g => g.source).firstOrDefault(i => i.text === text);
                         if (item) {
                             this.selectedListItems = item && !item.disabled ? [item] : [];
-                            this.value = this.selectedListItems.length > 0 ? this.selectedListItems[0].data : null;
-                            this.valueChange.emit(this.value);
+
+                            const newValue = this.selectedListItems.length > 0 ? this.selectedListItems[0].data : null;
+                            if (newValue !== this.value) {
+                                this.value = newValue;
+                                this.valueChange.emit(this.value);
+                            }
                         } else {
                             this.selectedListItems = [];
                             if (this.value != null) {
@@ -213,8 +257,13 @@ export class ComboBoxComponent implements OnInit, OnDestroy {
                                 this.highlightedItem = null;
                             }
                         }
+                        this.valueText = text;
                     }
                 }
             });
+    }
+
+    private get inputElement(): HTMLInputElement {
+        return this.elementRef.nativeElement.querySelector("input:first-child") as HTMLInputElement;
     }
 }

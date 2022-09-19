@@ -70,7 +70,8 @@ export class AppComponent implements OnInit {
         { text: "Cabbage", value: 2, group: "Vegetable", active: true },
         { text: "Grilled Meat", value: 3, group: "Food", active: false },
         { text: "Plum", value: 4, group: "Fruit", active: false },
-        { text: "Banana", value: 5, group: "Fruit", active: true }
+        { text: "Banana", value: 5, group: "Fruit", active: true },
+        { text: "Cabbage Black", value: 6, group: "Vegetable", active: false }
     ];
     public groupedDropdownListDataItems: List<Group<string, ListItem>> = new List<Group<string, ListItem>>([
         new Group<string, ListItem>(

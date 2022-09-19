@@ -2,8 +2,8 @@
      [ngClass]="{'mona-disabled': disabled}"
      #comboboxWrapper>
     <div class="mona-input-selector-value">
-        <mona-text-box [ngModel]="filterText" (ngModelChange)="filterChange$.next($event)"
-                       (keydown)="filterKeydown$.next($event)"></mona-text-box>
+        <mona-text-box [ngModel]="valueText" (ngModelChange)="filterChange$.next($event)"
+                       (keydown)="valueKeydown$.next($event)"></mona-text-box>
     </div>
     <div class="mona-input-selector-icon" (click)="open()">
         <fa-icon [icon]="dropdownIcon"></fa-icon>

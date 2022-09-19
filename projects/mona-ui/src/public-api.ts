@@ -15,6 +15,9 @@ export * from "./lib/buttons/modules/split-button/split-button.module";
 export * from "./lib/buttons/buttons.module";
 
 /** Dropdowns */
+
+export * from "./lib/dropdowns/modules/combo-box/directives/combo-box-group-template.directive";
+export * from "./lib/dropdowns/modules/combo-box/directives/combo-box-item-template.directive";
 export * from "./lib/dropdowns/modules/combo-box/components/combo-box/combo-box.component";
 export * from "./lib/dropdowns/modules/combo-box/combo-box.module";
 
