@@ -34,8 +34,7 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
     private readonly componentDestroy$: Subject<void> = new Subject<void>();
     private disabler?: Action<ListItem, boolean> | null = null;
     private keyManager!: ActiveDescendantKeyManager<ListItemComponent>;
-    private selectedValues: ListItem[] = [];
-    public highlightedItem: ListItem | null = null;
+    public selectedValues: ListItem[] = [];
 
     @Input()
     public data: List<Group<string, ListItem>> = new List<Group<string, ListItem>>();
@@ -45,6 +44,12 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
 
     @ContentChild(ListGroupTemplateDirective, { read: TemplateRef })
     public groupTemplate?: TemplateRef<void>;
+
+    @Input()
+    public highlightable: boolean = false;
+
+    @Input()
+    public highlightedItem: ListItem | null = null;
 
     @Input()
     public set itemDisabler(disabler: Action<any, boolean> | string | null) {
@@ -121,21 +126,30 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
         return listData.selectMany(g => g.source).firstOrDefault(d => !d.disabled);
     }
 
+    public static findLastNonDisabledItem(listData: List<Group<string, ListItem>>): ListItem | null {
+        return listData
+            .selectMany(g => g.source)
+            .reverse()
+            .firstOrDefault(d => !d.disabled);
+    }
+
     public static findNextNotDisabledItem(listData: List<Group<string, ListItem>>, item: ListItem): ListItem | null {
+        const count = listData.selectMany(d => d.source).count();
         return listData
             .selectMany(d => d.source)
             .skipWhile(d => d !== item)
-            .skip(1)
+            .skip(count === 1 ? 0 : 1)
             .skipWhile(d => !!d.disabled)
             .firstOrDefault();
     }
 
     public static findPrevNotDisabledItem(listData: List<Group<string, ListItem>>, item: ListItem): ListItem | null {
+        const count = listData.selectMany(d => d.source).count();
         return listData
             .selectMany(d => d.source)
             .reverse()
             .skipWhile(d => d !== item)
-            .skip(1)
+            .skip(count === 1 ? 0 : 1)
             .skipWhile(d => !!d.disabled)
             .firstOrDefault();
     }
@@ -239,43 +253,43 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     private setEventListeners(): void {
-        fromEvent(this.elementRef.nativeElement, "keydown")
-            .pipe(
-                takeUntil(this.componentDestroy$),
-                filter(() => !this.disabled),
-                filter((e: Event) => {
-                    const event = e as KeyboardEvent;
-                    return event.key === "ArrowDown" || event.key === "ArrowUp" || event.key === "Enter";
-                })
-            )
-            .subscribe(e => {
-                e.preventDefault();
-                const event = e as KeyboardEvent;
-                if (event.key === "ArrowDown") {
-                    if (!this.highlightedItem) {
-                        this.highlightFirstItem();
-                        if (this.selectionMode === "single" && this.highlightedItem) {
-                            this.onDropDownItemSelect(this.highlightedItem, "navigation");
-                        }
-                    } else {
-                        this.highlightNextItem();
-                        if (this.selectionMode === "single") {
-                            this.onDropDownItemSelect(this.highlightedItem, "navigation");
-                        }
-                    }
-                } else if (event.key === "ArrowUp") {
-                    if (this.highlightedItem) {
-                        this.highlightPreviousItem();
-                        if (this.selectionMode === "single") {
-                            this.onDropDownItemSelect(this.highlightedItem, "navigation");
-                        }
-                    }
-                } else if (event.key === "Enter") {
-                    if (this.keyManager.activeItem?.item) {
-                        this.onDropDownItemSelect(this.keyManager.activeItem?.item, "selection");
-                    }
-                }
-            });
+        // fromEvent(this.elementRef.nativeElement, "keydown")
+        //     .pipe(
+        //         takeUntil(this.componentDestroy$),
+        //         filter(() => !this.disabled),
+        //         filter((e: Event) => {
+        //             const event = e as KeyboardEvent;
+        //             return event.key === "ArrowDown" || event.key === "ArrowUp" || event.key === "Enter";
+        //         })
+        //     )
+        //     .subscribe(e => {
+        //         e.preventDefault();
+        //         const event = e as KeyboardEvent;
+        //         if (event.key === "ArrowDown") {
+        //             if (!this.highlightedItem) {
+        //                 this.highlightFirstItem();
+        //                 if (this.selectionMode === "single" && this.highlightedItem) {
+        //                     this.onDropDownItemSelect(this.highlightedItem, "navigation");
+        //                 }
+        //             } else {
+        //                 this.highlightNextItem();
+        //                 if (this.selectionMode === "single") {
+        //                     this.onDropDownItemSelect(this.highlightedItem, "navigation");
+        //                 }
+        //             }
+        //         } else if (event.key === "ArrowUp") {
+        //             if (this.highlightedItem) {
+        //                 this.highlightPreviousItem();
+        //                 if (this.selectionMode === "single") {
+        //                     this.onDropDownItemSelect(this.highlightedItem, "navigation");
+        //                 }
+        //             }
+        //         } else if (event.key === "Enter") {
+        //             if (this.keyManager.activeItem?.item) {
+        //                 this.onDropDownItemSelect(this.keyManager.activeItem?.item, "selection");
+        //             }
+        //         }
+        //     });
     }
 
     private setKeyManagerActiveItem(item: ListItemComponent | ListItem): void {

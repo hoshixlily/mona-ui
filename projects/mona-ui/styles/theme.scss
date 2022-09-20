@@ -226,6 +226,26 @@ mona-button-group button[monaButton] {
     width: 100%;
 }
 
+/** Combo Box */
+.mona-combo-box {
+    & .mona-input-selector-value {
+        & mona-text-box {
+            box-shadow: none;
+            & div:first-child {
+                border-left: none;
+            }
+        }
+    }
+}
+
+
+/** Dropdown List */
+.mona-dropdown-list {
+    &.mona-disabled {
+        @include disabled;
+    }
+}
+
 .mona-dropdown-no-data {
     display: flex;
     align-items: center;

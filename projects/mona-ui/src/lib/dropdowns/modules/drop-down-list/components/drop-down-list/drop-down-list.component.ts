@@ -12,7 +12,7 @@ import {
     ViewChild
 } from "@angular/core";
 import { PopupRef } from "../../../../../popup/models/PopupRef";
-import { debounceTime, fromEvent, mergeWith, Subject, take, takeUntil } from "rxjs";
+import { debounce, debounceTime, fromEvent, mergeWith, of, Subject, take, takeUntil, timer } from "rxjs";
 import { Group, List } from "@mirei/ts-collections";
 import { DropDownListItemTemplateDirective } from "../../directives/drop-down-list-item-template.directive";
 import { DropDownListValueTemplateDirective } from "../../directives/drop-down-list-value-template.directive";
@@ -117,8 +117,6 @@ export class DropDownListComponent implements OnInit, OnDestroy, AfterViewInit {
 
     public onSelectedListItemsChange(event: ValueChangeEvent): void {
         this.selectedListItems = event.value;
-        this.value = this.selectedListItems.length > 0 ? this.selectedListItems[0].data : null;
-        this.valueChange.emit(this.value);
         if (event.via === "selection") {
             this.popupRef?.close();
             this.popupRef = null;
@@ -144,11 +142,16 @@ export class DropDownListComponent implements OnInit, OnDestroy, AfterViewInit {
                 )
             ]
         });
-        const ul = this.popupRef.overlayRef.overlayElement.querySelector("ul");
-        if (ul) {
-            ul.focus();
-        }
         this.popupRef.closed.pipe(take(1)).subscribe(() => {
+            if (this.value != null) {
+                if (this.value !== this.selectedListItems[0]?.data) {
+                    this.value = this.selectedListItems[0]?.data;
+                    this.valueChange.emit(this.value);
+                }
+            } else if (this.selectedListItems.length > 0) {
+                this.value = this.selectedListItems[0].data;
+                this.valueChange.emit(this.value);
+            }
             this.popupRef = null;
             this.filterChange$.next("");
             (this.elementRef.nativeElement.firstElementChild as HTMLElement)?.focus();
@@ -168,28 +171,43 @@ export class DropDownListComponent implements OnInit, OnDestroy, AfterViewInit {
 
     private setEventListeners(): void {
         fromEvent(this.elementRef.nativeElement, "keydown")
-            .pipe(mergeWith(this.filterKeydown$), takeUntil(this.componentDestroy$))
+            .pipe(
+                mergeWith(this.filterKeydown$),
+                takeUntil(this.componentDestroy$),
+                debounce(e => {
+                    const key = (e as KeyboardEvent).key;
+                    if (key === "ArrowDown" || key === "ArrowUp" || key === "Enter") {
+                        return of(e);
+                    }
+                    return timer(100);
+                })
+            )
             .subscribe((e: Event) => {
                 e.stopPropagation();
                 const event = e as KeyboardEvent;
                 if (event.key === "ArrowDown") {
                     e.preventDefault();
-                    const nextItem = ListComponent.findNextNotDisabledItem(this.viewData, this.selectedListItems[0]);
+                    const nextItem =
+                        ListComponent.findNextNotDisabledItem(this.viewData, this.selectedListItems[0]) ??
+                        ListComponent.findFirstNonDisabledItem(this.viewData);
                     if (nextItem) {
                         this.selectedListItems = [nextItem];
-                        this.value = nextItem.data;
-                        this.valueChange.emit(this.value);
+                        if (!this.popupRef) {
+                            this.value = nextItem.data;
+                            this.valueChange.emit(this.value);
+                        }
                     }
                 } else if (event.key === "ArrowUp") {
                     e.preventDefault();
-                    const previousItem = ListComponent.findPrevNotDisabledItem(
-                        this.viewData,
-                        this.selectedListItems[0]
-                    );
+                    const previousItem =
+                        ListComponent.findPrevNotDisabledItem(this.viewData, this.selectedListItems[0]) ??
+                        ListComponent.findLastNonDisabledItem(this.viewData);
                     if (previousItem) {
                         this.selectedListItems = [previousItem];
-                        this.value = previousItem.data;
-                        this.valueChange.emit(this.value);
+                        if (!this.popupRef) {
+                            this.value = previousItem.data;
+                            this.valueChange.emit(this.value);
+                        }
                     }
                 } else if (event.key === "Enter") {
                     if (this.elementRef.nativeElement.contains(event.target as HTMLElement)) {
@@ -208,7 +226,7 @@ export class DropDownListComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     private setSubscriptions(): void {
-        this.filterChange$.pipe(takeUntil(this.componentDestroy$), debounceTime(200)).subscribe(filter => {
+        this.filterChange$.pipe(takeUntil(this.componentDestroy$), debounceTime(50)).subscribe(filter => {
             this.filterText = filter;
             this.filterListData(filter);
         });

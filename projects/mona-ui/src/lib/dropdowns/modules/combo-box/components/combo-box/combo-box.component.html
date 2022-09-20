@@ -1,32 +1,19 @@
-<div class="mona-dropdown mona-dropdown-list mona-input-selector" [attr.tabindex]="disabled ? -1 : 0"
+<div class="mona-dropdown mona-combo-box mona-input-selector"
      [ngClass]="{'mona-disabled': disabled}"
-     (click)="open()"
-     #dropdownWrapper>
+     #comboboxWrapper>
     <div class="mona-input-selector-value">
-        <ng-container *ngIf="!valueTemplate">
-            <span>{{selectedListItems[0]?.text ?? value}}</span>
-        </ng-container>
-        <ng-container *ngIf="valueTemplate">
-            <ng-container [ngTemplateOutlet]="valueTemplate"
-                          [ngTemplateOutletContext]="{$implicit: selectedListItems[0]?.data ?? value, listItem: selectedListItems[0]}"></ng-container>
-        </ng-container>
+        <mona-text-box [ngModel]="valueText" (ngModelChange)="filterChange$.next($event)"
+                       (keydown)="valueKeydown$.next($event)"></mona-text-box>
     </div>
-    <div class="mona-input-selector-icon">
+    <div class="mona-input-selector-icon" (click)="open()">
         <fa-icon [icon]="dropdownIcon"></fa-icon>
     </div>
 </div>
 
-<ng-template #dropdownPopupTemplate>
-    <div *ngIf="filterable">
-        <mona-text-box class="filter-box" [ngModel]="filterText" (ngModelChange)="filterChange$.next($event)"
-                       (keydown)="filterKeydown$.next($event)">
-            <ng-template monaTextBoxPrefixTemplate>
-                <fa-icon [icon]="filterIcon"></fa-icon>
-            </ng-template>
-        </mona-text-box>
-    </div>
+<ng-template #comboboxPopupTemplate>
     <div>
-        <mona-list [data]="viewData" [itemDisabler]="itemDisabler"
+        <mona-list [data]="viewData" [itemDisabler]="itemDisabler" [highlightedItem]="highlightedItem"
+                   [highlightable]="true"
                    [value]="selectedListItems" (valueChange)="onSelectedListItemsChange($event)">
             <ng-container *ngIf="itemTemplate">
                 <ng-template monaListItemTemplate let-dataItem let-listItem="listItem">

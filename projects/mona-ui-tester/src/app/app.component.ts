@@ -3,6 +3,8 @@ import { PopupRef, PopupService, PopupSettings } from "mona-ui";
 import { TestComponentComponent } from "./test-component/test-component.component";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { faMoon, faSearch, faSnowflake, faSun } from "@fortawesome/free-solid-svg-icons";
+import { Enumerable, Group, List } from "@mirei/ts-collections";
+import { ListItem } from "../../../../dist/mona-ui/lib/shared/data/ListItem";
 
 @Component({
     selector: "app-root",
@@ -68,10 +70,27 @@ export class AppComponent implements OnInit {
         { text: "Cabbage", value: 2, group: "Vegetable", active: true },
         { text: "Grilled Meat", value: 3, group: "Food", active: false },
         { text: "Plum", value: 4, group: "Fruit", active: false },
-        { text: "Banana", value: 5, group: "Fruit", active: true }
+        { text: "Banana", value: 5, group: "Fruit", active: true },
+        { text: "Cabbage Black", value: 6, group: "Vegetable", active: false }
     ];
+    public groupedDropdownListDataItems: List<Group<string, ListItem>> = new List<Group<string, ListItem>>([
+        new Group<string, ListItem>(
+            "",
+            Enumerable.from(this.dropdownListDataItems)
+                .select(d => {
+                    return {
+                        data: d,
+                        text: d.text,
+                        value: d.value
+                    } as ListItem;
+                })
+                .toList()
+        )
+    ]);
+
     public numericTextBoxValue: number = 629;
     public rangedSliderValues: [number, number] = [12, 18];
+    public selectedComboBoxDataItem: any = null;
     public selectedDropdownListDataItem: any;
     public sliderValue: number = 8;
     public switchValue: boolean = false;
@@ -110,6 +129,11 @@ export class AppComponent implements OnInit {
     public onColorPickerValueChange(value: string | null): void {
         this.colorPickerValue = value;
         console.log(value);
+    }
+
+    public onComboBoxValueChange(value: unknown): void {
+        this.selectedComboBoxDataItem = value;
+        console.log(`Combobox value changed`, value);
     }
 
     public onDropDownValueChange(value: unknown): void {
