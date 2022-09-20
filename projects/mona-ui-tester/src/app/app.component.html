@@ -94,8 +94,9 @@
     </div>
 
     <div>
-        <mona-drop-down-list [data]="dropdownListDataItems" groupField="group" textField="text" valueField="value" itemDisabler="active" [filterable]="true"
-                             [value]="selectedDropdownListDataItem" (valueChange)="onDropDownValueChange($event)" style="width: 150px;">
+        <mona-drop-down-list [data]="dropdownListDataItems" groupField="" textField="text" valueField="value"
+                             itemDisabler="active" [filterable]="true" [disabled]="false"
+                             [value]="selectedDropdownListDataItem" (valueChange)="onDropDownValueChange($event)" style="width: 150px; margin-right: 20px;">
 <!--            <ng-template monaDropDownListItemTemplate let-dataItem let-listItem="listItem">-->
 <!--                <span style="color: deeppink;" *ngIf="!listItem.disabled && dataItem.value <= 3">{{dataItem.text}}</span>-->
 <!--                <span style="color: deepskyblue;" *ngIf="!listItem.disabled && dataItem.value > 3">{{dataItem.text}}</span>-->
@@ -108,6 +109,15 @@
                 <span style="color: crimson; font-weight: bold;">{{group}}</span>
             </ng-template>
         </mona-drop-down-list>
+
+        <mona-combo-box [data]="dropdownListDataItems" itemDisabler="active"
+                        [value]="selectedComboBoxDataItem" (valueChange)="onComboBoxValueChange($event)"
+                        [filterable]="false"
+                        textField="text" valueField="text" groupField="group">
+            <ng-template monaComboBoxItemTemplate let-dataItem>
+                <span style="color: darkred; font-weight: bold">{{dataItem.text}}</span>
+            </ng-template>
+        </mona-combo-box>
     </div>
 
     <div>
@@ -168,7 +178,7 @@
     </div>
 
 <!--    <div>-->
-<!--        <mona-list [data]="dropdownListDataItems" textField="text" valueField="value" groupField="group" selectionMode="multiple" (valueChange)="print($event)">-->
+<!--        <mona-list [data]="groupedDropdownListDataItems" textField="text" valueField="value" groupField="group" selectionMode="multiple" (valueChange)="print($event)">-->
 <!--            <ng-template monaListItemTemplate let-dataItem>-->
 <!--                <span style="color: tomato; font-weight: bold;">{{dataItem.text}}</span>-->
 <!--            </ng-template>-->

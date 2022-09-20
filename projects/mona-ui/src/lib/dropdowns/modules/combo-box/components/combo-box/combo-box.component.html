@@ -1,0 +1,32 @@
+<div class="mona-dropdown mona-combo-box mona-input-selector"
+     [ngClass]="{'mona-disabled': disabled}"
+     #comboboxWrapper>
+    <div class="mona-input-selector-value">
+        <mona-text-box [ngModel]="valueText" (ngModelChange)="filterChange$.next($event)"
+                       (keydown)="valueKeydown$.next($event)"></mona-text-box>
+    </div>
+    <div class="mona-input-selector-icon" (click)="open()">
+        <fa-icon [icon]="dropdownIcon"></fa-icon>
+    </div>
+</div>
+
+<ng-template #comboboxPopupTemplate>
+    <div>
+        <mona-list [data]="viewData" [itemDisabler]="itemDisabler" [highlightedItem]="highlightedItem"
+                   [highlightable]="true"
+                   [value]="selectedListItems" (valueChange)="onSelectedListItemsChange($event)">
+            <ng-container *ngIf="itemTemplate">
+                <ng-template monaListItemTemplate let-dataItem let-listItem="listItem">
+                    <ng-container [ngTemplateOutlet]="itemTemplate ?? null"
+                                  [ngTemplateOutletContext]="{$implicit: dataItem, listItem}"></ng-container>
+                </ng-template>
+            </ng-container>
+            <ng-container *ngIf="groupTemplate">
+                <ng-template monaListGroupTemplate let-dataItem let-listItem="listItem">
+                    <ng-container [ngTemplateOutlet]="groupTemplate ?? null"
+                                  [ngTemplateOutletContext]="{$implicit: dataItem, listItem}"></ng-container>
+                </ng-template>
+            </ng-container>
+        </mona-list>
+    </div>
+</ng-template>
