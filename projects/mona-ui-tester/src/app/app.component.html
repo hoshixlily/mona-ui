@@ -94,7 +94,7 @@
     </div>
 
     <div>
-        <mona-drop-down-list [data]="dropdownListDataItems" groupField="group" textField="text" valueField="value"
+        <mona-drop-down-list [data]="dropdownListDataItems" groupField="" textField="text" valueField="value"
                              itemDisabler="active" [filterable]="true" [disabled]="false"
                              [value]="selectedDropdownListDataItem" (valueChange)="onDropDownValueChange($event)" style="width: 150px; margin-right: 20px;">
 <!--            <ng-template monaDropDownListItemTemplate let-dataItem let-listItem="listItem">-->
@@ -112,7 +112,7 @@
 
         <mona-combo-box [data]="dropdownListDataItems" itemDisabler="active"
                         [value]="selectedComboBoxDataItem" (valueChange)="onComboBoxValueChange($event)"
-                        [filterable]="true"
+                        [filterable]="false"
                         textField="text" valueField="text" groupField="group">
             <ng-template monaComboBoxItemTemplate let-dataItem>
                 <span style="color: darkred; font-weight: bold">{{dataItem.text}}</span>
