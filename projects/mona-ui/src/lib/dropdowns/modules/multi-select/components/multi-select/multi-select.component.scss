@@ -1,0 +1,34 @@
+div.mona-input-selector {
+    height: auto;
+    &:hover,
+    &:active {
+        background-color: var(--mona-background);
+    }
+}
+
+div.mona-input-selector-value {
+    padding: 0 1px;
+    & > div:first-child {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        width: 100%;
+        height: 100%;
+    }
+    & mona-text-box {
+        flex: 1;
+    }
+    & mona-chip {
+        //&:first-child {
+        //    margin-left: 1px;
+        //}
+        &:not(:last-child) {
+            margin: 1px 1px 0 1px;
+        }
+    }
+}
+
+div.mona-input-selector-icon {
+    min-width: var(--mona-input-height);
+    border-left: 1px solid var(--mona-border-color);
+}

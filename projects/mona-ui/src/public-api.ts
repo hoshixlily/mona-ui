@@ -26,6 +26,12 @@ export * from "./lib/dropdowns/modules/drop-down-list/directives/drop-down-list-
 export * from "./lib/dropdowns/modules/drop-down-list/directives/drop-down-list-value-template.directive";
 export * from "./lib/dropdowns/modules/drop-down-list/components/drop-down-list/drop-down-list.component";
 export * from "./lib/dropdowns/modules/drop-down-list/drop-down-list.module";
+
+// export * from "./lib/dropdowns/modules/multi-select/directives/multi-select-group-template.directive";
+// export * from "./lib/dropdowns/modules/multi-select/directives/multi-select-item-template.directive";
+export * from "./lib/dropdowns/modules/multi-select/components/multi-select/multi-select.component";
+export * from "./lib/dropdowns/modules/multi-select/multi-select.module";
+
 export * from "./lib/dropdowns/drop-downs.module";
 
 /** Inputs */

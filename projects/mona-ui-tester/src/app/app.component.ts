@@ -92,6 +92,7 @@ export class AppComponent implements OnInit {
     public rangedSliderValues: [number, number] = [12, 18];
     public selectedComboBoxDataItem: any = null;
     public selectedDropdownListDataItem: any;
+    public selectedMultiSelectDataItems: any[] = [];
     public sliderValue: number = 8;
     public switchValue: boolean = false;
     public textBoxValue: string = "TEXT BOX VALUE";
@@ -140,6 +141,10 @@ export class AppComponent implements OnInit {
         this.selectedDropdownListDataItem = value;
         console.log(`Dropdown value changed`, value);
         // console.log(value);
+    }
+
+    public onMultiSelectValueChange(value: unknown[]): void {
+        console.log(`MultiSelect value changed`, value);
     }
 
     public onPopupClose(): void {

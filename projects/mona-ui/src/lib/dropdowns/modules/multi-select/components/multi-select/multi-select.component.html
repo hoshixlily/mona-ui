@@ -1,0 +1,37 @@
+<div class="mona-dropdown mona-multi-select mona-input-selector"
+     [ngClass]="{'mona-disabled': disabled}"
+     #multiSelectWrapper>
+    <div class="mona-input-selector-value">
+        <div>
+            <mona-chip *ngFor="let item of selectedListItems" [removable]="true" (remove)="onSelectedItemRemove(item)" (click)="$event.stopImmediatePropagation();">
+                <span>{{item.text}}</span>
+            </mona-chip>
+            <mona-text-box [ngModel]="valueText" (ngModelChange)="filterChange$.next($event)"
+                           (keydown)="valueKeydown$.next($event)"></mona-text-box>
+        </div>
+    </div>
+    <div class="mona-input-selector-icon" (click)="open()">
+        <fa-icon [icon]="dropdownIcon"></fa-icon>
+    </div>
+</div>
+
+<ng-template #multiSelectPopupTemplate>
+    <div>
+        <mona-list [data]="viewData" [itemDisabler]="itemDisabler" [highlightedItem]="highlightedItem"
+                   [highlightable]="true" selectionMode="multiple"
+                   [value]="selectedListItems" (valueChange)="onSelectedListItemsChange($event)">
+            <ng-container *ngIf="itemTemplate">
+                <ng-template monaListItemTemplate let-dataItem let-listItem="listItem">
+                    <ng-container [ngTemplateOutlet]="itemTemplate ?? null"
+                                  [ngTemplateOutletContext]="{$implicit: dataItem, listItem}"></ng-container>
+                </ng-template>
+            </ng-container>
+            <ng-container *ngIf="groupTemplate">
+                <ng-template monaListGroupTemplate let-dataItem let-listItem="listItem">
+                    <ng-container [ngTemplateOutlet]="groupTemplate ?? null"
+                                  [ngTemplateOutletContext]="{$implicit: dataItem, listItem}"></ng-container>
+                </ng-template>
+            </ng-container>
+        </mona-list>
+    </div>
+</ng-template>
