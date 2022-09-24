@@ -1,6 +1,5 @@
 import {
     AfterViewInit,
-    ChangeDetectorRef,
     Component,
     ContentChild,
     ElementRef,
@@ -34,6 +33,7 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
     private readonly componentDestroy$: Subject<void> = new Subject<void>();
     private disabler?: Action<ListItem, boolean> | null = null;
     private keyManager!: ActiveDescendantKeyManager<ListItemComponent>;
+    public highlightedListItem: ListItem | null = null;
     public selectedValues: ListItem[] = [];
 
     @Input()
@@ -49,7 +49,10 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
     public highlightable: boolean = false;
 
     @Input()
-    public highlightedItem: ListItem | null = null;
+    public set highlightedItem(item: ListItem | null) {
+        this.highlightedListItem = item;
+        this.scrollToHighlightedItem();
+    }
 
     @Input()
     public set itemDisabler(disabler: Action<any, boolean> | string | null) {
@@ -80,7 +83,7 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
     @Output()
     public valueChange: EventEmitter<ValueChangeEvent> = new EventEmitter<ValueChangeEvent>();
 
-    public constructor(private readonly cdr: ChangeDetectorRef, private readonly elementRef: ElementRef<HTMLElement>) {}
+    public constructor(public readonly elementRef: ElementRef<HTMLElement>) {}
 
     public static createListData(options: ListDataCreationOptions): List<Group<string, ListItem>> {
         let data: List<Group<string, ListItem>> = new List<Group<string, ListItem>>();
@@ -91,12 +94,14 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
                 .select(g => {
                     const items = g.source
                         .select(d => {
-                            return {
+                            return new ListItem({
                                 data: d,
                                 index: index++,
                                 text: options.textField ? d[options.textField] : d,
-                                value: options.valueField ? d[options.valueField] : d
-                            } as ListItem;
+                                textField: options.textField ?? "",
+                                value: options.valueField ? d[options.valueField] : d,
+                                valueField: options.valueField ?? ""
+                            });
                         })
                         .toList();
                     return new Group(g.key, items);
@@ -106,12 +111,14 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
         } else {
             const items = Enumerable.from(options.data)
                 .select(d => {
-                    return {
+                    return new ListItem({
                         data: d,
                         index: index++,
                         text: options.textField ? d[options.textField as string] : d,
-                        value: options.valueField ? d[options.valueField as string] : d
-                    } as ListItem;
+                        textField: options.textField ?? "",
+                        value: options.valueField ? d[options.valueField as string] : d,
+                        valueField: options.valueField ?? ""
+                    });
                 })
                 .toList();
             data.add(new Group<string, any>("", items));
@@ -122,7 +129,7 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
         return data;
     }
 
-    public static findFirstNonDisabledItem(listData: List<Group<string, ListItem>>): ListItem | null {
+    public static findFirstNotDisabledItem(listData: List<Group<string, ListItem>>): ListItem | null {
         return listData.selectMany(g => g.source).firstOrDefault(d => !d.disabled);
     }
 
@@ -137,7 +144,7 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
         const count = listData.selectMany(d => d.source).count();
         return listData
             .selectMany(d => d.source)
-            .skipWhile(d => d !== item)
+            .skipWhile(d => !d.equals(item))
             .skip(count === 1 ? 0 : 1)
             .skipWhile(d => !!d.disabled)
             .firstOrDefault();
@@ -148,7 +155,7 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
         return listData
             .selectMany(d => d.source)
             .reverse()
-            .skipWhile(d => d !== item)
+            .skipWhile(d => !d.equals(item))
             .skip(count === 1 ? 0 : 1)
             .skipWhile(d => !!d.disabled)
             .firstOrDefault();
@@ -198,7 +205,7 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
         } else {
             if (this.selectedValues.includes(item)) {
                 item.selected = false;
-                this.selectedValues = this.selectedValues.filter(d => d !== item);
+                this.selectedValues = this.selectedValues.filter(d => !d.equals(item));
             } else {
                 item.selected = true;
                 this.selectedValues = [...this.selectedValues, item];
@@ -208,24 +215,33 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
                 via
             });
         }
-        this.highlightedItem = item;
+        this.highlightedListItem = item;
+    }
+
+    public scrollToHighlightedItem(): void {
+        if (this.highlightedListItem) {
+            const listItem = this.listItemComponents.find(d => d.item.equals(this.highlightedListItem));
+            if (listItem) {
+                listItem.elementRef.nativeElement.scrollIntoView({ behavior: "auto", block: "center" });
+            }
+        }
     }
 
     private highlightFirstItem(): void {
-        this.highlightedItem = ListComponent.findFirstNonDisabledItem(this.data);
-        if (this.highlightedItem) {
-            this.setKeyManagerActiveItem(this.highlightedItem);
+        this.highlightedListItem = ListComponent.findFirstNotDisabledItem(this.data);
+        if (this.highlightedListItem) {
+            this.setKeyManagerActiveItem(this.highlightedListItem);
         }
     }
 
     private highlightInitialSelectedItem(): void {
         if (this.selectedValues.length > 0) {
             if (this.selectionMode === "single") {
-                this.highlightedItem = this.selectedValues[this.selectedValues.length - 1];
-                this.setKeyManagerActiveItem(this.highlightedItem);
+                this.highlightedListItem = this.selectedValues[this.selectedValues.length - 1];
+                this.setKeyManagerActiveItem(this.highlightedListItem);
             } else {
-                this.highlightedItem = this.selectedValues[this.selectedValues.length - 1];
-                this.setKeyManagerActiveItem(this.highlightedItem);
+                this.highlightedListItem = this.selectedValues[this.selectedValues.length - 1];
+                this.setKeyManagerActiveItem(this.highlightedListItem);
             }
         } else {
             this.highlightFirstItem();
@@ -233,70 +249,81 @@ export class ListComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     private highlightNextItem(): void {
-        if (this.highlightedItem) {
-            const nextItem = ListComponent.findNextNotDisabledItem(this.data, this.highlightedItem);
+        if (this.highlightedListItem) {
+            const nextItem = ListComponent.findNextNotDisabledItem(this.data, this.highlightedListItem);
             if (nextItem) {
-                this.highlightedItem = nextItem;
-                this.setKeyManagerActiveItem(this.highlightedItem);
+                this.highlightedListItem = nextItem;
+                this.setKeyManagerActiveItem(this.highlightedListItem);
             }
         }
     }
 
     private highlightPreviousItem(): void {
-        if (this.highlightedItem) {
-            const previousItem = ListComponent.findPrevNotDisabledItem(this.data, this.highlightedItem);
+        if (this.highlightedListItem) {
+            const previousItem = ListComponent.findPrevNotDisabledItem(this.data, this.highlightedListItem);
             if (previousItem) {
-                this.highlightedItem = previousItem;
+                this.highlightedListItem = previousItem;
                 this.setKeyManagerActiveItem(previousItem);
             }
         }
     }
 
+    private scrollIntoView(): void {
+        if (this.highlightedListItem) {
+            const listItem = this.listItemComponents.find(d => d.item.equals(this.highlightedListItem));
+            if (listItem) {
+                listItem.elementRef.nativeElement.scrollIntoView({ behavior: "auto", block: "center" });
+            }
+        }
+    }
+
     private setEventListeners(): void {
-        // fromEvent(this.elementRef.nativeElement, "keydown")
-        //     .pipe(
-        //         takeUntil(this.componentDestroy$),
-        //         filter(() => !this.disabled),
-        //         filter((e: Event) => {
-        //             const event = e as KeyboardEvent;
-        //             return event.key === "ArrowDown" || event.key === "ArrowUp" || event.key === "Enter";
-        //         })
-        //     )
-        //     .subscribe(e => {
-        //         e.preventDefault();
-        //         const event = e as KeyboardEvent;
-        //         if (event.key === "ArrowDown") {
-        //             if (!this.highlightedItem) {
-        //                 this.highlightFirstItem();
-        //                 if (this.selectionMode === "single" && this.highlightedItem) {
-        //                     this.onDropDownItemSelect(this.highlightedItem, "navigation");
-        //                 }
-        //             } else {
-        //                 this.highlightNextItem();
-        //                 if (this.selectionMode === "single") {
-        //                     this.onDropDownItemSelect(this.highlightedItem, "navigation");
-        //                 }
-        //             }
-        //         } else if (event.key === "ArrowUp") {
-        //             if (this.highlightedItem) {
-        //                 this.highlightPreviousItem();
-        //                 if (this.selectionMode === "single") {
-        //                     this.onDropDownItemSelect(this.highlightedItem, "navigation");
-        //                 }
-        //             }
-        //         } else if (event.key === "Enter") {
-        //             if (this.keyManager.activeItem?.item) {
-        //                 this.onDropDownItemSelect(this.keyManager.activeItem?.item, "selection");
-        //             }
-        //         }
-        //     });
+        fromEvent(this.elementRef.nativeElement, "keydown")
+            .pipe(
+                takeUntil(this.componentDestroy$),
+                filter(() => !this.disabled),
+                filter((e: Event) => {
+                    const event = e as KeyboardEvent;
+                    return event.key === "ArrowDown" || event.key === "ArrowUp" || event.key === "Enter";
+                })
+            )
+            .subscribe(e => {
+                e.preventDefault();
+                const event = e as KeyboardEvent;
+                if (event.key === "ArrowDown") {
+                    if (!this.highlightedListItem) {
+                        this.highlightFirstItem();
+                        if (this.selectionMode === "single" && this.highlightedListItem) {
+                            this.onDropDownItemSelect(this.highlightedListItem, "navigation");
+                        }
+                    } else {
+                        this.highlightNextItem();
+                        if (this.selectionMode === "single") {
+                            this.onDropDownItemSelect(this.highlightedListItem, "navigation");
+                        }
+                    }
+                    this.scrollIntoView();
+                } else if (event.key === "ArrowUp") {
+                    if (this.highlightedListItem) {
+                        this.highlightPreviousItem();
+                        if (this.selectionMode === "single") {
+                            this.onDropDownItemSelect(this.highlightedListItem, "navigation");
+                        }
+                    }
+                    this.scrollIntoView();
+                } else if (event.key === "Enter") {
+                    if (this.keyManager.activeItem?.item) {
+                        this.onDropDownItemSelect(this.keyManager.activeItem?.item, "selection");
+                    }
+                }
+            });
     }
 
     private setKeyManagerActiveItem(item: ListItemComponent | ListItem): void {
         if (item instanceof ListItemComponent) {
             this.keyManager.setActiveItem(item);
         } else {
-            const keyManagerItem = this.listItemComponents.find(d => d.item === this.highlightedItem);
+            const keyManagerItem = this.listItemComponents.find(d => d.item.equals(this.highlightedListItem));
             if (keyManagerItem) {
                 this.keyManager.setActiveItem(keyManagerItem);
             }

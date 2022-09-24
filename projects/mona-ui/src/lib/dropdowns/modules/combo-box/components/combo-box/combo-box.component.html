@@ -12,9 +12,9 @@
 
 <ng-template #comboboxPopupTemplate>
     <div>
-        <mona-list [data]="viewData" [itemDisabler]="itemDisabler" [highlightedItem]="highlightedItem"
+        <mona-list [data]="viewData" [itemDisabler]="itemDisabler" [highlightedItem]="selectedListItems[0]"
                    [highlightable]="true"
-                   [value]="selectedListItems" (valueChange)="onSelectedListItemsChange($event)">
+                   [value]="selectedListItems" (valueChange)="onSelectedListItemsChange($event)" #listComponent>
             <ng-container *ngIf="itemTemplate">
                 <ng-template monaListItemTemplate let-dataItem let-listItem="listItem">
                     <ng-container [ngTemplateOutlet]="itemTemplate ?? null"

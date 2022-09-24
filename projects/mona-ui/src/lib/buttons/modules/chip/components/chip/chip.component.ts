@@ -16,7 +16,10 @@ export class ChipComponent implements OnInit {
     public removable: boolean = false;
 
     @Output()
-    public remove: EventEmitter<void> = new EventEmitter<void>();
+    public remove: EventEmitter<Event> = new EventEmitter<Event>();
+
+    @Input()
+    public tabindex: number = 0;
 
     public constructor() {}
     public ngOnInit(): void {}

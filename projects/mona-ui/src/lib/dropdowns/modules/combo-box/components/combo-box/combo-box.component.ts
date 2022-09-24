@@ -68,6 +68,9 @@ export class ComboBoxComponent implements OnInit, OnDestroy {
     @ContentChild(ComboBoxItemTemplateDirective, { read: TemplateRef })
     public itemTemplate?: TemplateRef<void>;
 
+    @ViewChild("listComponent")
+    public listComponent!: ListComponent;
+
     @Input()
     public textField?: string;
 
@@ -103,8 +106,9 @@ export class ComboBoxComponent implements OnInit, OnDestroy {
         this.viewData = this.listData.toList();
 
         if (this.value) {
-            const listItem = this.viewData.selectMany(g => g.source).firstOrDefault(i => i.data === this.value);
+            const listItem = this.viewData.selectMany(g => g.source).firstOrDefault(i => i.dataEquals(this.value));
             this.selectedListItems = listItem && !listItem.disabled ? [listItem] : [];
+            this.valueText = this.selectedListItems[0]?.text ?? "";
         }
 
         this.setSubscriptions();
@@ -139,6 +143,11 @@ export class ComboBoxComponent implements OnInit, OnDestroy {
             ]
         });
         this.inputElement?.focus();
+
+        window.setTimeout(() => {
+            this.listComponent.scrollToHighlightedItem();
+        });
+
         this.popupRef.closed.pipe(take(1)).subscribe(() => {
             if (this.value != null) {
                 if (this.value !== this.selectedListItems[0]?.data) {
@@ -172,6 +181,7 @@ export class ComboBoxComponent implements OnInit, OnDestroy {
             .pipe(takeUntil(this.componentDestroy$))
             .subscribe(e => {
                 this.inputElement?.focus();
+                this.inputElement.setSelectionRange(-1, -1);
                 this.viewData = this.listData.toList();
             });
         this.focusMonitor
@@ -202,12 +212,8 @@ export class ComboBoxComponent implements OnInit, OnDestroy {
                 if (event.key === "ArrowDown") {
                     event.preventDefault();
                     const nextItem =
-                        this.selectedListItems.length > 0
-                            ? ListComponent.findNextNotDisabledItem(this.viewData, this.selectedListItems[0]) ??
-                              ListComponent.findFirstNonDisabledItem(this.viewData)
-                            : this.highlightedItem && this.selectedListItems.length !== 0
-                            ? ListComponent.findNextNotDisabledItem(this.viewData, this.highlightedItem)
-                            : ListComponent.findFirstNonDisabledItem(this.viewData);
+                        ListComponent.findNextNotDisabledItem(this.viewData, this.selectedListItems[0]) ??
+                        ListComponent.findFirstNotDisabledItem(this.viewData);
                     if (nextItem) {
                         this.selectedListItems = [nextItem];
                         if (!this.popupRef) {
@@ -219,12 +225,8 @@ export class ComboBoxComponent implements OnInit, OnDestroy {
                 } else if (event.key === "ArrowUp") {
                     event.preventDefault();
                     const previousItem =
-                        this.selectedListItems.length > 0
-                            ? ListComponent.findPrevNotDisabledItem(this.viewData, this.selectedListItems[0]) ??
-                              ListComponent.findLastNonDisabledItem(this.viewData)
-                            : this.highlightedItem && this.selectedListItems.length !== 0
-                            ? ListComponent.findPrevNotDisabledItem(this.viewData, this.highlightedItem)
-                            : ListComponent.findLastNonDisabledItem(this.viewData);
+                        ListComponent.findPrevNotDisabledItem(this.viewData, this.selectedListItems[0]) ??
+                        ListComponent.findLastNonDisabledItem(this.viewData);
                     if (previousItem) {
                         this.selectedListItems = [previousItem];
                         if (!this.popupRef) {
@@ -237,6 +239,9 @@ export class ComboBoxComponent implements OnInit, OnDestroy {
                     event.preventDefault();
                     this.popupRef?.close();
                     this.popupRef = null;
+                    this.valueText = this.selectedListItems[0]?.text ?? "";
+                } else if (event.key === "Escape") {
+                    return;
                 } else {
                     if (this.inputElement) {
                         const text = this.inputElement.value;
@@ -249,7 +254,9 @@ export class ComboBoxComponent implements OnInit, OnDestroy {
                         if (textChanged && !this.popupRef) {
                             this.open();
                         }
-                        const item = this.viewData.selectMany(g => g.source).firstOrDefault(i => i.text === text);
+                        const item = this.viewData
+                            .selectMany(g => g.source)
+                            .firstOrDefault(i => i.text.toLowerCase().startsWith(text.toLowerCase()));
                         if (item) {
                             this.selectedListItems = item && !item.disabled ? [item] : [];
 
@@ -269,7 +276,7 @@ export class ComboBoxComponent implements OnInit, OnDestroy {
                             }
                             const highlightedItem = this.viewData
                                 .selectMany(g => g.source)
-                                .firstOrDefault(i => i.text.startsWith(text));
+                                .firstOrDefault(i => i.text.toLowerCase().startsWith(text.toLowerCase()));
                             if (highlightedItem) {
                                 this.highlightedItem = highlightedItem;
                             } else {

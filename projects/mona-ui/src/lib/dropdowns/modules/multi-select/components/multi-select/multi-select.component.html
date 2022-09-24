@@ -1,22 +1,27 @@
-<div class="mona-dropdown mona-dropdown-list mona-input-selector" [attr.tabindex]="disabled ? -1 : 0"
-     [ngClass]="{'mona-disabled': disabled}"
-     (click)="open()"
-     #dropdownWrapper>
+<div class="mona-dropdown mona-multi-select mona-input-selector" [attr.tabindex]="disabled ? -1 : 0"
+     [ngClass]="{'mona-disabled': disabled}"  (click)="open()"
+     #multiSelectWrapper>
     <div class="mona-input-selector-value">
-        <ng-container *ngIf="!valueTemplate">
-            <span>{{selectedListItems[0]?.text ?? value}}</span>
-        </ng-container>
-        <ng-container *ngIf="valueTemplate">
-            <ng-container [ngTemplateOutlet]="valueTemplate"
-                          [ngTemplateOutletContext]="{$implicit: selectedListItems[0]?.data ?? value, listItem: selectedListItems[0]}"></ng-container>
-        </ng-container>
+        <div>
+            <mona-chip *ngFor="let item of selectedListItems | slice:0:visibleTagCount"
+                       [tabindex]="-1" [removable]="true" (remove)="onSelectedItemRemove($event, item)">
+                <span *ngIf="!tagTemplate">{{item.text}}</span>
+                <ng-container [ngTemplateOutlet]="tagTemplate" [ngTemplateOutletContext]="{$implicit: item.data}" *ngIf="tagTemplate"></ng-container>
+            </mona-chip>
+            <mona-chip [tabindex]="-1" [removable]="true" (remove)="onSelectedItemGroupRemove($event)"
+                       *ngIf="tagCount >= 0 && selectedListItems.length > tagCount">
+                <span *ngIf="!summaryTagTemplate">{{summaryTagText}}</span>
+                <ng-container [ngTemplateOutlet]="summaryTagTemplate" [ngTemplateOutletContext]="{$implicit: selectedListItems}"
+                              *ngIf="summaryTagTemplate"></ng-container>
+            </mona-chip>
+        </div>
     </div>
     <div class="mona-input-selector-icon">
         <fa-icon [icon]="dropdownIcon"></fa-icon>
     </div>
 </div>
 
-<ng-template #dropdownPopupTemplate>
+<ng-template #multiSelectPopupTemplate>
     <div *ngIf="filterable">
         <mona-text-box class="filter-box" [ngModel]="filterText" (ngModelChange)="filterChange$.next($event)"
                        (keydown)="filterKeydown$.next($event)">
@@ -26,7 +31,8 @@
         </mona-text-box>
     </div>
     <div>
-        <mona-list [data]="viewData" [itemDisabler]="itemDisabler" [highlightable]="true" [highlightedItem]="selectedListItems[0]"
+        <mona-list [data]="viewData" [itemDisabler]="itemDisabler" [highlightedItem]="highlightedItem"
+                   [highlightable]="true" selectionMode="multiple"
                    [value]="selectedListItems" (valueChange)="onSelectedListItemsChange($event)" #listComponent>
             <ng-container *ngIf="itemTemplate">
                 <ng-template monaListItemTemplate let-dataItem let-listItem="listItem">
