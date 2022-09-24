@@ -1,4 +1,7 @@
 import {
+    AfterViewInit,
+    ChangeDetectionStrategy,
+    ChangeDetectorRef,
     Component,
     ContentChild,
     ElementRef,
@@ -23,13 +26,16 @@ import { ValueChangeEvent } from "../../../../../shared/data/ValueChangeEvent";
 import { ConnectionPositionPair } from "@angular/cdk/overlay";
 import { MultiSelectGroupTemplateDirective } from "../../directives/multi-select-group-template.directive";
 import { MultiSelectItemTemplateDirective } from "../../directives/multi-select-item-template.directive";
+import { MultiSelectSummaryTagDirective } from "../../directives/multi-select-summary-tag.directive";
+import { MultiSelectTagTemplateDirective } from "../../directives/multi-select-tag-template.directive";
 
 @Component({
     selector: "mona-multi-select",
     templateUrl: "./multi-select.component.html",
-    styleUrls: ["./multi-select.component.scss"]
+    styleUrls: ["./multi-select.component.scss"],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class MultiSelectComponent implements OnInit, OnDestroy {
+export class MultiSelectComponent implements OnInit, OnDestroy, AfterViewInit {
     private readonly componentDestroy$: Subject<void> = new Subject();
     private popupRef: PopupRef | null = null;
     private resizeObserver: ResizeObserver | null = null;
@@ -41,7 +47,8 @@ export class MultiSelectComponent implements OnInit, OnDestroy {
     public highlightedItem: ListItem | null = null;
     public listData: List<Group<string, ListItem>> = new List();
     public selectedListItems: ListItem[] = [];
-    // public valueText: string = "";
+    public summaryTagTemplate: TemplateRef<any> | null = null;
+    public tagCount: number = -1; // set by directive
     public viewData: List<Group<string, ListItem>> = new List();
 
     @Input()
@@ -74,6 +81,9 @@ export class MultiSelectComponent implements OnInit, OnDestroy {
     @ViewChild("multiSelectWrapper")
     public multiSelectWrapper!: ElementRef<HTMLDivElement>;
 
+    @ContentChild(MultiSelectTagTemplateDirective, { read: TemplateRef })
+    public tagTemplate: TemplateRef<any> | null = null;
+
     @Input()
     public textField?: string;
 
@@ -87,10 +97,15 @@ export class MultiSelectComponent implements OnInit, OnDestroy {
     public valueField?: string;
 
     public constructor(
+        private readonly cdr: ChangeDetectorRef,
         private readonly elementRef: ElementRef<HTMLElement>,
         private readonly focusMonitor: FocusMonitor,
         private readonly popupService: PopupService
     ) {}
+
+    public ngAfterViewInit(): void {
+        console.log("STD: ", this.summaryTagTemplate);
+    }
 
     public ngOnDestroy(): void {
         this.componentDestroy$.next();
@@ -123,6 +138,13 @@ export class MultiSelectComponent implements OnInit, OnDestroy {
         this.setEventListeners();
     }
 
+    public onSelectedItemGroupRemove(event: Event): void {
+        event.stopPropagation();
+        this.selectedListItems = this.selectedListItems.slice(0, this.visibleTagCount);
+        this.value = this.selectedListItems.map(i => i.data);
+        this.valueChange.emit(this.value);
+    }
+
     public onSelectedItemRemove(event: Event, item: ListItem): void {
         event.stopPropagation();
         this.selectedListItems = this.selectedListItems.filter(i => i !== item);
@@ -132,6 +154,7 @@ export class MultiSelectComponent implements OnInit, OnDestroy {
 
     public onSelectedListItemsChange(event: ValueChangeEvent): void {
         this.selectedListItems = event.value;
+        this.cdr.markForCheck();
     }
 
     public open(): void {
@@ -288,5 +311,20 @@ export class MultiSelectComponent implements OnInit, OnDestroy {
             this.filterText = filter;
             this.filterListData(filter);
         });
+    }
+
+    public get summaryTagText(): string {
+        console.log(this.tagCount);
+        return this.tagCount < 0
+            ? ""
+            : this.tagCount === 0
+            ? `${this.selectedListItems.length} item${this.selectedListItems.length === 1 ? "" : "s"}`
+            : `${this.selectedListItems.length - this.tagCount} item${
+                  this.selectedListItems.length - this.tagCount > 1 ? "s" : ""
+              }`;
+    }
+
+    public get visibleTagCount(): number {
+        return this.tagCount < 0 ? this.selectedListItems.length : this.tagCount === 0 ? 0 : this.tagCount;
     }
 }

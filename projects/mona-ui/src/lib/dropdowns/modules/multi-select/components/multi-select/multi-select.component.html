@@ -3,9 +3,16 @@
      #multiSelectWrapper>
     <div class="mona-input-selector-value">
         <div>
-            <mona-chip *ngFor="let item of selectedListItems"
-                       [tabindex]="-1" [removable]="true" (remove)="onSelectedItemRemove($event, item)" (click)="$event.stopImmediatePropagation();">
-                <span>{{item.text}}</span>
+            <mona-chip *ngFor="let item of selectedListItems | slice:0:visibleTagCount"
+                       [tabindex]="-1" [removable]="true" (remove)="onSelectedItemRemove($event, item)">
+                <span *ngIf="!tagTemplate">{{item.text}}</span>
+                <ng-container [ngTemplateOutlet]="tagTemplate" [ngTemplateOutletContext]="{$implicit: item.data}" *ngIf="tagTemplate"></ng-container>
+            </mona-chip>
+            <mona-chip [tabindex]="-1" [removable]="true" (remove)="onSelectedItemGroupRemove($event)"
+                       *ngIf="tagCount >= 0 && selectedListItems.length > tagCount">
+                <span *ngIf="!summaryTagTemplate">{{summaryTagText}}</span>
+                <ng-container [ngTemplateOutlet]="summaryTagTemplate" [ngTemplateOutletContext]="{$implicit: selectedListItems}"
+                              *ngIf="summaryTagTemplate"></ng-container>
             </mona-chip>
         </div>
     </div>

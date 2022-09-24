@@ -66,36 +66,36 @@ export class AppComponent implements OnInit {
 
     public contextMenuItemVisible: boolean = true;
     public dropdownListDataItems: any[] = [
-        { text: "Cherry", value: 1, group: "Fruit", active: false },
+        { text: "Cherry", value: 1, group: "Fruit", active: true },
         { text: "Cabbage", value: 2, group: "Vegetable", active: true },
-        { text: "Grilled Meat", value: 3, group: "Food", active: false },
-        { text: "Plum", value: 4, group: "Fruit", active: false },
+        { text: "Grilled Meat", value: 3, group: "Food", active: true },
+        { text: "Plum", value: 4, group: "Fruit", active: true },
         { text: "Banana", value: 5, group: "Fruit", active: true },
-        { text: "Cabbage Black", value: 6, group: "Vegetable", active: false },
-        { text: "Quince", value: 7, group: "Fruit", active: false },
-        { text: "Pineapple", value: 8, group: "Fruit", active: false },
+        { text: "Cabbage Black", value: 6, group: "Vegetable", active: true },
+        { text: "Quince", value: 7, group: "Fruit", active: true },
+        { text: "Pineapple", value: 8, group: "Fruit", active: true },
         { text: "Pumpkin", value: 9, group: "Vegetable", active: false },
         { text: "Peach", value: 10, group: "Fruit", active: false },
-        { text: "Pear", value: 11, group: "Fruit", active: false },
-        { text: "Pomegranate", value: 12, group: "Fruit", active: false },
-        { text: "Paprika", value: 13, group: "Vegetable", active: false },
+        { text: "Pear", value: 11, group: "Fruit", active: true },
+        { text: "Pomegranate", value: 12, group: "Fruit", active: true },
+        { text: "Paprika", value: 13, group: "Vegetable", active: true },
         { text: "Potato", value: 14, group: "Vegetable", active: false },
-        { text: "Raspberry", value: 15, group: "Fruit", active: false },
-        { text: "Strawberry", value: 16, group: "Fruit", active: false },
-        { text: "Tomato", value: 17, group: "Vegetable", active: false },
-        { text: "Watermelon", value: 18, group: "Fruit", active: false },
-        { text: "Zucchini", value: 19, group: "Vegetable", active: false },
-        { text: "Apple", value: 20, group: "Fruit", active: false },
-        { text: "Apricot", value: 21, group: "Fruit", active: false },
-        { text: "Yakisoba", value: 22, group: "Food", active: false },
-        { text: "Yakitori", value: 23, group: "Food", active: false },
+        { text: "Raspberry", value: 15, group: "Fruit", active: true },
+        { text: "Strawberry", value: 16, group: "Fruit", active: true },
+        { text: "Tomato", value: 17, group: "Vegetable", active: true },
+        { text: "Watermelon", value: 18, group: "Fruit", active: true },
+        { text: "Zucchini", value: 19, group: "Vegetable", active: true },
+        { text: "Apple", value: 20, group: "Fruit", active: true },
+        { text: "Apricot", value: 21, group: "Fruit", active: true },
+        { text: "Yakisoba", value: 22, group: "Food", active: true },
+        { text: "Yakitori", value: 23, group: "Food", active: true },
         { text: "Sushi", value: 24, group: "Food", active: false },
-        { text: "Sashimi", value: 25, group: "Food", active: false },
+        { text: "Sashimi", value: 25, group: "Food", active: true },
         { text: "Soba", value: 26, group: "Food", active: false },
-        { text: "Ramen", value: 27, group: "Food", active: false },
-        { text: "Onigiri", value: 28, group: "Food", active: false },
-        { text: "Okonomiyaki", value: 29, group: "Food", active: false },
-        { text: "Yakizakana", value: 30, group: "Food", active: false }
+        { text: "Ramen", value: 27, group: "Food", active: true },
+        { text: "Onigiri", value: 28, group: "Food", active: true },
+        { text: "Okonomiyaki", value: 29, group: "Food", active: true },
+        { text: "Yakizakana", value: 30, group: "Food", active: true }
     ];
     public groupedDropdownListDataItems: List<Group<string, ListItem>> = new List<Group<string, ListItem>>([
         new Group<string, ListItem>(
@@ -140,7 +140,7 @@ export class AppComponent implements OnInit {
 
     public constructor(public readonly popupService: PopupService) {}
 
-    public dropdownItemDisabler = (item: any): boolean => item.value % 2 === 0;
+    public dropdownItemDisabler = (item: any): boolean => !item.active;
 
     public ngOnInit(): void {
         this.selectedDropdownListDataItem = { text: "REPLACED WITH PAPRIKA", value: 13, group: "Fruit", active: true };

@@ -8,10 +8,27 @@ import { SharedModule } from "../../../shared/shared.module";
 import { ChipModule } from "../../../buttons/modules/chip/chip.module";
 import { MultiSelectItemTemplateDirective } from "./directives/multi-select-item-template.directive";
 import { MultiSelectGroupTemplateDirective } from "./directives/multi-select-group-template.directive";
+import { MultiSelectSummaryTagDirective } from "./directives/multi-select-summary-tag.directive";
+import { MultiSelectSummaryTagTemplateDirective } from "./directives/multi-select-summary-tag-template.directive";
+import { MultiSelectTagTemplateDirective } from "./directives/multi-select-tag-template.directive";
 
 @NgModule({
-    declarations: [MultiSelectComponent, MultiSelectItemTemplateDirective, MultiSelectGroupTemplateDirective],
+    declarations: [
+        MultiSelectComponent,
+        MultiSelectItemTemplateDirective,
+        MultiSelectGroupTemplateDirective,
+        MultiSelectSummaryTagDirective,
+        MultiSelectSummaryTagTemplateDirective,
+        MultiSelectTagTemplateDirective
+    ],
     imports: [CommonModule, TextBoxModule, FontAwesomeModule, FormsModule, SharedModule, ChipModule],
-    exports: [MultiSelectComponent, MultiSelectGroupTemplateDirective, MultiSelectItemTemplateDirective]
+    exports: [
+        MultiSelectComponent,
+        MultiSelectGroupTemplateDirective,
+        MultiSelectItemTemplateDirective,
+        MultiSelectSummaryTagDirective,
+        MultiSelectSummaryTagTemplateDirective,
+        MultiSelectTagTemplateDirective
+    ]
 })
 export class MultiSelectModule {}
