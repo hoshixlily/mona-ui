@@ -121,7 +121,14 @@
 
         <mona-multi-select [data]="dropdownListDataItems" [value]="selectedMultiSelectDataItems2" (valueChange)="onMultiSelectValueChange($event)"
                            [itemDisabler]="'active'"
-                           textField="text" valueField="value" groupField="group" style="width: 250px;"></mona-multi-select>
+                           textField="text" valueField="value" groupField="group" style="width: 250px;">
+            <ng-template monaMultiSelectItemTemplate let-dataItem>
+                <span style="color: greenyellow; font-weight: bold">{{dataItem.text}}</span>
+            </ng-template>
+            <ng-template monaMultiSelectGroupTemplate let-group>
+                <span style="color: deepskyblue; font-weight: bold">{{group.toUpperCase()}}</span>
+            </ng-template>
+        </mona-multi-select>
     </div>
 
     <div>

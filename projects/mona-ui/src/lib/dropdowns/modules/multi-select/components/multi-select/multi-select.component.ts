@@ -1,5 +1,6 @@
 import {
     Component,
+    ContentChild,
     ElementRef,
     EventEmitter,
     Input,
@@ -20,6 +21,8 @@ import { PopupService } from "../../../../../popup/services/popup.service";
 import { ListComponent } from "../../../../../shared/components/list/list.component";
 import { ValueChangeEvent } from "../../../../../shared/data/ValueChangeEvent";
 import { ConnectionPositionPair } from "@angular/cdk/overlay";
+import { MultiSelectGroupTemplateDirective } from "../../directives/multi-select-group-template.directive";
+import { MultiSelectItemTemplateDirective } from "../../directives/multi-select-item-template.directive";
 
 @Component({
     selector: "mona-multi-select",
@@ -53,13 +56,13 @@ export class MultiSelectComponent implements OnInit, OnDestroy {
     @Input()
     public groupField?: string;
 
-    // @ContentChild(ComboBoxGroupTemplateDirective, { read: TemplateRef })
+    @ContentChild(MultiSelectGroupTemplateDirective, { read: TemplateRef })
     public groupTemplate?: TemplateRef<void>;
 
     @Input()
     public itemDisabler: Action<any, boolean> | string | null = null;
 
-    // @ContentChild(ComboBoxItemTemplateDirective, { read: TemplateRef })
+    @ContentChild(MultiSelectItemTemplateDirective, { read: TemplateRef })
     public itemTemplate?: TemplateRef<void>;
 
     @ViewChild("listComponent")
