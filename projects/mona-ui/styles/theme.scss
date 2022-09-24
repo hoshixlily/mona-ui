@@ -112,7 +112,7 @@ ul.mona-list {
         }
 
         // TODO: Update this to a better visual style
-        &.mona-highlighted:not(.mona-selected) {
+        &.mona-highlighted {
             border: 1px solid darkgray;
         }
 
@@ -268,6 +268,25 @@ mona-button-group button[monaButton] {
             border: none;
             & > span {
                 border-right: none;
+            }
+        }
+    }
+}
+
+/** Multi Select */
+.mona-multi-select {
+    & .mona-input-selector-value {
+        & mona-text-box {
+            box-shadow: none;
+            & div:first-child {
+                border: none;
+                height: calc(var(--mona-input-height) - 2px);
+            }
+        }
+        & mona-chip {
+            & div.mona-chip {
+                margin-top: 1px;
+                height: calc(var(--mona-input-height) - 6px);
             }
         }
     }

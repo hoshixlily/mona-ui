@@ -66,12 +66,59 @@ export class AppComponent implements OnInit {
 
     public contextMenuItemVisible: boolean = true;
     public dropdownListDataItems: any[] = [
-        { text: "Cherry", value: 1, group: "Fruit", active: false },
+        { text: "Cherry", value: 1, group: "Fruit", active: true },
         { text: "Cabbage", value: 2, group: "Vegetable", active: true },
-        { text: "Grilled Meat", value: 3, group: "Food", active: false },
-        { text: "Plum", value: 4, group: "Fruit", active: false },
+        { text: "Grilled Meat", value: 3, group: "Food", active: true },
+        { text: "Plum", value: 4, group: "Fruit", active: true },
         { text: "Banana", value: 5, group: "Fruit", active: true },
-        { text: "Cabbage Black", value: 6, group: "Vegetable", active: false }
+        { text: "Cabbage Black", value: 6, group: "Vegetable", active: true },
+        { text: "Quince", value: 7, group: "Fruit", active: true },
+        { text: "Pineapple", value: 8, group: "Fruit", active: true },
+        { text: "Pumpkin", value: 9, group: "Vegetable", active: false },
+        { text: "Peach", value: 10, group: "Fruit", active: false },
+        { text: "Pear", value: 11, group: "Fruit", active: true },
+        { text: "Pomegranate", value: 12, group: "Fruit", active: true },
+        { text: "Paprika", value: 13, group: "Vegetable", active: true },
+        { text: "Potato", value: 14, group: "Vegetable", active: false },
+        { text: "Raspberry", value: 15, group: "Fruit", active: true },
+        { text: "Strawberry", value: 16, group: "Fruit", active: true },
+        { text: "Tomato", value: 17, group: "Vegetable", active: true },
+        { text: "Watermelon", value: 18, group: "Fruit", active: true },
+        { text: "Zucchini", value: 19, group: "Vegetable", active: true },
+        { text: "Apple", value: 20, group: "Fruit", active: true },
+        { text: "Apricot", value: 21, group: "Fruit", active: true },
+        { text: "Yakisoba", value: 22, group: "Food", active: true },
+        { text: "Yakitori", value: 23, group: "Food", active: true },
+        { text: "Sushi", value: 24, group: "Food", active: false },
+        { text: "Sashimi", value: 25, group: "Food", active: true },
+        { text: "Soba", value: 26, group: "Food", active: false },
+        { text: "Ramen", value: 27, group: "Food", active: true },
+        { text: "Onigiri", value: 28, group: "Food", active: true },
+        { text: "Okonomiyaki", value: 29, group: "Food", active: true },
+        { text: "Yakizakana", value: 30, group: "Food", active: true }
+    ];
+    public dropdownPrimitiveDataItems: string[] = [
+        "Willow",
+        "Birch",
+        "Oak",
+        "Pine",
+        "Maple",
+        "Cedar",
+        "Elm",
+        "Hemlock",
+        "Spruce",
+        "Cypress",
+        "Fir",
+        "Larch",
+        "Beech",
+        "Ash",
+        "Hazel",
+        "Hawthorn",
+        "Holly",
+        "Hornbeam",
+        "Horse Chestnut",
+        "Linden",
+        "Maidenhair Tree"
     ];
     public groupedDropdownListDataItems: List<Group<string, ListItem>> = new List<Group<string, ListItem>>([
         new Group<string, ListItem>(
@@ -92,6 +139,11 @@ export class AppComponent implements OnInit {
     public rangedSliderValues: [number, number] = [12, 18];
     public selectedComboBoxDataItem: any = null;
     public selectedDropdownListDataItem: any;
+    public selectedMultiSelectDataItems: any[] = [this.dropdownListDataItems[2], this.dropdownListDataItems[4]];
+    public selectedMultiSelectDataItems2: any[] = [
+        { text: "REPLACED WITH PAPRIKA", value: 13, group: "Fruit", active: true },
+        { text: "REPLACED WITH Okonomiyaki", value: 29, group: "FOODIE", active: true }
+    ];
     public sliderValue: number = 8;
     public switchValue: boolean = false;
     public textBoxValue: string = "TEXT BOX VALUE";
@@ -111,13 +163,15 @@ export class AppComponent implements OnInit {
 
     public constructor(public readonly popupService: PopupService) {}
 
-    public dropdownItemDisabler = (item: any): boolean => item.value % 2 === 0;
+    public dropdownItemDisabler = (item: any): boolean => !item.active;
 
     public ngOnInit(): void {
-        this.selectedDropdownListDataItem = this.dropdownListDataItems[2];
-        // window.setInterval(() => {
-        //     this.contextMenuItemVisible = !this.contextMenuItemVisible;
-        // }, 3000);
+        this.selectedDropdownListDataItem = { text: "REPLACED WITH PAPRIKA", value: 13, group: "Fruit", active: true };
+        this.selectedComboBoxDataItem = { text: "REPLACED WITH PAPRIKA", value: 13, group: "Fruit", active: true };
+        window.setInterval(() => {
+            // this.contextMenuItemVisible = !this.contextMenuItemVisible;
+            // this.dropdownItemDisabler = (item: any): boolean => item.value % 3 === 0;
+        }, 3000);
     }
 
     public numericTextBoxFormatter = (value: number | null): string => (value != null ? `${value} °C` : "");
@@ -140,6 +194,10 @@ export class AppComponent implements OnInit {
         this.selectedDropdownListDataItem = value;
         console.log(`Dropdown value changed`, value);
         // console.log(value);
+    }
+
+    public onMultiSelectValueChange(value: unknown[]): void {
+        console.log(`MultiSelect value changed`, value);
     }
 
     public onPopupClose(): void {
