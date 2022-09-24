@@ -1,5 +1,6 @@
 div.mona-input-selector {
     height: auto;
+    min-height: var(--mona-input-height);
     &:hover,
     &:active {
         background-color: var(--mona-background);
@@ -7,7 +8,7 @@ div.mona-input-selector {
 }
 
 div.mona-input-selector-value {
-    padding: 0 1px;
+    padding: 0 1px 1px 1px;
     & > div:first-child {
         display: flex;
         flex-direction: row;
@@ -23,7 +24,7 @@ div.mona-input-selector-value {
         //    margin-left: 1px;
         //}
         &:not(:last-child) {
-            margin: 1px 1px 0 1px;
+            margin: 0 1px 0 0;
         }
     }
 }

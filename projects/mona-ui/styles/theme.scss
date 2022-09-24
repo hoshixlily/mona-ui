@@ -286,7 +286,7 @@ mona-button-group button[monaButton] {
         & mona-chip {
             & div.mona-chip {
                 margin-top: 1px;
-                height: calc(var(--mona-input-height) - 8px);
+                height: calc(var(--mona-input-height) - 6px);
             }
         }
     }

@@ -14,7 +14,7 @@
             </ng-container>
             <li class="mona-list-item" *ngFor="let item of group.source"
                 [ngClass]="{'mona-selected': item.selected,
-                'mona-highlighted': highlightable && ((selectionMode==='single' && item === highlightedItem && selectedValues.length === 0) || (selectionMode==='multiple' && item === highlightedItem)), 'mona-disabled': item.disabled}"
+                'mona-highlighted': highlightable && ((selectionMode==='single' && item === highlightedListItem && selectedValues.length === 0) || (selectionMode==='multiple' && item === highlightedListItem)), 'mona-disabled': item.disabled}"
                 (click)="onDropDownItemSelect(item)">
                 <mona-list-item [item]="item" [itemTemplate]="itemTemplate" ></mona-list-item>
             </li>

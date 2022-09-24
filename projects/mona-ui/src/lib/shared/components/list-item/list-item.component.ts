@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, TemplateRef } from "@angular/core";
+import { Component, ElementRef, Input, OnInit, TemplateRef } from "@angular/core";
 import { ListItem } from "../../data/ListItem";
 import { Highlightable } from "@angular/cdk/a11y";
 
@@ -14,7 +14,7 @@ export class ListItemComponent implements OnInit, Highlightable {
     @Input()
     public itemTemplate?: TemplateRef<void>;
 
-    public constructor() {}
+    public constructor(public readonly elementRef: ElementRef) {}
 
     public ngOnInit(): void {}
 

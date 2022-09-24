@@ -69,6 +69,9 @@ export class DropDownListComponent implements OnInit, OnDestroy, AfterViewInit {
     @ContentChild(DropDownListItemTemplateDirective, { read: TemplateRef })
     public itemTemplate?: TemplateRef<void>;
 
+    @ViewChild("listComponent")
+    public listComponent!: ListComponent;
+
     @Input()
     public textField?: string;
 
@@ -108,7 +111,7 @@ export class DropDownListComponent implements OnInit, OnDestroy, AfterViewInit {
         this.viewData = this.listData;
 
         if (this.value) {
-            const listItem = this.viewData.selectMany(g => g.source).firstOrDefault(i => i.data === this.value);
+            const listItem = this.viewData.selectMany(g => g.source).firstOrDefault(i => i.dataEquals(this.value));
             this.selectedListItems = listItem && !listItem.disabled ? [listItem] : [];
         }
         this.setEventListeners();
@@ -142,6 +145,11 @@ export class DropDownListComponent implements OnInit, OnDestroy, AfterViewInit {
                 )
             ]
         });
+
+        window.setTimeout(() => {
+            this.listComponent.scrollToHighlightedItem();
+        });
+
         this.popupRef.closed.pipe(take(1)).subscribe(() => {
             if (this.value != null) {
                 if (this.value !== this.selectedListItems[0]?.data) {
@@ -189,7 +197,7 @@ export class DropDownListComponent implements OnInit, OnDestroy, AfterViewInit {
                     e.preventDefault();
                     const nextItem =
                         ListComponent.findNextNotDisabledItem(this.viewData, this.selectedListItems[0]) ??
-                        ListComponent.findFirstNonDisabledItem(this.viewData);
+                        ListComponent.findFirstNotDisabledItem(this.viewData);
                     if (nextItem) {
                         this.selectedListItems = [nextItem];
                         if (!this.popupRef) {
@@ -209,6 +217,8 @@ export class DropDownListComponent implements OnInit, OnDestroy, AfterViewInit {
                             this.valueChange.emit(this.value);
                         }
                     }
+                } else if (event.key === "Escape") {
+                    return;
                 } else if (event.key === "Enter") {
                     if (this.elementRef.nativeElement.contains(event.target as HTMLElement)) {
                         if (this.popupRef) {
@@ -221,6 +231,23 @@ export class DropDownListComponent implements OnInit, OnDestroy, AfterViewInit {
                         this.popupRef?.close();
                         this.popupRef = null;
                     }
+                } else if (event.key === "Tab") {
+                    event.preventDefault();
+                    this.popupRef?.close();
+                    this.popupRef = null;
+                }
+            });
+        fromEvent(this.elementRef.nativeElement, "focusout")
+            .pipe(takeUntil(this.componentDestroy$))
+            .subscribe((e: Event) => {
+                const event = e as FocusEvent;
+                if (
+                    !this.elementRef.nativeElement.contains(event.relatedTarget as HTMLElement) &&
+                    this.popupRef &&
+                    !this.popupRef.overlayRef.overlayElement.contains(event.relatedTarget as HTMLElement)
+                ) {
+                    this.popupRef?.close();
+                    this.popupRef = null;
                 }
             });
     }

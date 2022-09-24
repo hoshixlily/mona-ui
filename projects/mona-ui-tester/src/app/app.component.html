@@ -95,7 +95,7 @@
 
     <div>
         <mona-drop-down-list [data]="dropdownListDataItems" groupField="" textField="text" valueField="value"
-                             itemDisabler="active" [filterable]="true" [disabled]="false"
+                              [filterable]="true" [disabled]="false"
                              [value]="selectedDropdownListDataItem" (valueChange)="onDropDownValueChange($event)" style="width: 200px; margin-right: 20px;">
 <!--            <ng-template monaDropDownListItemTemplate let-dataItem let-listItem="listItem">-->
 <!--                <span style="color: deeppink;" *ngIf="!listItem.disabled && dataItem.value <= 3">{{dataItem.text}}</span>-->
@@ -113,14 +113,15 @@
         <mona-combo-box [data]="dropdownListDataItems" itemDisabler="active"
                         [value]="selectedComboBoxDataItem" (valueChange)="onComboBoxValueChange($event)"
                         [filterable]="false"
-                        textField="text" valueField="text" groupField="group" style="margin-right: 20px;">
+                        textField="text" valueField="value" groupField="group" style="margin-right: 20px;">
             <ng-template monaComboBoxItemTemplate let-dataItem>
                 <span style="color: darkred; font-weight: bold">{{dataItem.text}}</span>
             </ng-template>
         </mona-combo-box>
 
-        <mona-multi-select [data]="dropdownListDataItems" [value]="selectedMultiSelectDataItems" (valueChange)="onMultiSelectValueChange($event)"
-                           textField="text" valueField="value" style="max-width: 250px;"></mona-multi-select>
+        <mona-multi-select [data]="dropdownListDataItems" [value]="selectedMultiSelectDataItems2" (valueChange)="onMultiSelectValueChange($event)"
+                           [itemDisabler]="'active'"
+                           textField="text" valueField="value" groupField="group" style="width: 250px;"></mona-multi-select>
     </div>
 
     <div>

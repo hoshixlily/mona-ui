@@ -71,7 +71,31 @@ export class AppComponent implements OnInit {
         { text: "Grilled Meat", value: 3, group: "Food", active: false },
         { text: "Plum", value: 4, group: "Fruit", active: false },
         { text: "Banana", value: 5, group: "Fruit", active: true },
-        { text: "Cabbage Black", value: 6, group: "Vegetable", active: false }
+        { text: "Cabbage Black", value: 6, group: "Vegetable", active: false },
+        { text: "Quince", value: 7, group: "Fruit", active: false },
+        { text: "Pineapple", value: 8, group: "Fruit", active: false },
+        { text: "Pumpkin", value: 9, group: "Vegetable", active: false },
+        { text: "Peach", value: 10, group: "Fruit", active: false },
+        { text: "Pear", value: 11, group: "Fruit", active: false },
+        { text: "Pomegranate", value: 12, group: "Fruit", active: false },
+        { text: "Paprika", value: 13, group: "Vegetable", active: false },
+        { text: "Potato", value: 14, group: "Vegetable", active: false },
+        { text: "Raspberry", value: 15, group: "Fruit", active: false },
+        { text: "Strawberry", value: 16, group: "Fruit", active: false },
+        { text: "Tomato", value: 17, group: "Vegetable", active: false },
+        { text: "Watermelon", value: 18, group: "Fruit", active: false },
+        { text: "Zucchini", value: 19, group: "Vegetable", active: false },
+        { text: "Apple", value: 20, group: "Fruit", active: false },
+        { text: "Apricot", value: 21, group: "Fruit", active: false },
+        { text: "Yakisoba", value: 22, group: "Food", active: false },
+        { text: "Yakitori", value: 23, group: "Food", active: false },
+        { text: "Sushi", value: 24, group: "Food", active: false },
+        { text: "Sashimi", value: 25, group: "Food", active: false },
+        { text: "Soba", value: 26, group: "Food", active: false },
+        { text: "Ramen", value: 27, group: "Food", active: false },
+        { text: "Onigiri", value: 28, group: "Food", active: false },
+        { text: "Okonomiyaki", value: 29, group: "Food", active: false },
+        { text: "Yakizakana", value: 30, group: "Food", active: false }
     ];
     public groupedDropdownListDataItems: List<Group<string, ListItem>> = new List<Group<string, ListItem>>([
         new Group<string, ListItem>(
@@ -92,7 +116,11 @@ export class AppComponent implements OnInit {
     public rangedSliderValues: [number, number] = [12, 18];
     public selectedComboBoxDataItem: any = null;
     public selectedDropdownListDataItem: any;
-    public selectedMultiSelectDataItems: any[] = [];
+    public selectedMultiSelectDataItems: any[] = [this.dropdownListDataItems[2], this.dropdownListDataItems[4]];
+    public selectedMultiSelectDataItems2: any[] = [
+        { text: "REPLACED WITH PAPRIKA", value: 13, group: "Fruit", active: true },
+        { text: "REPLACED WITH Okonomiyaki", value: 29, group: "FOODIE", active: true }
+    ];
     public sliderValue: number = 8;
     public switchValue: boolean = false;
     public textBoxValue: string = "TEXT BOX VALUE";
@@ -115,10 +143,12 @@ export class AppComponent implements OnInit {
     public dropdownItemDisabler = (item: any): boolean => item.value % 2 === 0;
 
     public ngOnInit(): void {
-        this.selectedDropdownListDataItem = this.dropdownListDataItems[2];
-        // window.setInterval(() => {
-        //     this.contextMenuItemVisible = !this.contextMenuItemVisible;
-        // }, 3000);
+        this.selectedDropdownListDataItem = { text: "REPLACED WITH PAPRIKA", value: 13, group: "Fruit", active: true };
+        this.selectedComboBoxDataItem = { text: "REPLACED WITH PAPRIKA", value: 13, group: "Fruit", active: true };
+        window.setInterval(() => {
+            // this.contextMenuItemVisible = !this.contextMenuItemVisible;
+            // this.dropdownItemDisabler = (item: any): boolean => item.value % 3 === 0;
+        }, 3000);
     }
 
     public numericTextBoxFormatter = (value: number | null): string => (value != null ? `${value} °C` : "");
