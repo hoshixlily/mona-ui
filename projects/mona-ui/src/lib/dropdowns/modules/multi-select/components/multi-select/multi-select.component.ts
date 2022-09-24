@@ -58,7 +58,7 @@ export class MultiSelectComponent implements OnInit, OnDestroy, AfterViewInit {
     public disabled: boolean = false;
 
     @Input()
-    public filterable: boolean = true;
+    public filterable: boolean = false;
 
     @Input()
     public groupField?: string;

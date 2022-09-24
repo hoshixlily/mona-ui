@@ -97,6 +97,29 @@ export class AppComponent implements OnInit {
         { text: "Okonomiyaki", value: 29, group: "Food", active: true },
         { text: "Yakizakana", value: 30, group: "Food", active: true }
     ];
+    public dropdownPrimitiveDataItems: string[] = [
+        "Willow",
+        "Birch",
+        "Oak",
+        "Pine",
+        "Maple",
+        "Cedar",
+        "Elm",
+        "Hemlock",
+        "Spruce",
+        "Cypress",
+        "Fir",
+        "Larch",
+        "Beech",
+        "Ash",
+        "Hazel",
+        "Hawthorn",
+        "Holly",
+        "Hornbeam",
+        "Horse Chestnut",
+        "Linden",
+        "Maidenhair Tree"
+    ];
     public groupedDropdownListDataItems: List<Group<string, ListItem>> = new List<Group<string, ListItem>>([
         new Group<string, ListItem>(
             "",
