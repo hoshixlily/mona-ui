@@ -108,10 +108,9 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
     }
 
     private static isNumeric(value: unknown): boolean {
-        if (typeof value != "string") {
-            return false;
-        }
-        return !isNaN(parseFloat(value)) && isFinite(parseFloat(value));
+        return (
+            (typeof value === "number" || (typeof value === "string" && value.trim() !== "")) && !isNaN(value as number)
+        );
     }
 
     public decrease(): void {
@@ -211,9 +210,12 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
 
     public registerOnTouched(fn: any) {}
 
-    public writeValue(obj: number) {
+    public writeValue(obj: number | string) {
         if (obj !== undefined) {
-            this.value = obj;
+            if (obj != null && typeof obj === "string" && !NumericTextBoxComponent.isNumeric(obj)) {
+                throw new Error("Value must be a number.");
+            }
+            this.value = +obj;
             this.visibleValue = this.formatter(this.value) ?? "";
         }
     }
