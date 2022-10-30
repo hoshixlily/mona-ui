@@ -65,6 +65,10 @@
     }
 }
 
+.mona-focused {
+    @include focus-shadow;
+}
+
 /** Shared Components **/
 .mona-input-selector {
     width: auto;
@@ -95,6 +99,7 @@
     justify-content: center;
     color: var(--mona-text);
 }
+
 
 
 ul.mona-list {

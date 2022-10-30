@@ -1,0 +1,144 @@
+import {
+    ChangeDetectorRef,
+    Component,
+    ElementRef,
+    EventEmitter,
+    Input,
+    OnDestroy,
+    OnInit,
+    TemplateRef,
+    ViewChild
+} from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { faChevronDown, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { PopupRef } from "../../../popup/models/PopupRef";
+import { PopupService } from "../../../popup/services/popup.service";
+import { ConnectionPositionPair } from "@angular/cdk/overlay";
+import { PopupSettings } from "../../../popup/models/PopupSettings";
+import { PopupListService } from "../../services/popup-list.service";
+import { fromEvent, Subject, take, takeUntil } from "rxjs";
+import { SelectionMode } from "../../../models/SelectionMode";
+
+@Component({
+    selector: "mona-abstract-drop-down-list",
+    standalone: true,
+    imports: [CommonModule],
+    template: "",
+    styleUrls: [],
+    providers: [PopupListService]
+})
+export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy {
+    private readonly componentDestroy$: Subject<void> = new Subject<void>();
+    public popupRef: PopupRef | null = null;
+    public readonly dropdownIcon: IconDefinition = faChevronDown;
+
+    @Input()
+    public data: Iterable<any> = [];
+
+    @Input()
+    public disabled: boolean = false;
+
+    @ViewChild("dropdownWrapper")
+    public dropdownWrapper!: ElementRef<HTMLDivElement>;
+
+    @Input()
+    public groupField?: string;
+
+    @ViewChild("popupTemplate")
+    public popupTemplate!: TemplateRef<void>;
+
+    @Input()
+    public textField?: string;
+
+    @Input()
+    public valueField?: string;
+
+    protected abstract selectionMode: SelectionMode;
+
+    // @Input()
+    public abstract value?: any | any[];
+
+    // @Output()
+    public abstract valueChange: EventEmitter<any | any[]>;
+
+    protected constructor(
+        protected readonly cdr: ChangeDetectorRef,
+        protected readonly elementRef: ElementRef<HTMLElement>,
+        protected readonly popupListService: PopupListService,
+        protected readonly popupService: PopupService
+    ) {}
+
+    public close(): void {
+        this.popupRef?.close();
+        this.popupRef = null;
+    }
+
+    public ngOnDestroy(): void {
+        this.componentDestroy$.next();
+        this.componentDestroy$.complete();
+    }
+
+    public ngOnInit(): void {
+        this.popupListService.initializeListData({
+            data: this.data,
+            textField: this.textField,
+            valueField: this.valueField,
+            groupField: this.groupField
+        });
+        this.setEvents();
+    }
+
+    public open(options: Partial<PopupSettings> = {}): void {
+        this.dropdownWrapper.nativeElement.focus();
+        this.popupRef = this.popupService.create({
+            anchor: this.dropdownWrapper,
+            content: this.popupTemplate,
+            hasBackdrop: true,
+            withPush: false,
+            width: this.elementRef.nativeElement.clientWidth,
+            popupClass: ["mona-dropdown-popup-content"],
+            positions: [
+                new ConnectionPositionPair(
+                    { originX: "start", originY: "bottom" },
+                    { overlayX: "start", overlayY: "top" }
+                )
+            ],
+            ...options
+        });
+        this.popupRef.closed.pipe(take(1)).subscribe(() => {
+            this.popupRef = null;
+        });
+    }
+
+    protected setEvents(): void {
+        fromEvent<KeyboardEvent>(this.elementRef.nativeElement, "keydown")
+            .pipe(takeUntil(this.componentDestroy$))
+            .subscribe((event: KeyboardEvent) => {
+                if (event.key === "Enter") {
+                    if (this.popupRef) {
+                        if (this.selectionMode === "single") {
+                            this.close();
+                        }
+                        return;
+                    }
+                    this.open();
+                } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+                    if (this.popupRef) {
+                        return;
+                    }
+                    const listItem = this.popupListService.navigate(event, this.selectionMode);
+                    if (listItem) {
+                        if (this.selectionMode === "single") {
+                            if (listItem.dataEquals(this.value)) {
+                                return;
+                            }
+                            this.value = listItem.data;
+                            this.valueChange.emit(this.value);
+                        }
+                    }
+                } else if (event.key === "Escape") {
+                    this.close();
+                }
+            });
+    }
+}

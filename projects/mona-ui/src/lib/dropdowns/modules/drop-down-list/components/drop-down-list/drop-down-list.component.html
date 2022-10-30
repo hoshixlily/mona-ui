@@ -1,0 +1,15 @@
+<div class="mona-dropdown mona-dropdown-list mona-input-selector" [attr.tabindex]="disabled ? -1 : 0" (click)="open()" #dropdownWrapper>
+    <div class="mona-input-selector-value">
+        <ng-container>{{value?.[$any(textField)]}}</ng-container>
+    </div>
+    <div class="mona-input-selector-icon">
+        <fa-icon [icon]="dropdownIcon"></fa-icon>
+    </div>
+</div>
+
+<ng-template #popupTemplate>
+    <div *ngIf="!!popupRef">
+        <mona-popup-list [data]="data" [textField]="textField" [valueField]="valueField" [groupField]="groupField" [value]="value ? [value] : []"
+                         (valueChange)="onPopupListValueChange($event)"></mona-popup-list>
+    </div>
+</ng-template>

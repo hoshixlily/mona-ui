@@ -1,24 +1,41 @@
-import { Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from "@angular/core";
-import { Enumerable, Group, List } from "@mirei/ts-collections";
+import {
+    AfterViewInit,
+    Component,
+    EventEmitter,
+    Input,
+    OnChanges,
+    OnDestroy,
+    OnInit,
+    Output,
+    QueryList,
+    SimpleChanges,
+    SkipSelf,
+    ViewChildren
+} from "@angular/core";
+import { Group, List } from "@mirei/ts-collections";
 import { PopupListItem } from "../../data/PopupListItem";
 import { SelectionMode } from "../../../models/SelectionMode";
 import { PopupListService } from "../../services/popup-list.service";
-import { fromEvent } from "rxjs";
+import { fromEvent, Subject, takeUntil } from "rxjs";
+import { CommonModule } from "@angular/common";
+import { PopupListItemComponent } from "../popup-list-item/popup-list-item.component";
+import { PopupListValueChangeEvent } from "../../data/PopupListValueChangeEvent";
 
 @Component({
     selector: "mona-popup-list",
     templateUrl: "./popup-list.component.html",
     styleUrls: ["./popup-list.component.scss"],
-    providers: [PopupListService]
+    standalone: true,
+    imports: [CommonModule, PopupListItemComponent]
 })
-export class PopupListComponent implements OnInit, OnChanges {
-    public listData: List<Group<string, PopupListItem>> = new List<Group<string, PopupListItem>>();
+export class PopupListComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
+    private readonly componentDestroy$: Subject<void> = new Subject<void>();
 
     @Input()
     public data: Iterable<any> = [];
 
     @Input()
-    public groupField: string = "";
+    public groupField?: string;
 
     @Input()
     public set highlightedValues(values: any[]) {
@@ -28,11 +45,14 @@ export class PopupListComponent implements OnInit, OnChanges {
     @Input()
     public navigable: boolean = true;
 
+    @ViewChildren(PopupListItemComponent)
+    public popupListItemComponents: QueryList<PopupListItemComponent> = new QueryList<PopupListItemComponent>();
+
     @Input()
     public selectionMode: SelectionMode = "single";
 
     @Input()
-    public textField!: string;
+    public textField?: string;
 
     @Input()
     public set value(values: any[]) {
@@ -40,16 +60,33 @@ export class PopupListComponent implements OnInit, OnChanges {
     }
 
     @Output()
-    public valueChange: EventEmitter<any[]> = new EventEmitter<any[]>();
+    public valueChange: EventEmitter<PopupListValueChangeEvent> = new EventEmitter<PopupListValueChangeEvent>();
 
     @Input()
-    public valueField!: string;
+    public valueField?: string;
 
-    public constructor(private readonly elementRef: ElementRef, private readonly popupListService: PopupListService) {}
+    public constructor(
+        @SkipSelf()
+        public readonly popupListService: PopupListService
+    ) {}
+
+    public ngAfterViewInit(): void {
+        const firstSelectedItem = this.listData
+            .selectMany(g => g.source)
+            .firstOrDefault(i => i.selected || i.highlighted);
+        if (firstSelectedItem) {
+            window.setTimeout(() => this.scrollToItem(firstSelectedItem), 250);
+        }
+    }
 
     public ngOnChanges(changes: SimpleChanges): void {
         if (changes["data"]) {
-            this.listData = this.initializeListData();
+            this.popupListService.initializeListData({
+                textField: this.textField,
+                valueField: this.valueField,
+                groupField: this.groupField,
+                data: changes["data"].currentValue
+            });
         }
         if (changes["highlightedValues"] && changes["highlightedValues"].isFirstChange()) {
             window.setTimeout(() => this.updateHighlightedValues(changes["highlightedValues"].currentValue));
@@ -59,8 +96,12 @@ export class PopupListComponent implements OnInit, OnChanges {
         }
     }
 
+    public ngOnDestroy(): void {
+        this.componentDestroy$.next();
+        this.componentDestroy$.complete();
+    }
+
     public ngOnInit(): void {
-        this.listData = this.initializeListData();
         this.setEvents();
     }
 
@@ -70,104 +111,61 @@ export class PopupListComponent implements OnInit, OnChanges {
         }
         if (this.selectionMode === "single") {
             this.updateSelectedValues([item.data]);
-            this.valueChange.emit([item.data]);
+            this.valueChange.emit({
+                value: [item],
+                via: "selection"
+            });
         } else if (this.selectionMode === "multiple") {
             item.selected = !item.selected;
             const selectedItems = this.listData
                 .selectMany(g => g.source)
                 .where(i => i.selected)
-                .select(i => i.data)
                 .toArray();
-            this.valueChange.emit(selectedItems);
+            this.valueChange.emit({
+                via: "selection",
+                value: selectedItems
+            });
         }
     }
 
-    private initializeListData(): List<Group<string, any>> {
-        let listItems: List<Group<string, PopupListItem>> = new List<Group<string, PopupListItem>>();
-        const createListItem = (item: any): PopupListItem => {
-            return new PopupListItem({
-                data: item,
-                text: this.textField ? item[this.textField] : item,
-                textField: this.textField,
-                value: this.valueField ? item[this.valueField] : this.valueField,
-                valueField: this.valueField
-            });
-        };
-        if (this.groupField) {
-            listItems = Enumerable.from(this.data)
-                .groupBy(d => d[this.groupField])
-                .select(g => new Group<string, any>(g.key, g.select(d => createListItem(d)).toList()))
-                .orderBy(g => g.key)
-                .toList();
-        } else {
-            const items = Enumerable.from(this.data)
-                .select(d => createListItem(d))
-                .toList();
-            listItems.add(new Group<string, any>("", items));
-        }
+    private findListItemComponent(item: PopupListItem): PopupListItemComponent | null {
+        const component = this.popupListItemComponents.find(c => c.item?.dataEquals(item.data) ?? false);
+        return component ?? null;
+    }
 
-        // item disabler code here
-        return listItems;
+    private scrollToItem(item: PopupListItem): void {
+        const component = this.findListItemComponent(item);
+        if (component) {
+            component.elementRef.nativeElement.scrollIntoView({ behavior: "auto", block: "center" });
+        }
     }
 
     private setEvents(): void {
-        fromEvent<KeyboardEvent>(this.elementRef.nativeElement, "keydown").subscribe((event: KeyboardEvent) => {
-            if (!this.navigable) {
-                return;
-            }
-            const selectedItem = this.listData.selectMany(g => g.source).firstOrDefault(i => i.selected);
-            const highlightedItem = this.listData.selectMany(g => g.source).firstOrDefault(i => i.highlighted);
-            const focusedItem = highlightedItem ?? selectedItem ?? null;
-            if (event.key === "ArrowDown") {
-                event.preventDefault();
-                if (!focusedItem) {
-                    const firstItem = this.listData.selectMany(g => g.source).firstOrDefault();
-                    if (firstItem) {
-                        if (this.selectionMode === "single") {
-                            this.updateSelectedValues([firstItem]);
-                        } else {
-                            this.updateHighlightedValues([firstItem]);
-                        }
-                    }
-                } else {
-                    if (PopupListService.isLastSelectableItem(this.listData, focusedItem)) {
+        fromEvent<KeyboardEvent>(document, "keydown")
+            .pipe(takeUntil(this.componentDestroy$))
+            .subscribe((event: KeyboardEvent) => {
+                if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+                    if (!this.navigable) {
                         return;
                     }
-                    focusedItem.highlighted = false;
-                    const nextItem = PopupListService.findNextSelectableItem(this.listData, focusedItem);
-                    if (nextItem) {
+                    event.stopImmediatePropagation();
+                    event.preventDefault();
+                    const listItem = this.popupListService.navigate(event, this.selectionMode);
+                    if (listItem) {
+                        this.scrollToItem(listItem);
                         if (this.selectionMode === "single") {
-                            focusedItem.selected = false;
-                            nextItem.selected = true;
-                        } else {
-                            focusedItem.highlighted = false;
-                            nextItem.highlighted = true;
+                            this.valueChange.emit({
+                                via: "navigation",
+                                value: [listItem]
+                            });
                         }
                     }
-                }
-            } else if (event.key === "ArrowUp") {
-                event.preventDefault();
-                if (focusedItem) {
-                    if (PopupListService.isFirstSelectableItem(this.listData, focusedItem)) {
-                        return;
-                    }
-                    const previousItem = PopupListService.findPreviousSelectableItem(this.listData, focusedItem);
-                    if (previousItem) {
-                        if (this.selectionMode === "single") {
-                            focusedItem.selected = false;
-                            previousItem.selected = true;
-                        } else {
-                            focusedItem.highlighted = false;
-                            previousItem.highlighted = true;
-                        }
+                } else if (event.key === "Enter") {
+                    if (this.selectionMode === "multiple") {
+                        console.log("TODO: Implement Enter handling for popup list component");
                     }
                 }
-            } else if (event.key === "Enter") {
-                if (focusedItem) {
-                    this.onListItemClick(focusedItem, new MouseEvent("click"));
-                }
-            }
-        });
+            });
     }
 
     private updateHighlightedValues(values: any[]): void {
@@ -184,5 +182,13 @@ export class PopupListComponent implements OnInit, OnChanges {
                 i.selected = values.some(v => i.dataEquals(v));
             });
         });
+        const selectedItem = PopupListService.findFirstSelectedItem(this.listData);
+        if (selectedItem) {
+            this.scrollToItem(selectedItem);
+        }
+    }
+
+    private get listData(): List<Group<string, PopupListItem>> {
+        return this.popupListService.listData;
     }
 }

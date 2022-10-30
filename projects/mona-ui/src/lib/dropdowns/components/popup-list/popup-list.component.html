@@ -1,13 +1,15 @@
 <ul class="mona-list" [attr.tabindex]="-1">
-    <ng-container *ngIf="listData.length !== 0; else empty;">
-        <ng-container *ngFor="let group of listData">
+    <ng-container *ngIf="popupListService.listData.length !== 0; else empty;">
+        <ng-container *ngFor="let group of popupListService.listData">
             <ng-container *ngIf="$any(group.source).length !== 0">
                 <ng-container>
                     <li class="mona-list-group-header" *ngIf="group.key">{{group.key}}</li>
                 </ng-container>
             </ng-container>
             <li class="mona-list-item" *ngFor="let item of group.source" (click)="onListItemClick(item, $event)"
-                [ngClass]="{'mona-selected': item.selected, 'mona-highlighted': item.highlighted}">{{item.text}}</li>
+                [ngClass]="{'mona-selected': item.selected, 'mona-highlighted': item.highlighted}">
+                <mona-popup-list-item [item]="item"></mona-popup-list-item>
+            </li>
         </ng-container>
     </ng-container>
     <ng-template #empty>

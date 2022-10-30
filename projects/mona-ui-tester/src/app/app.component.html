@@ -110,6 +110,9 @@
 <!--            </ng-template>-->
 <!--        </mona-drop-down-list>-->
 
+        <mona-drop-down-list [data]="dropdownListDataItems" textField="text" valueField="value" groupField="group" [value]="dropdownListDataItems[12]"
+            (valueChange)="onDropDownValueChange($event)"></mona-drop-down-list>
+
 <!--        <mona-combo-box [data]="dropdownListDataItems" [itemDisabler]="dropdownItemDisabler"-->
 <!--                        [value]="selectedComboBoxDataItem" (valueChange)="onComboBoxValueChange($event)"-->
 <!--                        [filterable]="false"-->
@@ -200,10 +203,10 @@
         <mona-color-picker [palette]="colorPalette" [ngModel]="colorPickerValue" (ngModelChange)="onColorPickerValueChange($event)" style="margin-left: 30px;"></mona-color-picker>
     </div>
 
-    <div>
-        <mona-popup-list [data]="dropdownListDataItems" groupField="group" textField="text" valueField="value" [value]="[]"
-        [highlightedValues]="[]" (valueChange)="print($event)"></mona-popup-list>
-    </div>
+<!--    <div>-->
+<!--        <mona-popup-list [data]="dropdownListDataItems" groupField="group" textField="text" valueField="value" [value]="[]"-->
+<!--        [highlightedValues]="[]" (valueChange)="print($event)"></mona-popup-list>-->
+<!--    </div>-->
 
 </div>
 
