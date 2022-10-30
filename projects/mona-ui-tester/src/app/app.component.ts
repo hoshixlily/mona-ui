@@ -4,7 +4,7 @@ import { TestComponentComponent } from "./test-component/test-component.componen
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { faMoon, faSearch, faSnowflake, faSun } from "@fortawesome/free-solid-svg-icons";
 import { Enumerable, Group, List } from "@mirei/ts-collections";
-// import { ListItem } from "../../../../dist/mona-ui/lib/shared/data/ListItem";
+// import { PopupListItem } from "../../../../dist/mona-ui/lib/shared/data/PopupListItem";
 
 @Component({
     selector: "app-root",
@@ -74,16 +74,16 @@ export class AppComponent implements OnInit {
         { text: "Cabbage Black", value: 6, group: "Vegetable", active: true },
         { text: "Quince", value: 7, group: "Fruit", active: true },
         { text: "Pineapple", value: 8, group: "Fruit", active: true },
-        { text: "Pumpkin", value: 9, group: "Vegetable", active: false },
-        { text: "Peach", value: 10, group: "Fruit", active: false },
-        { text: "Pear", value: 11, group: "Fruit", active: true },
-        { text: "Pomegranate", value: 12, group: "Fruit", active: true },
-        { text: "Paprika", value: 13, group: "Vegetable", active: true },
-        { text: "Potato", value: 14, group: "Vegetable", active: false },
-        { text: "Raspberry", value: 15, group: "Fruit", active: true },
-        { text: "Strawberry", value: 16, group: "Fruit", active: true },
-        { text: "Tomato", value: 17, group: "Vegetable", active: true },
-        { text: "Watermelon", value: 18, group: "Fruit", active: true },
+        // { text: "Pumpkin", value: 9, group: "Vegetable", active: false },
+        // { text: "Peach", value: 10, group: "Fruit", active: false },
+        // { text: "Pear", value: 11, group: "Fruit", active: true },
+        // { text: "Pomegranate", value: 12, group: "Fruit", active: true },
+        // { text: "Paprika", value: 13, group: "Vegetable", active: true },
+        // { text: "Potato", value: 14, group: "Vegetable", active: false },
+        // { text: "Raspberry", value: 15, group: "Fruit", active: true },
+        // { text: "Strawberry", value: 16, group: "Fruit", active: true },
+        // { text: "Tomato", value: 17, group: "Vegetable", active: true },
+        // { text: "Watermelon", value: 18, group: "Fruit", active: true },
         { text: "Zucchini", value: 19, group: "Vegetable", active: true },
         { text: "Apple", value: 20, group: "Fruit", active: true },
         { text: "Apricot", value: 21, group: "Fruit", active: true },
@@ -120,8 +120,8 @@ export class AppComponent implements OnInit {
         "Linden",
         "Maidenhair Tree"
     ];
-    // public groupedDropdownListDataItems: List<Group<string, ListItem>> = new List<Group<string, ListItem>>([
-    //     new Group<string, ListItem>(
+    // public groupedDropdownListDataItems: List<Group<string, PopupListItem>> = new List<Group<string, PopupListItem>>([
+    //     new Group<string, PopupListItem>(
     //         "",
     //         Enumerable.from(this.dropdownListDataItems)
     //             .select(d => {
@@ -129,7 +129,7 @@ export class AppComponent implements OnInit {
     //                     data: d,
     //                     text: d.text,
     //                     value: d.value
-    //                 } as ListItem;
+    //                 } as PopupListItem;
     //             })
     //             .toList()
     //     )

@@ -7,7 +7,7 @@ export interface ListItemOptions {
     disabled?: boolean;
 }
 
-export class ListItem {
+export class PopupListItem {
     public data: any;
     public disabled: boolean;
     public highlighted: boolean = false;
