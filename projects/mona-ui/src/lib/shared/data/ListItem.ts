@@ -1,44 +1,35 @@
-export interface ListItemOptions<T = any> {
-    data: T;
-    disabled?: boolean;
-    index: number;
-    selected?: boolean;
+export interface ListItemOptions {
+    data: any;
     text: string;
-    textField: string;
-    value: string;
-    valueField: string;
+    textField?: string;
+    value: any;
+    valueField?: string;
+    disabled?: boolean;
 }
 
-export class ListItem<T = any> {
-    public readonly data: T;
-    public readonly index: number;
-    public readonly text: string;
-    public readonly textField: string = "";
-    public readonly value: string;
-    public readonly valueField: string = "";
-    public disabled?: boolean;
-    public selected?: boolean;
+export class ListItem {
+    public data: any;
+    public disabled: boolean;
+    public highlighted: boolean = false;
+    public selected: boolean = false;
+    public text: string;
+    public textField?: string;
+    public value: any;
+    public valueField?: string;
 
-    public constructor(options: ListItemOptions<T>) {
+    public constructor(options: ListItemOptions) {
         this.data = options.data;
-        this.disabled = options.disabled;
-        this.index = options.index;
-        this.selected = options.selected;
         this.text = options.text;
         this.textField = options.textField;
         this.value = options.value;
         this.valueField = options.valueField;
+        this.disabled = options.disabled ?? false;
     }
 
     public dataEquals(other: any): boolean {
         if (this.valueField) {
-            const dataValue = (this.data as any)[this.valueField];
-            return dataValue === other[this.valueField];
+            return this.data[this.valueField] === other[this.valueField];
         }
-        return this.data === other;
-    }
-
-    public equals(other: ListItem<T> | null): boolean {
-        return this.value === other?.value;
+        return this.value === other;
     }
 }

@@ -4,7 +4,7 @@ import { TestComponentComponent } from "./test-component/test-component.componen
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { faMoon, faSearch, faSnowflake, faSun } from "@fortawesome/free-solid-svg-icons";
 import { Enumerable, Group, List } from "@mirei/ts-collections";
-import { ListItem } from "../../../../dist/mona-ui/lib/shared/data/ListItem";
+// import { ListItem } from "../../../../dist/mona-ui/lib/shared/data/ListItem";
 
 @Component({
     selector: "app-root",
@@ -120,20 +120,20 @@ export class AppComponent implements OnInit {
         "Linden",
         "Maidenhair Tree"
     ];
-    public groupedDropdownListDataItems: List<Group<string, ListItem>> = new List<Group<string, ListItem>>([
-        new Group<string, ListItem>(
-            "",
-            Enumerable.from(this.dropdownListDataItems)
-                .select(d => {
-                    return {
-                        data: d,
-                        text: d.text,
-                        value: d.value
-                    } as ListItem;
-                })
-                .toList()
-        )
-    ]);
+    // public groupedDropdownListDataItems: List<Group<string, ListItem>> = new List<Group<string, ListItem>>([
+    //     new Group<string, ListItem>(
+    //         "",
+    //         Enumerable.from(this.dropdownListDataItems)
+    //             .select(d => {
+    //                 return {
+    //                     data: d,
+    //                     text: d.text,
+    //                     value: d.value
+    //                 } as ListItem;
+    //             })
+    //             .toList()
+    //     )
+    // ]);
 
     public numericTextBoxValue: number = 629;
     public rangedSliderValues: [number, number] = [12, 18];

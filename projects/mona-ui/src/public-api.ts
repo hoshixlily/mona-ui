@@ -98,7 +98,7 @@ export * from "./lib/popup/popup.module";
 
 /** Shared [TEMPORARY EXPORT] */
 // export * from "./lib/shared/components/list-item/list-item.component";
-// export * from "./lib/shared/components/list/list.component";
+export * from "./lib/shared/components/list/list.component";
 export * from "./lib/shared/directives/list-group-template.directive";
 export * from "./lib/shared/directives/list-item-template.directive";
 export * from "./lib/shared/shared.module";

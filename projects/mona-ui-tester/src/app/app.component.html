@@ -200,13 +200,10 @@
         <mona-color-picker [palette]="colorPalette" [ngModel]="colorPickerValue" (ngModelChange)="onColorPickerValueChange($event)" style="margin-left: 30px;"></mona-color-picker>
     </div>
 
-<!--    <div>-->
-<!--        <mona-list [data]="groupedDropdownListDataItems" textField="text" valueField="value" groupField="group" selectionMode="multiple" (valueChange)="print($event)">-->
-<!--            <ng-template monaListItemTemplate let-dataItem>-->
-<!--                <span style="color: tomato; font-weight: bold;">{{dataItem.text}}</span>-->
-<!--            </ng-template>-->
-<!--        </mona-list>-->
-<!--    </div>-->
+    <div>
+        <mona-list [data]="dropdownListDataItems" groupField="group" textField="text" valueField="value" [value]="[dropdownListDataItems[2]]"
+        [highlightedValues]="[dropdownListDataItems[2]]" (valueChange)="print($event)"></mona-list>
+    </div>
 
 </div>
 
