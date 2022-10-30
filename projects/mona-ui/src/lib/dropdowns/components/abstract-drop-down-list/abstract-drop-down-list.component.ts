@@ -18,6 +18,8 @@ import { PopupSettings } from "../../../popup/models/PopupSettings";
 import { PopupListService } from "../../services/popup-list.service";
 import { fromEvent, Subject, take, takeUntil } from "rxjs";
 import { SelectionMode } from "../../../models/SelectionMode";
+import { Action } from "../../../utils/Action";
+import { PopupListItem } from "../../data/PopupListItem";
 
 @Component({
     selector: "mona-abstract-drop-down-list",
@@ -29,8 +31,8 @@ import { SelectionMode } from "../../../models/SelectionMode";
 })
 export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy {
     private readonly componentDestroy$: Subject<void> = new Subject<void>();
-    public popupRef: PopupRef | null = null;
     public readonly dropdownIcon: IconDefinition = faChevronDown;
+    public popupRef: PopupRef | null = null;
 
     @Input()
     public data: Iterable<any> = [];
@@ -44,6 +46,9 @@ export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy
     @Input()
     public groupField?: string;
 
+    @Input()
+    public itemDisabler?: Action<any, boolean> | string;
+
     @ViewChild("popupTemplate")
     public popupTemplate!: TemplateRef<void>;
 
@@ -54,6 +59,7 @@ export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy
     public valueField?: string;
 
     protected abstract selectionMode: SelectionMode;
+    public abstract valuePopupListItem?: PopupListItem | PopupListItem[];
 
     // @Input()
     public abstract value?: any | any[];
@@ -81,10 +87,16 @@ export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy
     public ngOnInit(): void {
         this.popupListService.initializeListData({
             data: this.data,
+            disabler: this.itemDisabler,
             textField: this.textField,
             valueField: this.valueField,
             groupField: this.groupField
         });
+        if (this.value) {
+            this.valuePopupListItem = this.popupListService.listData
+                .selectMany(g => g.source)
+                .singleOrDefault(d => d.dataEquals(this.value));
+        }
         this.setEvents();
     }
 
@@ -107,6 +119,7 @@ export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy
         });
         this.popupRef.closed.pipe(take(1)).subscribe(() => {
             this.popupRef = null;
+            (this.elementRef.nativeElement.firstElementChild as HTMLElement)?.focus();
         });
     }
 
@@ -132,13 +145,18 @@ export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy
                             if (listItem.dataEquals(this.value)) {
                                 return;
                             }
-                            this.value = listItem.data;
-                            this.valueChange.emit(this.value);
+                            this.updateValue(listItem);
                         }
                     }
                 } else if (event.key === "Escape") {
                     this.close();
                 }
             });
+    }
+
+    protected updateValue(listItem: PopupListItem): void {
+        this.value = listItem.data;
+        this.valuePopupListItem = listItem;
+        this.valueChange.emit(this.value);
     }
 }

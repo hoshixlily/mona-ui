@@ -3,10 +3,31 @@ import { CommonModule } from "@angular/common";
 import { DropDownListComponent } from "./components/drop-down-list/drop-down-list.component";
 import { PopupListComponent } from "../../components/popup-list/popup-list.component";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { DropDownListItemTemplateDirective } from "./directives/drop-down-list-item-template.directive";
+import { ListItemTemplateDirective } from "../../directives/list-item-template.directive";
+import { DropDownListValueTemplateDirective } from "./directives/drop-down-list-value-template.directive";
+import { DropDownListGroupTemplateDirective } from "./directives/drop-down-list-group-template.directive";
+import { ListGroupTemplateDirective } from "../../directives/list-group-template.directive";
 
 @NgModule({
-    declarations: [DropDownListComponent],
-    imports: [CommonModule, PopupListComponent, FontAwesomeModule],
-    exports: [DropDownListComponent]
+    declarations: [
+        DropDownListComponent,
+        DropDownListItemTemplateDirective,
+        DropDownListValueTemplateDirective,
+        DropDownListGroupTemplateDirective
+    ],
+    imports: [
+        CommonModule,
+        PopupListComponent,
+        FontAwesomeModule,
+        ListItemTemplateDirective,
+        ListGroupTemplateDirective
+    ],
+    exports: [
+        DropDownListComponent,
+        DropDownListItemTemplateDirective,
+        DropDownListValueTemplateDirective,
+        DropDownListGroupTemplateDirective
+    ]
 })
 export class DropDownListModule {}

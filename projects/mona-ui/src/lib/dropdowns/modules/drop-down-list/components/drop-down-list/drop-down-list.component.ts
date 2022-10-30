@@ -1,10 +1,24 @@
-import { ChangeDetectorRef, Component, ElementRef, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import {
+    ChangeDetectorRef,
+    Component,
+    ContentChild,
+    ElementRef,
+    EventEmitter,
+    Input,
+    OnInit,
+    Output,
+    TemplateRef
+} from "@angular/core";
 import { AbstractDropDownListComponent } from "../../../../components/abstract-drop-down-list/abstract-drop-down-list.component";
 import { PopupService } from "../../../../../popup/services/popup.service";
 import { PopupSettings } from "../../../../../popup/models/PopupSettings";
 import { PopupListService } from "../../../../services/popup-list.service";
 import { SelectionMode } from "../../../../../models/SelectionMode";
 import { PopupListValueChangeEvent } from "../../../../data/PopupListValueChangeEvent";
+import { DropDownListItemTemplateDirective } from "../../directives/drop-down-list-item-template.directive";
+import { DropDownListValueTemplateDirective } from "../../directives/drop-down-list-value-template.directive";
+import { PopupListItem } from "../../../../data/PopupListItem";
+import { DropDownListGroupTemplateDirective } from "../../directives/drop-down-list-group-template.directive";
 
 @Component({
     selector: "mona-drop-down-list",
@@ -14,12 +28,22 @@ import { PopupListValueChangeEvent } from "../../../../data/PopupListValueChange
 })
 export class DropDownListComponent extends AbstractDropDownListComponent implements OnInit {
     protected selectionMode: SelectionMode = "single";
+    public override valuePopupListItem?: PopupListItem;
+
+    @ContentChild(DropDownListGroupTemplateDirective, { read: TemplateRef })
+    public groupTemplate?: TemplateRef<void>;
+
+    @ContentChild(DropDownListItemTemplateDirective, { read: TemplateRef })
+    public itemTemplate?: TemplateRef<void>;
 
     @Input()
     public override value?: any;
 
     @Output()
     public override valueChange: EventEmitter<any | any[]> = new EventEmitter<any>();
+
+    @ContentChild(DropDownListValueTemplateDirective, { read: TemplateRef })
+    public valueTemplate?: TemplateRef<void>;
 
     public constructor(
         protected override readonly cdr: ChangeDetectorRef,
@@ -38,11 +62,10 @@ export class DropDownListComponent extends AbstractDropDownListComponent impleme
         if (event.value[0].dataEquals(this.value)) {
             return;
         }
-        this.value = event.value[0].data;
         if (event.via === "selection") {
             this.close();
         }
-        this.valueChange.emit(this.value);
+        this.updateValue(event.value[0]);
     }
 
     public override open(options: Partial<PopupSettings> = {}): void {

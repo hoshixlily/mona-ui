@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnInit } from "@angular/core";
+import { Component, ElementRef, Input, OnInit, TemplateRef } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { PopupListItem } from "../../data/PopupListItem";
 
@@ -12,6 +12,9 @@ import { PopupListItem } from "../../data/PopupListItem";
 export class PopupListItemComponent implements OnInit {
     @Input()
     public item: PopupListItem | null = null;
+
+    @Input()
+    public itemTemplate?: TemplateRef<void>;
 
     public constructor(public readonly elementRef: ElementRef<HTMLElement>) {}
     public ngOnInit(): void {}

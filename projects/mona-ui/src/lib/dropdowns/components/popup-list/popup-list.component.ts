@@ -1,6 +1,7 @@
 import {
     AfterViewInit,
     Component,
+    ContentChild,
     EventEmitter,
     Input,
     OnChanges,
@@ -10,6 +11,7 @@ import {
     QueryList,
     SimpleChanges,
     SkipSelf,
+    TemplateRef,
     ViewChildren
 } from "@angular/core";
 import { Group, List } from "@mirei/ts-collections";
@@ -20,6 +22,8 @@ import { fromEvent, Subject, takeUntil } from "rxjs";
 import { CommonModule } from "@angular/common";
 import { PopupListItemComponent } from "../popup-list-item/popup-list-item.component";
 import { PopupListValueChangeEvent } from "../../data/PopupListValueChangeEvent";
+import { ListItemTemplateDirective } from "../../directives/list-item-template.directive";
+import { ListGroupTemplateDirective } from "../../directives/list-group-template.directive";
 
 @Component({
     selector: "mona-popup-list",
@@ -32,15 +36,18 @@ export class PopupListComponent implements OnInit, OnChanges, AfterViewInit, OnD
     private readonly componentDestroy$: Subject<void> = new Subject<void>();
 
     @Input()
-    public data: Iterable<any> = [];
-
-    @Input()
     public groupField?: string;
+
+    @ContentChild(ListGroupTemplateDirective, { read: TemplateRef })
+    public groupTemplate?: TemplateRef<void>;
 
     @Input()
     public set highlightedValues(values: any[]) {
         this.updateHighlightedValues(values);
     }
+
+    @ContentChild(ListItemTemplateDirective, { read: TemplateRef })
+    public itemTemplate?: TemplateRef<void>;
 
     @Input()
     public navigable: boolean = true;
@@ -80,14 +87,6 @@ export class PopupListComponent implements OnInit, OnChanges, AfterViewInit, OnD
     }
 
     public ngOnChanges(changes: SimpleChanges): void {
-        if (changes["data"]) {
-            this.popupListService.initializeListData({
-                textField: this.textField,
-                valueField: this.valueField,
-                groupField: this.groupField,
-                data: changes["data"].currentValue
-            });
-        }
         if (changes["highlightedValues"] && changes["highlightedValues"].isFirstChange()) {
             window.setTimeout(() => this.updateHighlightedValues(changes["highlightedValues"].currentValue));
         }

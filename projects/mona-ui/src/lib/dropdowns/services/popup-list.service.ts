@@ -2,6 +2,7 @@ import { Injectable } from "@angular/core";
 import { Enumerable, Group, List } from "@mirei/ts-collections";
 import { PopupListItem } from "../data/PopupListItem";
 import { SelectionMode } from "../../models/SelectionMode";
+import { ItemDisabler, ItemDisablerAction } from "../data/ItemDisabler";
 
 @Injectable()
 export class PopupListService {
@@ -42,6 +43,13 @@ export class PopupListService {
                 .skip(1)
                 .firstOrDefault(i => !i.disabled) ?? null
         );
+    }
+
+    public static getItemDisablerAction(disabler: ItemDisabler): ItemDisablerAction {
+        if (typeof disabler === "string") {
+            return (item: any) => !!item?.[disabler] ?? false;
+        }
+        return disabler;
     }
 
     public static isFirstSelectableItem(items: List<Group<string, PopupListItem>>, item: PopupListItem): boolean {
@@ -96,45 +104,15 @@ export class PopupListService {
                         previousItem.highlighted = true;
                     }
                     newItem = previousItem;
-                    // this.scrollToItem(previousItem);
                 }
             }
         }
         return newItem;
     }
 
-    public selectItem(item: PopupListItem | any): void {
-        if (item instanceof PopupListItem) {
-            this.listData.selectMany(g => g.source).forEach(i => (i.selected = i.dataEquals(item.data)));
-        } else {
-            this.listData.selectMany(g => g.source).forEach(i => (i.selected = i.dataEquals(item)));
-        }
-    }
-
-    public selectNextItem(item: PopupListItem): PopupListItem | null {
-        if (PopupListService.isLastSelectableItem(this.listData, item)) {
-            return null;
-        }
-        const nextItem = PopupListService.findNextSelectableItem(this.listData, item);
-        if (nextItem) {
-            this.selectItem(nextItem);
-        }
-        return nextItem;
-    }
-
-    public selectPreviousItem(item: PopupListItem): PopupListItem | null {
-        if (PopupListService.isFirstSelectableItem(this.listData, item)) {
-            return null;
-        }
-        const previousItem = PopupListService.findPreviousSelectableItem(this.listData, item);
-        if (previousItem) {
-            this.selectItem(previousItem);
-        }
-        return previousItem;
-    }
-
     public initializeListData(params: {
         data: Iterable<any>;
+        disabler?: ItemDisabler;
         textField?: string;
         valueField?: string;
         groupField?: string;
@@ -164,23 +142,15 @@ export class PopupListService {
 
         this.listData = listItems;
 
-        // item disabler code here
+        if (params.disabler) {
+            const disablerAction = PopupListService.getItemDisablerAction(params.disabler);
+            this.updateDisabledItems(disablerAction);
+        }
+
         return listItems;
     }
 
-    // public updateHighlightedValues(values: any[]): void {
-    //     this.listData.forEach(g => {
-    //         g.source.forEach(i => {
-    //             i.highlighted = values.some(v => i.dataEquals(v));
-    //         });
-    //     });
-    // }
-    //
-    // public updateSelectedValues(values: any[]): void {
-    //     this.listData.forEach(g => {
-    //         g.source.forEach(i => {
-    //             i.selected = values.some(v => i.dataEquals(v));
-    //         });
-    //     });
-    // }
+    private updateDisabledItems(disablerAction: ItemDisablerAction): void {
+        this.listData.selectMany(g => g.source).forEach(i => (i.disabled = disablerAction(i.data)));
+    }
 }
