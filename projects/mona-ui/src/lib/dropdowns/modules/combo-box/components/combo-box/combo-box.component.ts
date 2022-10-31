@@ -9,6 +9,7 @@ import { DropDownListItemTemplateDirective } from "../../../drop-down-list/direc
 import { PopupListValueChangeEvent } from "../../../../data/PopupListValueChangeEvent";
 import { PopupSettings } from "../../../../../popup/models/PopupSettings";
 import { distinctUntilChanged, fromEvent, Subject, takeUntil } from "rxjs";
+import { Group } from "@mirei/ts-collections";
 
 @Component({
     selector: "mona-combo-box",
@@ -21,6 +22,9 @@ export class ComboBoxComponent extends AbstractDropDownListComponent implements 
     public readonly comboBoxValue$: Subject<string> = new Subject<string>();
     public override valuePopupListItem?: PopupListItem;
     public comboBoxValue: string = "";
+
+    @Input()
+    public filterable: boolean = false;
 
     @ContentChild(DropDownListGroupTemplateDirective, { read: TemplateRef })
     public groupTemplate?: TemplateRef<void>;
@@ -52,6 +56,7 @@ export class ComboBoxComponent extends AbstractDropDownListComponent implements 
         super.ngOnInit();
         this.setEventListeners();
         this.setSubscriptions();
+        this.comboBoxValue = this.valuePopupListItem?.text ?? "";
     }
 
     public onPopupListValueChange(event: PopupListValueChangeEvent): void {
@@ -106,6 +111,22 @@ export class ComboBoxComponent extends AbstractDropDownListComponent implements 
 
     private setSubscriptions(): void {
         this.comboBoxValue$.pipe(takeUntil(this.componentDestroy$), distinctUntilChanged()).subscribe(value => {
+            if (this.filterable) {
+                if (!value) {
+                    this.popupListService.viewListData = this.popupListService.sourceListData.toList();
+                    this.popupListService.filterModeActive = false;
+                } else {
+                    this.popupListService.viewListData = this.popupListService.sourceListData
+                        .select(g => {
+                            const filteredItems = g.source.where(i =>
+                                i.text.toLowerCase().includes(value.toLowerCase())
+                            );
+                            return new Group<string, PopupListItem>(g.key, filteredItems.toList());
+                        })
+                        .toList();
+                    this.popupListService.filterModeActive = true;
+                }
+            }
             this.popupListService.viewListData
                 .selectMany(g => g.source)
                 .forEach(i => (i.selected = i.highlighted = false));

@@ -126,7 +126,8 @@
             </ng-template>
         </mona-drop-down-list>
 
-        <mona-combo-box [data]="dropdownListDataItems" textField="text" valueField="value" groupField="group" style="width: 200px;"></mona-combo-box>
+        <mona-combo-box [data]="dropdownListDataItems" textField="text" valueField="value" groupField="group" [filterable]="true" style="width: 200px;"
+            [value]="dropdownListDataItems[3]" (valueChange)="onComboBoxValueChange($event)"></mona-combo-box>
 
 <!--        <mona-combo-box [data]="dropdownListDataItems" [itemDisabler]="dropdownItemDisabler"-->
 <!--                        [value]="selectedComboBoxDataItem" (valueChange)="onComboBoxValueChange($event)"-->
