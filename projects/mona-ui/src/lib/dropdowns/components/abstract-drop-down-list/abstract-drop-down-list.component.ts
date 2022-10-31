@@ -30,7 +30,7 @@ import { PopupListItem } from "../../data/PopupListItem";
     providers: [PopupListService]
 })
 export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy {
-    private readonly componentDestroy$: Subject<void> = new Subject<void>();
+    protected readonly componentDestroy$: Subject<void> = new Subject<void>();
     public readonly clearIcon: IconDefinition = faTimes;
     public readonly dropdownIcon: IconDefinition = faChevronDown;
     public popupRef: PopupRef | null = null;

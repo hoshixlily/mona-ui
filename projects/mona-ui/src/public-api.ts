@@ -22,8 +22,8 @@ export * from "./lib/dropdowns/directives/list-item-template.directive";
 
 // export * from "./lib/dropdowns/modules/combo-box/directives/combo-box-group-template.directive";
 // export * from "./lib/dropdowns/modules/combo-box/directives/combo-box-item-template.directive";
-// export * from "./lib/dropdowns/modules/combo-box/components/combo-box/combo-box.component";
-// export * from "./lib/dropdowns/modules/combo-box/combo-box.module";
+export * from "./lib/dropdowns/modules/combo-box/components/combo-box/combo-box.component";
+export * from "./lib/dropdowns/modules/combo-box/combo-box.module";
 //
 export * from "./lib/dropdowns/modules/drop-down-list/directives/drop-down-list-group-template.directive";
 export * from "./lib/dropdowns/modules/drop-down-list/directives/drop-down-list-item-template.directive";

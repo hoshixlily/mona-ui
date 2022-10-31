@@ -3,9 +3,11 @@ import { Enumerable, Group, List } from "@mirei/ts-collections";
 import { PopupListItem } from "../data/PopupListItem";
 import { SelectionMode } from "../../models/SelectionMode";
 import { ItemDisabler, ItemDisablerAction } from "../data/ItemDisabler";
+import { Subject } from "rxjs";
 
 @Injectable()
 export class PopupListService {
+    public readonly scrollToListItem$: Subject<PopupListItem> = new Subject<PopupListItem>();
     public filterModeActive: boolean = false;
     public sourceListData: List<Group<string, PopupListItem>> = new List<Group<string, PopupListItem>>();
     public viewListData: List<Group<string, PopupListItem>> = new List<Group<string, PopupListItem>>();
@@ -173,7 +175,15 @@ export class PopupListService {
                         }
                     } else {
                         if (focusedItem) {
-                            focusedItem.selected = false;
+                            if (focusedItem.highlighted && !focusedItem.selected) {
+                                focusedItem.highlighted = false;
+                                focusedItem.selected = true;
+                                newItem = focusedItem;
+                                return newItem;
+                            } else {
+                                focusedItem.selected = false;
+                                focusedItem.highlighted = false;
+                            }
                         }
                         nextItem.selected = true;
                     }
@@ -206,8 +216,15 @@ export class PopupListService {
                                 previousItem.selected = true;
                             }
                         } else {
-                            focusedItem.selected = false;
-                            previousItem.selected = true;
+                            if (focusedItem.highlighted && !focusedItem.selected) {
+                                focusedItem.highlighted = false;
+                                focusedItem.selected = true;
+                                newItem = focusedItem;
+                                return newItem;
+                            } else {
+                                focusedItem.selected = false;
+                                previousItem.selected = true;
+                            }
                         }
                     } else {
                         focusedItem.highlighted = false;
