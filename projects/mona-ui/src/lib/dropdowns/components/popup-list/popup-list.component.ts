@@ -14,26 +14,34 @@ import {
     TemplateRef,
     ViewChildren
 } from "@angular/core";
-import { Group, List } from "@mirei/ts-collections";
 import { PopupListItem } from "../../data/PopupListItem";
 import { SelectionMode } from "../../../models/SelectionMode";
 import { PopupListService } from "../../services/popup-list.service";
-import { fromEvent, Subject, takeUntil } from "rxjs";
+import { debounceTime, fromEvent, Subject, takeUntil } from "rxjs";
 import { CommonModule } from "@angular/common";
 import { PopupListItemComponent } from "../popup-list-item/popup-list-item.component";
 import { PopupListValueChangeEvent } from "../../data/PopupListValueChangeEvent";
 import { ListItemTemplateDirective } from "../../directives/list-item-template.directive";
 import { ListGroupTemplateDirective } from "../../directives/list-group-template.directive";
+import { TextBoxModule } from "../../../inputs/modules/text-box/text-box.module";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { faSearch, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { FormsModule } from "@angular/forms";
 
 @Component({
     selector: "mona-popup-list",
     templateUrl: "./popup-list.component.html",
     styleUrls: ["./popup-list.component.scss"],
     standalone: true,
-    imports: [CommonModule, PopupListItemComponent]
+    imports: [CommonModule, PopupListItemComponent, TextBoxModule, FontAwesomeModule, FormsModule]
 })
 export class PopupListComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
     private readonly componentDestroy$: Subject<void> = new Subject<void>();
+    public readonly filterIcon: IconDefinition = faSearch;
+    public readonly filter$: Subject<string> = new Subject<string>();
+
+    @Input()
+    public filterable: boolean = false;
 
     @Input()
     public groupField?: string;
@@ -78,7 +86,7 @@ export class PopupListComponent implements OnInit, OnChanges, AfterViewInit, OnD
     ) {}
 
     public ngAfterViewInit(): void {
-        const firstSelectedItem = this.listData
+        const firstSelectedItem = this.popupListService.viewListData
             .selectMany(g => g.source)
             .firstOrDefault(i => i.selected || i.highlighted);
         if (firstSelectedItem) {
@@ -102,6 +110,7 @@ export class PopupListComponent implements OnInit, OnChanges, AfterViewInit, OnD
 
     public ngOnInit(): void {
         this.setEvents();
+        this.setSubscriptions();
     }
 
     public onListItemClick(item: PopupListItem, event: MouseEvent): void {
@@ -116,7 +125,7 @@ export class PopupListComponent implements OnInit, OnChanges, AfterViewInit, OnD
             });
         } else if (this.selectionMode === "multiple") {
             item.selected = !item.selected;
-            const selectedItems = this.listData
+            const selectedItems = this.popupListService.viewListData
                 .selectMany(g => g.source)
                 .where(i => i.selected)
                 .toArray();
@@ -162,13 +171,31 @@ export class PopupListComponent implements OnInit, OnChanges, AfterViewInit, OnD
                 } else if (event.key === "Enter") {
                     if (this.selectionMode === "multiple") {
                         console.log("TODO: Implement Enter handling for popup list component");
+                    } else {
+                        if (this.popupListService.filterModeActive) {
+                            const selectedItem = this.popupListService.viewListData
+                                .selectMany(g => g.source)
+                                .firstOrDefault(i => i.selected);
+                            if (selectedItem) {
+                                this.valueChange.emit({
+                                    value: [selectedItem],
+                                    via: "selection"
+                                });
+                            }
+                        }
                     }
                 }
             });
     }
 
+    private setSubscriptions(): void {
+        this.filter$
+            .pipe(takeUntil(this.componentDestroy$), debounceTime(200))
+            .subscribe(filter => this.popupListService.filterItems(filter));
+    }
+
     private updateHighlightedValues(values: any[]): void {
-        this.listData.forEach(g => {
+        this.popupListService.viewListData.forEach(g => {
             g.source.forEach(i => {
                 i.highlighted = values.some(v => i.dataEquals(v));
             });
@@ -176,18 +203,14 @@ export class PopupListComponent implements OnInit, OnChanges, AfterViewInit, OnD
     }
 
     private updateSelectedValues(values: any[]): void {
-        this.listData.forEach(g => {
+        this.popupListService.viewListData.forEach(g => {
             g.source.forEach(i => {
                 i.selected = values.some(v => i.dataEquals(v));
             });
         });
-        const selectedItem = PopupListService.findFirstSelectedItem(this.listData);
+        const selectedItem = PopupListService.findFirstSelectedItem(this.popupListService.viewListData);
         if (selectedItem) {
             this.scrollToItem(selectedItem);
         }
-    }
-
-    private get listData(): List<Group<string, PopupListItem>> {
-        return this.popupListService.listData;
     }
 }

@@ -17,15 +17,19 @@ import {
 export class ButtonDirective implements OnInit, OnDestroy {
     private clickListener: () => void = () => void 0;
 
-    @HostBinding("class.disabled")
+    @HostBinding("class.mona-disabled")
     @Input()
     public disabled: boolean = false;
 
-    @HostBinding("class.primary")
+    @HostBinding("class.mona-flat")
+    @Input()
+    public flat: boolean = false;
+
+    @HostBinding("class.mona-primary")
     @Input()
     public primary: boolean = false;
 
-    @HostBinding("class.selected")
+    @HostBinding("class.mona-selected")
     @Input()
     public selected: boolean = false;
 

@@ -6,7 +6,9 @@ import { ItemDisabler, ItemDisablerAction } from "../data/ItemDisabler";
 
 @Injectable()
 export class PopupListService {
-    public listData: List<Group<string, PopupListItem>> = new List<Group<string, PopupListItem>>();
+    public filterModeActive: boolean = false;
+    public sourceListData: List<Group<string, PopupListItem>> = new List<Group<string, PopupListItem>>();
+    public viewListData: List<Group<string, PopupListItem>> = new List<Group<string, PopupListItem>>();
 
     public constructor() {}
 
@@ -60,54 +62,39 @@ export class PopupListService {
         return PopupListService.findNextSelectableItem(items, item) === null;
     }
 
-    public navigate(event: KeyboardEvent, selectionMode: SelectionMode): PopupListItem | null {
-        const selectedItem = this.listData.selectMany(g => g.source).firstOrDefault(i => i.selected);
-        const highlightedItem = this.listData.selectMany(g => g.source).firstOrDefault(i => i.highlighted);
-        const firstItem = this.listData.selectMany(g => g.source).firstOrDefault();
-        const focusedItem = highlightedItem ?? selectedItem ?? null;
-        let newItem: PopupListItem | null = null;
-        if (event.key === "ArrowDown") {
-            event.preventDefault();
-            if (focusedItem && PopupListService.isLastSelectableItem(this.listData, focusedItem)) {
-                return focusedItem;
-            }
-            const nextItem = !focusedItem
-                ? firstItem
-                : PopupListService.findNextSelectableItem(this.listData, focusedItem);
-            if (nextItem) {
-                if (selectionMode === "single") {
-                    nextItem.selected = true;
-                    if (focusedItem) {
-                        focusedItem.selected = false;
-                    }
-                } else {
-                    nextItem.highlighted = true;
-                    if (focusedItem) {
-                        focusedItem.highlighted = false;
-                    }
-                }
-                newItem = nextItem;
-            }
-        } else if (event.key === "ArrowUp") {
-            event.preventDefault();
-            if (focusedItem) {
-                if (PopupListService.isFirstSelectableItem(this.listData, focusedItem)) {
-                    return focusedItem;
-                }
-                const previousItem = PopupListService.findPreviousSelectableItem(this.listData, focusedItem);
-                if (previousItem) {
-                    if (selectionMode === "single") {
-                        focusedItem.selected = false;
-                        previousItem.selected = true;
-                    } else {
-                        focusedItem.highlighted = false;
-                        previousItem.highlighted = true;
-                    }
-                    newItem = previousItem;
-                }
+    public clearFilters(): void {
+        this.viewListData = this.sourceListData.toList();
+        this.viewListData.selectMany(g => g.source).forEach(i => (i.highlighted = false));
+        this.filterModeActive = false;
+    }
+
+    public filterItems(filter: string): void {
+        if (!filter) {
+            this.clearFilters();
+            return;
+        }
+        this.viewListData = this.sourceListData
+            .select(g => {
+                const filteredItems = g.source.where(i => i.text.toLowerCase().includes(filter.toLowerCase()));
+                return new Group<string, PopupListItem>(g.key, filteredItems.toList());
+            })
+            .toList();
+        const selectedItem = this.viewListData
+            .selectMany(g => g.source)
+            .where(i => i.selected)
+            .firstOrDefault();
+        if (selectedItem) {
+            selectedItem.highlighted = true;
+        } else {
+            const firstItem = this.viewListData
+                .selectMany(g => g.source)
+                .where(i => !i.disabled)
+                .firstOrDefault();
+            if (firstItem) {
+                firstItem.highlighted = true;
             }
         }
-        return newItem;
+        this.filterModeActive = true;
     }
 
     public initializeListData(params: {
@@ -140,7 +127,8 @@ export class PopupListService {
             listItems.add(new Group<string, any>("", items));
         }
 
-        this.listData = listItems;
+        this.sourceListData = listItems;
+        this.viewListData = this.sourceListData.toList();
 
         if (params.disabler) {
             const disablerAction = PopupListService.getItemDisablerAction(params.disabler);
@@ -150,7 +138,89 @@ export class PopupListService {
         return listItems;
     }
 
+    public navigate(event: KeyboardEvent, selectionMode: SelectionMode): PopupListItem | null {
+        const selectedItem = this.viewListData.selectMany(g => g.source).firstOrDefault(i => i.selected);
+        const highlightedItem = this.viewListData.selectMany(g => g.source).firstOrDefault(i => i.highlighted);
+        const firstItem = this.viewListData.selectMany(g => g.source).firstOrDefault();
+        const focusedItem = highlightedItem ?? selectedItem ?? null;
+        let newItem: PopupListItem | null = null;
+        if (event.key === "ArrowDown") {
+            event.preventDefault();
+            if (focusedItem && PopupListService.isLastSelectableItem(this.viewListData, focusedItem)) {
+                if (this.filterModeActive && focusedItem.highlighted && !focusedItem.selected) {
+                    focusedItem.highlighted = false;
+                    focusedItem.selected = true;
+                }
+                return focusedItem;
+            }
+            const nextItem = !focusedItem
+                ? firstItem
+                : PopupListService.findNextSelectableItem(this.viewListData, focusedItem);
+            if (nextItem) {
+                if (selectionMode === "single") {
+                    if (this.filterModeActive) {
+                        if (focusedItem && focusedItem.highlighted && !focusedItem.selected) {
+                            focusedItem.highlighted = false;
+                            focusedItem.selected = true;
+                            newItem = focusedItem;
+                            return newItem;
+                        } else {
+                            if (focusedItem) {
+                                focusedItem.selected = false;
+                                focusedItem.highlighted = false;
+                                nextItem.selected = true;
+                            }
+                        }
+                    } else {
+                        if (focusedItem) {
+                            focusedItem.selected = false;
+                        }
+                        nextItem.selected = true;
+                    }
+                } else {
+                    nextItem.highlighted = true;
+                    if (focusedItem) {
+                        focusedItem.highlighted = false;
+                    }
+                }
+                newItem = nextItem;
+            }
+        } else if (event.key === "ArrowUp") {
+            event.preventDefault();
+            if (focusedItem) {
+                if (PopupListService.isFirstSelectableItem(this.viewListData, focusedItem)) {
+                    return focusedItem;
+                }
+                const previousItem = PopupListService.findPreviousSelectableItem(this.viewListData, focusedItem);
+                if (previousItem) {
+                    if (selectionMode === "single") {
+                        if (this.filterModeActive) {
+                            if (focusedItem.highlighted && !focusedItem.selected) {
+                                focusedItem.highlighted = false;
+                                focusedItem.selected = true;
+                                newItem = focusedItem;
+                                return newItem;
+                            } else {
+                                focusedItem.selected = false;
+                                focusedItem.highlighted = false;
+                                previousItem.selected = true;
+                            }
+                        } else {
+                            focusedItem.selected = false;
+                            previousItem.selected = true;
+                        }
+                    } else {
+                        focusedItem.highlighted = false;
+                        previousItem.highlighted = true;
+                    }
+                    newItem = previousItem;
+                }
+            }
+        }
+        return newItem;
+    }
+
     private updateDisabledItems(disablerAction: ItemDisablerAction): void {
-        this.listData.selectMany(g => g.source).forEach(i => (i.disabled = disablerAction(i.data)));
+        this.sourceListData.selectMany(g => g.source).forEach(i => (i.disabled = disablerAction(i.data)));
     }
 }

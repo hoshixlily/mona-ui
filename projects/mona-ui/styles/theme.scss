@@ -90,17 +90,20 @@
     white-space: nowrap;
     padding: 0 8px;
     flex: 1;
+    overflow: hidden;
+    & > span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 }
 
 .mona-input-selector-icon {
-    width: var(--mona-input-height);
+    min-width: var(--mona-input-height);
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--mona-text);
 }
-
-
 
 ul.mona-list {
     //background: var(--mona-background);
@@ -150,29 +153,43 @@ button[monaButton] {
     border: 1px solid var(--mona-border-color);
     outline: none;
     user-select: none;
+    cursor: pointer;
 
-    &.primary {
+    &.mona-primary {
         background-color: var(--mona-primary);
         color: var(--mona-background);
         border: 1px solid var(--mona-primary);
-        &.selected {
+        &.mona-selected {
             background-color: var(--mona-primary-dark);
             color: var(--mona-background-light);
         }
     }
 
-    &.selected {
+    &.mona-flat {
+        border: none;
+        background: transparent;
+        transition: none;
+        &:focus,
+        &:focus-within {
+            box-shadow: none;
+        }
+        &:hover {
+            background-color: transparent;
+        }
+    }
+
+    &.mona-selected {
         background: var(--mona-primary);
         color: var(--mona-background);
     }
 
-    &.disabled {
+    &.mona-disabled {
         @include disabled;
     }
 
     @include background-transition;
 
-    &:not(.selected) {
+    &:not(.mona-selected) {
         @include hover-background;
         @include active-background;
     }
@@ -194,7 +211,7 @@ mona-button-group button[monaButton] {
     color: var(--mona-text);
     border: 1px solid var(--mona-border-color);
 
-    &.disabled {
+    &.mona-disabled {
         @include disabled;
     }
 
@@ -229,6 +246,13 @@ mona-button-group button[monaButton] {
 
 .mona-dropdown {
     width: 100%;
+}
+
+.mona-dropdown-clear-icon {
+    &:hover {
+        color: var(--mona-text-light);
+        font-weight: bold;
+    }
 }
 
 /** Combo Box */

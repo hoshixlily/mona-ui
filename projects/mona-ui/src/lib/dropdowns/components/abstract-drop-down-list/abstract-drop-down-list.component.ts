@@ -10,7 +10,7 @@ import {
     ViewChild
 } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { faChevronDown, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { faChevronDown, faSearch, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { PopupRef } from "../../../popup/models/PopupRef";
 import { PopupService } from "../../../popup/services/popup.service";
 import { ConnectionPositionPair } from "@angular/cdk/overlay";
@@ -31,6 +31,7 @@ import { PopupListItem } from "../../data/PopupListItem";
 })
 export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy {
     private readonly componentDestroy$: Subject<void> = new Subject<void>();
+    public readonly clearIcon: IconDefinition = faTimes;
     public readonly dropdownIcon: IconDefinition = faChevronDown;
     public popupRef: PopupRef | null = null;
 
@@ -49,8 +50,14 @@ export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy
     @Input()
     public itemDisabler?: Action<any, boolean> | string;
 
+    @Input()
+    public placeholder?: string;
+
     @ViewChild("popupTemplate")
     public popupTemplate!: TemplateRef<void>;
+
+    @Input()
+    public showClearButton: boolean = false;
 
     @Input()
     public textField?: string;
@@ -68,7 +75,6 @@ export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy
     public abstract valueChange: EventEmitter<any | any[]>;
 
     protected constructor(
-        protected readonly cdr: ChangeDetectorRef,
         protected readonly elementRef: ElementRef<HTMLElement>,
         protected readonly popupListService: PopupListService,
         protected readonly popupService: PopupService
@@ -93,9 +99,12 @@ export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy
             groupField: this.groupField
         });
         if (this.value) {
-            this.valuePopupListItem = this.popupListService.listData
+            this.valuePopupListItem = this.popupListService.viewListData
                 .selectMany(g => g.source)
                 .singleOrDefault(d => d.dataEquals(this.value));
+            if (this.valuePopupListItem) {
+                this.valuePopupListItem.selected = true;
+            }
         }
         this.setEvents();
     }
@@ -120,6 +129,7 @@ export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy
         this.popupRef.closed.pipe(take(1)).subscribe(() => {
             this.popupRef = null;
             (this.elementRef.nativeElement.firstElementChild as HTMLElement)?.focus();
+            this.popupListService.clearFilters();
         });
     }
 

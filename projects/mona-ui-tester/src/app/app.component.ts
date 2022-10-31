@@ -3,8 +3,6 @@ import { PopupRef, PopupService, PopupSettings } from "mona-ui";
 import { TestComponentComponent } from "./test-component/test-component.component";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { faMoon, faSearch, faSnowflake, faSun } from "@fortawesome/free-solid-svg-icons";
-import { Enumerable, Group, List } from "@mirei/ts-collections";
-// import { PopupListItem } from "../../../../dist/mona-ui/lib/shared/data/PopupListItem";
 
 @Component({
     selector: "app-root",
@@ -95,7 +93,8 @@ export class AppComponent implements OnInit {
         { text: "Ramen", value: 27, group: "Food", active: true },
         { text: "Onigiri", value: 28, group: "Food", active: true },
         { text: "Okonomiyaki", value: 29, group: "Food", active: true },
-        { text: "Yakizakana", value: 30, group: "Food", active: true }
+        { text: "Yakizakana", value: 30, group: "Food", active: true },
+        { text: "Pink-flowered native raspberry", value: 31, group: "Fruit", active: true }
     ];
     public dropdownPrimitiveDataItems: string[] = [
         "Willow",
@@ -172,6 +171,7 @@ export class AppComponent implements OnInit {
             // this.contextMenuItemVisible = !this.contextMenuItemVisible;
             // this.dropdownItemDisabler = (item: any): boolean => item.value % 3 === 0;
         }, 3000);
+        this.selectedDropdownListDataItem = { ...this.dropdownListDataItems[4] };
     }
 
     public numericTextBoxFormatter = (value: number | null): string => (value != null ? `${value} °C` : "");

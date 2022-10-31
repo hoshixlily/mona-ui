@@ -8,6 +8,7 @@ import { ListItemTemplateDirective } from "../../directives/list-item-template.d
 import { DropDownListValueTemplateDirective } from "./directives/drop-down-list-value-template.directive";
 import { DropDownListGroupTemplateDirective } from "./directives/drop-down-list-group-template.directive";
 import { ListGroupTemplateDirective } from "../../directives/list-group-template.directive";
+import { ButtonModule } from "../../../buttons/modules/button/button.module";
 
 @NgModule({
     declarations: [
@@ -21,7 +22,8 @@ import { ListGroupTemplateDirective } from "../../directives/list-group-template
         PopupListComponent,
         FontAwesomeModule,
         ListItemTemplateDirective,
-        ListGroupTemplateDirective
+        ListGroupTemplateDirective,
+        ButtonModule
     ],
     exports: [
         DropDownListComponent,

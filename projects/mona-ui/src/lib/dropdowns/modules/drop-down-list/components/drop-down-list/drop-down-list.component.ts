@@ -30,6 +30,9 @@ export class DropDownListComponent extends AbstractDropDownListComponent impleme
     protected selectionMode: SelectionMode = "single";
     public override valuePopupListItem?: PopupListItem;
 
+    @Input()
+    public filterable: boolean = false;
+
     @ContentChild(DropDownListGroupTemplateDirective, { read: TemplateRef })
     public groupTemplate?: TemplateRef<void>;
 
@@ -46,12 +49,17 @@ export class DropDownListComponent extends AbstractDropDownListComponent impleme
     public valueTemplate?: TemplateRef<void>;
 
     public constructor(
-        protected override readonly cdr: ChangeDetectorRef,
         protected override readonly elementRef: ElementRef<HTMLElement>,
         protected override readonly popupListService: PopupListService,
         protected override readonly popupService: PopupService
     ) {
-        super(cdr, elementRef, popupListService, popupService);
+        super(elementRef, popupListService, popupService);
+    }
+
+    public clearValue(event: MouseEvent): void {
+        event.stopImmediatePropagation();
+        this.value = undefined;
+        this.valuePopupListItem = undefined;
     }
 
     public override ngOnInit(): void {
@@ -59,7 +67,10 @@ export class DropDownListComponent extends AbstractDropDownListComponent impleme
     }
 
     public onPopupListValueChange(event: PopupListValueChangeEvent): void {
-        if (event.value[0].dataEquals(this.value)) {
+        if (this.value && event.value[0].dataEquals(this.value)) {
+            if (event.via === "selection") {
+                this.close();
+            }
             return;
         }
         if (event.via === "selection") {
