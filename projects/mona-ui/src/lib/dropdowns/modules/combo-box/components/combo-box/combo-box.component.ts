@@ -162,6 +162,7 @@ export class ComboBoxComponent extends AbstractDropDownListComponent implements 
                 popupListItem.highlighted = true;
                 this.popupListService.scrollToListItem$.next(popupListItem);
             }
+            this.comboBoxValue = value;
         });
     }
 }
