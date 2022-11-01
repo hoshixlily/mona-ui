@@ -78,8 +78,4 @@ export class DropDownListComponent extends AbstractDropDownListComponent impleme
         }
         this.updateValue(event.value[0]);
     }
-
-    public override open(options: Partial<PopupSettings> = {}): void {
-        super.open(options);
-    }
 }
