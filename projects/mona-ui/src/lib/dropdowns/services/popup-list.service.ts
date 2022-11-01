@@ -143,7 +143,7 @@ export class PopupListService {
     public navigate(event: KeyboardEvent, selectionMode: SelectionMode): PopupListItem | null {
         const selectedItem = this.viewListData.selectMany(g => g.source).firstOrDefault(i => i.selected);
         const highlightedItem = this.viewListData.selectMany(g => g.source).firstOrDefault(i => i.highlighted);
-        const firstItem = this.viewListData.selectMany(g => g.source).firstOrDefault();
+        const firstItem = this.viewListData.selectMany(g => g.source).firstOrDefault(i => !i.disabled);
         const focusedItem = highlightedItem ?? selectedItem ?? null;
         let newItem: PopupListItem | null = null;
         if (event.key === "ArrowDown") {

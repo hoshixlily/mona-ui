@@ -50,6 +50,7 @@ export class ComboBoxComponent extends AbstractDropDownListComponent implements 
         event.stopImmediatePropagation();
         this.value = undefined;
         this.valuePopupListItem = undefined;
+        this.comboBoxValue = "";
     }
 
     public override ngOnInit(): void {
@@ -132,7 +133,7 @@ export class ComboBoxComponent extends AbstractDropDownListComponent implements 
                 .forEach(i => (i.selected = i.highlighted = false));
             const popupListItem = this.popupListService.viewListData
                 .selectMany(g => g.source)
-                .firstOrDefault(item => item.text.toLowerCase().includes(value.toLowerCase()));
+                .firstOrDefault(item => !item.disabled && item.text.toLowerCase().includes(value.toLowerCase()));
             if (!this.popupRef) {
                 this.open();
             }

@@ -16,6 +16,10 @@
     color: var(--mona-text) !important;
 }
 
+input {
+    font-size: 12px;
+}
+
 @mixin active-background {
     &:active {
         background-color: var(--mona-background-darker);
@@ -30,9 +34,9 @@
 
 @mixin disabled {
     pointer-events: none;
-    opacity: 0.5;
+    opacity: 0.37;
     cursor: default;
-    background-color: var(--mona-background-dark);
+    //background-color: var(--mona-background-dark);
 }
 
 @mixin focus-transition {
@@ -247,6 +251,9 @@ mona-button-group button[monaButton] {
 .mona-dropdown {
     width: 100%;
     overflow: hidden;
+    &.mona-disabled {
+        @include disabled;
+    }
 }
 
 .mona-dropdown-clear-icon {
@@ -264,6 +271,12 @@ mona-button-group button[monaButton] {
             & div:first-child {
                 border-left: none;
             }
+            & input {
+                padding: 2px 8px;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+            }
         }
     }
 }
@@ -271,9 +284,7 @@ mona-button-group button[monaButton] {
 
 /** Dropdown List */
 .mona-dropdown-list {
-    &.mona-disabled {
-        @include disabled;
-    }
+
 }
 
 .mona-dropdown-no-data {
