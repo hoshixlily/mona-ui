@@ -237,6 +237,15 @@ export class PopupListService {
         return newItem;
     }
 
+    public selectItem(item: PopupListItem, selectionMode: SelectionMode): void {
+        if (selectionMode === "single") {
+            this.viewListData.selectMany(g => g.source).forEach(i => (i.selected = false));
+            item.selected = true;
+        } else {
+            item.selected = !item.selected;
+        }
+    }
+
     private updateDisabledItems(disablerAction: ItemDisablerAction): void {
         this.sourceListData.selectMany(g => g.source).forEach(i => (i.disabled = disablerAction(i.data)));
     }

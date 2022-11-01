@@ -1,6 +1,6 @@
 <div class="mona-dropdown mona-combo-box mona-input-selector" [ngClass]="{'mona-disabled': disabled}" [attr.tabindex]="disabled ? -1 : 0" #dropdownWrapper>
     <div class="mona-input-selector-value">
-        <mona-text-box [ngModel]="comboBoxValue" (ngModelChange)="comboBoxValue$.next($event)"></mona-text-box>
+        <mona-text-box [ngModel]="comboBoxValue" (ngModelChange)="comboBoxValue$.next($event)" (keydown)="onKeydown($event)"></mona-text-box>
     </div>
     <div class="mona-input-selector-icon" *ngIf="showClearButton && valuePopupListItem">
         <button monaButton [flat]="true" (click)="clearValue($event)" class="mona-dropdown-clear-icon">

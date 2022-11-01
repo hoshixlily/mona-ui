@@ -109,7 +109,10 @@ export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy
         this.setEvents();
     }
 
-    public open(options: Partial<PopupSettings> = {}): void {
+    public open(options: Partial<PopupSettings> = {}): PopupRef {
+        if (this.popupRef) {
+            return this.popupRef;
+        }
         this.dropdownWrapper.nativeElement.focus();
         this.popupRef = this.popupService.create({
             anchor: this.dropdownWrapper,
@@ -131,6 +134,7 @@ export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy
             (this.elementRef.nativeElement.firstElementChild as HTMLElement)?.focus();
             this.popupListService.clearFilters();
         });
+        return this.popupRef;
     }
 
     protected setEvents(): void {

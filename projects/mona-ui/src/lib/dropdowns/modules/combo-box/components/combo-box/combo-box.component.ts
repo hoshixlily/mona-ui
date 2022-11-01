@@ -8,8 +8,9 @@ import { DropDownListGroupTemplateDirective } from "../../../drop-down-list/dire
 import { DropDownListItemTemplateDirective } from "../../../drop-down-list/directives/drop-down-list-item-template.directive";
 import { PopupListValueChangeEvent } from "../../../../data/PopupListValueChangeEvent";
 import { PopupSettings } from "../../../../../popup/models/PopupSettings";
-import { distinctUntilChanged, fromEvent, Subject, takeUntil } from "rxjs";
+import { distinctUntilChanged, fromEvent, Subject, take, takeUntil } from "rxjs";
 import { Group } from "@mirei/ts-collections";
+import { PopupRef } from "../../../../../popup/models/PopupRef";
 
 @Component({
     selector: "mona-combo-box",
@@ -60,6 +61,20 @@ export class ComboBoxComponent extends AbstractDropDownListComponent implements 
         this.comboBoxValue = this.valuePopupListItem?.text ?? "";
     }
 
+    public onKeydown(event: KeyboardEvent): void {
+        if (event.key === "Enter") {
+            const item = this.popupListService.viewListData
+                .selectMany(g => g.source)
+                .firstOrDefault(i => i.text.toLowerCase() === this.comboBoxValue.toLowerCase());
+            if (item) {
+                this.popupListService.selectItem(item, this.selectionMode);
+                this.updateValue(item);
+            }
+        } else if (event.key === "Escape") {
+            this.close();
+        }
+    }
+
     public onPopupListValueChange(event: PopupListValueChangeEvent): void {
         if (this.value && event.value[0].dataEquals(this.value)) {
             if (event.via === "selection") {
@@ -73,11 +88,8 @@ export class ComboBoxComponent extends AbstractDropDownListComponent implements 
         this.updateValue(event.value[0]);
     }
 
-    public override open(options: Partial<PopupSettings> = {}): void {
-        if (this.popupRef) {
-            return;
-        }
-        super.open({
+    public override open(options: Partial<PopupSettings> = {}): PopupRef {
+        this.popupRef = super.open({
             ...options,
             hasBackdrop: false,
             closeOnOutsideClick: false
@@ -89,6 +101,15 @@ export class ComboBoxComponent extends AbstractDropDownListComponent implements 
                 input.setSelectionRange(-1, -1);
             }
         });
+        this.popupRef?.closed.pipe(take(1)).subscribe(() => {
+            const item = this.popupListService.viewListData
+                .selectMany(g => g.source)
+                .firstOrDefault(i => i.text.toLowerCase() === this.comboBoxValue.toLowerCase());
+            if (!item) {
+                this.comboBoxValue = "";
+            }
+        });
+        return this.popupRef;
     }
 
     protected override updateValue(listItem: PopupListItem) {
