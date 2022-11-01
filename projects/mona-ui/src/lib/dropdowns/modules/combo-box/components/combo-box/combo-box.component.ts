@@ -8,9 +8,10 @@ import { DropDownListGroupTemplateDirective } from "../../../drop-down-list/dire
 import { DropDownListItemTemplateDirective } from "../../../drop-down-list/directives/drop-down-list-item-template.directive";
 import { PopupListValueChangeEvent } from "../../../../data/PopupListValueChangeEvent";
 import { PopupSettings } from "../../../../../popup/models/PopupSettings";
-import { distinctUntilChanged, fromEvent, Subject, take, takeUntil } from "rxjs";
+import { distinctUntilChanged, fromEvent, map, Observable, of, Subject, take, takeUntil } from "rxjs";
 import { Group } from "@mirei/ts-collections";
 import { PopupRef } from "../../../../../popup/models/PopupRef";
+import { Action } from "../../../../../utils/Action";
 
 @Component({
     selector: "mona-combo-box",
@@ -23,6 +24,9 @@ export class ComboBoxComponent extends AbstractDropDownListComponent implements 
     public readonly comboBoxValue$: Subject<string> = new Subject<string>();
     public override valuePopupListItem?: PopupListItem;
     public comboBoxValue: string = "";
+
+    @Input()
+    public allowCustomValue: boolean = true;
 
     @Input()
     public filterable: boolean = false;
@@ -38,6 +42,10 @@ export class ComboBoxComponent extends AbstractDropDownListComponent implements 
 
     @Output()
     public override valueChange: EventEmitter<any | any[]> = new EventEmitter<any>();
+
+    @Input()
+    public valueNormalizer: Action<Observable<string>, Observable<any>> = (text$: Observable<string>) =>
+        text$.pipe(map(value => value));
 
     public constructor(
         protected override readonly elementRef: ElementRef<HTMLElement>,
@@ -69,6 +77,28 @@ export class ComboBoxComponent extends AbstractDropDownListComponent implements 
             if (item) {
                 this.popupListService.selectItem(item, this.selectionMode);
                 this.updateValue(item);
+            } else {
+                if (this.allowCustomValue) {
+                    this.valueNormalizer(of(this.comboBoxValue)).subscribe(normalizedValue => {
+                        this.data = [...this.data, normalizedValue];
+                        this.popupListService.initializeListData({
+                            data: [...this.data],
+                            valueField: this.valueField,
+                            disabler: this.itemDisabler,
+                            textField: this.textField,
+                            groupField: this.groupField
+                        });
+                        const item = this.popupListService.viewListData
+                            .selectMany(g => g.source)
+                            .firstOrDefault(i => i.text.toLowerCase() === this.comboBoxValue.toLowerCase());
+                        if (item) {
+                            this.popupListService.selectItem(item, this.selectionMode);
+                            this.updateValue(item);
+                        }
+                    });
+                } else {
+                    this.comboBoxValue = "";
+                }
             }
         } else if (event.key === "Escape") {
             this.close();

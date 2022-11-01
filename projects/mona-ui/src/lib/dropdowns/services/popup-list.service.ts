@@ -112,7 +112,7 @@ export class PopupListService {
                 data: item,
                 text: params.textField ? item[params.textField] : item,
                 textField: params.textField,
-                value: params.valueField ? item[params.valueField] : params.valueField,
+                value: params.valueField ? item[params.valueField] : item,
                 valueField: params.valueField
             });
         };

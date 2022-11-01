@@ -3,6 +3,8 @@ import { PopupRef, PopupService, PopupSettings } from "mona-ui";
 import { TestComponentComponent } from "./test-component/test-component.component";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { faMoon, faSearch, faSnowflake, faSun } from "@fortawesome/free-solid-svg-icons";
+import { IndexableList } from "@mirei/ts-collections";
+import { map, Observable } from "rxjs";
 
 @Component({
     selector: "app-root",
@@ -62,8 +64,21 @@ export class AppComponent implements OnInit {
     public colorPaletteValue: string = "#fb9a99";
     public colorPickerValue: string | null = "#0086fc";
 
+    public comboBoxValueNormalizer$ = (text$: Observable<string>): Observable<any> => {
+        return text$.pipe(
+            map((text: string) => {
+                return {
+                    text: text,
+                    value: Math.random(),
+                    group: "Custom",
+                    active: true
+                };
+            })
+        );
+    };
+
     public contextMenuItemVisible: boolean = true;
-    public dropdownListDataItems: any[] = [
+    public dropdownListDataItems: IndexableList<any> = new IndexableList([
         { text: "Cherry", value: 1, group: "Fruit", active: true },
         { text: "Cabbage", value: 2, group: "Vegetable", active: true },
         { text: "Grilled Meat", value: 3, group: "Food", active: true },
@@ -95,7 +110,7 @@ export class AppComponent implements OnInit {
         { text: "Okonomiyaki", value: 29, group: "Food", active: true },
         { text: "Yakizakana", value: 30, group: "Food", active: true },
         { text: "Pink-flowered native raspberry", value: 31, group: "Fruit", active: true }
-    ];
+    ]);
     public dropdownPrimitiveDataItems: string[] = [
         "Willow",
         "Birch",
