@@ -169,8 +169,13 @@ export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy
     }
 
     protected updateValue(listItem: PopupListItem): void {
-        this.value = listItem.data;
-        this.valuePopupListItem = listItem;
-        this.valueChange.emit(this.value);
+        if (this.selectionMode === "single") {
+            if (listItem.dataEquals(this.value)) {
+                return;
+            }
+            this.value = listItem.data;
+            this.valuePopupListItem = listItem;
+            this.valueChange.emit(this.value);
+        }
     }
 }

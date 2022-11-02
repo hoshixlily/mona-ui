@@ -134,20 +134,6 @@ export class AppComponent implements OnInit {
         "Linden",
         "Maidenhair Tree"
     ];
-    // public groupedDropdownListDataItems: List<Group<string, PopupListItem>> = new List<Group<string, PopupListItem>>([
-    //     new Group<string, PopupListItem>(
-    //         "",
-    //         Enumerable.from(this.dropdownListDataItems)
-    //             .select(d => {
-    //                 return {
-    //                     data: d,
-    //                     text: d.text,
-    //                     value: d.value
-    //                 } as PopupListItem;
-    //             })
-    //             .toList()
-    //     )
-    // ]);
 
     public numericTextBoxValue: number = 629;
     public rangedSliderValues: [number, number] = [12, 18];
@@ -158,6 +144,7 @@ export class AppComponent implements OnInit {
         { text: "REPLACED WITH PAPRIKA", value: 13, group: "Fruit", active: true },
         { text: "REPLACED WITH Okonomiyaki", value: 29, group: "FOODIE", active: true }
     ];
+    public selectedPrimitiveComboBoxDataItem: string | null = null;
     public sliderValue: number = 8;
     public switchValue: boolean = false;
     public textBoxValue: string = "TEXT BOX VALUE";
@@ -178,6 +165,7 @@ export class AppComponent implements OnInit {
     public constructor(public readonly popupService: PopupService) {}
 
     public dropdownItemDisabler = (item: any): boolean => !item.active;
+    public dropdownPrimitiveItemDisabler = (item: string): boolean => item.includes("i");
 
     public ngOnInit(): void {
         this.selectedDropdownListDataItem = { text: "REPLACED WITH PAPRIKA", value: 13, group: "Fruit", active: true };
@@ -187,6 +175,7 @@ export class AppComponent implements OnInit {
             // this.dropdownItemDisabler = (item: any): boolean => item.value % 3 === 0;
         }, 3000);
         this.selectedDropdownListDataItem = { ...this.dropdownListDataItems[4] };
+        this.selectedPrimitiveComboBoxDataItem = this.dropdownPrimitiveDataItems[7];
     }
 
     public numericTextBoxFormatter = (value: number | null): string => (value != null ? `${value} °C` : "");

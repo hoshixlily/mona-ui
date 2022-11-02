@@ -4,14 +4,14 @@ import { PopupListService } from "../../../../services/popup-list.service";
 import { PopupService } from "../../../../../popup/services/popup.service";
 import { PopupListItem } from "../../../../data/PopupListItem";
 import { SelectionMode } from "../../../../../models/SelectionMode";
-import { DropDownListGroupTemplateDirective } from "../../../drop-down-list/directives/drop-down-list-group-template.directive";
-import { DropDownListItemTemplateDirective } from "../../../drop-down-list/directives/drop-down-list-item-template.directive";
 import { PopupListValueChangeEvent } from "../../../../data/PopupListValueChangeEvent";
 import { PopupSettings } from "../../../../../popup/models/PopupSettings";
 import { distinctUntilChanged, fromEvent, map, Observable, of, Subject, take, takeUntil } from "rxjs";
 import { Group } from "@mirei/ts-collections";
 import { PopupRef } from "../../../../../popup/models/PopupRef";
 import { Action } from "../../../../../utils/Action";
+import { ComboBoxGroupTemplateDirective } from "../../directives/combo-box-group-template.directive";
+import { ComboBoxItemTemplateDirective } from "../../directives/combo-box-item-template.directive";
 
 @Component({
     selector: "mona-combo-box",
@@ -31,10 +31,10 @@ export class ComboBoxComponent extends AbstractDropDownListComponent implements 
     @Input()
     public filterable: boolean = false;
 
-    @ContentChild(DropDownListGroupTemplateDirective, { read: TemplateRef })
+    @ContentChild(ComboBoxGroupTemplateDirective, { read: TemplateRef })
     public groupTemplate?: TemplateRef<void>;
 
-    @ContentChild(DropDownListItemTemplateDirective, { read: TemplateRef })
+    @ContentChild(ComboBoxItemTemplateDirective, { read: TemplateRef })
     public itemTemplate?: TemplateRef<void>;
 
     @Input()

@@ -8,9 +8,11 @@ import { ListItemTemplateDirective } from "../../directives/list-item-template.d
 import { ListGroupTemplateDirective } from "../../directives/list-group-template.directive";
 import { TextBoxModule } from "../../../inputs/modules/text-box/text-box.module";
 import { FormsModule } from "@angular/forms";
+import { ComboBoxGroupTemplateDirective } from "./directives/combo-box-group-template.directive";
+import { ComboBoxItemTemplateDirective } from "./directives/combo-box-item-template.directive";
 
 @NgModule({
-    declarations: [ComboBoxComponent],
+    declarations: [ComboBoxComponent, ComboBoxGroupTemplateDirective, ComboBoxItemTemplateDirective],
     imports: [
         CommonModule,
         FontAwesomeModule,
@@ -21,6 +23,6 @@ import { FormsModule } from "@angular/forms";
         TextBoxModule,
         FormsModule
     ],
-    exports: [ComboBoxComponent]
+    exports: [ComboBoxComponent, ComboBoxGroupTemplateDirective, ComboBoxItemTemplateDirective]
 })
 export class ComboBoxModule {}
