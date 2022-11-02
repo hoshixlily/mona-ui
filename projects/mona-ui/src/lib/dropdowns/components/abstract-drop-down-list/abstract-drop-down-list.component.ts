@@ -99,11 +99,19 @@ export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy
             groupField: this.groupField
         });
         if (this.value) {
-            this.valuePopupListItem = this.popupListService.viewListData
-                .selectMany(g => g.source)
-                .singleOrDefault(d => d.dataEquals(this.value));
-            if (this.valuePopupListItem) {
-                this.valuePopupListItem.selected = true;
+            if (this.selectionMode === "single") {
+                this.valuePopupListItem = this.popupListService.viewListData
+                    .selectMany(g => g.source)
+                    .singleOrDefault(d => d.dataEquals(this.value));
+                if (this.valuePopupListItem) {
+                    this.valuePopupListItem.selected = true;
+                }
+            } else {
+                this.valuePopupListItem = this.popupListService.viewListData
+                    .selectMany(g => g.source)
+                    .where(d => (this.value as any[]).some(v => d.dataEquals(v)))
+                    .toArray();
+                this.valuePopupListItem.forEach(d => (d.selected = true));
             }
         }
         this.setEvents();
@@ -168,13 +176,19 @@ export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy
             });
     }
 
-    protected updateValue(listItem: PopupListItem): void {
+    protected updateValue(listItem: PopupListItem | PopupListItem[]): void {
         if (this.selectionMode === "single") {
-            if (listItem.dataEquals(this.value)) {
+            const item = listItem as PopupListItem;
+            if (item.dataEquals(this.value)) {
                 return;
             }
-            this.value = listItem.data;
-            this.valuePopupListItem = listItem;
+            this.value = item.data;
+            this.valuePopupListItem = item;
+            this.valueChange.emit(this.value);
+        } else {
+            const items = listItem as PopupListItem[];
+            this.valuePopupListItem = [...items];
+            this.value = (this.valuePopupListItem as PopupListItem[]).map(v => v.data);
             this.valueChange.emit(this.value);
         }
     }

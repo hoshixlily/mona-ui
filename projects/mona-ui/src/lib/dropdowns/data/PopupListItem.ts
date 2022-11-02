@@ -27,6 +27,9 @@ export class PopupListItem {
     }
 
     public dataEquals(other: any): boolean {
+        if (!other) {
+            return false;
+        }
         if (this.valueField) {
             return this.data[this.valueField] === other[this.valueField];
         }
