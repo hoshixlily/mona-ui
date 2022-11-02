@@ -110,9 +110,9 @@
 <!--            </ng-template>-->
 <!--        </mona-drop-down-list>-->
 
-        <mona-drop-down-list [data]="dropdownListDataItems" textField="text" valueField="value" groupField="group" [filterable]="true"
+        <mona-drop-down-list [data]="dropdownListDataItems" textField="text" valueField="value" groupField="group" [filterable]="true" [disabled]="false"
                              [showClearButton]="true" placeholder="Select an item..." [(value)]="selectedDropdownListDataItem"
-                             [itemDisabler]="dropdownItemDisabler" (valueChange)="onDropDownValueChange($event)" style="width: 200px;">
+                             [itemDisabler]="dropdownItemDisabler" (valueChange)="onDropDownValueChange($event)" style="width: 200px; margin-right: 20px;">
 <!--            <ng-template monaDropDownListItemTemplate let-dataItem let-listItem="listItem">-->
 <!--                <span style="color: deeppink;" *ngIf="dataItem.value % 3 === 0 && !listItem.disabled">{{dataItem.text}}</span>-->
 <!--                <span style="color: dodgerblue;" *ngIf="dataItem.value % 3 !== 0 && !listItem.disabled">{{dataItem.text}}</span>-->
@@ -125,6 +125,23 @@
                 <span style="color: crimson; font-weight: bold;">{{group}}</span>
             </ng-template>
         </mona-drop-down-list>
+
+        <mona-combo-box [data]="dropdownListDataItems" textField="text" valueField="value" groupField="group" [filterable]="false" style="width: 200px; margin-right: 20px;" [disabled]="false"
+                        [showClearButton]="true" [allowCustomValue]="true" [valueNormalizer]="comboBoxValueNormalizer$"
+            [value]="dropdownListDataItems[3]" [itemDisabler]="dropdownItemDisabler" (valueChange)="onComboBoxValueChange($event)">
+            <ng-template monaComboBoxGroupTemplate let-group>
+                <span style="color: crimson; font-weight: bold;">{{group}}</span>
+            </ng-template>
+        </mona-combo-box>
+
+        <mona-combo-box [data]="dropdownPrimitiveDataItems" [allowCustomValue]="true" [showClearButton]="true"
+                        [filterable]="true" [itemDisabler]="dropdownPrimitiveItemDisabler" style="width: 200px; margin-right: 20px;"
+                        [value]="selectedPrimitiveComboBoxDataItem" (valueChange)="onComboBoxValueChange($event)">
+        >
+            <ng-template monaComboBoxItemTemplate let-dataItem>
+                <span style="color: darkorange; font-weight: 600;">{{dataItem}}</span>
+            </ng-template>
+        </mona-combo-box>
 
 <!--        <mona-combo-box [data]="dropdownListDataItems" [itemDisabler]="dropdownItemDisabler"-->
 <!--                        [value]="selectedComboBoxDataItem" (valueChange)="onComboBoxValueChange($event)"-->

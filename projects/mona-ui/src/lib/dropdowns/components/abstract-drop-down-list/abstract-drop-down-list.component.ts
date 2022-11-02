@@ -30,7 +30,7 @@ import { PopupListItem } from "../../data/PopupListItem";
     providers: [PopupListService]
 })
 export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy {
-    private readonly componentDestroy$: Subject<void> = new Subject<void>();
+    protected readonly componentDestroy$: Subject<void> = new Subject<void>();
     public readonly clearIcon: IconDefinition = faTimes;
     public readonly dropdownIcon: IconDefinition = faChevronDown;
     public popupRef: PopupRef | null = null;
@@ -109,7 +109,10 @@ export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy
         this.setEvents();
     }
 
-    public open(options: Partial<PopupSettings> = {}): void {
+    public open(options: Partial<PopupSettings> = {}): PopupRef {
+        if (this.popupRef) {
+            return this.popupRef;
+        }
         this.dropdownWrapper.nativeElement.focus();
         this.popupRef = this.popupService.create({
             anchor: this.dropdownWrapper,
@@ -131,6 +134,7 @@ export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy
             (this.elementRef.nativeElement.firstElementChild as HTMLElement)?.focus();
             this.popupListService.clearFilters();
         });
+        return this.popupRef;
     }
 
     protected setEvents(): void {
@@ -165,8 +169,13 @@ export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy
     }
 
     protected updateValue(listItem: PopupListItem): void {
-        this.value = listItem.data;
-        this.valuePopupListItem = listItem;
-        this.valueChange.emit(this.value);
+        if (this.selectionMode === "single") {
+            if (listItem.dataEquals(this.value)) {
+                return;
+            }
+            this.value = listItem.data;
+            this.valuePopupListItem = listItem;
+            this.valueChange.emit(this.value);
+        }
     }
 }

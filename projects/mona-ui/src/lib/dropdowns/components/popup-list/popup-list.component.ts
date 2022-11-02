@@ -192,6 +192,9 @@ export class PopupListComponent implements OnInit, OnChanges, AfterViewInit, OnD
         this.filter$
             .pipe(takeUntil(this.componentDestroy$), debounceTime(200))
             .subscribe(filter => this.popupListService.filterItems(filter));
+        this.popupListService.scrollToListItem$
+            .pipe(takeUntil(this.componentDestroy$))
+            .subscribe(item => this.scrollToItem(item));
     }
 
     private updateHighlightedValues(values: any[]): void {
