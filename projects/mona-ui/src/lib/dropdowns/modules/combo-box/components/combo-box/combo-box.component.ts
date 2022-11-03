@@ -1,4 +1,14 @@
-import { Component, ContentChild, ElementRef, EventEmitter, Input, OnInit, Output, TemplateRef } from "@angular/core";
+import {
+    ChangeDetectionStrategy,
+    Component,
+    ContentChild,
+    ElementRef,
+    EventEmitter,
+    Input,
+    OnInit,
+    Output,
+    TemplateRef
+} from "@angular/core";
 import { AbstractDropDownListComponent } from "../../../../components/abstract-drop-down-list/abstract-drop-down-list.component";
 import { PopupListService } from "../../../../services/popup-list.service";
 import { PopupService } from "../../../../../popup/services/popup.service";
@@ -17,7 +27,8 @@ import { ComboBoxItemTemplateDirective } from "../../directives/combo-box-item-t
     selector: "mona-combo-box",
     templateUrl: "./combo-box.component.html",
     styleUrls: ["./combo-box.component.scss"],
-    providers: [PopupListService]
+    providers: [PopupListService],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ComboBoxComponent extends AbstractDropDownListComponent implements OnInit {
     protected selectionMode: SelectionMode = "single";
@@ -60,6 +71,7 @@ export class ComboBoxComponent extends AbstractDropDownListComponent implements 
         this.value = undefined;
         this.valuePopupListItem = undefined;
         this.comboBoxValue = "";
+        this.updateValue();
     }
 
     public override ngOnInit(): void {
@@ -106,6 +118,13 @@ export class ComboBoxComponent extends AbstractDropDownListComponent implements 
     }
 
     public onPopupListValueChange(event: PopupListValueChangeEvent): void {
+        if (!event.value || event.value.length === 0) {
+            this.value = undefined;
+            this.valuePopupListItem = undefined;
+            this.comboBoxValue = "";
+            this.updateValue();
+            return;
+        }
         if (this.value && event.value[0].dataEquals(this.value)) {
             if (event.via === "selection") {
                 this.close();
@@ -142,9 +161,9 @@ export class ComboBoxComponent extends AbstractDropDownListComponent implements 
         return this.popupRef;
     }
 
-    protected override updateValue(listItem: PopupListItem) {
+    protected override updateValue(listItem?: PopupListItem) {
         super.updateValue(listItem);
-        this.comboBoxValue = listItem.text;
+        this.comboBoxValue = listItem?.text ?? "";
     }
 
     private setEventListeners(): void {

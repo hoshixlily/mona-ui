@@ -70,7 +70,7 @@ export class PopupListService {
         this.filterModeActive = false;
     }
 
-    public filterItems(filter: string): void {
+    public filterItems(filter: string, selectionMode: SelectionMode): void {
         if (!filter) {
             this.clearFilters();
             return;
@@ -81,13 +81,24 @@ export class PopupListService {
                 return new Group<string, PopupListItem>(g.key, filteredItems.toList());
             })
             .toList();
-        const selectedItem = this.viewListData
-            .selectMany(g => g.source)
-            .where(i => i.selected)
-            .firstOrDefault();
-        if (selectedItem) {
-            selectedItem.highlighted = true;
+        if (selectionMode === "single") {
+            const selectedItem = this.viewListData
+                .selectMany(g => g.source)
+                .where(i => i.selected)
+                .firstOrDefault();
+            if (selectedItem) {
+                selectedItem.highlighted = true;
+            } else {
+                const firstItem = this.viewListData
+                    .selectMany(g => g.source)
+                    .where(i => !i.disabled)
+                    .firstOrDefault();
+                if (firstItem) {
+                    firstItem.highlighted = true;
+                }
+            }
         } else {
+            this.viewListData.selectMany(g => g.source).forEach(i => (i.highlighted = false));
             const firstItem = this.viewListData
                 .selectMany(g => g.source)
                 .where(i => !i.disabled)
@@ -97,6 +108,17 @@ export class PopupListService {
             }
         }
         this.filterModeActive = true;
+    }
+
+    public getListItemsOfValues(values: any[]): PopupListItem[] {
+        const popupListItems: PopupListItem[] = [];
+        values.forEach(v => {
+            const item = this.sourceListData.selectMany(g => g.source).firstOrDefault(i => i.dataEquals(v));
+            if (item) {
+                popupListItems.push(item);
+            }
+        });
+        return popupListItems;
     }
 
     public initializeListData(params: {
@@ -129,8 +151,19 @@ export class PopupListService {
             listItems.add(new Group<string, any>("", items));
         }
 
+        const selectedItems = this.sourceListData
+            .selectMany(g => g.source)
+            .where(i => i.selected)
+            .toList();
+
         this.sourceListData = listItems;
         this.viewListData = this.sourceListData.toList();
+
+        this.sourceListData
+            .selectMany(g => g.source)
+            .forEach(i => {
+                i.selected = selectedItems.any(s => s.dataEquals(i.data));
+            });
 
         if (params.disabler) {
             const disablerAction = PopupListService.getItemDisablerAction(params.disabler);

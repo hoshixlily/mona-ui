@@ -70,9 +70,7 @@ export class PopupListComponent implements OnInit, OnChanges, AfterViewInit, OnD
     public textField?: string;
 
     @Input()
-    public set value(values: any[]) {
-        this.updateSelectedValues(values);
-    }
+    public value: any[] = [];
 
     @Output()
     public valueChange: EventEmitter<PopupListValueChangeEvent> = new EventEmitter<PopupListValueChangeEvent>();
@@ -90,7 +88,7 @@ export class PopupListComponent implements OnInit, OnChanges, AfterViewInit, OnD
             .selectMany(g => g.source)
             .firstOrDefault(i => i.selected || i.highlighted);
         if (firstSelectedItem) {
-            window.setTimeout(() => this.scrollToItem(firstSelectedItem), 250);
+            window.setTimeout(() => this.scrollToItem(firstSelectedItem), 0);
         }
     }
 
@@ -98,7 +96,7 @@ export class PopupListComponent implements OnInit, OnChanges, AfterViewInit, OnD
         if (changes["highlightedValues"] && changes["highlightedValues"].isFirstChange()) {
             window.setTimeout(() => this.updateHighlightedValues(changes["highlightedValues"].currentValue));
         }
-        if (changes["value"] && changes["value"].isFirstChange()) {
+        if (changes["value"]) {
             window.setTimeout(() => this.updateSelectedValues(changes["value"].currentValue));
         }
     }
@@ -119,19 +117,25 @@ export class PopupListComponent implements OnInit, OnChanges, AfterViewInit, OnD
         }
         if (this.selectionMode === "single") {
             this.updateSelectedValues([item.data]);
+            this.value = [item.data];
             this.valueChange.emit({
                 value: [item],
                 via: "selection"
             });
         } else if (this.selectionMode === "multiple") {
             item.selected = !item.selected;
-            const selectedItems = this.popupListService.viewListData
-                .selectMany(g => g.source)
-                .where(i => i.selected)
-                .toArray();
+            let values: any[] = [...this.value];
+            let items: PopupListItem[] = [];
+            if (item.selected) {
+                values.push(item.data);
+                items = this.popupListService.getListItemsOfValues(values);
+            } else {
+                const valueItems = this.popupListService.getListItemsOfValues(values);
+                items = valueItems.filter(i => !i.dataEquals(item));
+            }
             this.valueChange.emit({
                 via: "selection",
-                value: selectedItems
+                value: items
             });
         }
     }
@@ -170,7 +174,28 @@ export class PopupListComponent implements OnInit, OnChanges, AfterViewInit, OnD
                     }
                 } else if (event.key === "Enter") {
                     if (this.selectionMode === "multiple") {
-                        console.log("TODO: Implement Enter handling for popup list component");
+                        const highlightedItem = this.popupListService.viewListData
+                            .selectMany(g => g.source)
+                            .firstOrDefault(i => i.highlighted);
+                        if (highlightedItem) {
+                            if (highlightedItem.selected) {
+                                highlightedItem.selected = false;
+                                const values = this.value.filter(v => !highlightedItem.dataEquals(v));
+                                const items = this.popupListService.getListItemsOfValues(values);
+                                this.valueChange.emit({
+                                    via: "selection",
+                                    value: items
+                                });
+                            } else {
+                                highlightedItem.selected = true;
+                                const values = [...this.value, highlightedItem.data];
+                                const items = this.popupListService.getListItemsOfValues(values);
+                                this.valueChange.emit({
+                                    via: "selection",
+                                    value: items
+                                });
+                            }
+                        }
                     } else {
                         if (this.popupListService.filterModeActive) {
                             const selectedItem = this.popupListService.viewListData
@@ -191,7 +216,7 @@ export class PopupListComponent implements OnInit, OnChanges, AfterViewInit, OnD
     private setSubscriptions(): void {
         this.filter$
             .pipe(takeUntil(this.componentDestroy$), debounceTime(200))
-            .subscribe(filter => this.popupListService.filterItems(filter));
+            .subscribe(filter => this.popupListService.filterItems(filter, this.selectionMode));
         this.popupListService.scrollToListItem$
             .pipe(takeUntil(this.componentDestroy$))
             .subscribe(item => this.scrollToItem(item));
@@ -200,7 +225,7 @@ export class PopupListComponent implements OnInit, OnChanges, AfterViewInit, OnD
     private updateHighlightedValues(values: any[]): void {
         this.popupListService.viewListData.forEach(g => {
             g.source.forEach(i => {
-                i.highlighted = values.some(v => i.dataEquals(v));
+                i.highlighted = values.length === 0 ? false : values.some(v => i.dataEquals(v));
             });
         });
     }
@@ -208,12 +233,8 @@ export class PopupListComponent implements OnInit, OnChanges, AfterViewInit, OnD
     private updateSelectedValues(values: any[]): void {
         this.popupListService.viewListData.forEach(g => {
             g.source.forEach(i => {
-                i.selected = values.some(v => i.dataEquals(v));
+                i.selected = values.length === 0 ? false : values.some(v => i.dataEquals(v));
             });
         });
-        const selectedItem = PopupListService.findFirstSelectedItem(this.popupListService.viewListData);
-        if (selectedItem) {
-            this.scrollToItem(selectedItem);
-        }
     }
 }

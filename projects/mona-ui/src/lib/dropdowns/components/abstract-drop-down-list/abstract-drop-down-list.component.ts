@@ -4,8 +4,10 @@ import {
     ElementRef,
     EventEmitter,
     Input,
+    OnChanges,
     OnDestroy,
     OnInit,
+    SimpleChanges,
     TemplateRef,
     ViewChild
 } from "@angular/core";
@@ -29,7 +31,7 @@ import { PopupListItem } from "../../data/PopupListItem";
     styleUrls: [],
     providers: [PopupListService]
 })
-export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy {
+export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy, OnChanges {
     protected readonly componentDestroy$: Subject<void> = new Subject<void>();
     public readonly clearIcon: IconDefinition = faTimes;
     public readonly dropdownIcon: IconDefinition = faChevronDown;
@@ -85,6 +87,18 @@ export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy
         this.popupRef = null;
     }
 
+    public ngOnChanges(changes: SimpleChanges): void {
+        if (changes["data"] && !changes["data"].isFirstChange()) {
+            this.popupListService.initializeListData({
+                data: this.data,
+                disabler: this.itemDisabler,
+                textField: this.textField,
+                valueField: this.valueField,
+                groupField: this.groupField
+            });
+        }
+    }
+
     public ngOnDestroy(): void {
         this.componentDestroy$.next();
         this.componentDestroy$.complete();
@@ -99,11 +113,19 @@ export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy
             groupField: this.groupField
         });
         if (this.value) {
-            this.valuePopupListItem = this.popupListService.viewListData
-                .selectMany(g => g.source)
-                .singleOrDefault(d => d.dataEquals(this.value));
-            if (this.valuePopupListItem) {
-                this.valuePopupListItem.selected = true;
+            if (this.selectionMode === "single") {
+                this.valuePopupListItem = this.popupListService.viewListData
+                    .selectMany(g => g.source)
+                    .singleOrDefault(d => d.dataEquals(this.value));
+                if (this.valuePopupListItem) {
+                    this.valuePopupListItem.selected = true;
+                }
+            } else {
+                this.valuePopupListItem = this.popupListService.viewListData
+                    .selectMany(g => g.source)
+                    .where(d => (this.value as any[]).some(v => d.dataEquals(v)))
+                    .toArray();
+                this.valuePopupListItem.forEach(d => (d.selected = true));
             }
         }
         this.setEvents();
@@ -168,13 +190,31 @@ export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy
             });
     }
 
-    protected updateValue(listItem: PopupListItem): void {
+    protected updateValue(listItem: PopupListItem | PopupListItem[] | null | undefined): void {
         if (this.selectionMode === "single") {
-            if (listItem.dataEquals(this.value)) {
+            if (!listItem) {
+                this.value = undefined;
+                this.valuePopupListItem = undefined;
+                this.valueChange.emit(this.value);
                 return;
             }
-            this.value = listItem.data;
-            this.valuePopupListItem = listItem;
+            const item = listItem as PopupListItem;
+            if (item.dataEquals(this.value)) {
+                return;
+            }
+            this.value = item.data;
+            this.valuePopupListItem = item;
+            this.valueChange.emit(this.value);
+        } else {
+            if (!listItem) {
+                this.value = [];
+                this.valuePopupListItem = [];
+                this.valueChange.emit(this.value);
+                return;
+            }
+            const items = listItem as PopupListItem[];
+            this.valuePopupListItem = [...items];
+            this.value = (this.valuePopupListItem as PopupListItem[]).map(v => v.data);
             this.valueChange.emit(this.value);
         }
     }
