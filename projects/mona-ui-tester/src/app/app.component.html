@@ -173,7 +173,7 @@
 
     <div>
         <mona-multi-select [data]="dropdownListDataItems" textField="text" valueField="value" groupField="group" style="width: auto; min-width: 200px; margin-right: 20px;"
-                           [monaMultiSelectSummaryTag]="multiSelectTagCount"
+                           [monaMultiSelectSummaryTag]="multiSelectTagCount" [filterable]="true"
                            [value]="selectedMultiSelectDataItems" (valueChange)="onMultiSelectValueChange($event)">
             <ng-template monaMultiSelectItemTemplate let-dataItem>
                 <span style="color: greenyellow; font-weight: bold">{{dataItem.text}}</span>

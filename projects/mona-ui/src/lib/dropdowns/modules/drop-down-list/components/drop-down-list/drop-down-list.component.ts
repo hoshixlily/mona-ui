@@ -60,6 +60,7 @@ export class DropDownListComponent extends AbstractDropDownListComponent impleme
         event.stopImmediatePropagation();
         this.value = undefined;
         this.valuePopupListItem = undefined;
+        this.updateValue(undefined);
     }
 
     public override ngOnInit(): void {
@@ -67,6 +68,12 @@ export class DropDownListComponent extends AbstractDropDownListComponent impleme
     }
 
     public onPopupListValueChange(event: PopupListValueChangeEvent): void {
+        if (!event.value || event.value.length === 0) {
+            this.value = undefined;
+            this.valuePopupListItem = undefined;
+            this.updateValue(undefined);
+            return;
+        }
         if (this.value && event.value[0].dataEquals(this.value)) {
             if (event.via === "selection") {
                 this.close();

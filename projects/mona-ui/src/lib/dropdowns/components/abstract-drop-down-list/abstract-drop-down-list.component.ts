@@ -190,8 +190,14 @@ export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy
             });
     }
 
-    protected updateValue(listItem: PopupListItem | PopupListItem[]): void {
+    protected updateValue(listItem: PopupListItem | PopupListItem[] | null | undefined): void {
         if (this.selectionMode === "single") {
+            if (!listItem) {
+                this.value = undefined;
+                this.valuePopupListItem = undefined;
+                this.valueChange.emit(this.value);
+                return;
+            }
             const item = listItem as PopupListItem;
             if (item.dataEquals(this.value)) {
                 return;
@@ -200,6 +206,12 @@ export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy
             this.valuePopupListItem = item;
             this.valueChange.emit(this.value);
         } else {
+            if (!listItem) {
+                this.value = [];
+                this.valuePopupListItem = [];
+                this.valueChange.emit(this.value);
+                return;
+            }
             const items = listItem as PopupListItem[];
             this.valuePopupListItem = [...items];
             this.value = (this.valuePopupListItem as PopupListItem[]).map(v => v.data);

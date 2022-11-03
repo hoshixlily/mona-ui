@@ -34,6 +34,9 @@ export class MultiSelectComponent extends AbstractDropDownListComponent implemen
     public tagCount: number = -1;
     public override valuePopupListItem: PopupListItem[] = [];
 
+    @Input()
+    public filterable: boolean = false;
+
     @ContentChild(MultiSelectGroupTemplateDirective, { read: TemplateRef })
     public groupTemplate?: TemplateRef<void>;
 

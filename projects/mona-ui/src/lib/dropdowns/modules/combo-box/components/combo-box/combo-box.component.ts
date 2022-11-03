@@ -71,6 +71,7 @@ export class ComboBoxComponent extends AbstractDropDownListComponent implements 
         this.value = undefined;
         this.valuePopupListItem = undefined;
         this.comboBoxValue = "";
+        this.updateValue();
     }
 
     public override ngOnInit(): void {
@@ -117,6 +118,13 @@ export class ComboBoxComponent extends AbstractDropDownListComponent implements 
     }
 
     public onPopupListValueChange(event: PopupListValueChangeEvent): void {
+        if (!event.value || event.value.length === 0) {
+            this.value = undefined;
+            this.valuePopupListItem = undefined;
+            this.comboBoxValue = "";
+            this.updateValue();
+            return;
+        }
         if (this.value && event.value[0].dataEquals(this.value)) {
             if (event.via === "selection") {
                 this.close();
@@ -153,9 +161,9 @@ export class ComboBoxComponent extends AbstractDropDownListComponent implements 
         return this.popupRef;
     }
 
-    protected override updateValue(listItem: PopupListItem) {
+    protected override updateValue(listItem?: PopupListItem) {
         super.updateValue(listItem);
-        this.comboBoxValue = listItem.text;
+        this.comboBoxValue = listItem?.text ?? "";
     }
 
     private setEventListeners(): void {
