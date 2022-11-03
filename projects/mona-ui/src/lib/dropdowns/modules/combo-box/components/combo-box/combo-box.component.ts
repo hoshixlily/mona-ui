@@ -1,4 +1,14 @@
-import { Component, ContentChild, ElementRef, EventEmitter, Input, OnInit, Output, TemplateRef } from "@angular/core";
+import {
+    ChangeDetectionStrategy,
+    Component,
+    ContentChild,
+    ElementRef,
+    EventEmitter,
+    Input,
+    OnInit,
+    Output,
+    TemplateRef
+} from "@angular/core";
 import { AbstractDropDownListComponent } from "../../../../components/abstract-drop-down-list/abstract-drop-down-list.component";
 import { PopupListService } from "../../../../services/popup-list.service";
 import { PopupService } from "../../../../../popup/services/popup.service";
@@ -17,7 +27,8 @@ import { ComboBoxItemTemplateDirective } from "../../directives/combo-box-item-t
     selector: "mona-combo-box",
     templateUrl: "./combo-box.component.html",
     styleUrls: ["./combo-box.component.scss"],
-    providers: [PopupListService]
+    providers: [PopupListService],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ComboBoxComponent extends AbstractDropDownListComponent implements OnInit {
     protected selectionMode: SelectionMode = "single";

@@ -5,6 +5,7 @@ import {
     ElementRef,
     EventEmitter,
     Input,
+    OnDestroy,
     OnInit,
     Output,
     TemplateRef
@@ -26,7 +27,8 @@ import { MultiSelectGroupTemplateDirective } from "../../directives/multi-select
     providers: [PopupListService],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class MultiSelectComponent extends AbstractDropDownListComponent implements OnInit {
+export class MultiSelectComponent extends AbstractDropDownListComponent implements OnInit, OnDestroy {
+    private resizeObserver: ResizeObserver | null = null;
     protected selectionMode: SelectionMode = "multiple";
     public summaryTagTemplate: TemplateRef<any> | null = null;
     public tagCount: number = -1;
@@ -55,8 +57,14 @@ export class MultiSelectComponent extends AbstractDropDownListComponent implemen
         super(elementRef, popupListService, popupService);
     }
 
+    public override ngOnDestroy(): void {
+        super.ngOnDestroy();
+        this.resizeObserver?.disconnect();
+    }
+
     public override ngOnInit(): void {
         super.ngOnInit();
+        this.setEventListeners();
     }
 
     public onPopupListValueChange(event: PopupListValueChangeEvent): void {
@@ -66,7 +74,7 @@ export class MultiSelectComponent extends AbstractDropDownListComponent implemen
             }
             return;
         }
-        if (event.via === "selection") {
+        if (event.via === "selection" && this.selectionMode === "single") {
             this.close();
         }
         this.updateValue(event.value);
@@ -80,14 +88,25 @@ export class MultiSelectComponent extends AbstractDropDownListComponent implemen
 
     public onSelectedItemGroupRemove(event: Event): void {
         event.stopImmediatePropagation();
+        const remainingItems = this.valuePopupListItem.slice(0, this.visibleTagCount);
+        this.updateValue(remainingItems);
     }
 
     private containsValue(popupListItems: PopupListItem[], value: any): boolean {
         return popupListItems.some(popupListItem => popupListItem.dataEquals(value));
     }
 
+    private setEventListeners(): void {
+        this.resizeObserver = new ResizeObserver(() => {
+            window.setTimeout(() => {
+                this.popupRef?.overlayRef.updatePosition();
+                this.popupRef?.overlayRef.updateSize({ width: this.elementRef.nativeElement.clientWidth });
+            });
+        });
+        this.resizeObserver.observe(this.elementRef.nativeElement);
+    }
+
     public get summaryTagText(): string {
-        console.log(this.tagCount);
         return this.tagCount < 0
             ? ""
             : this.tagCount === 0

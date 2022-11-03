@@ -111,6 +111,7 @@ export class AppComponent implements OnInit {
         { text: "Yakizakana", value: 30, group: "Food", active: true },
         { text: "Pink-flowered native raspberry", value: 31, group: "Fruit", active: true }
     ]);
+    public dropdownPartialPrimitiveDataItems: string[] = [];
     public dropdownPrimitiveDataItems: string[] = [
         "Willow",
         "Birch",
@@ -134,6 +135,8 @@ export class AppComponent implements OnInit {
         "Linden",
         "Maidenhair Tree"
     ];
+
+    public multiSelectTagCount: number = 2;
 
     public numericTextBoxValue: number = 629;
     public rangedSliderValues: [number, number] = [12, 18];
@@ -176,9 +179,24 @@ export class AppComponent implements OnInit {
         }, 3000);
         this.selectedDropdownListDataItem = { ...this.dropdownListDataItems[4] };
         this.selectedPrimitiveComboBoxDataItem = this.dropdownPrimitiveDataItems[7];
+
+        this.dropdownPartialPrimitiveDataItems = this.dropdownPrimitiveDataItems.slice();
+
+        // window.setInterval(() => {
+        //     const randomIndex = Math.floor(Math.random() * this.dropdownListDataItems.length);
+        //     const randomIndex2 = Math.floor(Math.random() * this.dropdownListDataItems.length);
+        //     this.dropdownPartialPrimitiveDataItems = this.dropdownPrimitiveDataItems.slice(
+        //         Math.min(randomIndex, randomIndex2),
+        //         Math.max(randomIndex, randomIndex2)
+        //     );
+        // }, 3000);
     }
 
     public numericTextBoxFormatter = (value: number | null): string => (value != null ? `${value} °C` : "");
+
+    public generateRandomNumber(min: number, max: number): number {
+        return Math.floor(Math.random() * (max - min)) + min;
+    }
 
     public onButtonSelectedChange(selected: boolean): void {
         // console.log(`Button selected: ${selected}`);
@@ -202,6 +220,7 @@ export class AppComponent implements OnInit {
 
     public onMultiSelectValueChange(value: unknown[]): void {
         console.log(`MultiSelect value changed`, value);
+        this.selectedMultiSelectDataItems = value;
     }
 
     public onPopupClose(): void {

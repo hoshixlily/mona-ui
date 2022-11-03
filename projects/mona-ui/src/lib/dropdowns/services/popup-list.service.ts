@@ -99,6 +99,17 @@ export class PopupListService {
         this.filterModeActive = true;
     }
 
+    public getListItemsOfValues(values: any[]): PopupListItem[] {
+        const popupListItems: PopupListItem[] = [];
+        values.forEach(v => {
+            const item = this.viewListData.selectMany(g => g.source).firstOrDefault(i => i.dataEquals(v));
+            if (item) {
+                popupListItems.push(item);
+            }
+        });
+        return popupListItems;
+    }
+
     public initializeListData(params: {
         data: Iterable<any>;
         disabler?: ItemDisabler;
@@ -129,8 +140,19 @@ export class PopupListService {
             listItems.add(new Group<string, any>("", items));
         }
 
+        const selectedItems = this.sourceListData
+            .selectMany(g => g.source)
+            .where(i => i.selected)
+            .toList();
+
         this.sourceListData = listItems;
         this.viewListData = this.sourceListData.toList();
+
+        this.sourceListData
+            .selectMany(g => g.source)
+            .forEach(i => {
+                i.selected = selectedItems.any(s => s.dataEquals(i.data));
+            });
 
         if (params.disabler) {
             const disablerAction = PopupListService.getItemDisablerAction(params.disabler);

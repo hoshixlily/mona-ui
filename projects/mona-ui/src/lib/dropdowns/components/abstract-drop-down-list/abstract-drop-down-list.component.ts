@@ -4,8 +4,10 @@ import {
     ElementRef,
     EventEmitter,
     Input,
+    OnChanges,
     OnDestroy,
     OnInit,
+    SimpleChanges,
     TemplateRef,
     ViewChild
 } from "@angular/core";
@@ -29,7 +31,7 @@ import { PopupListItem } from "../../data/PopupListItem";
     styleUrls: [],
     providers: [PopupListService]
 })
-export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy {
+export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy, OnChanges {
     protected readonly componentDestroy$: Subject<void> = new Subject<void>();
     public readonly clearIcon: IconDefinition = faTimes;
     public readonly dropdownIcon: IconDefinition = faChevronDown;
@@ -83,6 +85,18 @@ export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy
     public close(): void {
         this.popupRef?.close();
         this.popupRef = null;
+    }
+
+    public ngOnChanges(changes: SimpleChanges): void {
+        if (changes["data"] && !changes["data"].isFirstChange()) {
+            this.popupListService.initializeListData({
+                data: this.data,
+                disabler: this.itemDisabler,
+                textField: this.textField,
+                valueField: this.valueField,
+                groupField: this.groupField
+            });
+        }
     }
 
     public ngOnDestroy(): void {
