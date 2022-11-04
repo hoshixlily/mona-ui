@@ -5,6 +5,7 @@ import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { faMoon, faSearch, faSnowflake, faSun } from "@fortawesome/free-solid-svg-icons";
 import { IndexableList } from "@mirei/ts-collections";
 import { map, Observable } from "rxjs";
+import { TreeNodeOptions } from "../../../mona-ui/src/lib/tree-view/data/TreeNode";
 
 @Component({
     selector: "app-root",
@@ -154,6 +155,22 @@ export class AppComponent implements OnInit {
     public switchValue: boolean = false;
     public textBoxValue: string = "TEXT BOX VALUE";
     public textBoxValue2: string = "a";
+
+    public treeData: any[] = [
+        {
+            text: "Root",
+            items: [
+                {
+                    text: "Fruits",
+                    items: [{ text: "Apple" }, { text: "Apricot" }, { text: "Banana" }, { text: "Cherry" }]
+                },
+                {
+                    text: "Foods",
+                    items: [{ text: "Yakisoba" }, { text: "Yakitori" }, { text: "Sushi" }, { text: "Sashimi" }]
+                }
+            ]
+        }
+    ];
 
     @ViewChild("italicButtonRef", { read: ElementRef })
     public italicButtonRef!: ElementRef<HTMLButtonElement>;

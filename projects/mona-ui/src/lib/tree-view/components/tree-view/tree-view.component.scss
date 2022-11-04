@@ -1,0 +1,21 @@
+ul {
+    list-style-type: none;
+    overflow: hidden;
+
+    &.mona-tree-list {
+        margin-top: 10px;
+        padding-bottom: 2px;
+    }
+
+    & li {
+        list-style-type: none;
+        position: relative;
+        color: var(--mona-text);
+    }
+
+    &.mona-subtree-list {
+        padding-left: 23px;
+        margin-top: 4px;
+        padding-bottom: 2px;
+    }
+}

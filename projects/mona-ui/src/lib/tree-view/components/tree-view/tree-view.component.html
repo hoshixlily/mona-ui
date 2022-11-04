@@ -1,0 +1,15 @@
+<div class="mona-tree-view">
+    <ul class="mona-tree-list">
+        <ng-template #treeTemplate let-nodeList>
+            <ng-container *ngFor="let node of nodeList; let nx = index;">
+                <li class="mona-tree-list-item">
+                    <mona-tree-view-node [node]="node"></mona-tree-view-node>
+                    <ul class="mona-subtree-list" *ngIf="node.nodes.length !== 0">
+                        <ng-container [ngTemplateOutlet]="treeTemplate" [ngTemplateOutletContext]="{$implicit: node.nodes}"></ng-container>
+                    </ul>
+                </li>
+            </ng-container>
+        </ng-template>
+        <ng-container [ngTemplateOutlet]="treeTemplate" [ngTemplateOutletContext]="{$implicit: viewNodeList}"></ng-container>
+    </ul>
+</div>

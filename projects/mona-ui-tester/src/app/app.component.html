@@ -1,263 +1,213 @@
 <div class="wrapper">
-
-    <div>
-        <button monaButton [disabled]="false" [primary]="false" [selected]="false" [toggleable]="false" [flat]="false"
-                (selectedChange)="onButtonSelectedChange($event)" (click)="openPopup($event)" #testButtonRef>Test Button
-        </button>
+    <div class="side-bar">
+        <mona-tree-view [data]="treeData" textField="text" childrenField="items"></mona-tree-view>
     </div>
+    <div class="content">
+        <div>
+            <button monaButton [disabled]="false" [primary]="false" [selected]="false" [toggleable]="false" [flat]="false"
+                    (selectedChange)="onButtonSelectedChange($event)" (click)="openPopup($event)" #testButtonRef>Test Button
+            </button>
+        </div>
 
-    <div>
-        <mona-button-group selection="multiple">
-            <button monaButton [toggleable]="true">B</button>
-            <button monaButton [toggleable]="true" (click)="openPopup2($event)" #italicButtonRef>I</button>
-            <button monaButton [toggleable]="true">U</button>
-        </mona-button-group>
-    </div>
+        <div>
+            <mona-button-group selection="multiple">
+                <button monaButton [toggleable]="true">B</button>
+                <button monaButton [toggleable]="true" (click)="openPopup2($event)" #italicButtonRef>I</button>
+                <button monaButton [toggleable]="true">U</button>
+            </mona-button-group>
+        </div>
 
-    <div>
-        <button monaButton #popupComponentAnchor>Popup Component Anchor</button>
-        <mona-popup [anchor]="popupComponentAnchor" trigger="click" [width]="popupComponentAnchor.offsetWidth"
-                    [offset]="{vertical: 0.5}"
-                    (close)="onPopupClose()" (open)="onPopupOpen($event)">
-            <ng-template>
-                <span style="color: #f0c420;">Moonlight Sonata</span>
-            </ng-template>
-        </mona-popup>
-    </div>
-
-    <div>
-        <mona-split-button text="Split Button" (buttonClick)="print('Split Button Main Button Clicked.')"
-                           [disabled]="false">
-            <ng-template monaSplitButtonTextTemplate>
-                <span style="color: mediumspringgreen;">Split Button</span>
-            </ng-template>
-            <mona-menu-item text="Split Menu I"></mona-menu-item>
-            <mona-menu-item text="Split Menu II" iconClass="fa fa-file">
-                <mona-menu-item text="Split Menu II I"></mona-menu-item>
-                <mona-menu-item text="Split Menu II II" (menuClick)="print('SMIIII')"></mona-menu-item>
-            </mona-menu-item>
-            <mona-menu-item text="Split Menu III" iconClass="fa fa-search"></mona-menu-item>
-        </mona-split-button>
-    </div>
-
-    <div>
-        <button monaButton [disabled]="false" [toggleable]="true" #contextMenuAnchor>
-            <span style="color: lightcoral;">Context Menu Target</span>
-        </button>
-        <mona-contextmenu [target]="contextMenuAnchor">
-            <mona-menu-item text="File">
-                <ng-template monaMenuItemTextTemplate let-menuItem>
-                    <span style="color: mediumseagreen;">File</span>
+        <div>
+            <button monaButton #popupComponentAnchor>Popup Component Anchor</button>
+            <mona-popup [anchor]="popupComponentAnchor" trigger="click" [width]="popupComponentAnchor.offsetWidth"
+                        [offset]="{vertical: 0.5}"
+                        (close)="onPopupClose()" (open)="onPopupOpen($event)">
+                <ng-template>
+                    <span style="color: #f0c420;">Moonlight Sonata</span>
                 </ng-template>
-            </mona-menu-item>
-            <mona-menu-item [divider]="true"></mona-menu-item>
-            <mona-menu-item text="Edit" [disabled]="false">
-                <mona-menu-item text="Undo" (menuClick)="print('Undo clicked.')"></mona-menu-item>
-                <mona-menu-item text="Redo"></mona-menu-item>
-            </mona-menu-item>
-            <mona-menu-item text="View" (menuClick)="print('View clicked.')">
-                <ng-template monaMenuItemIconTemplate>
-                    <span style="color: deeppink; font-size: 16px;">♫</span>
+            </mona-popup>
+        </div>
+
+        <div>
+            <mona-split-button text="Split Button" (buttonClick)="print('Split Button Main Button Clicked.')"
+                               [disabled]="false">
+                <ng-template monaSplitButtonTextTemplate>
+                    <span style="color: mediumspringgreen;">Split Button</span>
                 </ng-template>
-            </mona-menu-item>
-            <mona-menu-item [divider]="true"></mona-menu-item>
-            <mona-menu-item text="Cut"></mona-menu-item>
-            <mona-menu-item text="Copy"></mona-menu-item>
-            <mona-menu-item text="Paste" [disabled]="true"></mona-menu-item>
-            <mona-menu-item text="Select All"></mona-menu-item>
-            <mona-menu-item [divider]="true"></mona-menu-item>
-            <mona-menu-item text="Search" [visible]="contextMenuItemVisible" iconClass="fa fa-star">
-                <mona-menu-item text="Find">
-                    <mona-menu-item text="Find Next" [disabled]="true" iconClass="fa fa-arrow-right"></mona-menu-item>
-                    <mona-menu-item text="Find Previous" [disabled]="false" iconClass="fa fa-arrow-left"
-                                    (menuClick)="print('Find Previous clicked.')"></mona-menu-item>
+                <mona-menu-item text="Split Menu I"></mona-menu-item>
+                <mona-menu-item text="Split Menu II" iconClass="fa fa-file">
+                    <mona-menu-item text="Split Menu II I"></mona-menu-item>
+                    <mona-menu-item text="Split Menu II II" (menuClick)="print('SMIIII')"></mona-menu-item>
                 </mona-menu-item>
-                <mona-menu-item text="Replace"></mona-menu-item>
-            </mona-menu-item>
-        </mona-contextmenu>
-    </div>
+                <mona-menu-item text="Split Menu III" iconClass="fa fa-search"></mona-menu-item>
+            </mona-split-button>
+        </div>
 
-    <div style="display: flex;">
-        <mona-chip label="Chip I" [disabled]="false" [removable]="true" style="margin-right: 5px;"></mona-chip>
-        <mona-chip [disabled]="true">
-            <span style="color: deeppink; font-weight: 600;">Chip Content</span>
-        </mona-chip>
-        <mona-chip style="margin-left: 5px;" [removable]="true">
-            <div style="width: 100%; height: 100%; display: flex; align-items: center;">
-                <div
-                    style="background: var(--mona-background-dark); border-right: 1px solid var(--mona-border-color); height: 100%; width: 25px; display: flex; align-items: center; justify-content: center; margin-left: -9px;">
-                    <span class="fa fa-user-alt" style="margin-left: 2px;"></span>
+        <div>
+            <button monaButton [disabled]="false" [toggleable]="true" #contextMenuAnchor>
+                <span style="color: lightcoral;">Context Menu Target</span>
+            </button>
+            <mona-contextmenu [target]="contextMenuAnchor">
+                <mona-menu-item text="File">
+                    <ng-template monaMenuItemTextTemplate let-menuItem>
+                        <span style="color: mediumseagreen;">File</span>
+                    </ng-template>
+                </mona-menu-item>
+                <mona-menu-item [divider]="true"></mona-menu-item>
+                <mona-menu-item text="Edit" [disabled]="false">
+                    <mona-menu-item text="Undo" (menuClick)="print('Undo clicked.')"></mona-menu-item>
+                    <mona-menu-item text="Redo"></mona-menu-item>
+                </mona-menu-item>
+                <mona-menu-item text="View" (menuClick)="print('View clicked.')">
+                    <ng-template monaMenuItemIconTemplate>
+                        <span style="color: deeppink; font-size: 16px;">♫</span>
+                    </ng-template>
+                </mona-menu-item>
+                <mona-menu-item [divider]="true"></mona-menu-item>
+                <mona-menu-item text="Cut"></mona-menu-item>
+                <mona-menu-item text="Copy"></mona-menu-item>
+                <mona-menu-item text="Paste" [disabled]="true"></mona-menu-item>
+                <mona-menu-item text="Select All"></mona-menu-item>
+                <mona-menu-item [divider]="true"></mona-menu-item>
+                <mona-menu-item text="Search" [visible]="contextMenuItemVisible" iconClass="fa fa-star">
+                    <mona-menu-item text="Find">
+                        <mona-menu-item text="Find Next" [disabled]="true" iconClass="fa fa-arrow-right"></mona-menu-item>
+                        <mona-menu-item text="Find Previous" [disabled]="false" iconClass="fa fa-arrow-left"
+                                        (menuClick)="print('Find Previous clicked.')"></mona-menu-item>
+                    </mona-menu-item>
+                    <mona-menu-item text="Replace"></mona-menu-item>
+                </mona-menu-item>
+            </mona-contextmenu>
+        </div>
+
+        <div style="display: flex;">
+            <mona-chip label="Chip I" [disabled]="false" [removable]="true" style="margin-right: 5px;"></mona-chip>
+            <mona-chip [disabled]="true">
+                <span style="color: deeppink; font-weight: 600;">Chip Content</span>
+            </mona-chip>
+            <mona-chip style="margin-left: 5px;" [removable]="true">
+                <div style="width: 100%; height: 100%; display: flex; align-items: center;">
+                    <div
+                        style="background: var(--mona-background-dark); border-right: 1px solid var(--mona-border-color); height: 100%; width: 25px; display: flex; align-items: center; justify-content: center; margin-left: -9px;">
+                        <span class="fa fa-user-alt" style="margin-left: 2px;"></span>
+                    </div>
+                    <span style="margin-left: 4px;">Username</span>
                 </div>
-                <span style="margin-left: 4px;">Username</span>
-            </div>
-        </mona-chip>
+            </mona-chip>
+        </div>
+
+        <div>
+
+            <mona-drop-down-list [data]="dropdownListDataItems" textField="text" valueField="value" groupField="group" [filterable]="true" [disabled]="false"
+                                 [showClearButton]="true" placeholder="Select an item..." [(value)]="selectedDropdownListDataItem"
+                                 [itemDisabler]="dropdownItemDisabler" (valueChange)="onDropDownValueChange($event)" style="width: 200px; margin-right: 20px;">
+                <!--            <ng-template monaDropDownListItemTemplate let-dataItem let-listItem="listItem">-->
+                <!--                <span style="color: deeppink;" *ngIf="dataItem.value % 3 === 0 && !listItem.disabled">{{dataItem.text}}</span>-->
+                <!--                <span style="color: dodgerblue;" *ngIf="dataItem.value % 3 !== 0 && !listItem.disabled">{{dataItem.text}}</span>-->
+                <!--                <span *ngIf="listItem.disabled">{{dataItem.text}}</span>-->
+                <!--            </ng-template>-->
+                <!--            <ng-template monaDropDownListValueTemplate let-dataItem>-->
+                <!--                <span style="color: darkorange; font-weight: 600;">{{dataItem?.text}}</span>-->
+                <!--            </ng-template>-->
+                <ng-template monaDropDownListGroupTemplate let-group>
+                    <span style="color: crimson; font-weight: bold;">{{group}}</span>
+                </ng-template>
+            </mona-drop-down-list>
+
+            <mona-combo-box [data]="dropdownListDataItems" textField="text" valueField="value" groupField="group" [filterable]="false" style="width: 200px; margin-right: 20px;" [disabled]="false"
+                            [showClearButton]="true" [allowCustomValue]="true" [valueNormalizer]="comboBoxValueNormalizer$"
+                            [value]="dropdownListDataItems[3]" [itemDisabler]="dropdownItemDisabler" (valueChange)="onComboBoxValueChange($event)">
+                <ng-template monaComboBoxGroupTemplate let-group>
+                    <span style="color: crimson; font-weight: bold;">{{group}}</span>
+                </ng-template>
+            </mona-combo-box>
+
+            <mona-combo-box [data]="dropdownPartialPrimitiveDataItems" [allowCustomValue]="true" [showClearButton]="true"
+                            [filterable]="true" [itemDisabler]="dropdownPrimitiveItemDisabler" style="width: 200px; margin-right: 20px;"
+                            [value]="selectedPrimitiveComboBoxDataItem" (valueChange)="onComboBoxValueChange($event)">
+                <ng-template monaComboBoxItemTemplate let-dataItem>
+                    <span style="color: darkorange; font-weight: 600;">{{dataItem}}</span>
+                </ng-template>
+            </mona-combo-box>
+
+            <mona-auto-complete [data]="dropdownListDataItems" textField="text" valueField="value" groupField="group" [showClearButton]="true"
+                                [value]="autoCompleteValue" (valueChange)="onAutoCompleteValueChange($event)" style="width: 200px; margin-right: 20px;"></mona-auto-complete>
+
+        </div>
+
+        <div>
+            <mona-multi-select [data]="dropdownListDataItems" textField="text" valueField="value" groupField="group" style="width: auto; min-width: 200px; margin-right: 20px;"
+                               [monaMultiSelectSummaryTag]="multiSelectTagCount" [filterable]="true"
+                               [value]="selectedMultiSelectDataItems" (valueChange)="onMultiSelectValueChange($event)">
+                <ng-template monaMultiSelectItemTemplate let-dataItem>
+                    <span style="color: greenyellow; font-weight: bold">{{dataItem.text}}</span>
+                </ng-template>
+                <ng-template monaMultiSelectGroupTemplate let-group>
+                    <span style="color: deepskyblue; font-weight: bold">{{group.toUpperCase()}}</span>
+                </ng-template>
+                <ng-template monaMultiSelectSummaryTagTemplate let-dataItems>
+                    <span style="color: deeppink;"><span style="font-weight: bold; color: deepskyblue;">+{{dataItems.length - multiSelectTagCount}}</span> items</span>
+                </ng-template>
+            </mona-multi-select>
+        </div>
+
+        <div>
+            <input type="text" [(ngModel)]="textBoxValue2" monaTextBox style="margin-right: 10px;" />
+            <mona-text-box [ngModel]="textBoxValue" (ngModelChange)="onTextBoxValueChange($event)">
+                <ng-template monaTextBoxPrefixTemplate>
+                    <fa-icon [icon]="searchIcon"></fa-icon>
+                </ng-template>
+                <ng-template monaTextBoxSuffixTemplate>
+                    <fa-icon [icon]="snowflakeIcon" style="color: lightblue;"></fa-icon>
+                </ng-template>
+            </mona-text-box>
+        </div>
+
+        <div>
+            <textarea monaTextArea [(ngModel)]="numericTextBoxValue" rows="4" style="width: 422px;"></textarea>
+        </div>
+
+        <div>
+            <input type="checkbox" monaCheckBox id="checkbox1" [indeterminate]="true" />
+            <label for="checkbox1" style="margin-right: 10px;">Checkbox Label 1</label>
+
+            <input type="radio" monaRadioButton id="radioButton1" name="A" [checked]="true" [disabled]="false" />
+            <label for="radioButton1">Radio Button Label 1</label>
+
+            <input type="radio" monaRadioButton id="radioButton2" name="A" />
+            <label for="radioButton2">Radio Button Label 2</label>
+        </div>
+
+        <div>
+            <mona-switch labelOn="ON" labelOff="OFF" [ngModel]="switchValue" (ngModelChange)="onSwitchValueChange($event)">
+                <ng-template monaSwitchOffLabelTemplate>
+                    <fa-icon [icon]="moonIcon" style="color: orange;"></fa-icon>
+                </ng-template>
+                <ng-template monaSwitchOnLabelTemplate>
+                    <fa-icon [icon]="sunIcon" style="color: yellow;"></fa-icon>
+                </ng-template>
+            </mona-switch>
+        </div>
+
+        <div style="display: flex; flex-direction: column; z-index: 100;">
+            <mona-slider style="width: 200px;" [value]="sliderValue" (valueChange)="onSliderValueChange($event)"></mona-slider>
+            <mona-range-slider [labelStep]="1" [(value)]="rangedSliderValues" orientation="horizontal" labelPosition="after"
+                               style="width: 500px;" [min]="0" [max]="24" [step]="1">
+                <ng-template monaSliderTickValueTemplate let-value>
+                    <fa-icon [icon]="moonIcon" *ngIf="value < 6 || value > 22" style="color: mediumpurple;"></fa-icon>
+                    <fa-icon [icon]="sunIcon" *ngIf="value >= 6 && value <= 22" style="color: #fafd0f;"></fa-icon>
+                </ng-template>
+            </mona-range-slider>
+
+            <mona-numeric-text-box [readonly]="true" [min]="-4" [step]="0.7" [(ngModel)]="numericTextBoxValue" [formatter]="numericTextBoxFormatter" style="margin-top: 10px; width: 200px;"></mona-numeric-text-box>
+
+        </div>
+
+        <div>
+            <!--        <mona-color-palette [palette]="colorPalette" [columns]="sliderValue" [tileSize]="27" [ngModel]="colorPaletteValue" (ngModelChange)="print($event)"></mona-color-palette>-->
+            <mona-color-picker [palette]="colorPalette" [ngModel]="colorPickerValue" (ngModelChange)="onColorPickerValueChange($event)" style="margin-left: 30px;"></mona-color-picker>
+        </div>
     </div>
-
-    <div>
-<!--        <mona-drop-down-list [data]="dropdownListDataItems" groupField="" textField="text" valueField="value"-->
-<!--                              [filterable]="true" [disabled]="false" [itemDisabler]="dropdownItemDisabler"-->
-<!--                             [value]="selectedDropdownListDataItem" (valueChange)="onDropDownValueChange($event)" style="width: 200px; margin-right: 20px;">-->
-<!--&lt;!&ndash;            <ng-template monaDropDownListItemTemplate let-dataItem let-listItem="listItem">&ndash;&gt;-->
-<!--&lt;!&ndash;                <span style="color: deeppink;" *ngIf="!listItem.disabled && dataItem.value <= 3">{{dataItem.text}}</span>&ndash;&gt;-->
-<!--&lt;!&ndash;                <span style="color: deepskyblue;" *ngIf="!listItem.disabled && dataItem.value > 3">{{dataItem.text}}</span>&ndash;&gt;-->
-<!--&lt;!&ndash;                <span *ngIf="listItem.disabled" style="opacity: 0.5">{{dataItem.text}}</span>&ndash;&gt;-->
-<!--&lt;!&ndash;            </ng-template>&ndash;&gt;-->
-<!--            <ng-template monaDropDownListValueTemplate let-dataItem>-->
-<!--                <span style="color: darkorange; font-weight: 600;">{{dataItem?.text}}</span>-->
-<!--            </ng-template>-->
-<!--            <ng-template monaDropDownListGroupTemplate let-group>-->
-<!--                <span style="color: crimson; font-weight: bold;">{{group}}</span>-->
-<!--            </ng-template>-->
-<!--        </mona-drop-down-list>-->
-
-        <mona-drop-down-list [data]="dropdownListDataItems" textField="text" valueField="value" groupField="group" [filterable]="true" [disabled]="false"
-                             [showClearButton]="true" placeholder="Select an item..." [(value)]="selectedDropdownListDataItem"
-                             [itemDisabler]="dropdownItemDisabler" (valueChange)="onDropDownValueChange($event)" style="width: 200px; margin-right: 20px;">
-<!--            <ng-template monaDropDownListItemTemplate let-dataItem let-listItem="listItem">-->
-<!--                <span style="color: deeppink;" *ngIf="dataItem.value % 3 === 0 && !listItem.disabled">{{dataItem.text}}</span>-->
-<!--                <span style="color: dodgerblue;" *ngIf="dataItem.value % 3 !== 0 && !listItem.disabled">{{dataItem.text}}</span>-->
-<!--                <span *ngIf="listItem.disabled">{{dataItem.text}}</span>-->
-<!--            </ng-template>-->
-<!--            <ng-template monaDropDownListValueTemplate let-dataItem>-->
-<!--                <span style="color: darkorange; font-weight: 600;">{{dataItem?.text}}</span>-->
-<!--            </ng-template>-->
-            <ng-template monaDropDownListGroupTemplate let-group>
-                <span style="color: crimson; font-weight: bold;">{{group}}</span>
-            </ng-template>
-        </mona-drop-down-list>
-
-        <mona-combo-box [data]="dropdownListDataItems" textField="text" valueField="value" groupField="group" [filterable]="false" style="width: 200px; margin-right: 20px;" [disabled]="false"
-                        [showClearButton]="true" [allowCustomValue]="true" [valueNormalizer]="comboBoxValueNormalizer$"
-            [value]="dropdownListDataItems[3]" [itemDisabler]="dropdownItemDisabler" (valueChange)="onComboBoxValueChange($event)">
-            <ng-template monaComboBoxGroupTemplate let-group>
-                <span style="color: crimson; font-weight: bold;">{{group}}</span>
-            </ng-template>
-        </mona-combo-box>
-
-        <mona-combo-box [data]="dropdownPartialPrimitiveDataItems" [allowCustomValue]="true" [showClearButton]="true"
-                        [filterable]="true" [itemDisabler]="dropdownPrimitiveItemDisabler" style="width: 200px; margin-right: 20px;"
-                        [value]="selectedPrimitiveComboBoxDataItem" (valueChange)="onComboBoxValueChange($event)">
-            <ng-template monaComboBoxItemTemplate let-dataItem>
-                <span style="color: darkorange; font-weight: 600;">{{dataItem}}</span>
-            </ng-template>
-        </mona-combo-box>
-
-        <mona-auto-complete [data]="dropdownListDataItems" textField="text" valueField="value" groupField="group" [showClearButton]="true"
-                            [value]="autoCompleteValue" (valueChange)="onAutoCompleteValueChange($event)" style="width: 200px; margin-right: 20px;"></mona-auto-complete>
-
-
-
-<!--        <mona-combo-box [data]="dropdownListDataItems" [itemDisabler]="dropdownItemDisabler"-->
-<!--                        [value]="selectedComboBoxDataItem" (valueChange)="onComboBoxValueChange($event)"-->
-<!--                        [filterable]="false"-->
-<!--                        textField="text" valueField="value" groupField="group" style="margin-right: 20px;">-->
-<!--            <ng-template monaComboBoxItemTemplate let-dataItem>-->
-<!--                <span style="color: yellowgreen; font-weight: bold">{{dataItem.text}}</span>-->
-<!--            </ng-template>-->
-<!--        </mona-combo-box>-->
-
-<!--        <mona-multi-select [data]="dropdownListDataItems" [value]="selectedMultiSelectDataItems2" (valueChange)="onMultiSelectValueChange($event)"-->
-<!--                           [itemDisabler]="dropdownItemDisabler" [monaMultiSelectSummaryTag]="0"-->
-<!--                           textField="text" valueField="value" groupField="group" style="width: 250px;">-->
-<!--            <ng-template monaMultiSelectItemTemplate let-dataItem>-->
-<!--                <span style="color: greenyellow; font-weight: bold">{{dataItem.text}}</span>-->
-<!--            </ng-template>-->
-<!--            <ng-template monaMultiSelectGroupTemplate let-group>-->
-<!--                <span style="color: deepskyblue; font-weight: bold">{{group.toUpperCase()}}</span>-->
-<!--            </ng-template>-->
-<!--            <ng-template monaMultiSelectSummaryTagTemplate let-dataItems>-->
-<!--                <span style="color: deeppink;"><span style="font-weight: bold; color: deepskyblue;">{{dataItems.length}}</span> items selected.</span>-->
-<!--            </ng-template>-->
-<!--&lt;!&ndash;            <ng-template monaMultiSelectTagTemplate let-dataItem>&ndash;&gt;-->
-<!--&lt;!&ndash;                {{dataItem.text}} :: {{dataItem.value}}&ndash;&gt;-->
-<!--&lt;!&ndash;            </ng-template>&ndash;&gt;-->
-<!--        </mona-multi-select>-->
-    </div>
-
-    <div>
-        <mona-multi-select [data]="dropdownListDataItems" textField="text" valueField="value" groupField="group" style="width: auto; min-width: 200px; margin-right: 20px;"
-                           [monaMultiSelectSummaryTag]="multiSelectTagCount" [filterable]="true"
-                           [value]="selectedMultiSelectDataItems" (valueChange)="onMultiSelectValueChange($event)">
-            <ng-template monaMultiSelectItemTemplate let-dataItem>
-                <span style="color: greenyellow; font-weight: bold">{{dataItem.text}}</span>
-            </ng-template>
-            <ng-template monaMultiSelectGroupTemplate let-group>
-                <span style="color: deepskyblue; font-weight: bold">{{group.toUpperCase()}}</span>
-            </ng-template>
-            <ng-template monaMultiSelectSummaryTagTemplate let-dataItems>
-                <span style="color: deeppink;"><span style="font-weight: bold; color: deepskyblue;">+{{dataItems.length - multiSelectTagCount}}</span> items</span>
-            </ng-template>
-        </mona-multi-select>
-    </div>
-
-<!--    <div>-->
-<!--        <mona-drop-down-list [data]="dropdownPrimitiveDataItems"></mona-drop-down-list>-->
-<!--        <mona-combo-box [data]="dropdownPrimitiveDataItems"></mona-combo-box>-->
-<!--        <mona-multi-select [data]="dropdownPrimitiveDataItems"></mona-multi-select>-->
-<!--    </div>-->
-
-    <div>
-        <input type="text" [(ngModel)]="textBoxValue2" monaTextBox style="margin-right: 10px;" />
-        <mona-text-box [ngModel]="textBoxValue" (ngModelChange)="onTextBoxValueChange($event)">
-            <ng-template monaTextBoxPrefixTemplate>
-                <fa-icon [icon]="searchIcon"></fa-icon>
-            </ng-template>
-            <ng-template monaTextBoxSuffixTemplate>
-                <fa-icon [icon]="snowflakeIcon" style="color: lightblue;"></fa-icon>
-            </ng-template>
-        </mona-text-box>
-    </div>
-
-    <div>
-        <textarea monaTextArea [(ngModel)]="numericTextBoxValue" rows="4" style="width: 422px;"></textarea>
-    </div>
-
-    <div>
-        <input type="checkbox" monaCheckBox id="checkbox1" [indeterminate]="true" />
-        <label for="checkbox1" style="margin-right: 10px;">Checkbox Label 1</label>
-
-        <input type="radio" monaRadioButton id="radioButton1" name="A" [checked]="true" [disabled]="false" />
-        <label for="radioButton1">Radio Button Label 1</label>
-
-        <input type="radio" monaRadioButton id="radioButton2" name="A" />
-        <label for="radioButton2">Radio Button Label 2</label>
-    </div>
-
-    <div>
-        <mona-switch labelOn="ON" labelOff="OFF" [ngModel]="switchValue" (ngModelChange)="onSwitchValueChange($event)">
-            <ng-template monaSwitchOffLabelTemplate>
-                <fa-icon [icon]="moonIcon" style="color: orange;"></fa-icon>
-            </ng-template>
-            <ng-template monaSwitchOnLabelTemplate>
-                <fa-icon [icon]="sunIcon" style="color: yellow;"></fa-icon>
-            </ng-template>
-        </mona-switch>
-    </div>
-
-    <div style="display: flex; flex-direction: column; z-index: 100;">
-        <mona-slider style="width: 200px;" [value]="sliderValue" (valueChange)="onSliderValueChange($event)"></mona-slider>
-        <mona-range-slider [labelStep]="1" [(value)]="rangedSliderValues" orientation="horizontal" labelPosition="after"
-                            style="width: 500px;" [min]="0" [max]="24" [step]="1">
-            <ng-template monaSliderTickValueTemplate let-value>
-                <fa-icon [icon]="moonIcon" *ngIf="value < 6 || value > 22" style="color: mediumpurple;"></fa-icon>
-                <fa-icon [icon]="sunIcon" *ngIf="value >= 6 && value <= 22" style="color: #fafd0f;"></fa-icon>
-            </ng-template>
-        </mona-range-slider>
-
-        <mona-numeric-text-box [readonly]="true" [min]="-4" [step]="0.7" [(ngModel)]="numericTextBoxValue" [formatter]="numericTextBoxFormatter" style="margin-top: 10px; width: 200px;"></mona-numeric-text-box>
-
-    </div>
-
-    <div>
-<!--        <mona-color-palette [palette]="colorPalette" [columns]="sliderValue" [tileSize]="27" [ngModel]="colorPaletteValue" (ngModelChange)="print($event)"></mona-color-palette>-->
-        <mona-color-picker [palette]="colorPalette" [ngModel]="colorPickerValue" (ngModelChange)="onColorPickerValueChange($event)" style="margin-left: 30px;"></mona-color-picker>
-    </div>
-
-<!--    <div>-->
-<!--        <mona-popup-list [data]="dropdownListDataItems" groupField="group" textField="text" valueField="value" [value]="[]"-->
-<!--        [highlightedValues]="[]" (valueChange)="print($event)"></mona-popup-list>-->
-<!--    </div>-->
-
 </div>
 
 <ng-template #popupContentTemplate>

@@ -14,6 +14,7 @@ import { TestComponentComponent } from "./test-component/test-component.componen
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { FormsModule } from "@angular/forms";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { TreeViewModule } from "../../../mona-ui/src/lib/tree-view/tree-view.module";
 
 @NgModule({
     declarations: [AppComponent, TestComponentComponent],
@@ -27,7 +28,8 @@ import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
         ContextMenuModule,
         FontAwesomeModule,
         FormsModule,
-        PopupListComponent
+        PopupListComponent,
+        TreeViewModule
     ],
     bootstrap: [AppComponent]
 })

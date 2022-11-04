@@ -103,6 +103,11 @@ export * from "./lib/popup/directives/popup-anchor.directive";
 export * from "./lib/popup/components/popup/popup.component";
 export * from "./lib/popup/popup.module";
 
+/** TreeView */
+export { TreeNodeOptions } from "./lib/tree-view/data/TreeNode";
+export * from "./lib/tree-view/components/tree-view/tree-view.component";
+export * from "./lib/tree-view/tree-view.module";
+
 /** Shared [TEMPORARY EXPORT] */
 // export * from "./lib/shared/components/popup-list-item/popup-list-item.component";
 export * from "./lib/shared/shared.module";
