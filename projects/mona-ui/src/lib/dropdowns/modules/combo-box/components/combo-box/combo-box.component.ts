@@ -1,295 +1,228 @@
 import {
+    ChangeDetectionStrategy,
     Component,
     ContentChild,
     ElementRef,
     EventEmitter,
     Input,
-    OnDestroy,
     OnInit,
     Output,
-    TemplateRef,
-    ViewChild
+    TemplateRef
 } from "@angular/core";
-import { debounce, debounceTime, fromEvent, of, Subject, take, takeUntil, timer } from "rxjs";
-import { Group, List } from "@mirei/ts-collections";
-import { ListItem } from "../../../../../shared/data/ListItem";
+import { AbstractDropDownListComponent } from "../../../../components/abstract-drop-down-list/abstract-drop-down-list.component";
+import { PopupListService } from "../../../../services/popup-list.service";
 import { PopupService } from "../../../../../popup/services/popup.service";
-import { Action } from "../../../../../utils/Action";
-import { ListComponent } from "../../../../../shared/components/list/list.component";
-import { faChevronDown, IconDefinition } from "@fortawesome/free-solid-svg-icons";
-import { ValueChangeEvent } from "../../../../../shared/data/ValueChangeEvent";
+import { PopupListItem } from "../../../../data/PopupListItem";
+import { SelectionMode } from "../../../../../models/SelectionMode";
+import { PopupListValueChangeEvent } from "../../../../data/PopupListValueChangeEvent";
+import { PopupSettings } from "../../../../../popup/models/PopupSettings";
+import { distinctUntilChanged, fromEvent, map, Observable, of, Subject, take, takeUntil } from "rxjs";
+import { Group } from "@mirei/ts-collections";
 import { PopupRef } from "../../../../../popup/models/PopupRef";
-import { ConnectionPositionPair } from "@angular/cdk/overlay";
+import { Action } from "../../../../../utils/Action";
 import { ComboBoxGroupTemplateDirective } from "../../directives/combo-box-group-template.directive";
 import { ComboBoxItemTemplateDirective } from "../../directives/combo-box-item-template.directive";
-import { FocusMonitor } from "@angular/cdk/a11y";
 
 @Component({
     selector: "mona-combo-box",
     templateUrl: "./combo-box.component.html",
-    styleUrls: ["./combo-box.component.scss"]
+    styleUrls: ["./combo-box.component.scss"],
+    providers: [PopupListService],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ComboBoxComponent implements OnInit, OnDestroy {
-    private readonly componentDestroy$: Subject<void> = new Subject();
-    private popupRef: PopupRef | null = null;
-    public readonly dropdownIcon: IconDefinition = faChevronDown;
-    public readonly filterChange$: Subject<string> = new Subject();
-    public readonly valueKeydown$: Subject<Event> = new Subject();
-    public highlightedItem: ListItem | null = null;
-    public listData: List<Group<string, ListItem>> = new List();
-    public selectedListItems: ListItem[] = [];
-    public valueText: string = "";
-    public viewData: List<Group<string, ListItem>> = new List();
-
-    @ViewChild("comboboxPopupTemplate")
-    public comboboxPopupTemplate!: TemplateRef<void>;
-
-    @ViewChild("comboboxWrapper")
-    public comboboxWrapper!: ElementRef<HTMLDivElement>;
+export class ComboBoxComponent extends AbstractDropDownListComponent implements OnInit {
+    protected selectionMode: SelectionMode = "single";
+    public readonly comboBoxValue$: Subject<string> = new Subject<string>();
+    public comboBoxValue: string = "";
+    public override valuePopupListItem?: PopupListItem;
 
     @Input()
-    public data: Iterable<any> = [];
-
-    @Input()
-    public disabled: boolean = false;
+    public allowCustomValue: boolean = true;
 
     @Input()
     public filterable: boolean = false;
 
-    @Input()
-    public groupField?: string;
-
     @ContentChild(ComboBoxGroupTemplateDirective, { read: TemplateRef })
     public groupTemplate?: TemplateRef<void>;
-
-    @Input()
-    public itemDisabler: Action<any, boolean> | string | null = null;
 
     @ContentChild(ComboBoxItemTemplateDirective, { read: TemplateRef })
     public itemTemplate?: TemplateRef<void>;
 
-    @ViewChild("listComponent")
-    public listComponent!: ListComponent;
-
     @Input()
-    public textField?: string;
-
-    @Input()
-    public value?: any;
+    public override value?: any;
 
     @Output()
-    public valueChange: EventEmitter<any> = new EventEmitter<any>();
+    public override valueChange: EventEmitter<any | any[]> = new EventEmitter<any>();
 
     @Input()
-    public valueField?: string;
+    public valueNormalizer: Action<Observable<string>, Observable<any>> = (text$: Observable<string>) =>
+        text$.pipe(map(value => value));
 
     public constructor(
-        private readonly elementRef: ElementRef<HTMLElement>,
-        private readonly focusMonitor: FocusMonitor,
-        private readonly popupService: PopupService
-    ) {}
-
-    public ngOnDestroy(): void {
-        this.componentDestroy$.next();
-        this.componentDestroy$.complete();
+        protected override readonly elementRef: ElementRef<HTMLElement>,
+        protected override readonly popupListService: PopupListService,
+        protected override readonly popupService: PopupService
+    ) {
+        super(elementRef, popupListService, popupService);
     }
 
-    public ngOnInit(): void {
-        this.listData = ListComponent.createListData({
-            data: this.data,
-            groupField: this.groupField,
-            disabler: ListComponent.getDisabler(this.itemDisabler) ?? undefined,
-            textField: this.textField,
-            valueField: this.valueField
-        });
+    public clearValue(event: MouseEvent): void {
+        event.stopImmediatePropagation();
+        this.value = undefined;
+        this.valuePopupListItem = undefined;
+        this.comboBoxValue = "";
+        this.updateValue();
+    }
 
-        this.viewData = this.listData.toList();
-
-        if (this.value) {
-            const listItem = this.viewData.selectMany(g => g.source).firstOrDefault(i => i.dataEquals(this.value));
-            this.selectedListItems = listItem && !listItem.disabled ? [listItem] : [];
-            this.valueText = this.selectedListItems[0]?.text ?? "";
-        }
-
-        this.setSubscriptions();
+    public override ngOnInit(): void {
+        super.ngOnInit();
         this.setEventListeners();
+        this.setSubscriptions();
+        this.comboBoxValue = this.valuePopupListItem?.text ?? "";
     }
 
-    public onSelectedListItemsChange(event: ValueChangeEvent): void {
-        this.selectedListItems = event.value;
-        if (event.via === "selection") {
-            this.popupRef?.close();
-            this.popupRef = null;
-        }
-        this.valueText = this.selectedListItems[0]?.text ?? "";
-    }
-
-    public open(): void {
-        this.popupRef = this.popupService.create({
-            anchor: this.comboboxWrapper,
-            content: this.comboboxPopupTemplate,
-            hasBackdrop: true,
-            withPush: false,
-            width: this.elementRef.nativeElement.clientWidth,
-            offset: {
-                vertical: 0
-            },
-            popupClass: ["mona-dropdown-popup-content"],
-            positions: [
-                new ConnectionPositionPair(
-                    { originX: "start", originY: "bottom" },
-                    { overlayX: "start", overlayY: "top" }
-                )
-            ]
-        });
-        this.inputElement?.focus();
-
-        window.setTimeout(() => {
-            this.listComponent.scrollToHighlightedItem();
-        });
-
-        this.popupRef.closed.pipe(take(1)).subscribe(() => {
-            if (this.value != null) {
-                if (this.value !== this.selectedListItems[0]?.data) {
-                    this.value = this.selectedListItems[0]?.data;
-                    this.valueChange.emit(this.value);
+    public onKeydown(event: KeyboardEvent): void {
+        if (event.key === "Enter") {
+            const item = this.popupListService.viewListData
+                .selectMany(g => g.source)
+                .firstOrDefault(i => i.text.toLowerCase() === this.comboBoxValue.toLowerCase());
+            if (item) {
+                this.popupListService.selectItem(item, this.selectionMode);
+                this.updateValue(item);
+            } else {
+                if (this.allowCustomValue) {
+                    this.valueNormalizer(of(this.comboBoxValue)).subscribe(normalizedValue => {
+                        this.data = [...this.data, normalizedValue];
+                        this.popupListService.initializeListData({
+                            data: [...this.data],
+                            valueField: this.valueField,
+                            disabler: this.itemDisabler,
+                            textField: this.textField,
+                            groupField: this.groupField
+                        });
+                        const item = this.popupListService.viewListData
+                            .selectMany(g => g.source)
+                            .firstOrDefault(i => i.text.toLowerCase() === this.comboBoxValue.toLowerCase());
+                        if (item) {
+                            this.popupListService.selectItem(item, this.selectionMode);
+                            this.updateValue(item);
+                        }
+                    });
+                } else {
+                    this.comboBoxValue = "";
                 }
-            } else if (this.selectedListItems.length > 0) {
-                this.value = this.selectedListItems[0].data;
-                this.valueChange.emit(this.value);
             }
-            this.popupRef = null;
-            this.filterChange$.next("");
-            (this.elementRef.nativeElement.firstElementChild as HTMLElement)?.focus();
-            this.viewData = this.listData.toList();
-        });
+        } else if (event.key === "Escape") {
+            this.close();
+        }
     }
 
-    private filterListData(filter: string): void {
-        this.viewData = this.listData
-            .select(g => {
-                const items = g.source
-                    .where(i => (!filter ? true : i.text.toLowerCase().includes(filter.toLowerCase())))
-                    .toList();
-                return new Group(g.key, items);
-            })
-            .toList();
+    public onPopupListValueChange(event: PopupListValueChangeEvent): void {
+        if (!event.value || event.value.length === 0) {
+            this.value = undefined;
+            this.valuePopupListItem = undefined;
+            this.comboBoxValue = "";
+            this.updateValue();
+            return;
+        }
+        if (this.value && event.value[0].dataEquals(this.value)) {
+            if (event.via === "selection") {
+                this.close();
+            }
+            return;
+        }
+        if (event.via === "selection") {
+            this.close();
+        }
+        this.updateValue(event.value[0]);
+    }
+
+    public override open(options: Partial<PopupSettings> = {}): PopupRef {
+        this.popupRef = super.open({
+            ...options,
+            hasBackdrop: false,
+            closeOnOutsideClick: false
+        });
+        window.setTimeout(() => {
+            const input = this.elementRef.nativeElement.querySelector("input");
+            if (input) {
+                input.focus();
+                input.setSelectionRange(-1, -1);
+            }
+        });
+        this.popupRef?.closed.pipe(take(1)).subscribe(() => {
+            const item = this.popupListService.viewListData
+                .selectMany(g => g.source)
+                .firstOrDefault(i => i.text.toLowerCase() === this.comboBoxValue.toLowerCase());
+            if (!item) {
+                this.comboBoxValue = "";
+            }
+        });
+        return this.popupRef;
+    }
+
+    protected override updateValue(listItem?: PopupListItem) {
+        super.updateValue(listItem);
+        this.comboBoxValue = listItem?.text ?? "";
     }
 
     private setEventListeners(): void {
-        fromEvent(this.elementRef.nativeElement, "focusin")
+        fromEvent<FocusEvent>(this.elementRef.nativeElement, "focusout")
             .pipe(takeUntil(this.componentDestroy$))
-            .subscribe(e => {
-                this.inputElement?.focus();
-                this.inputElement.setSelectionRange(-1, -1);
-                this.viewData = this.listData.toList();
+            .subscribe(event => {
+                const target = event.relatedTarget as HTMLElement;
+                if (
+                    target &&
+                    (this.elementRef.nativeElement.contains(target) ||
+                        this.popupRef?.overlayRef.overlayElement.contains(target))
+                ) {
+                    return;
+                }
+                this.close();
             });
-        this.focusMonitor
-            .monitor(this.elementRef.nativeElement, true)
-            .pipe(takeUntil(this.componentDestroy$), debounceTime(150))
-            .subscribe(origin => {
-                if (!origin) {
-                    this.popupRef?.close();
-                    this.popupRef = null;
+        fromEvent<FocusEvent>(this.elementRef.nativeElement, "focusin")
+            .pipe(takeUntil(this.componentDestroy$))
+            .subscribe(() => {
+                const input = this.elementRef.nativeElement.querySelector("input");
+                if (input) {
+                    input.focus();
+                    input.setSelectionRange(-1, -1);
                 }
             });
     }
 
     private setSubscriptions(): void {
-        this.valueKeydown$
-            .pipe(
-                takeUntil(this.componentDestroy$),
-                debounce(e => {
-                    const key = (e as KeyboardEvent).key;
-                    if (key === "ArrowDown" || key === "ArrowUp" || key === "Enter") {
-                        return of(e);
-                    }
-                    return timer(20);
-                })
-            )
-            .subscribe(e => {
-                const event = e as KeyboardEvent;
-                if (event.key === "ArrowDown") {
-                    event.preventDefault();
-                    const nextItem =
-                        ListComponent.findNextNotDisabledItem(this.viewData, this.selectedListItems[0]) ??
-                        ListComponent.findFirstNotDisabledItem(this.viewData);
-                    if (nextItem) {
-                        this.selectedListItems = [nextItem];
-                        if (!this.popupRef) {
-                            this.value = nextItem.data;
-                            this.valueChange.emit(this.value);
-                        }
-                        this.valueText = nextItem.text;
-                    }
-                } else if (event.key === "ArrowUp") {
-                    event.preventDefault();
-                    const previousItem =
-                        ListComponent.findPrevNotDisabledItem(this.viewData, this.selectedListItems[0]) ??
-                        ListComponent.findLastNonDisabledItem(this.viewData);
-                    if (previousItem) {
-                        this.selectedListItems = [previousItem];
-                        if (!this.popupRef) {
-                            this.value = previousItem.data;
-                            this.valueChange.emit(this.value);
-                        }
-                        this.valueText = previousItem.text;
-                    }
-                } else if (event.key === "Enter") {
-                    event.preventDefault();
-                    this.popupRef?.close();
-                    this.popupRef = null;
-                    this.valueText = this.selectedListItems[0]?.text ?? "";
-                } else if (event.key === "Escape") {
-                    return;
+        this.comboBoxValue$.pipe(takeUntil(this.componentDestroy$), distinctUntilChanged()).subscribe(value => {
+            if (this.filterable) {
+                if (!value) {
+                    this.popupListService.viewListData = this.popupListService.sourceListData.toList();
+                    this.popupListService.filterModeActive = false;
                 } else {
-                    if (this.inputElement) {
-                        const text = this.inputElement.value;
-                        const textChanged = text !== this.valueText;
-
-                        if (this.filterable && textChanged) {
-                            this.filterListData(text);
-                        }
-
-                        if (textChanged && !this.popupRef) {
-                            this.open();
-                        }
-                        const item = this.viewData
-                            .selectMany(g => g.source)
-                            .firstOrDefault(i => i.text.toLowerCase().startsWith(text.toLowerCase()));
-                        if (item) {
-                            this.selectedListItems = item && !item.disabled ? [item] : [];
-
-                            if (!this.popupRef) {
-                                const newValue =
-                                    this.selectedListItems.length > 0 ? this.selectedListItems[0].data : null;
-                                if (newValue !== this.value) {
-                                    this.value = newValue;
-                                    this.valueChange.emit(this.value);
-                                }
-                            }
-                        } else {
-                            this.selectedListItems = [];
-                            if (!this.popupRef && this.value != null) {
-                                this.value = null;
-                                this.valueChange.emit(this.value);
-                            }
-                            const highlightedItem = this.viewData
-                                .selectMany(g => g.source)
-                                .firstOrDefault(i => i.text.toLowerCase().startsWith(text.toLowerCase()));
-                            if (highlightedItem) {
-                                this.highlightedItem = highlightedItem;
-                            } else {
-                                this.highlightedItem = null;
-                            }
-                        }
-                        this.valueText = text;
-                    }
+                    this.popupListService.viewListData = this.popupListService.sourceListData
+                        .select(g => {
+                            const filteredItems = g.source.where(i =>
+                                i.text.toLowerCase().includes(value.toLowerCase())
+                            );
+                            return new Group<string, PopupListItem>(g.key, filteredItems.toList());
+                        })
+                        .toList();
+                    this.popupListService.filterModeActive = true;
                 }
-            });
-    }
-
-    private get inputElement(): HTMLInputElement {
-        return this.elementRef.nativeElement.querySelector("input:first-child") as HTMLInputElement;
+            }
+            this.popupListService.viewListData
+                .selectMany(g => g.source)
+                .forEach(i => (i.selected = i.highlighted = false));
+            const popupListItem = this.popupListService.viewListData
+                .selectMany(g => g.source)
+                .firstOrDefault(item => !item.disabled && item.text.toLowerCase().includes(value.toLowerCase()));
+            if (!this.popupRef) {
+                this.open();
+            }
+            if (popupListItem) {
+                popupListItem.highlighted = true;
+                this.popupListService.scrollToListItem$.next(popupListItem);
+            }
+            this.comboBoxValue = value;
+        });
     }
 }

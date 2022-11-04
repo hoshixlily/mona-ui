@@ -1,4 +1,4 @@
-import { AfterContentInit, AfterViewInit, ContentChild, Directive, Input, OnInit, TemplateRef } from "@angular/core";
+import { AfterContentInit, ContentChild, Directive, Input, OnInit, TemplateRef } from "@angular/core";
 import { MultiSelectComponent } from "../components/multi-select/multi-select.component";
 import { MultiSelectSummaryTagTemplateDirective } from "./multi-select-summary-tag-template.directive";
 

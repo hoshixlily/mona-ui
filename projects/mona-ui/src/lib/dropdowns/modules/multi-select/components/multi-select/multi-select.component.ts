@@ -1,7 +1,5 @@
 import {
-    AfterViewInit,
     ChangeDetectionStrategy,
-    ChangeDetectorRef,
     Component,
     ContentChild,
     ElementRef,
@@ -10,218 +8,95 @@ import {
     OnDestroy,
     OnInit,
     Output,
-    TemplateRef,
-    ViewChild
+    TemplateRef
 } from "@angular/core";
-import { debounce, debounceTime, fromEvent, mergeWith, of, Subject, take, takeUntil, timer } from "rxjs";
-import { PopupRef } from "../../../../../popup/models/PopupRef";
-import { faChevronDown, faSearch, IconDefinition } from "@fortawesome/free-solid-svg-icons";
-import { ListItem } from "../../../../../shared/data/ListItem";
-import { Enumerable, Group, List } from "@mirei/ts-collections";
-import { Action } from "../../../../../utils/Action";
-import { FocusMonitor } from "@angular/cdk/a11y";
+import { AbstractDropDownListComponent } from "../../../../components/abstract-drop-down-list/abstract-drop-down-list.component";
+import { PopupListService } from "../../../../services/popup-list.service";
 import { PopupService } from "../../../../../popup/services/popup.service";
-import { ListComponent } from "../../../../../shared/components/list/list.component";
-import { ValueChangeEvent } from "../../../../../shared/data/ValueChangeEvent";
-import { ConnectionPositionPair } from "@angular/cdk/overlay";
-import { MultiSelectGroupTemplateDirective } from "../../directives/multi-select-group-template.directive";
-import { MultiSelectItemTemplateDirective } from "../../directives/multi-select-item-template.directive";
-import { MultiSelectSummaryTagDirective } from "../../directives/multi-select-summary-tag.directive";
+import { SelectionMode } from "../../../../../models/SelectionMode";
+import { PopupListItem } from "../../../../data/PopupListItem";
+import { PopupListValueChangeEvent } from "../../../../data/PopupListValueChangeEvent";
 import { MultiSelectTagTemplateDirective } from "../../directives/multi-select-tag-template.directive";
+import { MultiSelectItemTemplateDirective } from "../../directives/multi-select-item-template.directive";
+import { MultiSelectGroupTemplateDirective } from "../../directives/multi-select-group-template.directive";
 
 @Component({
     selector: "mona-multi-select",
     templateUrl: "./multi-select.component.html",
     styleUrls: ["./multi-select.component.scss"],
+    providers: [PopupListService],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class MultiSelectComponent implements OnInit, OnDestroy, AfterViewInit {
-    private readonly componentDestroy$: Subject<void> = new Subject();
-    private popupRef: PopupRef | null = null;
+export class MultiSelectComponent extends AbstractDropDownListComponent implements OnInit, OnDestroy {
     private resizeObserver: ResizeObserver | null = null;
-    public readonly dropdownIcon: IconDefinition = faChevronDown;
-    public readonly filterChange$: Subject<string> = new Subject();
-    public readonly filterKeydown$: Subject<Event> = new Subject();
-    public readonly filterIcon: IconDefinition = faSearch;
-    public filterText: string = "";
-    public highlightedItem: ListItem | null = null;
-    public listData: List<Group<string, ListItem>> = new List();
-    public selectedListItems: ListItem[] = [];
+    protected selectionMode: SelectionMode = "multiple";
     public summaryTagTemplate: TemplateRef<any> | null = null;
-    public tagCount: number = -1; // set by directive
-    public viewData: List<Group<string, ListItem>> = new List();
-
-    @Input()
-    public data: Iterable<any> = [];
-
-    @Input()
-    public disabled: boolean = false;
+    public tagCount: number = -1;
+    public override valuePopupListItem: PopupListItem[] = [];
 
     @Input()
     public filterable: boolean = false;
 
-    @Input()
-    public groupField?: string;
-
     @ContentChild(MultiSelectGroupTemplateDirective, { read: TemplateRef })
     public groupTemplate?: TemplateRef<void>;
 
-    @Input()
-    public itemDisabler: Action<any, boolean> | string | null = null;
-
     @ContentChild(MultiSelectItemTemplateDirective, { read: TemplateRef })
     public itemTemplate?: TemplateRef<void>;
-
-    @ViewChild("listComponent")
-    public listComponent!: ListComponent;
-
-    @ViewChild("multiSelectPopupTemplate")
-    public multiSelectPopupTemplate!: TemplateRef<void>;
-
-    @ViewChild("multiSelectWrapper")
-    public multiSelectWrapper!: ElementRef<HTMLDivElement>;
 
     @ContentChild(MultiSelectTagTemplateDirective, { read: TemplateRef })
     public tagTemplate: TemplateRef<any> | null = null;
 
     @Input()
-    public textField?: string;
-
-    @Input()
-    public value: any[] = [];
+    public override value: any[] = [];
 
     @Output()
-    public valueChange: EventEmitter<any[]> = new EventEmitter<any[]>();
-
-    @Input()
-    public valueField?: string;
+    public override valueChange: EventEmitter<any[]> = new EventEmitter<any[]>();
 
     public constructor(
-        private readonly cdr: ChangeDetectorRef,
-        private readonly elementRef: ElementRef<HTMLElement>,
-        private readonly focusMonitor: FocusMonitor,
-        private readonly popupService: PopupService
-    ) {}
-
-    public ngAfterViewInit(): void {
-        console.log("STD: ", this.summaryTagTemplate);
+        protected override readonly elementRef: ElementRef<HTMLElement>,
+        protected override readonly popupListService: PopupListService,
+        protected override readonly popupService: PopupService
+    ) {
+        super(elementRef, popupListService, popupService);
     }
 
-    public ngOnDestroy(): void {
-        this.componentDestroy$.next();
-        this.componentDestroy$.complete();
+    public override ngOnDestroy(): void {
+        super.ngOnDestroy();
         this.resizeObserver?.disconnect();
     }
 
-    public ngOnInit(): void {
-        this.listData = ListComponent.createListData({
-            data: this.data,
-            groupField: this.groupField,
-            disabler: ListComponent.getDisabler(this.itemDisabler) ?? undefined,
-            textField: this.textField,
-            valueField: this.valueField
-        });
-
-        this.viewData = this.listData.toList();
-
-        if (this.value) {
-            const valueEnumerable = Enumerable.from(this.value);
-            const listItems = this.viewData
-                .selectMany(g => g.source)
-                .where(i => valueEnumerable.any(v => i.dataEquals(v)))
-                .toArray();
-            this.selectedListItems = listItems.filter(i => !i.disabled);
-            this.highlightedItem = Enumerable.from(listItems).lastOrDefault(i => !i.disabled);
-        }
-
-        this.setSubscriptions();
+    public override ngOnInit(): void {
+        super.ngOnInit();
         this.setEventListeners();
     }
 
-    public onSelectedItemGroupRemove(event: Event): void {
-        event.stopPropagation();
-        this.selectedListItems = this.selectedListItems.slice(0, this.visibleTagCount);
-        this.value = this.selectedListItems.map(i => i.data);
-        this.valueChange.emit(this.value);
-    }
-
-    public onSelectedItemRemove(event: Event, item: ListItem): void {
-        event.stopPropagation();
-        this.selectedListItems = this.selectedListItems.filter(i => i !== item);
-        this.value = this.selectedListItems.map(i => i.data);
-        this.valueChange.emit(this.value);
-    }
-
-    public onSelectedListItemsChange(event: ValueChangeEvent): void {
-        this.selectedListItems = event.value;
-        this.cdr.markForCheck();
-    }
-
-    public open(): void {
-        this.popupRef = this.popupService.create({
-            anchor: this.multiSelectWrapper,
-            content: this.multiSelectPopupTemplate,
-            hasBackdrop: true,
-            withPush: false,
-            width: this.elementRef.nativeElement.clientWidth,
-            offset: {
-                vertical: 0
-            },
-            popupClass: ["mona-dropdown-popup-content"],
-            positions: [
-                new ConnectionPositionPair(
-                    { originX: "start", originY: "bottom" },
-                    { overlayX: "start", overlayY: "top" }
-                )
-            ]
-        });
-
-        this.highlightLastSelectedItem();
-
-        window.setTimeout(() => {
-            this.listComponent.scrollToHighlightedItem();
-        });
-
-        this.popupRef.closed.pipe(take(1)).subscribe(() => {
-            if (this.value.length !== this.selectedListItems.length) {
-                this.value = this.selectedListItems.map(i => i.data);
-                this.valueChange.emit(this.value);
+    public onPopupListValueChange(event: PopupListValueChangeEvent): void {
+        if (this.value && this.containsValue(event.value, this.value)) {
+            if (event.via === "selection") {
+                this.close();
             }
-            this.popupRef = null;
-            this.filterChange$.next("");
-            (this.elementRef.nativeElement.firstElementChild as HTMLElement)?.focus();
-            this.viewData = this.listData.toList();
-            this.highlightedItem = null;
-        });
+            return;
+        }
+        if (event.via === "selection" && this.selectionMode === "single") {
+            this.close();
+        }
+        this.updateValue(event.value);
     }
 
-    private filterListData(filter: string): void {
-        if (!filter) {
-            this.viewData = this.listData.toList();
-            this.highlightLastSelectedItem();
-        }
-        this.viewData = this.listData
-            .select(g => {
-                const items = g.source
-                    .where(i => (!filter ? true : i.text.toLowerCase().includes(filter.toLowerCase())))
-                    .toList();
-                return new Group(g.key, items);
-            })
-            .toList();
-        if (this.highlightedItem && !this.viewData.selectMany(g => g.source).any(i => i.equals(this.highlightedItem))) {
-            this.highlightedItem = null;
-        }
+    public onSelectedItemRemove(event: Event, popupListItem: PopupListItem): void {
+        event.stopImmediatePropagation();
+        const remainingItems = this.valuePopupListItem.filter(item => !item.dataEquals(popupListItem.data)) ?? [];
+        this.updateValue(remainingItems);
     }
 
-    private highlightLastSelectedItem(): void {
-        this.highlightedItem =
-            this.selectedListItems.length > 0
-                ? this.viewData
-                      .selectMany(g => g.source)
-                      .firstOrDefault(
-                          i => !i.disabled && i.equals(this.selectedListItems[this.selectedListItems.length - 1])
-                      )
-                : this.viewData.selectMany(g => g.source).firstOrDefault(i => !i.disabled);
+    public onSelectedItemGroupRemove(event: Event): void {
+        event.stopImmediatePropagation();
+        const remainingItems = this.valuePopupListItem.slice(0, this.visibleTagCount);
+        this.updateValue(remainingItems);
+    }
+
+    private containsValue(popupListItems: PopupListItem[], value: any): boolean {
+        return popupListItems.some(popupListItem => popupListItem.dataEquals(value));
     }
 
     private setEventListeners(): void {
@@ -234,97 +109,17 @@ export class MultiSelectComponent implements OnInit, OnDestroy, AfterViewInit {
         this.resizeObserver.observe(this.elementRef.nativeElement);
     }
 
-    private setSubscriptions(): void {
-        fromEvent(this.elementRef.nativeElement, "keydown")
-            .pipe(
-                mergeWith(this.filterKeydown$),
-                takeUntil(this.componentDestroy$),
-                debounce(e => {
-                    const key = (e as KeyboardEvent).key;
-                    if (key === "ArrowDown" || key === "ArrowUp" || key === "Enter") {
-                        return of(e);
-                    }
-                    return timer(20);
-                })
-            )
-            .subscribe(e => {
-                const event = e as KeyboardEvent;
-                if (event.key === "ArrowDown") {
-                    event.preventDefault();
-                    if (!this.popupRef) {
-                        this.open();
-                    } else {
-                        const nextItem = this.highlightedItem
-                            ? ListComponent.findNextNotDisabledItem(this.viewData, this.highlightedItem)
-                            : ListComponent.findFirstNotDisabledItem(this.viewData);
-                        if (nextItem) {
-                            this.highlightedItem = nextItem;
-                        }
-                    }
-                } else if (event.key === "ArrowUp") {
-                    if (!this.popupRef) {
-                        return;
-                    }
-                    event.preventDefault();
-                    const prevItem = this.highlightedItem
-                        ? ListComponent.findPrevNotDisabledItem(this.viewData, this.highlightedItem)
-                        : ListComponent.findLastNonDisabledItem(this.viewData);
-                    if (prevItem) {
-                        this.highlightedItem = prevItem;
-                    }
-                } else if (event.key === "Escape") {
-                    return;
-                } else if (event.key === "Enter") {
-                    if (!this.popupRef) {
-                        this.open();
-                        return;
-                    }
-                    if (
-                        event.target instanceof HTMLInputElement &&
-                        !this.viewData
-                            .selectMany(g => g.source)
-                            .any(i =>
-                                i.text.toLowerCase().startsWith((event.target as HTMLInputElement).value.toLowerCase())
-                            )
-                    ) {
-                        e.stopImmediatePropagation();
-                        return;
-                    }
-                    event.preventDefault();
-                    if (this.highlightedItem) {
-                        if (!this.viewData.selectMany(g => g.source).any(i => i.equals(this.highlightedItem))) {
-                            return;
-                        }
-                        if (this.selectedListItems.includes(this.highlightedItem)) {
-                            this.selectedListItems = this.selectedListItems.filter(
-                                i => !i.equals(this.highlightedItem)
-                            );
-                        } else {
-                            this.selectedListItems = [...this.selectedListItems, this.highlightedItem];
-                        }
-                        this.value = this.selectedListItems.map(i => i.data);
-                        this.valueChange.emit(this.value);
-                    }
-                }
-            });
-        this.filterChange$.pipe(takeUntil(this.componentDestroy$), debounceTime(50)).subscribe(filter => {
-            this.filterText = filter;
-            this.filterListData(filter);
-        });
-    }
-
     public get summaryTagText(): string {
-        console.log(this.tagCount);
         return this.tagCount < 0
             ? ""
             : this.tagCount === 0
-            ? `${this.selectedListItems.length} item${this.selectedListItems.length === 1 ? "" : "s"}`
-            : `${this.selectedListItems.length - this.tagCount} item${
-                  this.selectedListItems.length - this.tagCount > 1 ? "s" : ""
+            ? `${this.valuePopupListItem.length} item${this.valuePopupListItem.length === 1 ? "" : "s"}`
+            : `+${this.valuePopupListItem.length - this.tagCount} item${
+                  this.valuePopupListItem.length - this.tagCount > 1 ? "s" : ""
               }`;
     }
 
     public get visibleTagCount(): number {
-        return this.tagCount < 0 ? this.selectedListItems.length : this.tagCount === 0 ? 0 : this.tagCount;
+        return this.tagCount < 0 ? this.valuePopupListItem.length : this.tagCount === 0 ? 0 : this.tagCount;
     }
 }
