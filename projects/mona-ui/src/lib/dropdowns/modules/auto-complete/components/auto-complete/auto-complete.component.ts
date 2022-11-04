@@ -50,6 +50,9 @@ export class AutoCompleteComponent extends AbstractDropDownListComponent impleme
 
     public clearValue(event: MouseEvent): void {
         event.stopImmediatePropagation();
+        this.popupListService.sourceListData
+            .selectMany(g => g.source)
+            .forEach(i => (i.selected = i.highlighted = false));
         this.value = "";
         this.autoCompleteValue = "";
         this.valueChange.emit(this.value);
@@ -68,14 +71,18 @@ export class AutoCompleteComponent extends AbstractDropDownListComponent impleme
                 .selectMany(g => g.source)
                 .firstOrDefault(i => i.selected || i.highlighted);
             if (item) {
-                this.value = item.text;
                 this.valuePopupListItem = item;
-                this.autoCompleteValue = this.valuePopupListItem?.text ?? "";
-                this.valueChange.emit(this.value);
+                this.autoCompleteValue = item.text;
+                if (this.value !== item.text) {
+                    this.value = item.text;
+                    this.valueChange.emit(this.value);
+                }
             } else {
-                this.value = this.autoCompleteValue;
-                this.valuePopupListItem = undefined;
-                this.valueChange.emit(this.value);
+                if (this.value !== this.autoCompleteValue) {
+                    this.value = this.autoCompleteValue;
+                    this.valuePopupListItem = undefined;
+                    this.valueChange.emit(this.value);
+                }
             }
             this.close();
         } else if (event.key === "Escape") {
@@ -148,9 +155,11 @@ export class AutoCompleteComponent extends AbstractDropDownListComponent impleme
                             this.popupRef?.overlayRef.overlayElement.contains(target))
                     )
                 ) {
-                    this.value = this.autoCompleteValue;
+                    if (this.value !== this.autoCompleteValue) {
+                        this.value = this.autoCompleteValue;
+                        this.valueChange.emit(this.value);
+                    }
                     this.valuePopupListItem = undefined;
-                    this.valueChange.emit(this.value);
                 }
             });
     }
