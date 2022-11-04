@@ -16,6 +16,10 @@
     color: var(--mona-text) !important;
 }
 
+input {
+    font-size: 12px;
+}
+
 @mixin active-background {
     &:active {
         background-color: var(--mona-background-darker);
@@ -30,9 +34,9 @@
 
 @mixin disabled {
     pointer-events: none;
-    opacity: 0.5;
+    opacity: 0.37;
     cursor: default;
-    background-color: var(--mona-background-dark);
+    //background-color: var(--mona-background-dark);
 }
 
 @mixin focus-transition {
@@ -65,6 +69,10 @@
     }
 }
 
+.mona-focused {
+    @include focus-shadow;
+}
+
 /** Shared Components **/
 .mona-input-selector {
     width: auto;
@@ -86,16 +94,20 @@
     white-space: nowrap;
     padding: 0 8px;
     flex: 1;
+    overflow: hidden;
+    & > span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 }
 
 .mona-input-selector-icon {
-    width: var(--mona-input-height);
+    min-width: var(--mona-input-height);
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--mona-text);
 }
-
 
 ul.mona-list {
     //background: var(--mona-background);
@@ -145,29 +157,43 @@ button[monaButton] {
     border: 1px solid var(--mona-border-color);
     outline: none;
     user-select: none;
+    cursor: pointer;
 
-    &.primary {
+    &.mona-primary {
         background-color: var(--mona-primary);
         color: var(--mona-background);
         border: 1px solid var(--mona-primary);
-        &.selected {
+        &.mona-selected {
             background-color: var(--mona-primary-dark);
             color: var(--mona-background-light);
         }
     }
 
-    &.selected {
+    &.mona-flat {
+        border: none;
+        background: transparent;
+        transition: none;
+        &:focus,
+        &:focus-within {
+            box-shadow: none;
+        }
+        &:hover {
+            background-color: transparent;
+        }
+    }
+
+    &.mona-selected {
         background: var(--mona-primary);
         color: var(--mona-background);
     }
 
-    &.disabled {
+    &.mona-disabled {
         @include disabled;
     }
 
     @include background-transition;
 
-    &:not(.selected) {
+    &:not(.mona-selected) {
         @include hover-background;
         @include active-background;
     }
@@ -189,7 +215,7 @@ mona-button-group button[monaButton] {
     color: var(--mona-text);
     border: 1px solid var(--mona-border-color);
 
-    &.disabled {
+    &.mona-disabled {
         @include disabled;
     }
 
@@ -224,6 +250,36 @@ mona-button-group button[monaButton] {
 
 .mona-dropdown {
     width: 100%;
+    overflow: hidden;
+    &.mona-disabled {
+        @include disabled;
+    }
+}
+
+.mona-dropdown-clear-icon {
+    &:hover {
+        color: var(--mona-text-light);
+        font-weight: bold;
+    }
+}
+
+/** Auto Complete */
+.mona-auto-complete {
+    & .mona-input-selector-value {
+        & mona-text-box {
+            box-shadow: none;
+            & div:first-child {
+                border-left: none;
+                border-right: none;
+            }
+            & input {
+                padding: 2px 8px;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+            }
+        }
+    }
 }
 
 /** Combo Box */
@@ -234,6 +290,12 @@ mona-button-group button[monaButton] {
             & div:first-child {
                 border-left: none;
             }
+            & input {
+                padding: 2px 8px;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+            }
         }
     }
 }
@@ -241,9 +303,7 @@ mona-button-group button[monaButton] {
 
 /** Dropdown List */
 .mona-dropdown-list {
-    &.mona-disabled {
-        @include disabled;
-    }
+
 }
 
 .mona-dropdown-no-data {

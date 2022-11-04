@@ -3,8 +3,8 @@ import { PopupRef, PopupService, PopupSettings } from "mona-ui";
 import { TestComponentComponent } from "./test-component/test-component.component";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { faMoon, faSearch, faSnowflake, faSun } from "@fortawesome/free-solid-svg-icons";
-import { Enumerable, Group, List } from "@mirei/ts-collections";
-import { ListItem } from "../../../../dist/mona-ui/lib/shared/data/ListItem";
+import { IndexableList } from "@mirei/ts-collections";
+import { map, Observable } from "rxjs";
 
 @Component({
     selector: "app-root",
@@ -17,6 +17,8 @@ export class AppComponent implements OnInit {
     public readonly searchIcon: IconDefinition = faSearch;
     public readonly snowflakeIcon: IconDefinition = faSnowflake;
     public readonly sunIcon: IconDefinition = faSun;
+
+    public autoCompleteValue: string = "Yakizakana";
 
     public colorPalette: string[] = [
         "#263400",
@@ -64,8 +66,21 @@ export class AppComponent implements OnInit {
     public colorPaletteValue: string = "#fb9a99";
     public colorPickerValue: string | null = "#0086fc";
 
+    public comboBoxValueNormalizer$ = (text$: Observable<string>): Observable<any> => {
+        return text$.pipe(
+            map((text: string) => {
+                return {
+                    text: text,
+                    value: Math.random(),
+                    group: "Custom",
+                    active: true
+                };
+            })
+        );
+    };
+
     public contextMenuItemVisible: boolean = true;
-    public dropdownListDataItems: any[] = [
+    public dropdownListDataItems: IndexableList<any> = new IndexableList([
         { text: "Cherry", value: 1, group: "Fruit", active: true },
         { text: "Cabbage", value: 2, group: "Vegetable", active: true },
         { text: "Grilled Meat", value: 3, group: "Food", active: true },
@@ -95,8 +110,10 @@ export class AppComponent implements OnInit {
         { text: "Ramen", value: 27, group: "Food", active: true },
         { text: "Onigiri", value: 28, group: "Food", active: true },
         { text: "Okonomiyaki", value: 29, group: "Food", active: true },
-        { text: "Yakizakana", value: 30, group: "Food", active: true }
-    ];
+        { text: "Yakizakana", value: 30, group: "Food", active: true },
+        { text: "Pink-flowered native raspberry", value: 31, group: "Fruit", active: true }
+    ]);
+    public dropdownPartialPrimitiveDataItems: string[] = [];
     public dropdownPrimitiveDataItems: string[] = [
         "Willow",
         "Birch",
@@ -120,20 +137,8 @@ export class AppComponent implements OnInit {
         "Linden",
         "Maidenhair Tree"
     ];
-    public groupedDropdownListDataItems: List<Group<string, ListItem>> = new List<Group<string, ListItem>>([
-        new Group<string, ListItem>(
-            "",
-            Enumerable.from(this.dropdownListDataItems)
-                .select(d => {
-                    return {
-                        data: d,
-                        text: d.text,
-                        value: d.value
-                    } as ListItem;
-                })
-                .toList()
-        )
-    ]);
+
+    public multiSelectTagCount: number = 2;
 
     public numericTextBoxValue: number = 629;
     public rangedSliderValues: [number, number] = [12, 18];
@@ -144,6 +149,7 @@ export class AppComponent implements OnInit {
         { text: "REPLACED WITH PAPRIKA", value: 13, group: "Fruit", active: true },
         { text: "REPLACED WITH Okonomiyaki", value: 29, group: "FOODIE", active: true }
     ];
+    public selectedPrimitiveComboBoxDataItem: string | null = null;
     public sliderValue: number = 8;
     public switchValue: boolean = false;
     public textBoxValue: string = "TEXT BOX VALUE";
@@ -164,6 +170,7 @@ export class AppComponent implements OnInit {
     public constructor(public readonly popupService: PopupService) {}
 
     public dropdownItemDisabler = (item: any): boolean => !item.active;
+    public dropdownPrimitiveItemDisabler = (item: string): boolean => item.includes("i");
 
     public ngOnInit(): void {
         this.selectedDropdownListDataItem = { text: "REPLACED WITH PAPRIKA", value: 13, group: "Fruit", active: true };
@@ -172,9 +179,30 @@ export class AppComponent implements OnInit {
             // this.contextMenuItemVisible = !this.contextMenuItemVisible;
             // this.dropdownItemDisabler = (item: any): boolean => item.value % 3 === 0;
         }, 3000);
+        this.selectedDropdownListDataItem = { ...this.dropdownListDataItems[4] };
+        this.selectedPrimitiveComboBoxDataItem = this.dropdownPrimitiveDataItems[7];
+
+        this.dropdownPartialPrimitiveDataItems = this.dropdownPrimitiveDataItems.slice();
+
+        // window.setInterval(() => {
+        //     const randomIndex = Math.floor(Math.random() * this.dropdownListDataItems.length);
+        //     const randomIndex2 = Math.floor(Math.random() * this.dropdownListDataItems.length);
+        //     this.dropdownPartialPrimitiveDataItems = this.dropdownPrimitiveDataItems.slice(
+        //         Math.min(randomIndex, randomIndex2),
+        //         Math.max(randomIndex, randomIndex2)
+        //     );
+        // }, 3000);
     }
 
     public numericTextBoxFormatter = (value: number | null): string => (value != null ? `${value} °C` : "");
+
+    public generateRandomNumber(min: number, max: number): number {
+        return Math.floor(Math.random() * (max - min)) + min;
+    }
+
+    public onAutoCompleteValueChange(value: string): void {
+        console.log("Auto-complete value changed: ", value);
+    }
 
     public onButtonSelectedChange(selected: boolean): void {
         // console.log(`Button selected: ${selected}`);
@@ -198,6 +226,7 @@ export class AppComponent implements OnInit {
 
     public onMultiSelectValueChange(value: unknown[]): void {
         console.log(`MultiSelect value changed`, value);
+        this.selectedMultiSelectDataItems = value;
     }
 
     public onPopupClose(): void {

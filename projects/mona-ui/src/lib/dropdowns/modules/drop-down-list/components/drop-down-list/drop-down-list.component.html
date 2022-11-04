@@ -1,45 +1,38 @@
-<div class="mona-dropdown mona-dropdown-list mona-input-selector" [attr.tabindex]="disabled ? -1 : 0"
-     [ngClass]="{'mona-disabled': disabled}"
-     (click)="open()"
-     #dropdownWrapper>
+<div class="mona-dropdown mona-dropdown-list mona-input-selector" [ngClass]="{'mona-disabled': disabled}" [attr.tabindex]="disabled ? -1 : 0" (click)="open()" #dropdownWrapper>
     <div class="mona-input-selector-value">
         <ng-container *ngIf="!valueTemplate">
-            <span>{{selectedListItems[0]?.text ?? value}}</span>
+            <span *ngIf="valuePopupListItem">{{valuePopupListItem?.text}}</span>
+            <span *ngIf="!valuePopupListItem">{{placeholder}}</span>
         </ng-container>
         <ng-container *ngIf="valueTemplate">
-            <ng-container [ngTemplateOutlet]="valueTemplate"
-                          [ngTemplateOutletContext]="{$implicit: selectedListItems[0]?.data ?? value, listItem: selectedListItems[0]}"></ng-container>
+            <ng-container [ngTemplateOutlet]="valueTemplate" [ngTemplateOutletContext]="{$implicit: valuePopupListItem?.data, listItem: valuePopupListItem}"></ng-container>
         </ng-container>
+    </div>
+    <div class="mona-input-selector-icon" *ngIf="showClearButton && valuePopupListItem">
+        <button monaButton [flat]="true" (click)="clearValue($event)" class="mona-dropdown-clear-icon">
+            <fa-icon [icon]="clearIcon"></fa-icon>
+        </button>
     </div>
     <div class="mona-input-selector-icon">
         <fa-icon [icon]="dropdownIcon"></fa-icon>
     </div>
 </div>
 
-<ng-template #dropdownPopupTemplate>
-    <div *ngIf="filterable">
-        <mona-text-box class="filter-box" [ngModel]="filterText" (ngModelChange)="filterChange$.next($event)"
-                       (keydown)="filterKeydown$.next($event)">
-            <ng-template monaTextBoxPrefixTemplate>
-                <fa-icon [icon]="filterIcon"></fa-icon>
-            </ng-template>
-        </mona-text-box>
-    </div>
-    <div>
-        <mona-list [data]="viewData" [itemDisabler]="itemDisabler" [highlightable]="true" [highlightedItem]="selectedListItems[0]"
-                   [value]="selectedListItems" (valueChange)="onSelectedListItemsChange($event)" #listComponent>
+<ng-template #popupTemplate>
+    <div *ngIf="!!popupRef">
+        <mona-popup-list [textField]="textField" [valueField]="valueField" [groupField]="groupField" [value]="value ? [value] : []"
+                         [filterable]="filterable"
+                         (valueChange)="onPopupListValueChange($event)">
             <ng-container *ngIf="itemTemplate">
                 <ng-template monaListItemTemplate let-dataItem let-listItem="listItem">
-                    <ng-container [ngTemplateOutlet]="itemTemplate ?? null"
-                                  [ngTemplateOutletContext]="{$implicit: dataItem, listItem}"></ng-container>
+                    <ng-container [ngTemplateOutlet]="itemTemplate ?? null" [ngTemplateOutletContext]="{$implicit: dataItem, listItem}"></ng-container>
                 </ng-template>
             </ng-container>
             <ng-container *ngIf="groupTemplate">
                 <ng-template monaListGroupTemplate let-dataItem let-listItem="listItem">
-                    <ng-container [ngTemplateOutlet]="groupTemplate ?? null"
-                                  [ngTemplateOutletContext]="{$implicit: dataItem, listItem}"></ng-container>
+                    <ng-container [ngTemplateOutlet]="groupTemplate ?? null" [ngTemplateOutletContext]="{$implicit: dataItem, listItem}"></ng-container>
                 </ng-template>
             </ng-container>
-        </mona-list>
+        </mona-popup-list>
     </div>
 </ng-template>
