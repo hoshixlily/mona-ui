@@ -263,6 +263,25 @@ mona-button-group button[monaButton] {
     }
 }
 
+/** Auto Complete */
+.mona-auto-complete {
+    & .mona-input-selector-value {
+        & mona-text-box {
+            box-shadow: none;
+            & div:first-child {
+                border-left: none;
+                border-right: none;
+            }
+            & input {
+                padding: 2px 8px;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+            }
+        }
+    }
+}
+
 /** Combo Box */
 .mona-combo-box {
     & .mona-input-selector-value {

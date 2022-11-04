@@ -33,6 +33,8 @@ import { PopupListItem } from "../../data/PopupListItem";
 })
 export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy, OnChanges {
     protected readonly componentDestroy$: Subject<void> = new Subject<void>();
+    protected navigateWhileClosed: boolean = true;
+    protected openOnEnter: boolean = false;
     public readonly clearIcon: IconDefinition = faTimes;
     public readonly dropdownIcon: IconDefinition = faChevronDown;
     public popupRef: PopupRef | null = null;
@@ -170,8 +172,13 @@ export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy
                         }
                         return;
                     }
-                    this.open();
+                    if (this.openOnEnter) {
+                        this.open();
+                    }
                 } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+                    if (!this.navigateWhileClosed) {
+                        return;
+                    }
                     if (this.popupRef) {
                         return;
                     }

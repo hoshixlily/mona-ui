@@ -1,0 +1,28 @@
+<div class="mona-dropdown mona-auto-complete mona-input-selector" [ngClass]="{'mona-disabled': disabled}" [attr.tabindex]="disabled ? -1 : 0" #dropdownWrapper>
+    <div class="mona-input-selector-value">
+        <mona-text-box [ngModel]="autoCompleteValue" (ngModelChange)="autoCompleteValue$.next($event)" (keydown)="onKeydown($event)"></mona-text-box>
+    </div>
+    <div class="mona-input-selector-icon" *ngIf="showClearButton && value">
+        <button monaButton [flat]="true" (click)="clearValue($event)" class="mona-dropdown-clear-icon" tabindex="-1">
+            <fa-icon [icon]="clearIcon"></fa-icon>
+        </button>
+    </div>
+</div>
+
+<ng-template #popupTemplate>
+    <div *ngIf="!!popupRef">
+        <mona-popup-list [textField]="textField" [valueField]="valueField" [groupField]="groupField" [value]="value ? [value] : []"
+                         (valueChange)="onPopupListValueChange($event)">
+            <ng-container *ngIf="itemTemplate">
+                <ng-template monaListItemTemplate let-dataItem let-listItem="listItem">
+                    <ng-container [ngTemplateOutlet]="itemTemplate ?? null" [ngTemplateOutletContext]="{$implicit: dataItem, listItem}"></ng-container>
+                </ng-template>
+            </ng-container>
+            <ng-container *ngIf="groupTemplate">
+                <ng-template monaListGroupTemplate let-dataItem let-listItem="listItem">
+                    <ng-container [ngTemplateOutlet]="groupTemplate ?? null" [ngTemplateOutletContext]="{$implicit: dataItem, listItem}"></ng-container>
+                </ng-template>
+            </ng-container>
+        </mona-popup-list>
+    </div>
+</ng-template>
