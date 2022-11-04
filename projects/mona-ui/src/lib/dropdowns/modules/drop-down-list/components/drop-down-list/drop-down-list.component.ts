@@ -27,6 +27,7 @@ import { DropDownListGroupTemplateDirective } from "../../directives/drop-down-l
     providers: [PopupListService]
 })
 export class DropDownListComponent extends AbstractDropDownListComponent implements OnInit {
+    protected override openOnEnter: boolean = true;
     protected selectionMode: SelectionMode = "single";
     public override valuePopupListItem?: PopupListItem;
 

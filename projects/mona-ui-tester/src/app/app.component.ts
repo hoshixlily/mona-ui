@@ -18,6 +18,8 @@ export class AppComponent implements OnInit {
     public readonly snowflakeIcon: IconDefinition = faSnowflake;
     public readonly sunIcon: IconDefinition = faSun;
 
+    public autoCompleteValue: string = "Yakizakana";
+
     public colorPalette: string[] = [
         "#263400",
         "#d61dff",
@@ -196,6 +198,10 @@ export class AppComponent implements OnInit {
 
     public generateRandomNumber(min: number, max: number): number {
         return Math.floor(Math.random() * (max - min)) + min;
+    }
+
+    public onAutoCompleteValueChange(value: string): void {
+        console.log("Auto-complete value changed: ", value);
     }
 
     public onButtonSelectedChange(selected: boolean): void {

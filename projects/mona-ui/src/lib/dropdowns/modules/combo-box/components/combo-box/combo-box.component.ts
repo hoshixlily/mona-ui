@@ -33,8 +33,8 @@ import { ComboBoxItemTemplateDirective } from "../../directives/combo-box-item-t
 export class ComboBoxComponent extends AbstractDropDownListComponent implements OnInit {
     protected selectionMode: SelectionMode = "single";
     public readonly comboBoxValue$: Subject<string> = new Subject<string>();
-    public override valuePopupListItem?: PopupListItem;
     public comboBoxValue: string = "";
+    public override valuePopupListItem?: PopupListItem;
 
     @Input()
     public allowCustomValue: boolean = true;
@@ -167,17 +167,28 @@ export class ComboBoxComponent extends AbstractDropDownListComponent implements 
     }
 
     private setEventListeners(): void {
-        fromEvent<FocusEvent>(this.elementRef.nativeElement, "focusout").subscribe(event => {
-            const target = event.relatedTarget as HTMLElement;
-            if (
-                target &&
-                (this.elementRef.nativeElement.contains(target) ||
-                    this.popupRef?.overlayRef.overlayElement.contains(target))
-            ) {
-                return;
-            }
-            this.close();
-        });
+        fromEvent<FocusEvent>(this.elementRef.nativeElement, "focusout")
+            .pipe(takeUntil(this.componentDestroy$))
+            .subscribe(event => {
+                const target = event.relatedTarget as HTMLElement;
+                if (
+                    target &&
+                    (this.elementRef.nativeElement.contains(target) ||
+                        this.popupRef?.overlayRef.overlayElement.contains(target))
+                ) {
+                    return;
+                }
+                this.close();
+            });
+        fromEvent<FocusEvent>(this.elementRef.nativeElement, "focusin")
+            .pipe(takeUntil(this.componentDestroy$))
+            .subscribe(() => {
+                const input = this.elementRef.nativeElement.querySelector("input");
+                if (input) {
+                    input.focus();
+                    input.setSelectionRange(-1, -1);
+                }
+            });
     }
 
     private setSubscriptions(): void {
