@@ -9,6 +9,7 @@ export interface TreeNodeOptions<T = any> {
 }
 
 export class TreeNode<T = any> {
+    public readonly uid: string = crypto.randomUUID();
     public checked: boolean = false;
     public data?: T;
     public expanded: boolean = false;

@@ -705,3 +705,14 @@ input[monaTextBox] {
     padding: 8px 10px;
     box-shadow: var(--mona-popup-shadow);
 }
+
+/** TreeView */
+.mona-tree-node-content {
+    & > input[monaCheckBox] + label::before {
+        width: calc(var(--mona-input-height) - 12px);
+        height: calc(var(--mona-input-height) - 12px);
+    }
+    & > input[monaCheckBox]:checked + label:before {
+        font-size: 1.0rem;
+    }
+}

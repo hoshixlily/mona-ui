@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { TreeNode } from "../../data/TreeNode";
-import { List } from "@mirei/ts-collections";
+import { Dictionary, List } from "@mirei/ts-collections";
 
 @Component({
     selector: "mona-tree-view",
@@ -8,6 +8,7 @@ import { List } from "@mirei/ts-collections";
     styleUrls: ["./tree-view.component.scss"]
 })
 export class TreeViewComponent implements OnInit {
+    private nodeDictionary: Dictionary<string, TreeNode> = new Dictionary<string, TreeNode>();
     public nodeList: TreeNode[] = [];
     public viewNodeList: TreeNode[] = [];
 
@@ -26,7 +27,6 @@ export class TreeViewComponent implements OnInit {
     public constructor() {}
     public ngOnInit(): void {
         this.prepareNodeList();
-        console.log(this.nodeList);
         this.viewNodeList = [...this.nodeList];
     }
 
@@ -56,6 +56,7 @@ export class TreeViewComponent implements OnInit {
                 this.prepareNodeListRecursively(dataItem[this.childrenField], node, node.nodes);
             }
             childNodes?.push(node);
+            this.nodeDictionary.add(node.uid, node);
         }
     }
 }

@@ -167,6 +167,21 @@ export class AppComponent implements OnInit {
                 {
                     text: "Foods",
                     items: [{ text: "Yakisoba" }, { text: "Yakitori" }, { text: "Sushi" }, { text: "Sashimi" }]
+                },
+                {
+                    text: "Vegetables",
+                    items: [{ text: "Cabbage" }, { text: "Cabbage Black" }, { text: "Pumpkin" }, { text: "Potato" }]
+                },
+                {
+                    text: "Trees",
+                    items: [
+                        { text: "Willow" },
+                        { text: "Birch" },
+                        { text: "Oak" },
+                        { text: "Pine" },
+                        { text: "Maple" },
+                        { text: "Cedar" }
+                    ]
                 }
             ]
         }
