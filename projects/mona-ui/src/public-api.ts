@@ -104,8 +104,10 @@ export * from "./lib/popup/components/popup/popup.component";
 export * from "./lib/popup/popup.module";
 
 /** TreeView */
-export { TreeNodeOptions } from "./lib/tree-view/data/TreeNode";
+export { NodeOptions } from "./lib/tree-view/data/Node";
 export * from "./lib/tree-view/components/tree-view/tree-view.component";
+export * from "./lib/tree-view/directives/tree-view-checkable.directive";
+export * from "./lib/tree-view/directives/tree-view-node-text-template.directive";
 export * from "./lib/tree-view/tree-view.module";
 
 /** Shared [TEMPORARY EXPORT] */

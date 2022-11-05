@@ -5,7 +5,7 @@ import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { faMoon, faSearch, faSnowflake, faSun } from "@fortawesome/free-solid-svg-icons";
 import { IndexableList } from "@mirei/ts-collections";
 import { map, Observable } from "rxjs";
-import { TreeNodeOptions } from "../../../mona-ui/src/lib/tree-view/data/TreeNode";
+import { NodeOptions } from "../../../mona-ui/src/lib/tree-view/data/Node";
 
 @Component({
     selector: "app-root",
@@ -159,28 +159,48 @@ export class AppComponent implements OnInit {
     public treeData: any[] = [
         {
             text: "Root",
+            id: "1",
             items: [
                 {
                     text: "Fruits",
-                    items: [{ text: "Apple" }, { text: "Apricot" }, { text: "Banana" }, { text: "Cherry" }]
+                    id: "1-1",
+                    items: [
+                        { text: "Apple", id: "1-1-1" },
+                        { text: "Apricot", id: "1-1-2" },
+                        { text: "Banana", id: "1-1-3" },
+                        { text: "Cherry", id: "1-1-4" }
+                    ]
                 },
                 {
                     text: "Foods",
-                    items: [{ text: "Yakisoba" }, { text: "Yakitori" }, { text: "Sushi" }, { text: "Sashimi" }]
+                    id: "1-2",
+                    items: [
+                        { text: "Yakisoba", id: "1-2-1" },
+                        { text: "Yakitori", id: "1-2-2" },
+                        { text: "Sushi", id: "1-2-3" },
+                        { text: "Sashimi", id: "1-2-4" }
+                    ]
                 },
                 {
                     text: "Vegetables",
-                    items: [{ text: "Cabbage" }, { text: "Cabbage Black" }, { text: "Pumpkin" }, { text: "Potato" }]
+                    id: "1-3",
+                    items: [
+                        { text: "Cabbage", id: "1-3-1" },
+                        { text: "Cabbage Black", id: "1-3-2" },
+                        { text: "Pumpkin", id: "1-3-3" },
+                        { text: "Potato", id: "1-3-4" }
+                    ]
                 },
                 {
                     text: "Trees",
+                    id: "1-4",
                     items: [
-                        { text: "Willow" },
-                        { text: "Birch" },
-                        { text: "Oak" },
-                        { text: "Pine" },
-                        { text: "Maple" },
-                        { text: "Cedar" }
+                        { text: "Willow", id: "1-4-1" },
+                        { text: "Birch", id: "1-4-2" },
+                        { text: "Oak", id: "1-4-3" },
+                        { text: "Pine", id: "1-4-4" },
+                        { text: "Maple", id: "1-4-5" },
+                        { text: "Cedar", id: "1-4-6" }
                     ]
                 }
             ]

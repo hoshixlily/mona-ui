@@ -1,6 +1,11 @@
 <div class="wrapper">
     <div class="side-bar">
-        <mona-tree-view [data]="treeData" textField="text" childrenField="items"></mona-tree-view>
+        <mona-tree-view [data]="treeData" textField="text" childrenField="items" keyField="id" [monaTreeViewCheckable]="{checkChildren: true}">
+            <ng-template monaTreeViewNodeTextTemplate let-dataItem>
+                <span style="color: crimson; font-weight: bold;" *ngIf="dataItem.items && dataItem.items?.length !== 0">{{dataItem.text}}</span>
+                <span style="color: snow; font-weight: bold;" *ngIf="!dataItem.items || dataItem.items?.length === 0">{{dataItem.text}}</span>
+            </ng-template>
+        </mona-tree-view>
     </div>
     <div class="content">
         <div>

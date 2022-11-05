@@ -3,13 +3,13 @@
         <ng-template #treeTemplate let-nodes>
             <ng-container *ngFor="let node of nodes; let nx = index;">
                 <li class="mona-tree-list-item">
-                    <mona-tree-view-node [node]="node"></mona-tree-view-node>
+                    <mona-tree-view-node [node]="node" [nodeTextTemplate]="nodeTextTemplate"></mona-tree-view-node>
                     <ul class="mona-subtree-list" *ngIf="node.nodes.length !== 0 && node.expanded">
                         <ng-container [ngTemplateOutlet]="treeTemplate" [ngTemplateOutletContext]="{$implicit: node.nodes}"></ng-container>
                     </ul>
                 </li>
             </ng-container>
         </ng-template>
-        <ng-container [ngTemplateOutlet]="treeTemplate" [ngTemplateOutletContext]="{$implicit: viewNodeList}"></ng-container>
+        <ng-container [ngTemplateOutlet]="treeTemplate" [ngTemplateOutletContext]="{$implicit: treeViewService.viewNodeList}"></ng-container>
     </ul>
 </div>

@@ -1,13 +1,15 @@
 <div class="mona-tree-view-node">
-    <div class="mona-tree-node-expander" (click)="onExpandNodeToggle($event)" [ngClass]="{'mona-interactive': node.nodes.length !== 0}">
+    <div class="mona-tree-node-expander" (click)="onExpandToggle($event)" [ngClass]="{'mona-interactive': node.nodes.length !== 0}">
         <fa-icon [icon]="expandIcon" *ngIf="node.nodes.length !== 0 && !node.expanded"></fa-icon>
         <fa-icon [icon]="collapseIcon" *ngIf="node.nodes.length !== 0 && node.expanded"></fa-icon>
     </div>
     <div class="mona-tree-node-content">
-        <input type="checkbox" id="mona-tree-node-checkbox-{{node.uid}}" monaCheckBox>
+        <input type="checkbox" id="mona-tree-node-checkbox-{{node.uid}}" [indeterminate]="node.indeterminate"
+               [ngModel]="node.checked" (ngModelChange)="onCheckToggle($event)" monaCheckBox *ngIf="treeViewService.checkableOptions?.enabled">
         <label for="mona-tree-node-checkbox-{{node.uid}}"></label>
         <div class="mona-tree-view-node-text">
-            <ng-container>{{node.text}}</ng-container>
+            <ng-container *ngIf="!nodeTextTemplate">{{node.text}}</ng-container>
+            <ng-container [ngTemplateOutlet]="nodeTextTemplate" [ngTemplateOutletContext]="{$implicit: node.data, node: node}" *ngIf="!!nodeTextTemplate"></ng-container>
         </div>
     </div>
 </div>

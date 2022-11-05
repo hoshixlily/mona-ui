@@ -1,17 +1,16 @@
-import { Component, Input, OnInit } from "@angular/core";
-import { TreeNode } from "../../data/TreeNode";
-import { Dictionary, List } from "@mirei/ts-collections";
+import { Component, ContentChild, Input, OnInit, TemplateRef } from "@angular/core";
+import { Node } from "../../data/Node";
+import { List } from "@mirei/ts-collections";
+import { TreeViewService } from "../../services/tree-view.service";
+import { TreeViewNodeTextTemplateDirective } from "../../directives/tree-view-node-text-template.directive";
 
 @Component({
     selector: "mona-tree-view",
     templateUrl: "./tree-view.component.html",
-    styleUrls: ["./tree-view.component.scss"]
+    styleUrls: ["./tree-view.component.scss"],
+    providers: [TreeViewService]
 })
 export class TreeViewComponent implements OnInit {
-    private nodeDictionary: Dictionary<string, TreeNode> = new Dictionary<string, TreeNode>();
-    public nodeList: TreeNode[] = [];
-    public viewNodeList: TreeNode[] = [];
-
     @Input()
     public childrenField: string = "";
 
@@ -21,42 +20,48 @@ export class TreeViewComponent implements OnInit {
     @Input()
     public keyField: string = "";
 
+    @ContentChild(TreeViewNodeTextTemplateDirective, { read: TemplateRef })
+    public nodeTextTemplate?: TemplateRef<never> | null = null;
+
     @Input()
     public textField: string = "";
 
-    public constructor() {}
+    public constructor(public readonly treeViewService: TreeViewService) {}
+
     public ngOnInit(): void {
         this.prepareNodeList();
-        this.viewNodeList = [...this.nodeList];
+        this.treeViewService.viewNodeList = [...this.treeViewService.nodeList];
     }
 
     private prepareNodeList(): void {
-        this.nodeList = [];
-        this.viewNodeList = [];
-        this.prepareNodeListRecursively(this.data, undefined, this.nodeList);
+        this.treeViewService.nodeList = [];
+        this.treeViewService.viewNodeList = [];
+        this.treeViewService.nodeDictionary.clear();
+        this.prepareNodeListRecursively(this.data, undefined, this.treeViewService.nodeList);
     }
 
-    private prepareNodeListRecursively(root: Iterable<any>, parentNode?: TreeNode, childNodes?: any[]): void {
+    private prepareNodeListRecursively(root: Iterable<any>, parentNode?: Node, childNodes?: any[]): void {
         const rootList = new List(root ?? []);
         if (rootList.length === 0) {
             return;
         }
         for (const [dx, dataItem] of rootList.entries()) {
             const nodeId = dataItem[this.keyField];
-            const node: TreeNode = new TreeNode<any>({
-                id: nodeId,
+            const node: Node = new Node<any>({
+                key: nodeId,
                 data: dataItem,
                 checked: false,
-                expanded: false,
+                expanded: true,
                 selected: false,
                 text: dataItem[this.textField],
-                nodes: []
+                nodes: [],
+                parent: parentNode
             });
             if (this.childrenField) {
                 this.prepareNodeListRecursively(dataItem[this.childrenField], node, node.nodes);
             }
             childNodes?.push(node);
-            this.nodeDictionary.add(node.uid, node);
+            this.treeViewService.nodeDictionary.add(node.uid, node);
         }
     }
 }
