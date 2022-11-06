@@ -1,6 +1,9 @@
 <div class="wrapper">
     <div class="side-bar">
-        <mona-tree-view [data]="treeData" textField="text" childrenField="items" keyField="id" [monaTreeViewCheckable]="{checkChildren: true}">
+        <mona-tree-view [data]="treeData" textField="text" childrenField="items" keyField="id"
+                        [monaTreeViewCheckable]="{enabled: true, checkChildren: true, checkParents: true, checkMode: 'multiple'}"
+                        [checkedKeys]="['1-2', '1-3']" (checkedKeysChange)="onTreeCheckedKeysChange($event)"
+                        monaTreeViewExpandable [expandedKeys]="['1-2', '1-3']" (expandedKeysChange)="onTreeExpandedKeysChange($event)">
             <ng-template monaTreeViewNodeTextTemplate let-dataItem>
                 <span style="color: crimson; font-weight: bold;" *ngIf="dataItem.items && dataItem.items?.length !== 0">{{dataItem.text}}</span>
                 <span style="color: snow; font-weight: bold;" *ngIf="!dataItem.items || dataItem.items?.length === 0">{{dataItem.text}}</span>

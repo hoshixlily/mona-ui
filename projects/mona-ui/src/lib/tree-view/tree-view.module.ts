@@ -7,15 +7,22 @@ import { CheckBoxModule } from "../inputs/modules/check-box/check-box.module";
 import { FormsModule } from "@angular/forms";
 import { TreeViewCheckableDirective } from "./directives/tree-view-checkable.directive";
 import { TreeViewNodeTextTemplateDirective } from "./directives/tree-view-node-text-template.directive";
+import { TreeViewExpandableDirective } from "./directives/tree-view-expandable.directive";
 
 @NgModule({
     declarations: [
         TreeViewComponent,
         TreeViewNodeComponent,
         TreeViewCheckableDirective,
-        TreeViewNodeTextTemplateDirective
+        TreeViewNodeTextTemplateDirective,
+        TreeViewExpandableDirective
     ],
     imports: [CommonModule, FontAwesomeModule, CheckBoxModule, FormsModule],
-    exports: [TreeViewComponent, TreeViewCheckableDirective, TreeViewNodeTextTemplateDirective]
+    exports: [
+        TreeViewComponent,
+        TreeViewCheckableDirective,
+        TreeViewNodeTextTemplateDirective,
+        TreeViewExpandableDirective
+    ]
 })
 export class TreeViewModule {}

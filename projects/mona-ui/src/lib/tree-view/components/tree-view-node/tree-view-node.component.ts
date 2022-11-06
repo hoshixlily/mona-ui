@@ -31,9 +31,34 @@ export class TreeViewNodeComponent implements OnInit {
             checkChildren: this.treeViewService.checkableOptions?.checkChildren,
             checkParent: this.treeViewService.checkableOptions?.checkParents
         });
+        const checkedKeys = this.treeViewService.nodeDictionary
+            .where(n => n.value.checked)
+            .select(n => n.value.key)
+            .toArray();
+        this.treeViewService.checkedKeysChange.emit(checkedKeys);
     }
 
     public onExpandToggle(event: MouseEvent): void {
-        this.node.expanded = !this.node.expanded;
+        this.node.expand(!this.node.expanded, false);
+        const expandedKeys = this.treeViewService.nodeDictionary
+            .where(n => n.value.expanded)
+            .select(n => n.value.key)
+            .toArray();
+        this.treeViewService.expandedKeysChange.emit(expandedKeys);
+    }
+
+    public onSelectToggle(event: MouseEvent): void {
+        if (this.node.selected) {
+            this.node.setSelected(false);
+            this.treeViewService.lastSelectedNode = undefined;
+        } else {
+            if (this.treeViewService.selectableOptions.mode === "single") {
+                if (this.treeViewService.lastSelectedNode) {
+                    this.treeViewService.lastSelectedNode.setSelected(false);
+                }
+            }
+            this.node.setSelected(true);
+            this.treeViewService.lastSelectedNode = this.node;
+        }
     }
 }

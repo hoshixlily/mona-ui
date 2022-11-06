@@ -26,8 +26,8 @@ export class Node<T = any> {
     public constructor(options: NodeOptions<T>) {
         this.checked = options.checked ?? false;
         this.data = options.data;
-        this.expanded = options.expanded || false;
-        this.indeterminate = options.indeterminate || false;
+        this.expanded = options.expanded ?? false;
+        this.indeterminate = options.indeterminate ?? false;
         this.key = options.key;
         this.nodes = options.nodes?.map(node => new Node(node)) ?? [];
         this.parent = options.parent;
@@ -53,5 +53,23 @@ export class Node<T = any> {
                 parent.check({ checked: allSiblingsChecked, checkChildren: false, checkParent: true });
             }
         }
+    }
+
+    public expand(expanded: boolean, expandChildren: boolean = false): void {
+        this.expanded = expanded;
+        if (expandChildren) {
+            this.nodes.forEach(node => node.expand(expanded, expandChildren));
+        }
+        if (this.expanded) {
+            let parent = this.parent;
+            while (parent) {
+                parent.expand(expanded, false);
+                parent = parent.parent;
+            }
+        }
+    }
+
+    public setSelected(selected: boolean): void {
+        this.selected = selected;
     }
 }

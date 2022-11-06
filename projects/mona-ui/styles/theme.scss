@@ -716,3 +716,8 @@ input[monaTextBox] {
         font-size: 1.0rem;
     }
 }
+
+.mona-tree-view-node-selected {
+    background-color: var(--mona-primary);
+    border: 1px solid var(--mona-border-color);
+}

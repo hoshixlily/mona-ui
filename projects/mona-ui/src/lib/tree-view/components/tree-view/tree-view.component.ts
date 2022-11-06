@@ -29,6 +29,11 @@ export class TreeViewComponent implements OnInit {
     public constructor(public readonly treeViewService: TreeViewService) {}
 
     public ngOnInit(): void {
+        if (!this.keyField) {
+            throw new Error(
+                "mona-tree-view: keyField is required. (keyField is a field that is unique for each node.)"
+            );
+        }
         this.prepareNodeList();
         this.treeViewService.viewNodeList = [...this.treeViewService.nodeList];
     }
@@ -45,13 +50,13 @@ export class TreeViewComponent implements OnInit {
         if (rootList.length === 0) {
             return;
         }
-        for (const [dx, dataItem] of rootList.entries()) {
+        for (const dataItem of rootList) {
             const nodeId = dataItem[this.keyField];
             const node: Node = new Node<any>({
                 key: nodeId,
                 data: dataItem,
                 checked: false,
-                expanded: true,
+                expanded: false,
                 selected: false,
                 text: dataItem[this.textField],
                 nodes: [],

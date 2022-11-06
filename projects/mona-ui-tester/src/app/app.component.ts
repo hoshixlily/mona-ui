@@ -309,6 +309,16 @@ export class AppComponent implements OnInit {
         this.textBoxValue = value;
     }
 
+    public onTreeCheckedKeysChange(checkedKeys: string[]): void {
+        console.log(checkedKeys);
+        // this.checkedTreeKeys = checkedKeys;
+    }
+
+    public onTreeExpandedKeysChange(expandedKeys: string[]): void {
+        console.log(expandedKeys);
+        // this.expandedTreeKeys = expandedKeys;
+    }
+
     public openPopup(event: MouseEvent): void {
         event.stopPropagation();
         const popupSettings: PopupSettings = {

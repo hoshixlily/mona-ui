@@ -5,9 +5,9 @@
     </div>
     <div class="mona-tree-node-content">
         <input type="checkbox" id="mona-tree-node-checkbox-{{node.uid}}" [indeterminate]="node.indeterminate"
-               [ngModel]="node.checked" (ngModelChange)="onCheckToggle($event)" monaCheckBox *ngIf="treeViewService.checkableOptions?.enabled">
+               [ngModel]="node.checked" (ngModelChange)="onCheckToggle($event)" monaCheckBox *ngIf="treeViewService.checkableOptions.enabled">
         <label for="mona-tree-node-checkbox-{{node.uid}}"></label>
-        <div class="mona-tree-view-node-text">
+        <div class="mona-tree-view-node-text" [ngClass]="{'mona-tree-view-node-selected': node.selected}" (click)="onSelectToggle($event)">
             <ng-container *ngIf="!nodeTextTemplate">{{node.text}}</ng-container>
             <ng-container [ngTemplateOutlet]="nodeTextTemplate" [ngTemplateOutletContext]="{$implicit: node.data, node: node}" *ngIf="!!nodeTextTemplate"></ng-container>
         </div>
