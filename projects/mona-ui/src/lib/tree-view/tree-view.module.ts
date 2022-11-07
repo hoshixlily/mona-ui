@@ -8,6 +8,7 @@ import { FormsModule } from "@angular/forms";
 import { TreeViewCheckableDirective } from "./directives/tree-view-checkable.directive";
 import { TreeViewNodeTextTemplateDirective } from "./directives/tree-view-node-text-template.directive";
 import { TreeViewExpandableDirective } from "./directives/tree-view-expandable.directive";
+import { TreeViewSelectableDirective } from "./directives/tree-view-selectable.directive";
 
 @NgModule({
     declarations: [
@@ -15,14 +16,16 @@ import { TreeViewExpandableDirective } from "./directives/tree-view-expandable.d
         TreeViewNodeComponent,
         TreeViewCheckableDirective,
         TreeViewNodeTextTemplateDirective,
-        TreeViewExpandableDirective
+        TreeViewExpandableDirective,
+        TreeViewSelectableDirective
     ],
     imports: [CommonModule, FontAwesomeModule, CheckBoxModule, FormsModule],
     exports: [
         TreeViewComponent,
         TreeViewCheckableDirective,
         TreeViewNodeTextTemplateDirective,
-        TreeViewExpandableDirective
+        TreeViewExpandableDirective,
+        TreeViewSelectableDirective
     ]
 })
 export class TreeViewModule {}

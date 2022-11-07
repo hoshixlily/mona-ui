@@ -8,7 +8,7 @@ import { SelectableOptions } from "../data/SelectableOptions";
 export class TreeViewService {
     public checkableOptions: CheckableOptions = {
         checkChildren: true,
-        checkMode: "multiple",
+        mode: "multiple",
         checkParents: true,
         enabled: false
     };
@@ -18,9 +18,11 @@ export class TreeViewService {
     public nodeDictionary: Dictionary<string, Node> = new Dictionary<string, Node>();
     public nodeList: Node[] = [];
     public selectableOptions: SelectableOptions = {
+        childrenOnly: false,
         enabled: false,
         mode: "single"
     };
+    public selectedKeysChange: EventEmitter<string[]> = new EventEmitter<string[]>();
     public viewNodeList: Node[] = [];
 
     public constructor() {}
@@ -49,6 +51,16 @@ export class TreeViewService {
             const node = this.nodeDictionary.firstOrDefault(n => n.value.key === key)?.value;
             if (node) {
                 node.expand(true);
+            }
+        }
+    }
+
+    public loadSelectedKeys(selectedKeys: Iterable<string>): void {
+        const selectedKeySet = new SortedSet(selectedKeys);
+        for (const key of selectedKeySet) {
+            const node = this.nodeDictionary.firstOrDefault(n => n.value.key === key)?.value;
+            if (node) {
+                node.setSelected(true);
             }
         }
     }

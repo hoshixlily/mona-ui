@@ -319,6 +319,11 @@ export class AppComponent implements OnInit {
         // this.expandedTreeKeys = expandedKeys;
     }
 
+    public onTreeSelectedKeysChange(selectedKeys: string[]): void {
+        console.log(selectedKeys);
+        // this.selectedTreeKeys = selectedKeys;
+    }
+
     public openPopup(event: MouseEvent): void {
         event.stopPropagation();
         const popupSettings: PopupSettings = {

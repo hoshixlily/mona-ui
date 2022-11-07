@@ -23,7 +23,7 @@ export class TreeViewNodeComponent implements OnInit {
     public ngOnInit(): void {}
 
     public onCheckToggle(checked: boolean): void {
-        if (this.treeViewService.checkableOptions?.checkMode === "single") {
+        if (this.treeViewService.checkableOptions?.mode === "single") {
             this.treeViewService.uncheckAllNodes();
         }
         this.node.check({
@@ -48,6 +48,12 @@ export class TreeViewNodeComponent implements OnInit {
     }
 
     public onSelectToggle(event: MouseEvent): void {
+        if (!this.treeViewService.selectableOptions.enabled) {
+            return;
+        }
+        if (this.treeViewService.selectableOptions.childrenOnly && this.node.nodes.length > 0) {
+            return;
+        }
         if (this.node.selected) {
             this.node.setSelected(false);
             this.treeViewService.lastSelectedNode = undefined;
@@ -60,5 +66,10 @@ export class TreeViewNodeComponent implements OnInit {
             this.node.setSelected(true);
             this.treeViewService.lastSelectedNode = this.node;
         }
+        const selectedKeys = this.treeViewService.nodeDictionary
+            .where(n => n.value.selected)
+            .select(n => n.value.key)
+            .toArray();
+        this.treeViewService.selectedKeysChange.emit(selectedKeys);
     }
 }
