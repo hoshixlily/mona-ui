@@ -108,6 +108,7 @@ export { NodeOptions } from "./lib/tree-view/data/Node";
 export * from "./lib/tree-view/data/CheckableOptions";
 export * from "./lib/tree-view/components/tree-view/tree-view.component";
 export * from "./lib/tree-view/directives/tree-view-checkable.directive";
+export * from "./lib/tree-view/directives/tree-view-disable.directive";
 export * from "./lib/tree-view/directives/tree-view-expandable.directive";
 export * from "./lib/tree-view/directives/tree-view-selectable.directive";
 export * from "./lib/tree-view/directives/tree-view-node-text-template.directive";

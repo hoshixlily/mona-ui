@@ -8,13 +8,13 @@ import {
     DropDownsModule,
     InputsModule,
     PopupListComponent,
-    PopupModule
+    PopupModule,
+    TreeViewModule
 } from "mona-ui";
 import { TestComponentComponent } from "./test-component/test-component.component";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { FormsModule } from "@angular/forms";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { TreeViewModule } from "../../../mona-ui/src/lib/tree-view/tree-view.module";
 
 @NgModule({
     declarations: [AppComponent, TestComponentComponent],

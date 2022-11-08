@@ -3,6 +3,7 @@ import { NodeCheckOptions } from "./NodeCheckOptions";
 export interface NodeOptions<T = any> {
     checked?: boolean;
     data?: T;
+    disabled?: boolean;
     expanded?: boolean;
     indeterminate?: boolean;
     key: string;
@@ -16,6 +17,7 @@ export class Node<T = any> {
     public readonly uid: string = crypto.randomUUID();
     public checked: boolean = false;
     public data?: T;
+    public disabled: boolean = false;
     public expanded: boolean = false;
     public indeterminate: boolean = false;
     public key: string;
@@ -26,6 +28,7 @@ export class Node<T = any> {
     public constructor(options: NodeOptions<T>) {
         this.checked = options.checked ?? false;
         this.data = options.data;
+        this.disabled = options.disabled ?? false;
         this.expanded = options.expanded ?? false;
         this.indeterminate = options.indeterminate ?? false;
         this.key = options.key;

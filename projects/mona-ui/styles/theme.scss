@@ -717,6 +717,12 @@ input[monaTextBox] {
     }
 }
 
+.mona-tree-view-node {
+    &.mona-disabled {
+        @include disabled;
+    }
+}
+
 .mona-tree-view-node-selected {
     background-color: var(--mona-primary);
     border: 1px solid var(--mona-border-color);

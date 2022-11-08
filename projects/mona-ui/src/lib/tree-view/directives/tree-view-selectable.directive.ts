@@ -1,4 +1,4 @@
-import { Directive, EventEmitter, Input, Output } from "@angular/core";
+import { Directive, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from "@angular/core";
 import { SelectableOptions } from "../data/SelectableOptions";
 import { TreeViewComponent } from "../components/tree-view/tree-view.component";
 import { TreeViewService } from "../services/tree-view.service";
@@ -6,12 +6,11 @@ import { TreeViewService } from "../services/tree-view.service";
 @Directive({
     selector: "mona-tree-view[monaTreeViewSelectable]"
 })
-export class TreeViewSelectableDirective {
-    private selectedKeysList: string[] = [];
-
+export class TreeViewSelectableDirective implements OnInit, OnChanges {
     @Input()
     public set selectedKeys(selectedKeys: Iterable<string>) {
-        this.selectedKeysList = [...selectedKeys];
+        this.treeViewService.selectedKeys.clear();
+        this.treeViewService.selectedKeys.addAll(selectedKeys);
     }
 
     @Output()
@@ -25,6 +24,12 @@ export class TreeViewSelectableDirective {
         private readonly treeViewService: TreeViewService
     ) {}
 
+    public ngOnChanges(changes: SimpleChanges): void {
+        if (changes && changes["selectedKeys"] && !changes["selectedKeys"].isFirstChange()) {
+            this.treeViewService.loadSelectedKeys(this.treeViewService.selectedKeys);
+        }
+    }
+
     public ngOnInit(): void {
         this.treeViewService.selectedKeysChange = this.selectedKeysChange;
         if (this.options) {
@@ -32,6 +37,6 @@ export class TreeViewSelectableDirective {
         } else if (this.options === "") {
             this.treeViewService.setSelectableOptions({ enabled: true });
         }
-        this.treeViewService.loadSelectedKeys(this.selectedKeysList);
+        this.treeViewService.loadSelectedKeys(this.treeViewService.selectedKeys);
     }
 }

@@ -1,17 +1,15 @@
 import { Component, ElementRef, OnInit, TemplateRef, ViewChild } from "@angular/core";
-import { PopupRef, PopupService, PopupSettings } from "mona-ui";
+import { PopupRef } from "mona-ui";
 import { TestComponentComponent } from "./test-component/test-component.component";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { faMoon, faSearch, faSnowflake, faSun } from "@fortawesome/free-solid-svg-icons";
 import { IndexableList } from "@mirei/ts-collections";
 import { map, Observable } from "rxjs";
-import { NodeOptions } from "../../../mona-ui/src/lib/tree-view/data/Node";
 
 @Component({
     selector: "app-root",
     templateUrl: "./app.component.html",
-    styleUrls: ["./app.component.scss"],
-    providers: [PopupService]
+    styleUrls: ["./app.component.scss"]
 })
 export class AppComponent implements OnInit {
     public readonly moonIcon: IconDefinition = faMoon;
@@ -155,6 +153,7 @@ export class AppComponent implements OnInit {
     public switchValue: boolean = false;
     public textBoxValue: string = "TEXT BOX VALUE";
     public textBoxValue2: string = "a";
+    public treeCheckedKeys: string[] = ["1-2", "1-3-1"];
 
     public treeData: any[] = [
         {
@@ -165,10 +164,10 @@ export class AppComponent implements OnInit {
                     text: "Fruits",
                     id: "1-1",
                     items: [
-                        { text: "Apple", id: "1-1-1" },
-                        { text: "Apricot", id: "1-1-2" },
+                        { text: "Apple", id: "1-1-1", disabled: true },
+                        { text: "Apricot", id: "1-1-2", disabled: false },
                         { text: "Banana", id: "1-1-3" },
-                        { text: "Cherry", id: "1-1-4" }
+                        { text: "Cherry", id: "1-1-4", disabled: true }
                     ]
                 },
                 {
@@ -207,6 +206,10 @@ export class AppComponent implements OnInit {
         }
     ];
 
+    public treeDisabledKeys: string[] = ["1-1-1", "1-4-4"];
+    public treeExpandedKeys: string[] = ["1-1", "1-2", "1-3", "1-4"];
+    public treeSelectedKeys: string[] = ["1-2-1", "1-2-2", "1-2-3", "1-2-4"];
+
     @ViewChild("italicButtonRef", { read: ElementRef })
     public italicButtonRef!: ElementRef<HTMLButtonElement>;
 
@@ -219,7 +222,7 @@ export class AppComponent implements OnInit {
     @ViewChild("testButtonRef", { read: ElementRef })
     public testButtonRef!: ElementRef<HTMLButtonElement>;
 
-    public constructor(public readonly popupService: PopupService) {}
+    public constructor() {}
 
     public dropdownItemDisabler = (item: any): boolean => !item.active;
     public dropdownPrimitiveItemDisabler = (item: string): boolean => item.includes("i");
@@ -244,6 +247,10 @@ export class AppComponent implements OnInit {
         //         Math.max(randomIndex, randomIndex2)
         //     );
         // }, 3000);
+
+        // window.setInterval(() => {
+        //     this.updateTreeData();
+        // }, 2000);
     }
 
     public numericTextBoxFormatter = (value: number | null): string => (value != null ? `${value} °C` : "");
@@ -311,45 +318,61 @@ export class AppComponent implements OnInit {
 
     public onTreeCheckedKeysChange(checkedKeys: string[]): void {
         console.log(checkedKeys);
-        // this.checkedTreeKeys = checkedKeys;
+        this.treeCheckedKeys = checkedKeys;
+    }
+
+    public onTreeDisabledKeysChange(disabledKeys: string[]): void {
+        console.log(disabledKeys);
+        this.treeDisabledKeys = disabledKeys;
     }
 
     public onTreeExpandedKeysChange(expandedKeys: string[]): void {
         console.log(expandedKeys);
-        // this.expandedTreeKeys = expandedKeys;
+        this.treeExpandedKeys = expandedKeys;
     }
 
     public onTreeSelectedKeysChange(selectedKeys: string[]): void {
         console.log(selectedKeys);
-        // this.selectedTreeKeys = selectedKeys;
+        this.treeSelectedKeys = selectedKeys;
     }
 
     public openPopup(event: MouseEvent): void {
-        event.stopPropagation();
-        const popupSettings: PopupSettings = {
-            anchor: this.testButtonRef,
-            closeOnEscape: false,
-            content: this.popupContentTemplate,
-            popupClass: "popup-noselect",
-            hasBackdrop: false,
-            width: this.testButtonRef.nativeElement.getBoundingClientRect().width,
-            offset: { vertical: 0.5 }
-        };
-        this.popupService.create(popupSettings);
+        // event.stopPropagation();
+        // const popupSettings: PopupSettings = {
+        //     anchor: this.testButtonRef,
+        //     closeOnEscape: false,
+        //     content: this.popupContentTemplate,
+        //     popupClass: "popup-noselect",
+        //     hasBackdrop: false,
+        //     width: this.testButtonRef.nativeElement.getBoundingClientRect().width,
+        //     offset: { vertical: 0.5 }
+        // };
+        // this.popupService.create(popupSettings);
     }
 
     public openPopup2(event: MouseEvent): void {
-        event.stopPropagation();
-        const ref = this.popupService.create({
-            anchor: this.italicButtonRef,
-            content: TestComponentComponent,
-            popupClass: "popup-noselect",
-            hasBackdrop: false,
-            offset: { horizontal: 0, vertical: 10 }
-        });
+        // event.stopPropagation();
+        // const ref = this.popupService.create({
+        //     anchor: this.italicButtonRef,
+        //     content: TestComponentComponent,
+        //     popupClass: "popup-noselect",
+        //     hasBackdrop: false,
+        //     offset: { horizontal: 0, vertical: 10 }
+        // });
     }
 
     public print(value: unknown): void {
         console.log(value);
+    }
+
+    public updateTreeData(): void {
+        this.treeData = [
+            ...this.treeData,
+            {
+                text: Math.random().toString(),
+                id: Math.random().toString(),
+                items: [{ text: "New 2", id: Math.random().toString(), disabled: Math.random() * 100 < 50 }]
+            }
+        ];
     }
 }
