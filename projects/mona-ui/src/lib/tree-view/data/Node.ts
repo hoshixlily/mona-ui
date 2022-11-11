@@ -63,13 +63,20 @@ export class Node<T = any> {
         if (expandChildren) {
             this.nodes.forEach(node => node.expand(expanded, expandChildren));
         }
-        if (this.expanded) {
-            let parent = this.parent;
-            while (parent) {
-                parent.expand(expanded, false);
-                parent = parent.parent;
-            }
+        // if (this.expanded) {
+        //     let parent = this.parent;
+        //     while (parent) {
+        //         parent.expand(expanded, false);
+        //         parent = parent.parent;
+        //     }
+        // }
+    }
+
+    public isDescendantOf(node: Node): boolean {
+        if (this.parent) {
+            return this.parent === node || this.parent.isDescendantOf(node);
         }
+        return false;
     }
 
     public setSelected(selected: boolean): void {

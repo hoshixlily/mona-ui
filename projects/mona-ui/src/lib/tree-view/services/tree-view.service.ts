@@ -4,6 +4,8 @@ import { Dictionary, EnumerableSet, SortedSet } from "@mirei/ts-collections";
 import { Node } from "../data/Node";
 import { SelectableOptions } from "../data/SelectableOptions";
 import { NodeDisabler, NodeDisablerAction } from "../data/NodeDisabler";
+import { Subject } from "rxjs";
+import { CdkDragStart } from "@angular/cdk/drag-drop";
 
 @Injectable()
 export class TreeViewService {
@@ -94,5 +96,26 @@ export class TreeViewService {
 
     public uncheckAllNodes(): void {
         this.nodeList.forEach(node => node.check({ checked: false, checkChildren: true, checkParent: true }));
+    }
+
+    public updateNodeCheckStatus(node: Node): void {
+        if (node.nodes.length > 0) {
+            const allChecked = node.nodes.every(childNode => childNode.checked);
+            const someChecked = node.nodes.some(childNode => childNode.checked);
+            const someIndeterminate = node.nodes.some(childNode => childNode.indeterminate);
+            node.checked = allChecked;
+            node.indeterminate = someIndeterminate || (!allChecked && someChecked);
+        } else {
+            node.indeterminate = false;
+        }
+        let parent = node.parent;
+        while (parent) {
+            const allChecked = parent.nodes.every(childNode => childNode.checked);
+            const someChecked = parent.nodes.some(childNode => childNode.checked);
+            const someIndeterminate = parent.nodes.some(childNode => childNode.indeterminate);
+            parent.checked = allChecked;
+            parent.indeterminate = someIndeterminate || (!allChecked && someChecked);
+            parent = parent.parent;
+        }
     }
 }

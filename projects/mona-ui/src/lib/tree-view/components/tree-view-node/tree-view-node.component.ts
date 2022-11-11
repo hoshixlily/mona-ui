@@ -1,7 +1,9 @@
-import { Component, Input, OnInit, TemplateRef } from "@angular/core";
+import { Component, ElementRef, EventEmitter, Input, OnInit, Output, TemplateRef } from "@angular/core";
 import { Node } from "../../data/Node";
 import { faChevronDown, faChevronRight, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { TreeViewService } from "../../services/tree-view.service";
+import { DropPosition } from "../../data/DropPosition";
+import { DropPositionChangeEvent } from "../../data/DropPositionChangeEvent";
 
 @Component({
     selector: "mona-tree-view-node",
@@ -11,6 +13,14 @@ import { TreeViewService } from "../../services/tree-view.service";
 export class TreeViewNodeComponent implements OnInit {
     public readonly collapseIcon: IconDefinition = faChevronDown;
     public readonly expandIcon: IconDefinition = faChevronRight;
+    public dropMagnetVisible: boolean = false;
+    public dropPosition?: DropPosition;
+
+    @Input()
+    public dragging: boolean = false;
+
+    @Output()
+    public dropPositionChange: EventEmitter<DropPositionChangeEvent> = new EventEmitter<DropPositionChangeEvent>();
 
     @Input()
     public node!: Node;
@@ -18,7 +28,10 @@ export class TreeViewNodeComponent implements OnInit {
     @Input()
     public nodeTextTemplate?: TemplateRef<never> | null = null;
 
-    public constructor(public readonly treeViewService: TreeViewService) {}
+    public constructor(
+        private readonly elementRef: ElementRef<HTMLElement>,
+        public readonly treeViewService: TreeViewService
+    ) {}
 
     public ngOnInit(): void {}
 
@@ -45,6 +58,44 @@ export class TreeViewNodeComponent implements OnInit {
             .select(n => n.value.key)
             .toArray();
         this.treeViewService.expandedKeysChange.emit(expandedKeys);
+    }
+
+    public onMouseEnter(event: MouseEvent): void {
+        if (!this.dragging) {
+            return;
+        }
+        this.dropMagnetVisible = true;
+    }
+
+    public onMouseLeave(event: MouseEvent): void {
+        this.dropMagnetVisible = false;
+        this.dropPosition = undefined;
+        if (!this.dragging) {
+            return;
+        }
+    }
+
+    public onMouseMove(event: MouseEvent): void {
+        if (!this.dragging) {
+            return;
+        }
+        const rect = this.elementRef.nativeElement.getBoundingClientRect();
+
+        if (event.clientY > rect.top && event.clientY - rect.top <= 5) {
+            this.dropPosition = "before";
+        } else if (event.clientY < rect.bottom && rect.bottom - event.clientY <= 5) {
+            this.dropPosition = "after";
+        } else if (event.clientY <= rect.top || event.clientY >= rect.bottom) {
+            this.dropPosition = undefined;
+        } else {
+            this.dropPosition = "inside";
+        }
+        if (this.dropPosition) {
+            this.dropPositionChange.emit({
+                position: this.dropPosition,
+                node: this.node
+            });
+        }
     }
 
     public onSelectToggle(event: MouseEvent): void {

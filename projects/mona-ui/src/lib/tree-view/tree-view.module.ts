@@ -11,6 +11,7 @@ import { TreeViewExpandableDirective } from "./directives/tree-view-expandable.d
 import { TreeViewSelectableDirective } from "./directives/tree-view-selectable.directive";
 import { ContextMenuModule } from "../menus/modules/context-menu/context-menu.module";
 import { TreeViewDisableDirective } from "./directives/tree-view-disable.directive";
+import { DragDropModule } from "@angular/cdk/drag-drop";
 
 @NgModule({
     declarations: [
@@ -22,7 +23,7 @@ import { TreeViewDisableDirective } from "./directives/tree-view-disable.directi
         TreeViewSelectableDirective,
         TreeViewDisableDirective
     ],
-    imports: [CommonModule, FontAwesomeModule, CheckBoxModule, FormsModule, ContextMenuModule],
+    imports: [CommonModule, FontAwesomeModule, CheckBoxModule, FormsModule, ContextMenuModule, DragDropModule],
     exports: [
         TreeViewComponent,
         TreeViewCheckableDirective,

@@ -208,7 +208,9 @@ export class AppComponent implements OnInit {
 
     public treeDisabledKeys: string[] = ["1-1-1", "1-4-4"];
     public treeExpandedKeys: string[] = ["1-1", "1-2", "1-3", "1-4"];
-    public treeSelectedKeys: string[] = ["1-2-1", "1-2-2", "1-2-3", "1-2-4"];
+    public treeSelectedKeys: string[] = [
+        /*"1-2-1", "1-2-2", "1-2-3", "1-2-4"*/
+    ];
 
     @ViewChild("italicButtonRef", { read: ElementRef })
     public italicButtonRef!: ElementRef<HTMLButtonElement>;
