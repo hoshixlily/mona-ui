@@ -1,6 +1,14 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, TemplateRef } from "@angular/core";
 import { Node } from "../../data/Node";
-import { faChevronDown, faChevronRight, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import {
+    faArrowDown,
+    faArrowUp,
+    faCaretRight,
+    faChevronDown,
+    faChevronRight,
+    faPlus,
+    IconDefinition
+} from "@fortawesome/free-solid-svg-icons";
 import { TreeViewService } from "../../services/tree-view.service";
 import { DropPosition } from "../../data/DropPosition";
 import { DropPositionChangeEvent } from "../../data/DropPositionChangeEvent";
@@ -12,6 +20,8 @@ import { DropPositionChangeEvent } from "../../data/DropPositionChangeEvent";
 })
 export class TreeViewNodeComponent implements OnInit {
     public readonly collapseIcon: IconDefinition = faChevronDown;
+
+    public readonly dropMagnetIcon: IconDefinition = faCaretRight;
     public readonly expandIcon: IconDefinition = faChevronRight;
     public dropMagnetVisible: boolean = false;
     public dropPosition?: DropPosition;

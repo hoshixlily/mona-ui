@@ -727,3 +727,25 @@ input[monaTextBox] {
     background-color: var(--mona-primary);
     border: 1px solid var(--mona-border-color);
 }
+
+.mona-tree-view-node-dropping {
+    background-color: var(--mona-primary);
+    border: 1px solid var(--mona-border-color);
+}
+
+.mona-tree-view-node-dragging {
+    background-color: var(--mona-background);
+    border: 1px solid var(--mona-border-color);
+    box-shadow: var(--mona-popup-shadow);
+    padding: 4px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--mona-text);
+    font-weight: bold;
+    font-size: 13px;
+    top: 10px;
+    & fa-icon {
+        margin-right: 4px;
+    }
+}

@@ -11,6 +11,22 @@
                         <ng-container [ngTemplateOutlet]="treeTemplate"
                                       [ngTemplateOutletContext]="{$implicit: node.nodes}"></ng-container>
                     </ul>
+                    <ng-template cdkDragPreview [data]="node">
+                        <div class="mona-tree-view-node-dragging">
+                            <span>
+                                <ng-container *ngIf="dropPosition==='inside'">
+                                    <fa-icon [icon]="dropInsideIcon"></fa-icon>
+                                </ng-container>
+                                <ng-container *ngIf="dropPosition==='after'">
+                                    <fa-icon [icon]="dropAfterIcon"></fa-icon>
+                                </ng-container>
+                                <ng-container *ngIf="dropPosition==='before'">
+                                    <fa-icon [icon]="dropBeforeIcon"></fa-icon>
+                                </ng-container>
+                            </span>
+                            <span>{{node.text}}</span>
+                        </div>
+                    </ng-template>
                 </li>
             </ng-container>
         </ng-template>

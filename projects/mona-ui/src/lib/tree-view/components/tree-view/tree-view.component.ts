@@ -7,6 +7,7 @@ import { Action } from "../../../utils/Action";
 import { CdkDragDrop, CdkDragEnd, CdkDragMove, CdkDragStart } from "@angular/cdk/drag-drop";
 import { DropPosition } from "../../data/DropPosition";
 import { DropPositionChangeEvent } from "../../data/DropPositionChangeEvent";
+import { faArrowDown, faArrowUp, faPlus, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 
 @Component({
     selector: "mona-tree-view",
@@ -17,9 +18,12 @@ import { DropPositionChangeEvent } from "../../data/DropPositionChangeEvent";
 export class TreeViewComponent implements OnInit, OnChanges {
     private disabler?: Action<any, boolean> | string;
     private dragNode?: Node;
-    private dropPosition?: DropPosition;
     private dropTargetNode?: Node;
+    public readonly dropAfterIcon: IconDefinition = faArrowDown;
+    public readonly dropBeforeIcon: IconDefinition = faArrowUp;
+    public readonly dropInsideIcon: IconDefinition = faPlus;
     public dragging: boolean = false;
+    public dropPosition?: DropPosition;
 
     @Input()
     public childrenField: string = "";
@@ -68,12 +72,17 @@ export class TreeViewComponent implements OnInit, OnChanges {
         this.dragNode = undefined;
     }
 
-    public onNodeDragMove(event: CdkDragMove, node: Node): void {}
+    public onNodeDragMove(event: CdkDragMove, node: Node): void {
+        if (event.event) {
+            const draggedElement = event.source.element.nativeElement.nextSibling as HTMLElement;
+            draggedElement.style.top = `${10}px`;
+            draggedElement.style.left = `${10}px`;
+        }
+    }
 
     public onNodeDragStart(event: CdkDragStart<Node>): void {
         this.dragging = true;
         this.dragNode = event.source.data;
-        console.log("drag start", this.dragNode);
     }
 
     public onNodeDrop(event: CdkDragDrop<Node, Node, Node>): void {
@@ -93,6 +102,7 @@ export class TreeViewComponent implements OnInit, OnChanges {
                 this.treeViewService.updateNodeCheckStatus(draggedNode.parent);
             }
             draggedNode.parent = this.dropTargetNode;
+            this.dropTargetNode.expanded = true;
             this.treeViewService.updateNodeCheckStatus(draggedNode.parent);
         } else if (this.dropPosition === "before") {
             if (draggedNode.parent) {
@@ -111,6 +121,9 @@ export class TreeViewComponent implements OnInit, OnChanges {
             } else {
                 const index = this.treeViewService.nodeList.findIndex(node => node.uid === this.dropTargetNode?.uid);
                 if (index >= 0) {
+                    this.treeViewService.nodeList = this.treeViewService.nodeList.filter(
+                        node => node.uid !== draggedNode.uid
+                    );
                     this.treeViewService.nodeList.splice(index, 0, draggedNode);
                     if (draggedNode.parent) {
                         this.treeViewService.updateNodeCheckStatus(draggedNode.parent);
@@ -136,6 +149,9 @@ export class TreeViewComponent implements OnInit, OnChanges {
             } else {
                 const index = this.treeViewService.nodeList.findIndex(node => node.uid === this.dropTargetNode?.uid);
                 if (index >= 0) {
+                    this.treeViewService.nodeList = this.treeViewService.nodeList.filter(
+                        node => node.uid !== draggedNode.uid
+                    );
                     this.treeViewService.nodeList.splice(index + 1, 0, draggedNode);
                     if (draggedNode.parent) {
                         this.treeViewService.updateNodeCheckStatus(draggedNode.parent);
