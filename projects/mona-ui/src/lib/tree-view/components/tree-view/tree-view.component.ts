@@ -1,4 +1,14 @@
-import { Component, ContentChild, Input, OnChanges, OnInit, SimpleChanges, TemplateRef } from "@angular/core";
+import {
+    Component,
+    ContentChild,
+    EventEmitter,
+    Input,
+    OnChanges,
+    OnInit,
+    Output,
+    SimpleChanges,
+    TemplateRef
+} from "@angular/core";
 import { Node } from "../../data/Node";
 import { List } from "@mirei/ts-collections";
 import { TreeViewService } from "../../services/tree-view.service";
@@ -8,6 +18,11 @@ import { CdkDragDrop, CdkDragEnd, CdkDragMove, CdkDragStart } from "@angular/cdk
 import { DropPosition } from "../../data/DropPosition";
 import { DropPositionChangeEvent } from "../../data/DropPositionChangeEvent";
 import { faArrowDown, faArrowUp, faPlus, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { NodeDragStartEvent } from "../../data/NodeDragStartEvent";
+import { NodeDragEvent } from "../../data/NodeDragEvent";
+import { NodeDropEvent } from "../../data/NodeDropEvent";
+import { NodeDragEndEvent } from "../../data/NodeDragEndEvent";
+import { NodeClickEvent } from "../../data/NodeClickEvent";
 
 @Component({
     selector: "mona-tree-view",
@@ -34,11 +49,29 @@ export class TreeViewComponent implements OnInit, OnChanges {
     @Input()
     public keyField: string = "";
 
+    @Output()
+    public nodeClick: EventEmitter<NodeClickEvent> = new EventEmitter<NodeClickEvent>();
+
     @Input()
     public set nodeDisabler(nodeDisabler: Action<any, boolean> | string) {
         this.disabler = nodeDisabler;
         this.updateDisabledState();
     }
+
+    @Output()
+    public nodeDoubleClick: EventEmitter<NodeClickEvent> = new EventEmitter<NodeClickEvent>();
+
+    @Output()
+    public nodeDrag: EventEmitter<NodeDragEvent> = new EventEmitter<NodeDragEvent>();
+
+    @Output()
+    public nodeDragEnd: EventEmitter<NodeDragEndEvent> = new EventEmitter<NodeDragEndEvent>();
+
+    @Output()
+    public nodeDragStart: EventEmitter<NodeDragStartEvent> = new EventEmitter<NodeDragStartEvent>();
+
+    @Output()
+    public nodeDrop: EventEmitter<NodeDropEvent> = new EventEmitter<NodeDropEvent>();
 
     @ContentChild(TreeViewNodeTextTemplateDirective, { read: TemplateRef })
     public nodeTextTemplate?: TemplateRef<never> | null = null;
@@ -68,11 +101,20 @@ export class TreeViewComponent implements OnInit, OnChanges {
     }
 
     public onNodeDragEnd(event: CdkDragEnd<Node>): void {
+        const dragEvent = new NodeDragEndEvent(event.source.data.getLookupItem(), event.event);
+        this.nodeDragEnd.emit(dragEvent);
         this.dragging = false;
         this.dragNode = undefined;
     }
 
     public onNodeDragMove(event: CdkDragMove, node: Node): void {
+        const dragEvent = new NodeDragEvent(
+            node.getLookupItem(),
+            this.dropTargetNode?.getLookupItem(),
+            this.dropPosition,
+            event.event
+        );
+        this.nodeDrag.emit(dragEvent);
         if (event.event) {
             const draggedElement = event.source.element.nativeElement.nextSibling as HTMLElement;
             draggedElement.style.top = `${10}px`;
@@ -81,11 +123,26 @@ export class TreeViewComponent implements OnInit, OnChanges {
     }
 
     public onNodeDragStart(event: CdkDragStart<Node>): void {
+        const dragEvent = new NodeDragStartEvent(event.source.data.getLookupItem(), event.event);
+        this.nodeDragStart.emit(dragEvent);
+        if (dragEvent.isDefaultPrevented()) {
+            return;
+        }
         this.dragging = true;
         this.dragNode = event.source.data;
     }
 
     public onNodeDrop(event: CdkDragDrop<Node, Node, Node>): void {
+        const dropEvent = new NodeDropEvent(
+            event.item.data.getLookupItem(),
+            this.dropTargetNode?.getLookupItem(),
+            this.dropPosition,
+            event.event
+        );
+        this.nodeDrop.emit(dropEvent);
+        if (dropEvent.isDefaultPrevented()) {
+            return;
+        }
         if (!event.isPointerOverContainer || !this.dropTargetNode) {
             return;
         }
@@ -94,8 +151,15 @@ export class TreeViewComponent implements OnInit, OnChanges {
             return;
         }
         if (this.dropPosition === "inside") {
+            if (draggedNode.parent?.uid === this.dropTargetNode.uid) {
+                return;
+            }
             if (draggedNode.parent) {
                 draggedNode.parent.nodes = draggedNode.parent.nodes.filter(node => node.uid !== draggedNode.uid);
+            } else {
+                this.treeViewService.nodeList = this.treeViewService.nodeList.filter(
+                    node => node.uid !== draggedNode.uid
+                );
             }
             this.dropTargetNode.nodes = [...this.dropTargetNode.nodes, draggedNode];
             if (draggedNode.parent) {
@@ -104,6 +168,7 @@ export class TreeViewComponent implements OnInit, OnChanges {
             draggedNode.parent = this.dropTargetNode;
             this.dropTargetNode.expanded = true;
             this.treeViewService.updateNodeCheckStatus(draggedNode.parent);
+            this.treeViewService.viewNodeList = [...this.treeViewService.nodeList];
         } else if (this.dropPosition === "before") {
             if (draggedNode.parent) {
                 draggedNode.parent.nodes = draggedNode.parent.nodes.filter(node => node.uid !== draggedNode.uid);

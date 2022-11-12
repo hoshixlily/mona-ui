@@ -6,7 +6,9 @@
                 <li class="mona-tree-list-item" cdkDrag [cdkDragData]="node" (cdkDragStarted)="onNodeDragStart($event)"
                     (cdkDragEnded)="onNodeDragEnd($event)" (cdkDragMoved)="onNodeDragMove($event, node)">
                     <mona-tree-view-node [node]="node" [nodeTextTemplate]="nodeTextTemplate" [dragging]="dragging"
-                                         (dropPositionChange)="onNodeDropPositionChange($event)"></mona-tree-view-node>
+                                         (dropPositionChange)="onNodeDropPositionChange($event)"
+                                         (nodeClick)="nodeClick.emit($event)"
+                                         (nodeDoubleClick)="nodeDoubleClick.emit($event)"></mona-tree-view-node>
                     <ul class="mona-subtree-list" *ngIf="node.nodes.length !== 0 && node.expanded">
                         <ng-container [ngTemplateOutlet]="treeTemplate"
                                       [ngTemplateOutletContext]="{$implicit: node.nodes}"></ng-container>

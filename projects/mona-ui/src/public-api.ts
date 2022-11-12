@@ -105,6 +105,12 @@ export * from "./lib/popup/popup.module";
 
 /** TreeView */
 export { NodeOptions } from "./lib/tree-view/data/Node";
+export * from "./lib/tree-view/data/NodeClickEvent";
+export * from "./lib/tree-view/data/NodeDragEndEvent";
+export * from "./lib/tree-view/data/NodeDragStartEvent";
+export * from "./lib/tree-view/data/NodeDragEvent";
+export * from "./lib/tree-view/data/NodeDropEvent";
+export * from "./lib/tree-view/data/NodeLookupItem";
 export * from "./lib/tree-view/data/CheckableOptions";
 export * from "./lib/tree-view/components/tree-view/tree-view.component";
 export * from "./lib/tree-view/directives/tree-view-checkable.directive";

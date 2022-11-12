@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnInit, TemplateRef, ViewChild } from "@angular/core";
-import { PopupRef } from "mona-ui";
+import { PopupRef, NodeDragStartEvent, NodeDragEvent, NodeDropEvent, NodeDragEndEvent, NodeClickEvent } from "mona-ui";
 import { TestComponentComponent } from "./test-component/test-component.component";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { faMoon, faSearch, faSnowflake, faSun } from "@fortawesome/free-solid-svg-icons";
@@ -331,6 +331,37 @@ export class AppComponent implements OnInit {
     public onTreeExpandedKeysChange(expandedKeys: string[]): void {
         console.log(expandedKeys);
         this.treeExpandedKeys = expandedKeys;
+    }
+
+    public onTreeNodeClick(event: NodeClickEvent): void {
+        console.log(event);
+        event.preventDefault();
+    }
+
+    public onTreeNodeDoubleClick(event: NodeClickEvent): void {
+        console.log(event);
+        event.preventDefault();
+    }
+
+    public onTreeNodeDrag(event: NodeDragEvent): void {
+        // console.log(event);
+        // event.preventDefault();
+    }
+
+    public onTreeNodeDragEnd(event: NodeDragEndEvent): void {
+        console.log(event);
+    }
+
+    public onTreeNodeDragStart(event: NodeDragStartEvent): void {
+        // console.log(event);
+        // event.preventDefault();
+    }
+
+    public onTreeNodeDrop(event: NodeDropEvent): void {
+        console.log(event);
+        if (event.destinationNode?.text === "Pine" && event.position === "inside") {
+            event.preventDefault();
+        }
     }
 
     public onTreeSelectedKeysChange(selectedKeys: string[]): void {

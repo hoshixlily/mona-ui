@@ -7,20 +7,26 @@
                         [monaTreeViewSelectable]="{enabled: true, mode: 'multiple', childrenOnly: true}" [selectedKeys]="treeSelectedKeys"
                         (selectedKeysChange)="onTreeSelectedKeysChange($event)"
                         [nodeDisabler]="'disabled'"
+                        (nodeDragStart)="onTreeNodeDragStart($event)"
+                        (nodeDrag)="onTreeNodeDrag($event)"
+                        (nodeDrop)="onTreeNodeDrop($event)"
+                        (nodeDragEnd)="onTreeNodeDragEnd($event)"
+                        (nodeClick)="onTreeNodeClick($event)"
+                        (nodeDoubleClick)="onTreeNodeDoubleClick($event)"
 
         >
 <!--            monaTreeViewDisable [disabledKeys]="treeDisabledKeys"-->
-            <ng-template monaTreeViewNodeTextTemplate let-dataItem>
-                <span #anchor>
-                    <span style="color: crimson; font-weight: bold;" *ngIf="dataItem.items && dataItem.items?.length !== 0">{{dataItem.text}}</span>
-                    <span style="color: snow; font-weight: bold;" *ngIf="!dataItem.items || dataItem.items?.length === 0">{{dataItem.text}}</span>
-                </span>
-                <mona-contextmenu [target]="anchor">
-                    <mona-menu-item text="AAA" (menuClick)="print(dataItem)"></mona-menu-item>
-                    <mona-menu-item text="BBB"></mona-menu-item>
-                    <mona-menu-item text="CCC" (menuClick)="updateTreeData()"></mona-menu-item>
-                </mona-contextmenu>
-            </ng-template>
+<!--            <ng-template monaTreeViewNodeTextTemplate let-dataItem>-->
+<!--                <span #anchor>-->
+<!--                    <span style="color: crimson; font-weight: bold;" *ngIf="dataItem.items && dataItem.items?.length !== 0">{{dataItem.text}}</span>-->
+<!--                    <span style="color: snow; font-weight: bold;" *ngIf="!dataItem.items || dataItem.items?.length === 0">{{dataItem.text}}</span>-->
+<!--                </span>-->
+<!--                <mona-contextmenu [target]="anchor">-->
+<!--                    <mona-menu-item text="AAA" (menuClick)="print(dataItem)"></mona-menu-item>-->
+<!--                    <mona-menu-item text="BBB"></mona-menu-item>-->
+<!--                    <mona-menu-item text="CCC" (menuClick)="updateTreeData()"></mona-menu-item>-->
+<!--                </mona-contextmenu>-->
+<!--            </ng-template>-->
         </mona-tree-view>
     </div>
     <div class="content">
