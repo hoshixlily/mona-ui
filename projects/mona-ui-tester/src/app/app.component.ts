@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnInit, TemplateRef, ViewChild } from "@angular/core";
-import { PopupRef, PopupService, PopupSettings } from "mona-ui";
+import { PopupRef, NodeDragStartEvent, NodeDragEvent, NodeDropEvent, NodeDragEndEvent, NodeClickEvent } from "mona-ui";
 import { TestComponentComponent } from "./test-component/test-component.component";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { faMoon, faSearch, faSnowflake, faSun } from "@fortawesome/free-solid-svg-icons";
@@ -9,8 +9,7 @@ import { map, Observable } from "rxjs";
 @Component({
     selector: "app-root",
     templateUrl: "./app.component.html",
-    styleUrls: ["./app.component.scss"],
-    providers: [PopupService]
+    styleUrls: ["./app.component.scss"]
 })
 export class AppComponent implements OnInit {
     public readonly moonIcon: IconDefinition = faMoon;
@@ -154,6 +153,64 @@ export class AppComponent implements OnInit {
     public switchValue: boolean = false;
     public textBoxValue: string = "TEXT BOX VALUE";
     public textBoxValue2: string = "a";
+    public treeCheckedKeys: string[] = ["1-2", "1-3-1"];
+
+    public treeData: any[] = [
+        {
+            text: "Root",
+            id: "1",
+            items: [
+                {
+                    text: "Fruits",
+                    id: "1-1",
+                    items: [
+                        { text: "Apple", id: "1-1-1", disabled: true },
+                        { text: "Apricot", id: "1-1-2", disabled: false },
+                        { text: "Banana", id: "1-1-3" },
+                        { text: "Cherry", id: "1-1-4", disabled: true }
+                    ]
+                },
+                {
+                    text: "Foods",
+                    id: "1-2",
+                    items: [
+                        { text: "Yakisoba", id: "1-2-1" },
+                        { text: "Yakitori", id: "1-2-2" },
+                        { text: "Sushi", id: "1-2-3" },
+                        { text: "Sashimi", id: "1-2-4" }
+                    ]
+                },
+                {
+                    text: "Vegetables",
+                    id: "1-3",
+                    items: [
+                        { text: "Cabbage", id: "1-3-1" },
+                        { text: "Cabbage Black", id: "1-3-2" },
+                        { text: "Pumpkin", id: "1-3-3" },
+                        { text: "Potato", id: "1-3-4" }
+                    ]
+                },
+                {
+                    text: "Trees",
+                    id: "1-4",
+                    items: [
+                        { text: "Willow", id: "1-4-1" },
+                        { text: "Birch", id: "1-4-2" },
+                        { text: "Oak", id: "1-4-3" },
+                        { text: "Pine", id: "1-4-4" },
+                        { text: "Maple", id: "1-4-5" },
+                        { text: "Cedar", id: "1-4-6" }
+                    ]
+                }
+            ]
+        }
+    ];
+
+    public treeDisabledKeys: string[] = ["1-1-1", "1-1-4", "1-4"];
+    public treeExpandedKeys: string[] = ["1", "1-1", "1-2", "1-3", "1-4"];
+    public treeSelectedKeys: string[] = [
+        /*"1-2-1", "1-2-2", "1-2-3", "1-2-4"*/
+    ];
 
     @ViewChild("italicButtonRef", { read: ElementRef })
     public italicButtonRef!: ElementRef<HTMLButtonElement>;
@@ -167,7 +224,7 @@ export class AppComponent implements OnInit {
     @ViewChild("testButtonRef", { read: ElementRef })
     public testButtonRef!: ElementRef<HTMLButtonElement>;
 
-    public constructor(public readonly popupService: PopupService) {}
+    public constructor() {}
 
     public dropdownItemDisabler = (item: any): boolean => !item.active;
     public dropdownPrimitiveItemDisabler = (item: string): boolean => item.includes("i");
@@ -192,6 +249,10 @@ export class AppComponent implements OnInit {
         //         Math.max(randomIndex, randomIndex2)
         //     );
         // }, 3000);
+
+        // window.setInterval(() => {
+        //     this.updateTreeData();
+        // }, 2000);
     }
 
     public numericTextBoxFormatter = (value: number | null): string => (value != null ? `${value} °C` : "");
@@ -257,32 +318,94 @@ export class AppComponent implements OnInit {
         this.textBoxValue = value;
     }
 
+    public onTreeCheckedKeysChange(checkedKeys: string[]): void {
+        console.log(checkedKeys);
+        this.treeCheckedKeys = checkedKeys;
+    }
+
+    public onTreeDisabledKeysChange(disabledKeys: string[]): void {
+        console.log(disabledKeys);
+        this.treeDisabledKeys = disabledKeys;
+    }
+
+    public onTreeExpandedKeysChange(expandedKeys: string[]): void {
+        console.log(expandedKeys);
+        this.treeExpandedKeys = expandedKeys;
+    }
+
+    public onTreeNodeClick(event: NodeClickEvent): void {
+        console.log(event);
+        // event.preventDefault();
+    }
+
+    public onTreeNodeDoubleClick(event: NodeClickEvent): void {
+        console.log(event);
+        event.preventDefault();
+    }
+
+    public onTreeNodeDrag(event: NodeDragEvent): void {
+        // console.log(event);
+        // event.preventDefault();
+    }
+
+    public onTreeNodeDragEnd(event: NodeDragEndEvent): void {
+        console.log(event);
+    }
+
+    public onTreeNodeDragStart(event: NodeDragStartEvent): void {
+        // console.log(event);
+        // event.preventDefault();
+    }
+
+    public onTreeNodeDrop(event: NodeDropEvent): void {
+        console.log(event);
+        if (event.destinationNode?.text === "Pine" && event.position === "inside") {
+            event.preventDefault();
+        }
+    }
+
+    public onTreeSelectedKeysChange(selectedKeys: string[]): void {
+        console.log(selectedKeys);
+        this.treeSelectedKeys = selectedKeys;
+    }
+
     public openPopup(event: MouseEvent): void {
-        event.stopPropagation();
-        const popupSettings: PopupSettings = {
-            anchor: this.testButtonRef,
-            closeOnEscape: false,
-            content: this.popupContentTemplate,
-            popupClass: "popup-noselect",
-            hasBackdrop: false,
-            width: this.testButtonRef.nativeElement.getBoundingClientRect().width,
-            offset: { vertical: 0.5 }
-        };
-        this.popupService.create(popupSettings);
+        // event.stopPropagation();
+        // const popupSettings: PopupSettings = {
+        //     anchor: this.testButtonRef,
+        //     closeOnEscape: false,
+        //     content: this.popupContentTemplate,
+        //     popupClass: "popup-noselect",
+        //     hasBackdrop: false,
+        //     width: this.testButtonRef.nativeElement.getBoundingClientRect().width,
+        //     offset: { vertical: 0.5 }
+        // };
+        // this.popupService.create(popupSettings);
     }
 
     public openPopup2(event: MouseEvent): void {
-        event.stopPropagation();
-        const ref = this.popupService.create({
-            anchor: this.italicButtonRef,
-            content: TestComponentComponent,
-            popupClass: "popup-noselect",
-            hasBackdrop: false,
-            offset: { horizontal: 0, vertical: 10 }
-        });
+        // event.stopPropagation();
+        // const ref = this.popupService.create({
+        //     anchor: this.italicButtonRef,
+        //     content: TestComponentComponent,
+        //     popupClass: "popup-noselect",
+        //     hasBackdrop: false,
+        //     offset: { horizontal: 0, vertical: 10 }
+        // });
     }
 
     public print(value: unknown): void {
         console.log(value);
+    }
+
+    public updateTreeData(): void {
+        this.treeData = [
+            ...this.treeData,
+            {
+                text: Math.random().toString(),
+                id: Math.random().toString(),
+                items: [{ text: "New 2", id: Math.random().toString(), disabled: Math.random() * 100 < 50 }]
+            }
+        ];
     }
 }

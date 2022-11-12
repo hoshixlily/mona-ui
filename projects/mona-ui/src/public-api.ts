@@ -103,6 +103,23 @@ export * from "./lib/popup/directives/popup-anchor.directive";
 export * from "./lib/popup/components/popup/popup.component";
 export * from "./lib/popup/popup.module";
 
+/** TreeView */
+export { NodeOptions } from "./lib/tree-view/data/Node";
+export * from "./lib/tree-view/data/NodeClickEvent";
+export * from "./lib/tree-view/data/NodeDragEndEvent";
+export * from "./lib/tree-view/data/NodeDragStartEvent";
+export * from "./lib/tree-view/data/NodeDragEvent";
+export * from "./lib/tree-view/data/NodeDropEvent";
+export * from "./lib/tree-view/data/NodeLookupItem";
+export * from "./lib/tree-view/data/CheckableOptions";
+export * from "./lib/tree-view/components/tree-view/tree-view.component";
+export * from "./lib/tree-view/directives/tree-view-checkable.directive";
+export * from "./lib/tree-view/directives/tree-view-disable.directive";
+export * from "./lib/tree-view/directives/tree-view-expandable.directive";
+export * from "./lib/tree-view/directives/tree-view-selectable.directive";
+export * from "./lib/tree-view/directives/tree-view-node-text-template.directive";
+export * from "./lib/tree-view/tree-view.module";
+
 /** Shared [TEMPORARY EXPORT] */
 // export * from "./lib/shared/components/popup-list-item/popup-list-item.component";
 export * from "./lib/shared/shared.module";
