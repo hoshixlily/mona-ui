@@ -20,6 +20,7 @@ export class Node<T = any> {
     public data?: T;
     public disabled: boolean = false;
     public expanded: boolean = false;
+    public focused: boolean = false;
     public indeterminate: boolean = false;
     public key: string;
     public nodes: Node<T>[] = [];
@@ -37,6 +38,13 @@ export class Node<T = any> {
         this.parent = options.parent;
         this.selected = options.selected ?? false;
         this.text = options.text ?? "";
+    }
+
+    public anyParentCollapsed(): boolean {
+        if (this.parent) {
+            return !this.parent.expanded || this.parent.anyParentCollapsed();
+        }
+        return false;
     }
 
     public check(options: NodeCheckOptions): void {

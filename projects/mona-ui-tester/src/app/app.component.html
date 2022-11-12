@@ -4,15 +4,15 @@
                         [monaTreeViewCheckable]="{enabled: true, checkChildren: true, checkParents: true, mode: 'multiple'}"
                         [checkedKeys]="treeCheckedKeys" (checkedKeysChange)="onTreeCheckedKeysChange($event)"
                         monaTreeViewExpandable [expandedKeys]="treeExpandedKeys" (expandedKeysChange)="onTreeExpandedKeysChange($event)"
-                        [monaTreeViewSelectable]="{enabled: true, mode: 'multiple', childrenOnly: true}" [selectedKeys]="treeSelectedKeys"
+                        [monaTreeViewSelectable]="{enabled: true, mode: 'single', childrenOnly: true}" [selectedKeys]="treeSelectedKeys"
                         (selectedKeysChange)="onTreeSelectedKeysChange($event)"
-                        [nodeDisabler]="'disabled'"
                         (nodeDragStart)="onTreeNodeDragStart($event)"
                         (nodeDrag)="onTreeNodeDrag($event)"
                         (nodeDrop)="onTreeNodeDrop($event)"
                         (nodeDragEnd)="onTreeNodeDragEnd($event)"
                         (nodeClick)="onTreeNodeClick($event)"
                         (nodeDoubleClick)="onTreeNodeDoubleClick($event)"
+                        monaTreeViewDisable [disabledKeys]="treeDisabledKeys"
 
         >
 <!--            monaTreeViewDisable [disabledKeys]="treeDisabledKeys"-->

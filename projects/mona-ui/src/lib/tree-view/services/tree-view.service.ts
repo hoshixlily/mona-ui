@@ -61,8 +61,18 @@ export class TreeViewService {
 
     public loadDisabledKeys(disabledKeys: Iterable<string>): void {
         const disabledKeySet = new SortedSet(disabledKeys);
-        for (const [uid, node] of this.nodeDictionary.entries()) {
-            node.disabled = disabledKeySet.contains(node.key);
+        const disable = (node: Node, disabled?: boolean): void => {
+            node.disabled = disabled ?? disabledKeySet.contains(node.key);
+            if (!node.disabled && disabled == null) {
+                node.nodes.forEach(childNode => disable(childNode));
+            } else if (!node.disabled) {
+                node.nodes.forEach(childNode => disable(childNode, false));
+            } else {
+                node.nodes.forEach(childNode => disable(childNode, true));
+            }
+        };
+        for (const node of this.nodeList) {
+            disable(node);
         }
     }
 
@@ -94,6 +104,67 @@ export class TreeViewService {
         this.selectableOptions = { ...this.selectableOptions, ...options };
     }
 
+    public toggleNodeCheck(node: Node, checked?: boolean): void {
+        if (node.disabled) {
+            return;
+        }
+        if (this.checkableOptions?.mode === "single") {
+            this.uncheckAllNodes();
+        }
+        node.check({
+            checked: checked ?? !node.checked,
+            checkChildren: this.checkableOptions?.checkChildren,
+            checkParent: this.checkableOptions?.checkParents
+        });
+        const checkedKeys = this.nodeDictionary
+            .where(n => n.value.checked)
+            .select(n => n.value.key)
+            .toArray();
+        this.checkedKeysChange.emit(checkedKeys);
+    }
+
+    public toggleNodeExpand(node: Node, expand?: boolean): void {
+        if (node.nodes.length === 0) {
+            return;
+        }
+        node.expand(expand ?? !node.expanded, false);
+        const expandedKeys = this.nodeDictionary
+            .where(n => n.value.expanded)
+            .select(n => n.value.key)
+            .toArray();
+        this.expandedKeysChange.emit(expandedKeys);
+    }
+
+    public toggleNodeSelection(node: Node): void {
+        if (!this.selectableOptions.enabled) {
+            return;
+        }
+        if (this.selectableOptions.childrenOnly && node.nodes.length > 0) {
+            return;
+        }
+        if (node.disabled) {
+            return;
+        }
+        if (node.selected) {
+            node.setSelected(false);
+            this.lastSelectedNode = undefined;
+        } else {
+            if (this.selectableOptions.mode === "single") {
+                if (this.lastSelectedNode) {
+                    this.lastSelectedNode.setSelected(false);
+                }
+            }
+            node.setSelected(true);
+            node.focused = true;
+            this.lastSelectedNode = node;
+        }
+        const selectedKeys = this.nodeDictionary
+            .where(n => n.value.selected)
+            .select(n => n.value.key)
+            .toArray();
+        this.selectedKeysChange.emit(selectedKeys);
+    }
+
     public uncheckAllNodes(): void {
         this.nodeList.forEach(node => node.check({ checked: false, checkChildren: true, checkParent: true }));
     }
@@ -117,5 +188,10 @@ export class TreeViewService {
             parent.indeterminate = someIndeterminate || (!allChecked && someChecked);
             parent = parent.parent;
         }
+        const checkedKeys = this.nodeDictionary
+            .where(n => n.value.checked)
+            .select(n => n.value.key)
+            .toArray();
+        this.checkedKeysChange.emit(checkedKeys);
     }
 }

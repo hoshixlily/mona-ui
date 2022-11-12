@@ -723,6 +723,10 @@ input[monaTextBox] {
     }
 }
 
+.mona-tree-view-node-focused {
+    border: 1px solid var(--mona-focus-border-color);
+}
+
 .mona-tree-view-node-selected {
     background-color: var(--mona-primary);
     border: 1px solid var(--mona-border-color);

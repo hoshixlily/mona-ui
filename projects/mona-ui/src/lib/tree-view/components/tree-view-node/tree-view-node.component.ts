@@ -14,13 +14,14 @@ import { DropPosition } from "../../data/DropPosition";
 import { DropPositionChangeEvent } from "../../data/DropPositionChangeEvent";
 import { NodeClickEvent } from "../../data/NodeClickEvent";
 import { debounceTime, distinctUntilChanged, map, of, Subject, switchMap, takeUntil } from "rxjs";
+import { FocusableOption, FocusOrigin, Highlightable } from "@angular/cdk/a11y";
 
 @Component({
     selector: "mona-tree-view-node",
     templateUrl: "./tree-view-node.component.html",
     styleUrls: ["./tree-view-node.component.scss"]
 })
-export class TreeViewNodeComponent implements OnInit, OnDestroy {
+export class TreeViewNodeComponent implements OnInit, OnDestroy, Highlightable {
     private readonly componentDestroy$: Subject<void> = new Subject<void>();
     public readonly click$: Subject<MouseEvent> = new Subject<MouseEvent>();
     public readonly collapseIcon: IconDefinition = faChevronDown;
@@ -44,6 +45,9 @@ export class TreeViewNodeComponent implements OnInit, OnDestroy {
     @Output()
     public nodeDoubleClick: EventEmitter<NodeClickEvent> = new EventEmitter<NodeClickEvent>();
 
+    @Output()
+    public nodeSelect: EventEmitter<Node> = new EventEmitter<Node>();
+
     @Input()
     public nodeTextTemplate?: TemplateRef<never> | null = null;
 
@@ -62,28 +66,11 @@ export class TreeViewNodeComponent implements OnInit, OnDestroy {
     }
 
     public onCheckToggle(checked: boolean): void {
-        if (this.treeViewService.checkableOptions?.mode === "single") {
-            this.treeViewService.uncheckAllNodes();
-        }
-        this.node.check({
-            checked,
-            checkChildren: this.treeViewService.checkableOptions?.checkChildren,
-            checkParent: this.treeViewService.checkableOptions?.checkParents
-        });
-        const checkedKeys = this.treeViewService.nodeDictionary
-            .where(n => n.value.checked)
-            .select(n => n.value.key)
-            .toArray();
-        this.treeViewService.checkedKeysChange.emit(checkedKeys);
+        this.treeViewService.toggleNodeCheck(this.node, checked);
     }
 
     public onExpandToggle(event: MouseEvent): void {
-        this.node.expand(!this.node.expanded, false);
-        const expandedKeys = this.treeViewService.nodeDictionary
-            .where(n => n.value.expanded)
-            .select(n => n.value.key)
-            .toArray();
-        this.treeViewService.expandedKeysChange.emit(expandedKeys);
+        this.treeViewService.toggleNodeExpand(this.node);
     }
 
     public onMouseEnter(event: MouseEvent): void {
@@ -129,48 +116,41 @@ export class TreeViewNodeComponent implements OnInit, OnDestroy {
     }
 
     public onNodeDoubleClick(event: MouseEvent): void {
+        if (this.node.disabled) {
+            return;
+        }
         const clickEvent = new NodeClickEvent(this.node.getLookupItem(), event, "dblclick");
         this.nodeDoubleClick.emit(clickEvent);
     }
 
     public onNodeClick(event: MouseEvent, type: "click" | "contextmenu"): void {
+        if (this.node.disabled) {
+            return;
+        }
         const clickEvent = new NodeClickEvent(this.node.getLookupItem(), event, type);
         this.nodeClick.emit(clickEvent);
         if (clickEvent.isDefaultPrevented()) {
             return;
         }
         if (event.type === "click") {
-            if (!this.treeViewService.selectableOptions.enabled) {
-                return;
-            }
-            if (this.treeViewService.selectableOptions.childrenOnly && this.node.nodes.length > 0) {
-                return;
-            }
-            if (this.node.selected) {
-                this.node.setSelected(false);
-                this.treeViewService.lastSelectedNode = undefined;
-            } else {
-                if (this.treeViewService.selectableOptions.mode === "single") {
-                    if (this.treeViewService.lastSelectedNode) {
-                        this.treeViewService.lastSelectedNode.setSelected(false);
-                    }
-                }
-                this.node.setSelected(true);
-                this.treeViewService.lastSelectedNode = this.node;
-            }
-            const selectedKeys = this.treeViewService.nodeDictionary
-                .where(n => n.value.selected)
-                .select(n => n.value.key)
-                .toArray();
-            this.treeViewService.selectedKeysChange.emit(selectedKeys);
+            this.treeViewService.toggleNodeSelection(this.node);
+            this.nodeSelect.emit(this.node);
         }
+    }
+
+    public setActiveStyles(): void {
+        this.node.focused = true;
+    }
+
+    public setInactiveStyles(): void {
+        this.node.focused = false;
     }
 
     private setSubscriptions(): void {
         this.click$
             .pipe(
                 takeUntil(this.componentDestroy$),
-                debounceTime(350),
+                // debounceTime(350),
                 switchMap(event => of({ event, type: event.type }))
             )
             .subscribe(result => {

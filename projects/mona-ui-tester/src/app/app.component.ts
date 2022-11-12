@@ -206,8 +206,8 @@ export class AppComponent implements OnInit {
         }
     ];
 
-    public treeDisabledKeys: string[] = ["1-1-1", "1-4-4"];
-    public treeExpandedKeys: string[] = ["1-1", "1-2", "1-3", "1-4"];
+    public treeDisabledKeys: string[] = ["1-1-1", "1-1-4", "1-4"];
+    public treeExpandedKeys: string[] = ["1", "1-1", "1-2", "1-3", "1-4"];
     public treeSelectedKeys: string[] = [
         /*"1-2-1", "1-2-2", "1-2-3", "1-2-4"*/
     ];
@@ -335,7 +335,7 @@ export class AppComponent implements OnInit {
 
     public onTreeNodeClick(event: NodeClickEvent): void {
         console.log(event);
-        event.preventDefault();
+        // event.preventDefault();
     }
 
     public onTreeNodeDoubleClick(event: NodeClickEvent): void {
