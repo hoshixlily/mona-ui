@@ -82,6 +82,9 @@ export * from "./lib/inputs/modules/text-box/text-box.module";
 
 export * from "./lib/inputs/inputs.module";
 
+/** Layout */
+export * from "./lib/layout/layout.module";
+
 /** Menus */
 // export * from "./lib/menus/models/MenuItem";
 export * from "./lib/menus/modules/shared-menu/components/menu-item/menu-item.component";
