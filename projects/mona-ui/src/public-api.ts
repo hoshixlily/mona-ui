@@ -83,6 +83,7 @@ export * from "./lib/inputs/modules/text-box/text-box.module";
 export * from "./lib/inputs/inputs.module";
 
 /** Layout */
+export * from "./lib/layout/modules/tab-strip/components/tab-strip/tab-strip.component";
 export * from "./lib/layout/layout.module";
 
 /** Menus */
