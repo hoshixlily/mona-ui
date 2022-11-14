@@ -83,7 +83,16 @@ export * from "./lib/inputs/modules/text-box/text-box.module";
 export * from "./lib/inputs/inputs.module";
 
 /** Layout */
+
+/* Tab Strip */
+export * from "./lib/layout/modules/tab-strip/data/TabCloseEvent";
+export * from "./lib/layout/modules/tab-strip/directives/tab-content-template.directive";
+export * from "./lib/layout/modules/tab-strip/directives/tab-title-template.directive";
+export * from "./lib/layout/modules/tab-strip/components/tab-strip/tab-strip.component";
+export * from "./lib/layout/modules/tab-strip/components/tab/tab.component";
+export * from "./lib/layout/modules/tab-strip/tab-strip.module";
 export * from "./lib/layout/layout.module";
+/** Layout End */
 
 /** Menus */
 // export * from "./lib/menus/models/MenuItem";

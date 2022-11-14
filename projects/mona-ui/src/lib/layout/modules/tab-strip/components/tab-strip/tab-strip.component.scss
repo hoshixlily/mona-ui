@@ -1,0 +1,97 @@
+:host {
+    width: 100%;
+    height: 100%;
+}
+
+div.mona-tab-strip {
+    width: 100%;
+    height: 100%;
+    //background: var(--mona-background);
+    border: 1px solid var(--mona-border-color);
+}
+
+div.mona-tab-strip-tabs {
+    width: 100%;
+    height: var(--mona-input-height);
+    background: 1px solid var(--mona-background-dark);
+    border-bottom: 1px solid var(--mona-border-color);
+    display: flex;
+}
+
+ul.mona-tab-list {
+    list-style-type: none;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    cursor: default;
+    user-select: none;
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    background: var(--mona-background-dark);
+    & li {
+        list-style-type: none;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--mona-text);
+        border-right: 1px solid var(--mona-border-color);
+        cursor: pointer;
+        //padding: 5px 20px;
+        &.mona-tab-active {
+            font-weight: bold;
+            //border-bottom: 1px solid transparent;
+            background: var(--mona-background);
+            color: var(--mona-primary);
+        }
+        & button.mona-tab-close {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            & fa-icon {
+                margin-top: 2px;
+            }
+        }
+    }
+}
+
+div.mona-tab-title {
+    padding: 5px 10px;
+}
+
+div.mona-tab-strip-scroll {
+    width: var(--mona-input-height);
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--mona-background-dark);
+    color: var(--mona-text);
+    & button[monaButton] {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        border: none;
+        color: var(--mona-text);
+        cursor: pointer;
+        &:hover {
+            background: var(--mona-background-darker);
+        }
+        box-shadow: none;
+    }
+}
+
+div.mona-tab-content {
+    width: 100%;
+    height: calc(100% - var(--mona-input-height));
+    background: var(--mona-background-light);
+    overflow: auto;
+}
+
+div.mona-tab-hidden {
+    display: none;
+}

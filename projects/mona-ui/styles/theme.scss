@@ -670,6 +670,16 @@ input[monaTextBox] {
     }
 }
 
+/** Layouts */
+/** Tab Strip */
+ul.mona-tab-list {
+    & li {
+        &.mona-disabled {
+            @include disabled;
+        }
+    }
+}
+
 
 /** Menu */
 /** Context Menu */

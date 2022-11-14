@@ -1,5 +1,13 @@
 import { Component, ElementRef, OnInit, TemplateRef, ViewChild } from "@angular/core";
-import { PopupRef, NodeDragStartEvent, NodeDragEvent, NodeDropEvent, NodeDragEndEvent, NodeClickEvent } from "mona-ui";
+import {
+    PopupRef,
+    NodeDragStartEvent,
+    NodeDragEvent,
+    NodeDropEvent,
+    NodeDragEndEvent,
+    NodeClickEvent,
+    TabCloseEvent
+} from "mona-ui";
 import { TestComponentComponent } from "./test-component/test-component.component";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { faMoon, faSearch, faSnowflake, faSun } from "@fortawesome/free-solid-svg-icons";
@@ -311,6 +319,12 @@ export class AppComponent implements OnInit {
     public onSwitchValueChange(value: boolean): void {
         // console.log(value);
         this.switchValue = value;
+    }
+
+    public onTabStripTabClose(event: TabCloseEvent): void {
+        console.log(event);
+        this.dropdownPrimitiveDataItems.splice(event.index - 1, 1);
+        this.dropdownPrimitiveDataItems = [...this.dropdownPrimitiveDataItems];
     }
 
     public onTextBoxValueChange(value: string): void {

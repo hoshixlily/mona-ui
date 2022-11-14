@@ -17,7 +17,6 @@ import { FlexibleConnectedPositionStrategyOrigin } from "@angular/cdk/overlay";
 import { PopupSettings } from "../../models/PopupSettings";
 import { PopupOffset } from "../../models/PopupOffset";
 import { PopupService } from "../../services/popup.service";
-import { Element } from "@angular/compiler";
 
 @Component({
     selector: "mona-popup",
@@ -81,7 +80,7 @@ export class PopupComponent implements OnInit, OnDestroy, AfterViewInit {
         if (!this.contentTemplate) {
             throw new Error(`${PopupComponent.name} requires contentTemplate`);
         }
-        this.create();
+        this.setEventListeners();
     }
 
     public ngOnDestroy(): void {
@@ -94,36 +93,18 @@ export class PopupComponent implements OnInit, OnDestroy, AfterViewInit {
         }
     }
 
-    private create(): void {
-        const popupSettings: PopupSettings = {
-            anchor: this.anchor,
-            closeOnEscape: this.closeOnEscape,
-            content: this.contentTemplate,
-            hasBackdrop: false,
-            height: this.height,
-            maxHeight: this.maxHeight,
-            maxWidth: this.maxWidth,
-            minHeight: this.minHeight,
-            minWidth: this.minWidth,
-            offset: this.offset,
-            popupClass: this.popupClass,
-            width: this.width
-        };
-        this.setEventListeners(popupSettings);
-    }
-
-    private setEventListeners(popupSettings: PopupSettings): void {
-        let pointAnchor = false;
-        let target: FlexibleConnectedPositionStrategyOrigin;
-        if (popupSettings.anchor instanceof ElementRef) {
-            target = popupSettings.anchor.nativeElement;
-        } else if (popupSettings.anchor instanceof HTMLElement) {
-            target = popupSettings.anchor;
-        } else {
-            target = document.body;
-            pointAnchor = true;
-        }
+    private setEventListeners(): void {
         this.zone.runOutsideAngular(() => {
+            let pointAnchor = false;
+            let target: FlexibleConnectedPositionStrategyOrigin;
+            if (this.anchor instanceof ElementRef) {
+                target = this.anchor.nativeElement;
+            } else if (this.anchor instanceof HTMLElement) {
+                target = this.anchor;
+            } else {
+                target = document.body;
+                pointAnchor = true;
+            }
             this.popupTriggerListener = this.renderer.listen(target, this.trigger, (event: Event) => {
                 event.preventDefault();
                 if (this.popupOpened) {
@@ -131,6 +112,20 @@ export class PopupComponent implements OnInit, OnDestroy, AfterViewInit {
                     return;
                 }
                 this.zone.run(() => {
+                    const popupSettings: PopupSettings = {
+                        anchor: this.anchor,
+                        closeOnEscape: this.closeOnEscape,
+                        content: this.contentTemplate,
+                        hasBackdrop: false,
+                        height: this.height,
+                        maxHeight: this.maxHeight,
+                        maxWidth: this.maxWidth,
+                        minHeight: this.minHeight,
+                        minWidth: this.minWidth,
+                        offset: this.offset,
+                        popupClass: this.popupClass,
+                        width: this.width
+                    };
                     this.popupRef = this.popupService.create(popupSettings);
                     const subscription = this.popupRef.closed.subscribe(result => {
                         this.popupRef = null;

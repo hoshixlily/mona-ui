@@ -72,10 +72,12 @@ export class SplitButtonComponent implements OnInit, AfterViewInit, AfterContent
     }
 
     public ngAfterViewInit(): void {
-        this.popupWidth = this.wrapperElementRef.nativeElement.getBoundingClientRect().width - 1;
-        this.popupOffset.horizontal = -this.mainButtonElementRef.nativeElement.offsetWidth - 1;
-        this.contextMenuComponent.setPrecise(false);
-        this.cdr.detectChanges();
+        window.setTimeout(() => {
+            this.popupWidth = this.wrapperElementRef.nativeElement.getBoundingClientRect().width - 1;
+            this.popupOffset.horizontal = -this.mainButtonElementRef.nativeElement.offsetWidth - 1;
+            this.contextMenuComponent.setPrecise(false);
+            this.cdr.detectChanges();
+        });
     }
 
     public ngOnDestroy(): void {
