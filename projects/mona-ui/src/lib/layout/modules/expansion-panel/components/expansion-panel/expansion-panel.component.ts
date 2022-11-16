@@ -1,6 +1,7 @@
-import { Component, Input, OnInit } from "@angular/core";
+import { Component, ContentChild, Input, OnInit, TemplateRef } from "@angular/core";
 import { faMinus, faPlus, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { SlideDown, SlideDownHidden } from "../../../../../animations/SlideDownAnimation";
+import { ExpansionPanelTitleTemplateDirective } from "../../directives/expansion-panel-title-template.directive";
 
 @Component({
     selector: "mona-expansion-panel",
@@ -17,6 +18,9 @@ export class ExpansionPanelComponent implements OnInit {
 
     @Input()
     public title: string = "";
+
+    @ContentChild(ExpansionPanelTitleTemplateDirective, { read: TemplateRef })
+    public titleTemplate: TemplateRef<any> | null = null;
 
     public constructor() {}
 
