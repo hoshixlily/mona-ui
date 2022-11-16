@@ -1,6 +1,6 @@
 import { Component, ContentChild, Input, OnInit, TemplateRef } from "@angular/core";
 import { faMinus, faPlus, IconDefinition } from "@fortawesome/free-solid-svg-icons";
-import { SlideDown, SlideDownHidden } from "../../../../../animations/SlideDownAnimation";
+import { SlideDownHidden } from "../../../../../animations/SlideDownAnimation";
 import { ExpansionPanelTitleTemplateDirective } from "../../directives/expansion-panel-title-template.directive";
 
 @Component({
