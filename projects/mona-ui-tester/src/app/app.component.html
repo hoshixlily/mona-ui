@@ -289,11 +289,18 @@
                         </div>
                     </ng-template>
                 </mona-tab>
-                <mona-tab [title]="item" [disabled]="ix%3===0" *ngFor="let item of dropdownPrimitiveDataItems; let ix=index;">
+                <mona-tab title="Expansion Panel">
                     <ng-template monaTabContentTemplate>
-                        {{item}}
+                        <div style="width: 100%; height: 100%; padding: 20px;">
+                            <mona-expansion-panel title="Panel {{x}}" *ngFor="let x of [1,2,3]"></mona-expansion-panel>
+                        </div>
                     </ng-template>
                 </mona-tab>
+<!--                <mona-tab [title]="item"  *ngFor="let item of dropdownPrimitiveDataItems |slice:0:5; let ix=index;">-->
+<!--                    <ng-template monaTabContentTemplate>-->
+<!--                        {{item}}-->
+<!--                    </ng-template>-->
+<!--                </mona-tab>-->
             </mona-tab-strip>
         </div>
 </div>

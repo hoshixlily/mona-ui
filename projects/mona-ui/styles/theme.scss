@@ -73,6 +73,10 @@ input {
     @include focus-shadow;
 }
 
+.mona-hidden {
+    display: none;
+}
+
 /** Shared Components **/
 .mona-input-selector {
     width: auto;
@@ -671,6 +675,12 @@ input[monaTextBox] {
 }
 
 /** Layouts */
+
+/** Expansion Panel */
+.mona-expansion-panel + .mona-expansion-panel {
+    border-top: none;
+}
+
 /** Tab Strip */
 ul.mona-tab-list {
     & li {
