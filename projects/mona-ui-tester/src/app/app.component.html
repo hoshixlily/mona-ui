@@ -298,6 +298,11 @@
                                     <fa-icon [icon]="snowflakeIcon" style="color: powderblue;"></fa-icon>
                                     <span style="color: snow; margin-left: 5px; font-weight: bold;">Panel {{x}}</span>
                                 </ng-template>
+                                <ng-template monaExpansionPanelActionsTemplate>
+                                    <button monaButton [flat]="true">
+                                        <fa-icon [icon]="snowflakeIcon"></fa-icon>
+                                    </button>
+                                </ng-template>
                             </mona-expansion-panel>
                         </div>
                     </ng-template>
