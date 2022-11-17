@@ -84,6 +84,12 @@ export * from "./lib/inputs/inputs.module";
 
 /** Layout */
 
+/* Expansion Panel */
+export * from "./lib/layout/modules/expansion-panel/components/expansion-panel/expansion-panel.component";
+export * from "./lib/layout/modules/expansion-panel/directives/expansion-panel-actions-template.directive";
+export * from "./lib/layout/modules/expansion-panel/directives/expansion-panel-title-template.directive";
+export * from "./lib/layout/modules/expansion-panel/expansion-panel.module";
+
 /* Tab Strip */
 export * from "./lib/layout/modules/tab-strip/data/TabCloseEvent";
 export * from "./lib/layout/modules/tab-strip/directives/tab-content-template.directive";

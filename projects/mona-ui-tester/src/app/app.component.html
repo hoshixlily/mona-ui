@@ -289,11 +289,29 @@
                         </div>
                     </ng-template>
                 </mona-tab>
-                <mona-tab [title]="item" [disabled]="ix%3===0" *ngFor="let item of dropdownPrimitiveDataItems; let ix=index;">
+                <mona-tab title="Expansion Panel">
                     <ng-template monaTabContentTemplate>
-                        {{item}}
+                        <div style="width: 100%; height: 100%; padding: 20px;">
+                            <mona-expansion-panel title="Panel {{x}}" *ngFor="let x of [1,2,3]">
+                                This is the content for panel {{x}}.
+                                <ng-template monaExpansionPanelTitleTemplate>
+                                    <fa-icon [icon]="snowflakeIcon" style="color: powderblue;"></fa-icon>
+                                    <span style="color: snow; margin-left: 5px; font-weight: bold;">Panel {{x}}</span>
+                                </ng-template>
+                                <ng-template monaExpansionPanelActionsTemplate>
+                                    <button monaButton [flat]="true">
+                                        <fa-icon [icon]="snowflakeIcon"></fa-icon>
+                                    </button>
+                                </ng-template>
+                            </mona-expansion-panel>
+                        </div>
                     </ng-template>
                 </mona-tab>
+<!--                <mona-tab [title]="item"  *ngFor="let item of dropdownPrimitiveDataItems |slice:0:5; let ix=index;">-->
+<!--                    <ng-template monaTabContentTemplate>-->
+<!--                        {{item}}-->
+<!--                    </ng-template>-->
+<!--                </mona-tab>-->
             </mona-tab-strip>
         </div>
 </div>
