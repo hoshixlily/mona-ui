@@ -1,6 +1,6 @@
 <div class="wrapper">
     <mona-splitter orientation="horizontal">
-        <mona-splitter-pane [size]="300">
+        <mona-splitter-pane [size]="300" [collapsible]="true" >
             <mona-tree-view [data]="treeData" textField="text" childrenField="items" keyField="id"
                             [monaTreeViewCheckable]="{enabled: true, checkChildren: true, checkParents: true, mode: 'multiple'}"
                             [checkedKeys]="treeCheckedKeys" (checkedKeysChange)="onTreeCheckedKeysChange($event)"
@@ -329,7 +329,7 @@
                                                 <button monaButton>Open Dialog</button>
                                             </div>
                                         </mona-splitter-pane>
-                                        <mona-splitter-pane>
+                                        <mona-splitter-pane [collapsible]="true">
                                             <div style="width: 100%; height: 100%; padding: 20px;">
                                                 <button monaButton>Open Dialog</button>
                                             </div>

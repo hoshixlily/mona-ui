@@ -2,10 +2,10 @@ import { Component, ElementRef, Input, OnChanges, OnInit, QueryList, SimpleChang
 import { SplitterPaneComponent } from "../splitter-pane/splitter-pane.component";
 import { Orientation } from "../../data/Orientation";
 import {
-    faChevronDown,
-    faChevronLeft,
-    faChevronRight,
-    faChevronUp,
+    faCaretDown,
+    faCaretLeft,
+    faCaretRight,
+    faCaretUp,
     faEllipsisH,
     faEllipsisV,
     IconDefinition
@@ -18,11 +18,11 @@ import { fromEvent } from "rxjs";
     styleUrls: ["./splitter-resizer.component.scss"]
 })
 export class SplitterResizerComponent implements OnInit, OnChanges {
-    public readonly horizontalCollapseNextIcon: IconDefinition = faChevronRight;
-    public readonly horizontalCollapsePreviousIcon: IconDefinition = faChevronLeft;
+    public readonly horizontalCollapseNextIcon: IconDefinition = faCaretRight;
+    public readonly horizontalCollapsePreviousIcon: IconDefinition = faCaretLeft;
     public readonly horizontalResizeIcon: IconDefinition = faEllipsisV;
-    public readonly verticalCollapseNextIcon: IconDefinition = faChevronDown;
-    public readonly verticalCollapsePreviousIcon: IconDefinition = faChevronUp;
+    public readonly verticalCollapseNextIcon: IconDefinition = faCaretDown;
+    public readonly verticalCollapsePreviousIcon: IconDefinition = faCaretUp;
     public readonly verticalResizeIcon: IconDefinition = faEllipsisH;
     public resizing: boolean = false;
 
