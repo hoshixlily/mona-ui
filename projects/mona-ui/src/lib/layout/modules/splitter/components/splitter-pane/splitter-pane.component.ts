@@ -13,11 +13,17 @@ export class SplitterPaneComponent implements OnInit {
     @Input()
     public collapsed: boolean = false;
 
+    @Output()
+    public collapsedChange: EventEmitter<boolean> = new EventEmitter<boolean>();
+
     @Input()
     public collapsible: boolean = false;
 
     @Input()
     public element!: HTMLDivElement;
+
+    @Input()
+    public resizable: boolean = true;
 
     @Input()
     public set size(size: string | number | undefined) {
@@ -32,7 +38,13 @@ export class SplitterPaneComponent implements OnInit {
     public templateRef: TemplateRef<never> | null = null;
 
     public constructor(public readonly elementRef: ElementRef<HTMLElement>) {}
+
     public ngOnInit(): void {}
+
+    public setCollapsed(collapsed: boolean): void {
+        this.collapsed = collapsed;
+        this.collapsedChange.emit(collapsed);
+    }
 
     public setSize(size: string | number | undefined): void {
         this.paneSize = size == null ? size : typeof size === "string" ? size : `${size}px`;

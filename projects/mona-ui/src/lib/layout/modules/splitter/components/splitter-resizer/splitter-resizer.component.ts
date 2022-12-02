@@ -20,13 +20,9 @@ import { fromEvent } from "rxjs";
 export class SplitterResizerComponent implements OnInit, OnChanges {
     public readonly horizontalCollapseNextIcon: IconDefinition = faChevronRight;
     public readonly horizontalCollapsePreviousIcon: IconDefinition = faChevronLeft;
-    public readonly horizontalExpandNextIcon: IconDefinition = faChevronLeft;
-    public readonly horizontalExpandPreviousIcon: IconDefinition = faChevronRight;
     public readonly horizontalResizeIcon: IconDefinition = faEllipsisV;
     public readonly verticalCollapseNextIcon: IconDefinition = faChevronDown;
     public readonly verticalCollapsePreviousIcon: IconDefinition = faChevronUp;
-    public readonly verticalExpandNextIcon: IconDefinition = faChevronUp;
-    public readonly verticalExpandPreviousIcon: IconDefinition = faChevronDown;
     public readonly verticalResizeIcon: IconDefinition = faEllipsisH;
     public resizing: boolean = false;
 
@@ -69,34 +65,34 @@ export class SplitterResizerComponent implements OnInit, OnChanges {
         if (position === "previous") {
             if (!this.previousPane.collapsed) {
                 if (!this.nextPane.collapsed) {
-                    this.previousPane.collapsed = true;
+                    this.previousPane.setCollapsed(true);
                     if (!this.previousPane.isStatic && this.nextPane.isStatic) {
                         this.nextPane.isStatic = false;
                     }
                 } else {
-                    this.nextPane.collapsed = false;
+                    this.nextPane.setCollapsed(false);
                     if (this.previousPane.uid === this.panes.first.uid && this.previousPane.paneSize != null) {
                         this.previousPane.isStatic = true;
                     }
                 }
             } else if (this.nextPane.collapsed) {
-                this.nextPane.collapsed = false;
+                this.nextPane.setCollapsed(false);
             }
         } else {
             if (!this.nextPane?.collapsed) {
                 if (!this.previousPane.collapsed) {
-                    this.nextPane.collapsed = true;
+                    this.nextPane.setCollapsed(true);
                     if (!this.nextPane.isStatic && this.previousPane.isStatic) {
                         this.previousPane.isStatic = false;
                     }
                 } else {
-                    this.previousPane.collapsed = false;
+                    this.previousPane.setCollapsed(false);
                     if (this.nextPane.uid === this.panes.last.uid && this.nextPane.paneSize != null) {
                         this.nextPane.isStatic = true;
                     }
                 }
             } else if (this.previousPane.collapsed) {
-                this.previousPane.collapsed = false;
+                this.previousPane.setCollapsed(false);
             }
         }
     }
@@ -138,6 +134,9 @@ export class SplitterResizerComponent implements OnInit, OnChanges {
         fromEvent<MouseEvent>(this.elementRef.nativeElement, "mousedown").subscribe(event => {
             this.resizing = true;
             const mouseMoveSubscription = fromEvent<MouseEvent>(document, "mousemove").subscribe(event => {
+                if (!this.previousPane.resizable || !this.nextPane.resizable) {
+                    return;
+                }
                 if (!this.previousPane.collapsed && !this.nextPane.collapsed) {
                     this.resize(event);
                 }
