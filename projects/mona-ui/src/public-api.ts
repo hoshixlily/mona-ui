@@ -90,6 +90,11 @@ export * from "./lib/layout/modules/expansion-panel/directives/expansion-panel-a
 export * from "./lib/layout/modules/expansion-panel/directives/expansion-panel-title-template.directive";
 export * from "./lib/layout/modules/expansion-panel/expansion-panel.module";
 
+/** Splitter */
+export * from "./lib/layout/modules/splitter/components/splitter/splitter.component";
+export * from "./lib/layout/modules/splitter/components/splitter-pane/splitter-pane.component";
+export * from "./lib/layout/modules/splitter/splitter.module";
+
 /* Tab Strip */
 export * from "./lib/layout/modules/tab-strip/data/TabCloseEvent";
 export * from "./lib/layout/modules/tab-strip/directives/tab-content-template.directive";
