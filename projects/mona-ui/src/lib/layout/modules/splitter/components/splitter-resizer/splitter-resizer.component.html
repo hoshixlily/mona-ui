@@ -1,11 +1,11 @@
-<div class="mona-splitter-resizer" [ngClass]="orientation" (click)="test()">
-    <div class="mona-splitter-collapse" (click)="toggle('previous')">
+<div class="mona-splitter-resizer" [ngClass]="orientation">
+    <div class="mona-splitter-collapse" (click)="toggle('previous')" *ngIf="previousPane.collapsible || nextPane.collapsed">
         <fa-icon [icon]="horizontalCollapsePreviousIcon" *ngIf="orientation==='horizontal' && !previousPane.collapsed"></fa-icon>
         <fa-icon [icon]="verticalCollapsePreviousIcon" *ngIf="orientation==='vertical' && !previousPane.collapsed"></fa-icon>
     </div>
-    <fa-icon [icon]="horizontalResizeIcon" *ngIf="orientation==='horizontal'"></fa-icon>
-    <fa-icon [icon]="verticalResizeIcon" *ngIf="orientation==='vertical'"></fa-icon>
-    <div class="mona-splitter-collapse" (click)="toggle('next')">
+    <fa-icon [icon]="horizontalResizeIcon" *ngIf="orientation==='horizontal' && !(previousPane.collapsed || nextPane.collapsed)"></fa-icon>
+    <fa-icon [icon]="verticalResizeIcon" *ngIf="orientation==='vertical' && !(previousPane.collapsed || nextPane.collapsed)"></fa-icon>
+    <div class="mona-splitter-collapse" (click)="toggle('next')" *ngIf="nextPane.collapsible || previousPane.collapsed">
         <fa-icon [icon]="horizontalCollapseNextIcon" *ngIf="orientation==='horizontal' && !nextPane?.collapsed"></fa-icon>
         <fa-icon [icon]="verticalCollapseNextIcon" *ngIf="orientation==='vertical' && !nextPane?.collapsed"></fa-icon>
     </div>

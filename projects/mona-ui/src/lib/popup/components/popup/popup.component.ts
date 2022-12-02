@@ -80,7 +80,9 @@ export class PopupComponent implements OnInit, OnDestroy, AfterViewInit {
         if (!this.contentTemplate) {
             throw new Error(`${PopupComponent.name} requires contentTemplate`);
         }
-        this.setEventListeners();
+        window.setTimeout(() => {
+            this.setEventListeners();
+        });
     }
 
     public ngOnDestroy(): void {
@@ -105,6 +107,13 @@ export class PopupComponent implements OnInit, OnDestroy, AfterViewInit {
                 target = document.body;
                 pointAnchor = true;
             }
+            const width =
+                this.width ??
+                (this.anchor instanceof HTMLElement
+                    ? this.anchor.offsetWidth
+                    : this.anchor instanceof ElementRef
+                    ? this.anchor.nativeElement.offsetWidth
+                    : undefined);
             this.popupTriggerListener = this.renderer.listen(target, this.trigger, (event: Event) => {
                 event.preventDefault();
                 if (this.popupOpened) {
@@ -124,7 +133,7 @@ export class PopupComponent implements OnInit, OnDestroy, AfterViewInit {
                         minWidth: this.minWidth,
                         offset: this.offset,
                         popupClass: this.popupClass,
-                        width: this.width
+                        width
                     };
                     this.popupRef = this.popupService.create(popupSettings);
                     const subscription = this.popupRef.closed.subscribe(result => {
