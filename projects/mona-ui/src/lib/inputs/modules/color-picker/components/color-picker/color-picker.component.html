@@ -7,7 +7,7 @@
     </div>
 </div>
 
-<mona-popup [anchor]="colorPickerAnchor" popupClass="mona-color-picker-popup">
+<mona-popup [anchor]="colorPickerAnchor" popupClass="mona-color-picker-popup" width="auto">
     <ng-template>
         <mona-color-palette [palette]="palette" [columns]="8" [value]="value"
                             (valueChange)="onColorPaletteValueChange($event)"></mona-color-palette>

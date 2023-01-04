@@ -1,0 +1,23 @@
+<div class="mona-stepper mona-relative mona-w-auto mona-grid"
+     [style.grid-template-columns]="'repeat('+(stepList.length*2)+', 1fr)'">
+    <ol class="mona-absolute mona-flex mona-list-none mona-w-full mona-col-span-full">
+        <li *ngFor="let step of stepList"
+            class="mona-flex mona-justify-center mona-items-center mona-grow mona-shrink-0 mona-basis-auto"
+            [style.max-width.%]="trackItemWidth"
+            (click)="onStepClick(step)">
+            <a class="mona-flex mona-flex-col mona-w-full mona-items-center mona-z-[1]" href="#">
+                <span
+                    class="mona-w-7 mona-h-7 mona-flex mona-items-center mona-justify-center mona-bg-background mona-border mona-border-border
+                           mona-text-text mona-transition-[background] mona-delay-50 mona-ease-in-out"
+                    [ngClass]="{'mona-bg-primary': step.active, 'mona-text-background': step.active}">{{step.index}}</span>
+                <span class="mona-text-text" *ngIf="!labelTemplate">{{step.label}}</span>
+                <ng-container *ngIf="labelTemplate" [ngTemplateOutlet]="labelTemplate?.templateRef ?? null" [ngTemplateOutletContext]="{$implicit: step.options, index: step.index}"></ng-container>
+            </a>
+        </li>
+    </ol>
+    <div class="mona-h-2 mona-relative mona-border mona-border-border mona-bg-background mona-grid mona-top-2.5"
+         [style.grid-column]="trackGridColumns">
+        <div class="mona-h-full mona-absolute mona-bg-primary mona-transition-[width] mona-ease-in-out mona-delay-50"
+             [style.width.%]="trackWidth"></div>
+    </div>
+</div>

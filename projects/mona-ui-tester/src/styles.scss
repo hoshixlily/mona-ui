@@ -6,8 +6,10 @@ html, body {
     width: 100%;
     height: 100%;
     background: #323335;
-    font-size: 12px;
+    scroll-behavior: smooth;
 }
+
+body { font-size: 0.75rem; }
 
 body {
     font-family: Helvetica Neue,Helvetica,Arial,sans-serif;
@@ -15,7 +17,7 @@ body {
 
 button[monaButton] {
     font-weight: 600;
-    font-size: 12px;
+    //font-size: 12px;
 }
 
 .popup-noselect {
