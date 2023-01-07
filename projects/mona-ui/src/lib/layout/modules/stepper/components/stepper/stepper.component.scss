@@ -1,0 +1,60 @@
+div.mona-stepper {
+    position: relative;
+    width: auto;
+    display: grid;
+}
+
+ol.mona-stepper-step-list {
+    position: absolute;
+    display: flex;
+    list-style: none;
+    width: 100%;
+    grid-column: 1 / -1;
+    & li {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: 1 0 auto;
+        & a {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            align-items: center;
+            z-index: 1;
+            text-decoration: none;
+            & > span:first-child {
+                width: var(--mona-input-height);
+                height: var(--mona-input-height);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background-color: var(--mona-background);
+                border: 1px solid var(--mona-border-color);
+                color: var(--mona-text);
+                transition: background-color 50ms ease-in-out, color 50ms ease-in-out;
+                &.mona-active {
+                    background-color: var(--mona-primary);
+                }
+            }
+            & > span:last-child {
+                color: var(--mona-text);
+                transition: color 50ms ease-in-out;
+            }
+        }
+    }
+}
+
+div.mona-stepper-track {
+    position: relative;
+    height: 8px;
+    display: grid;
+    top: calc(calc(var(--mona-input-height) - 8px) / 2);
+    background-color: var(--mona-background);
+    border: 1px solid var(--mona-border-color);
+    & > div {
+        height: 100%;
+        position: absolute;
+        background-color: var(--mona-primary);
+        transition: width 50ms ease-in-out;
+    }
+}

@@ -92,7 +92,9 @@ export * from "./lib/layout/modules/expansion-panel/expansion-panel.module";
 
 /** Stepper */
 export { StepOptions } from "./lib/layout/modules/stepper/models/Step";
+export * from "./lib/layout/modules/stepper/directives/stepper-indicator-template.directive";
 export * from "./lib/layout/modules/stepper/directives/stepper-label-template.directive";
+export * from "./lib/layout/modules/stepper/directives/stepper-step-template.directive";
 export * from "./lib/layout/modules/stepper/components/stepper/stepper.component";
 export * from "./lib/layout/modules/stepper/stepper.module";
 

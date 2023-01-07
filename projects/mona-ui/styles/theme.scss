@@ -1,17 +1,4 @@
 @import '~@angular/cdk/overlay-prebuilt.css';
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-@layer base {
-    :root {
-        --primary: 243 244 245;
-        --secondary: 234 237 240;
-        --background: 23 24 27;
-        --border: 14 16 19;
-        --text: 187 190 192;
-    }
-}
 
 *,
 *::before,
@@ -28,8 +15,6 @@
     background-color: var(--mona-primary-dark) !important;
     color: var(--mona-text) !important;
 }
-
-
 
 input {
     //font-size: 12px;

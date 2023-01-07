@@ -1,23 +1,28 @@
-<div class="mona-stepper mona-relative mona-w-auto mona-grid"
+<div class="mona-stepper"
      [style.grid-template-columns]="'repeat('+(stepList.length*2)+', 1fr)'">
-    <ol class="mona-absolute mona-flex mona-list-none mona-w-full mona-col-span-full">
+    <ol class="mona-stepper-step-list">
         <li *ngFor="let step of stepList"
-            class="mona-flex mona-justify-center mona-items-center mona-grow mona-shrink-0 mona-basis-auto"
             [style.max-width.%]="trackItemWidth"
             (click)="onStepClick(step)">
-            <a class="mona-flex mona-flex-col mona-w-full mona-items-center mona-z-[1]" href="#">
-                <span
-                    class="mona-w-7 mona-h-7 mona-flex mona-items-center mona-justify-center mona-bg-background mona-border mona-border-border
-                           mona-text-text mona-transition-[background] mona-delay-50 mona-ease-in-out"
-                    [ngClass]="{'mona-bg-primary': step.active, 'mona-text-background': step.active}">{{step.index}}</span>
-                <span class="mona-text-text" *ngIf="!labelTemplate">{{step.label}}</span>
-                <ng-container *ngIf="labelTemplate" [ngTemplateOutlet]="labelTemplate?.templateRef ?? null" [ngTemplateOutletContext]="{$implicit: step.options, index: step.index}"></ng-container>
+            <a href="#">
+                <ng-container *ngIf="!stepTemplateDirective">
+                    <span [ngClass]="{'mona-active': step.active}">
+                        <ng-container *ngIf="!indicatorTemplateDirective">{{step.index}}</ng-container>
+                        <ng-container *ngIf="indicatorTemplateDirective" [ngTemplateOutlet]="indicatorTemplateDirective.templateRef"
+                                      [ngTemplateOutletContext]="{$implicit: step.options, index: step.index, active: step.active}"></ng-container>
+                    </span>
+                </ng-container>
+                <ng-container *ngIf="stepTemplateDirective">
+                    <ng-container [ngTemplateOutlet]="stepTemplateDirective.templateRef"
+                                  [ngTemplateOutletContext]="{$implicit: step.options, index: step.index, active: step.active}"></ng-container>
+                </ng-container>
+                <span class="mona-text-text" *ngIf="!labelTemplateDirective">{{step.label}}</span>
+                <ng-container *ngIf="labelTemplateDirective" [ngTemplateOutlet]="labelTemplateDirective?.templateRef ?? null"
+                              [ngTemplateOutletContext]="{$implicit: step.options, index: step.index, active: step.active}"></ng-container>
             </a>
         </li>
     </ol>
-    <div class="mona-h-2 mona-relative mona-border mona-border-border mona-bg-background mona-grid mona-top-2.5"
-         [style.grid-column]="trackGridColumns">
-        <div class="mona-h-full mona-absolute mona-bg-primary mona-transition-[width] mona-ease-in-out mona-delay-50"
-             [style.width.%]="trackWidth"></div>
+    <div class="mona-stepper-track" [style.grid-column]="trackGridColumns">
+        <div [style.width.%]="trackWidth"></div>
     </div>
 </div>

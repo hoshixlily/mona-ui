@@ -287,10 +287,19 @@
                             </div>
 
                             <div>
-                                <mona-stepper [steps]="stepperSteps" [step]="1" (stepChange)="onStepperStepChange($event)" [linear]="true" style="width: 600px;">
+                                <mona-stepper [steps]="stepperSteps" [step]="1" (stepChange)="onStepperStepChange($event)" [linear]="false" style="width: 600px;">
                                     <ng-template monaStepperLabelTemplate let-step let-index="index">
-                                        <span style="color: deeppink; text-decoration: underline;">{{index}}. {{step.label}}</span>
+                                        <span style="color: snow; font-weight: bolder;">{{index}}. {{step.label}}</span>
                                     </ng-template>
+                                    <ng-template monaStepperIndicatorTemplate let-step let-index="index">
+                                        <span style="color: snow; font-weight: bold;">{{step.label.substring(0,2).toUpperCase()}}</span>
+                                    </ng-template>
+<!--                                    <ng-template monaStepperStepTemplate let-step let-index="index" let-active="active">-->
+<!--                                        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; background-color: #1a1a1a; color: white; font-weight: bold; font-size: 20px;">-->
+<!--                                            <span *ngIf="active">{{index + 1}}</span>-->
+<!--                                            <span *ngIf="!active">[{{index + 1}}]</span>-->
+<!--                                        </div>-->
+<!--                                    </ng-template>-->
                                 </mona-stepper>
                             </div>
 

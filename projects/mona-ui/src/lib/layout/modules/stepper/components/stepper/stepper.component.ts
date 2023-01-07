@@ -2,6 +2,8 @@ import { ChangeDetectionStrategy, Component, ContentChild, EventEmitter, Input, 
 import { Step, StepOptions } from "../../models/Step";
 import { Enumerable } from "@mirei/ts-collections";
 import { StepperLabelTemplateDirective } from "../../directives/stepper-label-template.directive";
+import { StepperIndicatorTemplateDirective } from "../../directives/stepper-indicator-template.directive";
+import { StepperStepTemplateDirective } from "../../directives/stepper-step-template.directive";
 
 @Component({
     selector: "mona-stepper",
@@ -11,14 +13,19 @@ import { StepperLabelTemplateDirective } from "../../directives/stepper-label-te
 })
 export class StepperComponent implements OnInit {
     public activeStep: Step | null = null;
+    public stepList: Step[] = [];
+
+    @ContentChild(StepperIndicatorTemplateDirective)
+    public indicatorTemplateDirective: StepperIndicatorTemplateDirective | null = null;
 
     @Input()
     public linear: boolean = false;
 
-    public stepList: Step[] = [];
-
     @ContentChild(StepperLabelTemplateDirective)
-    public labelTemplate: StepperLabelTemplateDirective | null = null;
+    public labelTemplateDirective: StepperLabelTemplateDirective | null = null;
+
+    @ContentChild(StepperStepTemplateDirective)
+    public stepTemplateDirective: StepperStepTemplateDirective | null = null;
 
     @Input()
     public set step(step: number) {
@@ -83,17 +90,14 @@ export class StepperComponent implements OnInit {
     }
 
     public get trackGridColumns(): string | undefined {
-        console.log("trackGridColumns");
         return this.activeStep ? `2/${this.stepList.length * 2}` : undefined;
     }
 
     public get trackItemWidth(): number {
-        console.log("trackItemWidth");
         return this.stepList.length !== 0 ? 100 / this.stepList.length : 0;
     }
 
     public get trackWidth(): string {
-        console.log("trackWidth");
         return !this.activeStep ? "0" : `${(100 / (this.stepList.length - 1)) * this.activeStep.index}`;
     }
 }
