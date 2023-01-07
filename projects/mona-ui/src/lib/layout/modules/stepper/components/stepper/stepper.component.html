@@ -1,8 +1,7 @@
-<div class="mona-stepper"
-     [style.grid-template-columns]="'repeat('+(stepList.length*2)+', 1fr)'">
-    <ol class="mona-stepper-step-list">
+<div class="mona-stepper" [ngStyle]="gridTemplateColumns" [ngClass]="{'vertical': orientation==='vertical'}">
+    <ol class="mona-stepper-step-list" [ngClass]="{'horizontal': orientation==='horizontal', 'vertical': orientation==='vertical'}">
         <li *ngFor="let step of stepList"
-            [style.max-width.%]="trackItemWidth"
+            [ngStyle]="trackItemStyles"
             (click)="onStepClick(step)">
             <a href="#">
                 <ng-container *ngIf="!stepTemplateDirective">
@@ -16,13 +15,13 @@
                     <ng-container [ngTemplateOutlet]="stepTemplateDirective.templateRef"
                                   [ngTemplateOutletContext]="{$implicit: step.options, index: step.index, active: step.active}"></ng-container>
                 </ng-container>
-                <span class="mona-text-text" *ngIf="!labelTemplateDirective">{{step.label}}</span>
+                <span *ngIf="!labelTemplateDirective">{{step.options.label}}</span>
                 <ng-container *ngIf="labelTemplateDirective" [ngTemplateOutlet]="labelTemplateDirective?.templateRef ?? null"
                               [ngTemplateOutletContext]="{$implicit: step.options, index: step.index, active: step.active}"></ng-container>
             </a>
         </li>
     </ol>
-    <div class="mona-stepper-track" [style.grid-column]="trackGridColumns">
-        <div [style.width.%]="trackWidth"></div>
+    <div class="mona-stepper-track" [ngStyle]="trackStyles" [ngClass]="{'horizontal': orientation==='horizontal', 'vertical': orientation==='vertical'}">
+        <div [ngStyle]="trackInnerStyles"></div>
     </div>
 </div>

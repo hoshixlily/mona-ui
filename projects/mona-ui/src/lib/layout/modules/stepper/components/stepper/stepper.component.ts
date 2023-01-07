@@ -28,6 +28,9 @@ export class StepperComponent implements OnInit {
     public stepTemplateDirective: StepperStepTemplateDirective | null = null;
 
     @Input()
+    public orientation: "horizontal" | "vertical" = "horizontal";
+
+    @Input()
     public set step(step: number) {
         if (this.stepList.length > 0) {
             this.setActiveStep(this.stepList[step]);
@@ -89,15 +92,50 @@ export class StepperComponent implements OnInit {
         return false;
     }
 
-    public get trackGridColumns(): string | undefined {
-        return this.activeStep ? `2/${this.stepList.length * 2}` : undefined;
+    public get gridTemplateColumns(): Partial<CSSStyleDeclaration> {
+        return {
+            gridTemplateColumns:
+                this.orientation === "horizontal" ? `repeat(${this.stepList.length * 2}, 1fr)` : undefined,
+            gridTemplateRows: this.orientation === "vertical" ? `repeat(${this.stepList.length * 2}, 1fr)` : undefined
+        };
     }
 
-    public get trackItemWidth(): number {
+    public get trackInnerStyles(): Partial<CSSStyleDeclaration> {
+        return {
+            width: this.orientation === "horizontal" ? this.trackLength : undefined,
+            height: this.orientation === "vertical" ? this.trackLength : undefined
+        };
+    }
+
+    public get trackItemSize(): number {
         return this.stepList.length !== 0 ? 100 / this.stepList.length : 0;
     }
 
-    public get trackWidth(): string {
-        return !this.activeStep ? "0" : `${(100 / (this.stepList.length - 1)) * this.activeStep.index}`;
+    public get trackItemStyles(): Partial<CSSStyleDeclaration> {
+        return {
+            maxWidth: this.orientation === "horizontal" ? `${this.trackItemSize}%` : undefined,
+            maxHeight: this.orientation === "vertical" ? `${this.trackItemSize}%` : undefined
+        };
+    }
+
+    public get trackLength(): string {
+        return !this.activeStep ? "0%" : `${(100 / (this.stepList.length - 1)) * this.activeStep.index}%`;
+    }
+
+    public get trackStyles(): Partial<CSSStyleDeclaration> {
+        return {
+            gridColumn:
+                this.orientation === "horizontal"
+                    ? this.activeStep
+                        ? `2/${this.stepList.length * 2}`
+                        : undefined
+                    : undefined,
+            gridRow:
+                this.orientation === "vertical"
+                    ? this.activeStep
+                        ? `2/${this.stepList.length * 2}`
+                        : undefined
+                    : undefined
+        };
     }
 }
