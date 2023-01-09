@@ -17,7 +17,7 @@
 }
 
 input {
-    font-size: 12px;
+    //font-size: 12px;
 }
 
 @mixin active-background {
@@ -71,6 +71,10 @@ input {
 
 .mona-focused {
     @include focus-shadow;
+}
+
+.mona-hidden {
+    display: none;
 }
 
 /** Shared Components **/
@@ -582,6 +586,13 @@ input[type="radio"][monaRadioButton] {
     }
 }
 
+/** Stepper */
+//.mona-stepper {
+//    & .mona-disabled {
+//        @include disabled;
+//    }
+//}
+
 /** Switch */
 .mona-switch {
     background-color: var(--mona-background);
@@ -667,6 +678,22 @@ input[monaTextBox] {
     }
     span.mona-text-box-suffix {
         border-left: 1px solid var(--mona-border-color);
+    }
+}
+
+/** Layouts */
+
+/** Expansion Panel */
+.mona-expansion-panel + .mona-expansion-panel {
+    border-top: none;
+}
+
+/** Tab Strip */
+ul.mona-tab-list {
+    & li {
+        &.mona-disabled {
+            @include disabled;
+        }
     }
 }
 

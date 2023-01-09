@@ -1,0 +1,30 @@
+div.mona-expansion-panel {
+    background: var(--mona-background);
+    border: 1px solid var(--mona-border-color);
+    &.collapsed {
+        border-bottom: none;
+    }
+}
+
+div.mona-expansion-panel-header {
+    width: 100%;
+    height: var(--mona-input-height);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 10px;
+    background: var(--mona-background-dark);
+    border-bottom: 1px solid var(--mona-border-color);
+    color: var(--mona-text);
+    cursor: pointer;
+    user-select: none;
+}
+
+div.mona-expansion-panel-content {
+    padding: 10px;
+    color: var(--mona-text);
+    &.hidden {
+        display: none;
+        border-bottom: none;
+    }
+}

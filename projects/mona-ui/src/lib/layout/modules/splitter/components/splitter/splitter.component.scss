@@ -1,0 +1,29 @@
+:host {
+    width: 100%;
+    height: 100%;
+}
+
+div.mona-splitter {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    position: relative;
+    flex-direction: row;
+    overflow: hidden;
+    &.mona-splitter-vertical {
+        flex-direction: column;
+    }
+}
+
+div.mona-splitter-pane {
+    flex: 1 1 auto;
+    overflow: hidden;
+    &.mona-splitter-static {
+        flex-grow: 0;
+        flex-shrink: 0;
+    }
+    &.mona-splitter-hidden {
+        flex: 0 1 0% !important;
+        overflow: hidden !important;
+    }
+}

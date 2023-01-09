@@ -82,6 +82,37 @@ export * from "./lib/inputs/modules/text-box/text-box.module";
 
 export * from "./lib/inputs/inputs.module";
 
+/** Layout */
+
+/* Expansion Panel */
+export * from "./lib/layout/modules/expansion-panel/components/expansion-panel/expansion-panel.component";
+export * from "./lib/layout/modules/expansion-panel/directives/expansion-panel-actions-template.directive";
+export * from "./lib/layout/modules/expansion-panel/directives/expansion-panel-title-template.directive";
+export * from "./lib/layout/modules/expansion-panel/expansion-panel.module";
+
+/** Stepper */
+export { StepOptions } from "./lib/layout/modules/stepper/models/Step";
+export * from "./lib/layout/modules/stepper/directives/stepper-indicator-template.directive";
+export * from "./lib/layout/modules/stepper/directives/stepper-label-template.directive";
+export * from "./lib/layout/modules/stepper/directives/stepper-step-template.directive";
+export * from "./lib/layout/modules/stepper/components/stepper/stepper.component";
+export * from "./lib/layout/modules/stepper/stepper.module";
+
+/** Splitter */
+export * from "./lib/layout/modules/splitter/components/splitter/splitter.component";
+export * from "./lib/layout/modules/splitter/components/splitter-pane/splitter-pane.component";
+export * from "./lib/layout/modules/splitter/splitter.module";
+
+/* Tab Strip */
+export * from "./lib/layout/modules/tab-strip/data/TabCloseEvent";
+export * from "./lib/layout/modules/tab-strip/directives/tab-content-template.directive";
+export * from "./lib/layout/modules/tab-strip/directives/tab-title-template.directive";
+export * from "./lib/layout/modules/tab-strip/components/tab-strip/tab-strip.component";
+export * from "./lib/layout/modules/tab-strip/components/tab/tab.component";
+export * from "./lib/layout/modules/tab-strip/tab-strip.module";
+export * from "./lib/layout/layout.module";
+/** Layout End */
+
 /** Menus */
 // export * from "./lib/menus/models/MenuItem";
 export * from "./lib/menus/modules/shared-menu/components/menu-item/menu-item.component";

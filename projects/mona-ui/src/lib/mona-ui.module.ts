@@ -5,9 +5,10 @@ import { MenusModule } from "./menus/menus.module";
 import { DropDownsModule } from "./dropdowns/drop-downs.module";
 import { InputsModule } from "./inputs/inputs.module";
 import { TreeViewModule } from "./tree-view/tree-view.module";
+import { LayoutModule } from "./layout/layout.module";
 
 @NgModule({
-    exports: [ButtonsModule, DropDownsModule, InputsModule, MenusModule, PopupModule, TreeViewModule],
+    exports: [ButtonsModule, DropDownsModule, InputsModule, LayoutModule, MenusModule, PopupModule, TreeViewModule],
     declarations: []
 })
 export class MonaUiModule {}

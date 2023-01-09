@@ -1,0 +1,18 @@
+<div class="mona-expansion-panel" [ngClass]="{'collapsed': !expanded}">
+    <div class="mona-expansion-panel-header" (click)="expanded=!expanded;">
+        <div class="mona-expansion-panel-header-title">
+            <ng-container *ngIf="!titleTemplate">{{title}}</ng-container>
+            <ng-container [ngTemplateOutlet]="titleTemplate" *ngIf="!!titleTemplate"></ng-container>
+        </div>
+        <div class="mona-expansion-panel-header-actions">
+            <ng-container *ngIf="!actionsTemplate">
+                <fa-icon [icon]="collapseIcon" *ngIf="expanded"></fa-icon>
+                <fa-icon [icon]="expandIcon" *ngIf="!expanded"></fa-icon>
+            </ng-container>
+            <ng-container [ngTemplateOutlet]="actionsTemplate" *ngIf="!!actionsTemplate"></ng-container>
+        </div>
+    </div>
+    <div class="mona-expansion-panel-content" [ngClass]="{'hidden': !expanded}" @slideDownHidden>
+        <ng-content></ng-content>
+    </div>
+</div>
