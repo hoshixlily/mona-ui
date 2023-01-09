@@ -160,6 +160,7 @@ export class AppComponent implements OnInit {
     public selectedPrimitiveComboBoxDataItem: string | null = null;
     public sliderValue: number = 8;
     public switchValue: boolean = false;
+    public stepperStep: number = 1;
     public stepperSteps: StepOptions[] = [
         { label: "Cart", data: { cart: true } },
         { label: "Shipping", data: { shipping: true } },
@@ -330,6 +331,7 @@ export class AppComponent implements OnInit {
 
     public onStepperStepChange(value: number): void {
         console.log(value);
+        this.stepperStep = value;
     }
 
     public onSwitchValueChange(value: boolean): void {

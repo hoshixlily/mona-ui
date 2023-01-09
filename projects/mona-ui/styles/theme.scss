@@ -586,6 +586,13 @@ input[type="radio"][monaRadioButton] {
     }
 }
 
+/** Stepper */
+//.mona-stepper {
+//    & .mona-disabled {
+//        @include disabled;
+//    }
+//}
+
 /** Switch */
 .mona-switch {
     background-color: var(--mona-background);

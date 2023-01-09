@@ -1,9 +1,21 @@
-import { ChangeDetectionStrategy, Component, ContentChild, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import {
+    ChangeDetectionStrategy,
+    ChangeDetectorRef,
+    Component,
+    ContentChild,
+    ElementRef,
+    EventEmitter,
+    Input,
+    OnDestroy,
+    OnInit,
+    Output
+} from "@angular/core";
 import { Step, StepOptions } from "../../models/Step";
 import { Enumerable } from "@mirei/ts-collections";
 import { StepperLabelTemplateDirective } from "../../directives/stepper-label-template.directive";
 import { StepperIndicatorTemplateDirective } from "../../directives/stepper-indicator-template.directive";
 import { StepperStepTemplateDirective } from "../../directives/stepper-step-template.directive";
+import { fromEvent, Subject } from "rxjs";
 
 @Component({
     selector: "mona-stepper",
@@ -11,7 +23,8 @@ import { StepperStepTemplateDirective } from "../../directives/stepper-step-temp
     styleUrls: ["./stepper.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class StepperComponent implements OnInit {
+export class StepperComponent implements OnInit, OnDestroy {
+    private readonly componentDestroy$: Subject<void> = new Subject<void>();
     public activeStep: Step | null = null;
     public stepList: Step[] = [];
 
@@ -24,11 +37,11 @@ export class StepperComponent implements OnInit {
     @ContentChild(StepperLabelTemplateDirective)
     public labelTemplateDirective: StepperLabelTemplateDirective | null = null;
 
-    @ContentChild(StepperStepTemplateDirective)
-    public stepTemplateDirective: StepperStepTemplateDirective | null = null;
-
     @Input()
     public orientation: "horizontal" | "vertical" = "horizontal";
+
+    @ContentChild(StepperStepTemplateDirective)
+    public stepTemplateDirective: StepperStepTemplateDirective | null = null;
 
     @Input()
     public set step(step: number) {
@@ -53,12 +66,18 @@ export class StepperComponent implements OnInit {
     @Output()
     public stepChange: EventEmitter<number> = new EventEmitter<number>();
 
-    public constructor() {}
+    public constructor(private readonly elementRef: ElementRef<HTMLElement>, private readonly cdr: ChangeDetectorRef) {}
+
+    public ngOnDestroy(): void {
+        this.componentDestroy$.next();
+        this.componentDestroy$.complete();
+    }
 
     public ngOnInit(): void {
         if (!this.activeStep) {
             this.setActiveStep(this.stepList[0], true);
         }
+        this.setSubscriptions();
     }
 
     public onStepClick(step: Step): void {
@@ -90,6 +109,27 @@ export class StepperComponent implements OnInit {
             }
         }
         return false;
+    }
+
+    private setSubscriptions(): void {
+        fromEvent<KeyboardEvent>(this.elementRef.nativeElement, "keydown").subscribe((event: KeyboardEvent) => {
+            if (!this.activeStep) {
+                this.activeStep = this.stepList[0];
+                return;
+            }
+            if (event.key === "ArrowLeft") {
+                const index = this.activeStep.index - 1;
+                if (index >= 0) {
+                    this.setActiveStep(this.stepList[index]);
+                }
+            } else if (event.key === "ArrowRight") {
+                const index = this.activeStep.index + 1;
+                if (index < this.stepList.length) {
+                    this.setActiveStep(this.stepList[index]);
+                }
+            }
+            this.cdr.detectChanges();
+        });
     }
 
     public get gridTemplateColumns(): Partial<CSSStyleDeclaration> {

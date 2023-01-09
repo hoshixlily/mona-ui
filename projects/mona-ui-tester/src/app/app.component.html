@@ -287,7 +287,8 @@
                             </div>
 
                             <div>
-                                <mona-stepper orientation="horizontal" [steps]="stepperSteps" [step]="1" (stepChange)="onStepperStepChange($event)" [linear]="false" style="width: 600px;">
+                                <mona-numeric-text-box [(ngModel)]="stepperStep" [min]="0" [max]="4" ></mona-numeric-text-box>
+                                <mona-stepper orientation="horizontal" [steps]="stepperSteps" [step]="stepperStep" (stepChange)="onStepperStepChange($event)" [linear]="true" style="width: 600px;">
                                     <ng-template monaStepperLabelTemplate let-step let-index="index" let-active="active">
                                         <span *ngIf="!active" style="color: snow; font-weight: bolder;">{{index+1}}. {{step.label}}</span>
                                         <span *ngIf="active" style="color: teal; font-weight: bolder;">{{index+1}}. {{step.label}}</span>

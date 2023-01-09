@@ -1,11 +1,11 @@
-<div class="mona-stepper" [ngStyle]="gridTemplateColumns" [ngClass]="{'vertical': orientation==='vertical'}">
-    <ol class="mona-stepper-step-list" [ngClass]="{'horizontal': orientation==='horizontal', 'vertical': orientation==='vertical'}">
+<div class="mona-stepper" [ngStyle]="gridTemplateColumns" [ngClass]="{'mona-stepper-vertical': orientation==='vertical', 'mona-stepper-linear': linear}" [attr.tabindex]="1">
+    <ol class="mona-stepper-step-list" [ngClass]="{'mona-stepper-step-list-horizontal': orientation==='horizontal', 'mona-stepper-step-list-vertical': orientation==='vertical'}">
         <li *ngFor="let step of stepList"
             [ngStyle]="trackItemStyles"
             (click)="onStepClick(step)">
-            <a href="#">
+            <div>
                 <ng-container *ngIf="!stepTemplateDirective">
-                    <span [ngClass]="{'mona-active': step.active}">
+                    <span [ngClass]="{'mona-stepper-step-active': step.active}">
                         <ng-container *ngIf="!indicatorTemplateDirective">{{step.index}}</ng-container>
                         <ng-container *ngIf="indicatorTemplateDirective" [ngTemplateOutlet]="indicatorTemplateDirective.templateRef"
                                       [ngTemplateOutletContext]="{$implicit: step.options, index: step.index, active: step.active}"></ng-container>
@@ -15,13 +15,14 @@
                     <ng-container [ngTemplateOutlet]="stepTemplateDirective.templateRef"
                                   [ngTemplateOutletContext]="{$implicit: step.options, index: step.index, active: step.active}"></ng-container>
                 </ng-container>
+
                 <span *ngIf="!labelTemplateDirective">{{step.options.label}}</span>
                 <ng-container *ngIf="labelTemplateDirective" [ngTemplateOutlet]="labelTemplateDirective?.templateRef ?? null"
                               [ngTemplateOutletContext]="{$implicit: step.options, index: step.index, active: step.active}"></ng-container>
-            </a>
+            </div>
         </li>
     </ol>
-    <div class="mona-stepper-track" [ngStyle]="trackStyles" [ngClass]="{'horizontal': orientation==='horizontal', 'vertical': orientation==='vertical'}">
+    <div class="mona-stepper-track" [ngStyle]="trackStyles" [ngClass]="{'mona-stepper-track-horizontal': orientation==='horizontal', 'mona-stepper-track-vertical': orientation==='vertical'}">
         <div [ngStyle]="trackInnerStyles"></div>
     </div>
 </div>

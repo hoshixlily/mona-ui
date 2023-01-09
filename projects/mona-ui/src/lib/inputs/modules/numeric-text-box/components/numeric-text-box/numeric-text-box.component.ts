@@ -71,7 +71,7 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
     public readonly: boolean = false;
 
     @Input()
-    public step: number = 0.1;
+    public step: number = 1;
 
     @Input()
     public value: number | null = null;

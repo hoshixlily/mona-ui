@@ -1,5 +1,6 @@
 export interface StepOptions<T = any> {
     data?: T;
+    // disabled?: boolean;
     label: string;
 }
 
