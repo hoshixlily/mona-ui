@@ -15,7 +15,7 @@ import { Enumerable } from "@mirei/ts-collections";
 import { StepperLabelTemplateDirective } from "../../directives/stepper-label-template.directive";
 import { StepperIndicatorTemplateDirective } from "../../directives/stepper-indicator-template.directive";
 import { StepperStepTemplateDirective } from "../../directives/stepper-step-template.directive";
-import { fromEvent, Subject } from "rxjs";
+import { fromEvent, Subject, takeUntil } from "rxjs";
 
 @Component({
     selector: "mona-stepper",
@@ -112,24 +112,26 @@ export class StepperComponent implements OnInit, OnDestroy {
     }
 
     private setSubscriptions(): void {
-        fromEvent<KeyboardEvent>(this.elementRef.nativeElement, "keydown").subscribe((event: KeyboardEvent) => {
-            if (!this.activeStep) {
-                this.activeStep = this.stepList[0];
-                return;
-            }
-            if (event.key === "ArrowLeft") {
-                const index = this.activeStep.index - 1;
-                if (index >= 0) {
-                    this.setActiveStep(this.stepList[index]);
+        fromEvent<KeyboardEvent>(this.elementRef.nativeElement, "keydown")
+            .pipe(takeUntil(this.componentDestroy$))
+            .subscribe((event: KeyboardEvent) => {
+                if (!this.activeStep) {
+                    this.activeStep = this.stepList[0];
+                    return;
                 }
-            } else if (event.key === "ArrowRight") {
-                const index = this.activeStep.index + 1;
-                if (index < this.stepList.length) {
-                    this.setActiveStep(this.stepList[index]);
+                if (event.key === "ArrowLeft") {
+                    const index = this.activeStep.index - 1;
+                    if (index >= 0) {
+                        this.setActiveStep(this.stepList[index]);
+                    }
+                } else if (event.key === "ArrowRight") {
+                    const index = this.activeStep.index + 1;
+                    if (index < this.stepList.length) {
+                        this.setActiveStep(this.stepList[index]);
+                    }
                 }
-            }
-            this.cdr.detectChanges();
-        });
+                this.cdr.detectChanges();
+            });
     }
 
     public get gridTemplateColumns(): Partial<CSSStyleDeclaration> {
