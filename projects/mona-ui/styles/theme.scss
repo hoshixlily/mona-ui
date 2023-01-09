@@ -17,7 +17,7 @@
 }
 
 input {
-    font-size: 12px;
+    //font-size: 12px;
 }
 
 @mixin active-background {
@@ -585,6 +585,13 @@ input[type="radio"][monaRadioButton] {
         }
     }
 }
+
+/** Stepper */
+//.mona-stepper {
+//    & .mona-disabled {
+//        @include disabled;
+//    }
+//}
 
 /** Switch */
 .mona-switch {

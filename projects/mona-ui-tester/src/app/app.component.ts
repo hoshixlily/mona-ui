@@ -6,7 +6,8 @@ import {
     NodeDropEvent,
     NodeDragEndEvent,
     NodeClickEvent,
-    TabCloseEvent
+    TabCloseEvent,
+    StepOptions
 } from "mona-ui";
 import { TestComponentComponent } from "./test-component/test-component.component";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
@@ -159,6 +160,14 @@ export class AppComponent implements OnInit {
     public selectedPrimitiveComboBoxDataItem: string | null = null;
     public sliderValue: number = 8;
     public switchValue: boolean = false;
+    public stepperStep: number = 1;
+    public stepperSteps: StepOptions[] = [
+        { label: "Cart", data: { cart: true } },
+        { label: "Shipping", data: { shipping: true } },
+        { label: "Payment", data: { payment: true } },
+        { label: "Review", data: { review: true } },
+        { label: "Complete" }
+    ];
     public textBoxValue: string = "TEXT BOX VALUE";
     public textBoxValue2: string = "a";
     public treeCheckedKeys: string[] = ["1-2", "1-3-1"];
@@ -237,13 +246,17 @@ export class AppComponent implements OnInit {
     public dropdownItemDisabler = (item: any): boolean => !item.active;
     public dropdownPrimitiveItemDisabler = (item: string): boolean => item.includes("i");
 
+    // public ngAfterContentChecked(): void {
+    //     console.log("ngAfterContentChecked :: AppComponent");
+    // }
+
     public ngOnInit(): void {
         this.selectedDropdownListDataItem = { text: "REPLACED WITH PAPRIKA", value: 13, group: "Fruit", active: true };
         this.selectedComboBoxDataItem = { text: "REPLACED WITH PAPRIKA", value: 13, group: "Fruit", active: true };
-        window.setInterval(() => {
-            // this.contextMenuItemVisible = !this.contextMenuItemVisible;
-            // this.dropdownItemDisabler = (item: any): boolean => item.value % 3 === 0;
-        }, 3000);
+        // window.setInterval(() => {
+        //     // this.contextMenuItemVisible = !this.contextMenuItemVisible;
+        //     // this.dropdownItemDisabler = (item: any): boolean => item.value % 3 === 0;
+        // }, 3000);
         this.selectedDropdownListDataItem = { ...this.dropdownListDataItems[4] };
         this.selectedPrimitiveComboBoxDataItem = this.dropdownPrimitiveDataItems[7];
 
@@ -314,6 +327,11 @@ export class AppComponent implements OnInit {
     public onSliderValueChange(value: number): void {
         console.log(value);
         this.sliderValue = value;
+    }
+
+    public onStepperStepChange(value: number): void {
+        console.log(value);
+        this.stepperStep = value;
     }
 
     public onSwitchValueChange(value: boolean): void {
