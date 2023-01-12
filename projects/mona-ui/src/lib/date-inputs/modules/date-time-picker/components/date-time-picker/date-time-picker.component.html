@@ -1,0 +1,65 @@
+<div class="mona-date-time-picker">
+    <mona-text-box [ngModel]="currentDateString">
+        <ng-template monaTextBoxSuffixTemplate>
+            <button monaButton [flat]="true" #dateMenuButton (click)="onDateInputButtonClick($event)">
+                <fa-icon [icon]="dateIcon"></fa-icon>
+            </button>
+        </ng-template>
+    </mona-text-box>
+</div>
+
+<ng-template #datePopupTemplate>
+    <div *ngIf="calendarView==='month'" style="width: 100%;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Mon</th>
+                    <th>Tue</th>
+                    <th>Wed</th>
+                    <th>Thu</th>
+                    <th>Fri</th>
+                    <th>Sat</th>
+                    <th>Sun</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td *ngFor="let dayPair of dayDictionary | monaSlice:0:7" (click)="onDayClick(dayPair.value, dayPair.key)">
+                        <span>{{dayPair.value}}</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td *ngFor="let dayPair of dayDictionary | monaSlice:7:14" (click)="onDayClick(dayPair.value, dayPair.key)">
+                        <span>{{dayPair.value}}</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td *ngFor="let dayPair of dayDictionary | monaSlice:14:21" (click)="onDayClick(dayPair.value, dayPair.key)">
+                        <span>{{dayPair.value}}</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td *ngFor="let dayPair of dayDictionary | monaSlice:21:28" (click)="onDayClick(dayPair.value, dayPair.key)">
+                        <span>{{dayPair.value}}</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td *ngFor="let dayPair of dayDictionary | monaSlice:28:35" (click)="onDayClick(dayPair.value, dayPair.key)">
+                        <span>{{dayPair.value}}</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td *ngFor="let dayPair of dayDictionary | monaSlice:35:dayDictionary.length" (click)="onDayClick(dayPair.value, dayPair.key)">
+                        <span>{{dayPair.value}}</span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div *ngIf="calendarView==='year'">
+        YEAR VIEW
+    </div>
+    <div *ngIf="calendarView==='decade'">
+        DECADE VIEW
+    </div>
+</ng-template>

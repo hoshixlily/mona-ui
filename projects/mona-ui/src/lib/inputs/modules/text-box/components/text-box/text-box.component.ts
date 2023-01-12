@@ -1,4 +1,14 @@
-import { Component, ContentChild, EventEmitter, forwardRef, Input, OnInit, Output, TemplateRef } from "@angular/core";
+import {
+    Component,
+    ContentChild,
+    ElementRef,
+    EventEmitter,
+    forwardRef,
+    Input,
+    OnInit,
+    Output,
+    TemplateRef
+} from "@angular/core";
 import { TextBoxPrefixTemplateDirective } from "../../directives/text-box-prefix-template.directive";
 import { TextBoxSuffixTemplateDirective } from "../../directives/text-box-suffix-template.directive";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
@@ -35,7 +45,7 @@ export class TextBoxComponent implements OnInit, ControlValueAccessor {
     @ContentChild(TextBoxSuffixTemplateDirective, { read: TemplateRef })
     public suffixTemplate?: TemplateRef<void>;
 
-    public constructor() {}
+    public constructor(public readonly elementRef: ElementRef<HTMLDivElement>) {}
 
     public ngOnInit(): void {}
 
