@@ -7,7 +7,8 @@ import {
     NodeDragEndEvent,
     NodeClickEvent,
     TabCloseEvent,
-    StepOptions
+    StepOptions,
+    PopupService
 } from "mona-ui";
 import { TestComponentComponent } from "./test-component/test-component.component";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
@@ -241,7 +242,7 @@ export class AppComponent implements OnInit {
     @ViewChild("testButtonRef", { read: ElementRef })
     public testButtonRef!: ElementRef<HTMLButtonElement>;
 
-    public constructor() {}
+    public constructor(private readonly popupService: PopupService) {}
 
     public dropdownItemDisabler = (item: any): boolean => !item.active;
     public dropdownPrimitiveItemDisabler = (item: string): boolean => item.includes("i");
@@ -416,14 +417,14 @@ export class AppComponent implements OnInit {
     }
 
     public openPopup2(event: MouseEvent): void {
-        // event.stopPropagation();
-        // const ref = this.popupService.create({
-        //     anchor: this.italicButtonRef,
-        //     content: TestComponentComponent,
-        //     popupClass: "popup-noselect",
-        //     hasBackdrop: false,
-        //     offset: { horizontal: 0, vertical: 10 }
-        // });
+        event.stopPropagation();
+        const ref = this.popupService.create({
+            anchor: this.italicButtonRef,
+            content: TestComponentComponent,
+            popupClass: "popup-noselect",
+            hasBackdrop: false,
+            offset: { horizontal: 0, vertical: 1 }
+        });
     }
 
     public print(value: unknown): void {

@@ -10,6 +10,21 @@
 
 <ng-template #datePopupTemplate>
     <div *ngIf="calendarView==='month'" style="width: 100%;">
+        <div class="mona-calendar-month-view-header">
+            <div>
+                <button monaButton (click)="onMonthNavigationClick('prev')">
+                    <fa-icon [icon]="prevMonthIcon"></fa-icon>
+                </button>
+            </div>
+            <div>
+                <button monaButton>{{navigatedDate|date:'MMMM YYYY'}}</button>
+            </div>
+            <div>
+                <button monaButton (click)="onMonthNavigationClick('next')">
+                    <fa-icon [icon]="nextMonthIcon"></fa-icon>
+                </button>
+            </div>
+        </div>
         <table>
             <thead>
                 <tr>
@@ -24,33 +39,33 @@
             </thead>
             <tbody>
                 <tr>
-                    <td *ngFor="let dayPair of dayDictionary | monaSlice:0:7" (click)="onDayClick(dayPair.value, dayPair.key)">
-                        <span>{{dayPair.value}}</span>
+                    <td *ngFor="let entry of monthlyViewDict | monaSlice:0:7" (click)="onDayClick(entry.key)">
+                        <span>{{entry.value}}</span>
                     </td>
                 </tr>
                 <tr>
-                    <td *ngFor="let dayPair of dayDictionary | monaSlice:7:14" (click)="onDayClick(dayPair.value, dayPair.key)">
-                        <span>{{dayPair.value}}</span>
+                    <td *ngFor="let entry of monthlyViewDict | monaSlice:7:14" (click)="onDayClick(entry.key)">
+                        <span>{{entry.value}}</span>
                     </td>
                 </tr>
                 <tr>
-                    <td *ngFor="let dayPair of dayDictionary | monaSlice:14:21" (click)="onDayClick(dayPair.value, dayPair.key)">
-                        <span>{{dayPair.value}}</span>
+                    <td *ngFor="let entry of monthlyViewDict | monaSlice:14:21" (click)="onDayClick(entry.key)">
+                        <span>{{entry.value}}</span>
                     </td>
                 </tr>
                 <tr>
-                    <td *ngFor="let dayPair of dayDictionary | monaSlice:21:28" (click)="onDayClick(dayPair.value, dayPair.key)">
-                        <span>{{dayPair.value}}</span>
+                    <td *ngFor="let entry of monthlyViewDict | monaSlice:21:28" (click)="onDayClick(entry.key)">
+                        <span>{{entry.value}}</span>
                     </td>
                 </tr>
                 <tr>
-                    <td *ngFor="let dayPair of dayDictionary | monaSlice:28:35" (click)="onDayClick(dayPair.value, dayPair.key)">
-                        <span>{{dayPair.value}}</span>
+                    <td *ngFor="let entry of monthlyViewDict | monaSlice:28:35" (click)="onDayClick(entry.key)">
+                        <span>{{entry.value}}</span>
                     </td>
                 </tr>
                 <tr>
-                    <td *ngFor="let dayPair of dayDictionary | monaSlice:35:dayDictionary.length" (click)="onDayClick(dayPair.value, dayPair.key)">
-                        <span>{{dayPair.value}}</span>
+                    <td *ngFor="let entry of monthlyViewDict | monaSlice:35:monthlyViewDict.length" (click)="onDayClick(entry.key)">
+                        <span>{{entry.value}}</span>
                     </td>
                 </tr>
             </tbody>

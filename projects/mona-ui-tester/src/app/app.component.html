@@ -49,12 +49,12 @@
                             </div>
 
                             <div>
-                                <mona-button-group selection="multiple">
-                                    <button monaButton [toggleable]="true">B</button>
-                                    <button monaButton [toggleable]="true" (click)="openPopup2($event)"
+                                <mona-button-group selection="single">
+                                    <button monaButton [toggleable]="false">B</button>
+                                    <button monaButton [toggleable]="false" (click)="openPopup2($event)"
                                             #italicButtonRef>I
                                     </button>
-                                    <button monaButton [toggleable]="true">U</button>
+                                    <button monaButton [toggleable]="false">U</button>
                                 </mona-button-group>
                             </div>
 

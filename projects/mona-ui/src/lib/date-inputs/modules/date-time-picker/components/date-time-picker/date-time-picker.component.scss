@@ -27,3 +27,20 @@ table {
     }
 }
 
+div.mona-calendar-month-view-header {
+    display: flex;
+    & > div:first-child, & > div:last-child {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+    & > div:nth-child(2) {
+        & button {
+            border-left: none;
+            border-right: none;
+            width: 100%;
+        }
+        flex: 1;
+    }
+}
