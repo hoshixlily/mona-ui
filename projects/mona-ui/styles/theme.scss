@@ -304,6 +304,19 @@ mona-button-group button[monaButton] {
     }
 }
 
+/** Date Picker */
+.mona-date-time-picker-popup {
+    & table {
+        & td {
+            @include hover-background;
+            @include active-background;
+            &.mona-selected {
+                background-color: var(--mona-primary);
+            }
+        }
+    }
+}
+
 
 /** Dropdown List */
 .mona-dropdown-list {

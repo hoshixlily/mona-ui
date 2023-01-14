@@ -1,12 +1,13 @@
 import {
     Component,
-    ContentChild,
+    ContentChildren,
     ElementRef,
     EventEmitter,
     forwardRef,
     Input,
     OnInit,
     Output,
+    QueryList,
     TemplateRef
 } from "@angular/core";
 import { TextBoxPrefixTemplateDirective } from "../../directives/text-box-prefix-template.directive";
@@ -39,11 +40,11 @@ export class TextBoxComponent implements OnInit, ControlValueAccessor {
     @Output()
     public inputFocus: EventEmitter<Event> = new EventEmitter<Event>();
 
-    @ContentChild(TextBoxPrefixTemplateDirective, { read: TemplateRef })
-    public prefixTemplate?: TemplateRef<void>;
+    @ContentChildren(TextBoxPrefixTemplateDirective, { read: TemplateRef })
+    public prefixTemplateList: QueryList<TemplateRef<void>> = new QueryList<TemplateRef<void>>();
 
-    @ContentChild(TextBoxSuffixTemplateDirective, { read: TemplateRef })
-    public suffixTemplate?: TemplateRef<void>;
+    @ContentChildren(TextBoxSuffixTemplateDirective, { read: TemplateRef })
+    public suffixTemplateList: QueryList<TemplateRef<void>> = new QueryList<TemplateRef<void>>();
 
     public constructor(public readonly elementRef: ElementRef<HTMLDivElement>) {}
 

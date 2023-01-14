@@ -20,6 +20,10 @@ table {
         td {
             padding: 4px 0;
             cursor: pointer;
+            &.mona-calendar-other-month {
+                color: var(--mona-text);
+                opacity: 0.35;
+            }
         }
         & tr:first-child td {
             margin-top: 4px;
