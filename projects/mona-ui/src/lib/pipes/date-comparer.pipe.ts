@@ -7,7 +7,10 @@ type DateComparisonOperator = "==" | "!=" | "<" | "<=" | ">" | ">=";
     standalone: true
 })
 export class DateComparerPipe implements PipeTransform {
-    public transform(value: Date, other: Date, operator: DateComparisonOperator): boolean {
+    public transform(value: Date | null, other: Date | null, operator: DateComparisonOperator): boolean {
+        if (value === null || other === null) {
+            return false;
+        }
         switch (operator) {
             case "==":
                 return (

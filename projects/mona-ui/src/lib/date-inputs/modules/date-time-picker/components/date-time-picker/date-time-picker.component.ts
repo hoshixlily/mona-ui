@@ -30,6 +30,7 @@ export class DateTimePickerComponent implements OnInit {
     public calendarView: CalendarView = "month";
     public currentDateInvalid: boolean = false;
     public currentDateString: string = "";
+    public decadeYears: number[] = [];
     public monthBounds: { start: Date; end: Date } = { start: new Date(), end: new Date() };
     public monthlyViewDict: Dictionary<Date, number> = new Dictionary<Date, number>();
     public navigatedDate: Date = new Date();
@@ -37,11 +38,14 @@ export class DateTimePickerComponent implements OnInit {
     @ViewChild("dateMenuButton")
     public readonly dateMenuButton?: ElementRef<HTMLButtonElement>;
 
+    @Input()
+    public format: string = "d/M/yyyy";
+
     @ViewChild("datePopupTemplate")
     public readonly popupTemplate?: TemplateRef<void>;
 
     @Input()
-    public value: Date = new Date();
+    public value: Date | null = null;
 
     public constructor(
         public readonly cdr: ChangeDetectorRef,
@@ -50,32 +54,30 @@ export class DateTimePickerComponent implements OnInit {
     ) {}
 
     public ngOnInit(): void {
-        this.value.setHours(0, 0, 0);
-        this.prepareMonthlyViewDictionary(this.value);
-        this.currentDateString = DateTime.fromJSDate(this.value).toFormat("d/M/yyyy");
-        this.navigatedDate = this.value;
+        const date = this.value ?? DateTime.now().toJSDate();
+        this.prepareMonthlyViewDictionary(date);
+        this.navigatedDate = date;
     }
 
     public onDateInputBlur(): void {
-        const date1 = DateTime.fromFormat(this.currentDateString, "d/M/yyyy");
-        const date2 = DateTime.fromFormat(this.currentDateString, "dd/MM/yy");
-        const validDate = date1.isValid ? date1 : date2.isValid ? date2 : null;
-        if (validDate) {
-            this.setCurrentDate(validDate.toJSDate());
-            this.prepareMonthlyViewDictionary(validDate.toJSDate());
-            this.currentDateInvalid = false;
-            this.navigatedDate = validDate.toJSDate();
-            this.cdr.detectChanges();
+        const date1 = DateTime.fromFormat(this.currentDateString, this.format);
+        if (date1.isValid) {
+            this.setCurrentDate(date1.toJSDate());
+            this.prepareMonthlyViewDictionary(date1.toJSDate());
+            this.navigatedDate = date1.toJSDate();
+            this.currentDateString = date1.toFormat(this.format);
         } else {
-            this.currentDateInvalid = true;
+            if (this.value) {
+                this.currentDateString = DateTime.fromJSDate(this.value).toFormat(this.format);
+            }
         }
+        this.cdr.detectChanges();
     }
 
     public onDateInputButtonClick(event: MouseEvent): void {
         if (!this.dateMenuButton || !this.popupTemplate) {
             return;
         }
-        this.prepareMonthlyViewDictionary(this.value);
         this.popupRef = this.popupService.create({
             anchor: this.elementRef.nativeElement,
             content: this.popupTemplate,
@@ -83,7 +85,8 @@ export class DateTimePickerComponent implements OnInit {
             popupClass: "mona-date-time-picker-popup"
         });
         this.popupRef.closed.subscribe(() => {
-            this.navigatedDate = this.value;
+            this.calendarView = "month";
+            this.navigatedDate = this.value ?? DateTime.now().toJSDate();
             this.prepareMonthlyViewDictionary(this.navigatedDate);
         });
     }
@@ -99,15 +102,52 @@ export class DateTimePickerComponent implements OnInit {
         this.popupRef?.close();
     }
 
-    public onMonthNavigationClick(direction: "prev" | "next"): void {
-        const date = DateTime.fromJSDate(this.navigatedDate);
-        this.navigatedDate =
-            direction === "prev" ? date.minus({ months: 1 }).toJSDate() : date.plus({ months: 1 }).toJSDate();
+    public onMonthClick(month: number): void {
+        this.navigatedDate = DateTime.fromJSDate(this.navigatedDate).set({ month }).toJSDate();
         this.prepareMonthlyViewDictionary(this.navigatedDate);
-        this.cdr.markForCheck();
+        this.calendarView = "month";
     }
 
-    // weekStartsOnMonday = true
+    public onNavigationClick(direction: "prev" | "next"): void {
+        if (this.calendarView === "month") {
+            const date = DateTime.fromJSDate(this.navigatedDate);
+            this.navigatedDate =
+                direction === "prev" ? date.minus({ months: 1 }).toJSDate() : date.plus({ months: 1 }).toJSDate();
+            this.prepareMonthlyViewDictionary(this.navigatedDate);
+            this.cdr.markForCheck();
+        } else if (this.calendarView === "year") {
+            const date = DateTime.fromJSDate(this.navigatedDate);
+            this.navigatedDate =
+                direction === "prev" ? date.minus({ years: 1 }).toJSDate() : date.plus({ years: 1 }).toJSDate();
+            this.cdr.markForCheck();
+        } else if (this.calendarView === "decade") {
+            const date = DateTime.fromJSDate(this.navigatedDate);
+            this.navigatedDate =
+                direction === "prev" ? date.minus({ years: 10 }).toJSDate() : date.plus({ years: 10 }).toJSDate();
+            this.prepareDecadeYears();
+            this.cdr.markForCheck();
+        }
+    }
+
+    public onViewChangeClick(view: CalendarView): void {
+        if (view === "decade") {
+            this.prepareDecadeYears();
+        }
+        this.calendarView = view;
+    }
+
+    public onYearClick(year: number): void {
+        this.navigatedDate = DateTime.fromJSDate(this.navigatedDate).set({ year }).toJSDate();
+        this.calendarView = "year";
+    }
+
+    private prepareDecadeYears(): void {
+        const date = DateTime.fromJSDate(this.navigatedDate);
+        const year = date.year;
+        const decadeStart = year - (year % 10);
+        this.decadeYears = Array.from({ length: 10 }, (_, i) => decadeStart + i);
+    }
+
     private prepareMonthlyViewDictionary(day: Date): void {
         const firstDayOfMonth = DateTime.fromJSDate(day).startOf("month");
         const lastDayOfMonth = DateTime.fromJSDate(day).endOf("month");
@@ -129,7 +169,7 @@ export class DateTimePickerComponent implements OnInit {
 
     private setCurrentDate(date: Date): void {
         this.value = date;
-        this.currentDateString = DateTime.fromJSDate(this.value).toFormat("d/M/yyyy");
+        this.currentDateString = DateTime.fromJSDate(this.value).toFormat(this.format);
     }
 
     public get timezone(): string {

@@ -306,6 +306,8 @@ mona-button-group button[monaButton] {
 
 /** Date Picker */
 .mona-date-time-picker-popup {
+    flex-direction: column;
+    border-top: none !important;
     & table {
         & td {
             @include hover-background;

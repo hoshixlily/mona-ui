@@ -1,4 +1,4 @@
-table {
+table.mona-calendar-month-view-table {
     width: 100%;
     border-collapse: collapse;
     & td, th {
@@ -31,7 +31,31 @@ table {
     }
 }
 
-div.mona-calendar-month-view-header {
+table.mona-calendar-year-view-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    & td, th {
+        text-align: center;
+        height: 48px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+}
+
+table.mona-calendar-decade-view-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    & td, th {
+        text-align: center;
+        height: 48px;
+        font-weight: 600;
+        cursor: pointer;
+    }
+}
+
+div.mona-calendar-header {
     display: flex;
     & > div:first-child, & > div:last-child {
         display: flex;

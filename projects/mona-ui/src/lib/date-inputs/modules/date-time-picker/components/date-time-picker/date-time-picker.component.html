@@ -14,23 +14,25 @@
 </div>
 
 <ng-template #datePopupTemplate>
-    <div *ngIf="calendarView==='month'" style="width: 100%;">
-        <div class="mona-calendar-month-view-header">
-            <div>
-                <button monaButton (click)="onMonthNavigationClick('prev')">
-                    <fa-icon [icon]="prevMonthIcon"></fa-icon>
-                </button>
-            </div>
-            <div>
-                <button monaButton>{{navigatedDate|date:'MMMM yyyy':timezone}}</button>
-            </div>
-            <div>
-                <button monaButton (click)="onMonthNavigationClick('next')">
-                    <fa-icon [icon]="nextMonthIcon"></fa-icon>
-                </button>
-            </div>
+    <div class="mona-calendar-header">
+        <div>
+            <button monaButton (click)="onNavigationClick('prev')">
+                <fa-icon [icon]="prevMonthIcon"></fa-icon>
+            </button>
         </div>
-        <table>
+        <div>
+            <button monaButton *ngIf="calendarView==='month'" (click)="onViewChangeClick('year')">{{navigatedDate|date:'MMMM yyyy':timezone}}</button>
+            <button monaButton *ngIf="calendarView==='year'" (click)="onViewChangeClick('decade')">{{navigatedDate|date:'yyyy':timezone}}</button>
+            <button monaButton *ngIf="calendarView==='decade'">{{decadeYears[0]}} - {{decadeYears[decadeYears.length-1]}}</button>
+        </div>
+        <div>
+            <button monaButton (click)="onNavigationClick('next')">
+                <fa-icon [icon]="nextMonthIcon"></fa-icon>
+            </button>
+        </div>
+    </div>
+    <div *ngIf="calendarView==='month'" style="width: 100%;">
+        <table class="mona-calendar-month-view-table">
             <thead>
                 <tr>
                     <th>Mon</th>
@@ -83,9 +85,47 @@
         </table>
     </div>
     <div *ngIf="calendarView==='year'">
-        YEAR VIEW
+        <table class="mona-calendar-year-view-table">
+            <tr>
+                <td (click)="onMonthClick(1)">Jan</td>
+                <td (click)="onMonthClick(2)">Feb</td>
+                <td (click)="onMonthClick(3)">Mar</td>
+            </tr>
+            <tr>
+                <td (click)="onMonthClick(4)">Apr</td>
+                <td (click)="onMonthClick(5)">May</td>
+                <td (click)="onMonthClick(6)">Jun</td>
+            </tr>
+            <tr>
+                <td (click)="onMonthClick(7)">Jul</td>
+                <td (click)="onMonthClick(8)">Aug</td>
+                <td (click)="onMonthClick(9)">Sep</td>
+            </tr>
+            <tr>
+                <td (click)="onMonthClick(10)">Oct</td>
+                <td (click)="onMonthClick(11)">Nov</td>
+                <td (click)="onMonthClick(12)">Dec</td>
+            </tr>
+        </table>
     </div>
     <div *ngIf="calendarView==='decade'">
-        DECADE VIEW
+        <table class="mona-calendar-decade-view-table">
+            <tr>
+                <td (click)="onYearClick(decadeYears[0])">{{decadeYears[0]}}</td>
+                <td (click)="onYearClick(decadeYears[1])">{{decadeYears[1]}}</td>
+                <td (click)="onYearClick(decadeYears[2])">{{decadeYears[2]}}</td>
+                <td (click)="onYearClick(decadeYears[3])">{{decadeYears[3]}}</td>
+            </tr>
+            <tr>
+                <td (click)="onYearClick(decadeYears[4])">{{decadeYears[4]}}</td>
+                <td (click)="onYearClick(decadeYears[5])">{{decadeYears[5]}}</td>
+                <td (click)="onYearClick(decadeYears[6])">{{decadeYears[6]}}</td>
+                <td (click)="onYearClick(decadeYears[7])">{{decadeYears[7]}}</td>
+            </tr>
+            <tr>
+                <td (click)="onYearClick(decadeYears[8])">{{decadeYears[8]}}</td>
+                <td (click)="onYearClick(decadeYears[9])">{{decadeYears[9]}}</td>
+            </tr>
+        </table>
     </div>
 </ng-template>
