@@ -13,10 +13,8 @@ import {
 } from "@angular/core";
 import {
     faCalendar,
-    faChevronDown,
     faChevronLeft,
     faChevronRight,
-    faChevronUp,
     faClock,
     faTimes,
     IconDefinition
@@ -26,7 +24,7 @@ import { PopupRef } from "../../../../../popup/models/PopupRef";
 import { CalendarView } from "../../../../models/CalendarView";
 import { Dictionary } from "@mirei/ts-collections";
 import { DateTime } from "luxon";
-import { Subject, takeUntil } from "rxjs";
+import { Subject, take } from "rxjs";
 
 @Component({
     selector: "mona-date-time-picker",
@@ -39,9 +37,7 @@ export class DateTimePickerComponent implements OnInit, OnDestroy {
     private popupRef: PopupRef | null = null;
     public readonly dateIcon: IconDefinition = faCalendar;
     public readonly nextMonthIcon: IconDefinition = faChevronRight;
-    public readonly nextTimeIcon: IconDefinition = faChevronDown;
     public readonly prevMonthIcon: IconDefinition = faChevronLeft;
-    public readonly prevTimeIcon: IconDefinition = faChevronUp;
     public readonly timeIcon: IconDefinition = faClock;
     public readonly wrongDateIcon: IconDefinition = faTimes;
     public calendarView: CalendarView = "month";
@@ -54,9 +50,6 @@ export class DateTimePickerComponent implements OnInit, OnDestroy {
     public monthBounds: { start: Date; end: Date } = { start: new Date(), end: new Date() };
     public monthlyViewDict: Dictionary<Date, number> = new Dictionary<Date, number>();
     public navigatedDate: Date = new Date();
-
-    @ViewChild("dateMenuButton")
-    public dateMenuButton?: ElementRef<HTMLButtonElement>;
 
     @ViewChild("datePopupTemplate")
     public datePopupTemplateRef?: TemplateRef<void>;
@@ -114,8 +107,8 @@ export class DateTimePickerComponent implements OnInit, OnDestroy {
         this.cdr.detectChanges();
     }
 
-    public onDateInputButtonClick(event: MouseEvent): void {
-        if (!this.dateMenuButton || !this.datePopupTemplateRef) {
+    public onDateInputButtonClick(): void {
+        if (!this.datePopupTemplateRef) {
             return;
         }
         this.popupRef = this.popupService.create({
@@ -126,7 +119,7 @@ export class DateTimePickerComponent implements OnInit, OnDestroy {
             hasBackdrop: false,
             closeOnOutsideClick: true
         });
-        this.popupRef.closed.pipe(takeUntil(this.componentDestroy$)).subscribe(() => {
+        this.popupRef.closed.pipe(take(1)).subscribe(() => {
             this.calendarView = "month";
             this.navigatedDate = this.value ?? DateTime.now().toJSDate();
             this.prepareMonthlyViewDictionary(this.navigatedDate);
@@ -149,7 +142,7 @@ export class DateTimePickerComponent implements OnInit, OnDestroy {
         }
         this.currentDateInvalid = false;
         this.cdr.markForCheck();
-        this.popupRef?.close();
+        this.popupRef?.close(true);
     }
 
     public onMeridiemClick(meridiem: "AM" | "PM"): void {
@@ -185,11 +178,11 @@ export class DateTimePickerComponent implements OnInit, OnDestroy {
     }
 
     public onTimeCancelClick(): void {
-        this.popupRef?.close();
+        this.popupRef?.close(true);
         this.navigatedDate = this.value ?? DateTime.now().toJSDate();
     }
 
-    public onTimeInputButtonClick(event: MouseEvent): void {
+    public onTimeInputButtonClick(): void {
         if (!this.timePopupTemplateRef) {
             return;
         }
@@ -201,10 +194,17 @@ export class DateTimePickerComponent implements OnInit, OnDestroy {
             hasBackdrop: false,
             closeOnOutsideClick: true
         });
+        this.popupRef.closed.pipe(take(1)).subscribe({
+            next: viaMethod => {
+                if (viaMethod instanceof PointerEvent) {
+                    this.onTimeCancelClick();
+                }
+            }
+        });
     }
 
     public onTimeSetClick(): void {
-        this.popupRef?.close();
+        this.popupRef?.close(true);
         this.setCurrentDate(this.navigatedDate);
     }
 
@@ -269,6 +269,9 @@ export class DateTimePickerComponent implements OnInit, OnDestroy {
     }
 
     public set hour(value: number) {
+        if (value < 0) {
+            value = 23;
+        }
         let hour: number;
         if (this.hourFormat === "24") {
             hour = value % 24;

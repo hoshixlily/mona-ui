@@ -6,12 +6,12 @@
             </ng-template>
         </ng-container>
         <ng-template monaTextBoxSuffixTemplate>
-            <button monaButton [flat]="true" #dateMenuButton (click)="onDateInputButtonClick($event)">
+            <button monaButton [flat]="true" (click)="onDateInputButtonClick()">
                 <fa-icon [icon]="dateIcon"></fa-icon>
             </button>
         </ng-template>
         <ng-template monaTextBoxSuffixTemplate>
-            <button monaButton [flat]="true" #timeMenuButton (click)="onTimeInputButtonClick($event)">
+            <button monaButton [flat]="true" (click)="onTimeInputButtonClick()">
                 <fa-icon [icon]="timeIcon"></fa-icon>
             </button>
         </ng-template>
