@@ -317,8 +317,24 @@ mona-button-group button[monaButton] {
             }
         }
     }
+    & mona-numeric-text-box {
+        & input {
+            text-align: center;
+            background-color: var(--mona-background-dark);
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-top: 6px;
+        }
+    }
+    & mona-button-group {
+        & button {
+            padding: 0 8px;
+        }
+    }
 }
-
 
 /** Dropdown List */
 .mona-dropdown-list {

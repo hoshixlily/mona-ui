@@ -72,3 +72,54 @@ div.mona-calendar-header {
         flex: 1;
     }
 }
+
+div.mona-date-time-picker-times {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    & > div:first-child {
+        display: flex;
+        & > div {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0 4px;
+            & > span {
+                font-size: 14px;
+                font-weight: bold;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            & mona-numeric-text-box {
+                width: 64px;
+            }
+        }
+    }
+    & > div:last-child {
+        padding: 16px 0 0 0;
+        & > button:not(:last-child) {
+            margin-right: 4px;
+        }
+    }
+    & fa-icon {
+        font-size: 18px;
+    }
+}
+
+//div.mona-date-time-picker-times-hours {
+//    display: flex;
+//    flex-direction: column;
+//
+//    & > span {
+//        font-size: 14px;
+//        font-weight: 600;
+//        display: flex;
+//        align-items: center;
+//        justify-content: center;
+//    }
+//}

@@ -1,4 +1,5 @@
 import {
+    ChangeDetectionStrategy,
     Component,
     ContentChildren,
     ElementRef,
@@ -19,6 +20,7 @@ import { Action } from "../../../../../utils/Action";
     selector: "mona-text-box",
     templateUrl: "./text-box.component.html",
     styleUrls: ["./text-box.component.scss"],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [
         {
             provide: NG_VALUE_ACCESSOR,

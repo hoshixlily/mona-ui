@@ -10,6 +10,11 @@
                 <fa-icon [icon]="dateIcon"></fa-icon>
             </button>
         </ng-template>
+        <ng-template monaTextBoxSuffixTemplate>
+            <button monaButton [flat]="true" #timeMenuButton (click)="onTimeInputButtonClick($event)">
+                <fa-icon [icon]="timeIcon"></fa-icon>
+            </button>
+        </ng-template>
     </mona-text-box>
 </div>
 
@@ -127,5 +132,31 @@
                 <td (click)="onYearClick(decadeYears[9])">{{decadeYears[9]}}</td>
             </tr>
         </table>
+    </div>
+</ng-template>
+
+<ng-template #timePopupTemplate>
+    <div class="mona-date-time-picker-times">
+        <div>
+            <div style="display: flex; flex-direction: column;">
+                <mona-numeric-text-box [(ngModel)]="hour" [min]="-1" [max]="hourFormat==='12' ? 13 : 24"></mona-numeric-text-box>
+            </div>
+            <div>
+                <span>:</span>
+            </div>
+            <div>
+                <mona-numeric-text-box [(ngModel)]="minute" [min]="-1" [max]="60"></mona-numeric-text-box>
+            </div>
+            <div *ngIf="hourFormat==='12'">
+                <mona-button-group>
+                    <button monaButton [selected]="meridiem==='AM'" (click)="onMeridiemClick('AM')">AM</button>
+                    <button monaButton [selected]="meridiem==='PM'" (click)="onMeridiemClick('PM')">PM</button>
+                </mona-button-group>
+            </div>
+        </div>
+        <div>
+            <button monaButton (click)="onTimeSetClick()">Set</button>
+            <button monaButton (click)="onTimeCancelClick()">Cancel</button>
+        </div>
     </div>
 </ng-template>

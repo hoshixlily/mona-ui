@@ -8,6 +8,8 @@ import { ButtonModule } from "../../../buttons/modules/button/button.module";
 import { FormsModule } from "@angular/forms";
 import { SlicePipe } from "../../../pipes/slice.pipe";
 import { DateComparerPipe } from "../../../pipes/date-comparer.pipe";
+import { ButtonGroupModule } from "../../../buttons/modules/button-group/button-group.module";
+import { NumericTextBoxModule } from "../../../inputs/modules/numeric-text-box/numeric-text-box.module";
 
 @NgModule({
     declarations: [DateTimePickerComponent],
@@ -19,7 +21,9 @@ import { DateComparerPipe } from "../../../pipes/date-comparer.pipe";
         ButtonModule,
         SlicePipe,
         FormsModule,
-        DateComparerPipe
+        DateComparerPipe,
+        ButtonGroupModule,
+        NumericTextBoxModule
     ],
     exports: [DateTimePickerComponent]
 })

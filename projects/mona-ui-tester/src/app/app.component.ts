@@ -89,6 +89,7 @@ export class AppComponent implements OnInit {
     };
 
     public contextMenuItemVisible: boolean = true;
+    public dateTimePickerValue: Date | null = new Date();
     public dropdownListDataItems: IndexableList<any> = new IndexableList([
         { text: "Cherry", value: 1, group: "Fruit", active: true },
         { text: "Cabbage", value: 2, group: "Vegetable", active: true },
@@ -299,6 +300,10 @@ export class AppComponent implements OnInit {
     public onComboBoxValueChange(value: unknown): void {
         this.selectedComboBoxDataItem = value;
         console.log(`Combobox value changed`, value);
+    }
+
+    public onDateTimePickerValueChange(value: Date | null): void {
+        console.log(value);
     }
 
     public onDropDownValueChange(value: unknown): void {

@@ -3,17 +3,30 @@ import {
     ChangeDetectorRef,
     Component,
     ElementRef,
+    EventEmitter,
     Input,
+    OnDestroy,
     OnInit,
+    Output,
     TemplateRef,
     ViewChild
 } from "@angular/core";
-import { faCalendar, faChevronLeft, faChevronRight, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import {
+    faCalendar,
+    faChevronDown,
+    faChevronLeft,
+    faChevronRight,
+    faChevronUp,
+    faClock,
+    faTimes,
+    IconDefinition
+} from "@fortawesome/free-solid-svg-icons";
 import { PopupService } from "../../../../../popup/services/popup.service";
 import { PopupRef } from "../../../../../popup/models/PopupRef";
 import { CalendarView } from "../../../../models/CalendarView";
 import { Dictionary } from "@mirei/ts-collections";
 import { DateTime } from "luxon";
+import { Subject, takeUntil } from "rxjs";
 
 @Component({
     selector: "mona-date-time-picker",
@@ -21,31 +34,47 @@ import { DateTime } from "luxon";
     styleUrls: ["./date-time-picker.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DateTimePickerComponent implements OnInit {
+export class DateTimePickerComponent implements OnInit, OnDestroy {
+    private readonly componentDestroy$: Subject<void> = new Subject<void>();
     private popupRef: PopupRef | null = null;
     public readonly dateIcon: IconDefinition = faCalendar;
     public readonly nextMonthIcon: IconDefinition = faChevronRight;
+    public readonly nextTimeIcon: IconDefinition = faChevronDown;
     public readonly prevMonthIcon: IconDefinition = faChevronLeft;
+    public readonly prevTimeIcon: IconDefinition = faChevronUp;
+    public readonly timeIcon: IconDefinition = faClock;
     public readonly wrongDateIcon: IconDefinition = faTimes;
     public calendarView: CalendarView = "month";
     public currentDateInvalid: boolean = false;
     public currentDateString: string = "";
     public decadeYears: number[] = [];
+    public hours: number[] = [];
+    public meridiem: "AM" | "PM" = "AM";
+    public minutes: number[] = [];
     public monthBounds: { start: Date; end: Date } = { start: new Date(), end: new Date() };
     public monthlyViewDict: Dictionary<Date, number> = new Dictionary<Date, number>();
     public navigatedDate: Date = new Date();
 
     @ViewChild("dateMenuButton")
-    public readonly dateMenuButton?: ElementRef<HTMLButtonElement>;
+    public dateMenuButton?: ElementRef<HTMLButtonElement>;
+
+    @ViewChild("datePopupTemplate")
+    public datePopupTemplateRef?: TemplateRef<void>;
 
     @Input()
     public format: string = "d/M/yyyy";
 
-    @ViewChild("datePopupTemplate")
-    public readonly popupTemplate?: TemplateRef<void>;
+    @Input()
+    public hourFormat: "12" | "24" = "24";
+
+    @ViewChild("timePopupTemplate")
+    public timePopupTemplateRef?: TemplateRef<void>;
 
     @Input()
     public value: Date | null = null;
+
+    @Output()
+    public valueChange: EventEmitter<Date> = new EventEmitter<Date>();
 
     public constructor(
         public readonly cdr: ChangeDetectorRef,
@@ -53,10 +82,21 @@ export class DateTimePickerComponent implements OnInit {
         private readonly popupService: PopupService
     ) {}
 
+    public ngOnDestroy(): void {
+        this.componentDestroy$.next();
+        this.componentDestroy$.complete();
+    }
+
     public ngOnInit(): void {
         const date = this.value ?? DateTime.now().toJSDate();
         this.prepareMonthlyViewDictionary(date);
         this.navigatedDate = date;
+        this.meridiem = date.getHours() >= 12 ? "PM" : "AM";
+        this.prepareHours();
+        this.prepareMinutes();
+        if (this.value) {
+            this.setCurrentDate(this.value);
+        }
     }
 
     public onDateInputBlur(): void {
@@ -75,16 +115,18 @@ export class DateTimePickerComponent implements OnInit {
     }
 
     public onDateInputButtonClick(event: MouseEvent): void {
-        if (!this.dateMenuButton || !this.popupTemplate) {
+        if (!this.dateMenuButton || !this.datePopupTemplateRef) {
             return;
         }
         this.popupRef = this.popupService.create({
             anchor: this.elementRef.nativeElement,
-            content: this.popupTemplate,
+            content: this.datePopupTemplateRef,
             width: this.elementRef.nativeElement.clientWidth,
-            popupClass: "mona-date-time-picker-popup"
+            popupClass: "mona-date-time-picker-popup",
+            hasBackdrop: false,
+            closeOnOutsideClick: true
         });
-        this.popupRef.closed.subscribe(() => {
+        this.popupRef.closed.pipe(takeUntil(this.componentDestroy$)).subscribe(() => {
             this.calendarView = "month";
             this.navigatedDate = this.value ?? DateTime.now().toJSDate();
             this.prepareMonthlyViewDictionary(this.navigatedDate);
@@ -96,10 +138,25 @@ export class DateTimePickerComponent implements OnInit {
     }
 
     public onDayClick(date: Date): void {
-        this.setCurrentDate(date);
+        if (this.value) {
+            const date1 = DateTime.fromJSDate(date);
+            const newDate = DateTime.fromJSDate(this.value)
+                .set({ day: date1.day, month: date1.month, year: date1.year })
+                .toJSDate();
+            this.setCurrentDate(newDate);
+        } else {
+            this.setCurrentDate(date);
+        }
         this.currentDateInvalid = false;
         this.cdr.markForCheck();
         this.popupRef?.close();
+    }
+
+    public onMeridiemClick(meridiem: "AM" | "PM"): void {
+        this.meridiem = meridiem;
+        this.navigatedDate = DateTime.fromJSDate(this.navigatedDate)
+            .set({ hour: this.navigatedDate.getHours() + (meridiem === "AM" ? -12 : 12) })
+            .toJSDate();
     }
 
     public onMonthClick(month: number): void {
@@ -114,19 +171,41 @@ export class DateTimePickerComponent implements OnInit {
             this.navigatedDate =
                 direction === "prev" ? date.minus({ months: 1 }).toJSDate() : date.plus({ months: 1 }).toJSDate();
             this.prepareMonthlyViewDictionary(this.navigatedDate);
-            this.cdr.markForCheck();
         } else if (this.calendarView === "year") {
             const date = DateTime.fromJSDate(this.navigatedDate);
             this.navigatedDate =
                 direction === "prev" ? date.minus({ years: 1 }).toJSDate() : date.plus({ years: 1 }).toJSDate();
-            this.cdr.markForCheck();
         } else if (this.calendarView === "decade") {
             const date = DateTime.fromJSDate(this.navigatedDate);
             this.navigatedDate =
                 direction === "prev" ? date.minus({ years: 10 }).toJSDate() : date.plus({ years: 10 }).toJSDate();
             this.prepareDecadeYears();
-            this.cdr.markForCheck();
         }
+        this.cdr.markForCheck();
+    }
+
+    public onTimeCancelClick(): void {
+        this.popupRef?.close();
+        this.navigatedDate = this.value ?? DateTime.now().toJSDate();
+    }
+
+    public onTimeInputButtonClick(event: MouseEvent): void {
+        if (!this.timePopupTemplateRef) {
+            return;
+        }
+        this.popupRef = this.popupService.create({
+            anchor: this.elementRef.nativeElement,
+            content: this.timePopupTemplateRef,
+            width: this.elementRef.nativeElement.clientWidth,
+            popupClass: "mona-date-time-picker-popup",
+            hasBackdrop: false,
+            closeOnOutsideClick: true
+        });
+    }
+
+    public onTimeSetClick(): void {
+        this.popupRef?.close();
+        this.setCurrentDate(this.navigatedDate);
     }
 
     public onViewChangeClick(view: CalendarView): void {
@@ -146,6 +225,14 @@ export class DateTimePickerComponent implements OnInit {
         const year = date.year;
         const decadeStart = year - (year % 10);
         this.decadeYears = Array.from({ length: 10 }, (_, i) => decadeStart + i);
+    }
+
+    private prepareHours(): void {
+        this.hours = Array.from({ length: 24 }, (_, i) => i);
+    }
+
+    private prepareMinutes(): void {
+        this.minutes = Array.from({ length: 60 }, (_, i) => i);
     }
 
     private prepareMonthlyViewDictionary(day: Date): void {
@@ -170,6 +257,40 @@ export class DateTimePickerComponent implements OnInit {
     private setCurrentDate(date: Date): void {
         this.value = date;
         this.currentDateString = DateTime.fromJSDate(this.value).toFormat(this.format);
+        this.valueChange.emit(this.value);
+        this.cdr.markForCheck();
+    }
+
+    public get hour(): number {
+        if (this.hourFormat === "12") {
+            return this.navigatedDate.getHours() % 12 || 12;
+        }
+        return this.navigatedDate.getHours();
+    }
+
+    public set hour(value: number) {
+        let hour: number;
+        if (this.hourFormat === "24") {
+            hour = value % 24;
+        } else {
+            hour = value % 12;
+            if (this.meridiem === "PM") {
+                hour += 12;
+            }
+        }
+        this.navigatedDate = DateTime.fromJSDate(this.navigatedDate).set({ hour }).toJSDate();
+    }
+
+    public get minute(): number {
+        return this.navigatedDate ? DateTime.fromJSDate(this.navigatedDate).minute : 0;
+    }
+
+    public set minute(value: number | string) {
+        if (!this.navigatedDate) {
+            this.navigatedDate = DateTime.now().toJSDate();
+        }
+        const minute = +value > 59 ? 0 : +value < 0 ? 59 : +value;
+        this.navigatedDate = DateTime.fromJSDate(this.navigatedDate).set({ minute }).toJSDate();
     }
 
     public get timezone(): string {

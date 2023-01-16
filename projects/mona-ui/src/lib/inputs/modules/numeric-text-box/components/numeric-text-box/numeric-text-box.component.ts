@@ -1,4 +1,5 @@
 import {
+    ChangeDetectionStrategy,
     Component,
     ElementRef,
     EventEmitter,
@@ -21,6 +22,7 @@ type Sign = "-" | "+";
     selector: "mona-numeric-text-box",
     templateUrl: "./numeric-text-box.component.html",
     styleUrls: ["./numeric-text-box.component.scss"],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [
         {
             provide: NG_VALUE_ACCESSOR,
