@@ -10,23 +10,9 @@
                 <fa-icon [icon]="dateIcon"></fa-icon>
             </button>
         </ng-template>
-        <ng-template monaTextBoxSuffixTemplate>
-            <button monaButton [flat]="true" (click)="onTimeInputButtonClick()">
-                <fa-icon [icon]="timeIcon"></fa-icon>
-            </button>
-        </ng-template>
     </mona-text-box>
 </div>
 
-
 <ng-template #datePopupTemplate>
     <mona-calendar [value]="value" (valueChange)="onCalendarValueChange($event)"></mona-calendar>
-</ng-template>
-
-<ng-template #timePopupTemplate>
-    <mona-time-selector [value]="value" [hourFormat]="hourFormat"></mona-time-selector>
-    <div style="display: flex;">
-        <button monaButton>Set</button>
-        <button monaButton>Cancel</button>
-    </div>
 </ng-template>

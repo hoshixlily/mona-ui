@@ -317,6 +317,10 @@ mona-button-group button[monaButton] {
             }
         }
     }
+}
+
+/** Time Selector */
+div.mona-time-selector {
     & mona-numeric-text-box {
         & input {
             text-align: center;

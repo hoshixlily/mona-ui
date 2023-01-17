@@ -15,8 +15,14 @@ export * from "./lib/buttons/modules/split-button/split-button.module";
 export * from "./lib/buttons/buttons.module";
 
 /** Date Inputs */
+export * from "./lib/date-inputs/modules/calendar/components/calendar/calendar.component";
+export * from "./lib/date-inputs/modules/calendar/calendar.module";
+export * from "./lib/date-inputs/modules/date-picker/components/date-picker/date-picker.component";
+export * from "./lib/date-inputs/modules/date-picker/date-picker.module";
 export * from "./lib/date-inputs/modules/date-time-picker/components/date-time-picker/date-time-picker.component";
 export * from "./lib/date-inputs/modules/date-time-picker/date-time-picker.module";
+export * from "./lib/date-inputs/modules/time-selector/components/time-selector/time-selector.component";
+export * from "./lib/date-inputs/modules/time-selector/time-selector.module";
 export * from "./lib/date-inputs/date-inputs.module";
 
 /** Dropdowns */

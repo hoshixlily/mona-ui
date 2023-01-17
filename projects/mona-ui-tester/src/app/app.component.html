@@ -87,9 +87,11 @@
                             </div>
 
                             <div>
-                                <mona-date-time-picker format="d/M/yy hh:mm:ss a" style="width: 250px;"
+                                <mona-date-time-picker format="dd/MM/yyyy hh:mm:ss a" style="width: 250px; margin-right: 20px;"
                                                        [value]="dateTimePickerValue" hourFormat="12"
                                                        (valueChange)="onDateTimePickerValueChange($event)"></mona-date-time-picker>
+                                <mona-date-picker format="d/M/yyyy" style="width: 250px;" [value]="dateTimePickerValue"></mona-date-picker>
+                                <mona-time-selector [value]="dateTimePickerValue" hourFormat="12"></mona-time-selector>
                             </div>
 
                             <div>

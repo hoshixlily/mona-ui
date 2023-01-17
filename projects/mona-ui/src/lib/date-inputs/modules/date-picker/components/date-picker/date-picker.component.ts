@@ -1,49 +1,39 @@
 import {
-    ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
     ElementRef,
     EventEmitter,
     Input,
-    OnDestroy,
     OnInit,
     Output,
     TemplateRef,
     ViewChild
 } from "@angular/core";
-import { faCalendar, faClock, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { PopupService } from "../../../../../popup/services/popup.service";
-import { PopupRef } from "../../../../../popup/models/PopupRef";
 import { DateTime } from "luxon";
 import { Subject } from "rxjs";
+import { PopupRef } from "../../../../../popup/models/PopupRef";
+import { faCalendar, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 
 @Component({
-    selector: "mona-date-time-picker",
-    templateUrl: "./date-time-picker.component.html",
-    styleUrls: ["./date-time-picker.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    selector: "mona-date-picker",
+    templateUrl: "./date-picker.component.html",
+    styleUrls: ["./date-picker.component.scss"]
 })
-export class DateTimePickerComponent implements OnInit, OnDestroy {
+export class DatePickerComponent implements OnInit {
     private readonly componentDestroy$: Subject<void> = new Subject<void>();
     private popupRef: PopupRef | null = null;
     public readonly dateIcon: IconDefinition = faCalendar;
-    public readonly timeIcon: IconDefinition = faClock;
     public readonly wrongDateIcon: IconDefinition = faTimes;
+
     public currentDateInvalid: boolean = false;
     public currentDateString: string = "";
-    public navigatedDate: Date = new Date();
 
     @ViewChild("datePopupTemplate")
     public datePopupTemplateRef?: TemplateRef<void>;
 
     @Input()
     public format: string = "d/M/yyyy";
-
-    @Input()
-    public hourFormat: "12" | "24" = "24";
-
-    @ViewChild("timePopupTemplate")
-    public timePopupTemplateRef?: TemplateRef<void>;
 
     @Input()
     public value: Date | null = null;
@@ -63,11 +53,9 @@ export class DateTimePickerComponent implements OnInit, OnDestroy {
     }
 
     public ngOnInit(): void {
-        const date = this.value ?? DateTime.now().toJSDate();
-        this.navigatedDate = date;
-        // if (this.value) {
-        //     this.setCurrentDate(this.value, false);
-        // }
+        if (this.value) {
+            this.currentDateString = DateTime.fromJSDate(this.value).toFormat(this.format);
+        }
     }
 
     public onCalendarValueChange(date: Date): void {
@@ -79,8 +67,6 @@ export class DateTimePickerComponent implements OnInit, OnDestroy {
         const date1 = DateTime.fromFormat(this.currentDateString, this.format);
         if (date1.isValid) {
             this.setCurrentDate(date1.toJSDate());
-            this.navigatedDate = date1.toJSDate();
-            this.currentDateString = date1.toFormat(this.format);
         } else {
             if (this.value) {
                 this.currentDateString = DateTime.fromJSDate(this.value).toFormat(this.format);
@@ -101,48 +87,15 @@ export class DateTimePickerComponent implements OnInit, OnDestroy {
             hasBackdrop: false,
             closeOnOutsideClick: true
         });
-        // this.popupRef.closed.pipe(take(1)).subscribe(() => {
-        //     this.calendarView = "month";
-        //     this.navigatedDate = this.value ?? DateTime.now().toJSDate();
-        //     this.prepareMonthlyViewDictionary(this.navigatedDate);
-        // });
     }
 
     public onDateStringEdit(dateString: string): void {
         this.currentDateString = dateString;
     }
 
-    public onTimeInputButtonClick(): void {
-        if (!this.timePopupTemplateRef) {
-            return;
-        }
-        this.popupRef = this.popupService.create({
-            anchor: this.elementRef.nativeElement,
-            content: this.timePopupTemplateRef,
-            width: this.elementRef.nativeElement.clientWidth,
-            popupClass: "mona-date-time-picker-popup",
-            hasBackdrop: false,
-            closeOnOutsideClick: true
-        });
-        // this.popupRef.closed.pipe(take(1)).subscribe({
-        //     next: viaMethod => {
-        //         if (viaMethod instanceof PointerEvent) {
-        //             this.onTimeCancelClick();
-        //         }
-        //     }
-        // });
-    }
-
-    private setCurrentDate(date: Date, emit: boolean = true): void {
+    public setCurrentDate(date: Date): void {
         this.value = date;
-        this.currentDateString = DateTime.fromJSDate(this.value).toFormat(this.format);
-        if (emit) {
-            this.valueChange.emit(this.value);
-        }
-        this.cdr.markForCheck();
-    }
-
-    public get timezone(): string {
-        return DateTime.local().zoneName;
+        this.currentDateString = DateTime.fromJSDate(date).toFormat(this.format);
+        this.valueChange.emit(date);
     }
 }

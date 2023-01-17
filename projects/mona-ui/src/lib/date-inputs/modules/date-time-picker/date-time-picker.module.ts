@@ -10,6 +10,8 @@ import { SlicePipe } from "../../../pipes/slice.pipe";
 import { DateComparerPipe } from "../../../pipes/date-comparer.pipe";
 import { ButtonGroupModule } from "../../../buttons/modules/button-group/button-group.module";
 import { NumericTextBoxModule } from "../../../inputs/modules/numeric-text-box/numeric-text-box.module";
+import { CalendarModule } from "../calendar/calendar.module";
+import { TimeSelectorModule } from "../time-selector/time-selector.module";
 
 @NgModule({
     declarations: [DateTimePickerComponent],
@@ -23,7 +25,9 @@ import { NumericTextBoxModule } from "../../../inputs/modules/numeric-text-box/n
         FormsModule,
         DateComparerPipe,
         ButtonGroupModule,
-        NumericTextBoxModule
+        NumericTextBoxModule,
+        CalendarModule,
+        TimeSelectorModule
     ],
     exports: [DateTimePickerComponent]
 })
