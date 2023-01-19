@@ -46,9 +46,6 @@ export class TimeSelectorComponent implements OnInit, OnDestroy {
         this.meridiem = date.getHours() >= 12 ? "PM" : "AM";
         this.prepareHours();
         this.prepareMinutes();
-        // if (this.value) {
-        //     this.setCurrentDate(this.value);
-        // }
     }
 
     public onMeridiemClick(meridiem: "AM" | "PM"): void {
@@ -56,6 +53,7 @@ export class TimeSelectorComponent implements OnInit, OnDestroy {
         this.navigatedDate = DateTime.fromJSDate(this.navigatedDate)
             .set({ hour: this.navigatedDate.getHours() + (meridiem === "AM" ? -12 : 12) })
             .toJSDate();
+        this.setCurrentDate(this.navigatedDate);
     }
 
     private prepareHours(): void {
@@ -93,6 +91,7 @@ export class TimeSelectorComponent implements OnInit, OnDestroy {
             }
         }
         this.navigatedDate = DateTime.fromJSDate(this.navigatedDate).set({ hour }).toJSDate();
+        this.setCurrentDate(this.navigatedDate);
     }
 
     public get minute(): number {
@@ -105,5 +104,6 @@ export class TimeSelectorComponent implements OnInit, OnDestroy {
         }
         const minute = +value > 59 ? 0 : +value < 0 ? 59 : +value;
         this.navigatedDate = DateTime.fromJSDate(this.navigatedDate).set({ minute }).toJSDate();
+        this.setCurrentDate(this.navigatedDate);
     }
 }

@@ -3,19 +3,16 @@ import {
     ChangeDetectorRef,
     Component,
     ElementRef,
-    EventEmitter,
     Input,
     OnDestroy,
     OnInit,
-    Output,
     TemplateRef,
     ViewChild
 } from "@angular/core";
 import { faCalendar, faClock, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { PopupService } from "../../../../../popup/services/popup.service";
-import { PopupRef } from "../../../../../popup/models/PopupRef";
 import { DateTime } from "luxon";
-import { Subject } from "rxjs";
+import { AbstractDateInputComponent } from "../../../../components/abstract-date-input/abstract-date-input.component";
 
 @Component({
     selector: "mona-date-time-picker",
@@ -23,9 +20,7 @@ import { Subject } from "rxjs";
     styleUrls: ["./date-time-picker.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DateTimePickerComponent implements OnInit, OnDestroy {
-    private readonly componentDestroy$: Subject<void> = new Subject<void>();
-    private popupRef: PopupRef | null = null;
+export class DateTimePickerComponent extends AbstractDateInputComponent implements OnInit, OnDestroy {
     public readonly dateIcon: IconDefinition = faCalendar;
     public readonly timeIcon: IconDefinition = faClock;
     public readonly wrongDateIcon: IconDefinition = faTimes;
@@ -45,29 +40,22 @@ export class DateTimePickerComponent implements OnInit, OnDestroy {
     @ViewChild("timePopupTemplate")
     public timePopupTemplateRef?: TemplateRef<void>;
 
-    @Input()
-    public value: Date | null = null;
-
-    @Output()
-    public valueChange: EventEmitter<Date> = new EventEmitter<Date>();
-
     public constructor(
-        public readonly cdr: ChangeDetectorRef,
+        protected override readonly cdr: ChangeDetectorRef,
         private readonly elementRef: ElementRef<HTMLElement>,
         private readonly popupService: PopupService
-    ) {}
+    ) {
+        super(cdr);
+    }
 
     public ngOnDestroy(): void {
         this.componentDestroy$.next();
         this.componentDestroy$.complete();
     }
 
-    public ngOnInit(): void {
-        const date = this.value ?? DateTime.now().toJSDate();
-        this.navigatedDate = date;
-        // if (this.value) {
-        //     this.setCurrentDate(this.value, false);
-        // }
+    public override ngOnInit(): void {
+        super.ngOnInit();
+        this.navigatedDate = this.value ?? DateTime.now().toJSDate();
     }
 
     public onCalendarValueChange(date: Date): void {
@@ -101,11 +89,6 @@ export class DateTimePickerComponent implements OnInit, OnDestroy {
             hasBackdrop: false,
             closeOnOutsideClick: true
         });
-        // this.popupRef.closed.pipe(take(1)).subscribe(() => {
-        //     this.calendarView = "month";
-        //     this.navigatedDate = this.value ?? DateTime.now().toJSDate();
-        //     this.prepareMonthlyViewDictionary(this.navigatedDate);
-        // });
     }
 
     public onDateStringEdit(dateString: string): void {
@@ -124,13 +107,10 @@ export class DateTimePickerComponent implements OnInit, OnDestroy {
             hasBackdrop: false,
             closeOnOutsideClick: true
         });
-        // this.popupRef.closed.pipe(take(1)).subscribe({
-        //     next: viaMethod => {
-        //         if (viaMethod instanceof PointerEvent) {
-        //             this.onTimeCancelClick();
-        //         }
-        //     }
-        // });
+    }
+
+    public onTimeSelectorValueChange(date: Date): void {
+        this.setCurrentDate(date);
     }
 
     private setCurrentDate(date: Date, emit: boolean = true): void {
@@ -140,9 +120,5 @@ export class DateTimePickerComponent implements OnInit, OnDestroy {
             this.valueChange.emit(this.value);
         }
         this.cdr.markForCheck();
-    }
-
-    public get timezone(): string {
-        return DateTime.local().zoneName;
     }
 }

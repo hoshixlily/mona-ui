@@ -1,31 +1,17 @@
-import {
-    ChangeDetectorRef,
-    Component,
-    ElementRef,
-    EventEmitter,
-    Input,
-    OnInit,
-    Output,
-    TemplateRef,
-    ViewChild
-} from "@angular/core";
+import { ChangeDetectorRef, Component, ElementRef, Input, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { PopupService } from "../../../../../popup/services/popup.service";
 import { DateTime } from "luxon";
-import { Subject } from "rxjs";
-import { PopupRef } from "../../../../../popup/models/PopupRef";
 import { faCalendar, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { AbstractDateInputComponent } from "../../../../components/abstract-date-input/abstract-date-input.component";
 
 @Component({
     selector: "mona-date-picker",
     templateUrl: "./date-picker.component.html",
     styleUrls: ["./date-picker.component.scss"]
 })
-export class DatePickerComponent implements OnInit {
-    private readonly componentDestroy$: Subject<void> = new Subject<void>();
-    private popupRef: PopupRef | null = null;
+export class DatePickerComponent extends AbstractDateInputComponent implements OnInit {
     public readonly dateIcon: IconDefinition = faCalendar;
     public readonly wrongDateIcon: IconDefinition = faTimes;
-
     public currentDateInvalid: boolean = false;
     public currentDateString: string = "";
 
@@ -35,24 +21,21 @@ export class DatePickerComponent implements OnInit {
     @Input()
     public format: string = "d/M/yyyy";
 
-    @Input()
-    public value: Date | null = null;
-
-    @Output()
-    public valueChange: EventEmitter<Date> = new EventEmitter<Date>();
-
     public constructor(
-        public readonly cdr: ChangeDetectorRef,
+        protected override readonly cdr: ChangeDetectorRef,
         private readonly elementRef: ElementRef<HTMLElement>,
         private readonly popupService: PopupService
-    ) {}
+    ) {
+        super(cdr);
+    }
 
     public ngOnDestroy(): void {
         this.componentDestroy$.next();
         this.componentDestroy$.complete();
     }
 
-    public ngOnInit(): void {
+    public override ngOnInit(): void {
+        super.ngOnInit();
         if (this.value) {
             this.currentDateString = DateTime.fromJSDate(this.value).toFormat(this.format);
         }
@@ -93,7 +76,7 @@ export class DatePickerComponent implements OnInit {
         this.currentDateString = dateString;
     }
 
-    public setCurrentDate(date: Date): void {
+    private setCurrentDate(date: Date): void {
         this.value = date;
         this.currentDateString = DateTime.fromJSDate(date).toFormat(this.format);
         this.valueChange.emit(date);

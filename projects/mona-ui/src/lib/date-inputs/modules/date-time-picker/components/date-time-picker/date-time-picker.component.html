@@ -24,9 +24,5 @@
 </ng-template>
 
 <ng-template #timePopupTemplate>
-    <mona-time-selector [value]="value" [hourFormat]="hourFormat"></mona-time-selector>
-    <div style="display: flex;">
-        <button monaButton>Set</button>
-        <button monaButton>Cancel</button>
-    </div>
+    <mona-time-selector [value]="value" (valueChange)="onTimeSelectorValueChange($event)" [hourFormat]="hourFormat"></mona-time-selector>
 </ng-template>

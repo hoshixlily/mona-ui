@@ -14,6 +14,7 @@ import { CalendarView } from "../../../../models/CalendarView";
 import { Dictionary } from "@mirei/ts-collections";
 import { faChevronLeft, faChevronRight, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { Subject } from "rxjs";
+import { AbstractDateInputComponent } from "../../../../components/abstract-date-input/abstract-date-input.component";
 
 @Component({
     selector: "mona-calendar",
@@ -21,8 +22,7 @@ import { Subject } from "rxjs";
     styleUrls: ["./calendar.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class CalendarComponent implements OnInit {
-    private readonly componentDestroy$: Subject<void> = new Subject<void>();
+export class CalendarComponent extends AbstractDateInputComponent implements OnInit {
     public readonly nextMonthIcon: IconDefinition = faChevronRight;
     public readonly prevMonthIcon: IconDefinition = faChevronLeft;
     public calendarView: CalendarView = "month";
@@ -31,19 +31,17 @@ export class CalendarComponent implements OnInit {
     public monthlyViewDict: Dictionary<Date, number> = new Dictionary<Date, number>();
     public navigatedDate: Date = new Date();
 
-    @Input()
-    public value: Date | null = null;
-
-    @Output()
-    public valueChange: EventEmitter<Date> = new EventEmitter<Date>();
-    public constructor(public readonly cdr: ChangeDetectorRef) {}
+    public constructor(protected override readonly cdr: ChangeDetectorRef) {
+        super(cdr);
+    }
 
     public ngOnDestroy(): void {
         this.componentDestroy$.next();
         this.componentDestroy$.complete();
     }
 
-    public ngOnInit(): void {
+    public override ngOnInit(): void {
+        super.ngOnInit();
         const date = this.value ?? DateTime.now().toJSDate();
         this.prepareMonthlyViewDictionary(date);
         this.navigatedDate = date;
