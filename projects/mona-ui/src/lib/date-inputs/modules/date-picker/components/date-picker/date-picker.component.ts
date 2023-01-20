@@ -59,7 +59,7 @@ export class DatePickerComponent extends AbstractDateInputComponent implements O
     }
 
     public onDateInputButtonClick(): void {
-        if (!this.datePopupTemplateRef) {
+        if (!this.datePopupTemplateRef || this.readonly) {
             return;
         }
         this.popupRef = this.popupService.create({

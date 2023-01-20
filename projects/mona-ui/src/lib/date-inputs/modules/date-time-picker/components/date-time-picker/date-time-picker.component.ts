@@ -78,7 +78,7 @@ export class DateTimePickerComponent extends AbstractDateInputComponent implemen
     }
 
     public onDateInputButtonClick(): void {
-        if (!this.datePopupTemplateRef) {
+        if (!this.datePopupTemplateRef || this.readonly) {
             return;
         }
         this.popupRef = this.popupService.create({
@@ -96,7 +96,7 @@ export class DateTimePickerComponent extends AbstractDateInputComponent implemen
     }
 
     public onTimeInputButtonClick(): void {
-        if (!this.timePopupTemplateRef) {
+        if (!this.timePopupTemplateRef || this.readonly) {
             return;
         }
         this.popupRef = this.popupService.create({

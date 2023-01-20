@@ -26,6 +26,9 @@ export abstract class AbstractDateInputComponent implements OnInit {
     public disabled: boolean = false;
 
     @Input()
+    public readonly: boolean = false;
+
+    @Input()
     public value: Date | null = null;
 
     @Output()

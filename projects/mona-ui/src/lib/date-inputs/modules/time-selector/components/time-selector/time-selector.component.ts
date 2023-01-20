@@ -25,7 +25,13 @@ export class TimeSelectorComponent implements OnInit, OnDestroy {
     public navigatedDate: Date = new Date();
 
     @Input()
+    public disabled: boolean = false;
+
+    @Input()
     public hourFormat: "12" | "24" = "24";
+
+    @Input()
+    public readonly: boolean = false;
 
     @Input()
     public value: Date | null = null;
@@ -49,6 +55,9 @@ export class TimeSelectorComponent implements OnInit, OnDestroy {
     }
 
     public onMeridiemClick(meridiem: "AM" | "PM"): void {
+        if (this.readonly) {
+            return;
+        }
         this.meridiem = meridiem;
         this.navigatedDate = DateTime.fromJSDate(this.navigatedDate)
             .set({ hour: this.navigatedDate.getHours() + (meridiem === "AM" ? -12 : 12) })

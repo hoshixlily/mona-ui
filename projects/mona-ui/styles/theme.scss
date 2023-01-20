@@ -36,7 +36,6 @@ input {
     pointer-events: none;
     opacity: 0.37;
     cursor: default;
-    //background-color: var(--mona-background-dark);
 }
 
 @mixin focus-transition {
@@ -305,6 +304,17 @@ mona-button-group button[monaButton] {
 }
 
 /** Date Picker */
+.mona-date-picker,
+.mona-date-time-picker,
+.mona-time-picker,
+.mona-time-selector {
+    &.mona-disabled {
+        @include disabled;
+    }
+}
+
+
+
 .mona-date-time-picker-popup {
     flex-direction: column;
     border-top: none !important;

@@ -45,6 +45,9 @@ export class TextBoxComponent implements OnInit, ControlValueAccessor {
     @ContentChildren(TextBoxPrefixTemplateDirective, { read: TemplateRef })
     public prefixTemplateList: QueryList<TemplateRef<void>> = new QueryList<TemplateRef<void>>();
 
+    @Input()
+    public readonly: boolean = false;
+
     @ContentChildren(TextBoxSuffixTemplateDirective, { read: TemplateRef })
     public suffixTemplateList: QueryList<TemplateRef<void>> = new QueryList<TemplateRef<void>>();
 
