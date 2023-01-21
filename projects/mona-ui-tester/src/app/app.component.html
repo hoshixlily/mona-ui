@@ -91,7 +91,8 @@
                                                        [value]="dateTimePickerValue" hourFormat="12" [readonly]="false"
                                                        (valueChange)="onDateTimePickerValueChange($event)"></mona-date-time-picker>
                                 <mona-date-picker format="d/M/yyyy" style="width: 250px;" [value]="dateTimePickerValue" [readonly]="false"></mona-date-picker>
-                                <mona-time-selector [value]="dateTimePickerValue" hourFormat="12" [readonly]="true" [disabled]="false"></mona-time-selector>
+
+                                <mona-time-selector  hourFormat="12" [readonly]="false" [disabled]="false" (valueChange)="print($event)"></mona-time-selector>
                             </div>
 
                             <div>
