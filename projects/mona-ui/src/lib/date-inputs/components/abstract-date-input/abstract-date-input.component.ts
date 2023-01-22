@@ -26,6 +26,8 @@ export abstract class AbstractDateInputComponent implements OnInit {
     public disabled: boolean = false;
 
     @Input()
+    public disabledDates: Iterable<Date> = [];
+    @Input()
     public readonly: boolean = false;
 
     @Input()

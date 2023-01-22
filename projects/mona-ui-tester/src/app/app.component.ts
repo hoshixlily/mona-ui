@@ -90,6 +90,16 @@ export class AppComponent implements OnInit {
 
     public contextMenuItemVisible: boolean = true;
     public dateTimePickerValue: Date | null = new Date();
+    public disabledDates: Date[] = [
+        new Date(2023, 0, 1),
+        new Date(2023, 0, 2),
+        new Date(2023, 0, 3),
+        new Date(2023, 0, 13),
+        new Date(2023, 0, 23),
+        new Date(2023, 0, 17),
+        new Date(2023, 1, 21),
+        new Date(2023, 1, 28)
+    ];
     public dropdownListDataItems: IndexableList<any> = new IndexableList([
         { text: "Cherry", value: 1, group: "Fruit", active: true },
         { text: "Cabbage", value: 2, group: "Vegetable", active: true },

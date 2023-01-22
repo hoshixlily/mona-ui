@@ -20,7 +20,7 @@
 
 
 <ng-template #datePopupTemplate>
-    <mona-calendar [value]="value" (valueChange)="onCalendarValueChange($event)"></mona-calendar>
+    <mona-calendar [disabledDates]="disabledDates" [value]="value" (valueChange)="onCalendarValueChange($event)"></mona-calendar>
 </ng-template>
 
 <ng-template #timePopupTemplate>

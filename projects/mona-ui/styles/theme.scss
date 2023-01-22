@@ -325,6 +325,9 @@ mona-button-group button[monaButton] {
             &.mona-selected {
                 background-color: var(--mona-primary);
             }
+            &.mona-disabled {
+                @include disabled;
+            }
         }
     }
 }
