@@ -15,6 +15,7 @@ import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { faMoon, faSearch, faSnowflake, faSun } from "@fortawesome/free-solid-svg-icons";
 import { IndexableList } from "@mirei/ts-collections";
 import { map, Observable } from "rxjs";
+import { DateTime } from "luxon";
 
 @Component({
     selector: "app-root",
@@ -100,6 +101,8 @@ export class AppComponent implements OnInit {
         new Date(2023, 1, 21),
         new Date(2023, 1, 28)
     ];
+    public dateMax: Date = new Date(2023, 0, 27);
+    public dateMin: Date = new Date(2023, 0, 6);
     public dropdownListDataItems: IndexableList<any> = new IndexableList([
         { text: "Cherry", value: 1, group: "Fruit", active: true },
         { text: "Cabbage", value: 2, group: "Vegetable", active: true },
@@ -286,6 +289,11 @@ export class AppComponent implements OnInit {
         // window.setInterval(() => {
         //     this.updateTreeData();
         // }, 2000);
+
+        // window.setInterval(() => {
+        //     this.dateMax = DateTime.fromJSDate(this.dateMax).plus({ days: 1 }).toJSDate();
+        //     this.dateMin = DateTime.fromJSDate(this.dateMin).plus({ days: 1 }).toJSDate();
+        // }, 5000);
     }
 
     public numericTextBoxFormatter = (value: number | null): string => (value != null ? `${value} °C` : "");

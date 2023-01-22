@@ -27,6 +27,13 @@ export abstract class AbstractDateInputComponent implements OnInit {
 
     @Input()
     public disabledDates: Iterable<Date> = [];
+
+    @Input()
+    public max: Date | null = null;
+
+    @Input()
+    public min: Date | null = null;
+
     @Input()
     public readonly: boolean = false;
 

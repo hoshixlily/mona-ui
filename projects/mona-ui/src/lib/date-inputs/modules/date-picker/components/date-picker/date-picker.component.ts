@@ -4,6 +4,7 @@ import { DateTime } from "luxon";
 import { faCalendar, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { AbstractDateInputComponent } from "../../../../components/abstract-date-input/abstract-date-input.component";
 import { FocusMonitor } from "@angular/cdk/a11y";
+import { take } from "rxjs";
 
 @Component({
     selector: "mona-date-picker",
@@ -25,7 +26,7 @@ export class DatePickerComponent extends AbstractDateInputComponent implements O
     public constructor(
         protected override readonly cdr: ChangeDetectorRef,
         private readonly elementRef: ElementRef<HTMLElement>,
-        private readonly focusMontior: FocusMonitor,
+        private readonly focusMonitor: FocusMonitor,
         private readonly popupService: PopupService
     ) {
         super(cdr);
@@ -46,7 +47,6 @@ export class DatePickerComponent extends AbstractDateInputComponent implements O
     public onCalendarValueChange(date: Date | null): void {
         this.setCurrentDate(date);
         this.popupRef?.close();
-        this.popupRef = null;
     }
 
     public onDateInputBlur(): void {
@@ -60,6 +60,14 @@ export class DatePickerComponent extends AbstractDateInputComponent implements O
         const date1 = DateTime.fromFormat(this.currentDateString, this.format);
         if (date1.isValid) {
             if (this.value && DateTime.fromJSDate(this.value).equals(date1)) {
+                return;
+            }
+            if (this.min && date1.startOf("day") < DateTime.fromJSDate(this.min).startOf("day")) {
+                this.setCurrentDate(this.min);
+                return;
+            }
+            if (this.max && date1.startOf("day") > DateTime.fromJSDate(this.max).startOf("day")) {
+                this.setCurrentDate(this.max);
                 return;
             }
             this.setCurrentDate(date1.toJSDate());
@@ -84,6 +92,10 @@ export class DatePickerComponent extends AbstractDateInputComponent implements O
             popupClass: "mona-date-time-picker-popup",
             hasBackdrop: false,
             closeOnOutsideClick: true
+        });
+        this.popupRef.closed.pipe(take(1)).subscribe(() => {
+            this.popupRef = null;
+            this.focusMonitor.focusVia(this.elementRef.nativeElement.querySelector("input") as HTMLElement, "program");
         });
     }
 
