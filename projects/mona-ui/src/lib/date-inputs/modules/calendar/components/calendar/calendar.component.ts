@@ -45,9 +45,6 @@ export class CalendarComponent extends AbstractDateInputComponent implements OnI
         const date = this.value ?? DateTime.now().toJSDate();
         this.prepareMonthlyViewDictionary(date);
         this.navigatedDate = date;
-        if (this.value) {
-            this.setCurrentDate(this.value);
-        }
     }
 
     public onDayClick(date: Date): void {

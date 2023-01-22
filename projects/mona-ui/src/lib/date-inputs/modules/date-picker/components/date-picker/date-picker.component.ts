@@ -3,6 +3,7 @@ import { PopupService } from "../../../../../popup/services/popup.service";
 import { DateTime } from "luxon";
 import { faCalendar, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { AbstractDateInputComponent } from "../../../../components/abstract-date-input/abstract-date-input.component";
+import { FocusMonitor } from "@angular/cdk/a11y";
 
 @Component({
     selector: "mona-date-picker",
@@ -24,6 +25,7 @@ export class DatePickerComponent extends AbstractDateInputComponent implements O
     public constructor(
         protected override readonly cdr: ChangeDetectorRef,
         private readonly elementRef: ElementRef<HTMLElement>,
+        private readonly focusMontior: FocusMonitor,
         private readonly popupService: PopupService
     ) {
         super(cdr);
@@ -41,18 +43,31 @@ export class DatePickerComponent extends AbstractDateInputComponent implements O
         }
     }
 
-    public onCalendarValueChange(date: Date): void {
+    public onCalendarValueChange(date: Date | null): void {
         this.setCurrentDate(date);
         this.popupRef?.close();
+        this.popupRef = null;
     }
 
     public onDateInputBlur(): void {
+        if (this.popupRef) {
+            return;
+        }
+        if (!this.currentDateString && this.value) {
+            this.setCurrentDate(null);
+            return;
+        }
         const date1 = DateTime.fromFormat(this.currentDateString, this.format);
         if (date1.isValid) {
+            if (this.value && DateTime.fromJSDate(this.value).equals(date1)) {
+                return;
+            }
             this.setCurrentDate(date1.toJSDate());
         } else {
             if (this.value) {
                 this.currentDateString = DateTime.fromJSDate(this.value).toFormat(this.format);
+            } else {
+                this.currentDateString = "";
             }
         }
         this.cdr.detectChanges();
@@ -76,9 +91,13 @@ export class DatePickerComponent extends AbstractDateInputComponent implements O
         this.currentDateString = dateString;
     }
 
-    private setCurrentDate(date: Date): void {
+    private setCurrentDate(date: Date | null): void {
         this.value = date;
-        this.currentDateString = DateTime.fromJSDate(date).toFormat(this.format);
+        if (this.value) {
+            this.currentDateString = DateTime.fromJSDate(this.value).toFormat(this.format);
+        } else {
+            this.currentDateString = "";
+        }
         this.valueChange.emit(date);
     }
 }

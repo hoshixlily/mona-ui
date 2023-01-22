@@ -56,22 +56,36 @@ export class DateTimePickerComponent extends AbstractDateInputComponent implemen
     public override ngOnInit(): void {
         super.ngOnInit();
         this.navigatedDate = this.value ?? DateTime.now().toJSDate();
+        if (this.value) {
+            this.currentDateString = DateTime.fromJSDate(this.value).toFormat(this.format);
+        }
     }
 
-    public onCalendarValueChange(date: Date): void {
+    public onCalendarValueChange(date: Date | null): void {
         this.setCurrentDate(date);
         this.popupRef?.close();
+        this.popupRef = null;
     }
 
     public onDateInputBlur(): void {
+        if (!this.popupRef) {
+            return;
+        }
+        if (!this.currentDateString && this.value) {
+            this.setCurrentDate(null);
+            return;
+        }
         const date1 = DateTime.fromFormat(this.currentDateString, this.format);
         if (date1.isValid) {
+            if (this.value && DateTime.fromJSDate(this.value).equals(date1)) {
+                return;
+            }
             this.setCurrentDate(date1.toJSDate());
-            this.navigatedDate = date1.toJSDate();
-            this.currentDateString = date1.toFormat(this.format);
         } else {
             if (this.value) {
                 this.currentDateString = DateTime.fromJSDate(this.value).toFormat(this.format);
+            } else {
+                this.currentDateString = "";
             }
         }
         this.cdr.detectChanges();
@@ -114,9 +128,13 @@ export class DateTimePickerComponent extends AbstractDateInputComponent implemen
         this.setCurrentDate(date);
     }
 
-    private setCurrentDate(date: Date, emit: boolean = true): void {
+    private setCurrentDate(date: Date | null, emit: boolean = true): void {
         this.value = date;
-        this.currentDateString = DateTime.fromJSDate(this.value).toFormat(this.format);
+        if (this.value) {
+            this.currentDateString = DateTime.fromJSDate(this.value).toFormat(this.format);
+        } else {
+            this.currentDateString = "";
+        }
         if (emit) {
             this.valueChange.emit(this.value);
         }

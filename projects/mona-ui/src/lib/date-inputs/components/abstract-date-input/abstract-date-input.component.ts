@@ -32,7 +32,7 @@ export abstract class AbstractDateInputComponent implements OnInit {
     public value: Date | null = null;
 
     @Output()
-    public valueChange: EventEmitter<Date> = new EventEmitter<Date>();
+    public valueChange: EventEmitter<Date | null> = new EventEmitter<Date | null>();
 
     protected constructor(protected readonly cdr: ChangeDetectorRef) {}
 
