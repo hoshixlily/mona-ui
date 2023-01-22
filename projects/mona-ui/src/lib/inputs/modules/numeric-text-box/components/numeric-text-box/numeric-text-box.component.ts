@@ -64,6 +64,12 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
     public formatter: Action<number | null, string> = (value: number | null): string =>
         value?.toFixed(this.decimals ?? 2) ?? "";
 
+    @Output()
+    public inputBlur: EventEmitter<Event> = new EventEmitter<Event>();
+
+    @Output()
+    public inputFocus: EventEmitter<Event> = new EventEmitter<Event>();
+
     @Input()
     public max?: number;
 

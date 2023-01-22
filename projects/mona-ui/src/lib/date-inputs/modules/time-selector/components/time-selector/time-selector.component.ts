@@ -41,7 +41,7 @@ export class TimeSelectorComponent implements OnInit, OnDestroy {
     }
 
     @Output()
-    public valueChange: EventEmitter<Date | null> = new EventEmitter<Date | null>();
+    public valueChange: EventEmitter<Date> = new EventEmitter<Date>();
 
     public constructor(private readonly cdr: ChangeDetectorRef) {}
 
@@ -54,27 +54,27 @@ export class TimeSelectorComponent implements OnInit, OnDestroy {
         if (this.time) {
             this.navigatedDate = this.time;
             this.meridiem = this.navigatedDate.getHours() >= 12 ? "PM" : "AM";
+            this.updateHour();
+            this.updateMinute();
         }
     }
 
-    public onHourChange(value: number | null): void {
-        if (value === null) {
-            this.hour = null;
-            this.setCurrentDate(null);
-            return;
+    public onHourBlur(event: Event): void {
+        if (this.hour === null) {
+            this.hour = 12;
         }
         if (!this.navigatedDate) {
             const now = this.minute != null ? DateTime.now().set({ minute: this.minute }) : DateTime.now();
             this.navigatedDate = now.toJSDate();
         }
-        if (value < 0) {
-            value = 23;
+        if (this.hour < 0) {
+            this.hour = 23;
         }
         let newHour: number;
         if (this.hourFormat === "24") {
-            newHour = value % 24;
+            newHour = this.hour % 24;
         } else {
-            newHour = value % 12;
+            newHour = this.hour % 12;
             if (this.meridiem === "PM") {
                 newHour += 12;
             }
@@ -84,10 +84,14 @@ export class TimeSelectorComponent implements OnInit, OnDestroy {
             this.hour = newHour % 12 || 12;
             if (this.minute == null) {
                 this.navigatedDate = DateTime.fromJSDate(this.navigatedDate).set({ minute: 0 }).toJSDate();
-                this.minute = this.navigatedDate.getMinutes();
+                this.updateMinute();
             }
         }
         this.setCurrentDate(this.navigatedDate);
+    }
+
+    public onHourChange(value: number | null): void {
+        this.hour = value;
     }
 
     public onMeridiemClick(meridiem: "AM" | "PM"): void {
@@ -99,34 +103,50 @@ export class TimeSelectorComponent implements OnInit, OnDestroy {
         this.navigatedDate = DateTime.fromJSDate(this.navigatedDate ?? date)
             .set({ hour: (this.navigatedDate ?? date).getHours() + (meridiem === "AM" ? -12 : 12) })
             .toJSDate();
+        this.updateHour();
+        this.updateMinute();
         this.setCurrentDate(this.navigatedDate);
     }
 
-    public onMinuteChange(value: number | null): void {
-        if (value === null) {
-            this.minute = null;
-            this.setCurrentDate(null);
-            return;
+    public onMinuteBlur(event: Event): void {
+        if (this.minute === null) {
+            this.minute = 0;
         }
         if (!this.navigatedDate) {
             const now = this.hour != null ? DateTime.now().set({ hour: this.hour }) : DateTime.now();
             this.navigatedDate = now.toJSDate();
         }
-        const minute = +value > 59 ? 0 : +value < 0 ? 59 : +value;
+        const minute = +this.minute > 59 ? 0 : +this.minute < 0 ? 59 : +this.minute;
         this.navigatedDate = DateTime.fromJSDate(this.navigatedDate).set({ minute }).toJSDate();
         this.minute = minute;
         if (this.hour == null) {
             this.navigatedDate = DateTime.fromJSDate(this.navigatedDate).set({ hour: 12 }).toJSDate();
-            this.hour =
-                this.hourFormat === "12" ? this.navigatedDate.getHours() % 12 || 12 : this.navigatedDate.getHours();
+            this.updateHour();
         }
         this.setCurrentDate(this.navigatedDate);
     }
 
-    private setCurrentDate(date: Date | null): void {
+    public onMinuteChange(value: number | null): void {
+        this.minute = value;
+    }
+
+    private setCurrentDate(date: Date): void {
         this.time = date;
         this.navigatedDate = date;
         this.valueChange.emit(this.time);
         this.cdr.markForCheck();
+    }
+
+    private updateHour(): void {
+        if (this.navigatedDate) {
+            this.hour =
+                this.hourFormat === "12" ? this.navigatedDate.getHours() % 12 || 12 : this.navigatedDate.getHours();
+        }
+    }
+
+    private updateMinute(): void {
+        if (this.navigatedDate) {
+            this.minute = this.navigatedDate.getMinutes();
+        }
     }
 }

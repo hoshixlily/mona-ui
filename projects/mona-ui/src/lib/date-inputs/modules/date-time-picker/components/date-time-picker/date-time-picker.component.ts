@@ -81,6 +81,7 @@ export class DateTimePickerComponent extends AbstractDateInputComponent implemen
         if (!this.datePopupTemplateRef || this.readonly) {
             return;
         }
+
         this.popupRef = this.popupService.create({
             anchor: this.elementRef.nativeElement,
             content: this.datePopupTemplateRef,
