@@ -21,6 +21,7 @@ import { PopupRef } from "../../../popup/models/PopupRef";
 export abstract class AbstractDateInputComponent implements OnInit {
     protected readonly componentDestroy$: Subject<void> = new Subject<void>();
     protected popupRef: PopupRef | null = null;
+    public navigatedDate: Date = new Date();
 
     @Input()
     public disabled: boolean = false;

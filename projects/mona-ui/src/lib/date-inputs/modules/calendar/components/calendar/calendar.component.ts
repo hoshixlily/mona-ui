@@ -1,19 +1,8 @@
-import {
-    ChangeDetectionStrategy,
-    ChangeDetectorRef,
-    Component,
-    ElementRef,
-    EventEmitter,
-    Input,
-    OnInit,
-    Output
-} from "@angular/core";
-import { PopupService } from "../../../../../popup/services/popup.service";
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from "@angular/core";
 import { DateTime } from "luxon";
 import { CalendarView } from "../../../../models/CalendarView";
 import { Dictionary } from "@mirei/ts-collections";
 import { faChevronLeft, faChevronRight, IconDefinition } from "@fortawesome/free-solid-svg-icons";
-import { Subject } from "rxjs";
 import { AbstractDateInputComponent } from "../../../../components/abstract-date-input/abstract-date-input.component";
 
 @Component({
@@ -29,7 +18,6 @@ export class CalendarComponent extends AbstractDateInputComponent implements OnI
     public decadeYears: number[] = [];
     public monthBounds: { start: Date; end: Date } = { start: new Date(), end: new Date() };
     public monthlyViewDict: Dictionary<Date, number> = new Dictionary<Date, number>();
-    public navigatedDate: Date = new Date();
 
     public constructor(protected override readonly cdr: ChangeDetectorRef) {
         super(cdr);

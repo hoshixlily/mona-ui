@@ -2,7 +2,7 @@
     <div style="display: flex; flex-direction: column;">
         <mona-numeric-text-box [readonly]="readonly" [value]="hour" (valueChange)="onHourChange($event)"
                                (inputBlur)="onHourBlur($event)"
-                               [min]="-1" [max]="hourFormat==='12' ? 13 : 24" [disabled]="disabled"></mona-numeric-text-box>
+                               [min]="0" [max]="hourFormat==='12' ? 12 : 23" [disabled]="disabled"></mona-numeric-text-box>
     </div>
     <div>
         <span>:</span>
@@ -10,7 +10,7 @@
     <div>
         <mona-numeric-text-box [readonly]="readonly" [value]="minute" (valueChange)="onMinuteChange($event)"
                                (inputBlur)="onMinuteBlur($event)"
-                               [min]="-1" [max]="60" [disabled]="disabled"></mona-numeric-text-box>
+                               [min]="0" [max]="59" [disabled]="disabled"></mona-numeric-text-box>
     </div>
     <div *ngIf="hourFormat==='12'">
         <mona-button-group [disabled]="disabled">

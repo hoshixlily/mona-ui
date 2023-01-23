@@ -1,35 +1,24 @@
-import { ChangeDetectorRef, Component, ElementRef, Input, OnInit, TemplateRef, ViewChild } from "@angular/core";
+import { ChangeDetectorRef, Component, ElementRef, OnInit } from "@angular/core";
 import { PopupService } from "../../../../../popup/services/popup.service";
 import { DateTime } from "luxon";
-import { faCalendar, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
-import { AbstractDateInputComponent } from "../../../../components/abstract-date-input/abstract-date-input.component";
 import { FocusMonitor } from "@angular/cdk/a11y";
-import { take } from "rxjs";
+import { AbstractDatePickerComponent } from "../../../../components/abstract-date-picker/abstract-date-picker.component";
 
 @Component({
     selector: "mona-date-picker",
     templateUrl: "./date-picker.component.html",
     styleUrls: ["./date-picker.component.scss"]
 })
-export class DatePickerComponent extends AbstractDateInputComponent implements OnInit {
-    public readonly dateIcon: IconDefinition = faCalendar;
-    public readonly wrongDateIcon: IconDefinition = faTimes;
+export class DatePickerComponent extends AbstractDatePickerComponent implements OnInit {
     public currentDateInvalid: boolean = false;
-    public currentDateString: string = "";
-
-    @ViewChild("datePopupTemplate")
-    public datePopupTemplateRef?: TemplateRef<void>;
-
-    @Input()
-    public format: string = "d/M/yyyy";
 
     public constructor(
         protected override readonly cdr: ChangeDetectorRef,
-        private readonly elementRef: ElementRef<HTMLElement>,
-        private readonly focusMonitor: FocusMonitor,
-        private readonly popupService: PopupService
+        protected override readonly elementRef: ElementRef<HTMLElement>,
+        protected override readonly focusMonitor: FocusMonitor,
+        protected override readonly popupService: PopupService
     ) {
-        super(cdr);
+        super(cdr, elementRef, focusMonitor, popupService);
     }
 
     public ngOnDestroy(): void {
@@ -42,11 +31,6 @@ export class DatePickerComponent extends AbstractDateInputComponent implements O
         if (this.value) {
             this.currentDateString = DateTime.fromJSDate(this.value).toFormat(this.format);
         }
-    }
-
-    public onCalendarValueChange(date: Date | null): void {
-        this.setCurrentDate(date);
-        this.popupRef?.close();
     }
 
     public onDateInputBlur(): void {
@@ -79,37 +63,5 @@ export class DatePickerComponent extends AbstractDateInputComponent implements O
             }
         }
         this.cdr.detectChanges();
-    }
-
-    public onDateInputButtonClick(): void {
-        if (!this.datePopupTemplateRef || this.readonly) {
-            return;
-        }
-        this.popupRef = this.popupService.create({
-            anchor: this.elementRef.nativeElement,
-            content: this.datePopupTemplateRef,
-            width: this.elementRef.nativeElement.clientWidth,
-            popupClass: "mona-date-time-picker-popup",
-            hasBackdrop: false,
-            closeOnOutsideClick: true
-        });
-        this.popupRef.closed.pipe(take(1)).subscribe(() => {
-            this.popupRef = null;
-            this.focusMonitor.focusVia(this.elementRef.nativeElement.querySelector("input") as HTMLElement, "program");
-        });
-    }
-
-    public onDateStringEdit(dateString: string): void {
-        this.currentDateString = dateString;
-    }
-
-    private setCurrentDate(date: Date | null): void {
-        this.value = date;
-        if (this.value) {
-            this.currentDateString = DateTime.fromJSDate(this.value).toFormat(this.format);
-        } else {
-            this.currentDateString = "";
-        }
-        this.valueChange.emit(date);
     }
 }

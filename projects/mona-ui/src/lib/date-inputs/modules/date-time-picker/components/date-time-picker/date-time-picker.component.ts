@@ -9,12 +9,11 @@ import {
     TemplateRef,
     ViewChild
 } from "@angular/core";
-import { faCalendar, faClock, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { faClock, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { PopupService } from "../../../../../popup/services/popup.service";
 import { DateTime } from "luxon";
-import { AbstractDateInputComponent } from "../../../../components/abstract-date-input/abstract-date-input.component";
-import { take } from "rxjs";
 import { FocusMonitor } from "@angular/cdk/a11y";
+import { AbstractDatePickerComponent } from "../../../../components/abstract-date-picker/abstract-date-picker.component";
 
 @Component({
     selector: "mona-date-time-picker",
@@ -22,19 +21,9 @@ import { FocusMonitor } from "@angular/cdk/a11y";
     styleUrls: ["./date-time-picker.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DateTimePickerComponent extends AbstractDateInputComponent implements OnInit, OnDestroy {
-    public readonly dateIcon: IconDefinition = faCalendar;
+export class DateTimePickerComponent extends AbstractDatePickerComponent implements OnInit, OnDestroy {
     public readonly timeIcon: IconDefinition = faClock;
-    public readonly wrongDateIcon: IconDefinition = faTimes;
     public currentDateInvalid: boolean = false;
-    public currentDateString: string = "";
-    public navigatedDate: Date = new Date();
-
-    @ViewChild("datePopupTemplate")
-    public datePopupTemplateRef?: TemplateRef<void>;
-
-    @Input()
-    public format: string = "d/M/yyyy";
 
     @Input()
     public hourFormat: "12" | "24" = "24";
@@ -44,11 +33,11 @@ export class DateTimePickerComponent extends AbstractDateInputComponent implemen
 
     public constructor(
         protected override readonly cdr: ChangeDetectorRef,
-        private readonly elementRef: ElementRef<HTMLElement>,
-        private readonly focusMonitor: FocusMonitor,
-        private readonly popupService: PopupService
+        protected override readonly elementRef: ElementRef<HTMLElement>,
+        protected override readonly focusMonitor: FocusMonitor,
+        protected override readonly popupService: PopupService
     ) {
-        super(cdr);
+        super(cdr, elementRef, focusMonitor, popupService);
     }
 
     public ngOnDestroy(): void {
@@ -64,13 +53,8 @@ export class DateTimePickerComponent extends AbstractDateInputComponent implemen
         }
     }
 
-    public onCalendarValueChange(date: Date | null): void {
-        this.setCurrentDate(date);
-        this.popupRef?.close();
-    }
-
     public onDateInputBlur(): void {
-        if (!this.popupRef) {
+        if (this.popupRef) {
             return;
         }
         if (!this.currentDateString && this.value) {
@@ -101,29 +85,6 @@ export class DateTimePickerComponent extends AbstractDateInputComponent implemen
         this.cdr.detectChanges();
     }
 
-    public onDateInputButtonClick(): void {
-        if (!this.datePopupTemplateRef || this.readonly) {
-            return;
-        }
-
-        this.popupRef = this.popupService.create({
-            anchor: this.elementRef.nativeElement,
-            content: this.datePopupTemplateRef,
-            width: this.elementRef.nativeElement.clientWidth,
-            popupClass: "mona-date-time-picker-popup",
-            hasBackdrop: false,
-            closeOnOutsideClick: true
-        });
-        this.popupRef.closed.pipe(take(1)).subscribe(() => {
-            this.popupRef = null;
-            this.focusMonitor.focusVia(this.elementRef.nativeElement.querySelector("input") as HTMLElement, "program");
-        });
-    }
-
-    public onDateStringEdit(dateString: string): void {
-        this.currentDateString = dateString;
-    }
-
     public onTimeInputButtonClick(): void {
         if (!this.timePopupTemplateRef || this.readonly) {
             return;
@@ -140,18 +101,5 @@ export class DateTimePickerComponent extends AbstractDateInputComponent implemen
 
     public onTimeSelectorValueChange(date: Date): void {
         this.setCurrentDate(date);
-    }
-
-    private setCurrentDate(date: Date | null, emit: boolean = true): void {
-        this.value = date;
-        if (this.value) {
-            this.currentDateString = DateTime.fromJSDate(this.value).toFormat(this.format);
-        } else {
-            this.currentDateString = "";
-        }
-        if (emit) {
-            this.valueChange.emit(this.value);
-        }
-        this.cdr.markForCheck();
     }
 }
