@@ -21,7 +21,7 @@ import { AbstractDatePickerComponent } from "../../../../components/abstract-dat
     styleUrls: ["./date-time-picker.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class DateTimePickerComponent extends AbstractDatePickerComponent implements OnInit, OnDestroy {
+export class DateTimePickerComponent extends AbstractDatePickerComponent implements OnInit {
     public readonly timeIcon: IconDefinition = faClock;
     public currentDateInvalid: boolean = false;
 
@@ -38,11 +38,6 @@ export class DateTimePickerComponent extends AbstractDatePickerComponent impleme
         protected override readonly popupService: PopupService
     ) {
         super(cdr, elementRef, focusMonitor, popupService);
-    }
-
-    public ngOnDestroy(): void {
-        this.componentDestroy$.next();
-        this.componentDestroy$.complete();
     }
 
     public override ngOnInit(): void {

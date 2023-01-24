@@ -4,6 +4,7 @@ import {
     Component,
     EventEmitter,
     Input,
+    OnDestroy,
     OnInit,
     Output
 } from "@angular/core";
@@ -18,7 +19,7 @@ import { PopupRef } from "../../../popup/models/PopupRef";
     styleUrls: [],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export abstract class AbstractDateInputComponent implements OnInit {
+export abstract class AbstractDateInputComponent implements OnInit, OnDestroy {
     protected readonly componentDestroy$: Subject<void> = new Subject<void>();
     protected popupRef: PopupRef | null = null;
     public navigatedDate: Date = new Date();
@@ -45,6 +46,11 @@ export abstract class AbstractDateInputComponent implements OnInit {
     public valueChange: EventEmitter<Date | null> = new EventEmitter<Date | null>();
 
     protected constructor(protected readonly cdr: ChangeDetectorRef) {}
+
+    public ngOnDestroy(): void {
+        this.componentDestroy$.next();
+        this.componentDestroy$.complete();
+    }
 
     public ngOnInit(): void {}
 }

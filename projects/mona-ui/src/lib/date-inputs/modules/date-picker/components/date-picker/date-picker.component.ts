@@ -21,11 +21,6 @@ export class DatePickerComponent extends AbstractDatePickerComponent implements 
         super(cdr, elementRef, focusMonitor, popupService);
     }
 
-    public ngOnDestroy(): void {
-        this.componentDestroy$.next();
-        this.componentDestroy$.complete();
-    }
-
     public override ngOnInit(): void {
         super.ngOnInit();
         if (this.value) {

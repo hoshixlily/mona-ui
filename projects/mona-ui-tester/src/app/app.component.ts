@@ -90,6 +90,7 @@ export class AppComponent implements OnInit {
     };
 
     public contextMenuItemVisible: boolean = true;
+    public dateFormat24Hours: boolean = true;
     public dateTimePickerValue: Date | null = new Date();
     public disabledDates: Date[] = [
         new Date(2023, 0, 1),

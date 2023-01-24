@@ -23,11 +23,6 @@ export class CalendarComponent extends AbstractDateInputComponent implements OnI
         super(cdr);
     }
 
-    public ngOnDestroy(): void {
-        this.componentDestroy$.next();
-        this.componentDestroy$.complete();
-    }
-
     public override ngOnInit(): void {
         super.ngOnInit();
         const date = this.value ?? DateTime.now().toJSDate();
