@@ -27,9 +27,7 @@ export class AppComponent implements OnInit {
     public readonly searchIcon: IconDefinition = faSearch;
     public readonly snowflakeIcon: IconDefinition = faSnowflake;
     public readonly sunIcon: IconDefinition = faSun;
-
     public autoCompleteValue: string = "Yakizakana";
-
     public colorPalette: string[] = [
         "#263400",
         "#d61dff",
@@ -90,6 +88,7 @@ export class AppComponent implements OnInit {
     };
 
     public contextMenuItemVisible: boolean = true;
+    public dateFormat24Hours: boolean = false;
     public dateTimePickerValue: Date | null = new Date();
     public disabledDates: Date[] = [
         new Date(2023, 0, 1),

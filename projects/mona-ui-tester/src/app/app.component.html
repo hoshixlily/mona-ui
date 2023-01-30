@@ -87,15 +87,19 @@
                             </div>
 
                             <div>
+
+                                <mona-switch [labelOff]="'12'" labelOn="24" [(ngModel)]="dateFormat24Hours"></mona-switch>
+
                                 <mona-date-time-picker format="dd/MM/yyyy hh:mm a" style="width: 250px; margin-right: 20px;"
-                                                        hourFormat="12" [readonly]="false"
+                                                       [hourFormat]="dateFormat24Hours ? '24' : '12'" [readonly]="false" [value]="dateTimePickerValue"
                                                        (valueChange)="onDateTimePickerValueChange($event)"></mona-date-time-picker>
 
                                 <mona-date-picker format="d/M/yyyy" style="width: 250px;" [readonly]="false"
-                                                  [min]="dateMin" [max]="dateMax"
+                                                  [min]="dateMin" [max]="dateMax" [value]="dateTimePickerValue"
                                                   (valueChange)="print($event)"></mona-date-picker>
 
-                                <mona-time-selector  hourFormat="12" [readonly]="false" [disabled]="false" (valueChange)="print($event)"></mona-time-selector>
+                                <mona-time-picker [hourFormat]="dateFormat24Hours ? '24':'12'" [showSeconds]="true" [value]="dateTimePickerValue"
+                                                  [format]="dateFormat24Hours ? 'HH:mm:ss' : 'hh:mm:ss a'" style="width: 200px; margin-left: 40px;"></mona-time-picker>
                             </div>
 
                             <div>
@@ -243,6 +247,7 @@
                             </div>
 
                             <div>
+
                                 <textarea monaTextArea [(ngModel)]="numericTextBoxValue" rows="4"
                                           style="width: 422px;"></textarea>
                             </div>

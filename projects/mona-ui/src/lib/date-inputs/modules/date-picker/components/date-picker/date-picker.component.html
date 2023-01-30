@@ -1,10 +1,5 @@
-<div class="mona-date-picker" [ngClass]="{'mona-disabled': disabled}">
+<div class="mona-date-picker" [ngClass]="{'mona-disabled': disabled}" #popupAnchor>
     <mona-text-box [disabled]="disabled" [readonly]="readonly" [ngModel]="currentDateString" (ngModelChange)="onDateStringEdit($event)" (inputBlur)="onDateInputBlur()">
-        <ng-container *ngIf="currentDateInvalid">
-            <ng-template monaTextBoxSuffixTemplate>
-                <fa-icon [icon]="wrongDateIcon" style="color: crimson;"></fa-icon>
-            </ng-template>
-        </ng-container>
         <ng-template monaTextBoxSuffixTemplate>
             <button monaButton [flat]="true" (click)="onDateInputButtonClick()" [disabled]="disabled">
                 <fa-icon [icon]="dateIcon"></fa-icon>

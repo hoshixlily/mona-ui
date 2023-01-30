@@ -7,6 +7,7 @@ import {
     Input,
     OnInit,
     Output,
+    SimpleChanges,
     TemplateRef
 } from "@angular/core";
 import { AbstractDropDownListComponent } from "../../../../components/abstract-drop-down-list/abstract-drop-down-list.component";
@@ -72,6 +73,13 @@ export class ComboBoxComponent extends AbstractDropDownListComponent implements 
         this.valuePopupListItem = undefined;
         this.comboBoxValue = "";
         this.updateValue();
+    }
+
+    public override ngOnChanges(changes: SimpleChanges): void {
+        super.ngOnChanges(changes);
+        if (changes["data"] && !changes["data"].isFirstChange()) {
+            this.comboBoxValue = this.valuePopupListItem?.text ?? "";
+        }
     }
 
     public override ngOnInit(): void {

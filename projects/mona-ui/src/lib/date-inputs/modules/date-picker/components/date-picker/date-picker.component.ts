@@ -10,8 +10,6 @@ import { AbstractDatePickerComponent } from "../../../../components/abstract-dat
     styleUrls: ["./date-picker.component.scss"]
 })
 export class DatePickerComponent extends AbstractDatePickerComponent implements OnInit {
-    public currentDateInvalid: boolean = false;
-
     public constructor(
         protected override readonly cdr: ChangeDetectorRef,
         protected override readonly elementRef: ElementRef<HTMLElement>,
@@ -19,11 +17,6 @@ export class DatePickerComponent extends AbstractDatePickerComponent implements 
         protected override readonly popupService: PopupService
     ) {
         super(cdr, elementRef, focusMonitor, popupService);
-    }
-
-    public ngOnDestroy(): void {
-        this.componentDestroy$.next();
-        this.componentDestroy$.complete();
     }
 
     public override ngOnInit(): void {

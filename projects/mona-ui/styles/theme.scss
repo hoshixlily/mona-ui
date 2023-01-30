@@ -61,6 +61,23 @@ input {
     }
 }
 
+@mixin scrollbars {
+    scrollbar-width: thin;
+    scrollbar-color: var(--mona-background-darker) var(--mona-background-dark);
+    &::-webkit-scrollbar {
+        width: 8px;
+    }
+    &::-webkit-scrollbar-track {
+        background: var(--mona-background-dark);
+    }
+    &::-webkit-scrollbar-thumb {
+        background-color: var(--mona-background-darker);
+        &:hover {
+            background-color: var(--mona-background-light);
+        }
+    }
+}
+
 /** General **/
 .mona-no-animation {
     &, & * {
@@ -113,7 +130,6 @@ input {
 }
 
 ul.mona-list {
-    //background: var(--mona-background);
     & li {
         @include hover-background;
         color: var(--mona-text);
@@ -135,6 +151,7 @@ ul.mona-list {
             @include disabled;
         }
     }
+    @include scrollbars;
 }
 
 li.mona-list-group-header {
@@ -311,13 +328,17 @@ mona-button-group button[monaButton] {
     &.mona-disabled {
         @include disabled;
     }
+    & mona-text-box {
+        width: 100%;
+    }
 }
 
 
 
-.mona-date-time-picker-popup {
+.mona-date-input-popup {
     flex-direction: column;
     border-top: none !important;
+    padding: 8px !important;
     & table {
         & td {
             @include hover-background;
@@ -334,23 +355,29 @@ mona-button-group button[monaButton] {
 
 /** Time Selector */
 div.mona-time-selector {
-    & mona-numeric-text-box {
-        & input {
-            text-align: center;
-            background-color: var(--mona-background-dark);
-            font-weight: 600;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding-top: 6px;
-        }
-    }
     & mona-button-group {
         & button {
             padding: 0 8px;
         }
     }
+    & ol {
+        @include scrollbars;
+        user-select: none;
+        & li {
+            cursor: pointer;
+            &.mona-selected {
+                background-color: var(--mona-primary);
+            }
+            &:not(.mona-selected):hover {
+                @include hover-background;
+            }
+        }
+    }
+}
+
+div.mona-time-picker-popup {
+    border-top: none !important;
+    padding: 0 !important;
 }
 
 /** Dropdown List */
@@ -383,6 +410,8 @@ div.mona-time-selector {
             }
         }
     }
+
+    @include scrollbars;
 }
 
 /** Multi Select */
@@ -685,6 +714,7 @@ textarea[monaTextArea] {
     &[disabled] {
         @include disabled;
     }
+    @include scrollbars;
 }
 
 /** Text Box */
@@ -779,6 +809,7 @@ ul.mona-tab-list {
     border: 1px solid var(--mona-border-color);
     padding: 8px 10px;
     box-shadow: var(--mona-popup-shadow);
+    @include scrollbars;
 }
 
 /** TreeView */

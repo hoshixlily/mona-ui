@@ -1,7 +1,7 @@
-import { ChangeDetectorRef, Component, ElementRef, Input, OnInit, TemplateRef, ViewChild } from "@angular/core";
+import { ChangeDetectorRef, Component, ElementRef, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { AbstractDateInputComponent } from "../abstract-date-input/abstract-date-input.component";
-import { faCalendar, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { faCalendar, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { take } from "rxjs";
 import { FocusMonitor } from "@angular/cdk/a11y";
 import { PopupService } from "../../../popup/services/popup.service";
@@ -16,14 +16,10 @@ import { DateTime } from "luxon";
 })
 export abstract class AbstractDatePickerComponent extends AbstractDateInputComponent implements OnInit {
     public readonly dateIcon: IconDefinition = faCalendar;
-    public readonly wrongDateIcon: IconDefinition = faTimes;
-    public currentDateString: string = "";
 
     @ViewChild("datePopupTemplate")
     public datePopupTemplateRef?: TemplateRef<void>;
 
-    @Input()
-    public format: string = "d/M/yyyy";
     protected constructor(
         protected override readonly cdr: ChangeDetectorRef,
         protected readonly elementRef: ElementRef,
@@ -44,11 +40,12 @@ export abstract class AbstractDatePickerComponent extends AbstractDateInputCompo
         }
 
         this.popupRef = this.popupService.create({
-            anchor: this.elementRef.nativeElement,
+            anchor: this.popupAnchor,
             content: this.datePopupTemplateRef,
             width: this.elementRef.nativeElement.clientWidth,
-            popupClass: "mona-date-time-picker-popup",
+            popupClass: "mona-date-input-popup",
             hasBackdrop: false,
+            withPush: false,
             closeOnOutsideClick: true
         });
         this.popupRef.closed.pipe(take(1)).subscribe(() => {
