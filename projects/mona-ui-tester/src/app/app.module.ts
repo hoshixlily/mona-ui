@@ -10,7 +10,7 @@ import {
     PopupListComponent,
     PopupModule,
     TreeViewModule,
-    LayoutModule
+    LayoutModule, DateInputsModule
 } from "mona-ui";
 import { TestComponentComponent } from "./test-component/test-component.component";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
@@ -31,7 +31,8 @@ import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
         FormsModule,
         LayoutModule,
         PopupListComponent,
-        TreeViewModule
+        TreeViewModule,
+        DateInputsModule
     ],
     bootstrap: [AppComponent]
 })

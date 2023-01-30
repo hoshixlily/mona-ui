@@ -8,7 +8,6 @@ import { TreeViewModule } from "./tree-view/tree-view.module";
 import { LayoutModule } from "./layout/layout.module";
 
 @NgModule({
-    exports: [ButtonsModule, DropDownsModule, InputsModule, LayoutModule, MenusModule, PopupModule, TreeViewModule],
-    declarations: []
+    exports: [ButtonsModule, DropDownsModule, InputsModule, LayoutModule, MenusModule, PopupModule, TreeViewModule]
 })
 export class MonaUiModule {}

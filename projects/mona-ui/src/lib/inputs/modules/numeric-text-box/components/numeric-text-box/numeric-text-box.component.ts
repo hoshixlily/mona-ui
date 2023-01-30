@@ -1,4 +1,5 @@
 import {
+    ChangeDetectionStrategy,
     Component,
     ElementRef,
     EventEmitter,
@@ -21,6 +22,7 @@ type Sign = "-" | "+";
     selector: "mona-numeric-text-box",
     templateUrl: "./numeric-text-box.component.html",
     styleUrls: ["./numeric-text-box.component.scss"],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [
         {
             provide: NG_VALUE_ACCESSOR,
@@ -46,6 +48,7 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
     private propagateChange: Action<number | null> | null = null;
     public readonly decreaseIcon: IconDefinition = faChevronDown;
     public readonly increaseIcon: IconDefinition = faChevronUp;
+    public componentValue: number | null = null;
     public spin$: Subject<Sign> = new Subject<Sign>();
     public spinStop$: Subject<void> = new Subject<void>();
     public value$: Subject<string> = new Subject<string>();
@@ -61,6 +64,12 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
     public formatter: Action<number | null, string> = (value: number | null): string =>
         value?.toFixed(this.decimals ?? 2) ?? "";
 
+    @Output()
+    public inputBlur: EventEmitter<Event> = new EventEmitter<Event>();
+
+    @Output()
+    public inputFocus: EventEmitter<Event> = new EventEmitter<Event>();
+
     @Input()
     public max?: number;
 
@@ -74,10 +83,12 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
     public step: number = 1;
 
     @Input()
-    public value: number | null = null;
+    public set value(value: number | null) {
+        this.updateValue(value == null ? null : String(value), false);
+    }
 
     @Output()
-    public valueChange: EventEmitter<number> = new EventEmitter<number>();
+    public valueChange: EventEmitter<number | null> = new EventEmitter<number | null>();
 
     @ViewChild("valueTextBox")
     public valueTextBoxRef!: ElementRef<HTMLInputElement>;
@@ -114,10 +125,10 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
     }
 
     public decrease(): void {
-        if (this.value == null) {
+        if (this.componentValue == null) {
             this.value$.next("0");
         } else {
-            let result = NumericTextBoxComponent.calculate(this.value, this.step, "-");
+            let result = NumericTextBoxComponent.calculate(this.componentValue, this.step, "-");
             if (this.min != null && result < this.min) {
                 result = this.min;
             }
@@ -127,10 +138,10 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
     }
 
     public increase(): void {
-        if (this.value == null) {
+        if (this.componentValue == null) {
             this.value$.next("0");
         } else {
-            let result = NumericTextBoxComponent.calculate(this.value, this.step, "+");
+            let result = NumericTextBoxComponent.calculate(this.componentValue, this.step, "+");
             if (this.max != null && result > this.max) {
                 result = this.max;
             }
@@ -154,9 +165,9 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
             .pipe(takeUntil(this.componentDestroy$))
             .subscribe((focusOrigin: FocusOrigin) => {
                 if (!focusOrigin) {
-                    this.visibleValue = this.formatter(this.value) ?? "";
+                    this.visibleValue = this.formatter(this.componentValue) ?? "";
                 } else {
-                    this.visibleValue = this.value ?? "";
+                    this.visibleValue = this.componentValue ?? "";
                 }
             });
     }
@@ -215,18 +226,18 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
             if (obj != null && typeof obj === "string" && !NumericTextBoxComponent.isNumeric(obj)) {
                 throw new Error("Value must be a number.");
             }
-            this.value = +obj;
-            this.visibleValue = this.formatter(this.value) ?? "";
+            this.componentValue = +obj;
+            this.visibleValue = this.formatter(this.componentValue) ?? "";
         }
     }
 
     private containsExcessiveDecimalPlaces(event: KeyboardEvent): boolean {
         const target = event.target as HTMLInputElement;
-        if (this.value != null) {
+        if (this.componentValue != null) {
             if (event.key === ".") {
                 return this.decimals === 0;
             }
-            const valueStr = this.value.toString();
+            const valueStr = this.componentValue.toString();
             if (!valueStr.includes(".")) {
                 return false;
             }
@@ -254,7 +265,7 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
                 event.preventDefault();
                 return true;
             }
-            if (target.selectionStart === 0 && this.value?.toString().charAt(0) === "-") {
+            if (target.selectionStart === 0 && this.componentValue?.toString().charAt(0) === "-") {
                 event.preventDefault();
                 return true;
             }
@@ -284,12 +295,16 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
         });
     }
 
-    private updateValue(value: string): void {
+    private updateValue(value: string | null, emit: boolean = true): void {
         if (this.readonly) {
             return;
         }
-        this.value = NumericTextBoxComponent.isNumeric(value) ? parseFloat(value) : null;
-        this.visibleValue = this.value == null ? "" : this.value;
-        this.propagateChange?.(this.value);
+        this.componentValue =
+            value == null ? null : NumericTextBoxComponent.isNumeric(value) ? parseFloat(value) : null;
+        this.visibleValue = this.componentValue == null ? "" : this.componentValue;
+        if (emit) {
+            this.valueChange.emit(this.componentValue);
+            this.propagateChange?.(this.componentValue);
+        }
     }
 }

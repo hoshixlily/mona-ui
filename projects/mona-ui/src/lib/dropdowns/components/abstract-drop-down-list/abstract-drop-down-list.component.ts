@@ -98,6 +98,16 @@ export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy
                 valueField: this.valueField,
                 groupField: this.groupField
             });
+            if (this.selectionMode === "single") {
+                this.valuePopupListItem = this.popupListService.viewListData
+                    .selectMany(g => g.source)
+                    .singleOrDefault(d => d.dataEquals(this.value));
+            } else if (this.selectionMode === "multiple") {
+                this.valuePopupListItem = this.popupListService.viewListData
+                    .selectMany(g => g.source)
+                    .where(d => (this.value as any[]).some(v => d.dataEquals(v)))
+                    .toArray();
+            }
         }
     }
 
@@ -143,7 +153,7 @@ export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy
             content: this.popupTemplate,
             hasBackdrop: true,
             withPush: false,
-            width: this.elementRef.nativeElement.clientWidth,
+            width: this.elementRef.nativeElement.offsetWidth,
             popupClass: ["mona-dropdown-popup-content"],
             positions: [
                 new ConnectionPositionPair(

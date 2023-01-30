@@ -1,0 +1,34 @@
+div.mona-time-picker {
+    display: flex;
+    position: relative;
+}
+
+ol {
+    list-style: none;
+    margin: 0;
+    background-color: var(--mona-background-dark);
+    height: 150px;
+    overflow-y: scroll;
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+        display: none;
+    }
+    padding: 75px 5px;
+    & li {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2px 8px;
+        color: var(--mona-text);
+    }
+}
+
+span.mona-time-picker-highlight {
+    display: block;
+    position: absolute;
+    height: var(--mona-input-height);
+    background-color: var(--mona-background-light);
+    border: 1px solid var(--mona-border-color);
+    top: calc(50% + 10px);
+    width: 100%;
+}

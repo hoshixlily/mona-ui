@@ -7,13 +7,15 @@ import {
     NodeDragEndEvent,
     NodeClickEvent,
     TabCloseEvent,
-    StepOptions
+    StepOptions,
+    PopupService
 } from "mona-ui";
 import { TestComponentComponent } from "./test-component/test-component.component";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { faMoon, faSearch, faSnowflake, faSun } from "@fortawesome/free-solid-svg-icons";
 import { IndexableList } from "@mirei/ts-collections";
 import { map, Observable } from "rxjs";
+import { DateTime } from "luxon";
 
 @Component({
     selector: "app-root",
@@ -25,9 +27,7 @@ export class AppComponent implements OnInit {
     public readonly searchIcon: IconDefinition = faSearch;
     public readonly snowflakeIcon: IconDefinition = faSnowflake;
     public readonly sunIcon: IconDefinition = faSun;
-
     public autoCompleteValue: string = "Yakizakana";
-
     public colorPalette: string[] = [
         "#263400",
         "#d61dff",
@@ -88,6 +88,20 @@ export class AppComponent implements OnInit {
     };
 
     public contextMenuItemVisible: boolean = true;
+    public dateFormat24Hours: boolean = false;
+    public dateTimePickerValue: Date | null = new Date();
+    public disabledDates: Date[] = [
+        new Date(2023, 0, 1),
+        new Date(2023, 0, 2),
+        new Date(2023, 0, 3),
+        new Date(2023, 0, 13),
+        new Date(2023, 0, 23),
+        new Date(2023, 0, 17),
+        new Date(2023, 1, 21),
+        new Date(2023, 1, 28)
+    ];
+    public dateMax: Date = new Date(2023, 0, 27);
+    public dateMin: Date = new Date(2023, 0, 6);
     public dropdownListDataItems: IndexableList<any> = new IndexableList([
         { text: "Cherry", value: 1, group: "Fruit", active: true },
         { text: "Cabbage", value: 2, group: "Vegetable", active: true },
@@ -241,7 +255,7 @@ export class AppComponent implements OnInit {
     @ViewChild("testButtonRef", { read: ElementRef })
     public testButtonRef!: ElementRef<HTMLButtonElement>;
 
-    public constructor() {}
+    public constructor(private readonly popupService: PopupService) {}
 
     public dropdownItemDisabler = (item: any): boolean => !item.active;
     public dropdownPrimitiveItemDisabler = (item: string): boolean => item.includes("i");
@@ -274,6 +288,11 @@ export class AppComponent implements OnInit {
         // window.setInterval(() => {
         //     this.updateTreeData();
         // }, 2000);
+
+        // window.setInterval(() => {
+        //     this.dateMax = DateTime.fromJSDate(this.dateMax).plus({ days: 1 }).toJSDate();
+        //     this.dateMin = DateTime.fromJSDate(this.dateMin).plus({ days: 1 }).toJSDate();
+        // }, 5000);
     }
 
     public numericTextBoxFormatter = (value: number | null): string => (value != null ? `${value} °C` : "");
@@ -298,6 +317,10 @@ export class AppComponent implements OnInit {
     public onComboBoxValueChange(value: unknown): void {
         this.selectedComboBoxDataItem = value;
         console.log(`Combobox value changed`, value);
+    }
+
+    public onDateTimePickerValueChange(value: Date | null): void {
+        console.log(value);
     }
 
     public onDropDownValueChange(value: unknown): void {
@@ -416,14 +439,14 @@ export class AppComponent implements OnInit {
     }
 
     public openPopup2(event: MouseEvent): void {
-        // event.stopPropagation();
-        // const ref = this.popupService.create({
-        //     anchor: this.italicButtonRef,
-        //     content: TestComponentComponent,
-        //     popupClass: "popup-noselect",
-        //     hasBackdrop: false,
-        //     offset: { horizontal: 0, vertical: 10 }
-        // });
+        event.stopPropagation();
+        const ref = this.popupService.create({
+            anchor: this.italicButtonRef,
+            content: TestComponentComponent,
+            popupClass: "popup-noselect",
+            hasBackdrop: false,
+            offset: { horizontal: 0, vertical: 1 }
+        });
     }
 
     public print(value: unknown): void {

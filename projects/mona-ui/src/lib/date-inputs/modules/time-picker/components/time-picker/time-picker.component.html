@@ -1,0 +1,14 @@
+<!--<mona-drop-down-list [data]="timeList" textField="text" valueField="date" (valueChange)="cdr.detectChanges()"></mona-drop-down-list>-->
+<div class="mona-time-picker" #popupAnchor>
+    <mona-text-box [disabled]="disabled" [readonly]="readonly" [ngModel]="currentDateString" (ngModelChange)="onDateStringEdit($event)" (inputBlur)="onTimeInputBlur()">
+        <ng-template monaTextBoxSuffixTemplate>
+            <button monaButton [flat]="true" (click)="onTimeInputButtonClick()" [disabled]="disabled">
+                <fa-icon [icon]="timeIcon"></fa-icon>
+            </button>
+        </ng-template>
+    </mona-text-box>
+</div>
+
+<ng-template #timePopupTemplate>
+    <mona-time-selector [value]="value" (valueChange)="onTimeSelectorValueChange($event)" [hourFormat]="hourFormat" [showSeconds]="showSeconds"></mona-time-selector>
+</ng-template>

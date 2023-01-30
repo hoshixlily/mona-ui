@@ -1,4 +1,16 @@
-import { Component, ContentChild, EventEmitter, forwardRef, Input, OnInit, Output, TemplateRef } from "@angular/core";
+import {
+    ChangeDetectionStrategy,
+    Component,
+    ContentChildren,
+    ElementRef,
+    EventEmitter,
+    forwardRef,
+    Input,
+    OnInit,
+    Output,
+    QueryList,
+    TemplateRef
+} from "@angular/core";
 import { TextBoxPrefixTemplateDirective } from "../../directives/text-box-prefix-template.directive";
 import { TextBoxSuffixTemplateDirective } from "../../directives/text-box-suffix-template.directive";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
@@ -8,6 +20,7 @@ import { Action } from "../../../../../utils/Action";
     selector: "mona-text-box",
     templateUrl: "./text-box.component.html",
     styleUrls: ["./text-box.component.scss"],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [
         {
             provide: NG_VALUE_ACCESSOR,
@@ -29,13 +42,16 @@ export class TextBoxComponent implements OnInit, ControlValueAccessor {
     @Output()
     public inputFocus: EventEmitter<Event> = new EventEmitter<Event>();
 
-    @ContentChild(TextBoxPrefixTemplateDirective, { read: TemplateRef })
-    public prefixTemplate?: TemplateRef<void>;
+    @ContentChildren(TextBoxPrefixTemplateDirective, { read: TemplateRef })
+    public prefixTemplateList: QueryList<TemplateRef<void>> = new QueryList<TemplateRef<void>>();
 
-    @ContentChild(TextBoxSuffixTemplateDirective, { read: TemplateRef })
-    public suffixTemplate?: TemplateRef<void>;
+    @Input()
+    public readonly: boolean = false;
 
-    public constructor() {}
+    @ContentChildren(TextBoxSuffixTemplateDirective, { read: TemplateRef })
+    public suffixTemplateList: QueryList<TemplateRef<void>> = new QueryList<TemplateRef<void>>();
+
+    public constructor(public readonly elementRef: ElementRef<HTMLDivElement>) {}
 
     public ngOnInit(): void {}
 
