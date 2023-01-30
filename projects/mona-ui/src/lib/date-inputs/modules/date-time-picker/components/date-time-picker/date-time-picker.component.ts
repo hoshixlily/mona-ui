@@ -4,7 +4,6 @@ import {
     Component,
     ElementRef,
     Input,
-    OnDestroy,
     OnInit,
     TemplateRef,
     ViewChild
@@ -23,10 +22,12 @@ import { AbstractDatePickerComponent } from "../../../../components/abstract-dat
 })
 export class DateTimePickerComponent extends AbstractDatePickerComponent implements OnInit {
     public readonly timeIcon: IconDefinition = faClock;
-    public currentDateInvalid: boolean = false;
 
     @Input()
     public hourFormat: "12" | "24" = "24";
+
+    @Input()
+    public showSeconds: boolean = false;
 
     @ViewChild("timePopupTemplate")
     public timePopupTemplateRef?: TemplateRef<void>;
@@ -42,10 +43,6 @@ export class DateTimePickerComponent extends AbstractDatePickerComponent impleme
 
     public override ngOnInit(): void {
         super.ngOnInit();
-        this.navigatedDate = this.value ?? DateTime.now().toJSDate();
-        if (this.value) {
-            this.currentDateString = DateTime.fromJSDate(this.value).toFormat(this.format);
-        }
     }
 
     public onDateInputBlur(): void {
@@ -85,11 +82,12 @@ export class DateTimePickerComponent extends AbstractDatePickerComponent impleme
             return;
         }
         this.popupRef = this.popupService.create({
-            anchor: this.elementRef.nativeElement,
+            anchor: this.popupAnchor,
             content: this.timePopupTemplateRef,
             width: this.elementRef.nativeElement.clientWidth,
-            popupClass: "mona-date-time-picker-popup",
+            popupClass: "mona-time-picker-popup",
             hasBackdrop: false,
+            withPush: false,
             closeOnOutsideClick: true
         });
     }

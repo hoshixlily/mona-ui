@@ -7,6 +7,7 @@ import { ButtonModule } from "../../../buttons/modules/button/button.module";
 import { FormsModule } from "@angular/forms";
 import { ComboBoxModule } from "../../../dropdowns/modules/combo-box/combo-box.module";
 import { DropDownListModule } from "../../../dropdowns/modules/drop-down-list/drop-down-list.module";
+import { TimeSelectorModule } from "../time-selector/time-selector.module";
 
 @NgModule({
     declarations: [TimePickerComponent],
@@ -17,7 +18,8 @@ import { DropDownListModule } from "../../../dropdowns/modules/drop-down-list/dr
         ButtonModule,
         FormsModule,
         ComboBoxModule,
-        DropDownListModule
+        DropDownListModule,
+        TimeSelectorModule
     ],
     exports: [TimePickerComponent]
 })

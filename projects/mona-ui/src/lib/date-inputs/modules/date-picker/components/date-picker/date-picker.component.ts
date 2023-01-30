@@ -10,8 +10,6 @@ import { AbstractDatePickerComponent } from "../../../../components/abstract-dat
     styleUrls: ["./date-picker.component.scss"]
 })
 export class DatePickerComponent extends AbstractDatePickerComponent implements OnInit {
-    public currentDateInvalid: boolean = false;
-
     public constructor(
         protected override readonly cdr: ChangeDetectorRef,
         protected override readonly elementRef: ElementRef<HTMLElement>,

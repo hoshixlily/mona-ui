@@ -23,8 +23,6 @@ export * from "./lib/date-inputs/modules/date-time-picker/components/date-time-p
 export * from "./lib/date-inputs/modules/date-time-picker/date-time-picker.module";
 export * from "./lib/date-inputs/modules/time-picker/components/time-picker/time-picker.component";
 export * from "./lib/date-inputs/modules/time-picker/time-picker.module";
-export * from "./lib/date-inputs/modules/time-selector/components/time-selector/time-selector.component";
-export * from "./lib/date-inputs/modules/time-selector/time-selector.module";
 export * from "./lib/date-inputs/date-inputs.module";
 
 /** Dropdowns */

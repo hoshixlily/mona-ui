@@ -14,9 +14,8 @@ import { AbstractDateInputComponent } from "../../../../components/abstract-date
 import { faClock, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { FocusMonitor } from "@angular/cdk/a11y";
 import { PopupService } from "../../../../../popup/services/popup.service";
-import { IndexableList } from "@mirei/ts-collections";
-import { TimePickerDropdownListDateItem } from "../../models/TimePickerDropdownListDateItem";
 import { DateTime } from "luxon";
+import { take } from "rxjs";
 
 @Component({
     selector: "mona-time-picker",
@@ -27,16 +26,11 @@ import { DateTime } from "luxon";
 export class TimePickerComponent extends AbstractDateInputComponent implements OnInit, OnChanges {
     public readonly timeIcon: IconDefinition = faClock;
 
-    public currentDateString: string = "";
-
-    public timeList: IndexableList<TimePickerDropdownListDateItem> =
-        new IndexableList<TimePickerDropdownListDateItem>();
-
-    @Input()
-    public format: string = "HH:mm";
-
     @Input()
     public hourFormat: "12" | "24" = "24";
+
+    @Input()
+    public showSeconds: boolean = false;
 
     @ViewChild("timePopupTemplate")
     public timePopupTemplateRef?: TemplateRef<void>;
@@ -50,21 +44,28 @@ export class TimePickerComponent extends AbstractDateInputComponent implements O
         super(cdr);
     }
 
-    public ngOnChanges(changes: SimpleChanges): void {
-        const format = changes["format"];
-        const hourFormat = changes["hourFormat"];
-        if ((format && !format.firstChange) || (hourFormat && !hourFormat.firstChange)) {
-            this.generateTimeList();
-        }
+    public override ngOnChanges(changes: SimpleChanges): void {
+        super.ngOnChanges(changes);
     }
 
     public override ngOnInit(): void {
         super.ngOnInit();
-        this.generateTimeList();
     }
 
     public onDateStringEdit(dateString: string): void {
         this.currentDateString = dateString;
+    }
+
+    public onTimeInputBlur(): void {
+        if (this.popupRef) {
+            return;
+        }
+        const date = DateTime.fromFormat(this.currentDateString, this.format);
+        if (date.isValid) {
+            this.setCurrentDate(date.toJSDate());
+        } else {
+            this.setCurrentDate(null);
+        }
     }
 
     public onTimeInputButtonClick(): void {
@@ -74,31 +75,29 @@ export class TimePickerComponent extends AbstractDateInputComponent implements O
         this.popupRef = this.popupService.create({
             anchor: this.elementRef.nativeElement,
             content: this.timePopupTemplateRef,
-            width: (this.elementRef.nativeElement.querySelector(".mona-dropdown") as HTMLElement).clientWidth,
-            popupClass: "mona-date-time-picker-popup",
+            width: this.popupAnchor.nativeElement.clientWidth,
+            popupClass: "mona-time-picker-popup",
             hasBackdrop: false,
             closeOnOutsideClick: true
         });
+        this.popupRef.closed.pipe(take(1)).subscribe(() => {
+            this.popupRef = null;
+            this.focusMonitor.focusVia(this.elementRef.nativeElement.querySelector("input") as HTMLElement, "program");
+        });
     }
 
-    // every half hour
-    private generateTimeList(): void {
-        if (this.timeList.isEmpty()) {
-            for (let i = 0; i < 48; i++) {
-                const date = new Date();
-                date.setHours(Math.floor(i / 2));
-                date.setMinutes((i % 2) * 30);
-                this.timeList.add({
-                    date,
-                    text: DateTime.fromJSDate(date).toFormat(this.format),
-                    disabled: false
-                });
-            }
+    public onTimeSelectorValueChange(date: Date): void {
+        this.setCurrentDate(date);
+    }
+
+    private setCurrentDate(date: Date | null): void {
+        this.value = date;
+        if (this.value) {
+            this.currentDateString = DateTime.fromJSDate(this.value).toFormat(this.format);
         } else {
-            this.timeList.forEach(item => {
-                item.text = DateTime.fromJSDate(item.date).toFormat(this.format);
-            });
+            this.currentDateString = "";
         }
-        this.timeList = this.timeList.toIndexableList();
+        this.cdr.markForCheck();
+        this.valueChange.emit(this.value);
     }
 }
