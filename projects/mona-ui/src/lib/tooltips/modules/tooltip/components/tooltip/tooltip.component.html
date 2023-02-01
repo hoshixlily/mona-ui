@@ -1,0 +1,8 @@
+<ng-template>
+    <div class="mona-tooltip" [attr.data-uid]="uid" >
+        <div class="mona-tooltip-content">
+            <ng-content></ng-content>
+        </div>
+        <div class="mona-tooltip-arrow" [ngClass]="{'top':position==='top', 'bottom': position==='bottom', 'left': position==='left', 'right': position==='right'}"></div>
+    </div>
+</ng-template>

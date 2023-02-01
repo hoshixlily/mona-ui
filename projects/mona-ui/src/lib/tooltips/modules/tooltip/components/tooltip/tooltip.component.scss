@@ -1,0 +1,51 @@
+div.mona-tooltip {
+    position: relative;
+}
+
+div.mona-tooltip-content {
+    width: 100%;
+    height: 100%;
+    padding: 8px 10px;
+    position: relative;
+}
+
+div.mona-tooltip-arrow {
+    width: 12px;
+    height: 12px;
+    box-sizing: border-box;
+    position: absolute;
+    pointer-events: none;
+    background: var(--mona-background);
+    transform-origin: center;
+    transform: rotate(45deg);
+    z-index: -1;
+    box-shadow: var(--mona-popup-shadow);
+
+    &.bottom {
+        top: -6px;
+        left: calc(50% - 6px);
+        border-left: 1px solid var(--mona-border-color);
+        border-top: 1px solid var(--mona-border-color);
+    }
+
+    &.top {
+        bottom: -6px;
+        left: calc(50% - 6px);
+        border-right: 1px solid var(--mona-border-color);
+        border-bottom: 1px solid var(--mona-border-color);
+    }
+
+    &.right {
+        left: -6px;
+        top: calc(50% - 6px);
+        border-left: 1px solid var(--mona-border-color);
+        border-bottom: 1px solid var(--mona-border-color);
+    }
+
+    &.left {
+        right: -6px;
+        top: calc(50% - 6px);
+        border-right: 1px solid var(--mona-border-color);
+        border-top: 1px solid var(--mona-border-color);
+    }
+}

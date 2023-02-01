@@ -812,6 +812,23 @@ ul.mona-tab-list {
     @include scrollbars;
 }
 
+/** Tooltip */
+.mona-tooltip-popup-content {
+    background-color: var(--mona-background);
+    color: var(--mona-text);
+    border: 1px solid var(--mona-border-color);
+    padding: 0 !important;
+    box-shadow: var(--mona-popup-shadow);
+    //overflow: hidden;
+}
+
+.mona-invisible-tooltip {
+    position: absolute !important;
+    z-index: -999;
+    top: -9999px;
+}
+
+
 /** TreeView */
 .mona-tree-node-content {
     & > input[monaCheckBox] + label::before {

@@ -58,8 +58,8 @@
                                 </mona-button-group>
                             </div>
 
-                            <div>
-                                <button monaButton #popupComponentAnchor>Popup Component Anchor</button>
+                            <div style="flex-direction: column;">
+                                <button monaButton #popupComponentAnchor style="margin-bottom: 5px;">Popup Component Anchor</button>
                                 <mona-popup [anchor]="popupComponentAnchor" trigger="click"
                                             [offset]="{vertical: 0.5}"
                                             (close)="onPopupClose()" (open)="onPopupOpen($event)">
@@ -67,6 +67,12 @@
                                         <span style="color: #f0c420;">Moonlight Sonata</span>
                                     </ng-template>
                                 </mona-popup>
+
+                                <button monaButton #tooltipComponentAnchor>Tooltip Component Anchor</button>
+                                <mona-tooltip [target]="tooltipComponentAnchor" position="right">
+                                    <span style="color: #95c5cb; font-weight: bold;">Tempest</span>
+                                </mona-tooltip>
+
                             </div>
 
                             <div>
