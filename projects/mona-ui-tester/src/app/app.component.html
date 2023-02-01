@@ -45,6 +45,9 @@
                                         [toggleable]="false" [flat]="false"
                                         (selectedChange)="onButtonSelectedChange($event)" (click)="openPopup($event)"
                                         #testButtonRef>Test Button
+                                    <mona-tooltip [target]="testButtonRef">
+                                        <span style="font-weight: bold; font-size: 24px;">Test Button Tooltip</span>
+                                    </mona-tooltip>
                                 </button>
                             </div>
 

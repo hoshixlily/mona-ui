@@ -15,8 +15,6 @@ export class TooltipComponent implements OnInit {
     private popupRef?: PopupRef;
     public readonly uid: string = window.crypto.randomUUID();
 
-    public invisible: boolean = true;
-
     @Input()
     public position: Position = "top";
 
