@@ -145,6 +145,11 @@ export * from "./lib/popup/directives/popup-anchor.directive";
 export * from "./lib/popup/components/popup/popup.component";
 export * from "./lib/popup/popup.module";
 
+/** Tooltip */
+export * from "./lib/tooltips/modules/tooltip/components/tooltip/tooltip.component";
+export * from "./lib/tooltips/modules/tooltip/tooltip.module";
+export * from "./lib/tooltips/tooltips.module";
+
 /** TreeView */
 export { NodeOptions } from "./lib/tree-view/data/Node";
 export * from "./lib/tree-view/data/NodeClickEvent";
