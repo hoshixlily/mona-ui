@@ -132,9 +132,9 @@ export * from "./lib/menus/modules/shared-menu/directives/menu-item-icon-templat
 export * from "./lib/menus/modules/shared-menu/directives/menu-item-text-template.directive";
 export * from "./lib/menus/modules/context-menu/components/context-menu/context-menu.component";
 export * from "./lib/menus/modules/context-menu/context-menu.module";
-// export * from "./lib/menus/modules/menu-bar/components/menu-bar/menu-bar.component";
-// export * from "./lib/menus/modules/menu-bar/components/menu/menu.component";
-// export * from "./lib/menus/modules/menu-bar/menu-bar.module";
+export * from "./lib/menus/modules/menubar/components/menu/menu.component";
+export * from "./lib/menus/modules/menubar/components/menubar/menubar.component";
+export * from "./lib/menus/modules/menubar/menubar.module";
 export * from "./lib/menus/menus.module";
 
 /** Popup */

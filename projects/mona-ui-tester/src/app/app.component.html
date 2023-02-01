@@ -39,6 +39,34 @@
                         <span style="color: deeppink; font-weight: bold;">Components</span>
                     </ng-template>
                     <ng-template monaTabContentTemplate>
+                        <div>
+                            <mona-menubar>
+                                <mona-menu text="File">
+                                    <mona-menu-item text="New" ></mona-menu-item>
+                                    <mona-menu-item text="Open" ></mona-menu-item>
+                                    <mona-menu-item text="Save"></mona-menu-item>
+                                    <mona-menu-item text="Save As"></mona-menu-item>
+                                    <mona-menu-item text="Exit"></mona-menu-item>
+                                </mona-menu>
+                                <mona-menu text="Edit">
+                                    <mona-menu-item text="Undo"></mona-menu-item>
+                                    <mona-menu-item text="Redo"></mona-menu-item>
+                                    <mona-menu-item text="Cut"></mona-menu-item>
+                                    <mona-menu-item text="Copy"></mona-menu-item>
+                                    <mona-menu-item text="Paste"></mona-menu-item>
+                                    <mona-menu-item text="Delete"></mona-menu-item>
+                                </mona-menu>
+                                <mona-menu text="View">
+                                    <mona-menu-item text="Zoom In"></mona-menu-item>
+                                    <mona-menu-item text="Zoom Out"></mona-menu-item>
+                                    <mona-menu-item text="Zoom To"></mona-menu-item>
+                                    <mona-menu-item text="Zoom All"></mona-menu-item>
+                                    <mona-menu-item text="Zoom Extents"></mona-menu-item>
+                                    <mona-menu-item text="Zoom Previous"></mona-menu-item>
+                                    <mona-menu-item text="Zoom Window"></mona-menu-item>
+                                </mona-menu>
+                            </mona-menubar>
+                        </div>
                         <div class="content">
                             <div>
                                 <button monaButton [disabled]="false" [primary]="false" [selected]="false"

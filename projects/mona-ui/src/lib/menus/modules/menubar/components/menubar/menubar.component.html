@@ -1,0 +1,8 @@
+<ul class="mona-menubar">
+    <ng-container *ngFor="let item of menuList">
+        <li #listItemElement>
+            <span>{{item.text}}</span>
+            <mona-contextmenu [target]="listItemElement" [menuItems]="item.menuItems" trigger="click"></mona-contextmenu>
+        </li>
+    </ng-container>
+</ul>

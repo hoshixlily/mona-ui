@@ -801,6 +801,15 @@ ul.mona-tab-list {
     }
 }
 
+/** Menu Bar */
+ul.mona-menubar {
+    background: var(--mona-background-dark);
+    border-bottom: 1px solid var(--mona-border-color);
+    & li {
+        color: var(--mona-text);
+    }
+}
+
 
 /** Popup */
 .mona-popup-content {

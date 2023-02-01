@@ -1,10 +1,10 @@
 import { NgModule } from "@angular/core";
-import { CommonModule } from "@angular/common";
 import { ContextMenuModule } from "./modules/context-menu/context-menu.module";
+import { MenubarModule } from "./modules/menubar/menubar.module";
 
 @NgModule({
     declarations: [],
     imports: [],
-    exports: [ContextMenuModule]
+    exports: [ContextMenuModule, MenubarModule]
 })
 export class MenusModule {}
