@@ -3,10 +3,12 @@ import {
     Component,
     ContentChildren,
     ElementRef,
+    EventEmitter,
     Input,
     NgZone,
     OnDestroy,
     OnInit,
+    Output,
     QueryList,
     Renderer2
 } from "@angular/core";
@@ -16,9 +18,12 @@ import { ContextMenuContentComponent } from "../context-menu-content/context-men
 import { MenuItem } from "../../models/MenuItem";
 import { ContextMenuInjectorData } from "../../models/ContextMenuInjectorData";
 import { PopupRef } from "../../../../../popup/models/PopupRef";
-import { Subject, takeUntil } from "rxjs";
+import { Subject, take, takeUntil } from "rxjs";
 import { PopupOffset } from "../../../../../popup/models/PopupOffset";
 import { MenuItemComponent } from "../../../shared-menu/components/menu-item/menu-item.component";
+import { ContextMenuCloseEvent } from "../../models/ContextMenuCloseEvent";
+import { v4 } from "uuid";
+import { ContextMenuOpenEvent } from "../../models/ContextMenuOpenEvent";
 
 @Component({
     selector: "mona-contextmenu",
@@ -33,6 +38,10 @@ export class ContextMenuComponent implements OnInit, OnDestroy, AfterContentInit
     private precise: boolean = true;
     private targetListener: () => void = () => void 0;
     private windowEventListenerRefs: Array<() => void> = [];
+    public readonly uid: string = v4();
+
+    @Output()
+    public close: EventEmitter<ContextMenuCloseEvent> = new EventEmitter<ContextMenuCloseEvent>();
 
     @ContentChildren(MenuItemComponent)
     public menuItemComponents: QueryList<MenuItemComponent> = new QueryList<MenuItemComponent>();
@@ -45,6 +54,9 @@ export class ContextMenuComponent implements OnInit, OnDestroy, AfterContentInit
 
     @Input()
     public offset?: PopupOffset;
+
+    @Output()
+    public open: EventEmitter<ContextMenuOpenEvent> = new EventEmitter<ContextMenuOpenEvent>();
 
     @Input()
     public popupClass: string | string[] = [];
@@ -65,6 +77,10 @@ export class ContextMenuComponent implements OnInit, OnDestroy, AfterContentInit
         private zone: NgZone
     ) {}
 
+    public closeMenu(): void {
+        this.contextMenuRef?.close();
+    }
+
     public ngAfterContentInit(): void {
         if (this.menuItems.length !== 0) {
             return;
@@ -81,6 +97,10 @@ export class ContextMenuComponent implements OnInit, OnDestroy, AfterContentInit
 
     public ngOnInit(): void {
         this.setEventListeners();
+    }
+
+    public openMenu(): void {
+        this.create(new MouseEvent("click") as PointerEvent);
     }
 
     public setPrecise(precise: boolean): void {
@@ -104,6 +124,10 @@ export class ContextMenuComponent implements OnInit, OnDestroy, AfterContentInit
             width: this.width
         });
         this.contextMenuInjectorData.parentMenuRef = this.contextMenuRef;
+        this.open.emit({ uid: this.uid, popupRef: this.contextMenuRef as PopupRef });
+        this.contextMenuRef.closed
+            .pipe(take(1))
+            .subscribe(() => this.close.emit({ uid: this.uid, popupRef: this.contextMenuRef as PopupRef }));
     }
 
     private onOutsideClick(event: MouseEvent): void {

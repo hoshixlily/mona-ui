@@ -803,10 +803,17 @@ ul.mona-tab-list {
 
 /** Menu Bar */
 ul.mona-menubar {
-    background: var(--mona-background-dark);
+    background: var(--mona-background);
     border-bottom: 1px solid var(--mona-border-color);
     & li {
         color: var(--mona-text);
+        &.mona-active {
+            background-color: var(--mona-primary);
+            color: var(--mona-text);
+        }
+        &:hover:not(.mona-active) {
+            @include hover-background;
+        }
     }
 }
 

@@ -4,6 +4,8 @@ ul.mona-menubar {
     list-style: none;
     display: flex;
     align-items: center;
+    cursor: default;
+    user-select: none;
     & li {
         height: 100%;
         display: flex;

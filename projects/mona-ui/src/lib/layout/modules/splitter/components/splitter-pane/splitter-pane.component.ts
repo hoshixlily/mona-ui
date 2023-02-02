@@ -1,4 +1,5 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, TemplateRef, ViewChild } from "@angular/core";
+import { v4 } from "uuid";
 
 @Component({
     selector: "mona-splitter-pane",
@@ -6,7 +7,7 @@ import { Component, ElementRef, EventEmitter, Input, OnInit, Output, TemplateRef
     styleUrls: ["./splitter-pane.component.scss"]
 })
 export class SplitterPaneComponent implements OnInit {
-    public readonly uid: string = crypto.randomUUID();
+    public readonly uid: string = v4();
     public paneSize?: string;
     public isStatic = false;
 

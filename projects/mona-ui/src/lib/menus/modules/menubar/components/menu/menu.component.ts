@@ -1,6 +1,7 @@
 import { AfterContentInit, Component, ContentChildren, Input, OnInit, QueryList } from "@angular/core";
 import { MenuItem } from "../../../context-menu/models/MenuItem";
 import { MenuItemComponent } from "../../../shared-menu/components/menu-item/menu-item.component";
+import { v4 } from "uuid";
 
 @Component({
     selector: "mona-menu",
@@ -8,6 +9,8 @@ import { MenuItemComponent } from "../../../shared-menu/components/menu-item/men
     styleUrls: []
 })
 export class MenuComponent implements OnInit, AfterContentInit {
+    public readonly uid: string = v4();
+
     @ContentChildren(MenuItemComponent)
     public menuItemComponents: QueryList<MenuItemComponent> = new QueryList<MenuItemComponent>();
 

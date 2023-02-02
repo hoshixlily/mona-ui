@@ -1,5 +1,6 @@
 import { NodeCheckOptions } from "./NodeCheckOptions";
 import { NodeLookupItem } from "./NodeLookupItem";
+import { v4 } from "uuid";
 
 export interface NodeOptions<T = any> {
     checked?: boolean;
@@ -15,7 +16,7 @@ export interface NodeOptions<T = any> {
 }
 
 export class Node<T = any> {
-    public readonly uid: string = crypto.randomUUID();
+    public readonly uid: string = v4();
     public checked: boolean = false;
     public data?: T;
     public disabled: boolean = false;
