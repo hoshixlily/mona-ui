@@ -25,6 +25,7 @@ export class MenuItemComponent implements OnInit, AfterContentInit, OnDestroy {
     private menuItem: MenuItem = {
         disabled: false,
         divider: false,
+        parent: null,
         subMenuItems: [],
         text: "",
         visible: true
@@ -74,11 +75,7 @@ export class MenuItemComponent implements OnInit, AfterContentInit, OnDestroy {
     public constructor() {}
 
     public getMenuItem(): MenuItem {
-        this.menuItem.iconTemplate = this.iconTemplate.get(0);
-        this.menuItem.menuClick = (): void => this.menuClick.emit();
-        this.menuItem.subMenuItems = this.submenuItems.map(si => si.getMenuItem());
-        this.menuItem.textTemplate = this.textTemplate.get(0);
-        return this.menuItem;
+        return this.getMenuItemWithDepth(0);
     }
 
     public ngAfterContentInit(): void {
@@ -93,4 +90,17 @@ export class MenuItemComponent implements OnInit, AfterContentInit, OnDestroy {
     }
 
     public ngOnInit(): void {}
+
+    private getMenuItemWithDepth(depth: number = 0): MenuItem {
+        this.menuItem.iconTemplate = this.iconTemplate.get(0);
+        this.menuItem.menuClick = (): void => this.menuClick.emit();
+        this.menuItem.subMenuItems = this.submenuItems.map(si => {
+            const subMenuItem = si.getMenuItemWithDepth(depth + 1);
+            subMenuItem.parent = this.menuItem;
+            return subMenuItem;
+        });
+        this.menuItem.depth = depth;
+        this.menuItem.textTemplate = this.textTemplate.get(0);
+        return this.menuItem;
+    }
 }
