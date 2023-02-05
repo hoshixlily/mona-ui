@@ -2,6 +2,7 @@ import { AfterContentInit, Component, ContentChildren, Input, OnInit, QueryList 
 import { MenuItem } from "../../../context-menu/models/MenuItem";
 import { MenuItemComponent } from "../../../shared-menu/components/menu-item/menu-item.component";
 import { v4 } from "uuid";
+import { ContextMenuComponent } from "../../../context-menu/components/context-menu/context-menu.component";
 
 @Component({
     selector: "mona-menu",
@@ -9,6 +10,7 @@ import { v4 } from "uuid";
     styleUrls: []
 })
 export class MenuComponent implements OnInit, AfterContentInit {
+    public contextMenu: ContextMenuComponent | null = null;
     public readonly uid: string = v4();
 
     @ContentChildren(MenuItemComponent)

@@ -1,24 +1,32 @@
 import {
+    AfterContentInit,
     AfterViewInit,
+    ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
     ContentChildren,
+    OnDestroy,
     OnInit,
     QueryList,
-    ViewChild,
     ViewChildren
 } from "@angular/core";
 import { MenuComponent } from "../menu/menu.component";
 import { ContextMenuComponent } from "../../../context-menu/components/context-menu/context-menu.component";
 import { ContextMenuCloseEvent } from "../../../context-menu/models/ContextMenuCloseEvent";
 import { ContextMenuOpenEvent } from "../../../context-menu/models/ContextMenuOpenEvent";
+import { ContextMenuNavigationEvent } from "../../../context-menu/models/ContextMenuNavigationEvent";
+import { Enumerable } from "@mirei/ts-collections";
+import { Subject, takeUntil } from "rxjs";
 
 @Component({
     selector: "mona-menubar",
     templateUrl: "./menubar.component.html",
-    styleUrls: ["./menubar.component.scss"]
+    styleUrls: ["./menubar.component.scss"],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class MenubarComponent implements OnInit, AfterViewInit {
+export class MenubarComponent implements OnInit, AfterViewInit, OnDestroy, AfterContentInit {
+    private readonly componentDestroy$: Subject<void> = new Subject<void>();
+
     @ViewChildren(ContextMenuComponent)
     public readonly contextMenuComponents: QueryList<ContextMenuComponent> = new QueryList<ContextMenuComponent>();
     public currentContextMenu: ContextMenuComponent | null = null;
@@ -28,12 +36,42 @@ export class MenubarComponent implements OnInit, AfterViewInit {
 
     public constructor(private readonly cdr: ChangeDetectorRef) {}
 
+    public ngAfterContentInit(): void {
+        this.menuList.changes.pipe(takeUntil(this.componentDestroy$)).subscribe(() => {
+            this.cdr.detectChanges();
+            const menuComponent = this.menuList.find(m => m.contextMenu === this.currentContextMenu);
+            if (!menuComponent) {
+                this.currentContextMenu?.closeMenu();
+                this.currentContextMenu = null;
+            }
+        });
+    }
+
     public ngAfterViewInit(): void {
         window.setTimeout(() => {
             this.contextMenuComponents.forEach(c => c.setPrecise(false));
             this.cdr.detectChanges();
         });
+        const pairContext = () => {
+            Enumerable.from(this.menuList)
+                .zip(Enumerable.from(this.contextMenuComponents))
+                .forEach(([menu, context]) => {
+                    menu.contextMenu = context;
+                });
+        };
+        pairContext();
+        this.contextMenuComponents.changes.pipe(takeUntil(this.componentDestroy$)).subscribe(() => {
+            this.contextMenuComponents.forEach(c => c.setPrecise(false));
+            this.cdr.detectChanges();
+            pairContext();
+        });
     }
+
+    public ngOnDestroy(): void {
+        this.componentDestroy$.next();
+        this.componentDestroy$.complete();
+    }
+
     public ngOnInit(): void {}
 
     public onContextMenuClose(event: ContextMenuCloseEvent): void {
@@ -43,15 +81,28 @@ export class MenubarComponent implements OnInit, AfterViewInit {
         }
     }
 
-    public onContextMenuOpen(event: ContextMenuOpenEvent): void {
-        if (this.currentContextMenu?.uid !== event.uid) {
-            this.contextMenuComponents.forEach(c => {
-                if (c.uid !== event.uid) {
-                    c.closeMenu();
+    public onContextMenuNavigate(event: ContextMenuNavigationEvent): void {
+        if (event.direction === "right") {
+            if (event.currentItem == null) {
+                const index = this.menuList.toArray().findIndex(n => n.contextMenu === this.currentContextMenu);
+                if (index >= 0) {
+                    const newIndex = index === this.menuList.length - 1 ? 0 : index + 1;
+                    this.currentContextMenu?.closeMenu();
+                    this.currentContextMenu = this.menuList.toArray()[newIndex].contextMenu;
+                    this.currentContextMenu?.openMenu();
                 }
-            });
+            }
+        } else if (event.direction === "left") {
+            if (event.currentItem == null) {
+                const index = this.menuList.toArray().findIndex(n => n.contextMenu === this.currentContextMenu);
+                if (index >= 0) {
+                    const newIndex = index === 0 ? this.menuList.length - 1 : index - 1;
+                    this.currentContextMenu?.closeMenu();
+                    this.currentContextMenu = this.menuList.toArray()[newIndex].contextMenu;
+                    this.currentContextMenu?.openMenu();
+                }
+            }
         }
-        this.currentContextMenu = this.contextMenuComponents.find(c => c.uid === event.uid) ?? null;
     }
 
     public onMenuClick(ctx: ContextMenuComponent): void {
@@ -76,6 +127,7 @@ export class MenubarComponent implements OnInit, AfterViewInit {
             this.currentContextMenu.closeMenu();
             this.currentContextMenu = ctx;
             this.currentContextMenu.openMenu();
+            this.cdr.detectChanges();
         }
     }
 }

@@ -4,7 +4,8 @@
             [ngClass]="{'mona-active': currentContextMenu?.uid===contextMenuComponent.uid}" #listItemElement>
             <span>{{item.text}}</span>
             <mona-contextmenu [target]="listItemElement" [menuItems]="item.menuItems" trigger="click"
-                              (open)="onContextMenuOpen($event)" (close)="onContextMenuClose($event)" #contextMenuComponent></mona-contextmenu>
+                              (navigate)="onContextMenuNavigate($event)"
+                              (close)="onContextMenuClose($event)" #contextMenuComponent></mona-contextmenu>
         </li>
     </ng-container>
 </ul>

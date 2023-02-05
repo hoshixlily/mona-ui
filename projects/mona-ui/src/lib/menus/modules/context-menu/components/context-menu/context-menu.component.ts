@@ -24,6 +24,7 @@ import { MenuItemComponent } from "../../../shared-menu/components/menu-item/men
 import { ContextMenuCloseEvent } from "../../models/ContextMenuCloseEvent";
 import { v4 } from "uuid";
 import { ContextMenuOpenEvent } from "../../models/ContextMenuOpenEvent";
+import { ContextMenuNavigationEvent } from "../../models/ContextMenuNavigationEvent";
 
 @Component({
     selector: "mona-contextmenu",
@@ -51,6 +52,9 @@ export class ContextMenuComponent implements OnInit, OnDestroy, AfterContentInit
 
     @Input()
     public minWidth?: number | string;
+
+    @Output()
+    public navigate: EventEmitter<ContextMenuNavigationEvent> = new EventEmitter<ContextMenuNavigationEvent>();
 
     @Input()
     public offset?: PopupOffset;
@@ -110,6 +114,7 @@ export class ContextMenuComponent implements OnInit, OnDestroy, AfterContentInit
     private create(event: PointerEvent): void {
         this.contextMenuInjectorData.menuClick = this.menuClickNotifier;
         this.contextMenuInjectorData.menuItems = this.menuItems;
+        this.contextMenuInjectorData.navigate = this.navigate;
         this.contextMenuInjectorData.popupClass = this.popupClass;
         this.contextMenuRef = this.contextMenuService.open({
             anchor: this.precise ? { x: event.x, y: event.y } : this.target,
