@@ -1,11 +1,13 @@
 <ul class="mona-menubar">
     <ng-container *ngFor="let item of menuList">
         <li [attr.data-uid]="item.uid" (click)="onMenuClick(contextMenuComponent)" (mouseenter)="onMenuMouseEnter(contextMenuComponent)"
-            [ngClass]="{'mona-active': currentContextMenu?.uid===contextMenuComponent.uid}" #listItemElement>
-            <span>{{item.text}}</span>
+            [ngClass]="{'mona-active': currentContextMenu?.uid===contextMenuComponent.uid, 'mona-disabled': item.disabled}" #listItemElement>
+            <span *ngIf="!item.textTemplate">{{item.text}}</span>
+            <ng-container [ngTemplateOutlet]="item.textTemplate?.templateRef ?? null" [ngTemplateOutletContext]="{$implicit: item.text, items: item.menuItems}"
+                          *ngIf="!!item.textTemplate?.templateRef"></ng-container>
             <mona-contextmenu [target]="listItemElement" [menuItems]="item.menuItems" trigger="click"
                               (navigate)="onContextMenuNavigate($event)"
-                              (close)="onContextMenuClose($event)" #contextMenuComponent></mona-contextmenu>
+                              (close)="onContextMenuClose($event)" (open)="onContextMenuOpen($event)" #contextMenuComponent></mona-contextmenu>
         </li>
     </ng-container>
 </ul>

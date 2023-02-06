@@ -15,7 +15,7 @@ import { ContextMenuComponent } from "../../../context-menu/components/context-m
 import { ContextMenuCloseEvent } from "../../../context-menu/models/ContextMenuCloseEvent";
 import { ContextMenuOpenEvent } from "../../../context-menu/models/ContextMenuOpenEvent";
 import { ContextMenuNavigationEvent } from "../../../context-menu/models/ContextMenuNavigationEvent";
-import { Enumerable } from "@mirei/ts-collections";
+import { Collections, Enumerable, List } from "@mirei/ts-collections";
 import { Subject, takeUntil } from "rxjs";
 
 @Component({
@@ -37,13 +37,10 @@ export class MenubarComponent implements OnInit, AfterViewInit, OnDestroy, After
     public constructor(private readonly cdr: ChangeDetectorRef) {}
 
     public ngAfterContentInit(): void {
-        this.menuList.changes.pipe(takeUntil(this.componentDestroy$)).subscribe(() => {
+        this.menuList.changes.pipe(takeUntil(this.componentDestroy$)).subscribe(event => {
             this.cdr.detectChanges();
-            const menuComponent = this.menuList.find(m => m.contextMenu === this.currentContextMenu);
-            if (!menuComponent) {
-                this.currentContextMenu?.closeMenu();
-                this.currentContextMenu = null;
-            }
+            this.currentContextMenu?.closeMenu();
+            this.currentContextMenu = null;
         });
     }
 
@@ -84,25 +81,36 @@ export class MenubarComponent implements OnInit, AfterViewInit, OnDestroy, After
     public onContextMenuNavigate(event: ContextMenuNavigationEvent): void {
         if (event.direction === "right") {
             if (event.currentItem == null) {
-                const index = this.menuList.toArray().findIndex(n => n.contextMenu === this.currentContextMenu);
+                const index = this.findNextNonDisabledMenuIndex();
                 if (index >= 0) {
-                    const newIndex = index === this.menuList.length - 1 ? 0 : index + 1;
                     this.currentContextMenu?.closeMenu();
-                    this.currentContextMenu = this.menuList.toArray()[newIndex].contextMenu;
+                    this.currentContextMenu = this.menuList.toArray()[index].contextMenu;
                     this.currentContextMenu?.openMenu();
                 }
             }
         } else if (event.direction === "left") {
             if (event.currentItem == null) {
-                const index = this.menuList.toArray().findIndex(n => n.contextMenu === this.currentContextMenu);
+                const index = this.findPreviousNonDisabledMenuIndex();
                 if (index >= 0) {
-                    const newIndex = index === 0 ? this.menuList.length - 1 : index - 1;
                     this.currentContextMenu?.closeMenu();
-                    this.currentContextMenu = this.menuList.toArray()[newIndex].contextMenu;
+                    this.currentContextMenu = this.menuList.toArray()[index].contextMenu;
                     this.currentContextMenu?.openMenu();
                 }
             }
         }
+    }
+
+    public onContextMenuOpen(event: ContextMenuOpenEvent): void {
+        if (this.currentContextMenu?.uid === event.uid) {
+            return;
+        }
+        this.contextMenuComponents.forEach(c => {
+            if (c.uid !== event.uid) {
+                c.closeMenu();
+            }
+        });
+        this.currentContextMenu = this.contextMenuComponents.find(c => c.uid === event.uid) ?? null;
+        this.cdr.detectChanges();
     }
 
     public onMenuClick(ctx: ContextMenuComponent): void {
@@ -129,5 +137,37 @@ export class MenubarComponent implements OnInit, AfterViewInit, OnDestroy, After
             this.currentContextMenu.openMenu();
             this.cdr.detectChanges();
         }
+    }
+
+    private findNextNonDisabledMenuIndex(): number {
+        const index = Enumerable.from(this.menuList)
+            .toArray()
+            .findIndex(n => n.contextMenu === this.currentContextMenu);
+        if (index < 0) {
+            return -1;
+        }
+        const list = new List(this.menuList.toArray());
+        Collections.rotate(list, -index);
+        const next = list.skip(1).firstOrDefault(m => !m.disabled);
+        if (next) {
+            return this.menuList.toArray().findIndex(m => m === next);
+        }
+        return -1;
+    }
+
+    private findPreviousNonDisabledMenuIndex(): number {
+        const index = Enumerable.from(this.menuList)
+            .toArray()
+            .findIndex(n => n.contextMenu === this.currentContextMenu);
+        if (index < 0) {
+            return -1;
+        }
+        const list = new List(this.menuList.toArray());
+        Collections.rotate(list, -index);
+        const next = list.reverse().firstOrDefault(m => !m.disabled);
+        if (next) {
+            return this.menuList.toArray().findIndex(m => m === next);
+        }
+        return -1;
     }
 }

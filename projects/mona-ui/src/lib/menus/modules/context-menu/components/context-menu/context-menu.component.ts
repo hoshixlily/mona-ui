@@ -118,7 +118,7 @@ export class ContextMenuComponent implements OnInit, OnDestroy, AfterContentInit
         this.contextMenuInjectorData.popupClass = this.popupClass;
         this.contextMenuRef = this.contextMenuService.open({
             anchor: this.precise ? { x: event.x, y: event.y } : this.target,
-            closeOnOutsideClick: false,
+            closeOnOutsideClick: true,
             content: ContextMenuContentComponent,
             data: this.contextMenuInjectorData,
             minWidth: this.minWidth,
@@ -159,7 +159,6 @@ export class ContextMenuComponent implements OnInit, OnDestroy, AfterContentInit
                 this.renderer.listen(window, "contextmenu", this.onOutsideClick.bind(this)),
                 this.renderer.listen(window, "auxclick", this.onOutsideClick.bind(this)),
                 this.renderer.listen(window, "keydown.esc", () => this.contextMenuRef?.close())
-                // this.renderer.listen(document, "focusout", () => this.contextMenuRef?.close())
             ];
         });
 

@@ -1,8 +1,9 @@
-import { AfterContentInit, Component, ContentChildren, Input, OnInit, QueryList } from "@angular/core";
+import { AfterContentInit, Component, ContentChild, ContentChildren, Input, OnInit, QueryList } from "@angular/core";
 import { MenuItem } from "../../../context-menu/models/MenuItem";
 import { MenuItemComponent } from "../../../shared-menu/components/menu-item/menu-item.component";
 import { v4 } from "uuid";
 import { ContextMenuComponent } from "../../../context-menu/components/context-menu/context-menu.component";
+import { MenuTextTemplateDirective } from "../../directives/menu-text-template.directive";
 
 @Component({
     selector: "mona-menu",
@@ -10,8 +11,11 @@ import { ContextMenuComponent } from "../../../context-menu/components/context-m
     styleUrls: []
 })
 export class MenuComponent implements OnInit, AfterContentInit {
-    public contextMenu: ContextMenuComponent | null = null;
     public readonly uid: string = v4();
+    public contextMenu: ContextMenuComponent | null = null;
+
+    @Input()
+    public disabled: boolean = false;
 
     @ContentChildren(MenuItemComponent)
     public menuItemComponents: QueryList<MenuItemComponent> = new QueryList<MenuItemComponent>();
@@ -21,6 +25,9 @@ export class MenuComponent implements OnInit, AfterContentInit {
 
     @Input()
     public text: string = "";
+
+    @ContentChild(MenuTextTemplateDirective)
+    public textTemplate: MenuTextTemplateDirective | null = null;
 
     public constructor() {}
 
