@@ -2,6 +2,7 @@ import { Injectable, TemplateRef } from "@angular/core";
 import { PopupService } from "../../popup/services/popup.service";
 import { WindowContentComponent } from "../components/window-content/window-content.component";
 import { WindowInjectorData } from "../models/WindowInjectorData";
+import { WindowSettings } from "../models/WindowSettings";
 
 @Injectable({
     providedIn: "root"
@@ -9,9 +10,9 @@ import { WindowInjectorData } from "../models/WindowInjectorData";
 export class WindowService {
     public constructor(private readonly popupService: PopupService) {}
 
-    public openWindow(content: TemplateRef<void>) {
+    public openWindow(settings: WindowSettings): void {
         const injectorData: WindowInjectorData = {
-            content,
+            content: settings.content,
             popupRef: null as any
         };
         const popupRef = this.popupService.create({

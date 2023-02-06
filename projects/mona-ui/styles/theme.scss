@@ -93,6 +93,14 @@ input {
     display: none;
 }
 
+.mona-unselectable {
+    &, & * {
+        pointer-events: none !important;
+        cursor: default;
+        user-select: none !important;
+    }
+}
+
 /** Shared Components **/
 .mona-input-selector {
     width: auto;

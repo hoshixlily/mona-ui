@@ -102,9 +102,9 @@
                                     </mona-tooltip>
                                 </button>
 
-                                <button monaButton (click)="windowService.openWindow(windowContentTemplate)">Show Window</button>
+                                <button monaButton (click)="windowService.openWindow({content: windowContentTemplate})">Show Window</button>
                                 <ng-template #windowContentTemplate>
-                                    <div style="width: 800px; height: 600px; display: flex; align-items: center; justify-content: center;">
+                                    <div style="display: flex; align-items: center; justify-content: center;">
                                         <mona-combo-box [data]="dropdownListDataItems" textField="text" valueField="value"
                                             groupField="group" [filterable]="false"
                                             style="width: 200px; margin-right: 20px;" [disabled]="false"

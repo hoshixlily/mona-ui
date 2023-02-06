@@ -8,6 +8,17 @@
         </div>
     </div>
     <div class="mona-window-content">
-        <ng-container [ngTemplateOutlet]="windowData.content"></ng-container>
+        <ng-container [ngTemplateOutlet]="$any(windowData.content)" *ngIf="contentType==='template'"></ng-container>
+        <ng-container [ngComponentOutlet]="$any(windowData.content)" *ngIf="contentType==='component'"></ng-container>
     </div>
+
+    <div monaWindowResizeHandler [windowRef]="windowData.popupRef" direction="north" class="mona-window-resizer mona-window-resizer-north"></div>
+    <div monaWindowResizeHandler [windowRef]="windowData.popupRef" direction="south" class="mona-window-resizer mona-window-resizer-south"></div>
+    <div monaWindowResizeHandler [windowRef]="windowData.popupRef" direction="east" class="mona-window-resizer mona-window-resizer-east"></div>
+    <div monaWindowResizeHandler [windowRef]="windowData.popupRef" direction="west" class="mona-window-resizer mona-window-resizer-west"></div>
+    <div monaWindowResizeHandler [windowRef]="windowData.popupRef" direction="northeast" class="mona-window-resizer mona-window-resizer-northeast"></div>
+    <div monaWindowResizeHandler [windowRef]="windowData.popupRef" direction="northwest" class="mona-window-resizer mona-window-resizer-northwest"></div>
+    <div monaWindowResizeHandler [windowRef]="windowData.popupRef" direction="southeast" class="mona-window-resizer mona-window-resizer-southeast"></div>
+    <div monaWindowResizeHandler [windowRef]="windowData.popupRef" direction="southwest" class="mona-window-resizer mona-window-resizer-southwest"></div>
+
 </div>
