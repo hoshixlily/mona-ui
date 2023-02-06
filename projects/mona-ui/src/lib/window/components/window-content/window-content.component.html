@@ -1,5 +1,5 @@
 <div class="mona-window-content-container">
-    <div class="mona-window-title-bar">
+    <div class="mona-window-title-bar" monaWindowDragHandler>
         <span class="mona-window-title">{{windowData.title ?? 'Default Title'}}</span>
         <div class="mona-window-title-bar-actions">
             <button monaButton class="mona-window-title-bar-action" [flat]="true" (click)="windowData.popupRef.close()">

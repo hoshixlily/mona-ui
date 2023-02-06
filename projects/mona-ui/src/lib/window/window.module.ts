@@ -4,9 +4,10 @@ import { WindowContentComponent } from "./components/window-content/window-conte
 import { ButtonModule } from "../buttons/modules/button/button.module";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { WindowResizeHandlerDirective } from "./directives/window-resize-handler.directive";
+import { WindowDragHandlerDirective } from './directives/window-drag-handler.directive';
 
 @NgModule({
-    declarations: [WindowContentComponent, WindowResizeHandlerDirective],
+    declarations: [WindowContentComponent, WindowResizeHandlerDirective, WindowDragHandlerDirective],
     imports: [CommonModule, ButtonModule, FontAwesomeModule]
 })
 export class WindowModule {}
