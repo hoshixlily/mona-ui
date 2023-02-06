@@ -168,6 +168,10 @@ export * from "./lib/tree-view/directives/tree-view-selectable.directive";
 export * from "./lib/tree-view/directives/tree-view-node-text-template.directive";
 export * from "./lib/tree-view/tree-view.module";
 
+/** Window */
+export * from "./lib/window/services/window.service";
+export * from "./lib/window/window.module";
+
 /** Shared [TEMPORARY EXPORT] */
 // export * from "./lib/shared/components/popup-list-item/popup-list-item.component";
 export * from "./lib/shared/shared.module";

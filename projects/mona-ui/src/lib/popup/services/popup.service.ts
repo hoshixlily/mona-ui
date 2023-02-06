@@ -50,7 +50,7 @@ export class PopupService implements OnDestroy {
             minWidth: settings.minWidth,
             width: settings.width,
             panelClass,
-            backdropClass: "transparent"
+            backdropClass: settings.backdropClass ?? "transparent"
         });
 
         const popupRef = new PopupRef(overlayRef);
@@ -81,13 +81,17 @@ export class PopupService implements OnDestroy {
         }
         overlayRef.attach(portal);
         if (settings.hasBackdrop) {
-            overlayRef
-                .backdropClick()
-                .pipe(take(1))
-                .subscribe(() => {
-                    popupRef.close();
-                    this.lastPopupRef = null;
-                });
+            if (settings.closeOnOutsideClick === true || settings.closeOnOutsideClick === undefined) {
+                overlayRef
+                    .backdropClick()
+                    .pipe(take(1))
+                    .subscribe(() => {
+                        popupRef.close();
+                        this.lastPopupRef = null;
+                    });
+            } else if (!settings.closeOnOutsideClick) {
+                // overlayRef
+            }
         } else {
             if (settings.closeOnOutsideClick ?? true) {
                 const subscription = overlayRef

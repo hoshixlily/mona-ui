@@ -8,7 +8,8 @@ import {
     NodeClickEvent,
     TabCloseEvent,
     StepOptions,
-    PopupService
+    PopupService,
+    WindowService
 } from "mona-ui";
 import { TestComponentComponent } from "./test-component/test-component.component";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
@@ -254,7 +255,7 @@ export class AppComponent implements OnInit {
     @ViewChild("testButtonRef", { read: ElementRef })
     public testButtonRef!: ElementRef<HTMLButtonElement>;
 
-    public constructor(private readonly popupService: PopupService) {}
+    public constructor(private readonly popupService: PopupService, public readonly windowService: WindowService) {}
 
     public dropdownItemDisabler = (item: any): boolean => !item.active;
     public dropdownPrimitiveItemDisabler = (item: string): boolean => item.includes("i");

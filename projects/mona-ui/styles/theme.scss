@@ -895,3 +895,16 @@ ul.mona-menubar {
         margin-right: 4px;
     }
 }
+
+/** Window */
+.mona-window-invisible {
+    visibility: hidden;
+}
+
+.mona-window-overlay {
+    background-color: rgba(0, 0, 0, 0.41);
+}
+
+.mona-window-popup-content {
+    padding: 0 !important;
+}
