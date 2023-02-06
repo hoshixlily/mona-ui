@@ -4,6 +4,7 @@ import { PopupService } from "../../../../../popup/services/popup.service";
 import { PopupRef } from "../../../../../popup/models/PopupRef";
 import { Position } from "../../../../../models/Position";
 import { DefaultTooltipPositionMap } from "../../../../models/DefaultTooltipPositionMap";
+import { v4 } from "uuid";
 
 @Component({
     selector: "mona-tooltip",
@@ -13,7 +14,7 @@ import { DefaultTooltipPositionMap } from "../../../../models/DefaultTooltipPosi
 export class TooltipComponent implements OnInit {
     private readonly componentDestroy$: Subject<void> = new Subject<void>();
     private popupRef?: PopupRef;
-    public readonly uid: string = window.crypto.randomUUID();
+    public readonly uid: string = v4();
 
     @Input()
     public position: Position = "top";

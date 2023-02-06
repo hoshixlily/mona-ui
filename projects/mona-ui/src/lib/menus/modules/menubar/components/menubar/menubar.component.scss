@@ -1,0 +1,16 @@
+ul.mona-menubar {
+    width: 100%;
+    height: var(--mona-input-height);
+    list-style: none;
+    display: flex;
+    align-items: center;
+    cursor: default;
+    user-select: none;
+    & li {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 10px;
+    }
+}

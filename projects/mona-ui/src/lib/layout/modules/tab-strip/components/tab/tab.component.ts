@@ -1,6 +1,7 @@
 import { Component, ContentChild, Input, OnInit, TemplateRef } from "@angular/core";
 import { TabContentTemplateDirective } from "../../directives/tab-content-template.directive";
 import { TabTitleTemplateDirective } from "../../directives/tab-title-template.directive";
+import { v4 } from "uuid";
 
 @Component({
     selector: "mona-tab",
@@ -8,7 +9,7 @@ import { TabTitleTemplateDirective } from "../../directives/tab-title-template.d
     styleUrls: ["./tab.component.scss"]
 })
 export class TabComponent implements OnInit {
-    public readonly uid: string = crypto.randomUUID();
+    public readonly uid: string = v4();
     public index: number = 0;
 
     @Input()

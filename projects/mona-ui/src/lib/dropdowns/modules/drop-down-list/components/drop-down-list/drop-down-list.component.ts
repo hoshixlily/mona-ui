@@ -1,17 +1,6 @@
-import {
-    ChangeDetectorRef,
-    Component,
-    ContentChild,
-    ElementRef,
-    EventEmitter,
-    Input,
-    OnInit,
-    Output,
-    TemplateRef
-} from "@angular/core";
+import { Component, ContentChild, ElementRef, EventEmitter, Input, OnInit, Output, TemplateRef } from "@angular/core";
 import { AbstractDropDownListComponent } from "../../../../components/abstract-drop-down-list/abstract-drop-down-list.component";
 import { PopupService } from "../../../../../popup/services/popup.service";
-import { PopupSettings } from "../../../../../popup/models/PopupSettings";
 import { PopupListService } from "../../../../services/popup-list.service";
 import { SelectionMode } from "../../../../../models/SelectionMode";
 import { PopupListValueChangeEvent } from "../../../../data/PopupListValueChangeEvent";
