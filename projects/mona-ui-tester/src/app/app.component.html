@@ -41,14 +41,18 @@
                     <ng-template monaTabContentTemplate>
                         <div>
                             <mona-menubar>
-                                <mona-menu text="File">
+                                <mona-menu text="File" [disabled]="menuBarMenuVisible">
                                     <mona-menu-item text="New" ></mona-menu-item>
                                     <mona-menu-item text="Open" ></mona-menu-item>
                                     <mona-menu-item text="Save"></mona-menu-item>
                                     <mona-menu-item text="Save As"></mona-menu-item>
-                                    <mona-menu-item text="Exit"></mona-menu-item>
+                                    <mona-menu-item text="Exit">
+                                        <ng-template monaMenuItemTextTemplate>
+                                            <span style="color: crimson; font-weight: bolder; font-size: 14px;">Exit</span>
+                                        </ng-template>
+                                    </mona-menu-item>
                                 </mona-menu>
-                                <mona-menu text="Edit">
+                                <mona-menu text="Edit" [disabled]="false">
                                     <mona-menu-item text="Undo"></mona-menu-item>
                                     <mona-menu-item text="Redo"></mona-menu-item>
                                     <mona-menu-item text="Cut"></mona-menu-item>
@@ -57,10 +61,18 @@
                                         <mona-menu-item text="Copy 2"></mona-menu-item>
                                         <mona-menu-item text="Copy 3"></mona-menu-item>
                                     </mona-menu-item>
-                                    <mona-menu-item text="Paste"></mona-menu-item>
+                                    <mona-menu-item text="Paste">
+                                        <mona-menu-item text="Paste 1" [disabled]="true"></mona-menu-item>
+                                        <mona-menu-item text="Paste 2">
+                                            <mona-menu-item text="Paste 2.1"></mona-menu-item>
+                                            <mona-menu-item text="Paste 2.2"></mona-menu-item>
+                                            <mona-menu-item text="Paste 2.3" (menuClick)="print($event)"></mona-menu-item>
+                                        </mona-menu-item>
+                                        <mona-menu-item text="Paste 3"></mona-menu-item>
+                                    </mona-menu-item>
                                     <mona-menu-item text="Delete"></mona-menu-item>
                                 </mona-menu>
-                                <mona-menu text="View">
+                                <mona-menu text="View" [disabled]="false">
                                     <mona-menu-item text="Zoom In"></mona-menu-item>
                                     <mona-menu-item text="Zoom Out"></mona-menu-item>
                                     <mona-menu-item text="Zoom To"></mona-menu-item>
@@ -68,6 +80,14 @@
                                     <mona-menu-item text="Zoom Extents"></mona-menu-item>
                                     <mona-menu-item text="Zoom Previous"></mona-menu-item>
                                     <mona-menu-item text="Zoom Window"></mona-menu-item>
+                                    <ng-template monaMenuTextTemplate let-text>
+                                        <span style="color: #00a86b; font-weight: bold;">{{text}}</span>
+                                    </ng-template>
+                                </mona-menu>
+                                <mona-menu text="Tools" [disabled]="menuBarMenuVisible" *ngIf="menuBarMenuVisible">
+                                    <mona-menu-item text="Options"></mona-menu-item>
+                                    <mona-menu-item text="Settings"></mona-menu-item>
+                                    <mona-menu-item text="Preferences"></mona-menu-item>
                                 </mona-menu>
                             </mona-menubar>
                         </div>
@@ -147,7 +167,7 @@
                                 <button monaButton [disabled]="false" [toggleable]="true" #contextMenuAnchor>
                                     <span style="color: lightcoral;">Context Menu Target</span>
                                 </button>
-                                <mona-contextmenu [target]="contextMenuAnchor">
+                                <mona-contextmenu [target]="contextMenuAnchor" (navigate)="print($event)">
                                     <mona-menu-item text="File">
                                         <ng-template monaMenuItemTextTemplate let-menuItem>
                                             <span style="color: mediumseagreen;">File</span>

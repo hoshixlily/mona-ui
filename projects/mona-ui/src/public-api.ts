@@ -132,6 +132,7 @@ export * from "./lib/menus/modules/shared-menu/directives/menu-item-icon-templat
 export * from "./lib/menus/modules/shared-menu/directives/menu-item-text-template.directive";
 export * from "./lib/menus/modules/context-menu/components/context-menu/context-menu.component";
 export * from "./lib/menus/modules/context-menu/context-menu.module";
+export * from "./lib/menus/modules/menubar/directives/menu-text-template.directive";
 export * from "./lib/menus/modules/menubar/components/menu/menu.component";
 export * from "./lib/menus/modules/menubar/components/menubar/menubar.component";
 export * from "./lib/menus/modules/menubar/menubar.module";

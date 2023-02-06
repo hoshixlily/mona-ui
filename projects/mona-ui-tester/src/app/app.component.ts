@@ -159,9 +159,8 @@ export class AppComponent implements OnInit {
         "Linden",
         "Maidenhair Tree"
     ];
-
+    public menuBarMenuVisible: boolean = false;
     public multiSelectTagCount: number = 2;
-
     public numericTextBoxValue: number = 629;
     public rangedSliderValues: [number, number] = [12, 18];
     public selectedComboBoxDataItem: any = null;
@@ -293,6 +292,10 @@ export class AppComponent implements OnInit {
         //     this.dateMax = DateTime.fromJSDate(this.dateMax).plus({ days: 1 }).toJSDate();
         //     this.dateMin = DateTime.fromJSDate(this.dateMin).plus({ days: 1 }).toJSDate();
         // }, 5000);
+
+        // window.setInterval(() => {
+        //     this.menuBarMenuVisible = !this.menuBarMenuVisible;
+        // }, 1000);
     }
 
     public numericTextBoxFormatter = (value: number | null): string => (value != null ? `${value} °C` : "");
@@ -360,6 +363,7 @@ export class AppComponent implements OnInit {
     public onSwitchValueChange(value: boolean): void {
         // console.log(value);
         this.switchValue = value;
+        this.menuBarMenuVisible = value;
     }
 
     public onTabStripTabClose(event: TabCloseEvent): void {

@@ -792,11 +792,11 @@ ul.mona-tab-list {
 }
 
 .mona-contextmenu-list-item {
-    &.disabled {
+    &.mona-disabled {
         @include disabled;
         background-color: inherit;
     }
-    &.focused {
+    &.mona-focused {
         background-color: var(--mona-background-dark);
     }
 }
@@ -810,6 +810,9 @@ ul.mona-menubar {
         &.mona-active {
             background-color: var(--mona-primary);
             color: var(--mona-text);
+        }
+        &.mona-disabled {
+            @include disabled;
         }
         &:hover:not(.mona-active) {
             @include hover-background;
