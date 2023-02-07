@@ -26,6 +26,7 @@ export class WindowResizeHandlerDirective implements AfterViewInit, OnDestroy {
 
     @Input()
     public windowRef!: PopupRef;
+
     public constructor(private readonly elementRef: ElementRef<HTMLDivElement>, private readonly zone: NgZone) {}
 
     public ngAfterViewInit(): void {

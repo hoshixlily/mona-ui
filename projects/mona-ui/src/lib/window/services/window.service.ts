@@ -1,10 +1,9 @@
-import { Injectable, TemplateRef } from "@angular/core";
+import { Injectable } from "@angular/core";
 import { PopupService } from "../../popup/services/popup.service";
 import { WindowContentComponent } from "../components/window-content/window-content.component";
 import { WindowInjectorData } from "../models/WindowInjectorData";
 import { WindowSettings } from "../models/WindowSettings";
-import { v4 } from "uuid";
-import { asapScheduler, take } from "rxjs";
+import { asapScheduler } from "rxjs";
 import { WindowRef } from "../models/WindowRef";
 
 @Injectable({
@@ -22,8 +21,10 @@ export class WindowService {
             maxWidth: settings.maxWidth ?? window.innerWidth,
             minHeight: settings.minHeight ?? 50,
             minWidth: settings.minWidth ?? 50,
-            resizable: settings.resizable ?? false,
             popupRef: null as any,
+            resizable: settings.resizable ?? false,
+            title: typeof settings.title === "string" ? settings.title : undefined,
+            titleTemplate: typeof settings.title === "string" ? undefined : settings.title,
             width: settings.width
         };
         const popupRef = this.popupService.create({

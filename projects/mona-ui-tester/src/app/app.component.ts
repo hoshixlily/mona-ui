@@ -454,7 +454,7 @@ export class AppComponent implements OnInit {
         });
     }
 
-    public openWindow(windowContentTemplate: TemplateRef<void>): void {
+    public openWindow(windowContentTemplate: TemplateRef<void>, titleTemplate: TemplateRef<void>): void {
         const ref = this.windowService.open({
             content: windowContentTemplate,
             height: 600,
@@ -465,7 +465,8 @@ export class AppComponent implements OnInit {
             minWidth: 150,
             minHeight: 150,
             maxWidth: 1200,
-            maxHeight: 768
+            maxHeight: 768,
+            title: titleTemplate
         });
         // window.setTimeout(() => {
         //     ref.center();

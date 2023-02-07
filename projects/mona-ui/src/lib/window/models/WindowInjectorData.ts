@@ -12,5 +12,6 @@ export interface WindowInjectorData {
     popupRef: PopupRef;
     resizable: boolean;
     title?: string;
+    titleTemplate?: TemplateRef<unknown>;
     width?: number;
 }

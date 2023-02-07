@@ -10,5 +10,6 @@ export interface WindowSettings {
     minWidth?: number;
     modal?: boolean;
     resizable?: boolean;
+    title?: string | TemplateRef<unknown>;
     width?: number;
 }

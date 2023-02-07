@@ -4,6 +4,7 @@ import { Observable } from "rxjs";
 export class WindowRef {
     private readonly element: HTMLElement;
     private readonly popupRef: PopupRef;
+
     public constructor(popupRef: PopupRef) {
         this.popupRef = popupRef;
         this.element = popupRef.overlayRef.overlayElement;
