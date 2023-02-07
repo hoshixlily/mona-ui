@@ -454,6 +454,27 @@ export class AppComponent implements OnInit {
         });
     }
 
+    public openWindow(windowContentTemplate: TemplateRef<void>): void {
+        const ref = this.windowService.open({
+            content: windowContentTemplate,
+            height: 600,
+            width: 800,
+            draggable: true,
+            resizable: true,
+            modal: true,
+            minWidth: 150,
+            minHeight: 150,
+            maxWidth: 1200,
+            maxHeight: 768
+        });
+        // window.setTimeout(() => {
+        //     ref.center();
+        //     window.setTimeout(() => {
+        //         ref.close();
+        //     }, 4444);
+        // }, 5000);
+    }
+
     public print(value: unknown): void {
         console.log(value);
     }

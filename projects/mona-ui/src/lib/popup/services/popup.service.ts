@@ -1,12 +1,15 @@
 import { Injectable, Injector, NgZone, OnDestroy, Renderer2, RendererFactory2, TemplateRef } from "@angular/core";
 import { PopupSettings } from "../models/PopupSettings";
-import { Overlay } from "@angular/cdk/overlay";
+import { Overlay, PositionStrategy } from "@angular/cdk/overlay";
 import { ComponentPortal, TemplatePortal } from "@angular/cdk/portal";
 import { PopupAnchorDirective } from "../directives/popup-anchor.directive";
 import { PopupRef } from "../models/PopupRef";
 import { PopupInjectionToken } from "../models/PopupInjectionToken";
 import { DefaultPositions } from "../models/DefaultPositions";
-import { Subject, take, takeUntil } from "rxjs";
+import { fromEvent, merge, Subject, take, takeUntil } from "rxjs";
+import { Dictionary } from "@mirei/ts-collections";
+import { PopupState } from "../models/PopupState";
+import { v4 } from "uuid";
 
 @Injectable({
     providedIn: "root"
@@ -14,8 +17,8 @@ import { Subject, take, takeUntil } from "rxjs";
 export class PopupService implements OnDestroy {
     public static popupAnchorDirective: PopupAnchorDirective;
     private readonly outsideEventsToClose = ["click", "mousedown", "dblclick", "contextmenu", "auxclick"];
+    private readonly popupStateMap: Dictionary<string, PopupState> = new Dictionary<string, PopupState>();
     private readonly serviceDestroy$: Subject<void> = new Subject<void>();
-    private lastPopupRef: PopupRef | null = null;
     private renderer: Renderer2;
 
     public constructor(
@@ -28,13 +31,19 @@ export class PopupService implements OnDestroy {
     }
 
     public create(settings: PopupSettings): PopupRef {
-        const positionStrategy = this.overlay
-            .position()
-            .flexibleConnectedTo(settings.anchor)
-            .withPositions(settings.positions ?? DefaultPositions)
-            .withDefaultOffsetX(settings.offset?.horizontal ?? 0)
-            .withDefaultOffsetY(settings.offset?.vertical ?? 0)
-            .withPush(settings.withPush ?? true);
+        const uid = v4();
+        let positionStrategy: PositionStrategy;
+        if (settings.positionStrategy === "global") {
+            positionStrategy = this.overlay.position().global();
+        } else {
+            positionStrategy = this.overlay
+                .position()
+                .flexibleConnectedTo(settings.anchor)
+                .withPositions(settings.positions ?? DefaultPositions)
+                .withDefaultOffsetX(settings.offset?.horizontal ?? 0)
+                .withDefaultOffsetY(settings.offset?.vertical ?? 0)
+                .withPush(settings.withPush ?? true);
+        }
 
         const panelClass = settings.popupClass
             ? ["mona-popup-content"].concat(settings.popupClass)
@@ -54,7 +63,6 @@ export class PopupService implements OnDestroy {
         });
 
         const popupRef = new PopupRef(overlayRef);
-        this.lastPopupRef = popupRef;
 
         const injector = Injector.create({
             parent: this.injector,
@@ -87,10 +95,7 @@ export class PopupService implements OnDestroy {
                     .pipe(take(1))
                     .subscribe(() => {
                         popupRef.close();
-                        this.lastPopupRef = null;
                     });
-            } else if (!settings.closeOnOutsideClick) {
-                // overlayRef
             }
         } else {
             if (settings.closeOnOutsideClick ?? true) {
@@ -100,13 +105,20 @@ export class PopupService implements OnDestroy {
                     .subscribe(event => {
                         if (this.outsideEventsToClose.includes(event.type)) {
                             popupRef.close(event);
-                            this.lastPopupRef = null;
                             subscription.unsubscribe();
                         }
                     });
             }
         }
-        this.setEventListeners(settings);
+        popupRef.closed.pipe(take(1)).subscribe(() => {
+            this.popupStateMap.remove(uid);
+        });
+        this.popupStateMap.add(uid, {
+            uid,
+            popupRef,
+            settings
+        });
+        this.setEventListeners(this.popupStateMap.get(uid));
         return popupRef;
     }
 
@@ -115,18 +127,16 @@ export class PopupService implements OnDestroy {
         this.serviceDestroy$.complete();
     }
 
-    private setEventListeners(settings: PopupSettings): void {
+    private setEventListeners(state: PopupState): void {
         this.zone.runOutsideAngular(() => {
-            if (settings.closeOnEscape ?? true) {
-                const keydownListenerRef = this.renderer.listen(document, "keydown", (event: KeyboardEvent) => {
-                    if (event.key === "Escape") {
-                        this.zone.run(() => {
-                            this.lastPopupRef?.close();
-                            this.lastPopupRef = null;
-                            keydownListenerRef();
-                        });
-                    }
-                });
+            if (state.settings.closeOnEscape ?? true) {
+                fromEvent<KeyboardEvent>(document, "keydown")
+                    .pipe(takeUntil(merge(state.popupRef.closed, this.serviceDestroy$)))
+                    .subscribe(event => {
+                        if (event.key === "Escape") {
+                            state.popupRef.close();
+                        }
+                    });
             }
         });
     }

@@ -13,6 +13,18 @@ export class WindowResizeHandlerDirective implements AfterViewInit, OnDestroy {
     public direction!: WindowResizeHandlerDirection;
 
     @Input()
+    public maxHeight?: number;
+
+    @Input()
+    public maxWidth?: number;
+
+    @Input()
+    public minHeight?: number;
+
+    @Input()
+    public minWidth?: number;
+
+    @Input()
     public windowRef!: PopupRef;
     public constructor(private readonly elementRef: ElementRef<HTMLDivElement>, private readonly zone: NgZone) {}
 
@@ -34,7 +46,6 @@ export class WindowResizeHandlerDirective implements AfterViewInit, OnDestroy {
         const initialTop = element.offsetTop;
         const initialLeft = element.offsetLeft;
 
-        // disable selection event on document while resizing
         const oldSelectStart = document.onselectstart;
         const oldDragStart = document.ondragstart;
         document.onselectstart = () => false;
@@ -43,31 +54,48 @@ export class WindowResizeHandlerDirective implements AfterViewInit, OnDestroy {
         const onMouseMove = (event: MouseEvent) => {
             const deltaX = event.clientX - initialX;
             const deltaY = event.clientY - initialY;
+            const minWidth = this.minWidth ?? 50;
+            const minHeight = this.minHeight ?? 50;
+            const maxWidth = this.maxWidth ?? window.innerWidth;
+            const maxHeight = this.maxHeight ?? window.innerHeight;
+
             switch (this.direction) {
                 case "northwest":
-                    if (initialTop + deltaY <= 0 || initialHeight - deltaY < 100) {
+                    if (initialTop + deltaY <= 0 || initialHeight - deltaY < minHeight) {
                         return;
                     }
+                    if (initialHeight - deltaY > maxHeight || initialWidth - deltaX > maxWidth) {
+                        return;
+                    }
+
                     element.style.top = `${initialTop + deltaY}px`;
                     element.style.height = `${initialHeight - deltaY}px`;
 
-                    if (initialLeft + deltaX < 0 || initialWidth - deltaX < 100) {
+                    if (initialLeft + deltaX < 0 || initialWidth - deltaX < minWidth) {
                         return;
                     }
+
                     element.style.left = `${initialLeft + deltaX}px`;
                     element.style.width = `${initialWidth - deltaX}px`;
                     break;
                 case "north":
-                    if (initialTop + deltaY <= 0 || initialHeight - deltaY < 100) {
+                    if (initialTop + deltaY <= 0 || initialHeight - deltaY < minHeight) {
+                        return;
+                    }
+                    if (initialHeight - deltaY > maxHeight) {
                         return;
                     }
                     element.style.top = `${initialTop + deltaY}px`;
                     element.style.height = `${initialHeight - deltaY}px`;
                     break;
                 case "northeast":
-                    if (initialTop + deltaY <= 0 || initialHeight - deltaY < 100) {
+                    if (initialTop + deltaY <= 0 || initialHeight - deltaY < minHeight) {
                         return;
                     }
+                    if (initialHeight - deltaY > maxHeight || initialWidth + deltaX > maxWidth) {
+                        return;
+                    }
+
                     element.style.top = `${initialTop + deltaY}px`;
                     element.style.height = `${initialHeight - deltaY}px`;
 
@@ -77,42 +105,67 @@ export class WindowResizeHandlerDirective implements AfterViewInit, OnDestroy {
                     element.style.width = `${initialWidth + deltaX}px`;
                     break;
                 case "east":
-                    if (initialWidth + deltaX < 100 || initialLeft + initialWidth + deltaX > window.innerWidth) {
+                    if (initialWidth + deltaX < minWidth || initialLeft + initialWidth + deltaX > window.innerWidth) {
+                        return;
+                    }
+                    if (initialWidth + deltaX > maxWidth) {
                         return;
                     }
                     element.style.width = `${initialWidth + deltaX}px`;
                     break;
                 case "southeast":
-                    if (initialHeight + deltaY < 100 || initialTop + initialHeight + deltaY > window.innerHeight) {
+                    if (
+                        initialHeight + deltaY < minHeight ||
+                        initialTop + initialHeight + deltaY > window.innerHeight
+                    ) {
+                        return;
+                    }
+                    if (initialHeight + deltaY > maxHeight || initialWidth + deltaX > maxWidth) {
                         return;
                     }
                     element.style.height = `${initialHeight + deltaY}px`;
 
-                    if (initialWidth + deltaX < 100 || initialLeft + initialWidth + deltaX > window.innerWidth) {
+                    if (initialWidth + deltaX < minWidth || initialLeft + initialWidth + deltaX > window.innerWidth) {
                         return;
                     }
                     element.style.width = `${initialWidth + deltaX}px`;
                     break;
                 case "south":
-                    if (initialHeight + deltaY < 100 || initialTop + initialHeight + deltaY > window.innerHeight) {
+                    if (
+                        initialHeight + deltaY < minHeight ||
+                        initialTop + initialHeight + deltaY > window.innerHeight
+                    ) {
+                        return;
+                    }
+                    if (initialHeight + deltaY > maxHeight) {
                         return;
                     }
                     element.style.height = `${initialHeight + deltaY}px`;
                     break;
                 case "southwest":
-                    if (initialHeight + deltaY < 100 || initialTop + initialHeight + deltaY > window.innerHeight) {
+                    if (
+                        initialHeight + deltaY < minHeight ||
+                        initialTop + initialHeight + deltaY > window.innerHeight
+                    ) {
                         return;
                     }
+                    if (initialHeight + deltaY > maxHeight || initialWidth - deltaX > maxWidth) {
+                        return;
+                    }
+
                     element.style.height = `${initialHeight + deltaY}px`;
 
-                    if (initialLeft + deltaX < 0 || initialWidth - deltaX < 100) {
+                    if (initialLeft + deltaX < 0 || initialWidth - deltaX < minWidth) {
                         return;
                     }
                     element.style.left = `${initialLeft + deltaX}px`;
                     element.style.width = `${initialWidth - deltaX}px`;
                     break;
                 case "west":
-                    if (initialLeft + deltaX < 0 || initialWidth - deltaX < 100) {
+                    if (initialLeft + deltaX < 0 || initialWidth - deltaX < minWidth) {
+                        return;
+                    }
+                    if (initialWidth - deltaX > maxWidth) {
                         return;
                     }
                     element.style.left = `${initialLeft + deltaX}px`;
@@ -124,7 +177,6 @@ export class WindowResizeHandlerDirective implements AfterViewInit, OnDestroy {
             document.removeEventListener("mousemove", onMouseMove);
             document.removeEventListener("mouseup", onMouseUp);
 
-            // enable selection event on document after resizing
             document.onselectstart = oldSelectStart;
             document.ondragstart = oldDragStart;
         };

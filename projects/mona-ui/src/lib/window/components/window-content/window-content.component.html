@@ -1,5 +1,5 @@
 <div class="mona-window-content-container">
-    <div class="mona-window-title-bar" monaWindowDragHandler>
+    <div class="mona-window-title-bar" monaWindowDragHandler [draggable]="windowData.draggable">
         <span class="mona-window-title">{{windowData.title ?? 'Default Title'}}</span>
         <div class="mona-window-title-bar-actions">
             <button monaButton class="mona-window-title-bar-action" [flat]="true" (click)="windowData.popupRef.close()">
@@ -12,13 +12,37 @@
         <ng-container [ngComponentOutlet]="$any(windowData.content)" *ngIf="contentType==='component'"></ng-container>
     </div>
 
-    <div monaWindowResizeHandler [windowRef]="windowData.popupRef" direction="north" class="mona-window-resizer mona-window-resizer-north"></div>
-    <div monaWindowResizeHandler [windowRef]="windowData.popupRef" direction="south" class="mona-window-resizer mona-window-resizer-south"></div>
-    <div monaWindowResizeHandler [windowRef]="windowData.popupRef" direction="east" class="mona-window-resizer mona-window-resizer-east"></div>
-    <div monaWindowResizeHandler [windowRef]="windowData.popupRef" direction="west" class="mona-window-resizer mona-window-resizer-west"></div>
-    <div monaWindowResizeHandler [windowRef]="windowData.popupRef" direction="northeast" class="mona-window-resizer mona-window-resizer-northeast"></div>
-    <div monaWindowResizeHandler [windowRef]="windowData.popupRef" direction="northwest" class="mona-window-resizer mona-window-resizer-northwest"></div>
-    <div monaWindowResizeHandler [windowRef]="windowData.popupRef" direction="southeast" class="mona-window-resizer mona-window-resizer-southeast"></div>
-    <div monaWindowResizeHandler [windowRef]="windowData.popupRef" direction="southwest" class="mona-window-resizer mona-window-resizer-southwest"></div>
+    <div monaWindowResizeHandler [minWidth]="windowData.minWidth" [minHeight]="windowData.minHeight"
+         [maxWidth]="windowData.maxWidth" [maxHeight]="windowData.maxHeight"
+         [windowRef]="windowData.popupRef" direction="north" class="mona-window-resizer mona-window-resizer-north"
+         *ngIf="windowData.resizable"></div>
+    <div monaWindowResizeHandler [minWidth]="windowData.minWidth" [minHeight]="windowData.minHeight"
+         [maxWidth]="windowData.maxWidth" [maxHeight]="windowData.maxHeight"
+         [windowRef]="windowData.popupRef" direction="south" class="mona-window-resizer mona-window-resizer-south"
+         *ngIf="windowData.resizable"></div>
+    <div monaWindowResizeHandler [minWidth]="windowData.minWidth" [minHeight]="windowData.minHeight"
+         [maxWidth]="windowData.maxWidth" [maxHeight]="windowData.maxHeight"
+         [windowRef]="windowData.popupRef" direction="east" class="mona-window-resizer mona-window-resizer-east"
+         *ngIf="windowData.resizable"></div>
+    <div monaWindowResizeHandler [minWidth]="windowData.minWidth" [minHeight]="windowData.minHeight"
+         [maxWidth]="windowData.maxWidth" [maxHeight]="windowData.maxHeight"
+         [windowRef]="windowData.popupRef" direction="west" class="mona-window-resizer mona-window-resizer-west"
+         *ngIf="windowData.resizable"></div>
+    <div monaWindowResizeHandler [minWidth]="windowData.minWidth" [minHeight]="windowData.minHeight"
+         [maxWidth]="windowData.maxWidth" [maxHeight]="windowData.maxHeight"
+         [windowRef]="windowData.popupRef" direction="northeast"
+         class="mona-window-resizer mona-window-resizer-northeast" *ngIf="windowData.resizable"></div>
+    <div monaWindowResizeHandler [minWidth]="windowData.minWidth" [minHeight]="windowData.minHeight"
+         [maxWidth]="windowData.maxWidth" [maxHeight]="windowData.maxHeight"
+         [windowRef]="windowData.popupRef" direction="northwest"
+         class="mona-window-resizer mona-window-resizer-northwest" *ngIf="windowData.resizable"></div>
+    <div monaWindowResizeHandler [minWidth]="windowData.minWidth" [minHeight]="windowData.minHeight"
+         [maxWidth]="windowData.maxWidth" [maxHeight]="windowData.maxHeight"
+         [windowRef]="windowData.popupRef" direction="southeast"
+         class="mona-window-resizer mona-window-resizer-southeast" *ngIf="windowData.resizable"></div>
+    <div monaWindowResizeHandler [minWidth]="windowData.minWidth" [minHeight]="windowData.minHeight"
+         [maxWidth]="windowData.maxWidth" [maxHeight]="windowData.maxHeight"
+         [windowRef]="windowData.popupRef" direction="southwest"
+         class="mona-window-resizer mona-window-resizer-southwest" *ngIf="windowData.resizable"></div>
 
 </div>

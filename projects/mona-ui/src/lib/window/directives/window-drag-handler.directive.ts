@@ -1,4 +1,4 @@
-import { AfterViewInit, Directive, ElementRef, OnDestroy } from "@angular/core";
+import { AfterViewInit, Directive, ElementRef, Input, NgZone, OnDestroy } from "@angular/core";
 import { fromEvent, Subject, takeUntil } from "rxjs";
 
 @Directive({
@@ -6,7 +6,11 @@ import { fromEvent, Subject, takeUntil } from "rxjs";
 })
 export class WindowDragHandlerDirective implements AfterViewInit, OnDestroy {
     private readonly componentDestroy$: Subject<void> = new Subject<void>();
-    public constructor(private readonly elementRef: ElementRef<HTMLElement>) {}
+
+    @Input()
+    public draggable?: boolean = false;
+
+    public constructor(private readonly elementRef: ElementRef<HTMLElement>, private readonly zone: NgZone) {}
 
     public ngAfterViewInit(): void {
         this.setEvents();
@@ -18,15 +22,24 @@ export class WindowDragHandlerDirective implements AfterViewInit, OnDestroy {
     }
 
     public onMouseDown(event: MouseEvent) {
+        if (!this.draggable) {
+            return;
+        }
         const element = this.elementRef.nativeElement.parentElement?.parentElement?.parentElement as HTMLElement;
         const initialX = event.clientX;
         const initialY = event.clientY;
         const initialTop = element.offsetTop;
         const initialLeft = element.offsetLeft;
-        const initialWidth = element.offsetWidth;
-        const initialHeight = element.offsetHeight;
 
         const onMouseMove = (event: MouseEvent) => {
+            if (
+                event.clientX < 0 ||
+                event.clientX > window.innerWidth ||
+                event.clientY < 0 ||
+                event.clientY > window.innerHeight
+            ) {
+                return;
+            }
             const deltaX = event.clientX - initialX;
             const deltaY = event.clientY - initialY;
             element.style.top = `${initialTop + deltaY}px`;
@@ -43,8 +56,10 @@ export class WindowDragHandlerDirective implements AfterViewInit, OnDestroy {
     }
 
     private setEvents() {
-        fromEvent<MouseEvent>(this.elementRef.nativeElement, "mousedown")
-            .pipe(takeUntil(this.componentDestroy$))
-            .subscribe(event => this.onMouseDown(event));
+        this.zone.runOutsideAngular(() => {
+            fromEvent<MouseEvent>(this.elementRef.nativeElement, "mousedown")
+                .pipe(takeUntil(this.componentDestroy$))
+                .subscribe(event => this.onMouseDown(event));
+        });
     }
 }

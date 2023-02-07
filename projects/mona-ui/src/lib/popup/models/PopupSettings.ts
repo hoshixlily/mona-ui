@@ -92,6 +92,8 @@ export interface PopupSettings<T = unknown, C = void> {
      */
     popupClass?: string | string[];
 
+    positionStrategy?: "global" | "connected";
+
     positions?: Array<ConnectedPosition | ConnectionPositionPair>;
 
     /**

@@ -3,6 +3,14 @@ import { PopupRef } from "../../popup/models/PopupRef";
 
 export interface WindowInjectorData {
     content: TemplateRef<unknown> | Type<unknown>;
+    draggable: boolean;
+    height?: number;
+    maxHeight: number;
+    maxWidth: number;
+    minHeight: number;
+    minWidth: number;
     popupRef: PopupRef;
+    resizable: boolean;
     title?: string;
+    width?: number;
 }
