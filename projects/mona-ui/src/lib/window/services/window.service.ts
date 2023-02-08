@@ -16,6 +16,7 @@ export class WindowService {
         const injectorData: WindowInjectorData = {
             content: settings.content,
             draggable: settings.draggable ?? false,
+            focusedElement: settings.focusedElement,
             height: settings.height,
             maxHeight: settings.maxHeight ?? window.innerHeight,
             maxWidth: settings.maxWidth ?? window.innerWidth,

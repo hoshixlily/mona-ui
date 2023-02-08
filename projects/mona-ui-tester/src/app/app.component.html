@@ -365,12 +365,18 @@
 
                                 <mona-switch labelOn="ON" labelOff="OFF" [(ngModel)]="windowVisible"></mona-switch>
 
-                                <mona-window [width]="460" [height]="300" [modal]="false" [draggable]="true" [resizable]="true" *ngIf="windowVisible">
+                                <mona-window [width]="460" [height]="300" [modal]="false" [draggable]="true" [resizable]="true" [focusedElement]="'#tbx2'" *ngIf="windowVisible">
                                     <button monaButton (click)="openWindow(winTemplate);">Inner Window</button>
+                                    <input monaTextBox style="width: 150px;" #textBox1/>
+                                    <input monaTextBox id="tbx2" style="width: 150px;" #textBox2/>
                                     <ng-template #winTemplate>
                                         <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
                                             <h1 style="color: darkorange;">Hello World!</h1>
+
                                         </div>
+                                    </ng-template>
+                                    <ng-template monaWindowTitleTemplate>
+                                        <span style="color: #00b876; font-weight: bolder; text-transform: uppercase;">Window Title Template</span>
                                     </ng-template>
                                 </mona-window>
 <!--                                <mona-window *ngIf="windowVisible2">-->

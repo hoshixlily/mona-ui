@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, Inject, OnInit, TemplateRef } from "@angular/core";
+import {
+    AfterViewInit,
+    ChangeDetectionStrategy,
+    Component,
+    ElementRef,
+    Inject,
+    OnInit,
+    TemplateRef
+} from "@angular/core";
 import { PopupInjectionToken } from "../../../popup/models/PopupInjectionToken";
 import { WindowInjectorData } from "../../models/WindowInjectorData";
 import { faClose, IconDefinition } from "@fortawesome/free-solid-svg-icons";
@@ -9,12 +17,15 @@ import { faClose, IconDefinition } from "@fortawesome/free-solid-svg-icons";
     styleUrls: ["./window-content.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class WindowContentComponent implements OnInit {
+export class WindowContentComponent implements OnInit, AfterViewInit {
     public readonly TemplateRef = TemplateRef;
     public readonly closeIcon: IconDefinition = faClose;
     public readonly contentType: "template" | "component" = "template";
 
-    public constructor(@Inject(PopupInjectionToken) public windowData: WindowInjectorData) {
+    public constructor(
+        @Inject(PopupInjectionToken) public windowData: WindowInjectorData,
+        private readonly elementRef: ElementRef<HTMLElement>
+    ) {
         if (windowData.content instanceof TemplateRef) {
             this.contentType = "template";
         } else {
@@ -22,5 +33,27 @@ export class WindowContentComponent implements OnInit {
         }
     }
 
+    public ngAfterViewInit(): void {
+        this.focusElement();
+    }
+
     public ngOnInit(): void {}
+
+    private focusElement(): void {
+        const element = this.windowData.focusedElement;
+        if (element === undefined) {
+            return;
+        }
+        const windowElement = this.elementRef.nativeElement;
+        if (element instanceof ElementRef) {
+            element.nativeElement.focus();
+        } else if (element instanceof HTMLElement) {
+            element.focus();
+        } else {
+            const elements = windowElement.querySelectorAll(element);
+            if (elements.length > 0) {
+                (elements[0] as HTMLElement).focus();
+            }
+        }
+    }
 }

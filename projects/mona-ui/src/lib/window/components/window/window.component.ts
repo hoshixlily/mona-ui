@@ -2,6 +2,8 @@ import {
     AfterViewInit,
     ChangeDetectionStrategy,
     Component,
+    ContentChild,
+    ElementRef,
     Input,
     OnDestroy,
     OnInit,
@@ -11,6 +13,7 @@ import {
 import { asapScheduler, Subject } from "rxjs";
 import { WindowRef } from "../../models/WindowRef";
 import { WindowService } from "../../services/window.service";
+import { WindowTitleTemplateDirective } from "../../directives/window-title-template.directive";
 
 @Component({
     selector: "mona-window",
@@ -24,6 +27,9 @@ export class WindowComponent implements OnInit, OnDestroy, AfterViewInit {
 
     @Input()
     public draggable?: boolean;
+
+    @Input()
+    public focusedElement?: HTMLElement | ElementRef<HTMLElement> | string;
 
     @Input()
     public height?: number;
@@ -49,6 +55,9 @@ export class WindowComponent implements OnInit, OnDestroy, AfterViewInit {
     @Input()
     public title?: string;
 
+    @ContentChild(WindowTitleTemplateDirective)
+    public titleTemplateDirective?: WindowTitleTemplateDirective;
+
     @Input()
     public width?: number;
 
@@ -62,6 +71,7 @@ export class WindowComponent implements OnInit, OnDestroy, AfterViewInit {
             this.windowRef = this.windowService.open({
                 content: this.windowTemplate,
                 draggable: this.draggable,
+                focusedElement: this.focusedElement,
                 height: this.height,
                 maxHeight: this.maxHeight,
                 maxWidth: this.maxWidth,
@@ -69,7 +79,7 @@ export class WindowComponent implements OnInit, OnDestroy, AfterViewInit {
                 minWidth: this.minWidth,
                 modal: this.modal,
                 resizable: this.resizable,
-                title: this.title,
+                title: this.titleTemplateDirective?.templateRef ?? this.title,
                 width: this.width
             });
         });
