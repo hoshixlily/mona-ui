@@ -32,7 +32,7 @@ export class WindowService {
             content: WindowContentComponent,
             closeOnEscape: false,
             closeOnOutsideClick: false,
-            hasBackdrop: true,
+            hasBackdrop: settings.modal,
             backdropClass: settings.modal ? "mona-window-overlay" : "transparent",
             popupClass: ["mona-window-invisible", "mona-window-popup-content"],
             positionStrategy: "global",

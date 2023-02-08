@@ -243,6 +243,9 @@ export class AppComponent implements OnInit {
         /*"1-2-1", "1-2-2", "1-2-3", "1-2-4"*/
     ];
 
+    public windowVisible: boolean = false;
+    public windowVisible2: boolean = false;
+
     @ViewChild("italicButtonRef", { read: ElementRef })
     public italicButtonRef!: ElementRef<HTMLButtonElement>;
 
@@ -297,6 +300,10 @@ export class AppComponent implements OnInit {
         // window.setInterval(() => {
         //     this.menuBarMenuVisible = !this.menuBarMenuVisible;
         // }, 1000);
+
+        // window.setInterval(() => {
+        //     this.windowVisible = !this.windowVisible;
+        // }, 2500);
     }
 
     public numericTextBoxFormatter = (value: number | null): string => (value != null ? `${value} °C` : "");
@@ -454,7 +461,7 @@ export class AppComponent implements OnInit {
         });
     }
 
-    public openWindow(windowContentTemplate: TemplateRef<void>, titleTemplate: TemplateRef<void>): void {
+    public openWindow(windowContentTemplate: TemplateRef<void>, titleTemplate?: TemplateRef<void>): void {
         const ref = this.windowService.open({
             content: windowContentTemplate,
             height: 600,

@@ -362,6 +362,23 @@
                                         <fa-icon [icon]="sunIcon" style="color: yellow;"></fa-icon>
                                     </ng-template>
                                 </mona-switch>
+
+                                <mona-switch labelOn="ON" labelOff="OFF" [(ngModel)]="windowVisible"></mona-switch>
+
+                                <mona-window [width]="460" [height]="300" [modal]="false" [draggable]="true" [resizable]="true" *ngIf="windowVisible">
+                                    <button monaButton (click)="openWindow(winTemplate);">Inner Window</button>
+                                    <ng-template #winTemplate>
+                                        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
+                                            <h1 style="color: darkorange;">Hello World!</h1>
+                                        </div>
+                                    </ng-template>
+                                </mona-window>
+<!--                                <mona-window *ngIf="windowVisible2">-->
+<!--                                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">-->
+<!--                                        <h1 style="color: mediumvioletred;">Inner Window</h1>-->
+<!--                                    </div>-->
+<!--                                </mona-window>-->
+
                             </div>
 
                             <div style="display: flex; flex-direction: column; z-index: 100;">

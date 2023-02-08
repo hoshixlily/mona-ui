@@ -22,7 +22,5 @@ export class WindowContentComponent implements OnInit {
         }
     }
 
-    public ngOnInit(): void {
-        console.log(this.windowData);
-    }
+    public ngOnInit(): void {}
 }

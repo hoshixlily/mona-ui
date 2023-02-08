@@ -170,6 +170,7 @@ export * from "./lib/tree-view/tree-view.module";
 
 /** Window */
 export * from "./lib/window/services/window.service";
+export * from "./lib/window/components/window/window.component";
 export * from "./lib/window/window.module";
 
 /** Shared [TEMPORARY EXPORT] */
