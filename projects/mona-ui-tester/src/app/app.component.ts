@@ -244,6 +244,8 @@ export class AppComponent implements OnInit {
     ];
 
     public windowHeight: number = 333;
+    public windowLeft: number = 444;
+    public windowTop: number = 555;
     public windowVisible: boolean = false;
     public windowVisible2: boolean = false;
     public windowWidth: number = 555;
@@ -477,6 +479,12 @@ export class AppComponent implements OnInit {
             maxHeight: 768,
             title: titleTemplate
         });
+
+        // window.setTimeout(() => {
+        //     ref.move({ top: 100, left: 100 });
+        //     ref.resize({ width: 333, height: 333, center: false });
+        // }, 3333);
+
         // window.setTimeout(() => {
         //     ref.resize({ width: 333, height: 333, center: true });
         // }, 4444);

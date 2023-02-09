@@ -15,7 +15,7 @@ import {
 import { asapScheduler, Subject, takeUntil } from "rxjs";
 import { WindowService } from "../../services/window.service";
 import { WindowTitleTemplateDirective } from "../../directives/window-title-template.directive";
-import { WindowRef, WindowReference } from "../../models/WindowRef";
+import { WindowRef } from "../../models/WindowRef";
 
 @Component({
     selector: "mona-window",
@@ -38,6 +38,12 @@ export class WindowComponent implements OnInit, OnDestroy, AfterViewInit {
 
     @Output()
     public heightChange: EventEmitter<number> = new EventEmitter<number>();
+
+    @Input()
+    public left?: number;
+
+    @Output()
+    public leftChange: EventEmitter<number> = new EventEmitter<number>();
 
     @Input()
     public maxHeight?: number;
@@ -64,6 +70,12 @@ export class WindowComponent implements OnInit, OnDestroy, AfterViewInit {
     public titleTemplateDirective?: WindowTitleTemplateDirective;
 
     @Input()
+    public top?: number;
+
+    @Output()
+    public topChange: EventEmitter<number> = new EventEmitter<number>();
+
+    @Input()
     public width?: number;
 
     @Output()
@@ -81,6 +93,7 @@ export class WindowComponent implements OnInit, OnDestroy, AfterViewInit {
                 draggable: this.draggable,
                 focusedElement: this.focusedElement,
                 height: this.height,
+                left: this.left,
                 maxHeight: this.maxHeight,
                 maxWidth: this.maxWidth,
                 minHeight: this.minHeight,
@@ -88,6 +101,7 @@ export class WindowComponent implements OnInit, OnDestroy, AfterViewInit {
                 modal: this.modal,
                 resizable: this.resizable,
                 title: this.titleTemplateDirective?.templateRef ?? this.title,
+                top: this.top,
                 width: this.width
             });
             this.windowRef.resized$.pipe(takeUntil(this.componentDestroy$)).subscribe(event => {
@@ -96,6 +110,20 @@ export class WindowComponent implements OnInit, OnDestroy, AfterViewInit {
                 }
                 if (event.height != null) {
                     this.heightChange.emit(event.height);
+                }
+                if (event.left != null) {
+                    this.leftChange.emit(event.left);
+                }
+                if (event.top != null) {
+                    this.topChange.emit(event.top);
+                }
+            });
+            this.windowRef.moved$.pipe(takeUntil(this.componentDestroy$)).subscribe(event => {
+                if (event.left != null) {
+                    this.leftChange.emit(event.left);
+                }
+                if (event.top != null) {
+                    this.topChange.emit(event.top);
                 }
             });
         });

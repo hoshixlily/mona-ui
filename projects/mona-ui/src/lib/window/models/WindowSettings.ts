@@ -5,6 +5,7 @@ export interface WindowSettings {
     draggable?: boolean;
     focusedElement?: HTMLElement | ElementRef<HTMLElement> | string;
     height?: number;
+    left?: number;
     maxHeight?: number;
     maxWidth?: number;
     minHeight?: number;
@@ -12,5 +13,6 @@ export interface WindowSettings {
     modal?: boolean;
     resizable?: boolean;
     title?: string | TemplateRef<unknown>;
+    top?: number;
     width?: number;
 }

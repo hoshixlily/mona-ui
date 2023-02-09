@@ -6,6 +6,7 @@ export interface WindowInjectorData {
     draggable: boolean;
     focusedElement?: HTMLElement | ElementRef<HTMLElement> | string;
     height?: number;
+    left?: number;
     maxHeight: number;
     maxWidth: number;
     minHeight: number;
@@ -13,6 +14,7 @@ export interface WindowInjectorData {
     resizable: boolean;
     title?: string;
     titleTemplate?: TemplateRef<unknown>;
+    top?: number;
     width?: number;
     windowReference: WindowReference;
 }

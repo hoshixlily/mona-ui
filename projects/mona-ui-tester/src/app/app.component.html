@@ -366,6 +366,7 @@
                                 <mona-switch labelOn="ON" labelOff="OFF" [(ngModel)]="windowVisible"></mona-switch>
 
                                 <mona-window [(width)]="windowWidth" [(height)]="windowHeight" [modal]="false" [draggable]="true"
+                                             [(left)]="windowLeft" [(top)]="windowTop"
                                              [resizable]="true" [focusedElement]="'#tbx2'" *ngIf="windowVisible">
                                     <button monaButton (click)="openWindow(winTemplate);">Inner Window</button>
                                     <input monaTextBox style="width: 150px;" #textBox1/>

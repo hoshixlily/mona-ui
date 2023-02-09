@@ -1,5 +1,5 @@
 <div class="mona-window-content-container">
-    <div class="mona-window-title-bar" monaWindowDragHandler [draggable]="windowData.draggable">
+    <div class="mona-window-title-bar" monaWindowDragHandler [draggable]="windowData.draggable" [windowRef]="windowData.windowReference">
         <div class="mona-window-title-container">
             <span class="mona-window-title" *ngIf="!windowData.titleTemplate">{{windowData.title ?? ''}}</span>
             <ng-container [ngTemplateOutlet]="windowData.titleTemplate" *ngIf="windowData.titleTemplate"></ng-container>

@@ -1,5 +1,6 @@
 import { AfterViewInit, Directive, ElementRef, Input, NgZone, OnDestroy } from "@angular/core";
 import { fromEvent, Subject, takeUntil } from "rxjs";
+import { WindowReference } from "../models/WindowRef";
 
 @Directive({
     selector: "div[monaWindowDragHandler]"
@@ -9,6 +10,9 @@ export class WindowDragHandlerDirective implements AfterViewInit, OnDestroy {
 
     @Input()
     public draggable?: boolean = false;
+
+    @Input()
+    public windowRef!: WindowReference;
 
     public constructor(private readonly elementRef: ElementRef<HTMLElement>, private readonly zone: NgZone) {}
 
@@ -42,8 +46,11 @@ export class WindowDragHandlerDirective implements AfterViewInit, OnDestroy {
             }
             const deltaX = event.clientX - initialX;
             const deltaY = event.clientY - initialY;
-            element.style.top = `${initialTop + deltaY}px`;
-            element.style.left = `${initialLeft + deltaX}px`;
+            const top = initialTop + deltaY;
+            const left = initialLeft + deltaX;
+            element.style.top = `${top}px`;
+            element.style.left = `${left}px`;
+            this.windowRef.move$.next({ top, left });
         };
 
         const onMouseUp = () => {

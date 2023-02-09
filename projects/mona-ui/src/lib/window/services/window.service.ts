@@ -18,6 +18,7 @@ export class WindowService {
             draggable: settings.draggable ?? false,
             focusedElement: settings.focusedElement,
             height: settings.height,
+            left: settings.left,
             maxHeight: settings.maxHeight ?? window.innerHeight,
             maxWidth: settings.maxWidth ?? window.innerWidth,
             minHeight: settings.minHeight ?? 50,
@@ -26,6 +27,7 @@ export class WindowService {
             resizable: settings.resizable ?? false,
             title: typeof settings.title === "string" ? settings.title : undefined,
             titleTemplate: typeof settings.title === "string" ? undefined : settings.title,
+            top: settings.top,
             width: settings.width
         };
         const popupRef = this.popupService.create({
@@ -47,8 +49,8 @@ export class WindowService {
             const element = popupRef.overlayRef.overlayElement;
             element.classList.add("mona-window");
             element.style.position = "absolute";
-            element.style.top = `calc(50% - ${element.offsetHeight / 2}px)`; // center vertically
-            element.style.left = `calc(50% - ${element.offsetWidth / 2}px)`; // center horizontally
+            element.style.top = settings.top ? `${settings.top}px` : `calc(50% - ${element.offsetHeight / 2}px)`;
+            element.style.left = settings.left ? `${settings.left}px` : `calc(50% - ${element.offsetWidth / 2}px)`;
             element.classList.remove("mona-window-invisible");
         });
         return windowReference.windowRef;
