@@ -4,7 +4,7 @@ import { WindowContentComponent } from "../components/window-content/window-cont
 import { WindowInjectorData } from "../models/WindowInjectorData";
 import { WindowSettings } from "../models/WindowSettings";
 import { asapScheduler } from "rxjs";
-import { WindowRef } from "../models/WindowRef";
+import { WindowRef, WindowReference } from "../models/WindowRef";
 
 @Injectable({
     providedIn: "root"
@@ -22,7 +22,7 @@ export class WindowService {
             maxWidth: settings.maxWidth ?? window.innerWidth,
             minHeight: settings.minHeight ?? 50,
             minWidth: settings.minWidth ?? 50,
-            popupRef: null as any,
+            windowReference: null as any,
             resizable: settings.resizable ?? false,
             title: typeof settings.title === "string" ? settings.title : undefined,
             titleTemplate: typeof settings.title === "string" ? undefined : settings.title,
@@ -41,8 +41,8 @@ export class WindowService {
             width: settings.width,
             height: settings.height
         });
-        injectorData.popupRef = popupRef;
-        const windowRef: WindowRef = new WindowRef(popupRef);
+        const windowReference: WindowReference = new WindowReference(popupRef);
+        injectorData.windowReference = windowReference;
         asapScheduler.schedule(() => {
             const element = popupRef.overlayRef.overlayElement;
             element.classList.add("mona-window");
@@ -51,6 +51,6 @@ export class WindowService {
             element.style.left = `calc(50% - ${element.offsetWidth / 2}px)`; // center horizontally
             element.classList.remove("mona-window-invisible");
         });
-        return windowRef;
+        return windowReference.windowRef;
     }
 }

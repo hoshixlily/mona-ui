@@ -1,5 +1,5 @@
 import { ElementRef, TemplateRef, Type } from "@angular/core";
-import { PopupRef } from "../../popup/models/PopupRef";
+import { WindowReference } from "./WindowRef";
 
 export interface WindowInjectorData {
     content: TemplateRef<unknown> | Type<unknown>;
@@ -10,9 +10,9 @@ export interface WindowInjectorData {
     maxWidth: number;
     minHeight: number;
     minWidth: number;
-    popupRef: PopupRef;
     resizable: boolean;
     title?: string;
     titleTemplate?: TemplateRef<unknown>;
     width?: number;
+    windowReference: WindowReference;
 }

@@ -243,8 +243,10 @@ export class AppComponent implements OnInit {
         /*"1-2-1", "1-2-2", "1-2-3", "1-2-4"*/
     ];
 
+    public windowHeight: number = 333;
     public windowVisible: boolean = false;
     public windowVisible2: boolean = false;
+    public windowWidth: number = 555;
 
     @ViewChild("italicButtonRef", { read: ElementRef })
     public italicButtonRef!: ElementRef<HTMLButtonElement>;
@@ -475,6 +477,10 @@ export class AppComponent implements OnInit {
             maxHeight: 768,
             title: titleTemplate
         });
+        // window.setTimeout(() => {
+        //     ref.resize({ width: 333, height: 333, center: true });
+        // }, 4444);
+
         // window.setTimeout(() => {
         //     ref.center();
         //     window.setTimeout(() => {

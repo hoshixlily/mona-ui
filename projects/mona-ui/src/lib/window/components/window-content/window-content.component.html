@@ -5,7 +5,7 @@
             <ng-container [ngTemplateOutlet]="windowData.titleTemplate" *ngIf="windowData.titleTemplate"></ng-container>
         </div>
         <div class="mona-window-title-bar-actions">
-            <button monaButton class="mona-window-title-bar-action" [flat]="true" (click)="windowData.popupRef.close()">
+            <button monaButton class="mona-window-title-bar-action" [flat]="true" (click)="windowData.windowReference.close()">
                 <fa-icon [icon]="closeIcon"></fa-icon>
             </button>
         </div>
@@ -17,35 +17,35 @@
 
     <div monaWindowResizeHandler [minWidth]="windowData.minWidth" [minHeight]="windowData.minHeight"
          [maxWidth]="windowData.maxWidth" [maxHeight]="windowData.maxHeight"
-         [windowRef]="windowData.popupRef" direction="north" class="mona-window-resizer mona-window-resizer-north"
+         [windowRef]="windowData.windowReference" direction="north" class="mona-window-resizer mona-window-resizer-north"
          *ngIf="windowData.resizable"></div>
     <div monaWindowResizeHandler [minWidth]="windowData.minWidth" [minHeight]="windowData.minHeight"
          [maxWidth]="windowData.maxWidth" [maxHeight]="windowData.maxHeight"
-         [windowRef]="windowData.popupRef" direction="south" class="mona-window-resizer mona-window-resizer-south"
+         [windowRef]="windowData.windowReference" direction="south" class="mona-window-resizer mona-window-resizer-south"
          *ngIf="windowData.resizable"></div>
     <div monaWindowResizeHandler [minWidth]="windowData.minWidth" [minHeight]="windowData.minHeight"
          [maxWidth]="windowData.maxWidth" [maxHeight]="windowData.maxHeight"
-         [windowRef]="windowData.popupRef" direction="east" class="mona-window-resizer mona-window-resizer-east"
+         [windowRef]="windowData.windowReference" direction="east" class="mona-window-resizer mona-window-resizer-east"
          *ngIf="windowData.resizable"></div>
     <div monaWindowResizeHandler [minWidth]="windowData.minWidth" [minHeight]="windowData.minHeight"
          [maxWidth]="windowData.maxWidth" [maxHeight]="windowData.maxHeight"
-         [windowRef]="windowData.popupRef" direction="west" class="mona-window-resizer mona-window-resizer-west"
+         [windowRef]="windowData.windowReference" direction="west" class="mona-window-resizer mona-window-resizer-west"
          *ngIf="windowData.resizable"></div>
     <div monaWindowResizeHandler [minWidth]="windowData.minWidth" [minHeight]="windowData.minHeight"
          [maxWidth]="windowData.maxWidth" [maxHeight]="windowData.maxHeight"
-         [windowRef]="windowData.popupRef" direction="northeast"
+         [windowRef]="windowData.windowReference" direction="northeast"
          class="mona-window-resizer mona-window-resizer-northeast" *ngIf="windowData.resizable"></div>
     <div monaWindowResizeHandler [minWidth]="windowData.minWidth" [minHeight]="windowData.minHeight"
          [maxWidth]="windowData.maxWidth" [maxHeight]="windowData.maxHeight"
-         [windowRef]="windowData.popupRef" direction="northwest"
+         [windowRef]="windowData.windowReference" direction="northwest"
          class="mona-window-resizer mona-window-resizer-northwest" *ngIf="windowData.resizable"></div>
     <div monaWindowResizeHandler [minWidth]="windowData.minWidth" [minHeight]="windowData.minHeight"
          [maxWidth]="windowData.maxWidth" [maxHeight]="windowData.maxHeight"
-         [windowRef]="windowData.popupRef" direction="southeast"
+         [windowRef]="windowData.windowReference" direction="southeast"
          class="mona-window-resizer mona-window-resizer-southeast" *ngIf="windowData.resizable"></div>
     <div monaWindowResizeHandler [minWidth]="windowData.minWidth" [minHeight]="windowData.minHeight"
          [maxWidth]="windowData.maxWidth" [maxHeight]="windowData.maxHeight"
-         [windowRef]="windowData.popupRef" direction="southwest"
+         [windowRef]="windowData.windowReference" direction="southwest"
          class="mona-window-resizer mona-window-resizer-southwest" *ngIf="windowData.resizable"></div>
 
 </div>

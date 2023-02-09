@@ -4,16 +4,18 @@ import {
     Component,
     ContentChild,
     ElementRef,
+    EventEmitter,
     Input,
     OnDestroy,
     OnInit,
+    Output,
     TemplateRef,
     ViewChild
 } from "@angular/core";
-import { asapScheduler, Subject } from "rxjs";
-import { WindowRef } from "../../models/WindowRef";
+import { asapScheduler, Subject, takeUntil } from "rxjs";
 import { WindowService } from "../../services/window.service";
 import { WindowTitleTemplateDirective } from "../../directives/window-title-template.directive";
+import { WindowRef, WindowReference } from "../../models/WindowRef";
 
 @Component({
     selector: "mona-window",
@@ -33,6 +35,9 @@ export class WindowComponent implements OnInit, OnDestroy, AfterViewInit {
 
     @Input()
     public height?: number;
+
+    @Output()
+    public heightChange: EventEmitter<number> = new EventEmitter<number>();
 
     @Input()
     public maxHeight?: number;
@@ -61,6 +66,9 @@ export class WindowComponent implements OnInit, OnDestroy, AfterViewInit {
     @Input()
     public width?: number;
 
+    @Output()
+    public widthChange: EventEmitter<number> = new EventEmitter<number>();
+
     @ViewChild("windowTemplate")
     public windowTemplate!: TemplateRef<void>;
 
@@ -81,6 +89,14 @@ export class WindowComponent implements OnInit, OnDestroy, AfterViewInit {
                 resizable: this.resizable,
                 title: this.titleTemplateDirective?.templateRef ?? this.title,
                 width: this.width
+            });
+            this.windowRef.resized$.pipe(takeUntil(this.componentDestroy$)).subscribe(event => {
+                if (event.width != null) {
+                    this.widthChange.emit(event.width);
+                }
+                if (event.height != null) {
+                    this.heightChange.emit(event.height);
+                }
             });
         });
     }

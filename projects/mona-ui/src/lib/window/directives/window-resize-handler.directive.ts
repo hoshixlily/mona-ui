@@ -1,7 +1,7 @@
 import { AfterViewInit, Directive, ElementRef, Input, NgZone, OnDestroy } from "@angular/core";
 import { WindowResizeHandlerDirection } from "../models/WindowResizeHandlerDirection";
-import { PopupRef } from "../../popup/models/PopupRef";
 import { fromEvent, Subject, takeUntil } from "rxjs";
+import { WindowReference } from "../models/WindowRef";
 
 @Directive({
     selector: "div[monaWindowResizeHandler]"
@@ -25,7 +25,7 @@ export class WindowResizeHandlerDirective implements AfterViewInit, OnDestroy {
     public minWidth?: number;
 
     @Input()
-    public windowRef!: PopupRef;
+    public windowRef!: WindowReference;
 
     public constructor(private readonly elementRef: ElementRef<HTMLDivElement>, private readonly zone: NgZone) {}
 
@@ -39,7 +39,7 @@ export class WindowResizeHandlerDirective implements AfterViewInit, OnDestroy {
     }
 
     public onMouseDown(event: MouseEvent) {
-        const element = this.windowRef.overlayRef.overlayElement;
+        const element = this.windowRef.element;
         const initialWidth = element.offsetWidth;
         const initialHeight = element.offsetHeight;
         const initialX = event.clientX;
@@ -59,6 +59,8 @@ export class WindowResizeHandlerDirective implements AfterViewInit, OnDestroy {
             const minHeight = this.minHeight ?? 50;
             const maxWidth = this.maxWidth ?? window.innerWidth;
             const maxHeight = this.maxHeight ?? window.innerHeight;
+            let height: number | undefined;
+            let width: number | undefined;
 
             switch (this.direction) {
                 case "northwest":
@@ -69,15 +71,17 @@ export class WindowResizeHandlerDirective implements AfterViewInit, OnDestroy {
                         return;
                     }
 
+                    height = initialHeight - deltaY;
                     element.style.top = `${initialTop + deltaY}px`;
-                    element.style.height = `${initialHeight - deltaY}px`;
+                    element.style.height = `${height}px`;
 
                     if (initialLeft + deltaX < 0 || initialWidth - deltaX < minWidth) {
                         return;
                     }
 
+                    width = initialWidth - deltaX;
                     element.style.left = `${initialLeft + deltaX}px`;
-                    element.style.width = `${initialWidth - deltaX}px`;
+                    element.style.width = `${width}px`;
                     break;
                 case "north":
                     if (initialTop + deltaY <= 0 || initialHeight - deltaY < minHeight) {
@@ -86,8 +90,9 @@ export class WindowResizeHandlerDirective implements AfterViewInit, OnDestroy {
                     if (initialHeight - deltaY > maxHeight) {
                         return;
                     }
+                    height = initialHeight - deltaY;
+                    element.style.height = `${height}px`;
                     element.style.top = `${initialTop + deltaY}px`;
-                    element.style.height = `${initialHeight - deltaY}px`;
                     break;
                 case "northeast":
                     if (initialTop + deltaY <= 0 || initialHeight - deltaY < minHeight) {
@@ -97,13 +102,16 @@ export class WindowResizeHandlerDirective implements AfterViewInit, OnDestroy {
                         return;
                     }
 
+                    height = initialHeight - deltaY;
+                    element.style.height = `${height}px`;
                     element.style.top = `${initialTop + deltaY}px`;
-                    element.style.height = `${initialHeight - deltaY}px`;
 
                     if (initialWidth + deltaX < 100 || initialLeft + initialWidth + deltaX > window.innerWidth) {
                         return;
                     }
-                    element.style.width = `${initialWidth + deltaX}px`;
+
+                    width = initialWidth + deltaX;
+                    element.style.width = `${width}px`;
                     break;
                 case "east":
                     if (initialWidth + deltaX < minWidth || initialLeft + initialWidth + deltaX > window.innerWidth) {
@@ -112,7 +120,9 @@ export class WindowResizeHandlerDirective implements AfterViewInit, OnDestroy {
                     if (initialWidth + deltaX > maxWidth) {
                         return;
                     }
-                    element.style.width = `${initialWidth + deltaX}px`;
+
+                    width = initialWidth + deltaX;
+                    element.style.width = `${width}px`;
                     break;
                 case "southeast":
                     if (
@@ -124,12 +134,16 @@ export class WindowResizeHandlerDirective implements AfterViewInit, OnDestroy {
                     if (initialHeight + deltaY > maxHeight || initialWidth + deltaX > maxWidth) {
                         return;
                     }
-                    element.style.height = `${initialHeight + deltaY}px`;
+
+                    height = initialHeight + deltaY;
+                    element.style.height = `${height}px`;
 
                     if (initialWidth + deltaX < minWidth || initialLeft + initialWidth + deltaX > window.innerWidth) {
                         return;
                     }
-                    element.style.width = `${initialWidth + deltaX}px`;
+
+                    width = initialWidth + deltaX;
+                    element.style.width = `${width}px`;
                     break;
                 case "south":
                     if (
@@ -141,7 +155,9 @@ export class WindowResizeHandlerDirective implements AfterViewInit, OnDestroy {
                     if (initialHeight + deltaY > maxHeight) {
                         return;
                     }
-                    element.style.height = `${initialHeight + deltaY}px`;
+
+                    height = initialHeight + deltaY;
+                    element.style.height = `${height}px`;
                     break;
                 case "southwest":
                     if (
@@ -154,13 +170,16 @@ export class WindowResizeHandlerDirective implements AfterViewInit, OnDestroy {
                         return;
                     }
 
-                    element.style.height = `${initialHeight + deltaY}px`;
+                    height = initialHeight + deltaY;
+                    element.style.height = `${height}px`;
 
                     if (initialLeft + deltaX < 0 || initialWidth - deltaX < minWidth) {
                         return;
                     }
+
+                    width = initialWidth - deltaX;
+                    element.style.width = `${width}px`;
                     element.style.left = `${initialLeft + deltaX}px`;
-                    element.style.width = `${initialWidth - deltaX}px`;
                     break;
                 case "west":
                     if (initialLeft + deltaX < 0 || initialWidth - deltaX < minWidth) {
@@ -169,10 +188,14 @@ export class WindowResizeHandlerDirective implements AfterViewInit, OnDestroy {
                     if (initialWidth - deltaX > maxWidth) {
                         return;
                     }
+
+                    width = initialWidth - deltaX;
+                    element.style.width = `${width}px`;
                     element.style.left = `${initialLeft + deltaX}px`;
-                    element.style.width = `${initialWidth - deltaX}px`;
                     break;
             }
+
+            this.windowRef.resize$.next({ width: width ?? initialWidth, height: height ?? initialHeight });
         };
         const onMouseUp = () => {
             document.removeEventListener("mousemove", onMouseMove);
