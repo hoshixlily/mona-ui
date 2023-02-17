@@ -32,13 +32,20 @@ export class CalendarComponent extends AbstractDateInputComponent implements OnI
 
     public onDayClick(date: Date): void {
         if (this.value) {
+            const oldMonth = DateTime.fromJSDate(this.value).month;
             const date1 = DateTime.fromJSDate(date);
             const newDate = DateTime.fromJSDate(this.value)
                 .set({ day: date1.day, month: date1.month, year: date1.year })
                 .toJSDate();
             this.setCurrentDate(newDate);
+            this.navigatedDate = newDate;
+            if (oldMonth !== DateTime.fromJSDate(newDate).month) {
+                this.prepareMonthlyViewDictionary(newDate);
+            }
         } else {
             this.setCurrentDate(date);
+            this.navigatedDate = date;
+            this.prepareMonthlyViewDictionary(date);
         }
         this.cdr.markForCheck();
     }
