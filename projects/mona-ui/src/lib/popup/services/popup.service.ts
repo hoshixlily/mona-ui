@@ -7,6 +7,7 @@ import { PopupRef } from "../models/PopupRef";
 import { PopupInjectionToken } from "../models/PopupInjectionToken";
 import { DefaultPositions } from "../models/DefaultPositions";
 import { Subject, take, takeUntil } from "rxjs";
+import { PopupCloseEvent } from "../models/PopupCloseEvent";
 
 @Injectable({
     providedIn: "root"
@@ -28,6 +29,7 @@ export class PopupService implements OnDestroy {
     }
 
     public create(settings: PopupSettings): PopupRef {
+        const preventClose = settings.preventClose ?? null;
         const positionStrategy = this.overlay
             .position()
             .flexibleConnectedTo(settings.anchor)
@@ -81,13 +83,21 @@ export class PopupService implements OnDestroy {
         }
         overlayRef.attach(portal);
         if (settings.hasBackdrop) {
-            overlayRef
+            const backdropSubject: Subject<void> = new Subject<void>();
+            const subscription = overlayRef
                 .backdropClick()
-                .pipe(take(1))
-                .subscribe(() => {
-                    popupRef.close();
-                    this.lastPopupRef = null;
+                .pipe(takeUntil(backdropSubject))
+                .subscribe(e => {
+                    const event = new PopupCloseEvent({ event: e, via: "backdropClick" });
+                    const prevented = preventClose ? preventClose(event) || event.isDefaultPrevented() : false;
+                    if (!prevented) {
+                        popupRef.close();
+                        this.lastPopupRef = null;
+                        backdropSubject.next();
+                        backdropSubject.complete();
+                    }
                 });
+            popupRef.closed.pipe(take(1)).subscribe(() => subscription.unsubscribe());
         } else {
             if (settings.closeOnOutsideClick ?? true) {
                 const subscription = overlayRef
@@ -95,11 +105,18 @@ export class PopupService implements OnDestroy {
                     .pipe(takeUntil(this.serviceDestroy$))
                     .subscribe(event => {
                         if (this.outsideEventsToClose.includes(event.type)) {
-                            popupRef.close(event);
-                            this.lastPopupRef = null;
-                            subscription.unsubscribe();
+                            const closeEvent = new PopupCloseEvent({ event, via: "outsideClick" });
+                            const prevented = preventClose
+                                ? preventClose(closeEvent) || closeEvent.isDefaultPrevented()
+                                : false;
+                            if (!prevented) {
+                                popupRef.close();
+                                this.lastPopupRef = null;
+                                subscription.unsubscribe();
+                            }
                         }
                     });
+                popupRef.closed.pipe(take(1)).subscribe(() => subscription.unsubscribe());
             }
         }
         this.setEventListeners(settings);
@@ -112,18 +129,26 @@ export class PopupService implements OnDestroy {
     }
 
     private setEventListeners(settings: PopupSettings): void {
+        let keydownListenerRef: () => void;
         this.zone.runOutsideAngular(() => {
             if (settings.closeOnEscape ?? true) {
-                const keydownListenerRef = this.renderer.listen(document, "keydown", (event: KeyboardEvent) => {
+                keydownListenerRef = this.renderer.listen(document, "keydown", (event: KeyboardEvent) => {
                     if (event.key === "Escape") {
-                        this.zone.run(() => {
-                            this.lastPopupRef?.close();
-                            this.lastPopupRef = null;
-                            keydownListenerRef();
-                        });
+                        const closeEvent = new PopupCloseEvent({ event, via: "escape" });
+                        const prevented = settings.preventClose
+                            ? settings.preventClose(closeEvent) || closeEvent.isDefaultPrevented()
+                            : false;
+                        if (!prevented) {
+                            this.zone.run(() => {
+                                this.lastPopupRef?.close();
+                                this.lastPopupRef = null;
+                                keydownListenerRef();
+                            });
+                        }
                     }
                 });
             }
         });
+        this.lastPopupRef?.closed.pipe(take(1)).subscribe(() => keydownListenerRef?.());
     }
 }

@@ -444,12 +444,17 @@ export class AppComponent implements OnInit {
 
     public openPopup2(event: MouseEvent): void {
         event.stopPropagation();
+        const prevented = 5;
         const ref = this.popupService.create({
             anchor: this.italicButtonRef,
             content: TestComponentComponent,
             popupClass: "popup-noselect",
-            hasBackdrop: false,
-            offset: { horizontal: 0, vertical: 1 }
+            hasBackdrop: true,
+            offset: { horizontal: 0, vertical: 1 },
+            preventClose: event => {
+                console.log(event);
+                return event.via === "backdropClick";
+            }
         });
     }
 
