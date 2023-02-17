@@ -49,6 +49,18 @@ export class WindowService {
             const element = popupRef.overlayRef.overlayElement;
             element.classList.add("mona-window");
             element.style.position = "absolute";
+            if (settings.minWidth != null) {
+                element.style.minWidth = `${settings.minWidth}px`;
+            }
+            if (settings.minHeight != null) {
+                element.style.minHeight = `${settings.minHeight}px`;
+            }
+            if (settings.maxWidth != null) {
+                element.style.maxWidth = `${settings.maxWidth}px`;
+            }
+            if (settings.maxHeight != null) {
+                element.style.maxHeight = `${settings.maxHeight}px`;
+            }
             element.style.top = settings.top ? `${settings.top}px` : `calc(50% - ${element.offsetHeight / 2}px)`;
             element.style.left = settings.left ? `${settings.left}px` : `calc(50% - ${element.offsetWidth / 2}px)`;
             element.classList.remove("mona-window-invisible");
