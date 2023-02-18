@@ -842,6 +842,22 @@ ul.mona-menubar {
     @include scrollbars;
 }
 
+/** Progress Bar */
+.mona-progress-bar {
+    background-color: var(--mona-background);
+    border: 1px solid var(--mona-border-color);
+    height: 22px;
+}
+
+div.mona-progress-bar-track {
+    background-color: var(--mona-primary);
+    color: white; // TODO: replace with css variable
+    &-next {
+        background-color: var(--mona-background);
+        color: var(--mona-text);
+    }
+}
+
 /** Tooltip */
 .mona-tooltip-popup-content {
     background-color: var(--mona-background);

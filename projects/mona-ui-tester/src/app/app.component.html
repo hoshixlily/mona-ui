@@ -390,6 +390,10 @@
 
                             </div>
 
+                            <div>
+                                <mona-progress-bar [value]="sliderValue*10" style="width: 400px;"></mona-progress-bar>
+                            </div>
+
                             <div style="display: flex; flex-direction: column; z-index: 100;">
                                 <mona-slider style="width: 200px;" [value]="sliderValue"
                                              (valueChange)="onSliderValueChange($event)"></mona-slider>
