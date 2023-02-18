@@ -83,7 +83,8 @@ export class TooltipComponent implements OnInit {
                     popupClass: "mona-tooltip-popup-content",
                     hasBackdrop: false,
                     positions: DefaultTooltipPositionMap[this.position],
-                    closeOnOutsideClick: true
+                    closeOnOutsideClick: true,
+                    withPush: false
                 });
                 this.popupRef.overlayRef.addPanelClass("mona-invisible-tooltip");
                 window.setTimeout(() => {

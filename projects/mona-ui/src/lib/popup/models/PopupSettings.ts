@@ -1,4 +1,4 @@
-import { TemplateRef } from "@angular/core";
+import { StaticProvider, TemplateRef } from "@angular/core";
 import {
     ComponentType,
     ConnectedPosition,
@@ -6,6 +6,8 @@ import {
     FlexibleConnectedPositionStrategyOrigin
 } from "@angular/cdk/overlay";
 import { PopupOffset } from "./PopupOffset";
+import { Action } from "../../utils/Action";
+import { PopupCloseEvent } from "./PopupCloseEvent";
 
 export interface PopupSettings<T = unknown, C = void> {
     /**
@@ -15,10 +17,18 @@ export interface PopupSettings<T = unknown, C = void> {
     anchor: FlexibleConnectedPositionStrategyOrigin;
 
     /**
+     * Classes to be applied to the backdrop.
+     * @type {string | string[]}
+     */
+    backdropClass?: string | string[];
+
+    /**
      * The content to display in the popup.
      * @type {TemplateRef<C> | ComponentType<C>}
      */
     content: TemplateRef<C> | ComponentType<C>;
+
+    closeOnBackdropClick?: boolean;
 
     /**
      * Whether the popup will be closed when the user presses the escape key.
@@ -86,7 +96,13 @@ export interface PopupSettings<T = unknown, C = void> {
      */
     popupClass?: string | string[];
 
+    positionStrategy?: "global" | "connected";
+
     positions?: Array<ConnectedPosition | ConnectionPositionPair>;
+
+    preventClose?: Action<PopupCloseEvent, boolean>;
+
+    providers?: StaticProvider[];
 
     /**
      * Width of the popup.

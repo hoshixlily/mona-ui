@@ -1,4 +1,5 @@
 import { Component, OnInit } from "@angular/core";
+import { PopupRef, WindowRef } from "mona-ui";
 
 @Component({
     selector: "app-test-component",
@@ -6,7 +7,10 @@ import { Component, OnInit } from "@angular/core";
     styleUrls: ["./test-component.component.scss"]
 })
 export class TestComponentComponent implements OnInit {
-    public constructor() {}
+    public constructor(private readonly popupRef: PopupRef) {}
 
-    public ngOnInit(): void {}
+    public ngOnInit(): void {
+        console.log(this.popupRef);
+        // console.log(this.windowRef);
+    }
 }
