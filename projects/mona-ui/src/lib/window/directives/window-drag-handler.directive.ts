@@ -1,6 +1,6 @@
 import { AfterViewInit, Directive, ElementRef, Input, NgZone, OnDestroy } from "@angular/core";
 import { fromEvent, Subject, takeUntil } from "rxjs";
-import { WindowReference } from "../models/WindowRef";
+import { WindowReference } from "../models/WindowReference";
 
 @Directive({
     selector: "div[monaWindowDragHandler]"

@@ -138,7 +138,7 @@ export * from "./lib/menus/modules/menubar/menubar.module";
 export * from "./lib/menus/menus.module";
 
 /** Popup */
-export * from "./lib/popup/models/PopupRef";
+export { PopupRef } from "./lib/popup/models/PopupRef";
 export * from "./lib/popup/models/PopupSettings";
 export * from "./lib/popup/services/popup.service";
 export * from "./lib/popup/directives/popup-anchor.directive";

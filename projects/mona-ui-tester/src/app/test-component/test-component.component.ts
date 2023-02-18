@@ -7,10 +7,10 @@ import { PopupRef, WindowRef } from "mona-ui";
     styleUrls: ["./test-component.component.scss"]
 })
 export class TestComponentComponent implements OnInit {
-    public constructor(private readonly popupRef: PopupRef, private readonly windowRef: WindowRef) {}
+    public constructor(private readonly popupRef: PopupRef) {}
 
     public ngOnInit(): void {
         console.log(this.popupRef);
-        console.log(this.windowRef);
+        // console.log(this.windowRef);
     }
 }

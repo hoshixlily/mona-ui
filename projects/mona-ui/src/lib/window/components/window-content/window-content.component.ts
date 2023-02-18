@@ -2,16 +2,22 @@ import {
     AfterViewInit,
     ChangeDetectionStrategy,
     Component,
+    ComponentRef,
     ElementRef,
     Inject,
+    Injector,
     OnInit,
-    TemplateRef
+    TemplateRef,
+    Type,
+    ViewChild,
+    ViewContainerRef
 } from "@angular/core";
 import { PopupInjectionToken } from "../../../popup/models/PopupInjectionToken";
 import { WindowInjectorData } from "../../models/WindowInjectorData";
 import { faClose, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { WindowCloseEvent } from "../../models/WindowCloseEvent";
 import { PopupCloseSource } from "../../../popup/models/PopupCloseEvent";
+import { PopupService } from "../../../popup/services/popup.service";
 
 @Component({
     selector: "mona-window-content",
@@ -20,11 +26,15 @@ import { PopupCloseSource } from "../../../popup/models/PopupCloseEvent";
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class WindowContentComponent implements OnInit, AfterViewInit {
-    public readonly TemplateRef = TemplateRef;
     public readonly closeIcon: IconDefinition = faClose;
+    public readonly componentRef?: ComponentRef<any>;
     public readonly contentType: "template" | "component" = "template";
 
+    @ViewChild("componentAnchor", { read: ViewContainerRef })
+    public componentAnchor!: ViewContainerRef;
+
     public constructor(
+        private injector: Injector,
         @Inject(PopupInjectionToken) public windowData: WindowInjectorData,
         private readonly elementRef: ElementRef<HTMLElement>
     ) {
@@ -32,10 +42,24 @@ export class WindowContentComponent implements OnInit, AfterViewInit {
             this.contentType = "template";
         } else {
             this.contentType = "component";
+            this.componentRef = PopupService.popupAnchorDirective.viewContainerRef.createComponent(
+                windowData.content as Type<any>,
+                {
+                    injector: this.injector
+                }
+            );
         }
     }
 
     public ngAfterViewInit(): void {
+        if (this.contentType === "component" && this.componentAnchor && this.componentRef) {
+            const index = PopupService.popupAnchorDirective.viewContainerRef.indexOf(this.componentRef.hostView);
+            if (index !== -1) {
+                PopupService.popupAnchorDirective.viewContainerRef.detach(index);
+            }
+            this.componentAnchor.insert(this.componentRef.hostView, 0);
+            this.componentRef.changeDetectorRef.detectChanges();
+        }
         this.focusElement();
     }
 

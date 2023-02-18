@@ -1,23 +1,29 @@
-import { Observable, Subject } from "rxjs";
+import { Observable } from "rxjs";
+import { PopupCloseEvent } from "./PopupCloseEvent";
+import { ComponentRef } from "@angular/core";
 import { OverlayRef } from "@angular/cdk/overlay";
-import { PopupCloseEvent, PopupCloseSource } from "./PopupCloseEvent";
+import { PopupRefParams } from "./PopupRefParams";
 
 export class PopupRef {
-    private closed$: Subject<PopupCloseEvent> = new Subject<PopupCloseEvent>();
+    #options: PopupRefParams;
 
-    public constructor(public readonly overlayRef: OverlayRef) {}
+    public constructor(options: PopupRefParams) {
+        this.#options = options;
+    }
 
     public close<R>(result?: R): void {
-        const event =
-            result instanceof PopupCloseEvent
-                ? result
-                : new PopupCloseEvent({ result, via: PopupCloseSource.Programmatic });
-        this.overlayRef.dispose();
-        this.closed$.next(event);
-        this.closed$.complete();
+        this.#options.close(result);
     }
 
     public get closed(): Observable<PopupCloseEvent> {
-        return this.closed$.asObservable();
+        return this.#options.closed$;
+    }
+
+    public get component(): ComponentRef<any> | null {
+        return this.#options.component;
+    }
+
+    public get overlayRef(): OverlayRef {
+        return this.#options.overlayRef;
     }
 }

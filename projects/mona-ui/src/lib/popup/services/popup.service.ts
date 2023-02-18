@@ -6,11 +6,12 @@ import { PopupAnchorDirective } from "../directives/popup-anchor.directive";
 import { PopupRef } from "../models/PopupRef";
 import { PopupInjectionToken } from "../models/PopupInjectionToken";
 import { DefaultPositions } from "../models/DefaultPositions";
-import { fromEvent, merge, Subject, take, takeUntil } from "rxjs";
+import { fromEvent, Subject, take, takeUntil } from "rxjs";
 import { PopupCloseEvent, PopupCloseSource } from "../models/PopupCloseEvent";
 import { Dictionary } from "@mirei/ts-collections";
 import { PopupState } from "../models/PopupState";
 import { v4 } from "uuid";
+import { PopupReference } from "../models/PopupReference";
 
 @Injectable({
     providedIn: "root"
@@ -64,12 +65,12 @@ export class PopupService implements OnDestroy {
         });
 
         const preventClose = settings.preventClose;
-        const popupRef = new PopupRef(overlayRef);
+        const popupReference = new PopupReference(overlayRef);
 
         const injector = Injector.create({
             parent: this.injector,
             providers: [
-                { provide: PopupRef, useValue: popupRef },
+                { provide: PopupRef, useFactory: () => popupReference.popupRef },
                 { provide: PopupInjectionToken, useValue: settings.data },
                 ...(settings.providers ?? [])
             ]
@@ -83,14 +84,16 @@ export class PopupService implements OnDestroy {
                 null,
                 injector
             );
+            overlayRef.attach(portal);
         } else {
             portal = new ComponentPortal(
                 settings.content,
                 PopupService.popupAnchorDirective.viewContainerRef,
                 injector
             );
+            popupReference.componentRef = overlayRef.attach(portal);
         }
-        overlayRef.attach(portal);
+
         if (settings.hasBackdrop) {
             const backdropSubject: Subject<void> = new Subject<void>();
             const subscription = overlayRef
@@ -100,12 +103,13 @@ export class PopupService implements OnDestroy {
                     const event = new PopupCloseEvent({ event: e, via: PopupCloseSource.BackdropClick });
                     const prevented = preventClose ? preventClose(event) || event.isDefaultPrevented() : false;
                     if (!prevented) {
-                        popupRef.close(event);
+                        popupReference.close(event);
+                        this.popupStateMap.remove(uid);
                         backdropSubject.next();
                         backdropSubject.complete();
                     }
                 });
-            popupRef.closed.pipe(take(1)).subscribe(() => subscription.unsubscribe());
+            popupReference.closed.pipe(take(1)).subscribe(() => subscription.unsubscribe());
         } else {
             if (settings.closeOnOutsideClick ?? true) {
                 const subscription = overlayRef
@@ -118,24 +122,25 @@ export class PopupService implements OnDestroy {
                                 ? preventClose(closeEvent) || closeEvent.isDefaultPrevented()
                                 : false;
                             if (!prevented) {
-                                popupRef.close(closeEvent);
+                                popupReference.close(closeEvent);
+                                this.popupStateMap.remove(uid);
                                 subscription.unsubscribe();
                             }
                         }
                     });
-                popupRef.closed.pipe(take(1)).subscribe(() => subscription.unsubscribe());
+                popupReference.closed.pipe(take(1)).subscribe(() => subscription.unsubscribe());
             }
         }
-        popupRef.closed.pipe(take(1)).subscribe(() => {
+        popupReference.closed.pipe(take(1)).subscribe(() => {
             this.popupStateMap.remove(uid);
         });
         this.popupStateMap.add(uid, {
             uid,
-            popupRef,
+            popupRef: popupReference.popupRef,
             settings
         });
         this.setEventListeners(this.popupStateMap.get(uid));
-        return popupRef;
+        return popupReference.popupRef;
     }
 
     public ngOnDestroy(): void {
@@ -157,6 +162,7 @@ export class PopupService implements OnDestroy {
                             if (!prevented) {
                                 this.zone.run(() => {
                                     state.popupRef.close(closeEvent);
+                                    this.popupStateMap.remove(state.uid);
                                 });
                             }
                         }
