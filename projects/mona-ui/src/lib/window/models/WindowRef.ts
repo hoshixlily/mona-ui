@@ -3,27 +3,69 @@ import { ResizeEvent } from "./ResizeEvent";
 import { PopupRef } from "../../popup/models/PopupRef";
 import { MoveEvent } from "./MoveEvent";
 import { WindowCloseEvent } from "./WindowCloseEvent";
-import { PopupCloseEvent, PopupCloseSource } from "../../popup/models/PopupCloseEvent";
+import { PopupCloseSource } from "../../popup/models/PopupCloseEvent";
 
-export abstract class WindowRef<R = unknown> {
-    public abstract close(result?: R): void;
-    public abstract center(): void;
-    public abstract move(params: { top?: number; left?: number }): void;
-    public abstract resize(params: { width?: number; height?: number; center?: boolean }): void;
-    public abstract get closed$(): Observable<WindowCloseEvent>;
-    public abstract get moved$(): Observable<MoveEvent>;
-    public abstract get resized$(): Observable<ResizeEvent>;
+export class WindowRef<R = unknown> {
+    #options: WindowRefParams<R>;
+
+    public constructor(options: WindowRefParams<R>) {
+        this.#options = options;
+    }
+
+    public close(result?: R): void {
+        this.#options.close(result);
+    }
+
+    public center(): void {
+        this.#options.center();
+    }
+
+    public move(params: { top?: number; left?: number }): void {
+        this.#options.move(params);
+    }
+
+    public resize(params: { width?: number; height?: number; center?: boolean }): void {
+        this.#options.resize(params);
+    }
+
+    public get closed$(): Observable<WindowCloseEvent> {
+        return this.#options.closed$;
+    }
+
+    public get moved$(): Observable<MoveEvent> {
+        return this.#options.moved$;
+    }
+
+    public get resized$(): Observable<ResizeEvent> {
+        return this.#options.resized$;
+    }
 }
 
-export class WindowReference<R = unknown> extends WindowRef<R> {
+/**
+ * @internal
+ */
+interface WindowRefParams<R = unknown> {
+    close: (result?: R) => void;
+    center: () => void;
+    move: (params: { top?: number; left?: number }) => void;
+    resize: (params: { width?: number; hight?: number; center?: boolean }) => void;
+    get closed$(): Observable<WindowCloseEvent>;
+    get moved$(): Observable<MoveEvent>;
+    get popupRef(): PopupRef;
+    get resized$(): Observable<ResizeEvent>;
+}
+
+/**
+ * @internal - used by WindowService. Do not export.
+ */
+export class WindowReference<R = unknown> implements WindowRefParams<R> {
     public readonly element: HTMLElement;
-    public readonly popupRef: PopupRef;
+    public readonly popupReference: PopupRef;
     public readonly move$: Subject<MoveEvent> = new Subject<MoveEvent>();
     public readonly resize$: Subject<ResizeEvent> = new Subject<ResizeEvent>();
 
     public constructor(popupRef: PopupRef) {
-        super();
-        this.popupRef = popupRef;
+        this.popupReference = popupRef;
         this.element = popupRef.overlayRef.overlayElement;
     }
 
@@ -41,10 +83,10 @@ export class WindowReference<R = unknown> extends WindowRef<R> {
             result instanceof WindowCloseEvent
                 ? result
                 : new WindowCloseEvent({ result, via: PopupCloseSource.Programmatic });
-        this.popupRef.close(event);
+        this.popupReference.close(event);
     }
 
-    public override move(params: { top?: number; left?: number }): void {
+    public move(params: { top?: number; left?: number }): void {
         if (params.top) {
             this.element.style.top = `${params.top}px`;
         }
@@ -53,7 +95,7 @@ export class WindowReference<R = unknown> extends WindowRef<R> {
         }
     }
 
-    public override resize(params: { width?: number; height?: number; center?: boolean }): void {
+    public resize(params: { width?: number; height?: number; center?: boolean }): void {
         if (params.width) {
             this.element.style.width = `${params.width}px`;
         }
@@ -66,7 +108,7 @@ export class WindowReference<R = unknown> extends WindowRef<R> {
     }
 
     public get closed$(): Observable<WindowCloseEvent> {
-        return this.popupRef.closed.pipe(
+        return this.popupReference.closed.pipe(
             map(event => {
                 if (event.type === "windowClose") {
                     return event;
@@ -80,11 +122,15 @@ export class WindowReference<R = unknown> extends WindowRef<R> {
         return this.move$;
     }
 
+    public get popupRef(): PopupRef {
+        return this.popupReference;
+    }
+
     public get resized$(): Observable<ResizeEvent> {
         return this.resize$;
     }
 
     public get windowRef(): WindowRef<R> {
-        return this;
+        return new WindowRef<R>(this);
     }
 }

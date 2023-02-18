@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { forwardRef, Injectable } from "@angular/core";
 import { PopupService } from "../../popup/services/popup.service";
 import { WindowContentComponent } from "../components/window-content/window-content.component";
 import { WindowInjectorData } from "../models/WindowInjectorData";
@@ -34,6 +34,7 @@ export class WindowService {
             width: settings.width
         };
 
+        let windowReference: WindowReference;
         const popupRef = this.popupService.create({
             anchor: document.body,
             content: WindowContentComponent,
@@ -46,6 +47,12 @@ export class WindowService {
             data: injectorData,
             width: settings.width,
             height: settings.height,
+            providers: [
+                {
+                    provide: WindowRef,
+                    useFactory: () => windowReference.windowRef
+                }
+            ],
             preventClose: (event: PopupCloseEvent) => {
                 if (settings.preventClose) {
                     const windowCloseEvent = new WindowCloseEvent({
@@ -59,7 +66,7 @@ export class WindowService {
                 return false;
             }
         });
-        const windowReference: WindowReference = new WindowReference(popupRef);
+        windowReference = new WindowReference(popupRef);
         injectorData.windowReference = windowReference;
         asapScheduler.schedule(() => {
             const element = popupRef.overlayRef.overlayElement;

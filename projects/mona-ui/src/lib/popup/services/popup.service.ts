@@ -70,7 +70,8 @@ export class PopupService implements OnDestroy {
             parent: this.injector,
             providers: [
                 { provide: PopupRef, useValue: popupRef },
-                { provide: PopupInjectionToken, useValue: settings.data }
+                { provide: PopupInjectionToken, useValue: settings.data },
+                ...(settings.providers ?? [])
             ]
         });
 

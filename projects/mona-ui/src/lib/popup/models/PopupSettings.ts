@@ -1,4 +1,4 @@
-import { TemplateRef } from "@angular/core";
+import { StaticProvider, TemplateRef } from "@angular/core";
 import {
     ComponentType,
     ConnectedPosition,
@@ -99,6 +99,8 @@ export interface PopupSettings<T = unknown, C = void> {
     positions?: Array<ConnectedPosition | ConnectionPositionPair>;
 
     preventClose?: Action<PopupCloseEvent, boolean>;
+
+    providers?: StaticProvider[];
 
     /**
      * Width of the popup.

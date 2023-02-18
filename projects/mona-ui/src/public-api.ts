@@ -90,7 +90,6 @@ export * from "./lib/inputs/modules/text-box/directives/text-box-prefix-template
 export * from "./lib/inputs/modules/text-box/directives/text-box-suffix-template.directive";
 export * from "./lib/inputs/modules/text-box/components/text-box/text-box.component";
 export * from "./lib/inputs/modules/text-box/text-box.module";
-
 export * from "./lib/inputs/inputs.module";
 
 /** Layout */
@@ -169,7 +168,7 @@ export * from "./lib/tree-view/directives/tree-view-node-text-template.directive
 export * from "./lib/tree-view/tree-view.module";
 
 /** Window */
-export * from "./lib/window/models/WindowRef";
+export { WindowRef } from "./lib/window/models/WindowRef";
 export * from "./lib/window/services/window.service";
 export * from "./lib/window/directives/window-title-template.directive";
 export * from "./lib/window/components/window/window.component";

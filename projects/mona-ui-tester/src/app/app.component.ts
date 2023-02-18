@@ -472,7 +472,7 @@ export class AppComponent implements OnInit {
 
     public openWindow(windowContentTemplate: TemplateRef<void>, titleTemplate?: TemplateRef<void>): void {
         const ref = this.windowService.open({
-            content: windowContentTemplate,
+            content: TestComponentComponent,
             height: 600,
             width: 800,
             draggable: true,
@@ -488,6 +488,9 @@ export class AppComponent implements OnInit {
                 return event.via === "closeButton";
             }
         });
+        window.setTimeout(() => {
+            ref.resize({ width: 1024, height: 768, center: true });
+        }, 2500);
         ref.closed$.subscribe(console.log);
         // window.setTimeout(() => {
         //     ref.close("Aoi");
