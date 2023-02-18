@@ -1,7 +1,7 @@
 import { AfterViewInit, Directive, ElementRef, Input, NgZone, OnDestroy } from "@angular/core";
 import { WindowResizeHandlerDirection } from "../models/WindowResizeHandlerDirection";
 import { fromEvent, Subject, takeUntil } from "rxjs";
-import { WindowReference } from "../models/WindowRef";
+import { WindowReference } from "../models/WindowReference";
 
 @Directive({
     selector: "div[monaWindowResizeHandler]"
@@ -46,9 +46,9 @@ export class WindowResizeHandlerDirective implements AfterViewInit, OnDestroy {
         const initialY = event.clientY;
         const initialTop = element.offsetTop;
         const initialLeft = element.offsetLeft;
-
         const oldSelectStart = document.onselectstart;
         const oldDragStart = document.ondragstart;
+
         document.onselectstart = () => false;
         document.ondragstart = () => false;
 

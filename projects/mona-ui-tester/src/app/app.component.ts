@@ -456,18 +456,23 @@ export class AppComponent implements OnInit {
 
     public openPopup2(event: MouseEvent): void {
         event.stopPropagation();
+        const prevented = 5;
         const ref = this.popupService.create({
             anchor: this.italicButtonRef,
             content: TestComponentComponent,
             popupClass: "popup-noselect",
-            hasBackdrop: false,
-            offset: { horizontal: 0, vertical: 1 }
+            hasBackdrop: true,
+            offset: { horizontal: 0, vertical: 1 },
+            preventClose: event => {
+                console.log(event);
+                return event.via === "backdropClick";
+            }
         });
     }
 
     public openWindow(windowContentTemplate: TemplateRef<void>, titleTemplate?: TemplateRef<void>): void {
         const ref = this.windowService.open({
-            content: windowContentTemplate,
+            content: TestComponentComponent,
             height: 600,
             width: 800,
             draggable: true,
@@ -477,8 +482,22 @@ export class AppComponent implements OnInit {
             minHeight: 150,
             maxWidth: 1200,
             maxHeight: 768,
-            title: titleTemplate
+            title: titleTemplate,
+            preventClose: event => {
+                // console.log(event);
+                return event.via === "backdropClick";
+            }
         });
+        window.setTimeout(() => {
+            ref.resize({ width: 1024, height: 768, center: true });
+            console.log(ref.component?.instance);
+            // window.setTimeout(() => ref.close(), 2500);
+            ref.popupRef.closed.subscribe(console.log);
+        }, 2500);
+        // ref.closed$.subscribe(console.log);
+        // window.setTimeout(() => {
+        //     ref.close("Aoi");
+        // }, 1500);
 
         // window.setTimeout(() => {
         //     ref.move({ top: 100, left: 100 });

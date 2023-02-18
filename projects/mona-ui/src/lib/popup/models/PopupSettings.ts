@@ -1,4 +1,4 @@
-import { TemplateRef } from "@angular/core";
+import { StaticProvider, TemplateRef } from "@angular/core";
 import {
     ComponentType,
     ConnectedPosition,
@@ -6,6 +6,8 @@ import {
     FlexibleConnectedPositionStrategyOrigin
 } from "@angular/cdk/overlay";
 import { PopupOffset } from "./PopupOffset";
+import { Action } from "../../utils/Action";
+import { PopupCloseEvent } from "./PopupCloseEvent";
 
 export interface PopupSettings<T = unknown, C = void> {
     /**
@@ -95,6 +97,10 @@ export interface PopupSettings<T = unknown, C = void> {
     positionStrategy?: "global" | "connected";
 
     positions?: Array<ConnectedPosition | ConnectionPositionPair>;
+
+    preventClose?: Action<PopupCloseEvent, boolean>;
+
+    providers?: StaticProvider[];
 
     /**
      * Width of the popup.

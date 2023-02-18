@@ -1,5 +1,7 @@
 import { ElementRef, TemplateRef, Type } from "@angular/core";
-import { WindowReference } from "./WindowRef";
+import { Action } from "../../utils/Action";
+import { WindowCloseEvent } from "./WindowCloseEvent";
+import { WindowReference } from "./WindowReference";
 
 export interface WindowInjectorData {
     content: TemplateRef<unknown> | Type<unknown>;
@@ -11,6 +13,7 @@ export interface WindowInjectorData {
     maxWidth: number;
     minHeight: number;
     minWidth: number;
+    preventClose?: Action<WindowCloseEvent, boolean>;
     resizable: boolean;
     title?: string;
     titleTemplate?: TemplateRef<unknown>;

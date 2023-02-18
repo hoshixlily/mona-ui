@@ -1,77 +1,55 @@
-import { asapScheduler, Observable, Subject } from "rxjs";
+import { Observable } from "rxjs";
 import { ResizeEvent } from "./ResizeEvent";
 import { PopupRef } from "../../popup/models/PopupRef";
 import { MoveEvent } from "./MoveEvent";
+import { WindowCloseEvent } from "./WindowCloseEvent";
+import { ComponentRef } from "@angular/core";
+import { WindowRefParams } from "./WindowRefParams";
 
-export abstract class WindowRef<R = unknown> {
-    public abstract close(result?: R): void;
-    public abstract center(): void;
-    public abstract move(params: { top?: number; left?: number }): void;
-    public abstract resize(params: { width?: number; height?: number; center?: boolean }): void;
-    public abstract get closed$(): Observable<R | null>;
-    public abstract get moved$(): Observable<MoveEvent>;
-    public abstract get resized$(): Observable<ResizeEvent>;
-}
+export class WindowRef<R = unknown> {
+    #options: WindowRefParams<R>;
 
-export class WindowReference<R = unknown> extends WindowRef<R> {
-    public readonly element: HTMLElement;
-    public readonly popupRef: PopupRef<R>;
-    public readonly move$: Subject<MoveEvent> = new Subject<MoveEvent>();
-    public readonly resize$: Subject<ResizeEvent> = new Subject<ResizeEvent>();
-
-    public constructor(popupRef: PopupRef<R>) {
-        super();
-        this.popupRef = popupRef;
-        this.element = popupRef.overlayRef.overlayElement;
-    }
-
-    public center(): void {
-        const width = this.element.offsetWidth;
-        const height = this.element.offsetHeight;
-        const left = (window.innerWidth - width) / 2;
-        const top = (window.innerHeight - height) / 2;
-        this.element.style.left = `${left}px`;
-        this.element.style.top = `${top}px`;
+    public constructor(options: WindowRefParams<R>) {
+        this.#options = options;
     }
 
     public close(result?: R): void {
-        this.popupRef.close(result);
+        this.#options.close(result);
     }
 
-    public override move(params: { top?: number; left?: number }): void {
-        if (params.top) {
-            this.element.style.top = `${params.top}px`;
-        }
-        if (params.left) {
-            this.element.style.left = `${params.left}px`;
-        }
+    public center(): void {
+        this.#options.center();
     }
 
-    public override resize(params: { width?: number; height?: number; center?: boolean }): void {
-        if (params.width) {
-            this.element.style.width = `${params.width}px`;
-        }
-        if (params.height) {
-            this.element.style.height = `${params.height}px`;
-        }
-        if (params.center) {
-            asapScheduler.schedule(() => this.center());
-        }
+    public move(params: { top?: number; left?: number }): void {
+        this.#options.move(params);
     }
 
-    public get closed$(): Observable<R | null> {
-        return this.popupRef.closed;
+    public resize(params: { width?: number; height?: number; center?: boolean }): void {
+        this.#options.resize(params);
+    }
+
+    public get closed$(): Observable<WindowCloseEvent> {
+        return this.#options.closed$;
+    }
+
+    public get component(): ComponentRef<any> | null {
+        return this.#options.component;
+    }
+
+    public get element(): HTMLElement {
+        return this.#options.element;
     }
 
     public get moved$(): Observable<MoveEvent> {
-        return this.move$;
+        return this.#options.moved$;
+    }
+
+    public get popupRef(): PopupRef {
+        return this.#options.popupRef;
     }
 
     public get resized$(): Observable<ResizeEvent> {
-        return this.resize$;
-    }
-
-    public get windowRef(): WindowRef<R> {
-        return this;
+        return this.#options.resized$;
     }
 }

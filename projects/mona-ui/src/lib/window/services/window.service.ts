@@ -1,10 +1,14 @@
-import { Injectable } from "@angular/core";
+import { forwardRef, Injectable } from "@angular/core";
 import { PopupService } from "../../popup/services/popup.service";
 import { WindowContentComponent } from "../components/window-content/window-content.component";
 import { WindowInjectorData } from "../models/WindowInjectorData";
 import { WindowSettings } from "../models/WindowSettings";
 import { asapScheduler } from "rxjs";
-import { WindowRef, WindowReference } from "../models/WindowRef";
+import { WindowRef } from "../models/WindowRef";
+import { PopupCloseEvent } from "../../popup/models/PopupCloseEvent";
+import { WindowCloseEvent } from "../models/WindowCloseEvent";
+import { WindowReference } from "../models/WindowReference";
+import { WindowReferenceOptions } from "../models/WindowReferenceOptions";
 
 @Injectable({
     providedIn: "root"
@@ -24,13 +28,23 @@ export class WindowService {
             minHeight: settings.minHeight ?? 50,
             minWidth: settings.minWidth ?? 50,
             windowReference: null as any,
+            preventClose: settings.preventClose,
             resizable: settings.resizable ?? false,
             title: typeof settings.title === "string" ? settings.title : undefined,
             titleTemplate: typeof settings.title === "string" ? undefined : settings.title,
             top: settings.top,
             width: settings.width
         };
-        const popupRef = this.popupService.create({
+
+        const windowReferenceHolder: { windowReference: WindowReference } = {
+            windowReference: null as any
+        };
+        const windowReferenceOptions: WindowReferenceOptions = {
+            popupRef: null as any
+        };
+        windowReferenceHolder.windowReference = new WindowReference(windowReferenceOptions);
+        injectorData.windowReference = windowReferenceHolder.windowReference;
+        windowReferenceOptions.popupRef = this.popupService.create({
             anchor: document.body,
             content: WindowContentComponent,
             closeOnEscape: false,
@@ -41,12 +55,30 @@ export class WindowService {
             positionStrategy: "global",
             data: injectorData,
             width: settings.width,
-            height: settings.height
+            height: settings.height,
+            providers: [
+                {
+                    provide: WindowRef,
+                    useFactory: forwardRef(() => {
+                        return windowReferenceHolder.windowReference.windowRef;
+                    })
+                }
+            ],
+            preventClose: (event: PopupCloseEvent) => {
+                if (settings.preventClose) {
+                    const windowCloseEvent = new WindowCloseEvent({
+                        event,
+                        via: event.via,
+                        type: event.type,
+                        result: event.result
+                    });
+                    return settings.preventClose(windowCloseEvent);
+                }
+                return false;
+            }
         });
-        const windowReference: WindowReference = new WindowReference(popupRef);
-        injectorData.windowReference = windowReference;
         asapScheduler.schedule(() => {
-            const element = popupRef.overlayRef.overlayElement;
+            const element = windowReferenceOptions.popupRef.overlayRef.overlayElement;
             element.classList.add("mona-window");
             element.style.position = "absolute";
             if (settings.minWidth != null) {
@@ -65,6 +97,6 @@ export class WindowService {
             element.style.left = settings.left ? `${settings.left}px` : `calc(50% - ${element.offsetWidth / 2}px)`;
             element.classList.remove("mona-window-invisible");
         });
-        return windowReference.windowRef;
+        return windowReferenceHolder.windowReference.windowRef;
     }
 }

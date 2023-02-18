@@ -6,10 +6,12 @@ import { PopupAnchorDirective } from "../directives/popup-anchor.directive";
 import { PopupRef } from "../models/PopupRef";
 import { PopupInjectionToken } from "../models/PopupInjectionToken";
 import { DefaultPositions } from "../models/DefaultPositions";
-import { fromEvent, merge, Subject, take, takeUntil } from "rxjs";
+import { fromEvent, Subject, take, takeUntil } from "rxjs";
+import { PopupCloseEvent, PopupCloseSource } from "../models/PopupCloseEvent";
 import { Dictionary } from "@mirei/ts-collections";
 import { PopupState } from "../models/PopupState";
 import { v4 } from "uuid";
+import { PopupReference } from "../models/PopupReference";
 
 @Injectable({
     providedIn: "root"
@@ -62,13 +64,15 @@ export class PopupService implements OnDestroy {
             backdropClass: settings.backdropClass ?? "transparent"
         });
 
-        const popupRef = new PopupRef(overlayRef);
+        const preventClose = settings.preventClose;
+        const popupReference = new PopupReference(overlayRef);
 
         const injector = Injector.create({
             parent: this.injector,
             providers: [
-                { provide: PopupRef, useValue: popupRef },
-                { provide: PopupInjectionToken, useValue: settings.data }
+                { provide: PopupRef, useFactory: () => popupReference.popupRef },
+                { provide: PopupInjectionToken, useValue: settings.data },
+                ...(settings.providers ?? [])
             ]
         });
 
@@ -80,23 +84,32 @@ export class PopupService implements OnDestroy {
                 null,
                 injector
             );
+            overlayRef.attach(portal);
         } else {
             portal = new ComponentPortal(
                 settings.content,
                 PopupService.popupAnchorDirective.viewContainerRef,
                 injector
             );
+            popupReference.componentRef = overlayRef.attach(portal);
         }
-        overlayRef.attach(portal);
+
         if (settings.hasBackdrop) {
-            if (settings.closeOnOutsideClick === true || settings.closeOnOutsideClick === undefined) {
-                overlayRef
-                    .backdropClick()
-                    .pipe(take(1))
-                    .subscribe(() => {
-                        popupRef.close();
-                    });
-            }
+            const backdropSubject: Subject<void> = new Subject<void>();
+            const subscription = overlayRef
+                .backdropClick()
+                .pipe(takeUntil(backdropSubject))
+                .subscribe(e => {
+                    const event = new PopupCloseEvent({ event: e, via: PopupCloseSource.BackdropClick });
+                    const prevented = preventClose ? preventClose(event) || event.isDefaultPrevented() : false;
+                    if (!prevented) {
+                        popupReference.close(event);
+                        this.popupStateMap.remove(uid);
+                        backdropSubject.next();
+                        backdropSubject.complete();
+                    }
+                });
+            popupReference.closed.pipe(take(1)).subscribe(() => subscription.unsubscribe());
         } else {
             if (settings.closeOnOutsideClick ?? true) {
                 const subscription = overlayRef
@@ -104,22 +117,30 @@ export class PopupService implements OnDestroy {
                     .pipe(takeUntil(this.serviceDestroy$))
                     .subscribe(event => {
                         if (this.outsideEventsToClose.includes(event.type)) {
-                            popupRef.close(event);
-                            subscription.unsubscribe();
+                            const closeEvent = new PopupCloseEvent({ event, via: PopupCloseSource.OutsideClick });
+                            const prevented = preventClose
+                                ? preventClose(closeEvent) || closeEvent.isDefaultPrevented()
+                                : false;
+                            if (!prevented) {
+                                popupReference.close(closeEvent);
+                                this.popupStateMap.remove(uid);
+                                subscription.unsubscribe();
+                            }
                         }
                     });
+                popupReference.closed.pipe(take(1)).subscribe(() => subscription.unsubscribe());
             }
         }
-        popupRef.closed.pipe(take(1)).subscribe(() => {
+        popupReference.closed.pipe(take(1)).subscribe(() => {
             this.popupStateMap.remove(uid);
         });
         this.popupStateMap.add(uid, {
             uid,
-            popupRef,
+            popupRef: popupReference.popupRef,
             settings
         });
         this.setEventListeners(this.popupStateMap.get(uid));
-        return popupRef;
+        return popupReference.popupRef;
     }
 
     public ngOnDestroy(): void {
@@ -131,10 +152,19 @@ export class PopupService implements OnDestroy {
         this.zone.runOutsideAngular(() => {
             if (state.settings.closeOnEscape ?? true) {
                 fromEvent<KeyboardEvent>(document, "keydown")
-                    .pipe(takeUntil(merge(state.popupRef.closed, this.serviceDestroy$)))
+                    .pipe(takeUntil(state.popupRef.closed))
                     .subscribe(event => {
                         if (event.key === "Escape") {
-                            state.popupRef.close();
+                            const closeEvent = new PopupCloseEvent({ event, via: PopupCloseSource.Escape });
+                            const prevented = state.settings.preventClose
+                                ? state.settings.preventClose(closeEvent) || closeEvent.isDefaultPrevented()
+                                : false;
+                            if (!prevented) {
+                                this.zone.run(() => {
+                                    state.popupRef.close(closeEvent);
+                                    this.popupStateMap.remove(state.uid);
+                                });
+                            }
                         }
                     });
             }

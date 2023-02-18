@@ -5,14 +5,14 @@
             <ng-container [ngTemplateOutlet]="windowData.titleTemplate" *ngIf="windowData.titleTemplate"></ng-container>
         </div>
         <div class="mona-window-title-bar-actions">
-            <button monaButton class="mona-window-title-bar-action" [flat]="true" (click)="windowData.windowReference.close()">
+            <button monaButton class="mona-window-title-bar-action" [flat]="true" (click)="onCloseClick($event)">
                 <fa-icon [icon]="closeIcon"></fa-icon>
             </button>
         </div>
     </div>
     <div class="mona-window-content">
         <ng-container [ngTemplateOutlet]="$any(windowData.content)" *ngIf="contentType==='template'"></ng-container>
-        <ng-container [ngComponentOutlet]="$any(windowData.content)" *ngIf="contentType==='component'"></ng-container>
+        <ng-container #componentAnchor *ngIf="contentType==='component'"></ng-container>
     </div>
 
     <div monaWindowResizeHandler [minWidth]="windowData.minWidth" [minHeight]="windowData.minHeight"
