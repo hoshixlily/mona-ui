@@ -1,25 +1,32 @@
 import { PreventableEvent } from "../../utils/PreventableEvent";
 
 export class PopupCloseEvent<R = unknown> extends PreventableEvent {
-    #options?: Partial<PopupCloseEventOptions<R>>;
+    protected readonly options?: Partial<PopupCloseEventOptions<R>>;
     public constructor(options?: Partial<PopupCloseEventOptions<R>>) {
-        super("close", options?.event);
-        this.#options = options;
+        super(options?.type ?? "popupClose", options?.event);
+        this.options = options;
     }
 
     public get result(): R | undefined {
-        return this.#options?.result;
+        return this.options?.result;
     }
 
     public get via(): PopupCloseSource | undefined {
-        return this.#options?.via;
+        return this.options?.via;
     }
 }
 
-interface PopupCloseEventOptions<R = unknown> {
-    event?: Event;
+export interface PopupCloseEventOptions<R = unknown> {
+    event?: unknown;
     result?: R;
+    type?: string;
     via?: PopupCloseSource;
 }
 
-export type PopupCloseSource = "backdropClick" | "escape" | "close" | "programmatic" | "outsideClick";
+export enum PopupCloseSource {
+    BackdropClick = "backdropClick",
+    CloseButton = "closeButton",
+    Escape = "escape",
+    Programmatic = "programmatic",
+    OutsideClick = "outsideClick"
+}

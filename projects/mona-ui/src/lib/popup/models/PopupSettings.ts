@@ -17,6 +17,12 @@ export interface PopupSettings<T = unknown, C = void> {
     anchor: FlexibleConnectedPositionStrategyOrigin;
 
     /**
+     * Classes to be applied to the backdrop.
+     * @type {string | string[]}
+     */
+    backdropClass?: string | string[];
+
+    /**
      * The content to display in the popup.
      * @type {TemplateRef<C> | ComponentType<C>}
      */
@@ -87,6 +93,8 @@ export interface PopupSettings<T = unknown, C = void> {
      * @type {string | string[]}
      */
     popupClass?: string | string[];
+
+    positionStrategy?: "global" | "connected";
 
     positions?: Array<ConnectedPosition | ConnectionPositionPair>;
 

@@ -93,6 +93,14 @@ input {
     display: none;
 }
 
+.mona-unselectable {
+    &, & * {
+        pointer-events: none !important;
+        cursor: default;
+        user-select: none !important;
+    }
+}
+
 /** Shared Components **/
 .mona-input-selector {
     width: auto;
@@ -897,4 +905,18 @@ ul.mona-menubar {
     & fa-icon {
         margin-right: 4px;
     }
+}
+
+/** Window */
+.mona-window-invisible {
+    visibility: hidden;
+}
+
+.mona-window-overlay {
+    background-color: rgba(0, 0, 0, 0.41);
+}
+
+.mona-window-popup-content {
+    padding: 0 !important;
+    position: absolute !important;
 }

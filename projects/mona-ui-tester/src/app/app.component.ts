@@ -8,7 +8,8 @@ import {
     NodeClickEvent,
     TabCloseEvent,
     StepOptions,
-    PopupService
+    PopupService,
+    WindowService
 } from "mona-ui";
 import { TestComponentComponent } from "./test-component/test-component.component";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
@@ -242,6 +243,13 @@ export class AppComponent implements OnInit {
         /*"1-2-1", "1-2-2", "1-2-3", "1-2-4"*/
     ];
 
+    public windowHeight: number = 333;
+    public windowLeft: number = 444;
+    public windowTop: number = 555;
+    public windowVisible: boolean = false;
+    public windowVisible2: boolean = false;
+    public windowWidth: number = 555;
+
     @ViewChild("italicButtonRef", { read: ElementRef })
     public italicButtonRef!: ElementRef<HTMLButtonElement>;
 
@@ -254,7 +262,7 @@ export class AppComponent implements OnInit {
     @ViewChild("testButtonRef", { read: ElementRef })
     public testButtonRef!: ElementRef<HTMLButtonElement>;
 
-    public constructor(private readonly popupService: PopupService) {}
+    public constructor(private readonly popupService: PopupService, public readonly windowService: WindowService) {}
 
     public dropdownItemDisabler = (item: any): boolean => !item.active;
     public dropdownPrimitiveItemDisabler = (item: string): boolean => item.includes("i");
@@ -296,6 +304,10 @@ export class AppComponent implements OnInit {
         // window.setInterval(() => {
         //     this.menuBarMenuVisible = !this.menuBarMenuVisible;
         // }, 1000);
+
+        // window.setInterval(() => {
+        //     this.windowVisible = !this.windowVisible;
+        // }, 2500);
     }
 
     public numericTextBoxFormatter = (value: number | null): string => (value != null ? `${value} °C` : "");
@@ -456,6 +468,46 @@ export class AppComponent implements OnInit {
                 return event.via === "backdropClick";
             }
         });
+    }
+
+    public openWindow(windowContentTemplate: TemplateRef<void>, titleTemplate?: TemplateRef<void>): void {
+        const ref = this.windowService.open({
+            content: windowContentTemplate,
+            height: 600,
+            width: 800,
+            draggable: true,
+            resizable: true,
+            modal: true,
+            minWidth: 150,
+            minHeight: 150,
+            maxWidth: 1200,
+            maxHeight: 768,
+            title: titleTemplate,
+            preventClose: event => {
+                // console.log(event);
+                return event.via === "closeButton";
+            }
+        });
+        ref.closed$.subscribe(console.log);
+        // window.setTimeout(() => {
+        //     ref.close("Aoi");
+        // }, 1500);
+
+        // window.setTimeout(() => {
+        //     ref.move({ top: 100, left: 100 });
+        //     ref.resize({ width: 333, height: 333, center: false });
+        // }, 3333);
+
+        // window.setTimeout(() => {
+        //     ref.resize({ width: 333, height: 333, center: true });
+        // }, 4444);
+
+        // window.setTimeout(() => {
+        //     ref.center();
+        //     window.setTimeout(() => {
+        //         ref.close();
+        //     }, 4444);
+        // }, 5000);
     }
 
     public print(value: unknown): void {

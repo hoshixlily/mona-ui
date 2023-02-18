@@ -1,9 +1,9 @@
-export class PreventableEvent<E extends Event = Event> {
+export class PreventableEvent<E = unknown> {
     readonly #event?: E;
-    readonly #type: string = "";
+    readonly #type?: string;
     #defaultPrevented: boolean = false;
 
-    protected constructor(type: string, event?: E) {
+    protected constructor(type?: string, event?: E) {
         this.#type = type;
         this.#event = event;
     }
@@ -18,5 +18,9 @@ export class PreventableEvent<E extends Event = Event> {
 
     public get originalEvent(): E | undefined {
         return this.#event;
+    }
+
+    public get type(): string | undefined {
+        return this.#type;
     }
 }

@@ -1,0 +1,112 @@
+:host {
+    width: 100%;
+    height: 100%;
+}
+
+div.mona-window-content-container {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+div.mona-window-title-bar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    height: var(--mona-input-height);
+    border-bottom: 1px solid var(--mona-border-color);
+    background-color: var(--mona-background-dark);
+}
+
+div.mona-window-title-container {
+    flex: 1;
+    padding: 0 10px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    cursor: default;
+    user-select: none;
+}
+
+span.mona-window-title {
+    font-weight: bold;
+    color: var(--mona-text);
+}
+
+div.mona-window-title-bar-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+.mona-window-content {
+    flex: 1;
+    overflow: auto;
+    padding: 10px;
+}
+
+
+.mona-window-resizer {
+    position: absolute;
+    display: flex;
+    background-color: transparent;
+    &-north {
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 10px;
+        cursor: ns-resize;
+    }
+    &-south {
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 10px;
+        cursor: ns-resize;
+    }
+    &-east {
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 10px;
+        cursor: ew-resize;
+    }
+    &-west {
+        top: 0;
+        left: 0;
+        bottom: 0;
+        width: 10px;
+        cursor: ew-resize;
+    }
+    &-northeast {
+        top: 0;
+        right: 0;
+        width: 10px;
+        height: 10px;
+        cursor: nesw-resize;
+    }
+    &-northwest {
+        top: 0;
+        left: 0;
+        width: 10px;
+        height: 10px;
+        cursor: nwse-resize;
+    }
+    &-southeast {
+        bottom: 0;
+        right: 0;
+        width: 10px;
+        height: 10px;
+        cursor: nwse-resize;
+    }
+    &-southwest {
+        bottom: 0;
+        left: 0;
+        width: 10px;
+        height: 10px;
+        cursor: nesw-resize;
+    }
+}
