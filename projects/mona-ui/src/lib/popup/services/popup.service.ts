@@ -95,21 +95,23 @@ export class PopupService implements OnDestroy {
         }
 
         if (settings.hasBackdrop) {
-            const backdropSubject: Subject<void> = new Subject<void>();
-            const subscription = overlayRef
-                .backdropClick()
-                .pipe(takeUntil(backdropSubject))
-                .subscribe(e => {
-                    const event = new PopupCloseEvent({ event: e, via: PopupCloseSource.BackdropClick });
-                    const prevented = preventClose ? preventClose(event) || event.isDefaultPrevented() : false;
-                    if (!prevented) {
-                        popupReference.close(event);
-                        this.popupStateMap.remove(uid);
-                        backdropSubject.next();
-                        backdropSubject.complete();
-                    }
-                });
-            popupReference.closed.pipe(take(1)).subscribe(() => subscription.unsubscribe());
+            if (settings.closeOnBackdropClick ?? true) {
+                const backdropSubject: Subject<void> = new Subject<void>();
+                const subscription = overlayRef
+                    .backdropClick()
+                    .pipe(takeUntil(backdropSubject))
+                    .subscribe(e => {
+                        const event = new PopupCloseEvent({ event: e, via: PopupCloseSource.BackdropClick });
+                        const prevented = preventClose ? preventClose(event) || event.isDefaultPrevented() : false;
+                        if (!prevented) {
+                            popupReference.close(event);
+                            this.popupStateMap.remove(uid);
+                            backdropSubject.next();
+                            backdropSubject.complete();
+                        }
+                    });
+                popupReference.closed.pipe(take(1)).subscribe(() => subscription.unsubscribe());
+            }
         } else {
             if (settings.closeOnOutsideClick ?? true) {
                 const subscription = overlayRef

@@ -47,7 +47,8 @@ export class WindowService {
         windowReferenceOptions.popupRef = this.popupService.create({
             anchor: document.body,
             content: WindowContentComponent,
-            closeOnEscape: false,
+            closeOnBackdropClick: false,
+            closeOnEscape: settings.closeOnEscape ?? false,
             closeOnOutsideClick: false,
             hasBackdrop: settings.modal,
             backdropClass: settings.modal ? "mona-window-overlay" : "transparent",

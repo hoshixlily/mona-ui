@@ -97,8 +97,9 @@
                                         [toggleable]="false" [flat]="false"
                                         (selectedChange)="onButtonSelectedChange($event)" (click)="openPopup($event)"
                                         #testButtonRef>Test Button
-                                    <mona-tooltip [target]="testButtonRef">
-                                        <span style="font-weight: bold; font-size: 24px;">Test Button Tooltip</span>
+                                    <mona-tooltip [target]="testButtonRef" position="bottom">
+<!--                                        <span style="font-weight: bold; font-size: 24px;">Test Button Tooltip</span>-->
+                                        <img src="https://photos.smugmug.com/Shared/Image/i-WG27Dmp/0/38cbf7f2/4K/colorful-liquid-flow-abstract-digital-art-uhdpaper.com-4K-8.1392-4K.jpg" style="width: 960px; height: 540px;" alt="Tooltip Image" />
                                     </mona-tooltip>
                                 </button>
 

@@ -4,6 +4,7 @@ import { WindowCloseEvent } from "./WindowCloseEvent";
 
 export interface WindowSettings {
     content: TemplateRef<unknown> | Type<unknown>;
+    closeOnEscape?: boolean;
     draggable?: boolean;
     focusedElement?: HTMLElement | ElementRef<HTMLElement> | string;
     height?: number;

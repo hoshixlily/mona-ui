@@ -488,12 +488,12 @@ export class AppComponent implements OnInit {
                 return event.via === "backdropClick";
             }
         });
-        window.setTimeout(() => {
-            ref.resize({ width: 1024, height: 768, center: true });
-            console.log(ref.component?.instance);
-            // window.setTimeout(() => ref.close(), 2500);
-            ref.popupRef.closed.subscribe(console.log);
-        }, 2500);
+        // window.setTimeout(() => {
+        //     ref.resize({ width: 1024, height: 768, center: true });
+        //     console.log(ref.component?.instance);
+        //     // window.setTimeout(() => ref.close(), 2500);
+        //     ref.popupRef.closed.subscribe(console.log);
+        // }, 2500);
         // ref.closed$.subscribe(console.log);
         // window.setTimeout(() => {
         //     ref.close("Aoi");

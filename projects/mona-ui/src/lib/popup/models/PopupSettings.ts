@@ -28,6 +28,8 @@ export interface PopupSettings<T = unknown, C = void> {
      */
     content: TemplateRef<C> | ComponentType<C>;
 
+    closeOnBackdropClick?: boolean;
+
     /**
      * Whether the popup will be closed when the user presses the escape key.
      * Default: true.
