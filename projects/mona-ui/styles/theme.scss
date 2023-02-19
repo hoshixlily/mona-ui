@@ -861,6 +861,13 @@ div.mona-progress-bar-track {
     }
 }
 
+.mona-circular-progress-bar {
+    & .mona-circular-progress-bar-label {
+        color: var(--mona-text);
+        user-select: none;
+    }
+}
+
 /** Tooltip */
 .mona-tooltip-popup-content {
     background-color: var(--mona-background);

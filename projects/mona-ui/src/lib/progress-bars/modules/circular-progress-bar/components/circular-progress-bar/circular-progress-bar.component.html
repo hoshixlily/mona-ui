@@ -1,0 +1,12 @@
+<div class="mona-circular-progress-bar" [ngStyle]="{'width': sizePx, 'height': sizePx}">
+    <svg>
+        <circle [attr.cx]="size/2" [attr.cy]="size/2" [attr.r]="size/2 - thickness" [attr.stroke]="strokeColor"
+                [attr.stroke-dasharray]="circumference" [attr.stroke-dashoffset]="strokeDashOffset"
+                [attr.stroke-width]="thickness" fill="transparent" />
+    </svg>
+    <div class="mona-circular-progress-bar-label">
+        <ng-container *ngIf="!labelTemplateDirective">{{progress}}%</ng-container>
+        <ng-container [ngTemplateOutlet]="labelTemplateDirective.templateRef" [ngTemplateOutletContext]="{$implicit: progress}"
+                      *ngIf="!!labelTemplateDirective"></ng-container>
+    </div>
+</div>
