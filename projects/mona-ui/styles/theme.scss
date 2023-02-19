@@ -832,6 +832,18 @@ ul.mona-menubar {
     }
 }
 
+/** Pager */
+.mona-pager {
+    & li.mona-pager-active {
+        & button {
+            background-color: var(--mona-primary);
+            &:hover, &:active, &:focus {
+                background-color: var(--mona-primary);
+            }
+        }
+    }
+}
+
 
 /** Popup */
 .mona-popup-content {

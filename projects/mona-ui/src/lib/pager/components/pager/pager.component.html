@@ -1,0 +1,35 @@
+<div class="mona-pager">
+    <ol class="mona-pager-list">
+        <li>
+            <button monaButton [flat]="true" [disabled]="page<=1" (click)="onPreviousPageClick()">
+                <fa-icon [icon]="previousIcon"></fa-icon>
+            </button>
+        </li>
+        <li *ngIf="pages.length !== 0" [ngClass]="{'mona-pager-active': page===1}">
+            <button monaButton [flat]="true" (click)="onPageClick(1)">1</button>
+        </li>
+        <li *ngIf="pages.length > visiblePages && pages[1].page - 1 > 1">
+            <button monaButton [flat]="true" (click)="onJumpPreviousClick()">
+                <fa-icon [icon]="ellipsisIcon"></fa-icon>
+            </button>
+        </li>
+        <ng-container *ngFor="let pageItem of pages|monaSlice:1:pages.length-1; let px = index;">
+            <li [attr.data-page]="pageItem.page" [ngClass]="{'mona-pager-active': page===pageItem.page}">
+                <button monaButton [flat]="true" (click)="onPageClick(pageItem.page)">{{pageItem.text}}</button>
+            </li>
+        </ng-container>
+        <li *ngIf="pages.length > visiblePages && pages[pages.length-1].page - pages[pages.length-2].page > 1">
+            <button monaButton [flat]="true" (click)="onJumpNextClick()">
+                <fa-icon [icon]="ellipsisIcon"></fa-icon>
+            </button>
+        </li>
+        <li *ngIf="pages.length > 1" [ngClass]="{'mona-pager-active': page===max}">
+            <button monaButton [flat]="true" (click)="onPageClick(max)">{{max}}</button>
+        </li>
+        <li>
+            <button monaButton [flat]="true" [disabled]="page < 1 || page === max" (click)="onNextPageClick()">
+                <fa-icon [icon]="nextIcon"></fa-icon>
+            </button>
+        </li>
+    </ol>
+</div>

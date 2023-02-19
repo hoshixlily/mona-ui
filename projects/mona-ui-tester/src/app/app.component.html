@@ -93,6 +93,9 @@
                         </div>
                         <div class="content">
                             <div>
+                                <mona-pager [page]="2"></mona-pager>
+                            </div>
+                            <div>
                                 <button monaButton [disabled]="false" [primary]="false" [selected]="false"
                                         [toggleable]="false" [flat]="false"
                                         (selectedChange)="onButtonSelectedChange($event)" (click)="openPopup($event)"
