@@ -146,6 +146,9 @@ export * from "./lib/popup/components/popup/popup.component";
 export * from "./lib/popup/popup.module";
 
 /** Progress */
+export * from "./lib/progress-bars/modules/circular-progress-bar/directives/circular-progress-bar-label-template.directive";
+export * from "./lib/progress-bars/modules/circular-progress-bar/components/circular-progress-bar/circular-progress-bar.component";
+export * from "./lib/progress-bars/modules/circular-progress-bar/circular-progress-bar.module";
 export * from "./lib/progress-bars/modules/progress-bar/components/progress-bar/progress-bar.component";
 export * from "./lib/progress-bars/modules/progress-bar/progress-bar.module";
 export * from "./lib/progress-bars/progress-bars.module";
