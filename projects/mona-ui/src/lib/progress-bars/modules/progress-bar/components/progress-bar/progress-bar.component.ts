@@ -22,6 +22,9 @@ export class ProgressBarComponent implements OnInit, AfterViewInit {
     public rightClip: number = -1;
 
     @Input()
+    public color: string | Action<number, string> = "var(--mona-primary)";
+
+    @Input()
     public disabled: boolean = false;
 
     @Input()
@@ -29,6 +32,9 @@ export class ProgressBarComponent implements OnInit, AfterViewInit {
 
     @Input()
     public labelPosition: LabelPosition = "center";
+
+    @Input()
+    public labelStyles: Partial<Record<string, string | number>> = {};
 
     @Input()
     public labelVisible: boolean = true;
@@ -76,5 +82,9 @@ export class ProgressBarComponent implements OnInit, AfterViewInit {
 
     public get label(): string {
         return this.labelFormat?.(this.progress) ?? `${this.progress}%`;
+    }
+
+    public get progressColor(): string {
+        return typeof this.color === "function" ? this.color(this.progress) : this.color;
     }
 }

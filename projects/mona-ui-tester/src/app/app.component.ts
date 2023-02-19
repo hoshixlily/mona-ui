@@ -521,6 +521,18 @@ export class AppComponent implements OnInit {
         console.log(value);
     }
 
+    public progressBarColorSelector(value: number): string {
+        if (value < 25) {
+            return "red";
+        } else if (value < 50) {
+            return "orange";
+        } else if (value < 75) {
+            return "yellow";
+        } else {
+            return "green";
+        }
+    }
+
     public updateTreeData(): void {
         this.treeData = [
             ...this.treeData,

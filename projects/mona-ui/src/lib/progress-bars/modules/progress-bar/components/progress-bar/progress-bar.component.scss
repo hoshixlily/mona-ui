@@ -14,6 +14,9 @@ div.mona-progress-bar-track {
     justify-content: center;
     width: 100%;
     padding: 3px 0 3px 0;
+    &-prev {
+        transition: background-color 0.35s linear;
+    }
     &-next {
         position: absolute;
         transition: clip-path 0.35s linear;
