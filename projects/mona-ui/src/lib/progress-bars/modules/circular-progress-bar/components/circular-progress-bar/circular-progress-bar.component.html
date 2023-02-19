@@ -4,7 +4,7 @@
                 [attr.stroke-dasharray]="circumference" [attr.stroke-dashoffset]="strokeDashOffset"
                 [attr.stroke-width]="thickness" fill="transparent" [ngClass]="{'mona-circular-progress-bar-indeterminate': indeterminate}" />
     </svg>
-    <div class="mona-circular-progress-bar-label">
+    <div class="mona-circular-progress-bar-label" *ngIf="!indeterminate">
         <ng-container *ngIf="!labelTemplateDirective">{{progress}}%</ng-container>
         <ng-container [ngTemplateOutlet]="labelTemplateDirective.templateRef" [ngTemplateOutletContext]="{$implicit: progress}"
                       *ngIf="!!labelTemplateDirective"></ng-container>

@@ -38,3 +38,16 @@ span.mona-progress-bar-label {
 div.mona-progress-bar-label-hidden {
     padding: 10px 0;
 }
+
+div.mona-progress-bar-indeterminate {
+    background-size: 200% 200%;
+    animation: indeterminate 16s linear infinite;
+    animation-direction: reverse;
+    padding: 10px 0;
+}
+
+@keyframes indeterminate {
+    100% {
+        background-position: 100% 100%;
+    }
+}

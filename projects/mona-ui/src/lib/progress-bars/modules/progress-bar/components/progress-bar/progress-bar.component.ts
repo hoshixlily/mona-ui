@@ -28,6 +28,9 @@ export class ProgressBarComponent implements OnInit, AfterViewInit {
     public disabled: boolean = false;
 
     @Input()
+    public indeterminate: boolean = false;
+
+    @Input()
     public labelFormat?: Action<number, string>;
 
     @Input()

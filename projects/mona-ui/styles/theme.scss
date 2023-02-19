@@ -861,6 +861,10 @@ div.mona-progress-bar-track {
     }
 }
 
+div.mona-progress-bar-indeterminate {
+    background: repeating-linear-gradient(135deg, var(--mona-background), var(--mona-background) 10px, var(--mona-background-dark) 10px, var(--mona-background-dark) 20px);
+}
+
 .mona-circular-progress-bar {
     & .mona-circular-progress-bar-label {
         color: var(--mona-text);

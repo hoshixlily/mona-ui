@@ -394,6 +394,7 @@
                                 <mona-progress-bar [value]="sliderValue*10" [disabled]="false" [min]="0" [max]="100"
                                                    [color]="progressBarColorSelector" [labelStyles]="{'font-weight': 'bolder'}"
                                                    [labelVisible]="true" [labelFormat]="progressLabelFormatter"
+                                                   [indeterminate]="switchValue"
                                                    labelPosition="end" style="width: 400px;"></mona-progress-bar>
 
                                 <mona-circular-progress-bar [disabled]="false" [value]="sliderValue*10" [color]="progressBarColorSelector" [thickness]="4" [indeterminate]="switchValue">
