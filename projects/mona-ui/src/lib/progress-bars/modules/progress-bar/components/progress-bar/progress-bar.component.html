@@ -1,0 +1,17 @@
+<div class="mona-progress-bar" [ngClass]="{'mona-disabled': disabled}">
+    <div class="mona-progress-bar-track mona-progress-bar-track-prev" [ngStyle]="{'background-color': progressColor}"
+         [ngClass]="{'mona-progress-left': labelPosition==='start', 'mona-progress-right': labelPosition==='end', 'mona-progress-bar-label-hidden': !labelVisible, 'mona-progress-bar-indeterminate': indeterminate}">
+        <ng-container *ngIf="labelVisible && !indeterminate">
+            <span class="mona-progress-bar-label" [ngStyle]="labelStyles" *ngIf="!labelFormat">{{progress | number:'1.0-2'}}%</span>
+            <span class="mona-progress-bar-label" [ngStyle]="labelStyles" *ngIf="labelFormat">{{label}}</span>
+        </ng-container>
+    </div>
+    <div class="mona-progress-bar-track mona-progress-bar-track-next indeterminate"
+         [ngClass]="{'mona-progress-left': labelPosition==='start', 'mona-progress-right': labelPosition==='end', 'mona-progress-bar-label-hidden': !labelVisible, 'mona-progress-bar-indeterminate': indeterminate}"
+         [ngStyle]="{'clip-path': 'inset(-1px '+rightClip+'px -1px '+progress+'%)'}">
+        <ng-container *ngIf="labelVisible && !indeterminate">
+            <span class="mona-progress-bar-label" [ngStyle]="labelStyles" *ngIf="!labelFormat">{{progress | number:'1.0-2'}}%</span>
+            <span class="mona-progress-bar-label" [ngStyle]="labelStyles" *ngIf="labelFormat">{{label}}</span>
+        </ng-container>
+    </div>
+</div>

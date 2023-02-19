@@ -163,6 +163,7 @@ export class AppComponent implements OnInit {
     public menuBarMenuVisible: boolean = false;
     public multiSelectTagCount: number = 2;
     public numericTextBoxValue: number = 629;
+    public progressLabelFormatter = (value: number) => `${value}/100`;
     public rangedSliderValues: [number, number] = [12, 18];
     public selectedComboBoxDataItem: any = null;
     public selectedDropdownListDataItem: any;
@@ -518,6 +519,18 @@ export class AppComponent implements OnInit {
 
     public print(value: unknown): void {
         console.log(value);
+    }
+
+    public progressBarColorSelector(value: number): string {
+        if (value < 25) {
+            return "red";
+        } else if (value < 50) {
+            return "orange";
+        } else if (value < 75) {
+            return "yellow";
+        } else {
+            return "green";
+        }
     }
 
     public updateTreeData(): void {

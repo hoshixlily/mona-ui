@@ -1,0 +1,53 @@
+div.mona-progress-bar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+div.mona-progress-bar-track {
+    font-size: 12px;
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 3px 0 3px 0;
+    &-prev {
+        transition: background-color 0.35s linear;
+    }
+    &-next {
+        position: absolute;
+        transition: clip-path 0.35s linear;
+    }
+}
+
+div.mona-progress-left {
+    justify-content: flex-start;
+}
+
+div.mona-progress-right {
+    justify-content: flex-end;
+}
+
+span.mona-progress-bar-label {
+    padding: 0 4px;
+}
+
+div.mona-progress-bar-label-hidden {
+    padding: 10px 0;
+}
+
+div.mona-progress-bar-indeterminate {
+    background-size: 200% 200%;
+    animation: indeterminate 16s linear infinite;
+    animation-direction: reverse;
+    padding: 10px 0;
+}
+
+@keyframes indeterminate {
+    100% {
+        background-position: 100% 100%;
+    }
+}

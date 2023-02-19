@@ -36,6 +36,7 @@ input {
     pointer-events: none;
     opacity: 0.37;
     cursor: default;
+    user-select: none;
 }
 
 @mixin focus-transition {
@@ -840,6 +841,38 @@ ul.mona-menubar {
     padding: 8px 10px;
     box-shadow: var(--mona-popup-shadow);
     @include scrollbars;
+}
+
+/** Progress Bar */
+.mona-progress-bar {
+    background-color: var(--mona-background);
+    border: 1px solid var(--mona-border-color);
+    height: 22px;
+    &.mona-disabled {
+        @include disabled;
+    }
+}
+
+div.mona-progress-bar-track {
+    color: white; // TODO: replace with css variable
+    &-next {
+        background-color: var(--mona-background);
+        color: var(--mona-text);
+    }
+}
+
+div.mona-progress-bar-indeterminate {
+    background: repeating-linear-gradient(135deg, var(--mona-background), var(--mona-background) 10px, var(--mona-background-dark) 10px, var(--mona-background-dark) 20px);
+}
+
+.mona-circular-progress-bar {
+    & .mona-circular-progress-bar-label {
+        color: var(--mona-text);
+        user-select: none;
+    }
+    &.mona-disabled {
+        @include disabled;
+    }
 }
 
 /** Tooltip */
