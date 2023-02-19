@@ -163,6 +163,7 @@ export class AppComponent implements OnInit {
     public menuBarMenuVisible: boolean = false;
     public multiSelectTagCount: number = 2;
     public numericTextBoxValue: number = 629;
+    public progressLabelFormatter = (value: number) => `${value}/100`;
     public rangedSliderValues: [number, number] = [12, 18];
     public selectedComboBoxDataItem: any = null;
     public selectedDropdownListDataItem: any;

@@ -12,10 +12,26 @@ div.mona-progress-bar-track {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 3px 0 3px 0;
     width: 100%;
+    padding: 3px 0 3px 0;
     &-next {
         position: absolute;
-        transition: clip-path 0.5s ease-out;
+        transition: clip-path 0.35s linear;
     }
+}
+
+div.mona-progress-left {
+    justify-content: flex-start;
+}
+
+div.mona-progress-right {
+    justify-content: flex-end;
+}
+
+span.mona-progress-bar-label {
+    padding: 0 4px;
+}
+
+div.mona-progress-bar-label-hidden {
+    padding: 10px 0;
 }

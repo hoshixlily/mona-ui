@@ -36,6 +36,7 @@ input {
     pointer-events: none;
     opacity: 0.37;
     cursor: default;
+    user-select: none;
 }
 
 @mixin focus-transition {
@@ -847,6 +848,9 @@ ul.mona-menubar {
     background-color: var(--mona-background);
     border: 1px solid var(--mona-border-color);
     height: 22px;
+    &.mona-disabled {
+        @include disabled;
+    }
 }
 
 div.mona-progress-bar-track {

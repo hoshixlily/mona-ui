@@ -1,4 +1,17 @@
-<div class="mona-progress-bar">
-    <div class="mona-progress-bar-track mona-progress-bar-track-prev">{{progress}}%</div>
-    <div class="mona-progress-bar-track mona-progress-bar-track-next" [ngStyle]="{'clip-path': 'inset(-1px -1px -1px '+progress+'%)'}">{{progress}}%</div>
+<div class="mona-progress-bar" [ngClass]="{'mona-disabled': disabled}">
+    <div class="mona-progress-bar-track mona-progress-bar-track-prev"
+         [ngClass]="{'mona-progress-left': labelPosition==='start', 'mona-progress-right': labelPosition==='end', 'mona-progress-bar-label-hidden': !labelVisible}">
+        <ng-container *ngIf="labelVisible">
+            <span class="mona-progress-bar-label" *ngIf="!labelFormat">{{progress | number:'1.0-2'}}%</span>
+            <span class="mona-progress-bar-label" *ngIf="labelFormat">{{label}}</span>
+        </ng-container>
+    </div>
+    <div class="mona-progress-bar-track mona-progress-bar-track-next"
+         [ngClass]="{'mona-progress-left': labelPosition==='start', 'mona-progress-right': labelPosition==='end', 'mona-progress-bar-label-hidden': !labelVisible}"
+         [ngStyle]="{'clip-path': 'inset(-1px '+rightClip+'px -1px '+progress+'%)'}">
+        <ng-container *ngIf="labelVisible">
+            <span class="mona-progress-bar-label" *ngIf="!labelFormat">{{progress | number:'1.0-2'}}%</span>
+            <span class="mona-progress-bar-label" *ngIf="labelFormat">{{label}}</span>
+        </ng-container>
+    </div>
 </div>
