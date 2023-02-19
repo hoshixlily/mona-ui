@@ -13,6 +13,12 @@ export class CircularProgressBarComponent implements OnInit, AfterViewInit {
     @Input()
     public color: string | Action<number, string> = "var(--mona-primary)";
 
+    @Input()
+    public disabled: boolean = false;
+
+    @Input()
+    public indeterminate: boolean = false;
+
     @ContentChild(CircularProgressBarLabelTemplateDirective)
     public labelTemplateDirective: CircularProgressBarLabelTemplateDirective | null = null;
 
@@ -61,6 +67,7 @@ export class CircularProgressBarComponent implements OnInit, AfterViewInit {
     }
 
     public get strokeDashOffset(): number {
-        return this.circumference * (1 - this.progress / 100);
+        const dashOffset = this.circumference * (1 - this.progress / 100);
+        return this.indeterminate ? this.circumference / 1.42 : dashOffset;
     }
 }

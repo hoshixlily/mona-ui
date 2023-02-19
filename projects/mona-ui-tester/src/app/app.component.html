@@ -396,7 +396,7 @@
                                                    [labelVisible]="true" [labelFormat]="progressLabelFormatter"
                                                    labelPosition="end" style="width: 400px;"></mona-progress-bar>
 
-                                <mona-circular-progress-bar [value]="sliderValue*10" [color]="progressBarColorSelector" [thickness]="4">
+                                <mona-circular-progress-bar [disabled]="false" [value]="sliderValue*10" [color]="progressBarColorSelector" [thickness]="4" [indeterminate]="switchValue">
                                     <ng-template monaCircularProgressBarLabelTemplate let-progress>
                                         <span *ngIf="progress !== 100" [ngStyle]="{'color': progressBarColorSelector(progress)}">{{progress}}%</span>
                                         <span *ngIf="progress === 100" [ngStyle]="{'color': progressBarColorSelector(progress)}">

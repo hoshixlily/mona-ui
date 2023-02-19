@@ -1,8 +1,8 @@
-<div class="mona-circular-progress-bar" [ngStyle]="{'width': sizePx, 'height': sizePx}">
+<div class="mona-circular-progress-bar" [ngStyle]="{'width': sizePx, 'height': sizePx}" [ngClass]="{'mona-disabled': disabled}">
     <svg>
         <circle [attr.cx]="size/2" [attr.cy]="size/2" [attr.r]="size/2 - thickness" [attr.stroke]="strokeColor"
                 [attr.stroke-dasharray]="circumference" [attr.stroke-dashoffset]="strokeDashOffset"
-                [attr.stroke-width]="thickness" fill="transparent" />
+                [attr.stroke-width]="thickness" fill="transparent" [ngClass]="{'mona-circular-progress-bar-indeterminate': indeterminate}" />
     </svg>
     <div class="mona-circular-progress-bar-label">
         <ng-container *ngIf="!labelTemplateDirective">{{progress}}%</ng-container>

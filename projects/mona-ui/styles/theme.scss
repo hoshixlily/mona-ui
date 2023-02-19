@@ -866,6 +866,9 @@ div.mona-progress-bar-track {
         color: var(--mona-text);
         user-select: none;
     }
+    &.mona-disabled {
+        @include disabled;
+    }
 }
 
 /** Tooltip */
