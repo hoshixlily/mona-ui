@@ -80,6 +80,9 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
     public readonly: boolean = false;
 
     @Input()
+    public spinners: boolean = true;
+
+    @Input()
     public step: number = 1;
 
     @Input()
@@ -201,6 +204,7 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
     }
 
     public onMouseWheel(event: WheelEvent): void {
+        event.preventDefault();
         if (event.deltaY < 0) {
             this.increase();
         } else {

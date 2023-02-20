@@ -48,8 +48,6 @@ export class DropDownListComponent extends AbstractDropDownListComponent impleme
 
     public clearValue(event: MouseEvent): void {
         event.stopImmediatePropagation();
-        this.value = undefined;
-        this.valuePopupListItem = undefined;
         this.updateValue(undefined);
     }
 
@@ -59,8 +57,6 @@ export class DropDownListComponent extends AbstractDropDownListComponent impleme
 
     public onPopupListValueChange(event: PopupListValueChangeEvent): void {
         if (!event.value || event.value.length === 0) {
-            this.value = undefined;
-            this.valuePopupListItem = undefined;
             this.updateValue(undefined);
             return;
         }

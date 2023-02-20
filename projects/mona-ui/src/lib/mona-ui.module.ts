@@ -9,6 +9,8 @@ import { LayoutModule } from "./layout/layout.module";
 import { DateInputsModule } from "./date-inputs/date-inputs.module";
 import { TooltipsModule } from "./tooltips/tooltips.module";
 import { WindowModule } from "./window/window.module";
+import { PagerModule } from "./pager/pager.module";
+import { ProgressBarsModule } from "./progress-bars/progress-bars.module";
 
 @NgModule({
     exports: [
@@ -18,7 +20,9 @@ import { WindowModule } from "./window/window.module";
         InputsModule,
         LayoutModule,
         MenusModule,
+        PagerModule,
         PopupModule,
+        ProgressBarsModule,
         TooltipsModule,
         TreeViewModule,
         WindowModule

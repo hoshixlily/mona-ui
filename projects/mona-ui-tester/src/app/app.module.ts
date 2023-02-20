@@ -15,7 +15,8 @@ import {
     TooltipsModule,
     MenubarModule,
     WindowModule,
-    ProgressBarsModule
+    ProgressBarsModule,
+    PagerModule
 } from "mona-ui";
 import { TestComponentComponent } from "./test-component/test-component.component";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
@@ -41,7 +42,8 @@ import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
         TooltipsModule,
         MenubarModule,
         WindowModule,
-        ProgressBarsModule
+        ProgressBarsModule,
+        PagerModule
     ],
     bootstrap: [AppComponent]
 })
