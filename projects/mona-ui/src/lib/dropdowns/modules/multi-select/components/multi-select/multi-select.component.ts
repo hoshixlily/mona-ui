@@ -1,5 +1,6 @@
 import {
     ChangeDetectionStrategy,
+    ChangeDetectorRef,
     Component,
     ContentChild,
     ElementRef,
@@ -8,6 +9,7 @@ import {
     OnDestroy,
     OnInit,
     Output,
+    SimpleChanges,
     TemplateRef
 } from "@angular/core";
 import { AbstractDropDownListComponent } from "../../../../components/abstract-drop-down-list/abstract-drop-down-list.component";
@@ -25,11 +27,12 @@ import { MultiSelectGroupTemplateDirective } from "../../directives/multi-select
     templateUrl: "./multi-select.component.html",
     styleUrls: ["./multi-select.component.scss"],
     providers: [PopupListService],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.Default
 })
 export class MultiSelectComponent extends AbstractDropDownListComponent implements OnInit, OnDestroy {
     private resizeObserver: ResizeObserver | null = null;
     protected selectionMode: SelectionMode = "multiple";
+    public popupListValues: any[] = [];
     public summaryTagTemplate: TemplateRef<any> | null = null;
     public tagCount: number = -1;
     public override valuePopupListItem: PopupListItem[] = [];
@@ -55,9 +58,21 @@ export class MultiSelectComponent extends AbstractDropDownListComponent implemen
     public constructor(
         protected override readonly elementRef: ElementRef<HTMLElement>,
         protected override readonly popupListService: PopupListService,
-        protected override readonly popupService: PopupService
+        protected override readonly popupService: PopupService,
+        private readonly cdr: ChangeDetectorRef
     ) {
         super(elementRef, popupListService, popupService);
+    }
+
+    public override ngOnChanges(changes: SimpleChanges) {
+        super.ngOnChanges(changes);
+        if (changes["value"]) {
+            this.popupListValues = this.value;
+            this.valuePopupListItem = this.popupListService.viewListData
+                .selectMany(g => g.source)
+                .where(d => (this.value as any[]).some(v => d.dataEquals(v)))
+                .toArray();
+        }
     }
 
     public override ngOnDestroy(): void {
@@ -81,6 +96,7 @@ export class MultiSelectComponent extends AbstractDropDownListComponent implemen
             this.close();
         }
         this.updateValue(event.value);
+        this.popupListValues = event.value;
     }
 
     public onSelectedItemRemove(event: Event, popupListItem: PopupListItem): void {

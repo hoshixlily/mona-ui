@@ -69,10 +69,8 @@ export class ComboBoxComponent extends AbstractDropDownListComponent implements 
 
     public clearValue(event: MouseEvent): void {
         event.stopImmediatePropagation();
-        this.value = undefined;
-        this.valuePopupListItem = undefined;
         this.comboBoxValue = "";
-        this.updateValue();
+        this.updateValue(undefined);
     }
 
     public override ngOnChanges(changes: SimpleChanges): void {
@@ -127,10 +125,8 @@ export class ComboBoxComponent extends AbstractDropDownListComponent implements 
 
     public onPopupListValueChange(event: PopupListValueChangeEvent): void {
         if (!event.value || event.value.length === 0) {
-            this.value = undefined;
-            this.valuePopupListItem = undefined;
             this.comboBoxValue = "";
-            this.updateValue();
+            this.updateValue(undefined);
             return;
         }
         if (this.value && event.value[0].dataEquals(this.value)) {

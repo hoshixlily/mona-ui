@@ -1,5 +1,7 @@
 import {
     AfterViewInit,
+    ChangeDetectionStrategy,
+    ChangeDetectorRef,
     Component,
     ContentChild,
     EventEmitter,
@@ -33,7 +35,8 @@ import { FormsModule } from "@angular/forms";
     templateUrl: "./popup-list.component.html",
     styleUrls: ["./popup-list.component.scss"],
     standalone: true,
-    imports: [CommonModule, PopupListItemComponent, TextBoxModule, FontAwesomeModule, FormsModule]
+    imports: [CommonModule, PopupListItemComponent, TextBoxModule, FontAwesomeModule, FormsModule],
+    changeDetection: ChangeDetectionStrategy.Default
 })
 export class PopupListComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
     private readonly componentDestroy$: Subject<void> = new Subject<void>();
@@ -80,7 +83,8 @@ export class PopupListComponent implements OnInit, OnChanges, AfterViewInit, OnD
 
     public constructor(
         @SkipSelf()
-        public readonly popupListService: PopupListService
+        public readonly popupListService: PopupListService,
+        private readonly cdr: ChangeDetectorRef
     ) {}
 
     public ngAfterViewInit(): void {
@@ -97,16 +101,33 @@ export class PopupListComponent implements OnInit, OnChanges, AfterViewInit, OnD
             window.setTimeout(() => this.updateHighlightedValues(changes["highlightedValues"].currentValue));
         }
         if (changes["value"]) {
-            window.setTimeout(() => this.updateSelectedValues(changes["value"].currentValue));
+            window.setTimeout(() => {
+                this.updateSelectedValues(changes["value"].currentValue);
+                if (changes["value"].isFirstChange() || this.selectionMode === "single") {
+                    const firstSelectedItem = this.popupListService.viewListData
+                        .selectMany(g => g.source)
+                        .firstOrDefault(i => i.selected || i.highlighted);
+                    if (firstSelectedItem) {
+                        window.setTimeout(() => this.scrollToItem(firstSelectedItem), 0);
+                    }
+                }
+            });
         }
     }
 
     public ngOnDestroy(): void {
         this.componentDestroy$.next();
         this.componentDestroy$.complete();
+        this.popupListService.viewListData.selectMany(g => g.source).forEach(i => (i.selected = false));
     }
 
     public ngOnInit(): void {
+        const selectedItem = this.popupListService.viewListData
+            .selectMany(g => g.source)
+            .firstOrDefault(i => i.dataEquals(this.value));
+        if (selectedItem) {
+            selectedItem.selected = true;
+        }
         this.setEvents();
         this.setSubscriptions();
     }

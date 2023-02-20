@@ -1,5 +1,4 @@
 import {
-    ChangeDetectorRef,
     Component,
     ElementRef,
     EventEmitter,
@@ -12,7 +11,7 @@ import {
     ViewChild
 } from "@angular/core";
 import { CommonModule } from "@angular/common";
-import { faChevronDown, faSearch, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { faChevronDown, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { PopupRef } from "../../../popup/models/PopupRef";
 import { PopupService } from "../../../popup/services/popup.service";
 import { ConnectionPositionPair } from "@angular/cdk/overlay";
@@ -98,16 +97,10 @@ export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy
                 valueField: this.valueField,
                 groupField: this.groupField
             });
-            if (this.selectionMode === "single") {
-                this.valuePopupListItem = this.popupListService.viewListData
-                    .selectMany(g => g.source)
-                    .singleOrDefault(d => d.dataEquals(this.value));
-            } else if (this.selectionMode === "multiple") {
-                this.valuePopupListItem = this.popupListService.viewListData
-                    .selectMany(g => g.source)
-                    .where(d => (this.value as any[]).some(v => d.dataEquals(v)))
-                    .toArray();
-            }
+            this.updateValuePopupListItems();
+        }
+        if (changes["value"] && !changes["value"].isFirstChange()) {
+            this.updateValuePopupListItems();
         }
     }
 
@@ -205,34 +198,54 @@ export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy
                     this.close();
                 }
             });
+        this.valueChange.pipe(takeUntil(this.componentDestroy$)).subscribe((emittedValue: any | any[]) => {
+            window.setTimeout(() => {
+                if (this.selectionMode === "single") {
+                    this.valuePopupListItem = this.popupListService.viewListData
+                        .selectMany(g => g.source)
+                        .singleOrDefault(d => d.dataEquals(this.value));
+                } else {
+                    this.valuePopupListItem = this.popupListService.viewListData
+                        .selectMany(g => g.source)
+                        .where(d => (this.value as any[]).some(v => d.dataEquals(v)))
+                        .toArray();
+                }
+            }, 0);
+        });
     }
 
     protected updateValue(listItem: PopupListItem | PopupListItem[] | null | undefined): void {
         if (this.selectionMode === "single") {
             if (!listItem) {
-                this.value = undefined;
-                this.valuePopupListItem = undefined;
-                this.valueChange.emit(this.value);
+                this.valueChange.emit(undefined);
                 return;
             }
             const item = listItem as PopupListItem;
             if (item.dataEquals(this.value)) {
                 return;
             }
-            this.value = item.data;
-            this.valuePopupListItem = item;
-            this.valueChange.emit(this.value);
+            this.valueChange.emit(item.data);
         } else {
             if (!listItem) {
-                this.value = [];
-                this.valuePopupListItem = [];
-                this.valueChange.emit(this.value);
+                this.valueChange.emit([]);
                 return;
             }
             const items = listItem as PopupListItem[];
-            this.valuePopupListItem = [...items];
-            this.value = (this.valuePopupListItem as PopupListItem[]).map(v => v.data);
-            this.valueChange.emit(this.value);
+            const values = items.map(v => v.data);
+            this.valueChange.emit(values);
+        }
+    }
+
+    private updateValuePopupListItems(): void {
+        if (this.selectionMode === "single") {
+            this.valuePopupListItem = this.popupListService.viewListData
+                .selectMany(g => g.source)
+                .singleOrDefault(d => d.dataEquals(this.value));
+        } else if (this.selectionMode === "multiple") {
+            this.valuePopupListItem = this.popupListService.viewListData
+                .selectMany(g => g.source)
+                .where(d => (this.value as any[]).some(v => d.dataEquals(v)))
+                .toArray();
         }
     }
 }

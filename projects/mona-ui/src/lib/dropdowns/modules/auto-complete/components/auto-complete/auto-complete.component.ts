@@ -53,9 +53,8 @@ export class AutoCompleteComponent extends AbstractDropDownListComponent impleme
         this.popupListService.sourceListData
             .selectMany(g => g.source)
             .forEach(i => (i.selected = i.highlighted = false));
-        this.value = "";
         this.autoCompleteValue = "";
-        this.valueChange.emit(this.value);
+        this.valueChange.emit("");
     }
 
     public override ngOnInit(): void {
@@ -74,14 +73,11 @@ export class AutoCompleteComponent extends AbstractDropDownListComponent impleme
                 this.valuePopupListItem = item;
                 this.autoCompleteValue = item.text;
                 if (this.value !== item.text) {
-                    this.value = item.text;
-                    this.valueChange.emit(this.value);
+                    this.valueChange.emit(item.text);
                 }
             } else {
                 if (this.value !== this.autoCompleteValue) {
-                    this.value = this.autoCompleteValue;
-                    this.valuePopupListItem = undefined;
-                    this.valueChange.emit(this.value);
+                    this.valueChange.emit(this.autoCompleteValue);
                 }
             }
             this.close();
@@ -95,10 +91,8 @@ export class AutoCompleteComponent extends AbstractDropDownListComponent impleme
             return;
         }
         if (!event.value || event.value.length === 0) {
-            this.value = "";
-            this.valuePopupListItem = undefined;
             this.autoCompleteValue = "";
-            this.valueChange.emit(this.value);
+            this.valueChange.emit("");
             return;
         }
         if (this.value && event.value[0].dataEquals(this.value)) {
@@ -108,10 +102,7 @@ export class AutoCompleteComponent extends AbstractDropDownListComponent impleme
             return;
         }
         if (event.via === "selection") {
-            this.value = event.value[0].text;
-            this.valuePopupListItem = event.value[0];
-            this.autoCompleteValue = this.valuePopupListItem?.text ?? "";
-            this.valueChange.emit(this.value);
+            this.valueChange.emit(event.value[0].text);
             this.close();
         }
     }
@@ -156,10 +147,9 @@ export class AutoCompleteComponent extends AbstractDropDownListComponent impleme
                     )
                 ) {
                     if (this.value !== this.autoCompleteValue) {
-                        this.value = this.autoCompleteValue;
-                        this.valueChange.emit(this.value);
+                        this.valueChange.emit(this.autoCompleteValue);
                     }
-                    this.valuePopupListItem = undefined;
+                    // this.valuePopupListItem = undefined;
                 }
             });
     }

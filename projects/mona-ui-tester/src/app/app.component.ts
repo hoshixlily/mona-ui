@@ -318,6 +318,7 @@ export class AppComponent implements OnInit {
     }
 
     public onAutoCompleteValueChange(value: string): void {
+        this.autoCompleteValue = value;
         console.log("Auto-complete value changed: ", value);
     }
 
@@ -328,6 +329,11 @@ export class AppComponent implements OnInit {
     public onColorPickerValueChange(value: string | null): void {
         this.colorPickerValue = value;
         console.log(value);
+    }
+
+    public onComboBoxPrimitiveValueChange(value: string): void {
+        this.selectedPrimitiveComboBoxDataItem = value;
+        console.log(`Combobox primitive value changed`, value);
     }
 
     public onComboBoxValueChange(value: unknown): void {
@@ -346,8 +352,10 @@ export class AppComponent implements OnInit {
     }
 
     public onMultiSelectValueChange(value: unknown[]): void {
-        console.log(`MultiSelect value changed`, value);
         this.selectedMultiSelectDataItems = value;
+        // this.cdr.detectChanges();
+        console.log(`MultiSelect value changed`, value);
+    }
     }
 
     public onPopupClose(): void {
@@ -471,7 +479,7 @@ export class AppComponent implements OnInit {
         });
     }
 
-    public openWindow(windowContentTemplate: TemplateRef<void>, titleTemplate?: TemplateRef<void>): void {
+    public openWindow(titleTemplate?: TemplateRef<void>): void {
         const ref = this.windowService.open({
             content: TestComponentComponent,
             height: 600,
