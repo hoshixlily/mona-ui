@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, TemplateRef, ViewChild } from "@angular/core";
+import { ChangeDetectorRef, Component, ElementRef, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import {
     PopupRef,
     NodeDragStartEvent,
@@ -9,12 +9,14 @@ import {
     TabCloseEvent,
     StepOptions,
     PopupService,
-    WindowService
+    WindowService,
+    PageSizeChangeEvent,
+    PageChangeEvent
 } from "mona-ui";
 import { TestComponentComponent } from "./test-component/test-component.component";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { faMoon, faSearch, faSnowflake, faSun } from "@fortawesome/free-solid-svg-icons";
-import { IndexableList } from "@mirei/ts-collections";
+import { Enumerable, IndexableList } from "@mirei/ts-collections";
 import { map, Observable } from "rxjs";
 import { DateTime } from "luxon";
 
@@ -163,6 +165,13 @@ export class AppComponent implements OnInit {
     public menuBarMenuVisible: boolean = false;
     public multiSelectTagCount: number = 2;
     public numericTextBoxValue: number = 629;
+    public pagerTestData: Array<{ index: number; text: string }> = Enumerable.range(1, 1337)
+        .select(i => {
+            return { index: i, text: `Item ${i}` };
+        })
+        .toArray();
+    public pagerPageSize: number = 10;
+    public pagerSkip: number = 33;
     public progressLabelFormatter = (value: number) => `${value}/100`;
     public rangedSliderValues: [number, number] = [12, 18];
     public selectedComboBoxDataItem: any = null;
@@ -263,7 +272,11 @@ export class AppComponent implements OnInit {
     @ViewChild("testButtonRef", { read: ElementRef })
     public testButtonRef!: ElementRef<HTMLButtonElement>;
 
-    public constructor(private readonly popupService: PopupService, public readonly windowService: WindowService) {}
+    public constructor(
+        private readonly popupService: PopupService,
+        public readonly windowService: WindowService,
+        private readonly cdr: ChangeDetectorRef
+    ) {}
 
     public dropdownItemDisabler = (item: any): boolean => !item.active;
     public dropdownPrimitiveItemDisabler = (item: string): boolean => item.includes("i");
@@ -309,6 +322,17 @@ export class AppComponent implements OnInit {
         // window.setInterval(() => {
         //     this.windowVisible = !this.windowVisible;
         // }, 2500);
+
+        // window.setTimeout(() => {
+        //     this.selectedMultiSelectDataItems = [
+        //         this.dropdownListDataItems[0],
+        //         this.dropdownListDataItems[2],
+        //         this.dropdownListDataItems[4],
+        //         this.dropdownListDataItems[6],
+        //         this.dropdownListDataItems[8],
+        //         this.dropdownListDataItems[10]
+        //     ];
+        // }, 5000);
     }
 
     public numericTextBoxFormatter = (value: number | null): string => (value != null ? `${value} °C` : "");
@@ -356,6 +380,19 @@ export class AppComponent implements OnInit {
         // this.cdr.detectChanges();
         console.log(`MultiSelect value changed`, value);
     }
+
+    public onPagerPageChange(event: PageChangeEvent): void {
+        this.pagerSkip = event.skip;
+        console.log(this.pagerTestData.slice(this.pagerSkip, this.pagerSkip + this.pagerPageSize));
+    }
+
+    public onPagerPageSizeChange(event: PageSizeChangeEvent): void {
+        if (event.newPageSize >= 50) {
+            event.preventDefault();
+            console.log("Prevented page size change to 50 or more");
+        } else {
+            this.pagerPageSize = event.newPageSize;
+        }
     }
 
     public onPopupClose(): void {

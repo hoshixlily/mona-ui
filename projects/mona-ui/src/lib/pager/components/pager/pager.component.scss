@@ -1,6 +1,43 @@
+div.mona-pager {
+    display: flex;
+    padding: 5px 10px;
+}
+
 ol.mona-pager-list {
     display: flex;
     & li {
         list-style: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
+}
+
+mona-numeric-text-box {
+    margin-left: 20px;
+    width: 50px;
+}
+
+mona-drop-down-list {
+    margin: 0 5px;
+}
+
+div.mona-pager-input {
+    display: flex;
+    align-items: center;
+    & mona-numeric-text-box {
+        width: 50px;
+        margin: 0 5px;
+    }
+    & span {
+        margin: 0 5px;
+    }
+}
+
+div.mona-pager-info {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex: 1 1 0;
+    padding-left: 10px;
 }

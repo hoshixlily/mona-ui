@@ -138,6 +138,8 @@ export * from "./lib/menus/modules/menubar/menubar.module";
 export * from "./lib/menus/menus.module";
 
 /** Pager */
+export * from "./lib/pager/models/PageChangeEvent";
+export * from "./lib/pager/models/PageSizeChangeEvent";
 export * from "./lib/pager/components/pager/pager.component";
 export * from "./lib/pager/pager.module";
 

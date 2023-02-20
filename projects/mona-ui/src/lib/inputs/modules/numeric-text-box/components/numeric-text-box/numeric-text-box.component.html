@@ -3,7 +3,7 @@
            (keydown)="onKeydown($event)" (paste)="onPaste($event)" (wheel)="onMouseWheel($event)" (focus)="inputFocus.emit($event)"
            (blur)="inputBlur.emit($event)"
            autocomplete="off" tabindex="0" #valueTextBox>
-    <div class="mona-numeric-text-box-spinners">
+    <div class="mona-numeric-text-box-spinners" *ngIf="spinners">
         <button monaButton [disabled]="disabled" (mousedown)="spin$.next('+')" (mouseup)="spinStop$.next()">
             <fa-icon [icon]="increaseIcon"></fa-icon>
         </button>

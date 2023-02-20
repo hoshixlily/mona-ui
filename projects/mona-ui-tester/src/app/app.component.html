@@ -93,7 +93,9 @@
                         </div>
                         <div class="content">
                             <div>
-                                <mona-pager [page]="2"></mona-pager>
+                                <mona-pager [skip]="pagerSkip" [total]="pagerTestData.length" (pageChange)="onPagerPageChange($event)" [pageInput]="true"
+                                            type="numeric" [firstLast]="true" [previousNext]="true" [pageSizeValues]="[5,10,20,25,50,100]"
+                                            [pageSize]="pagerPageSize" (pageSizeChange)="onPagerPageSizeChange($event)" style="width: 850px;"></mona-pager>
                             </div>
                             <div>
                                 <button monaButton [disabled]="false" [primary]="false" [selected]="false"
@@ -102,7 +104,7 @@
                                         #testButtonRef>Test Button
                                     <mona-tooltip [target]="testButtonRef" position="bottom">
 <!--                                        <span style="font-weight: bold; font-size: 24px;">Test Button Tooltip</span>-->
-                                        <img src="https://photos.smugmug.com/Shared/Image/i-WG27Dmp/0/38cbf7f2/4K/colorful-liquid-flow-abstract-digital-art-uhdpaper.com-4K-8.1392-4K.jpg" style="width: 960px; height: 540px;" alt="Tooltip Image" />
+                                        <img src="https://photos.smugmug.com/Shared/Image/i-WG27Dmp/0/38cbf7f2/4K/colorful-liquid-flow-abstract-digital-art-uhdpaper.com-4K-8.1392-4K.jpg" style="width: 480px; height: 270px;" alt="Tooltip Image" />
                                     </mona-tooltip>
                                 </button>
 
