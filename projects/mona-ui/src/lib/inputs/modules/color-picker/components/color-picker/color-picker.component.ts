@@ -19,12 +19,18 @@ export class ColorPickerComponent implements OnInit, ControlValueAccessor {
     private propagateChange: Action<string | null> | null = null;
     public readonly noColorIcon: IconDefinition = faTimes;
     public readonly dropdownIcon: IconDefinition = faChevronDown;
+    public color: string | null = null;
 
     @Input()
     public palette: string[] = [];
 
     @Input()
-    public value: string | null = null;
+    public set value(value: string | null) {
+        this.color = value;
+    }
+    public get value(): string | null {
+        return this.color;
+    }
 
     @Output()
     public valueChange: EventEmitter<string | null> = new EventEmitter<string | null>();
@@ -34,7 +40,7 @@ export class ColorPickerComponent implements OnInit, ControlValueAccessor {
     public ngOnInit(): void {}
 
     public onColorPaletteValueChange(value: string | null): void {
-        this.value = value;
+        this.color = value;
         this.valueChange.emit(value);
         this.propagateChange?.(value);
     }
@@ -48,6 +54,6 @@ export class ColorPickerComponent implements OnInit, ControlValueAccessor {
     }
 
     public writeValue(obj: string | null): void {
-        this.value = obj;
+        this.color = obj;
     }
 }

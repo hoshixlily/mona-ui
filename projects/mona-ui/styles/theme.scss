@@ -331,6 +331,8 @@ mona-button-group button[monaButton] {
 
 /** Calendar */
 .mona-calendar {
+    background: var(--mona-background);
+    color: var(--mona-text);
     & table {
         & td {
             @include hover-background;
@@ -358,11 +360,23 @@ mona-button-group button[monaButton] {
     }
 }
 
+.mona-date-picker {
+
+}
+
 .mona-date-input-popup {
     flex-direction: column;
     border-top: none !important;
     padding: 8px !important;
-
+    & mona-calendar  {
+        & div.mona-calendar-month-view,
+        & div.mona-calendar-year-view,
+        & div.mona-calendar-decade-view {
+            border-left: 0;
+            border-right: 0;
+            border-bottom: 0;
+        }
+    }
 }
 
 /** Time Selector */

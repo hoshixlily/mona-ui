@@ -18,7 +18,6 @@ import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { faMoon, faSearch, faSnowflake, faSun } from "@fortawesome/free-solid-svg-icons";
 import { Enumerable, IndexableList } from "@mirei/ts-collections";
 import { map, Observable } from "rxjs";
-import { DateTime } from "luxon";
 
 @Component({
     selector: "app-root",
@@ -31,6 +30,8 @@ export class AppComponent implements OnInit {
     public readonly snowflakeIcon: IconDefinition = faSnowflake;
     public readonly sunIcon: IconDefinition = faSun;
     public autoCompleteValue: string = "Yakizakana";
+    public buttonGroupButtonSelected: boolean = true;
+    public calendarValue: Date | null = null;
     public colorPalette: string[] = [
         "#263400",
         "#d61dff",
@@ -92,6 +93,7 @@ export class AppComponent implements OnInit {
 
     public contextMenuItemVisible: boolean = true;
     public dateFormat24Hours: boolean = false;
+    public datePickerValue: Date | null = new Date();
     public dateTimePickerValue: Date | null = new Date();
     public disabledDates: Date[] = [
         new Date(2023, 0, 1),
@@ -103,7 +105,7 @@ export class AppComponent implements OnInit {
         new Date(2023, 1, 21),
         new Date(2023, 1, 28)
     ];
-    public dateMax: Date = new Date(2023, 0, 27);
+    public dateMax: Date = new Date(2023, 1, 27);
     public dateMin: Date = new Date(2023, 0, 6);
     public dropdownListDataItems: IndexableList<any> = new IndexableList([
         { text: "Cherry", value: 1, group: "Fruit", active: true },
@@ -194,6 +196,8 @@ export class AppComponent implements OnInit {
     ];
     public textBoxValue: string = "TEXT BOX VALUE";
     public textBoxValue2: string = "a";
+    public timePickerValue: Date | null = new Date(2018, 0, 1, 17, 13, 37);
+    public toggleableButtonSelected: boolean = true;
     public treeCheckedKeys: string[] = ["1-2", "1-3-1"];
 
     public treeData: any[] = [
@@ -365,11 +369,17 @@ export class AppComponent implements OnInit {
         console.log(`Combobox value changed`, value);
     }
 
+    public onDatePickerValueChange(value: Date | null): void {
+        console.log(value);
+        this.datePickerValue = value;
+    }
+
     public onDateTimePickerValueChange(value: Date | null): void {
         console.log(value);
     }
 
     public onDropDownValueChange(value: unknown): void {
+        // if (true) return;
         this.selectedDropdownListDataItem = value;
         console.log(`Dropdown value changed`, value);
         // console.log(value);
@@ -501,19 +511,24 @@ export class AppComponent implements OnInit {
     }
 
     public openPopup2(event: MouseEvent): void {
-        event.stopPropagation();
-        const prevented = 5;
-        const ref = this.popupService.create({
-            anchor: this.italicButtonRef,
-            content: TestComponentComponent,
-            popupClass: "popup-noselect",
-            hasBackdrop: true,
-            offset: { horizontal: 0, vertical: 1 },
-            preventClose: event => {
-                console.log(event);
-                return event.via === "backdropClick";
-            }
-        });
+        // event.stopPropagation();
+        // const prevented = 5;
+        // const ref = this.popupService.create({
+        //     anchor: this.italicButtonRef,
+        //     content: TestComponentComponent,
+        //     popupClass: "popup-noselect",
+        //     hasBackdrop: true,
+        //     offset: { horizontal: 0, vertical: 1 },
+        //     preventClose: event => {
+        //         console.log(event);
+        //         return event.via === "backdropClick";
+        //     }
+        // });
+    }
+
+    public onTimePickerValueChange(value: Date | null): void {
+        console.log(value);
+        this.timePickerValue = value;
     }
 
     public openWindow(titleTemplate?: TemplateRef<void>): void {

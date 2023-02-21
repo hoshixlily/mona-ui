@@ -6,7 +6,8 @@ import {
     OnChanges,
     OnInit,
     Output,
-    SimpleChanges
+    SimpleChanges,
+    ViewChild
 } from "@angular/core";
 import { Page } from "../../models/Page";
 import {
@@ -19,6 +20,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { PageChangeEvent } from "../../models/PageChangeEvent";
 import { PageSizeChangeEvent } from "../../models/PageSizeChangeEvent";
+import { DropDownListComponent } from "../../../dropdowns/modules/drop-down-list/components/drop-down-list/drop-down-list.component";
 
 @Component({
     selector: "mona-pager",
@@ -27,6 +29,7 @@ import { PageSizeChangeEvent } from "../../models/PageSizeChangeEvent";
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PagerComponent implements OnInit, OnChanges {
+    private previousPageSize: number = 10;
     public readonly ellipsisIcon: IconDefinition = faEllipsis;
     public readonly firstPageIcon: IconDefinition = faAngleDoubleLeft;
     public readonly lastPageIcon: IconDefinition = faAngleDoubleRight;
@@ -53,6 +56,9 @@ export class PagerComponent implements OnInit, OnChanges {
 
     @Output()
     public pageSizeChange: EventEmitter<PageSizeChangeEvent> = new EventEmitter<PageSizeChangeEvent>();
+
+    @ViewChild("pageSizeDropdownList")
+    public pageSizeDropdownList?: DropDownListComponent;
 
     @Input()
     public previousNext: boolean = true;
@@ -145,11 +151,22 @@ export class PagerComponent implements OnInit, OnChanges {
             return;
         }
         const event = new PageSizeChangeEvent(value, this.pageSize);
+        if (this.pageSizeDropdownList) {
+            this.pageSizeDropdownList.setValue(this.previousPageSize);
+        }
+
         this.pageSizeChange.emit(event);
         if (event.isDefaultPrevented()) {
+            this.pageSize = this.previousPageSize;
+            if (this.pageSizeDropdownList) {
+                this.pageSizeDropdownList.setValue(this.previousPageSize);
+            }
             return;
         }
-        this.pageSize = value;
+        this.previousPageSize = value;
+        if (this.pageSizeDropdownList) {
+            this.pageSizeDropdownList.setValue(value);
+        }
         this.pageCount = Math.ceil(this.total / this.pageSize);
         this.setPage(1);
     }

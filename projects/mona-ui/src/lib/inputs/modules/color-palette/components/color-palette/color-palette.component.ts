@@ -32,11 +32,11 @@ export class ColorPaletteComponent implements OnInit, ControlValueAccessor {
 
     @Input()
     public set value(value: string | null) {
-        if (value) {
-            this.selectedColor = this.colors.find(c => c === value) ?? null;
-        } else {
-            this.selectedColor = null;
-        }
+        this.selectedColor = value ? this.colors.find(c => c === value) ?? null : null;
+    }
+
+    public get value(): string | null {
+        return this.selectedColor;
     }
 
     @Output()

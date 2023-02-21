@@ -72,3 +72,11 @@ div.mona-calendar-header {
         flex: 1;
     }
 }
+
+div.mona-calendar-month-view,
+div.mona-calendar-year-view,
+div.mona-calendar-decade-view {
+    border-left: 1px solid var(--mona-border-color);
+    border-right: 1px solid var(--mona-border-color);
+    border-bottom: 1px solid var(--mona-border-color);
+}

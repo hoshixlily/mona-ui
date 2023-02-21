@@ -2,7 +2,6 @@ import {
     AfterViewInit,
     ChangeDetectorRef,
     Component,
-    ContentChild,
     ElementRef,
     EventEmitter,
     forwardRef,
@@ -12,22 +11,10 @@ import {
     OnDestroy,
     OnInit,
     Output,
-    Renderer2,
-    SimpleChanges,
-    TemplateRef,
-    ViewChild
+    Renderer2
 } from "@angular/core";
-import { fromEvent, Subject, take, takeUntil, timer } from "rxjs";
 import { Action } from "../../../../../utils/Action";
-import { SliderTick } from "../../models/SliderTick";
-import { SliderTickValueTemplateDirective } from "../../directives/slider-tick-value-template.directive";
-import { SliderHandlerPositionData } from "../../models/SliderHandlerPositionData";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
-import { Orientation } from "../../../../../models/Orientation";
-import { SliderHandlerType } from "../../models/SliderHandlerType";
-import { SliderTrackData } from "../../models/SliderTrackData";
-import { SliderHandlerData } from "../../models/SliderHandlerData";
-import { SliderLabelPosition } from "../../models/SliderLabelPosition";
 import { AbstractSliderComponent } from "../abstract-slider/abstract-slider.component";
 
 @Component({
