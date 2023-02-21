@@ -115,13 +115,20 @@
                                 </ng-template>
                             </div>
 
-                            <div>
-                                <mona-button-group selection="single">
-                                    <button monaButton [toggleable]="false">B</button>
-                                    <button monaButton [toggleable]="false" (click)="openPopup2($event)"
+                            <div style="flex-direction: column;">
+                                <mona-button-group selection="single" style="margin-bottom: 10px;">
+                                    <button monaButton [toggleable]="true">B</button>
+                                    <button monaButton [toggleable]="true" (click)="openPopup2($event)"
                                             #italicButtonRef>I
                                     </button>
-                                    <button monaButton [toggleable]="false">U</button>
+                                    <button monaButton [toggleable]="true">U</button>
+                                    <button monaButton [toggleable]="true" [(selected)]="buttonGroupButtonSelected">J</button>
+                                </mona-button-group>
+
+                                <mona-button-group selection="multiple">
+                                    <button monaButton [toggleable]="true">Left</button>
+                                    <button monaButton [toggleable]="true">Center</button>
+                                    <button monaButton [toggleable]="true" [(selected)]="buttonGroupButtonSelected">Right</button>
                                 </mona-button-group>
                             </div>
 
@@ -176,7 +183,8 @@
                             </div>
 
                             <div>
-                                <button monaButton [disabled]="false" [toggleable]="true" #contextMenuAnchor>
+                                <button monaButton [disabled]="false" [toggleable]="true" [selected]="toggleableButtonSelected"
+                                        (selectedChange)="toggleableButtonSelected=$event" #contextMenuAnchor>
                                     <span style="color: lightcoral;">Context Menu Target</span>
                                 </button>
                                 <mona-contextmenu [target]="contextMenuAnchor" (navigate)="print($event)">

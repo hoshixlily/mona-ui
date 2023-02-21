@@ -1,15 +1,18 @@
-import { AfterContentInit, Component, ContentChildren, Input, OnInit, QueryList } from "@angular/core";
+import { AfterContentInit, Component, ContentChildren, Input, OnDestroy, OnInit, QueryList, Self } from "@angular/core";
 import { ButtonDirective } from "../../../button/directives/button.directive";
 import { SelectionMode } from "../../../../../models/SelectionMode";
+import { ButtonService } from "../../../../services/button.service";
+import { Subject, takeUntil } from "rxjs";
 
 @Component({
     selector: "mona-button-group",
     templateUrl: "./button-group.component.html",
-    styleUrls: ["./button-group.component.scss"]
+    styleUrls: ["./button-group.component.scss"],
+    providers: [ButtonService]
 })
-export class ButtonGroupComponent implements OnInit, AfterContentInit {
+export class ButtonGroupComponent implements OnInit, AfterContentInit, OnDestroy {
+    private readonly componentDestroy$: Subject<void> = new Subject<void>();
     private isDisabled: boolean = false;
-    private selectedButtons: ButtonDirective[] = [];
     private selectionMode: SelectionMode = "multiple";
 
     @ContentChildren(ButtonDirective)
@@ -24,39 +27,47 @@ export class ButtonGroupComponent implements OnInit, AfterContentInit {
     @Input()
     public set selection(selection: SelectionMode) {
         this.selectionMode = selection;
-        this.notifySelectionStateChange();
     }
 
-    public constructor() {}
+    public constructor(private readonly buttonService: ButtonService) {}
 
     public ngAfterContentInit(): void {
         this.notifyDisableStateChanged();
-        this.notifySelectionStateChange();
     }
 
-    public ngOnInit(): void {}
+    public ngOnDestroy(): void {
+        this.componentDestroy$.next();
+        this.componentDestroy$.complete();
+    }
+
+    public ngOnInit(): void {
+        this.notifySelectionStateChange();
+    }
 
     private notifyDisableStateChanged(): void {
         this.buttons.forEach(b => (b.disabled = this.isDisabled));
     }
 
     private notifySelectionStateChange(): void {
-        this.buttons.forEach(b => {
-            if (b.selected) {
-                this.selectedButtons.push(b);
+        this.buttonService.buttonClick$.pipe(takeUntil(this.componentDestroy$)).subscribe(button => {
+            if (this.selectionMode === "single") {
+                this.buttons.forEach(b => {
+                    this.buttonService.buttonSelect$.next([b, b === button]);
+                });
+            } else {
+                this.buttonService.buttonSelect$.next([button, !button.selected]);
             }
-            b.selectedChange.subscribe(s => {
-                if (!s) {
-                    this.selectedButtons = this.selectedButtons.filter(sb => sb !== b);
-                } else {
-                    if (this.selectionMode === "single") {
-                        this.selectedButtons.forEach(sb => (sb.selected = false));
-                        this.selectedButtons = [b];
-                    } else {
-                        this.selectedButtons = [...this.selectedButtons, b];
-                    }
+        });
+        this.buttonService.buttonSelected$.pipe(takeUntil(this.componentDestroy$)).subscribe(button => {
+            if (this.selectionMode === "single") {
+                if (button.selected) {
+                    this.buttons.forEach(b => {
+                        if (b !== button) {
+                            this.buttonService.buttonSelect$.next([b, false]);
+                        }
+                    });
                 }
-            });
+            }
         });
     }
 }

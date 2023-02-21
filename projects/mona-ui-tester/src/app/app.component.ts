@@ -31,6 +31,7 @@ export class AppComponent implements OnInit {
     public readonly snowflakeIcon: IconDefinition = faSnowflake;
     public readonly sunIcon: IconDefinition = faSun;
     public autoCompleteValue: string = "Yakizakana";
+    public buttonGroupButtonSelected: boolean = true;
     public colorPalette: string[] = [
         "#263400",
         "#d61dff",
@@ -194,6 +195,7 @@ export class AppComponent implements OnInit {
     ];
     public textBoxValue: string = "TEXT BOX VALUE";
     public textBoxValue2: string = "a";
+    public toggleableButtonSelected: boolean = true;
     public treeCheckedKeys: string[] = ["1-2", "1-3-1"];
 
     public treeData: any[] = [
@@ -501,19 +503,19 @@ export class AppComponent implements OnInit {
     }
 
     public openPopup2(event: MouseEvent): void {
-        event.stopPropagation();
-        const prevented = 5;
-        const ref = this.popupService.create({
-            anchor: this.italicButtonRef,
-            content: TestComponentComponent,
-            popupClass: "popup-noselect",
-            hasBackdrop: true,
-            offset: { horizontal: 0, vertical: 1 },
-            preventClose: event => {
-                console.log(event);
-                return event.via === "backdropClick";
-            }
-        });
+        // event.stopPropagation();
+        // const prevented = 5;
+        // const ref = this.popupService.create({
+        //     anchor: this.italicButtonRef,
+        //     content: TestComponentComponent,
+        //     popupClass: "popup-noselect",
+        //     hasBackdrop: true,
+        //     offset: { horizontal: 0, vertical: 1 },
+        //     preventClose: event => {
+        //         console.log(event);
+        //         return event.via === "backdropClick";
+        //     }
+        // });
     }
 
     public openWindow(titleTemplate?: TemplateRef<void>): void {

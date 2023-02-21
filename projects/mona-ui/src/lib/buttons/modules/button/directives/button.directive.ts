@@ -2,20 +2,25 @@ import {
     Directive,
     ElementRef,
     EventEmitter,
+    Host,
     HostBinding,
     Input,
-    NgZone,
     OnDestroy,
     OnInit,
+    Optional,
     Output,
-    Renderer2
+    SkipSelf
 } from "@angular/core";
+import { fromEvent, Subject, takeUntil } from "rxjs";
+import { ButtonService } from "../../../services/button.service";
 
 @Directive({
     selector: "[monaButton]"
+    // providers: [ButtonService]
 })
 export class ButtonDirective implements OnInit, OnDestroy {
-    private clickListener: () => void = () => void 0;
+    private readonly destroy$: Subject<void> = new Subject<void>();
+    private buttonSelected: boolean = false;
 
     @HostBinding("class.mona-disabled")
     @Input()
@@ -31,7 +36,14 @@ export class ButtonDirective implements OnInit, OnDestroy {
 
     @HostBinding("class.mona-selected")
     @Input()
-    public selected: boolean = false;
+    public set selected(selected: boolean) {
+        this.buttonSelected = selected;
+        this.buttonService?.buttonSelected$.next(this);
+    }
+
+    public get selected(): boolean {
+        return this.buttonSelected;
+    }
 
     @Output()
     public selectedChange: EventEmitter<boolean> = new EventEmitter<boolean>();
@@ -40,28 +52,34 @@ export class ButtonDirective implements OnInit, OnDestroy {
     public toggleable: boolean = false;
 
     public constructor(
-        private readonly elementRef: ElementRef<HTMLButtonElement>,
-        private readonly renderer: Renderer2,
-        private readonly zone: NgZone
+        @Host() @Optional() private readonly buttonService: ButtonService,
+        public readonly elementRef: ElementRef<HTMLButtonElement>
     ) {}
 
     public ngOnDestroy(): void {
-        this.clickListener();
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     public ngOnInit(): void {
-        this.zone.runOutsideAngular(() => {
-            this.clickListener = this.renderer.listen(this.elementRef.nativeElement, "click", () => {
-                if (this.toggleable) {
-                    const oldSelected = this.selected;
-                    this.selected = !this.selected;
-                    if (oldSelected !== this.selected) {
-                        this.zone.run(() => {
-                            this.selectedChange.emit(this.selected);
-                        });
+        if (this.toggleable) {
+            fromEvent<MouseEvent>(this.elementRef.nativeElement, "click")
+                .pipe(takeUntil(this.destroy$))
+                .subscribe(() => {
+                    if (this.buttonService) {
+                        this.buttonService.buttonClick$.next(this);
+                    } else {
+                        this.selected = !this.selected;
+                        this.selectedChange.emit(this.selected);
                     }
-                }
-            });
+                });
+        }
+        this.buttonService?.buttonSelect$.pipe(takeUntil(this.destroy$)).subscribe(result => {
+            const [button, selected] = result;
+            if (button === this) {
+                this.buttonSelected = selected;
+                this.selectedChange.emit(this.buttonSelected);
+            }
         });
     }
 }
