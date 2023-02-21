@@ -60,15 +60,12 @@ export class TimePickerComponent extends AbstractDateInputComponent implements O
         if (this.popupRef) {
             return;
         }
-        let date = DateTime.fromFormat(this.currentDateString, this.format);
-        const currentDate = DateTime.fromJSDate(this.value ?? new Date());
-        date = date.set({ day: currentDate.day, month: currentDate.month, year: currentDate.year });
-
-        if (this.dateEquals(date.toJSDate(), this.value)) {
+        const dateTime = DateTime.fromFormat(this.currentDateString, this.format);
+        if (this.dateStringEquals(dateTime.toJSDate(), this.value)) {
             return;
         }
-        if (date.isValid) {
-            this.setCurrentDate(date.toJSDate());
+        if (dateTime.isValid) {
+            this.setCurrentDate(dateTime.toJSDate());
         } else {
             this.setCurrentDate(null);
         }

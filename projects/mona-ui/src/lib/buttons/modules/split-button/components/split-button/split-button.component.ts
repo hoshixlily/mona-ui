@@ -9,7 +9,6 @@ import {
     EventEmitter,
     Input,
     OnDestroy,
-    OnInit,
     Output,
     QueryList,
     TemplateRef,
@@ -28,7 +27,7 @@ import { faChevronDown, IconDefinition } from "@fortawesome/free-solid-svg-icons
     templateUrl: "./split-button.component.html",
     styleUrls: ["./split-button.component.scss"]
 })
-export class SplitButtonComponent implements OnInit, AfterViewInit, AfterContentInit, OnDestroy {
+export class SplitButtonComponent implements AfterViewInit, AfterContentInit, OnDestroy {
     private readonly componentDestroy$: Subject<void> = new Subject<void>();
     public readonly menuIcon: IconDefinition = faChevronDown;
     public menuItems: MenuItem[] = [];
@@ -84,6 +83,4 @@ export class SplitButtonComponent implements OnInit, AfterViewInit, AfterContent
         this.componentDestroy$.next();
         this.componentDestroy$.complete();
     }
-
-    public ngOnInit(): void {}
 }

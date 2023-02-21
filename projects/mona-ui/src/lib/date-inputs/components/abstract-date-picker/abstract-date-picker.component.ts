@@ -53,7 +53,7 @@ export abstract class AbstractDatePickerComponent extends AbstractDateInputCompo
         }
 
         const dateTime = DateTime.fromFormat(this.currentDateString, this.format);
-        if (this.dateEquals(this.value, dateTime.toJSDate())) {
+        if (this.dateStringEquals(this.value, dateTime.toJSDate())) {
             return;
         }
         if (dateTime.isValid) {

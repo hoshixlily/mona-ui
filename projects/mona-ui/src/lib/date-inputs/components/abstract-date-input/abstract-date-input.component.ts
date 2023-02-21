@@ -61,6 +61,7 @@ export abstract class AbstractDateInputComponent implements OnInit, OnDestroy, O
             this.currentDateString = "";
         }
     }
+
     public get value(): Date | null {
         return this.#value;
     }
@@ -99,9 +100,11 @@ export abstract class AbstractDateInputComponent implements OnInit, OnDestroy, O
         this.cdr.markForCheck();
     }
 
-    protected dateEquals(date1: Date | null, date2: Date | null): boolean {
+    protected dateStringEquals(date1: Date | null, date2: Date | null): boolean {
         if (date1 && date2) {
-            return DateTime.fromJSDate(date1).equals(DateTime.fromJSDate(date2));
+            return (
+                DateTime.fromJSDate(date1).toFormat(this.format) === DateTime.fromJSDate(date2).toFormat(this.format)
+            );
         }
         return date1 === date2;
     }

@@ -10,7 +10,6 @@ import {
 } from "@angular/core";
 import { faClock, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { PopupService } from "../../../../../popup/services/popup.service";
-import { DateTime } from "luxon";
 import { FocusMonitor } from "@angular/cdk/a11y";
 import { AbstractDatePickerComponent } from "../../../../components/abstract-date-picker/abstract-date-picker.component";
 
@@ -39,10 +38,6 @@ export class DateTimePickerComponent extends AbstractDatePickerComponent impleme
         protected override readonly popupService: PopupService
     ) {
         super(cdr, elementRef, focusMonitor, popupService);
-    }
-
-    public override ngOnInit(): void {
-        super.ngOnInit();
     }
 
     public onTimeInputButtonClick(): void {
