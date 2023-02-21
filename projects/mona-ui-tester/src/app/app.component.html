@@ -92,6 +92,7 @@
                             </mona-menubar>
                         </div>
                         <div class="content">
+                            <div style="color: #95c5cb;">{{datePickerValue | json}}</div>
                             <div>
                                 <mona-pager [skip]="pagerSkip" [total]="pagerTestData.length" (pageChange)="onPagerPageChange($event)" [pageInput]="true"
                                             type="numeric" [firstLast]="true" [previousNext]="true" [pageSizeValues]="[5,10,20,25,50,100]"
@@ -175,10 +176,11 @@
                                                        (valueChange)="onDateTimePickerValueChange($event)"></mona-date-time-picker>
 
                                 <mona-date-picker format="d/M/yyyy" style="width: 250px;" [readonly]="false"
-                                                  [min]="dateMin" [max]="dateMax" [value]="dateTimePickerValue"
-                                                  (valueChange)="print($event)"></mona-date-picker>
+                                                  [min]="dateMin" [max]="dateMax" [value]="datePickerValue"
+                                                  (valueChange)="onDatePickerValueChange($event)"></mona-date-picker>
 
-                                <mona-time-picker [hourFormat]="dateFormat24Hours ? '24':'12'" [showSeconds]="true" [value]="dateTimePickerValue"
+                                <mona-time-picker [hourFormat]="dateFormat24Hours ? '24':'12'" [showSeconds]="true" [value]="timePickerValue"
+                                                  (valueChange)="onTimePickerValueChange($event)"
                                                   [format]="dateFormat24Hours ? 'HH:mm:ss' : 'hh:mm:ss a'" style="width: 200px; margin-left: 40px;"></mona-time-picker>
                             </div>
 
@@ -485,7 +487,7 @@
                                     <mona-splitter orientation="horizontal">
                                         <mona-splitter-pane [collapsible]="true">
                                             <div style="width: 100%; height: 100%; padding: 20px;">
-                                                <button monaButton>Open Dialog</button>
+                                                <mona-calendar [(value)]="calendarValue" style="width: 300px;"></mona-calendar>
                                             </div>
                                         </mona-splitter-pane>
                                         <mona-splitter-pane [collapsible]="true">

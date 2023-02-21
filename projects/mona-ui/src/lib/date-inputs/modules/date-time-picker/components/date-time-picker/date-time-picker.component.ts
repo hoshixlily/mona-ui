@@ -45,38 +45,6 @@ export class DateTimePickerComponent extends AbstractDatePickerComponent impleme
         super.ngOnInit();
     }
 
-    public onDateInputBlur(): void {
-        if (this.popupRef) {
-            return;
-        }
-        if (!this.currentDateString && this.value) {
-            this.setCurrentDate(null);
-            return;
-        }
-        const date1 = DateTime.fromFormat(this.currentDateString, this.format);
-        if (date1.isValid) {
-            if (this.value && DateTime.fromJSDate(this.value).equals(date1)) {
-                return;
-            }
-            if (this.min && date1.startOf("day") < DateTime.fromJSDate(this.min).startOf("day")) {
-                this.setCurrentDate(this.min);
-                return;
-            }
-            if (this.max && date1.startOf("day") > DateTime.fromJSDate(this.max).startOf("day")) {
-                this.setCurrentDate(this.max);
-                return;
-            }
-            this.setCurrentDate(date1.toJSDate());
-        } else {
-            if (this.value) {
-                this.currentDateString = DateTime.fromJSDate(this.value).toFormat(this.format);
-            } else {
-                this.currentDateString = "";
-            }
-        }
-        this.cdr.detectChanges();
-    }
-
     public onTimeInputButtonClick(): void {
         if (!this.timePopupTemplateRef || this.readonly) {
             return;
@@ -92,7 +60,7 @@ export class DateTimePickerComponent extends AbstractDatePickerComponent impleme
         });
     }
 
-    public onTimeSelectorValueChange(date: Date): void {
+    public onTimeSelectorValueChange(date: Date | null): void {
         this.setCurrentDate(date);
     }
 }

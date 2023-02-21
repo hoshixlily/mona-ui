@@ -1,4 +1,12 @@
-import { ChangeDetectorRef, Component, ElementRef, OnInit, TemplateRef, ViewChild } from "@angular/core";
+import {
+    ChangeDetectionStrategy,
+    ChangeDetectorRef,
+    Component,
+    ElementRef,
+    OnInit,
+    TemplateRef,
+    ViewChild
+} from "@angular/core";
 import { CommonModule } from "@angular/common";
 import { AbstractDateInputComponent } from "../abstract-date-input/abstract-date-input.component";
 import { faCalendar, IconDefinition } from "@fortawesome/free-solid-svg-icons";
@@ -12,7 +20,8 @@ import { DateTime } from "luxon";
     standalone: true,
     imports: [CommonModule],
     template: "",
-    styleUrls: []
+    styleUrls: [],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export abstract class AbstractDatePickerComponent extends AbstractDateInputComponent implements OnInit {
     public readonly dateIcon: IconDefinition = faCalendar;
@@ -34,11 +43,48 @@ export abstract class AbstractDatePickerComponent extends AbstractDateInputCompo
         this.popupRef?.close();
     }
 
+    public onDateInputBlur(): void {
+        if (this.popupRef) {
+            return;
+        }
+        if (!this.currentDateString && this.value) {
+            this.setCurrentDate(null);
+            return;
+        }
+
+        const dateTime = DateTime.fromFormat(this.currentDateString, this.format);
+        if (this.dateEquals(this.value, dateTime.toJSDate())) {
+            return;
+        }
+        if (dateTime.isValid) {
+            if (this.value && DateTime.fromJSDate(this.value).equals(dateTime)) {
+                return;
+            }
+            if (this.min && dateTime.startOf("day") < DateTime.fromJSDate(this.min).startOf("day")) {
+                this.setCurrentDate(this.min);
+                return;
+            }
+            if (this.max && dateTime.startOf("day") > DateTime.fromJSDate(this.max).startOf("day")) {
+                this.setCurrentDate(this.max);
+                return;
+            }
+            this.setCurrentDate(dateTime.toJSDate());
+        } else {
+            if (this.value) {
+                this.currentDateString = DateTime.fromJSDate(this.value).toFormat(this.format);
+            } else {
+                this.currentDateString = "";
+            }
+        }
+        this.cdr.detectChanges();
+    }
+
     public onDateInputButtonClick(): void {
         if (!this.datePopupTemplateRef || this.readonly) {
             return;
         }
 
+        const input = this.elementRef.nativeElement.querySelector("input") as HTMLElement;
         this.popupRef = this.popupService.create({
             anchor: this.popupAnchor,
             content: this.datePopupTemplateRef,
@@ -50,21 +96,11 @@ export abstract class AbstractDatePickerComponent extends AbstractDateInputCompo
         });
         this.popupRef.closed.pipe(take(1)).subscribe(() => {
             this.popupRef = null;
-            this.focusMonitor.focusVia(this.elementRef.nativeElement.querySelector("input") as HTMLElement, "program");
+            this.focusMonitor.focusVia(input, "program");
         });
     }
 
     public onDateStringEdit(dateString: string): void {
         this.currentDateString = dateString;
-    }
-
-    protected setCurrentDate(date: Date | null): void {
-        this.value = date;
-        if (this.value) {
-            this.currentDateString = DateTime.fromJSDate(this.value).toFormat(this.format);
-        } else {
-            this.currentDateString = "";
-        }
-        this.valueChange.emit(this.value);
     }
 }

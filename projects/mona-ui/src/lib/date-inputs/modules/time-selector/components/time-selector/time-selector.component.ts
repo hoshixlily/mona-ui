@@ -4,16 +4,14 @@ import {
     ChangeDetectorRef,
     Component,
     ElementRef,
-    EventEmitter,
     Input,
     OnDestroy,
     OnInit,
-    Output,
     ViewChild
 } from "@angular/core";
 import { DateTime } from "luxon";
-import { Subject } from "rxjs";
 import { Enumerable } from "@mirei/ts-collections";
+import { AbstractDateInputComponent } from "../../../../components/abstract-date-input/abstract-date-input.component";
 
 @Component({
     selector: "mona-time-selector",
@@ -21,20 +19,14 @@ import { Enumerable } from "@mirei/ts-collections";
     styleUrls: ["./time-selector.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TimeSelectorComponent implements OnInit, OnDestroy, AfterViewInit {
-    private readonly componentDestroy$: Subject<void> = new Subject<void>();
+export class TimeSelectorComponent extends AbstractDateInputComponent implements OnInit, OnDestroy, AfterViewInit {
     public hour: number | null = null;
     public hours: number[] = [];
     public meridiem: "AM" | "PM" = "AM";
     public minute: number | null = null;
     public minutes: number[] = [];
-    public navigatedDate: Date | null = null;
     public second: number | null = null;
     public seconds: number[] = [];
-    public time: Date | null = null;
-
-    @Input()
-    public disabled: boolean = false;
 
     @Input()
     public hourFormat: "12" | "24" = "24";
@@ -45,25 +37,15 @@ export class TimeSelectorComponent implements OnInit, OnDestroy, AfterViewInit {
     @ViewChild("minutesListElement")
     public minutesListElement!: ElementRef<HTMLOListElement>;
 
-    @Input()
-    public readonly: boolean = false;
-
     @ViewChild("secondsListElement")
     public secondsListElement!: ElementRef<HTMLOListElement>;
 
     @Input()
     public showSeconds: boolean = false;
 
-    @Input()
-    public set value(value: Date | null) {
-        this.time = value;
-        this.navigatedDate = value;
+    public constructor(protected override readonly cdr: ChangeDetectorRef, private readonly elementRef: ElementRef) {
+        super(cdr);
     }
-
-    @Output()
-    public valueChange: EventEmitter<Date> = new EventEmitter<Date>();
-
-    public constructor(private readonly cdr: ChangeDetectorRef, private readonly elementRef: ElementRef) {}
 
     public ngAfterViewInit(): void {
         window.setTimeout(() => {
@@ -74,17 +56,13 @@ export class TimeSelectorComponent implements OnInit, OnDestroy, AfterViewInit {
         }, 0);
     }
 
-    public ngOnDestroy(): void {
-        this.componentDestroy$.next();
-        this.componentDestroy$.complete();
-    }
-
-    public ngOnInit(): void {
+    public override ngOnInit(): void {
+        super.ngOnInit();
         this.hours = this.hourFormat === "24" ? Enumerable.range(0, 24).toArray() : Enumerable.range(1, 12).toArray();
         this.minutes = Enumerable.range(0, 60).toArray();
         this.seconds = Enumerable.range(0, 60).toArray();
-        if (this.time) {
-            this.navigatedDate = this.time;
+        if (this.value) {
+            this.navigatedDate = this.value;
             this.meridiem = this.navigatedDate.getHours() >= 12 ? "PM" : "AM";
             this.updateHour();
             this.updateMinute();
@@ -173,13 +151,6 @@ export class TimeSelectorComponent implements OnInit, OnDestroy, AfterViewInit {
                 element.scrollIntoView({ behavior: "auto", block: "center" });
             }
         }
-    }
-
-    private setCurrentDate(date: Date): void {
-        this.time = date;
-        this.navigatedDate = date;
-        this.valueChange.emit(this.time);
-        this.cdr.markForCheck();
     }
 
     private updateHour(): void {

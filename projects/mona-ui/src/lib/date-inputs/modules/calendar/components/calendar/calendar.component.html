@@ -16,7 +16,7 @@
             </button>
         </div>
     </div>
-    <div *ngIf="calendarView==='month'" style="width: 100%;">
+    <div class="mona-calendar-month-view" *ngIf="calendarView==='month'" style="width: 100%;">
         <table class="mona-calendar-month-view-table">
             <thead>
             <tr>
@@ -78,7 +78,7 @@
             </tbody>
         </table>
     </div>
-    <div *ngIf="calendarView==='year'">
+    <div class="mona-calendar-year-view" *ngIf="calendarView==='year'">
         <table class="mona-calendar-year-view-table">
             <tr>
                 <td (click)="onMonthClick(1)">Jan</td>
@@ -102,7 +102,7 @@
             </tr>
         </table>
     </div>
-    <div *ngIf="calendarView==='decade'">
+    <div class="mona-calendar-decade-view" *ngIf="calendarView==='decade'">
         <table class="mona-calendar-decade-view-table">
             <tr>
                 <td (click)="onYearClick(decadeYears[0])">{{decadeYears[0]}}</td>

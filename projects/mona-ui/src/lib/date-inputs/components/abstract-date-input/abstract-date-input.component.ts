@@ -25,10 +25,10 @@ import { DateTime } from "luxon";
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export abstract class AbstractDateInputComponent implements OnInit, OnDestroy, OnChanges {
+    #value: Date | null = null;
     protected readonly componentDestroy$: Subject<void> = new Subject<void>();
     protected popupRef: PopupRef | null = null;
     public currentDateString: string = "";
-
     public navigatedDate: Date = new Date();
 
     @Input()
@@ -53,7 +53,17 @@ export abstract class AbstractDateInputComponent implements OnInit, OnDestroy, O
     public readonly: boolean = false;
 
     @Input()
-    public value: Date | null = null;
+    public set value(date: Date | null) {
+        this.#value = date;
+        if (date) {
+            this.currentDateString = DateTime.fromJSDate(date).toFormat(this.format);
+        } else {
+            this.currentDateString = "";
+        }
+    }
+    public get value(): Date | null {
+        return this.#value;
+    }
 
     @Output()
     public valueChange: EventEmitter<Date | null> = new EventEmitter<Date | null>();
@@ -76,5 +86,23 @@ export abstract class AbstractDateInputComponent implements OnInit, OnDestroy, O
         if (this.value) {
             this.currentDateString = DateTime.fromJSDate(this.value).toFormat(this.format);
         }
+    }
+
+    protected setCurrentDate(date: Date | null): void {
+        this.#value = date;
+        if (date) {
+            this.currentDateString = DateTime.fromJSDate(date).toFormat(this.format);
+        } else {
+            this.currentDateString = "";
+        }
+        this.valueChange.emit(date);
+        this.cdr.markForCheck();
+    }
+
+    protected dateEquals(date1: Date | null, date2: Date | null): boolean {
+        if (date1 && date2) {
+            return DateTime.fromJSDate(date1).equals(DateTime.fromJSDate(date2));
+        }
+        return date1 === date2;
     }
 }

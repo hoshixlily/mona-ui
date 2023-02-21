@@ -113,12 +113,6 @@ export class CalendarComponent extends AbstractDateInputComponent implements OnI
         this.cdr.markForCheck();
     }
 
-    private setCurrentDate(date: Date): void {
-        this.value = date;
-        this.valueChange.emit(this.value);
-        this.cdr.markForCheck();
-    }
-
     public get timezone(): string {
         return DateTime.local().zoneName;
     }

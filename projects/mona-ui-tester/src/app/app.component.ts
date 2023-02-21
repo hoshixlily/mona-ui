@@ -32,6 +32,7 @@ export class AppComponent implements OnInit {
     public readonly sunIcon: IconDefinition = faSun;
     public autoCompleteValue: string = "Yakizakana";
     public buttonGroupButtonSelected: boolean = true;
+    public calendarValue: Date | null = null;
     public colorPalette: string[] = [
         "#263400",
         "#d61dff",
@@ -93,6 +94,7 @@ export class AppComponent implements OnInit {
 
     public contextMenuItemVisible: boolean = true;
     public dateFormat24Hours: boolean = false;
+    public datePickerValue: Date | null = new Date();
     public dateTimePickerValue: Date | null = new Date();
     public disabledDates: Date[] = [
         new Date(2023, 0, 1),
@@ -195,6 +197,7 @@ export class AppComponent implements OnInit {
     ];
     public textBoxValue: string = "TEXT BOX VALUE";
     public textBoxValue2: string = "a";
+    public timePickerValue: Date | null = new Date(2018, 0, 1, 17, 13, 37);
     public toggleableButtonSelected: boolean = true;
     public treeCheckedKeys: string[] = ["1-2", "1-3-1"];
 
@@ -367,6 +370,11 @@ export class AppComponent implements OnInit {
         console.log(`Combobox value changed`, value);
     }
 
+    public onDatePickerValueChange(value: Date | null): void {
+        console.log(value);
+        this.datePickerValue = value;
+    }
+
     public onDateTimePickerValueChange(value: Date | null): void {
         console.log(value);
     }
@@ -516,6 +524,11 @@ export class AppComponent implements OnInit {
         //         return event.via === "backdropClick";
         //     }
         // });
+    }
+
+    public onTimePickerValueChange(value: Date | null): void {
+        console.log(value);
+        this.timePickerValue = value;
     }
 
     public openWindow(titleTemplate?: TemplateRef<void>): void {
