@@ -11,8 +11,8 @@ import { Subject, takeUntil } from "rxjs";
     providers: [ButtonService]
 })
 export class ButtonGroupComponent implements OnInit, AfterContentInit, OnDestroy {
+    #disabled: boolean = false;
     private readonly componentDestroy$: Subject<void> = new Subject<void>();
-    private isDisabled: boolean = false;
     private selectionMode: SelectionMode = "multiple";
 
     @ContentChildren(ButtonDirective)
@@ -20,8 +20,11 @@ export class ButtonGroupComponent implements OnInit, AfterContentInit, OnDestroy
 
     @Input()
     public set disabled(disabled: boolean) {
-        this.isDisabled = disabled;
+        this.#disabled = disabled;
         this.notifyDisableStateChanged();
+    }
+    public get disabled(): boolean {
+        return this.#disabled;
     }
 
     @Input()
@@ -45,7 +48,7 @@ export class ButtonGroupComponent implements OnInit, AfterContentInit, OnDestroy
     }
 
     private notifyDisableStateChanged(): void {
-        this.buttons.forEach(b => (b.disabled = this.isDisabled));
+        this.buttons.forEach(b => (b.disabled = this.#disabled));
     }
 
     private notifySelectionStateChange(): void {

@@ -8,19 +8,17 @@ import {
     OnDestroy,
     OnInit,
     Optional,
-    Output,
-    SkipSelf
+    Output
 } from "@angular/core";
 import { fromEvent, Subject, takeUntil } from "rxjs";
 import { ButtonService } from "../../../services/button.service";
 
 @Directive({
     selector: "[monaButton]"
-    // providers: [ButtonService]
 })
 export class ButtonDirective implements OnInit, OnDestroy {
+    #selected: boolean = false;
     private readonly destroy$: Subject<void> = new Subject<void>();
-    private buttonSelected: boolean = false;
 
     @HostBinding("class.mona-disabled")
     @Input()
@@ -37,12 +35,12 @@ export class ButtonDirective implements OnInit, OnDestroy {
     @HostBinding("class.mona-selected")
     @Input()
     public set selected(selected: boolean) {
-        this.buttonSelected = selected;
+        this.#selected = selected;
         this.buttonService?.buttonSelected$.next(this);
     }
 
     public get selected(): boolean {
-        return this.buttonSelected;
+        return this.#selected;
     }
 
     @Output()
@@ -77,8 +75,8 @@ export class ButtonDirective implements OnInit, OnDestroy {
         this.buttonService?.buttonSelect$.pipe(takeUntil(this.destroy$)).subscribe(result => {
             const [button, selected] = result;
             if (button === this) {
-                this.buttonSelected = selected;
-                this.selectedChange.emit(this.buttonSelected);
+                this.#selected = selected;
+                this.selectedChange.emit(selected);
             }
         });
     }
