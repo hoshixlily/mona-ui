@@ -48,7 +48,7 @@
             </li>
             <li>
                 <mona-drop-down-list [data]="pageSizeValueList" [value]="pageSize"
-                                     (valueChange)="onPageSizeValueChange($event)" *ngIf="pageSizeValueList.length !== 0"></mona-drop-down-list>
+                                     (valueChange)="onPageSizeValueChange($event)" *ngIf="pageSizeValueList.length !== 0" #pageSizeDropdownList></mona-drop-down-list>
                 <span>items per page</span>
             </li>
         </ol>

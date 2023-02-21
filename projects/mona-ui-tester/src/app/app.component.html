@@ -92,7 +92,7 @@
                             </mona-menubar>
                         </div>
                         <div class="content">
-                            <div style="color: #95c5cb;">{{datePickerValue | json}}</div>
+                            <div style="color: #95c5cb;">{{selectedDropdownListDataItem | json}}</div>
                             <div>
                                 <mona-pager [skip]="pagerSkip" [total]="pagerTestData.length" (pageChange)="onPagerPageChange($event)" [pageInput]="true"
                                             type="numeric" [firstLast]="true" [previousNext]="true" [pageSizeValues]="[5,10,20,25,50,100]"
@@ -243,12 +243,12 @@
                                 </mona-chip>
                             </div>
 
-                            <div>
+                            <div *ngIf="false">
 
                                 <mona-drop-down-list [data]="dropdownListDataItems" textField="text" valueField="value"
                                                      groupField="group" [filterable]="true" [disabled]="false"
                                                      [showClearButton]="true" placeholder="Select an item..."
-                                                     [(value)]="selectedDropdownListDataItem"
+                                                     [value]="selectedDropdownListDataItem"
                                                      [itemDisabler]="dropdownItemDisabler"
                                                      (valueChange)="onDropDownValueChange($event)"
                                                      style="width: 200px; margin-right: 20px;">
@@ -296,7 +296,7 @@
 
                             </div>
 
-                            <div>
+                            <div *ngIf="false">
                                 <mona-multi-select [data]="dropdownListDataItems" textField="text" valueField="value"
                                                    groupField="group"
                                                    style="width: auto; min-width: 200px; margin-right: 20px;"
@@ -422,9 +422,10 @@
                             </div>
 
                             <div>
-                                <!--        <mona-color-palette [palette]="colorPalette" [columns]="sliderValue" [tileSize]="27" [ngModel]="colorPaletteValue" (ngModelChange)="print($event)"></mona-color-palette>-->
+<!--                                <mona-color-palette [palette]="colorPalette" [columns]="sliderValue" [tileSize]="27" [ngModel]="colorPaletteValue" (ngModelChange)="print($event)"></mona-color-palette>-->
                                 <mona-color-picker [palette]="colorPalette" [ngModel]="colorPickerValue"
                                                    (ngModelChange)="onColorPickerValueChange($event)"
+                                                   [value]="colorPickerValue" (valueChange)="onColorPickerValueChange($event)"
                                                    style="margin-left: 30px;"></mona-color-picker>
                             </div>
 

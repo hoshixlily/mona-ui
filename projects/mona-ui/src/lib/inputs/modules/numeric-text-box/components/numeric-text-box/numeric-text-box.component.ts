@@ -89,6 +89,9 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
     public set value(value: number | null) {
         this.updateValue(value == null ? null : String(value), false);
     }
+    public get value(): number | null {
+        return this.componentValue;
+    }
 
     @Output()
     public valueChange: EventEmitter<number | null> = new EventEmitter<number | null>();

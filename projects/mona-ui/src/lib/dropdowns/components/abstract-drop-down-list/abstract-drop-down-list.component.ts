@@ -32,6 +32,7 @@ import { PopupListItem } from "../../data/PopupListItem";
 })
 export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy, OnChanges {
     protected readonly componentDestroy$: Subject<void> = new Subject<void>();
+    protected currentValue?: any | any[];
     protected navigateWhileClosed: boolean = true;
     protected openOnEnter: boolean = false;
     public readonly clearIcon: IconDefinition = faTimes;
@@ -198,25 +199,13 @@ export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy
                     this.close();
                 }
             });
-        this.valueChange.pipe(takeUntil(this.componentDestroy$)).subscribe((emittedValue: any | any[]) => {
-            window.setTimeout(() => {
-                if (this.selectionMode === "single") {
-                    this.valuePopupListItem = this.popupListService.viewListData
-                        .selectMany(g => g.source)
-                        .singleOrDefault(d => d.dataEquals(this.value));
-                } else {
-                    this.valuePopupListItem = this.popupListService.viewListData
-                        .selectMany(g => g.source)
-                        .where(d => (this.value as any[]).some(v => d.dataEquals(v)))
-                        .toArray();
-                }
-            }, 0);
-        });
     }
 
     protected updateValue(listItem: PopupListItem | PopupListItem[] | null | undefined): void {
         if (this.selectionMode === "single") {
             if (!listItem) {
+                this.value = undefined;
+                this.valuePopupListItem = undefined;
                 this.valueChange.emit(undefined);
                 return;
             }
@@ -224,19 +213,25 @@ export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy
             if (item.dataEquals(this.value)) {
                 return;
             }
+            this.value = item.data;
+            this.valuePopupListItem = item;
             this.valueChange.emit(item.data);
         } else {
             if (!listItem) {
+                this.value = [];
+                this.valuePopupListItem = [];
                 this.valueChange.emit([]);
                 return;
             }
             const items = listItem as PopupListItem[];
+            this.valuePopupListItem = [...items];
             const values = items.map(v => v.data);
+            this.value = values;
             this.valueChange.emit(values);
         }
     }
 
-    private updateValuePopupListItems(): void {
+    protected updateValuePopupListItems(): void {
         if (this.selectionMode === "single") {
             this.valuePopupListItem = this.popupListService.viewListData
                 .selectMany(g => g.source)
@@ -247,5 +242,10 @@ export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy
                 .where(d => (this.value as any[]).some(v => d.dataEquals(v)))
                 .toArray();
         }
+    }
+
+    public setValue(value: any | any[] | undefined): void {
+        this.value = value;
+        this.updateValuePopupListItems();
     }
 }

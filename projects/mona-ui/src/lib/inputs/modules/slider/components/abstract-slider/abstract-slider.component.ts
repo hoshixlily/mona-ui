@@ -10,7 +10,6 @@ import {
     OnChanges,
     OnDestroy,
     OnInit,
-    Output,
     Renderer2,
     SimpleChanges,
     TemplateRef,

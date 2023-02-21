@@ -18,7 +18,6 @@ import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { faMoon, faSearch, faSnowflake, faSun } from "@fortawesome/free-solid-svg-icons";
 import { Enumerable, IndexableList } from "@mirei/ts-collections";
 import { map, Observable } from "rxjs";
-import { DateTime } from "luxon";
 
 @Component({
     selector: "app-root",
@@ -380,6 +379,7 @@ export class AppComponent implements OnInit {
     }
 
     public onDropDownValueChange(value: unknown): void {
+        // if (true) return;
         this.selectedDropdownListDataItem = value;
         console.log(`Dropdown value changed`, value);
         // console.log(value);
