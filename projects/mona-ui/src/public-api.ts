@@ -55,6 +55,11 @@ export * from "./lib/dropdowns/modules/multi-select/multi-select.module";
 
 export * from "./lib/dropdowns/drop-downs.module";
 
+/** Filters */
+export * from "./lib/filter/FilterManager";
+export * from "./lib/filter/FilterDescriptor";
+export * from "./lib/filter/FilterOperators";
+
 /** Inputs */
 export * from "./lib/inputs/modules/check-box/directives/check-box.directive";
 export * from "./lib/inputs/modules/check-box/check-box.module";

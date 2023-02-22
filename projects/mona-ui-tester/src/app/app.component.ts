@@ -18,6 +18,7 @@ import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { faMoon, faSearch, faSnowflake, faSun } from "@fortawesome/free-solid-svg-icons";
 import { Enumerable, IndexableList } from "@mirei/ts-collections";
 import { map, Observable } from "rxjs";
+import { FilterManager } from "../../../mona-ui/src/lib/filter/FilterManager";
 
 @Component({
     selector: "app-root",
@@ -289,6 +290,22 @@ export class AppComponent implements OnInit {
     //     console.log("ngAfterContentChecked :: AppComponent");
     // }
 
+    public filterData(): void {
+        const data = Enumerable.range(1, 100)
+            .select(i => ({ text: `Item ${i}`, value: i }))
+            .toArray();
+        const filteredData = FilterManager(data, [
+            {
+                filters: [
+                    { field: "value", operator: "between", value: [10, 17] },
+                    { field: "value", operator: "between", value: [41, 66] }
+                ],
+                logic: "or"
+            }
+        ]);
+        console.log(filteredData);
+    }
+
     public ngOnInit(): void {
         this.selectedDropdownListDataItem = { text: "REPLACED WITH PAPRIKA", value: 13, group: "Fruit", active: true };
         this.selectedComboBoxDataItem = { text: "REPLACED WITH PAPRIKA", value: 13, group: "Fruit", active: true };
@@ -300,6 +317,8 @@ export class AppComponent implements OnInit {
         this.selectedPrimitiveComboBoxDataItem = this.dropdownPrimitiveDataItems[7];
 
         this.dropdownPartialPrimitiveDataItems = this.dropdownPrimitiveDataItems.slice();
+
+        this.filterData();
 
         // window.setInterval(() => {
         //     const randomIndex = Math.floor(Math.random() * this.dropdownListDataItems.length);
