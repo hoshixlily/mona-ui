@@ -11,14 +11,14 @@ import {
     PopupService,
     WindowService,
     PageSizeChangeEvent,
-    PageChangeEvent
+    PageChangeEvent,
+    Query
 } from "mona-ui";
 import { TestComponentComponent } from "./test-component/test-component.component";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { faMoon, faSearch, faSnowflake, faSun } from "@fortawesome/free-solid-svg-icons";
 import { Enumerable, IndexableList } from "@mirei/ts-collections";
 import { map, Observable } from "rxjs";
-import { FilterManager } from "../../../mona-ui/src/lib/filter/FilterManager";
 
 @Component({
     selector: "app-root",
@@ -294,16 +294,21 @@ export class AppComponent implements OnInit {
         const data = Enumerable.range(1, 100)
             .select(i => ({ text: `Item ${i}`, value: i }))
             .toArray();
-        const filteredData = FilterManager(data, [
-            {
-                filters: [
-                    { field: "value", operator: "between", value: [10, 17] },
-                    { field: "value", operator: "between", value: [41, 66] }
-                ],
-                logic: "or"
-            }
-        ]);
-        console.log(filteredData);
+        const result = Query.from(data)
+            // .filter({ field: "value", operator: "between", value: [17, 33] })
+            // .filter({ field: "text", operator: "endswith", value: "7" })
+            .filter({
+                logic: "or",
+                filters: [{ field: "value", operator: "between", value: [17, 33] }]
+            })
+            .filter({
+                field: "value",
+                operator: "function",
+                value: (value: number) => value % 3 === 0
+            })
+            .sort({ field: "value", dir: "desc" })
+            .run();
+        console.log(result);
     }
 
     public ngOnInit(): void {

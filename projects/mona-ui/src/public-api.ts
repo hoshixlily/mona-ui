@@ -56,9 +56,8 @@ export * from "./lib/dropdowns/modules/multi-select/multi-select.module";
 export * from "./lib/dropdowns/drop-downs.module";
 
 /** Filters */
-export * from "./lib/filter/FilterManager";
-export * from "./lib/filter/FilterDescriptor";
-export * from "./lib/filter/FilterOperators";
+export * from "./lib/query/filter/FilterDescriptor";
+export { Query, IQuery } from "./lib/query/core/Query";
 
 /** Inputs */
 export * from "./lib/inputs/modules/check-box/directives/check-box.directive";
