@@ -93,6 +93,11 @@
                         </div>
                         <div class="content">
                             <div style="color: #95c5cb;">{{selectedDropdownListDataItem | json}}</div>
+
+                            <div>
+                                <mona-filter-menu type="number" field="value" (apply)="onFilterMenuFilterApply($event)"></mona-filter-menu>
+                            </div>
+
                             <div>
                                 <mona-pager [skip]="pagerSkip" [total]="pagerTestData.length" (pageChange)="onPagerPageChange($event)" [pageInput]="true"
                                             type="numeric" [firstLast]="true" [previousNext]="true" [pageSizeValues]="[5,10,20,25,50,100]"
@@ -329,23 +334,7 @@
                                 </mona-text-box>
                             </div>
 
-                            <div>
 
-                                <textarea monaTextArea [(ngModel)]="numericTextBoxValue" rows="4"
-                                          style="width: 422px;"></textarea>
-                            </div>
-
-                            <div>
-                                <input type="checkbox" monaCheckBox id="checkbox1" [indeterminate]="true"/>
-                                <label for="checkbox1" style="margin-right: 10px;">Checkbox Label 1</label>
-
-                                <input type="radio" monaRadioButton id="radioButton1" name="A" [checked]="true"
-                                       [disabled]="false"/>
-                                <label for="radioButton1">Radio Button Label 1</label>
-
-                                <input type="radio" monaRadioButton id="radioButton2" name="A"/>
-                                <label for="radioButton2">Radio Button Label 2</label>
-                            </div>
 
                             <div>
                                 <mona-switch labelOn="ON" labelOff="OFF" [ngModel]="switchValue"
@@ -466,6 +455,21 @@
                                     </button>
                                 </ng-template>
                             </mona-expansion-panel>
+
+                            <textarea monaTextArea [(ngModel)]="numericTextBoxValue" rows="4"
+                                      style="width: 422px;"></textarea>
+
+                            <div>
+                                <input type="checkbox" monaCheckBox id="checkbox1" [indeterminate]="true"/>
+                                <label for="checkbox1" style="margin-right: 10px;">Checkbox Label 1</label>
+
+                                <input type="radio" monaRadioButton id="radioButton1" name="A" [checked]="true"
+                                       [disabled]="false"/>
+                                <label for="radioButton1">Radio Button Label 1</label>
+
+                                <input type="radio" monaRadioButton id="radioButton2" name="A"/>
+                                <label for="radioButton2">Radio Button Label 2</label>
+                            </div>
                         </div>
                     </ng-template>
                 </mona-tab>

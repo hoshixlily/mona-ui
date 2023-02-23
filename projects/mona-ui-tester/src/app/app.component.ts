@@ -19,6 +19,7 @@ import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { faMoon, faSearch, faSnowflake, faSun } from "@fortawesome/free-solid-svg-icons";
 import { Enumerable, IndexableList } from "@mirei/ts-collections";
 import { map, Observable } from "rxjs";
+import { CompositeFilterDescriptor } from "../../../mona-ui/src/lib/query/filter/FilterDescriptor";
 
 @Component({
     selector: "app-root",
@@ -304,7 +305,7 @@ export class AppComponent implements OnInit {
             .filter({
                 field: "value",
                 operator: "function",
-                value: (value: number) => value % 3 === 0
+                predicate: (value: number) => value % 3 === 0
             })
             .sort({ field: "value", dir: "desc" })
             .run();
@@ -407,6 +408,15 @@ export class AppComponent implements OnInit {
         this.selectedDropdownListDataItem = value;
         console.log(`Dropdown value changed`, value);
         // console.log(value);
+    }
+
+    public onFilterMenuFilterApply(filter: CompositeFilterDescriptor): void {
+        console.log(filter);
+        const data = Enumerable.range(1, 100)
+            .select(i => ({ text: `Item ${i}`, value: i }))
+            .toArray();
+        const result = Query.from(data).filter(filter).run();
+        console.log(result);
     }
 
     public onMultiSelectValueChange(value: unknown[]): void {

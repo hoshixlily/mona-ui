@@ -58,6 +58,8 @@ export * from "./lib/dropdowns/drop-downs.module";
 /** Filters */
 export * from "./lib/query/filter/FilterDescriptor";
 export { Query, IQuery } from "./lib/query/core/Query";
+export * from "./lib/filter/components/filter-menu/filter-menu.component";
+export * from "./lib/filter/filter.module";
 
 /** Inputs */
 export * from "./lib/inputs/modules/check-box/directives/check-box.directive";

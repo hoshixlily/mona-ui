@@ -78,7 +78,7 @@ export abstract class FilterUtils {
                         value > (descriptor.value as unknown as T[])[1]
                     );
                 case "function":
-                    return (descriptor.value as Predicate<T>)(value);
+                    return (descriptor.predicate as Predicate<T>)(value);
                 default:
                     return false;
             }

@@ -1,0 +1,35 @@
+<div class="mona-filter-menu">
+    <div class="mona-filter-menu-item">
+        <ng-container *ngIf="type==='string'">
+            <mona-drop-down-list [data]="stringFilterMenuDataItems" textField="text" valueField="value" [value]="selectedFilterMenuDataItemList[0]"
+                                 (valueChange)="onFilterOperatorChange(0, $event)"></mona-drop-down-list>
+            <mona-text-box [(ngModel)]="stringFilterValues[0]"></mona-text-box>
+        </ng-container>
+
+        <ng-container *ngIf="type==='number'">
+            <mona-drop-down-list [data]="numericFilterMenuDataItems" textField="text" valueField="value" [value]="selectedFilterMenuDataItemList[0]"
+                                 (valueChange)="onFilterOperatorChange(0, $event)"></mona-drop-down-list>
+            <mona-numeric-text-box [(ngModel)]="numberFilterValues[0]"></mona-numeric-text-box>
+        </ng-container>
+    </div>
+    <div class="mona-filter-menu-item">
+        <mona-drop-down-list [data]="connectorDataItems" textField="text" valueField="value" [value]="selectedConnectorItem" (valueChange)="onConnectorChange($event)"></mona-drop-down-list>
+    </div>
+    <div class="mona-filter-menu-item">
+        <ng-container *ngIf="type==='string'">
+            <mona-drop-down-list [data]="stringFilterMenuDataItems" textField="text" valueField="value" [value]="selectedFilterMenuDataItemList[1]"
+                                 (valueChange)="onFilterOperatorChange(1, $event)"></mona-drop-down-list>
+            <mona-text-box [(ngModel)]="stringFilterValues[1]"></mona-text-box>
+        </ng-container>
+
+        <ng-container *ngIf="type==='number'">
+            <mona-drop-down-list [data]="numericFilterMenuDataItems" textField="text" valueField="value" [value]="selectedFilterMenuDataItemList[1]"
+                                 (valueChange)="onFilterOperatorChange(1, $event)"></mona-drop-down-list>
+            <mona-numeric-text-box [(ngModel)]="numberFilterValues[1]"></mona-numeric-text-box>
+        </ng-container>
+    </div>
+    <div class="mona-filter-menu-item mona-filter-menu-actions">
+        <button monaButton (click)="onFilterApply()" [disabled]="applyDisabled">Apply</button>
+        <button monaButton (click)="onFilterClear()">Clear</button>
+    </div>
+</div>

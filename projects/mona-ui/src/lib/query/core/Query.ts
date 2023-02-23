@@ -5,7 +5,9 @@ import { SortDescriptor } from "../sort/SortDescriptor";
 
 export interface IQuery<T> {
     filter(filter: FilterDescriptor | CompositeFilterDescriptor): IQuery<T>;
+
     run(): T[];
+
     sort(descriptor: SortDescriptor): IQuery<T>;
 }
 

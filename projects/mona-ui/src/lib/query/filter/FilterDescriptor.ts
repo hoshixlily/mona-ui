@@ -9,6 +9,17 @@ export type NullOrEmptyFilterOperators = "isnullorempty" | "isnotnullorempty";
 export type ArrayFilterOperators = "in" | "notin";
 export type RangeFilterOperators = "between" | "notbetween";
 export type FunctionFilterOperators = "function";
+export type FilterOperators =
+    | CommonFilterOperators
+    | NumericFilterOperators
+    | StringFilterOperators
+    | NullFilterOperators
+    | EmptyFilterOperators
+    | NullOrEmptyFilterOperators
+    | ArrayFilterOperators
+    | RangeFilterOperators
+    | FunctionFilterOperators;
+
 export type FieldDefinition = { field: string };
 export type CommonFilterDescriptor = FieldDefinition & { operator: CommonFilterOperators; value: any };
 export type NumericFilterDescriptor = FieldDefinition & { operator: NumericFilterOperators; value: number };
@@ -20,7 +31,7 @@ export type ArrayFilterDescriptor = FieldDefinition & { operator: ArrayFilterOpe
 export type RangeFilterDescriptor = FieldDefinition & { operator: RangeFilterOperators; value: [number, number] };
 export type FunctionFilterDescriptor = FieldDefinition & {
     operator: FunctionFilterOperators;
-    value: Predicate<any>;
+    predicate: Predicate<any>;
 };
 
 export type FilterDescriptor =
