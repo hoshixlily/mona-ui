@@ -20,6 +20,7 @@ import { faMoon, faSearch, faSnowflake, faSun } from "@fortawesome/free-solid-sv
 import { Enumerable, IndexableList } from "@mirei/ts-collections";
 import { map, Observable } from "rxjs";
 import { CompositeFilterDescriptor } from "../../../mona-ui/src/lib/query/filter/FilterDescriptor";
+import { DateTime } from "luxon";
 
 @Component({
     selector: "app-root",
@@ -413,7 +414,15 @@ export class AppComponent implements OnInit {
     public onFilterMenuFilterApply(filter: CompositeFilterDescriptor): void {
         console.log(filter);
         const data = Enumerable.range(1, 100)
-            .select(i => ({ text: `Item ${i}`, value: i }))
+            .select(i => ({
+                text: `Item ${i}`,
+                value: i,
+                active: i % 5 === 0 ? true : i % 8 === 0 ? null : false,
+                date: DateTime.local()
+                    .plus({ days: i })
+                    .set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
+                    .toJSDate()
+            }))
             .toArray();
         const result = Query.from(data).filter(filter).run();
         console.log(result);

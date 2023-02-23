@@ -1,4 +1,4 @@
-import { FilterOperators, FunctionFilterOperators } from "../../query/filter/FilterDescriptor";
+import { FilterOperators } from "../../query/filter/FilterDescriptor";
 
 export interface FilterMenuDataItem {
     text: string;

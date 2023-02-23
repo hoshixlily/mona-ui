@@ -1,5 +1,6 @@
 import { Predicate } from "@mirei/ts-collections";
 import { CompositeFilterDescriptor, FilterDescriptor } from "./FilterDescriptor";
+import { DateTime } from "luxon";
 
 export abstract class FilterUtils {
     public static compositeDescriptorToPredicate<T>(descriptor: CompositeFilterDescriptor): Predicate<T> {
@@ -7,21 +8,25 @@ export abstract class FilterUtils {
             const filters = descriptor.filters;
             const logic = descriptor.logic;
             if (logic === "and") {
-                return filters.every(f => {
+                const result = filters.every(f => {
                     if (f.hasOwnProperty("field")) {
                         return FilterUtils.descriptorToPredicate(f as FilterDescriptor)(item);
                     } else {
                         return FilterUtils.compositeDescriptorToPredicate(f as CompositeFilterDescriptor)(item);
                     }
                 });
+                // console.log([item, result]);
+                return result;
             } else if (logic === "or") {
-                return filters.some(f => {
+                const result = filters.some(f => {
                     if (f.hasOwnProperty("field")) {
                         return FilterUtils.descriptorToPredicate(f as FilterDescriptor)(item);
                     } else {
                         return FilterUtils.compositeDescriptorToPredicate(f as CompositeFilterDescriptor)(item);
                     }
                 });
+                // console.log([item, result]);
+                return result;
             } else {
                 return false;
             }
@@ -32,9 +37,21 @@ export abstract class FilterUtils {
             const value = (item as any)[descriptor.field];
             switch (descriptor.operator) {
                 case "eq":
-                    return value === descriptor.value;
+                    return value == null && descriptor.value == null
+                        ? true
+                        : (value == null && descriptor.value != null) || (value != null && descriptor.value == null)
+                        ? false
+                        : value instanceof Date
+                        ? DateTime.fromJSDate(value).equals(DateTime.fromJSDate(descriptor.value))
+                        : value === descriptor.value;
                 case "neq":
-                    return value !== descriptor.value;
+                    return value == null && descriptor.value == null
+                        ? false
+                        : (value == null && descriptor.value != null) || (value != null && descriptor.value == null)
+                        ? true
+                        : value instanceof Date
+                        ? !DateTime.fromJSDate(value).equals(DateTime.fromJSDate(descriptor.value))
+                        : value !== descriptor.value;
                 case "gt":
                     return value > descriptor.value;
                 case "gte":

@@ -228,14 +228,17 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
 
     public registerOnTouched(fn: any) {}
 
-    public writeValue(obj: number | string) {
-        if (obj !== undefined) {
-            if (obj != null && typeof obj === "string" && !NumericTextBoxComponent.isNumeric(obj)) {
-                throw new Error("Value must be a number.");
-            }
-            this.componentValue = +obj;
+    public writeValue(obj: number | string | null | undefined) {
+        if (obj == null) {
+            this.componentValue = null;
             this.visibleValue = this.formatter(this.componentValue) ?? "";
+            return;
         }
+        if (typeof obj === "string" && !NumericTextBoxComponent.isNumeric(obj)) {
+            throw new Error("Value must be a number.");
+        }
+        this.componentValue = +obj;
+        this.visibleValue = this.formatter(this.componentValue) ?? "";
     }
 
     private containsExcessiveDecimalPlaces(event: KeyboardEvent): boolean {

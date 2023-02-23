@@ -1,13 +1,17 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Host, Input, OnInit, Output } from "@angular/core";
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { FilterFieldType } from "../../models/FilterFieldType";
-import { FilterService } from "../../services/filter.service";
 import { FilterMenuDataItem } from "../../models/FilterMenuDataItem";
 import { FilterMenuConnectorItem } from "../../models/FilterMenuConnectorItem";
 import {
+    BooleanFilterDescriptor,
+    BooleanFilterOperators,
+    CommonFilterOperators,
     CompositeFilterDescriptor,
+    DateFilterDescriptor,
+    DateFilterOperators,
     FilterDescriptor,
-    FilterOperators,
-    FunctionFilterOperators,
+    NullFilterOperators,
+    NumericFilterDescriptor,
     NumericFilterOperators,
     StringFilterDescriptor,
     StringFilterOperators
@@ -20,9 +24,27 @@ import {
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FilterMenuComponent implements OnInit {
+    public readonly booleanFilterMenuDataItems: FilterMenuDataItem[] = [
+        { text: "Is true", value: "eq" },
+        { text: "Is false", value: "neq" },
+        { text: "Is null", value: "isnull" },
+        { text: "Is not null", value: "isnotnull" }
+    ];
+
     public readonly connectorDataItems: FilterMenuConnectorItem[] = [
         { text: "AND", value: "and" },
         { text: "OR", value: "or" }
+    ];
+
+    public readonly dateFilterMenuDataItems: FilterMenuDataItem[] = [
+        { text: "Is equal to", value: "eq" },
+        { text: "Is not equal to", value: "neq" },
+        { text: "Is after", value: "gt" },
+        { text: "Is after or equal to", value: "gte" },
+        { text: "Is before", value: "lt" },
+        { text: "Is before or equal to", value: "lte" },
+        { text: "Is null", value: "isnull" },
+        { text: "Is not null", value: "isnotnull" }
     ];
 
     // TODO: Add null and empty filter operators
@@ -50,8 +72,9 @@ export class FilterMenuComponent implements OnInit {
         { text: "Is not null or empty", value: "isnotnullorempty" }
     ];
 
+    public dateFilterValues: [Date | null, Date | null] = [null, null];
     public numberFilterValues: [number | null, number | null] = [null, null];
-    public selectedConnectorItem: FilterMenuConnectorItem = this.connectorDataItems[0];
+    public selectedConnectorItem: FilterMenuConnectorItem | null = null;
     public selectedFilterMenuDataItemList: FilterMenuDataItem[] = [
         this.stringFilterMenuDataItems[0],
         this.stringFilterMenuDataItems[0]
@@ -62,12 +85,19 @@ export class FilterMenuComponent implements OnInit {
     public apply: EventEmitter<CompositeFilterDescriptor> = new EventEmitter<CompositeFilterDescriptor>();
 
     @Input()
+    public dateOptions: { format: string; type: "date" | "time" | "datetime" } = {
+        format: "dd/MM/yyyy",
+        type: "date"
+    };
+
+    @Input()
     public field: string = "";
 
     @Input()
     public type: FilterFieldType = "string";
 
     public constructor() {}
+
     public ngOnInit(): void {
         if (this.type === "number") {
             this.selectedFilterMenuDataItemList = [
@@ -79,75 +109,130 @@ export class FilterMenuComponent implements OnInit {
                 this.stringFilterMenuDataItems[0],
                 this.stringFilterMenuDataItems[1]
             ];
+        } else if (this.type === "date") {
+            this.selectedFilterMenuDataItemList = [this.dateFilterMenuDataItems[0], this.dateFilterMenuDataItems[1]];
+        } else if (this.type === "boolean") {
+            this.selectedFilterMenuDataItemList = [
+                this.booleanFilterMenuDataItems[0],
+                this.booleanFilterMenuDataItems[1]
+            ];
         }
     }
 
     public onConnectorChange(item: FilterMenuConnectorItem): void {
-        this.selectedConnectorItem = item;
+        if (item.value === this.selectedConnectorItem?.value) {
+            this.selectedConnectorItem = null;
+        } else {
+            this.selectedConnectorItem = item;
+        }
     }
 
     public onFilterApply(): void {
-        switch (this.type) {
-            case "string":
-                if (this.stringFilterValues[0] === "" && this.stringFilterValues[1] === "") {
-                    return;
-                }
-                const stringDescriptors: FilterDescriptor[] = [];
-                if (this.stringFilterValues[0] !== "") {
-                    stringDescriptors.push({
-                        field: this.field,
-                        operator: this.selectedFilterMenuDataItemList[0].value as StringFilterOperators,
-                        value: this.stringFilterValues[0]
-                    });
-                }
-                if (this.stringFilterValues[1] !== "") {
-                    stringDescriptors.push({
-                        field: this.field,
-                        operator: this.selectedFilterMenuDataItemList[1].value as StringFilterOperators,
-                        value: this.stringFilterValues[1]
-                    });
-                }
+        if (this.type === "string") {
+            if (this.stringFilterValues[0] === "" && this.stringFilterValues[1] === "") {
+                return;
+            }
+            const stringDescriptors: StringFilterDescriptor[] = [];
+            if (this.stringFilterValues[0] !== "") {
+                stringDescriptors.push({
+                    field: this.field,
+                    operator: this.selectedFilterMenuDataItemList[0].value as StringFilterOperators,
+                    value: this.stringFilterValues[0]
+                });
+            }
+            if (this.selectedConnectorItem && this.stringFilterValues[1] !== "") {
+                stringDescriptors.push({
+                    field: this.field,
+                    operator: this.selectedFilterMenuDataItemList[1].value as StringFilterOperators,
+                    value: this.stringFilterValues[1]
+                });
+            }
 
-                const compositeDescriptor: CompositeFilterDescriptor = {
-                    logic: this.selectedConnectorItem.value,
-                    filters: stringDescriptors
-                };
-                this.apply.emit(compositeDescriptor);
-                break;
-            case "number":
-                if (this.numberFilterValues[0] === null && this.numberFilterValues[1] === null) {
-                    return;
-                }
-                const numberDescriptors: FilterDescriptor[] = [];
-                if (this.numberFilterValues[0] !== null) {
-                    numberDescriptors.push({
-                        field: this.field,
-                        operator: this.selectedFilterMenuDataItemList[0].value as NumericFilterOperators,
-                        value: this.numberFilterValues[0]
-                    });
-                }
-                if (this.numberFilterValues[1] !== null) {
-                    numberDescriptors.push({
-                        field: this.field,
-                        operator: this.selectedFilterMenuDataItemList[1].value as NumericFilterOperators,
-                        value: this.numberFilterValues[1]
-                    });
-                }
-                const compositeDescriptor2: CompositeFilterDescriptor = {
-                    logic: this.selectedConnectorItem.value,
-                    filters: numberDescriptors
-                };
-                this.apply.emit(compositeDescriptor2);
-                break;
-            default:
-                console.log("Filter type not supported yet.");
-                break;
+            const descriptor: CompositeFilterDescriptor = {
+                logic: this.selectedConnectorItem?.value ?? "and",
+                filters: stringDescriptors
+            };
+            this.apply.emit(descriptor);
+        } else if (this.type === "number") {
+            if (this.numberFilterValues[0] === null && this.numberFilterValues[1] === null) {
+                return;
+            }
+            const numberDescriptors: NumericFilterDescriptor[] = [];
+            if (this.numberFilterValues[0] !== null) {
+                numberDescriptors.push({
+                    field: this.field,
+                    operator: this.selectedFilterMenuDataItemList[0].value as NumericFilterOperators,
+                    value: this.numberFilterValues[0]
+                });
+            }
+            if (this.selectedConnectorItem && this.numberFilterValues[1] !== null) {
+                numberDescriptors.push({
+                    field: this.field,
+                    operator: this.selectedFilterMenuDataItemList[1].value as NumericFilterOperators,
+                    value: this.numberFilterValues[1]
+                });
+            }
+            const descriptor: CompositeFilterDescriptor = {
+                logic: this.selectedConnectorItem?.value ?? "and",
+                filters: numberDescriptors
+            };
+            this.apply.emit(descriptor);
+        } else if (this.type === "date") {
+            if (this.dateFilterValues[0] === null && this.dateFilterValues[1] === null) {
+                return;
+            }
+            const dateDescriptors: DateFilterDescriptor[] = [];
+            if (this.dateFilterValues[0] !== null) {
+                dateDescriptors.push({
+                    field: this.field,
+                    operator: this.selectedFilterMenuDataItemList[0].value as DateFilterOperators,
+                    value: this.dateFilterValues[0]
+                });
+            }
+            if (this.selectedConnectorItem && this.dateFilterValues[1] !== null) {
+                dateDescriptors.push({
+                    field: this.field,
+                    operator: this.selectedFilterMenuDataItemList[1].value as DateFilterOperators,
+                    value: this.dateFilterValues[1]
+                });
+            }
+            const descriptor: CompositeFilterDescriptor = {
+                logic: this.selectedConnectorItem?.value ?? "and",
+                filters: dateDescriptors
+            };
+            this.apply.emit(descriptor);
+        } else if (this.type === "boolean") {
+            const booleanDescriptors: BooleanFilterDescriptor[] = [];
+            booleanDescriptors.push({
+                field: this.field,
+                operator: this.selectedFilterMenuDataItemList[0].value === "isnotnull" ? "neq" : "eq",
+                value: this.getBooleanFilterValue(
+                    this.selectedFilterMenuDataItemList[0].value as BooleanFilterOperators
+                )
+            });
+            if (this.selectedConnectorItem) {
+                booleanDescriptors.push({
+                    field: this.field,
+                    operator: this.selectedFilterMenuDataItemList[1].value === "isnotnull" ? "neq" : "eq",
+                    value: this.getBooleanFilterValue(
+                        this.selectedFilterMenuDataItemList[1].value as BooleanFilterOperators
+                    )
+                });
+            }
+            const descriptor: CompositeFilterDescriptor = {
+                logic: this.selectedConnectorItem?.value ?? "and",
+                filters: booleanDescriptors
+            };
+            this.apply.emit(descriptor);
+        } else {
+            console.log("Filter type not supported yet.");
         }
     }
 
     public onFilterClear(): void {
         this.numberFilterValues = [null, null];
         this.stringFilterValues = ["", ""];
+        this.dateFilterValues = [null, null];
         this.apply.emit({
             logic: "and",
             filters: []
@@ -158,14 +243,52 @@ export class FilterMenuComponent implements OnInit {
         this.selectedFilterMenuDataItemList[index] = item;
     }
 
-    public get applyDisabled(): boolean {
+    private getBooleanFilterValue(operator: BooleanFilterOperators): boolean | null {
+        switch (operator) {
+            case "eq":
+                return true;
+            case "neq":
+                return false;
+            case "isnull":
+                return null;
+            case "isnotnull":
+                return null;
+            default:
+                return null;
+        }
+    }
+
+    public get firstFilterValid(): boolean {
         switch (this.type) {
             case "string":
-                return this.stringFilterValues[0] === "" && this.stringFilterValues[1] === "";
+                return this.stringFilterValues[0] !== "";
             case "number":
-                return this.numberFilterValues[0] === null && this.numberFilterValues[1] === null;
-            default:
+                return this.numberFilterValues[0] !== null;
+            case "date":
+                return this.dateFilterValues[0] !== null;
+            case "boolean":
                 return true;
+            default:
+                return false;
         }
+    }
+
+    public get secondFilterValid(): boolean {
+        switch (this.type) {
+            case "string":
+                return this.stringFilterValues[1] !== "";
+            case "number":
+                return this.numberFilterValues[1] !== null;
+            case "date":
+                return this.dateFilterValues[1] !== null;
+            case "boolean":
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    public get applyDisabled(): boolean {
+        return !this.firstFilterValid && !this.secondFilterValid;
     }
 }
