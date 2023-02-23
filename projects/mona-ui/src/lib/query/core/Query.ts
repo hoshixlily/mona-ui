@@ -8,7 +8,7 @@ export interface IQuery<T> {
 
     run(): T[];
 
-    sort(descriptor: SortDescriptor): IQuery<T>;
+    sort(descriptor: SortDescriptor[]): IQuery<T>;
 }
 
 export class Query<T> implements IQuery<T> {
@@ -34,7 +34,7 @@ export class Query<T> implements IQuery<T> {
         return this.enumerator.toArray();
     }
 
-    public sort(descriptor: SortDescriptor): IQuery<T> {
+    public sort(descriptor: SortDescriptor[]): IQuery<T> {
         return this.enumerator.sort(descriptor);
     }
 }
@@ -52,7 +52,7 @@ export class QueryEnumerator<T> extends Enumerator<T> implements IQuery<T> {
         return Array.from(this);
     }
 
-    public sort(descriptor: SortDescriptor): IQuery<T> {
+    public sort(descriptor: SortDescriptor[]): IQuery<T> {
         return new QueryEnumerator(() => this.sortGenerator(descriptor));
     }
 
@@ -63,9 +63,17 @@ export class QueryEnumerator<T> extends Enumerator<T> implements IQuery<T> {
         yield* this.where(predicate);
     }
 
-    private *sortGenerator(descriptor: SortDescriptor): Iterable<T> {
-        yield* descriptor.dir === "asc"
-            ? this.orderBy(d => (d as any)[descriptor.field], descriptor.sort)
-            : this.orderByDescending(d => (d as any)[descriptor.field], descriptor.sort);
+    private *sortGenerator(descriptor: SortDescriptor[]): Iterable<T> {
+        let result =
+            descriptor[0].dir === "asc"
+                ? this.orderBy(d => (d as any)[descriptor[0].field], descriptor[0].sort)
+                : this.orderByDescending(d => (d as any)[descriptor[0].field], descriptor[0].sort);
+        for (let i = 1; i < descriptor.length; i++) {
+            result =
+                descriptor[i].dir === "asc"
+                    ? result.thenBy(d => (d as any)[descriptor[i].field], descriptor[i].sort)
+                    : result.thenByDescending(d => (d as any)[descriptor[i].field], descriptor[i].sort);
+        }
+        yield* result;
     }
 }

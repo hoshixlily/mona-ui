@@ -5,12 +5,9 @@ import { FilterMenuConnectorItem } from "../../models/FilterMenuConnectorItem";
 import {
     BooleanFilterDescriptor,
     BooleanFilterOperators,
-    CommonFilterOperators,
     CompositeFilterDescriptor,
     DateFilterDescriptor,
     DateFilterOperators,
-    FilterDescriptor,
-    NullFilterOperators,
     NumericFilterDescriptor,
     NumericFilterOperators,
     StringFilterDescriptor,

@@ -308,7 +308,6 @@ export class AppComponent implements OnInit {
                 operator: "function",
                 predicate: (value: number) => value % 3 === 0
             })
-            .sort({ field: "value", dir: "desc" })
             .run();
         console.log(result);
     }
@@ -424,7 +423,13 @@ export class AppComponent implements OnInit {
                     .toJSDate()
             }))
             .toArray();
-        const result = Query.from(data).filter(filter).run();
+        const result = Query.from(data)
+            .filter(filter)
+            .sort([
+                { field: "active", dir: "asc" },
+                { field: "value", dir: "desc" }
+            ])
+            .run();
         console.log(result);
     }
 

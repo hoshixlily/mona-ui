@@ -1,7 +1,7 @@
 import { OrderComparator } from "@mirei/ts-collections";
 
 export interface SortDescriptor {
-    field: string;
     dir: "asc" | "desc";
+    field: string;
     sort?: OrderComparator<any>;
 }
