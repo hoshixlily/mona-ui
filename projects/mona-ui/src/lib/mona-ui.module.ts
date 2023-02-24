@@ -11,12 +11,14 @@ import { TooltipsModule } from "./tooltips/tooltips.module";
 import { WindowModule } from "./window/window.module";
 import { PagerModule } from "./pager/pager.module";
 import { ProgressBarsModule } from "./progress-bars/progress-bars.module";
+import { FilterModule } from "./filter/filter.module";
 
 @NgModule({
     exports: [
         ButtonsModule,
         DateInputsModule,
         DropDownsModule,
+        FilterModule,
         InputsModule,
         LayoutModule,
         MenusModule,

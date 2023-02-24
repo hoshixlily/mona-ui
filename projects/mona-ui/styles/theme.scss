@@ -459,6 +459,15 @@ div.mona-time-picker-popup {
     }
 }
 
+/** Filters */
+div.mona-filter-menu-item {
+    & mona-button-group {
+        & button {
+            flex: 1;
+        }
+    }
+}
+
 /** Inputs */
 
 /** Check Box */

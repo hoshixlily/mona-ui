@@ -55,7 +55,7 @@ export class ButtonGroupComponent implements OnInit, AfterContentInit, OnDestroy
         this.buttonService.buttonClick$.pipe(takeUntil(this.componentDestroy$)).subscribe(button => {
             if (this.selectionMode === "single") {
                 this.buttons.forEach(b => {
-                    this.buttonService.buttonSelect$.next([b, b === button]);
+                    this.buttonService.buttonSelect$.next([b, b === button ? !b.selected : false]);
                 });
             } else {
                 this.buttonService.buttonSelect$.next([button, !button.selected]);
