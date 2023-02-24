@@ -8,6 +8,7 @@ import {
     CompositeFilterDescriptor,
     DateFilterDescriptor,
     DateFilterOperators,
+    FilterOperators,
     NumericFilterDescriptor,
     NumericFilterOperators,
     StringFilterDescriptor,
@@ -19,7 +20,7 @@ import { FilterMenuValue } from "../../models/FilterMenuValue";
     selector: "mona-filter-menu",
     templateUrl: "./filter-menu.component.html",
     styleUrls: ["./filter-menu.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.Default
 })
 export class FilterMenuComponent implements OnInit {
     private booleanFilterValues: [boolean | null, boolean | null] = [null, null];
@@ -76,10 +77,7 @@ export class FilterMenuComponent implements OnInit {
     public dateFilterValues: [Date | null, Date | null] = [null, null];
     public numberFilterValues: [number | null, number | null] = [null, null];
     public selectedConnectorItem: FilterMenuConnectorItem | null = null;
-    public selectedFilterMenuDataItemList: FilterMenuDataItem[] = [
-        this.stringFilterMenuDataItems[0],
-        this.stringFilterMenuDataItems[0]
-    ];
+    public selectedFilterMenuDataItemList: Array<FilterMenuDataItem | undefined> = [undefined, undefined];
     public stringFilterValues: [string, string] = ["", ""];
 
     @Output()
@@ -95,6 +93,9 @@ export class FilterMenuComponent implements OnInit {
     public field: string = "";
 
     @Input()
+    public operators: FilterOperators[] = [];
+
+    @Input()
     public set value(value: FilterMenuValue) {
         this.setFilterValues(value);
     }
@@ -108,26 +109,7 @@ export class FilterMenuComponent implements OnInit {
 
     public constructor() {}
 
-    public ngOnInit(): void {
-        if (this.type === "number") {
-            this.selectedFilterMenuDataItemList = [
-                this.numericFilterMenuDataItems[0],
-                this.numericFilterMenuDataItems[0]
-            ];
-        } else if (this.type === "string") {
-            this.selectedFilterMenuDataItemList = [
-                this.stringFilterMenuDataItems[0],
-                this.stringFilterMenuDataItems[0]
-            ];
-        } else if (this.type === "date") {
-            this.selectedFilterMenuDataItemList = [this.dateFilterMenuDataItems[0], this.dateFilterMenuDataItems[0]];
-        } else if (this.type === "boolean") {
-            this.selectedFilterMenuDataItemList = [
-                this.booleanFilterMenuDataItems[0],
-                this.booleanFilterMenuDataItems[1]
-            ];
-        }
-    }
+    public ngOnInit(): void {}
 
     public onConnectorChange(item: FilterMenuConnectorItem): void {
         if (item.value === this.selectedConnectorItem?.value) {
@@ -217,8 +199,8 @@ export class FilterMenuComponent implements OnInit {
         if (this.type === "string") {
             const value1 = this.stringFilterValues[0];
             const value2 = this.stringFilterValues[1];
-            const operator1 = this.selectedFilterMenuDataItemList[0].value as StringFilterOperators;
-            const operator2 = this.selectedFilterMenuDataItemList[1].value as StringFilterOperators;
+            const operator1 = this.selectedFilterMenuDataItemList[0]?.value as StringFilterOperators;
+            const operator2 = this.selectedFilterMenuDataItemList[1]?.value as StringFilterOperators;
             const stringDescriptors: StringFilterDescriptor[] = [];
 
             const descriptor1 = this.getStringDescriptor(operator1, value1);
@@ -242,8 +224,8 @@ export class FilterMenuComponent implements OnInit {
         } else if (this.type === "number") {
             const value1 = this.numberFilterValues[0];
             const value2 = this.numberFilterValues[1];
-            const operator1 = this.selectedFilterMenuDataItemList[0].value as NumericFilterOperators;
-            const operator2 = this.selectedFilterMenuDataItemList[1].value as NumericFilterOperators;
+            const operator1 = this.selectedFilterMenuDataItemList[0]?.value as NumericFilterOperators;
+            const operator2 = this.selectedFilterMenuDataItemList[1]?.value as NumericFilterOperators;
             const numberDescriptors: NumericFilterDescriptor[] = [];
 
             const descriptor1 = this.getNumberDescriptor(operator1, value1);
@@ -267,8 +249,8 @@ export class FilterMenuComponent implements OnInit {
         } else if (this.type === "date") {
             const value1 = this.dateFilterValues[0];
             const value2 = this.dateFilterValues[1];
-            const operator1 = this.selectedFilterMenuDataItemList[0].value as DateFilterOperators;
-            const operator2 = this.selectedFilterMenuDataItemList[1].value as DateFilterOperators;
+            const operator1 = this.selectedFilterMenuDataItemList[0]?.value as DateFilterOperators;
+            const operator2 = this.selectedFilterMenuDataItemList[1]?.value as DateFilterOperators;
             const dateDescriptors: DateFilterDescriptor[] = [];
 
             const descriptor1 = this.getDateDescriptor(operator1, value1);
@@ -290,8 +272,8 @@ export class FilterMenuComponent implements OnInit {
 
             this.apply.emit(descriptor);
         } else if (this.type === "boolean") {
-            const operator1 = this.selectedFilterMenuDataItemList[0].value as BooleanFilterOperators;
-            const operator2 = this.selectedFilterMenuDataItemList[1].value as BooleanFilterOperators;
+            const operator1 = this.selectedFilterMenuDataItemList[0]?.value as BooleanFilterOperators;
+            const operator2 = this.selectedFilterMenuDataItemList[1]?.value as BooleanFilterOperators;
             const booleanDescriptors: BooleanFilterDescriptor[] = [];
 
             const descriptor1 = this.getBooleanDescriptor(operator1);
@@ -321,6 +303,8 @@ export class FilterMenuComponent implements OnInit {
         this.numberFilterValues = [null, null];
         this.stringFilterValues = ["", ""];
         this.dateFilterValues = [null, null];
+        this.booleanFilterValues = [null, null];
+        this.selectedFilterMenuDataItemList = [undefined, undefined];
         this.selectedConnectorItem = null;
         this.apply.emit({
             logic: "and",
@@ -333,7 +317,10 @@ export class FilterMenuComponent implements OnInit {
     }
 
     public get firstFilterValid(): boolean {
-        const operator = this.selectedFilterMenuDataItemList[0].value;
+        const operator = this.selectedFilterMenuDataItemList[0]?.value;
+        if (!operator) {
+            return false;
+        }
         if (operator === "isnull" || operator === "isnotnull") {
             return true;
         }
@@ -360,7 +347,10 @@ export class FilterMenuComponent implements OnInit {
     }
 
     public get secondFilterValid(): boolean {
-        const operator = this.selectedFilterMenuDataItemList[1].value;
+        const operator = this.selectedFilterMenuDataItemList[1]?.value;
+        if (!operator) {
+            return false;
+        }
         if (operator === "isnull" || operator === "isnotnull") {
             return true;
         }
@@ -443,6 +433,6 @@ export class FilterMenuComponent implements OnInit {
     }
 
     public get applyDisabled(): boolean {
-        return !this.firstFilterValid && !this.secondFilterValid;
+        return !this.firstFilterValid || (!!this.selectedConnectorItem && !this.secondFilterValid);
     }
 }

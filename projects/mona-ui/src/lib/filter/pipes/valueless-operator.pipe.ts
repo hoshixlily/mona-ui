@@ -5,7 +5,7 @@ import { FilterOperators } from "../../query/filter/FilterDescriptor";
     name: "valuelessOperator"
 })
 export class ValuelessOperatorPipe implements PipeTransform {
-    public transform(value: FilterOperators): boolean {
+    public transform(value: FilterOperators | undefined): boolean {
         return (
             value === "isnull" ||
             value === "isnotnull" ||

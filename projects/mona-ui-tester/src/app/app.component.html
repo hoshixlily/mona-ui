@@ -95,7 +95,7 @@
                             <div style="color: #95c5cb;">{{selectedDropdownListDataItem | json}}</div>
 
                             <div style="display: flex;">
-                                <mona-filter-menu type="boolean" field="active" (apply)="onFilterMenuFilterApply($event)"></mona-filter-menu>
+                                <mona-filter-menu type="boolean" field="active" (apply)="onFilterMenuFilterApply($event)" [operators]="['eq', 'neq', 'contains']"></mona-filter-menu>
                                 <button monaButton (click)="openFilterPopup(filterPopupAnchor)" #filterPopupAnchor>
                                     <fa-icon [icon]="filterIcon"></fa-icon>
                                 </button>
