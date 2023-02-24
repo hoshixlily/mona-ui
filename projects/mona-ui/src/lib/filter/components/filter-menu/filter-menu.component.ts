@@ -137,6 +137,21 @@ export class FilterMenuComponent implements OnInit {
         }
     }
 
+    private getBooleanDescriptor(operator: BooleanFilterOperators): BooleanFilterDescriptor | null {
+        if (operator === "isnotnull" || operator === "isnull") {
+            return {
+                field: this.field,
+                operator: operator
+            };
+        } else {
+            return {
+                field: this.field,
+                operator: "eq",
+                value: operator === "eq"
+            };
+        }
+    }
+
     private getDateDescriptor(operator: DateFilterOperators, value: Date | null): DateFilterDescriptor | null {
         if (operator === "isnotnull" || operator === "isnull") {
             return {
@@ -207,7 +222,6 @@ export class FilterMenuComponent implements OnInit {
             const stringDescriptors: StringFilterDescriptor[] = [];
 
             const descriptor1 = this.getStringDescriptor(operator1, value1);
-
             if (descriptor1 != null) {
                 stringDescriptors.push(descriptor1);
             }
@@ -276,30 +290,27 @@ export class FilterMenuComponent implements OnInit {
 
             this.apply.emit(descriptor);
         } else if (this.type === "boolean") {
-            // TODO: Make this part same as the other types above
+            const operator1 = this.selectedFilterMenuDataItemList[0].value as BooleanFilterOperators;
+            const operator2 = this.selectedFilterMenuDataItemList[1].value as BooleanFilterOperators;
             const booleanDescriptors: BooleanFilterDescriptor[] = [];
-            this.booleanFilterValues[0] = this.getBooleanFilterValue(
-                this.selectedFilterMenuDataItemList[0].value as BooleanFilterOperators
-            );
-            booleanDescriptors.push({
-                field: this.field,
-                operator: this.selectedFilterMenuDataItemList[0].value === "isnotnull" ? "neq" : "eq",
-                value: this.booleanFilterValues[0]
-            });
-            if (this.selectedConnectorItem) {
-                this.booleanFilterValues[1] = this.getBooleanFilterValue(
-                    this.selectedFilterMenuDataItemList[1].value as BooleanFilterOperators
-                );
-                booleanDescriptors.push({
-                    field: this.field,
-                    operator: this.selectedFilterMenuDataItemList[1].value === "isnotnull" ? "neq" : "eq",
-                    value: this.booleanFilterValues[1]
-                });
+
+            const descriptor1 = this.getBooleanDescriptor(operator1);
+            if (descriptor1 != null) {
+                booleanDescriptors.push(descriptor1);
             }
+
+            if (this.selectedConnectorItem) {
+                const descriptor2 = this.getBooleanDescriptor(operator2);
+                if (descriptor2 != null) {
+                    booleanDescriptors.push(descriptor2);
+                }
+            }
+
             const descriptor: CompositeFilterDescriptor = {
                 logic: this.selectedConnectorItem?.value ?? "and",
                 filters: booleanDescriptors
             };
+
             this.apply.emit(descriptor);
         } else {
             console.log("Filter type not supported yet.");
@@ -319,21 +330,6 @@ export class FilterMenuComponent implements OnInit {
 
     public onFilterOperatorChange(index: number, item: FilterMenuDataItem): void {
         this.selectedFilterMenuDataItemList[index] = item;
-    }
-
-    private getBooleanFilterValue(operator: BooleanFilterOperators): boolean | null {
-        switch (operator) {
-            case "eq":
-                return true;
-            case "neq":
-                return false;
-            case "isnull":
-                return null;
-            case "isnotnull":
-                return null;
-            default:
-                return null;
-        }
     }
 
     public get firstFilterValid(): boolean {

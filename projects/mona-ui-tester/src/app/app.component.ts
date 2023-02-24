@@ -436,10 +436,10 @@ export class AppComponent implements OnInit {
             .toArray();
         const result = Query.from(data)
             .filter(filter)
-            .sort([
-                { field: "active", dir: "asc" },
-                { field: "value", dir: "desc" }
-            ])
+            // .sort([
+            //     { field: "active", dir: "asc" },
+            //     { field: "value", dir: "desc" }
+            // ])
             .run();
         // console.log(data);
         console.log(result);
