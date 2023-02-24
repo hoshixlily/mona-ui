@@ -12,11 +12,13 @@ import {
     WindowService,
     PageSizeChangeEvent,
     PageChangeEvent,
-    Query
+    Query,
+    FilterMenuComponent,
+    FilterMenuValue
 } from "mona-ui";
 import { TestComponentComponent } from "./test-component/test-component.component";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
-import { faMoon, faSearch, faSnowflake, faSun } from "@fortawesome/free-solid-svg-icons";
+import { faFilter, faMoon, faSearch, faSnowflake, faSun } from "@fortawesome/free-solid-svg-icons";
 import { Enumerable, IndexableList } from "@mirei/ts-collections";
 import { map, Observable } from "rxjs";
 import { CompositeFilterDescriptor } from "../../../mona-ui/src/lib/query/filter/FilterDescriptor";
@@ -28,6 +30,7 @@ import { DateTime } from "luxon";
     styleUrls: ["./app.component.scss"]
 })
 export class AppComponent implements OnInit {
+    public readonly filterIcon: IconDefinition = faFilter;
     public readonly moonIcon: IconDefinition = faMoon;
     public readonly searchIcon: IconDefinition = faSearch;
     public readonly snowflakeIcon: IconDefinition = faSnowflake;
@@ -167,6 +170,11 @@ export class AppComponent implements OnInit {
         "Linden",
         "Maidenhair Tree"
     ];
+    public filterMenuValue: FilterMenuValue = {
+        value1: "Item 2",
+        value2: "Item 63",
+        logic: "or"
+    };
     public menuBarMenuVisible: boolean = false;
     public multiSelectTagCount: number = 2;
     public numericTextBoxValue: number = 629;
@@ -293,23 +301,23 @@ export class AppComponent implements OnInit {
     // }
 
     public filterData(): void {
-        const data = Enumerable.range(1, 100)
-            .select(i => ({ text: `Item ${i}`, value: i }))
-            .toArray();
-        const result = Query.from(data)
-            // .filter({ field: "value", operator: "between", value: [17, 33] })
-            // .filter({ field: "text", operator: "endswith", value: "7" })
-            .filter({
-                logic: "or",
-                filters: [{ field: "value", operator: "between", value: [17, 33] }]
-            })
-            .filter({
-                field: "value",
-                operator: "function",
-                predicate: (value: number) => value % 3 === 0
-            })
-            .run();
-        console.log(result);
+        // const data = Enumerable.range(1, 100)
+        //     .select(i => ({ text: `Item ${i}`, value: i }))
+        //     .toArray();
+        // const result = Query.from(data)
+        //     // .filter({ field: "value", operator: "between", value: [17, 33] })
+        //     // .filter({ field: "text", operator: "endswith", value: "7" })
+        //     .filter({
+        //         logic: "or",
+        //         filters: [{ field: "value", operator: "between", value: [17, 33] }]
+        //     })
+        //     .filter({
+        //         field: "value",
+        //         operator: "function",
+        //         predicate: (value: number) => value % 3 === 0
+        //     })
+        //     .run();
+        // console.log(result);
     }
 
     public ngOnInit(): void {
@@ -414,13 +422,16 @@ export class AppComponent implements OnInit {
         console.log(filter);
         const data = Enumerable.range(1, 100)
             .select(i => ({
-                text: `Item ${i}`,
-                value: i,
+                text: i % 6 === 0 ? "" : i % 4 === 0 ? null : `Item ${i}`,
+                value: i % 7 === 0 ? null : i,
                 active: i % 5 === 0 ? true : i % 8 === 0 ? null : false,
-                date: DateTime.local()
-                    .plus({ days: i })
-                    .set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
-                    .toJSDate()
+                date:
+                    i % 9 === 0
+                        ? null
+                        : DateTime.local()
+                              .plus({ days: i })
+                              .set({ hour: 0, minute: 0, second: 0, millisecond: 0 })
+                              .toJSDate()
             }))
             .toArray();
         const result = Query.from(data)
@@ -430,6 +441,7 @@ export class AppComponent implements OnInit {
                 { field: "value", dir: "desc" }
             ])
             .run();
+        // console.log(data);
         console.log(result);
     }
 
@@ -542,6 +554,30 @@ export class AppComponent implements OnInit {
     public onTreeSelectedKeysChange(selectedKeys: string[]): void {
         console.log(selectedKeys);
         this.treeSelectedKeys = selectedKeys;
+    }
+
+    public openFilterPopup(anchor: HTMLButtonElement): void {
+        const filterPopupRef = this.popupService.create({
+            content: FilterMenuComponent,
+            anchor,
+            preventClose: event => {
+                if (event.originalEvent instanceof PointerEvent) {
+                    const target = event.originalEvent.target as HTMLElement;
+                    if (target.closest(".mona-popup-content")) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+        });
+        if (filterPopupRef.component) {
+            const component = filterPopupRef.component.instance as FilterMenuComponent;
+            component.value = this.filterMenuValue;
+            component.apply.subscribe(() => {
+                this.filterMenuValue = component.value;
+                filterPopupRef.close();
+            });
+        }
     }
 
     public openPopup(event: MouseEvent): void {

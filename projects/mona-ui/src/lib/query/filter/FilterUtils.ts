@@ -53,21 +53,21 @@ export abstract class FilterUtils {
                         ? !DateTime.fromJSDate(value).equals(DateTime.fromJSDate(descriptor.value))
                         : value !== descriptor.value;
                 case "gt":
-                    return value > descriptor.value;
+                    return value == null || descriptor.value == null ? false : value > descriptor.value;
                 case "gte":
-                    return value >= descriptor.value;
+                    return value == null || descriptor.value == null ? false : value >= descriptor.value;
                 case "lt":
-                    return value < descriptor.value;
+                    return value == null || descriptor.value == null ? false : value < descriptor.value;
                 case "lte":
-                    return value <= descriptor.value;
+                    return value == null || descriptor.value == null ? false : value <= descriptor.value;
                 case "startswith":
-                    return value.startsWith(descriptor.value);
+                    return value == null || descriptor.value == null ? false : value.startsWith(descriptor.value);
                 case "endswith":
-                    return value.endsWith(descriptor.value);
+                    return value == null || descriptor.value == null ? false : value.endsWith(descriptor.value);
                 case "contains":
-                    return value.includes(descriptor.value);
+                    return value == null || descriptor.value == null ? false : value.includes(descriptor.value);
                 case "doesnotcontain":
-                    return !value.includes(descriptor.value);
+                    return value == null || descriptor.value == null ? false : !value.includes(descriptor.value);
                 case "isnull":
                     return value == null;
                 case "isnotnull":
@@ -84,16 +84,6 @@ export abstract class FilterUtils {
                     return (descriptor.value as T[]).includes(value);
                 case "notin":
                     return !(descriptor.value as T[]).includes(value);
-                case "between":
-                    return (
-                        value >= (descriptor.value as unknown as T[])[0] &&
-                        value <= (descriptor.value as unknown as T[])[1]
-                    );
-                case "notbetween":
-                    return (
-                        value < (descriptor.value as unknown as T[])[0] ||
-                        value > (descriptor.value as unknown as T[])[1]
-                    );
                 case "function":
                     return (descriptor.predicate as Predicate<T>)(value);
                 default:

@@ -10,9 +10,10 @@ import { DatePickerModule } from "../date-inputs/modules/date-picker/date-picker
 import { DateTimePickerModule } from "../date-inputs/modules/date-time-picker/date-time-picker.module";
 import { TimePickerModule } from "../date-inputs/modules/time-picker/time-picker.module";
 import { ButtonGroupModule } from "../buttons/modules/button-group/button-group.module";
+import { ValuelessOperatorPipe } from './pipes/valueless-operator.pipe';
 
 @NgModule({
-    declarations: [FilterMenuComponent],
+    declarations: [FilterMenuComponent, ValuelessOperatorPipe],
     imports: [
         CommonModule,
         DropDownListModule,
