@@ -32,6 +32,7 @@ div.mona-grid {
             text-overflow: ellipsis;
             text-align: left;
             position: relative;
+            user-select: none;
             &:not(:last-child) {
                 border-right: 1px solid var(--mona-border-color);
             }
@@ -56,4 +57,9 @@ div.mona-grid-column-wrap {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    cursor: pointer;
+}
+
+spna.mona-grid-column-title {
+    flex: 1;
 }

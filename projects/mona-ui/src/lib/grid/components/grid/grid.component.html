@@ -9,9 +9,11 @@
                     <tr>
                         <th *ngFor="let column of gridService.columns">
                             <div class="mona-grid-column-wrap">
-                                <span class="mona-grid-column-title">{{column.title}}</span>
+                                <span class="mona-grid-column-title" (click)="onColumnSort(column)">{{column.title}}</span>
                                 <div class="mona-grid-column-actions">
-                                    <mona-grid-filter-menu [field]="column.field"></mona-grid-filter-menu>
+                                    <fa-icon [icon]="ascendingSortIcon" *ngIf="column.sortDirection==='asc'"></fa-icon>
+                                    <fa-icon [icon]="descendingSortIcon" *ngIf="column.sortDirection==='desc'"></fa-icon>
+                                    <mona-grid-filter-menu [column]="column" [type]="column.filterType" (apply)="onColumnFilter(column, $event)"></mona-grid-filter-menu>
                                 </div>
                             </div>
                             <div monaGridColumnResizeHandler [column]="column" class="mona-grid-column-resizer" *ngIf="resizable"></div>

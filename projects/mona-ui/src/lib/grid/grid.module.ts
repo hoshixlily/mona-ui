@@ -6,10 +6,16 @@ import { GridColumnResizeHandlerDirective } from "./directives/grid-column-resiz
 import { GridFilterMenuComponent } from "./components/grid-filter-menu/grid-filter-menu.component";
 import { ButtonModule } from "../buttons/modules/button/button.module";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { GridFilterPipe } from './pipes/grid-filter.pipe';
+import { GridFilterPipe } from "./pipes/grid-filter.pipe";
 
 @NgModule({
-    declarations: [GridComponent, GridListComponent, GridColumnResizeHandlerDirective, GridFilterMenuComponent, GridFilterPipe],
+    declarations: [
+        GridComponent,
+        GridListComponent,
+        GridColumnResizeHandlerDirective,
+        GridFilterMenuComponent,
+        GridFilterPipe
+    ],
     imports: [CommonModule, ButtonModule, FontAwesomeModule],
     exports: [GridComponent]
 })
