@@ -1,0 +1,51 @@
+:host {
+    position: relative;
+    display: block;
+    overflow: hidden;
+}
+
+div.mona-grid {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: var(--mona-background-dark);
+    border: 1px solid var(--mona-border-color);
+}
+
+.mona-grid-header {
+    background-color: var(--mona-background-dark);
+    border-bottom: 1px solid var(--mona-border-color);
+    border-right: 1px solid var(--mona-border-color);
+    overflow: hidden;
+    display: flex;
+    flex-direction: row;
+    flex: 0 0 auto;
+
+    & table {
+        border-collapse: collapse;
+        table-layout: fixed;
+        width: 100%;
+        & th {
+            padding: 8px 10px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            text-align: left;
+            position: relative;
+            &:not(:last-child) {
+                border-right: 1px solid var(--mona-border-color);
+            }
+        }
+    }
+}
+
+div.mona-grid-column-resizer {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 10px;
+    background-color: transparent;
+    cursor: col-resize;
+    z-index: 1;
+    right: 0;
+}

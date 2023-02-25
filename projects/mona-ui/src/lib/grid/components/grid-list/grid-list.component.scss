@@ -1,0 +1,48 @@
+:host {
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+}
+
+div.mona-grid-list {
+    overflow: auto scroll;
+    width: 100%;
+}
+
+div.mona-grid-list-wrap {
+
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+    table-layout: fixed;
+
+    & tbody {
+        text-align: left;
+    }
+
+    & tr {
+        &:nth-child(even) {
+            background-color: var(--mona-background-dark);
+        }
+
+        &:nth-child(odd) {
+            background-color: var(--mona-background);
+        }
+
+        &:not(:last-child) {
+            border-bottom: 1px solid var(--mona-border-color);
+        }
+    }
+
+    & td {
+        padding: 8px 10px;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        &:not(:last-child) {
+            border-right: 1px solid var(--mona-border-color);
+        }
+    }
+}

@@ -63,10 +63,10 @@ input {
 }
 
 @mixin scrollbars {
-    scrollbar-width: thin;
     scrollbar-color: var(--mona-background-darker) var(--mona-background-dark);
     &::-webkit-scrollbar {
         width: 8px;
+        height: 8px;
     }
     &::-webkit-scrollbar-track {
         background: var(--mona-background-dark);
@@ -76,6 +76,22 @@ input {
         &:hover {
             background-color: var(--mona-background-light);
         }
+    }
+    &::-webkit-scrollbar-corner {
+        background: var(--mona-background-dark);
+    }
+}
+
+@mixin scrollbars-thin {
+    scrollbar-width: thin;
+    @include scrollbars;
+}
+
+@mixin scrollbars-thick {
+    @include scrollbars;
+    &::-webkit-scrollbar {
+        width: 12px;
+        height: 12px;
     }
 }
 
@@ -160,7 +176,7 @@ ul.mona-list {
             @include disabled;
         }
     }
-    @include scrollbars;
+    @include scrollbars-thin;
 }
 
 li.mona-list-group-header {
@@ -467,6 +483,16 @@ div.mona-filter-menu-item {
         }
     }
 }
+
+
+/** Grid */
+.mona-grid {
+    color: var(--mona-text);
+}
+.mona-grid-list {
+    @include scrollbars-thick;
+}
+
 
 /** Inputs */
 

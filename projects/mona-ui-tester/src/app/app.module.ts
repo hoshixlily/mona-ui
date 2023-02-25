@@ -17,7 +17,8 @@ import {
     WindowModule,
     ProgressBarsModule,
     PagerModule,
-    FilterModule
+    FilterModule,
+    GridModule
 } from "mona-ui";
 import { TestComponentComponent } from "./test-component/test-component.component";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
@@ -45,7 +46,8 @@ import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
         WindowModule,
         ProgressBarsModule,
         PagerModule,
-        FilterModule
+        FilterModule,
+        GridModule
     ],
     bootstrap: [AppComponent]
 })

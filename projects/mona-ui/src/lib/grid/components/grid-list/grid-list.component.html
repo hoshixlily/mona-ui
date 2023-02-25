@@ -1,0 +1,14 @@
+<div class="mona-grid-list">
+    <div class="mona-grid-list-wrap">
+        <table>
+            <colgroup>
+                <col *ngFor="let column of gridService.columns" [style.width.px]="column.calculatedWidth" [style.min-width.px]="column.minWidth">
+            </colgroup>
+            <tbody>
+            <tr *ngFor="let row of gridService.rows">
+                <td *ngFor="let column of gridService.columns">{{row[column.field]}}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,88 @@
+import { AfterViewInit, ChangeDetectorRef, Directive, ElementRef, Input, NgZone, OnDestroy } from "@angular/core";
+import { Column } from "../models/Column";
+import { fromEvent, Subject, takeUntil } from "rxjs";
+
+@Directive({
+    selector: "[monaGridColumnResizeHandler]"
+})
+export class GridColumnResizeHandlerDirective implements AfterViewInit, OnDestroy {
+    private readonly destroy$: Subject<void> = new Subject<void>();
+
+    @Input()
+    public column!: Column;
+
+    public constructor(
+        private readonly elementRef: ElementRef<HTMLDivElement>,
+        private readonly zone: NgZone,
+        private readonly cdr: ChangeDetectorRef
+    ) {}
+
+    public ngAfterViewInit(): void {
+        this.setEvents();
+    }
+
+    public ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
+    }
+
+    private onMouseDown(event: MouseEvent) {
+        const element = this.elementRef.nativeElement;
+        const initialWidth = this.column.calculatedWidth ?? element.offsetWidth;
+        const initialX = event.clientX;
+        const oldSelectStart = document.onselectstart;
+        const oldDragStart = document.ondragstart;
+        const headerTableElement = element.closest("table");
+        const bodyTableElement = document.querySelector(".mona-grid-list-wrap > table") as HTMLTableElement;
+
+        document.onselectstart = () => false;
+        // document.ondragstart = () => false;
+
+        const onMouseMove = (event: MouseEvent) => {
+            const deltaX = event.clientX - initialX;
+            const minWidth = this.column.minWidth;
+            const maxWidth = this.column.maxWidth ?? window.innerWidth;
+
+            if (initialWidth + deltaX < minWidth) {
+                return;
+            }
+
+            if (initialWidth + deltaX > maxWidth) {
+                return;
+            }
+
+            const oldWidth = this.column.calculatedWidth ?? element.offsetWidth;
+            this.column.calculatedWidth = initialWidth + deltaX;
+            if (headerTableElement) {
+                headerTableElement.style.width = `${
+                    headerTableElement.offsetWidth + (this.column.calculatedWidth - oldWidth)
+                }px`;
+            }
+            if (bodyTableElement) {
+                bodyTableElement.style.width = `${
+                    bodyTableElement.offsetWidth + (this.column.calculatedWidth - oldWidth)
+                }px`;
+            }
+
+            this.cdr.detectChanges();
+        };
+
+        const onMouseUp = () => {
+            document.removeEventListener("mousemove", onMouseMove);
+            document.removeEventListener("mouseup", onMouseUp);
+            document.onselectstart = oldSelectStart;
+            // document.ondragstart = oldDragStart;
+        };
+
+        document.addEventListener("mousemove", onMouseMove);
+        document.addEventListener("mouseup", onMouseUp);
+    }
+
+    private setEvents(): void {
+        this.zone.runOutsideAngular(() => {
+            fromEvent<MouseEvent>(this.elementRef.nativeElement, "mousedown")
+                .pipe(takeUntil(this.destroy$))
+                .subscribe(event => this.onMouseDown(event));
+        });
+    }
+}

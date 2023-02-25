@@ -34,7 +34,14 @@
         </mona-splitter-pane>
         <mona-splitter-pane>
             <mona-tab-strip [keepTabContent]="true" [closable]="true" (tabClose)="onTabStripTabClose($event)">
-                <mona-tab [title]="'TAB I'" [closable]="false" [selected]="true">
+                <mona-tab [title]="'Grid Tab'" [selected]="true">
+                    <ng-template monaTabContentTemplate>
+                        <div style="padding: 40px;">
+                            <mona-grid style="height: 400px;"></mona-grid>
+                        </div>
+                    </ng-template>
+                </mona-tab>
+                <mona-tab [title]="'TAB I'" [closable]="false">
                     <ng-template monaTabTitleTemplate>
                         <span style="color: deeppink; font-weight: bold;">Components</span>
                     </ng-template>

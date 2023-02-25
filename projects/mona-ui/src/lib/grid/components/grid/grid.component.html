@@ -1,0 +1,20 @@
+<div class="mona-grid">
+    <div class="mona-grid-header" [ngStyle]="{'margin': headerMargin}" #gridHeaderElement>
+        <div class="mona-grid-header-wrap">
+            <table>
+                <colgroup>
+                    <col *ngFor="let column of gridService.columns" [style.width.px]="column.calculatedWidth" [style.min-width.px]="column.minWidth">
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th *ngFor="let column of gridService.columns">
+                            {{column.title}}
+                            <div monaGridColumnResizeHandler [column]="column" class="mona-grid-column-resizer" *ngIf="resizable"></div>
+                        </th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+    <mona-grid-list></mona-grid-list>
+</div>
