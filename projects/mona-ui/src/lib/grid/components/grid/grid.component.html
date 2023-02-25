@@ -8,7 +8,12 @@
                 <thead>
                     <tr>
                         <th *ngFor="let column of gridService.columns">
-                            {{column.title}}
+                            <div class="mona-grid-column-wrap">
+                                <span class="mona-grid-column-title">{{column.title}}</span>
+                                <div class="mona-grid-column-actions">
+                                    <mona-grid-filter-menu [field]="column.field"></mona-grid-filter-menu>
+                                </div>
+                            </div>
                             <div monaGridColumnResizeHandler [column]="column" class="mona-grid-column-resizer" *ngIf="resizable"></div>
                         </th>
                     </tr>

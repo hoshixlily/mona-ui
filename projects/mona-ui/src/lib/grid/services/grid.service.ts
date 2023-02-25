@@ -1,8 +1,12 @@
 import { ElementRef, Injectable } from "@angular/core";
 import { Column } from "../models/Column";
+import { CompositeFilterDescriptor } from "../../query/filter/FilterDescriptor";
+import { Dictionary } from "@mirei/ts-collections";
+import { ColumnFilterState } from "../models/ColumnFilterState";
 
 @Injectable()
 export class GridService {
+    public appliedFilters: Dictionary<string, ColumnFilterState> = new Dictionary<string, ColumnFilterState>();
     public columns: Column[] = [
         new Column({ field: "id", title: "ID", width: 40 }),
         new Column({ field: "name", title: "Name", width: 88 }),
