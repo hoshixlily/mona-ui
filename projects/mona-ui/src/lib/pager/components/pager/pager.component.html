@@ -46,14 +46,14 @@
                 <mona-numeric-text-box [spinners]="false" [min]="1" [max]="pageCount" [(value)]="inputValue"
                                        (inputBlur)="onPageInputBlur()" *ngIf="pageInput"></mona-numeric-text-box>
             </li>
-            <li>
+            <li *ngIf="pageSizeValueList.length !== 0">
                 <mona-drop-down-list [data]="pageSizeValueList" [value]="pageSize"
-                                     (valueChange)="onPageSizeValueChange($event)" *ngIf="pageSizeValueList.length !== 0" #pageSizeDropdownList></mona-drop-down-list>
+                                     (valueChange)="onPageSizeValueChange($event)" #pageSizeDropdownList></mona-drop-down-list>
                 <span>items per page</span>
             </li>
         </ol>
         <div class="mona-pager-info">
-            <span>{{(page-1)*pageSize+1}} - {{page*pageSize > total ? total : page*pageSize}} of {{total}} items</span>
+            <span>{{currentPageDataCountStart}} - {{currentPageDataCountEnd}} of {{total}} items</span>
         </div>
     </ng-container>
     <ng-container *ngIf="type==='input'">

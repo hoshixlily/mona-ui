@@ -9,6 +9,7 @@ export class Column {
     public maxWidth?: number;
     public minWidth: number = 40;
     public sortDirection?: "asc" | "desc";
+    public sortIndex?: number; // 1-based
     public title: string;
     public width?: number;
 

@@ -488,7 +488,14 @@ div.mona-filter-menu-item {
 /** Grid */
 .mona-grid {
     color: var(--mona-text);
+    & mona-pager {
+        & .mona-pager {
+            border: none;
+            border-top: 1px solid var(--mona-border-color);
+        }
+    }
 }
+
 .mona-grid-list {
     @include scrollbars-thick;
 }

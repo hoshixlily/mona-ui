@@ -7,6 +7,9 @@ import { GridFilterMenuComponent } from "./components/grid-filter-menu/grid-filt
 import { ButtonModule } from "../buttons/modules/button/button.module";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { GridFilterPipe } from "./pipes/grid-filter.pipe";
+import { PagerModule } from "../pager/pager.module";
+import { SlicePipe } from "../pipes/slice.pipe";
+import { GridPagePipe } from './pipes/grid-page.pipe';
 
 @NgModule({
     declarations: [
@@ -14,9 +17,10 @@ import { GridFilterPipe } from "./pipes/grid-filter.pipe";
         GridListComponent,
         GridColumnResizeHandlerDirective,
         GridFilterMenuComponent,
-        GridFilterPipe
+        GridFilterPipe,
+        GridPagePipe
     ],
-    imports: [CommonModule, ButtonModule, FontAwesomeModule],
+    imports: [CommonModule, ButtonModule, FontAwesomeModule, PagerModule, SlicePipe],
     exports: [GridComponent]
 })
 export class GridModule {}

@@ -1,21 +1,37 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, OnInit, ViewChild } from "@angular/core";
+import {
+    AfterViewInit,
+    ChangeDetectionStrategy,
+    ChangeDetectorRef,
+    Component,
+    ElementRef,
+    Input,
+    OnInit,
+    ViewChild
+} from "@angular/core";
 import { GridService } from "../../services/grid.service";
-import { faChevronDown, faChevronUp, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import {
+    faArrowDownLong,
+    faArrowUpLong,
+    faChevronDown,
+    faChevronUp,
+    IconDefinition
+} from "@fortawesome/free-solid-svg-icons";
 import { Column } from "../../models/Column";
 import { SortDescriptor } from "../../../query/sort/SortDescriptor";
-import { CompositeFilterDescriptor } from "../../../query/filter/FilterDescriptor";
 import { ColumnFilterState } from "../../models/ColumnFilterState";
+import { PageSizeChangeEvent } from "../../../pager/models/PageSizeChangeEvent";
+import { PageChangeEvent } from "../../../pager/models/PageChangeEvent";
 
 @Component({
     selector: "mona-grid",
     templateUrl: "./grid.component.html",
     styleUrls: ["./grid.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush,
+    changeDetection: ChangeDetectionStrategy.Default,
     providers: [GridService]
 })
 export class GridComponent implements OnInit, AfterViewInit {
-    public readonly ascendingSortIcon: IconDefinition = faChevronDown;
-    public readonly descendingSortIcon: IconDefinition = faChevronUp;
+    public readonly ascendingSortIcon: IconDefinition = faArrowUpLong;
+    public readonly descendingSortIcon: IconDefinition = faArrowDownLong;
 
     @ViewChild("gridHeaderElement")
     public set gridHeaderElement(value: ElementRef<HTMLDivElement>) {
@@ -24,16 +40,25 @@ export class GridComponent implements OnInit, AfterViewInit {
     }
 
     @Input()
+    public set pageSize(value: number) {
+        this.gridService.pageState.take = value;
+    }
+
+    @Input()
+    public pageSizeValues: number[] = [];
+
+    @Input()
     public resizable: boolean = true;
 
-    public constructor(public readonly gridService: GridService) {}
+    public constructor(public readonly gridService: GridService, private readonly cdr: ChangeDetectorRef) {}
 
-    public ngAfterViewInit(): void {}
+    public ngAfterViewInit(): void {
+        this.cdr.detectChanges();
+    }
 
     public ngOnInit(): void {}
 
     public onColumnFilter(column: Column, state: ColumnFilterState): void {
-        console.log("onColumnFilter", column, state);
         if (state.filter && state.filter.filters.length > 0) {
             this.gridService.appliedFilters.put(column.field, state);
             column.filtered = true;
@@ -54,6 +79,7 @@ export class GridComponent implements OnInit, AfterViewInit {
             column.sortDirection = "desc";
         } else {
             column.sortDirection = undefined;
+            column.sortIndex = undefined;
         }
         if (column.sortDirection != null) {
             const sortDescriptor: SortDescriptor = {
@@ -64,10 +90,32 @@ export class GridComponent implements OnInit, AfterViewInit {
         } else {
             this.gridService.appliedSorts.remove(column.field);
         }
+        this.gridService.appliedSorts.keys().forEach((field, fx) => {
+            const col = this.gridService.columns.find(c => c.field === field);
+            if (col) {
+                col.sortIndex = fx + 1;
+            }
+        });
         this.gridService.appliedSorts = this.gridService.appliedSorts.toDictionary(
             p => p.key,
             p => p.value
         );
+    }
+
+    public onPageChange(event: PageChangeEvent): void {
+        this.gridService.pageState = {
+            skip: event.skip,
+            take: event.take
+        };
+        this.cdr.detectChanges();
+    }
+
+    public onPageSizeChange(data: PageSizeChangeEvent): void {
+        this.gridService.pageState = {
+            skip: 0,
+            take: data.newPageSize
+        };
+        this.cdr.detectChanges();
     }
 
     private setInitialCalculatedWidthOfColumns(): void {
@@ -80,6 +128,7 @@ export class GridComponent implements OnInit, AfterViewInit {
     }
 
     public get headerMargin(): string {
-        return `0 12px 0 0`;
+        const rightMargin = 12;
+        return `0 ${rightMargin}px 0 0`;
     }
 }

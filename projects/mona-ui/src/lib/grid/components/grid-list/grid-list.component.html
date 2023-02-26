@@ -5,8 +5,8 @@
                 <col *ngFor="let column of gridService.columns" [style.width.px]="column.calculatedWidth" [style.min-width.px]="column.minWidth">
             </colgroup>
             <tbody>
-            <tr *ngFor="let row of gridService.rows|gridFilter:gridService.appliedFilters:gridService.appliedSorts">
-                <td *ngFor="let column of gridService.columns">{{row[column.field]}}</td>
+            <tr *ngFor="let row of data">
+                <td *ngFor="let column of columns">{{row[column.field]}}</td>
             </tr>
             </tbody>
         </table>

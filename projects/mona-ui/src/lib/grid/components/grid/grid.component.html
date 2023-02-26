@@ -11,6 +11,7 @@
                             <div class="mona-grid-column-wrap">
                                 <span class="mona-grid-column-title" (click)="onColumnSort(column)">{{column.title}}</span>
                                 <div class="mona-grid-column-actions">
+                                    <span *ngIf="column.sortIndex != null">{{column.sortIndex}}</span>
                                     <fa-icon [icon]="ascendingSortIcon" *ngIf="column.sortDirection==='asc'"></fa-icon>
                                     <fa-icon [icon]="descendingSortIcon" *ngIf="column.sortDirection==='desc'"></fa-icon>
                                     <mona-grid-filter-menu [column]="column" [type]="column.filterType" (apply)="onColumnFilter(column, $event)"></mona-grid-filter-menu>
@@ -23,5 +24,12 @@
             </table>
         </div>
     </div>
-    <mona-grid-list></mona-grid-list>
+    <ng-container *ngIf="(gridService.rows|gridFilter:gridService.appliedFilters:gridService.appliedSorts) as filteredData">
+        <ng-container *ngIf="filteredData|gridPage:gridService.pageState.skip:gridService.pageState.take as viewData">
+            <mona-grid-list [columns]="gridService.columns" [data]="viewData"></mona-grid-list>
+            <mona-pager [skip]="gridService.pageState.skip" [pageSize]="gridService.pageState.take" [total]="filteredData.length"
+                        [pageInput]="true" [pageSizeValues]="pageSizeValues" (pageSizeChange)="onPageSizeChange($event)"
+                        (pageChange)="onPageChange($event)"></mona-pager>
+        </ng-container>
+    </ng-container>
 </div>

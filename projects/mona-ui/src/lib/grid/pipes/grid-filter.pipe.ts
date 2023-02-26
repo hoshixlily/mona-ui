@@ -8,6 +8,8 @@ import { ColumnSortState } from "../models/ColumnSortState";
     name: "gridFilter"
 })
 export class GridFilterPipe implements PipeTransform {
+    public constructor() {}
+
     public transform(
         value: any[],
         filterStateDict: Dictionary<string, ColumnFilterState>,
@@ -22,12 +24,14 @@ export class GridFilterPipe implements PipeTransform {
             }
         }
         if (sortStateDict.length > 0) {
-            for (const sortState of sortStateDict) {
-                if (sortState.value.sort) {
-                    queryEnumerable = queryEnumerable.sort([sortState.value.sort]);
-                }
-            }
+            queryEnumerable = queryEnumerable.sort(
+                sortStateDict
+                    .values()
+                    .select(d => d.sort)
+                    .toArray()
+            );
         }
+        console.log(sortStateDict.values().toArray());
         return queryEnumerable.run();
     }
 }

@@ -1,6 +1,17 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit } from "@angular/core";
+import {
+    AfterViewInit,
+    ChangeDetectorRef,
+    Component,
+    ElementRef,
+    EventEmitter,
+    Input,
+    OnDestroy,
+    OnInit,
+    Output
+} from "@angular/core";
 import { GridService } from "../../services/grid.service";
 import { fromEvent, Subject, takeUntil } from "rxjs";
+import { Column } from "../../models/Column";
 
 @Component({
     selector: "mona-grid-list",
@@ -9,6 +20,13 @@ import { fromEvent, Subject, takeUntil } from "rxjs";
 })
 export class GridListComponent implements OnInit, AfterViewInit, OnDestroy {
     private readonly componentDestroy$: Subject<void> = new Subject<void>();
+
+    @Input()
+    public columns: Column[] = [];
+
+    @Input()
+    public data: any[] = [];
+
     public constructor(
         public readonly gridService: GridService,
         private readonly elementRef: ElementRef<HTMLDivElement>

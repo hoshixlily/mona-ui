@@ -40,7 +40,6 @@ export class PagerComponent implements OnInit, OnChanges {
     public page: number = 1;
     public pageSizeValueList: number[] = [];
     public pages: Page[] = [];
-    public skipCount: number = 0;
 
     @Input()
     public firstLast: boolean = true;
@@ -67,23 +66,15 @@ export class PagerComponent implements OnInit, OnChanges {
     public set pageSizeValues(values: number[] | boolean) {
         if (values === false || (Array.isArray(values) && values.length === 0)) {
             this.pageSizeValueList = [];
-            this.pageSize = 10;
         } else if (Array.isArray(values)) {
             this.pageSizeValueList = values;
-            this.pageSize = values[0];
         } else {
             this.pageSizeValueList = [10, 20, 50, 100];
-            this.pageSize = this.pageSizeValueList[0];
         }
     }
 
     @Input()
-    public set skip(skip: number) {
-        this.page = Math.floor(skip / this.pageSize) + 1;
-        this.skipCount = skip;
-        this.inputValue = this.page;
-        this.preparePages(this.page, this.visiblePages, this.pageCount);
-    }
+    public skip: number = 0;
 
     @Input()
     public total: number = 0;
@@ -97,19 +88,22 @@ export class PagerComponent implements OnInit, OnChanges {
     public constructor() {}
 
     public ngOnChanges(changes: SimpleChanges) {
-        if (changes["pageSize"] || changes["total"]) {
-            this.pageCount = Math.ceil(this.total / this.pageSize);
-            this.preparePages(this.page, this.visiblePages, this.pageCount);
-        }
-        if (changes["visiblePages"]) {
-            this.preparePages(this.page, this.visiblePages, this.pageCount);
+        if (changes["pageSize"] || changes["total"] || changes["visiblePages"] || changes["skip"]) {
+            const pageSize = changes["pageSize"] ? changes["pageSize"].currentValue : this.pageSize;
+            const total = changes["total"] ? changes["total"].currentValue : this.total;
+            const visiblePages = changes["visiblePages"] ? changes["visiblePages"].currentValue : this.visiblePages;
+            this.pageCount = Math.ceil(total / pageSize);
+            if (changes["skip"] && changes["skip"].currentValue !== changes["skip"].previousValue) {
+                const skip = changes["skip"].currentValue;
+                this.page = Math.floor(skip / pageSize) + 1 ?? this.page;
+                this.inputValue = this.page;
+            }
+            this.pageCount = Math.ceil(total / pageSize);
+            this.preparePages(this.page, visiblePages, this.pageCount);
         }
     }
 
-    public ngOnInit(): void {
-        this.inputValue = this.page;
-        this.preparePages(this.page, this.visiblePages, this.pageCount);
-    }
+    public ngOnInit(): void {}
 
     public onJumpNextClick(): void {
         const page = Math.min(this.page + this.visiblePages, this.pageCount);
@@ -209,5 +203,13 @@ export class PagerComponent implements OnInit, OnChanges {
     private setPage(page: number): void {
         const skip = (page - 1) * this.pageSize;
         this.pageChange.emit({ page, skip, take: this.pageSize });
+    }
+
+    public get currentPageDataCountEnd(): number {
+        return Math.min(this.page * this.pageSize, this.total);
+    }
+
+    public get currentPageDataCountStart(): number {
+        return (this.page - 1) * this.pageSize + 1;
     }
 }
