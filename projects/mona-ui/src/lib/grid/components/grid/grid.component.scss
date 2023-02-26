@@ -14,7 +14,7 @@ div.mona-grid {
 
 .mona-grid-header {
     background-color: var(--mona-background-dark);
-    border-bottom: 1px solid var(--mona-border-color);
+    //border-bottom: 1px solid var(--mona-border-color);
     border-right: 1px solid var(--mona-border-color);
     overflow: hidden;
     display: flex;
@@ -26,8 +26,6 @@ div.mona-grid {
         table-layout: fixed;
         width: 100%;
         & th {
-            //padding: 8px 10px;
-            overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
             text-align: left;
@@ -40,6 +38,10 @@ div.mona-grid {
     }
 }
 
+mona-grid-list {
+    border-top: 1px solid var(--mona-border-color);
+}
+
 div.mona-grid-column-resizer {
     position: absolute;
     top: 0;
@@ -48,7 +50,7 @@ div.mona-grid-column-resizer {
     background-color: transparent;
     cursor: col-resize;
     z-index: 1;
-    right: 0;
+    right: -5px;
 }
 
 div.mona-grid-column-wrap {
@@ -66,4 +68,5 @@ span.mona-grid-column-title {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+    font-weight: bold;
 }

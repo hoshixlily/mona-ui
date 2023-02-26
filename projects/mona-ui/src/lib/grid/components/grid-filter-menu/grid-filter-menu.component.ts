@@ -47,6 +47,7 @@ export class GridFilterMenuComponent implements OnInit {
         this.popupRef = this.popupService.create({
             anchor: this.elementRef.nativeElement,
             content: FilterMenuComponent,
+            popupClass: "mona-grid-filter-menu-popup-content",
             preventClose: event => {
                 if (event.originalEvent instanceof PointerEvent) {
                     const target = event.originalEvent.target as HTMLElement;

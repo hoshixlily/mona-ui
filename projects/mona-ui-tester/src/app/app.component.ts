@@ -23,6 +23,9 @@ import { Enumerable, IndexableList } from "@mirei/ts-collections";
 import { map, Observable } from "rxjs";
 import { CompositeFilterDescriptor } from "../../../mona-ui/src/lib/query/filter/FilterDescriptor";
 import { DateTime } from "luxon";
+import { Column } from "../../../mona-ui/src/lib/grid/models/Column";
+import { GridProductData } from "./GridProductData";
+import { GridOrderData } from "./GridOrderData";
 
 @Component({
     selector: "app-root",
@@ -175,6 +178,41 @@ export class AppComponent implements OnInit {
         value2: "Item 63",
         logic: "or"
     };
+
+    public gridOrderColumns: any[] = [
+        { field: "OrderID", title: "Order ID", filterType: "number" },
+        { field: "ShipCountry", title: "Ship Country", filterType: "string" },
+        { field: "OrderDate", title: "Order Date", filterType: "date" },
+        { field: "Freight", title: "Freight", filterType: "number" },
+        // { field: "CustomerID", title: "Customer ID", filterType: "string" },
+        // { field: "EmployeeID", title: "Employee ID", filterType: "number" },
+        // { field: "RequiredDate", title: "Required Date", filterType: "date" },
+        { field: "ShippedDate", title: "Shipped Date", filterType: "date" },
+        // { field: "ShipVia", title: "Ship Via", filterType: "number" },
+        { field: "ShipName", title: "Ship Name", filterType: "string" },
+        // { field: "ShipAddress", title: "Ship Address", filterType: "string" },
+        { field: "ShipCity", title: "Ship City", filterType: "string" },
+        { field: "ShipRegion", title: "Ship Region", filterType: "string" }
+        // { field: "ShipPostalCode", title: "Ship Postal Code", filterType: "string" }
+    ];
+
+    public gridProductColumns: any[] = [
+        { field: "ProductID", title: "Product ID", filterType: "number" },
+        { field: "ProductName", title: "Product Name", filterType: "string" },
+        { field: "SupplierID", title: "Supplier ID", filterType: "number" },
+        { field: "CategoryID", title: "Category ID", filterType: "number" },
+        { field: "QuantityPerUnit", title: "Quantity Per Unit", filterType: "string" },
+        { field: "UnitPrice", title: "Unit Price", filterType: "number" },
+        { field: "UnitsInStock", title: "Units In Stock", filterType: "number" },
+        { field: "UnitsOnOrder", title: "Units On Order", filterType: "number" },
+        { field: "ReorderLevel", title: "Reorder Level", filterType: "number" },
+        { field: "Discontinued", title: "Discontinued", filterType: "boolean" },
+        { field: "FirstOrderedOn", title: "First Ordered On", filterType: "date" }
+    ];
+
+    public gridOrderData: any[] = GridOrderData;
+    public gridProductData: any[] = GridProductData;
+
     public menuBarMenuVisible: boolean = false;
     public multiSelectTagCount: number = 2;
     public numericTextBoxValue: number = 629;

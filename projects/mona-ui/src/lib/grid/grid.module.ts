@@ -9,7 +9,9 @@ import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { GridFilterPipe } from "./pipes/grid-filter.pipe";
 import { PagerModule } from "../pager/pager.module";
 import { SlicePipe } from "../pipes/slice.pipe";
-import { GridPagePipe } from './pipes/grid-page.pipe';
+import { GridPagePipe } from "./pipes/grid-page.pipe";
+import { GridColumnComponent } from "./components/grid-column/grid-column.component";
+import { GridCellTemplateDirective } from "./directives/grid-cell-template.directive";
 
 @NgModule({
     declarations: [
@@ -18,9 +20,11 @@ import { GridPagePipe } from './pipes/grid-page.pipe';
         GridColumnResizeHandlerDirective,
         GridFilterMenuComponent,
         GridFilterPipe,
-        GridPagePipe
+        GridPagePipe,
+        GridColumnComponent,
+        GridCellTemplateDirective
     ],
     imports: [CommonModule, ButtonModule, FontAwesomeModule, PagerModule, SlicePipe],
-    exports: [GridComponent]
+    exports: [GridComponent, GridColumnComponent, GridCellTemplateDirective]
 })
 export class GridModule {}

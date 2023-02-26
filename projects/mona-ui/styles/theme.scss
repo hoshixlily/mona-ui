@@ -500,6 +500,11 @@ div.mona-filter-menu-item {
     @include scrollbars-thick;
 }
 
+.mona-grid-filter-menu-popup-content {
+    padding: 0 !important;
+    background: var(--mona-background-dark) !important;
+}
+
 
 /** Inputs */
 

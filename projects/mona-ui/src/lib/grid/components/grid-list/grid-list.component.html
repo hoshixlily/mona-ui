@@ -6,7 +6,10 @@
             </colgroup>
             <tbody>
             <tr *ngFor="let row of data">
-                <td *ngFor="let column of columns">{{row[column.field]}}</td>
+                <td *ngFor="let column of columns">
+                    <ng-container *ngIf="!column.cellTemplate">{{row[column.field]}}</ng-container>
+                    <ng-container [ngTemplateOutlet]="column.cellTemplate.templateRef ?? null" *ngIf="column.cellTemplate" [ngTemplateOutletContext]="{$implicit: row, column}"></ng-container>
+                </td>
             </tr>
             </tbody>
         </table>

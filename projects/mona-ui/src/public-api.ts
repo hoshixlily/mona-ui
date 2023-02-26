@@ -63,6 +63,8 @@ export * from "./lib/filter/components/filter-menu/filter-menu.component";
 export * from "./lib/filter/filter.module";
 
 /** Grid */
+export * from "./lib/grid/directives/grid-cell-template.directive";
+export * from "./lib/grid/components/grid-column/grid-column.component";
 export * from "./lib/grid/components/grid/grid.component";
 export * from "./lib/grid/grid.module";
 

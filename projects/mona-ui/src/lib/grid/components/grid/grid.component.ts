@@ -3,9 +3,11 @@ import {
     ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
+    ContentChildren,
     ElementRef,
     Input,
     OnInit,
+    QueryList,
     ViewChild
 } from "@angular/core";
 import { GridService } from "../../services/grid.service";
@@ -21,6 +23,7 @@ import { SortDescriptor } from "../../../query/sort/SortDescriptor";
 import { ColumnFilterState } from "../../models/ColumnFilterState";
 import { PageSizeChangeEvent } from "../../../pager/models/PageSizeChangeEvent";
 import { PageChangeEvent } from "../../../pager/models/PageChangeEvent";
+import { GridColumnComponent } from "../grid-column/grid-column.component";
 
 @Component({
     selector: "mona-grid",
@@ -32,6 +35,18 @@ import { PageChangeEvent } from "../../../pager/models/PageChangeEvent";
 export class GridComponent implements OnInit, AfterViewInit {
     public readonly ascendingSortIcon: IconDefinition = faArrowUpLong;
     public readonly descendingSortIcon: IconDefinition = faArrowDownLong;
+    public gridColumns: Column[] = [];
+
+    @ContentChildren(GridColumnComponent)
+    public set columns(value: QueryList<GridColumnComponent>) {
+        this.gridColumns = value.map(c => c.column);
+        this.gridService.columns = this.gridColumns;
+    }
+
+    @Input()
+    public set data(value: any[]) {
+        this.gridService.rows = value;
+    }
 
     @ViewChild("gridHeaderElement")
     public set gridHeaderElement(value: ElementRef<HTMLDivElement>) {
