@@ -13,6 +13,7 @@ import {
     PageSizeChangeEvent,
     PageChangeEvent,
     Query,
+    CompositeFilterDescriptor,
     FilterMenuComponent,
     FilterMenuValue
 } from "mona-ui";
@@ -21,9 +22,7 @@ import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { faFilter, faMoon, faSearch, faSnowflake, faSun } from "@fortawesome/free-solid-svg-icons";
 import { Enumerable, IndexableList } from "@mirei/ts-collections";
 import { map, Observable } from "rxjs";
-import { CompositeFilterDescriptor } from "../../../mona-ui/src/lib/query/filter/FilterDescriptor";
 import { DateTime } from "luxon";
-import { Column } from "../../../mona-ui/src/lib/grid/models/Column";
 import { GridProductData } from "./GridProductData";
 import { GridOrderData } from "./GridOrderData";
 

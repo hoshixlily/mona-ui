@@ -24,6 +24,11 @@ import { ColumnFilterState } from "../../models/ColumnFilterState";
 import { PageSizeChangeEvent } from "../../../pager/models/PageSizeChangeEvent";
 import { PageChangeEvent } from "../../../pager/models/PageChangeEvent";
 import { GridColumnComponent } from "../grid-column/grid-column.component";
+import { CdkDragDrop, CdkDragEnd, CdkDragMove, CdkDragStart } from "@angular/cdk/drag-drop";
+import { Node } from "../../../tree-view/data/Node";
+import { NodeDragEndEvent } from "../../../tree-view/data/NodeDragEndEvent";
+import { NodeDragEvent } from "../../../tree-view/data/NodeDragEvent";
+import { NodeDragStartEvent } from "../../../tree-view/data/NodeDragStartEvent";
 
 @Component({
     selector: "mona-grid",
@@ -35,12 +40,17 @@ import { GridColumnComponent } from "../grid-column/grid-column.component";
 export class GridComponent implements OnInit, AfterViewInit {
     public readonly ascendingSortIcon: IconDefinition = faArrowUpLong;
     public readonly descendingSortIcon: IconDefinition = faArrowDownLong;
+    public columnDragging: boolean = false;
+    public dragColumn?: Column;
+    public dropColumn?: Column;
     public gridColumns: Column[] = [];
+    public resizing: boolean = false;
 
     @ContentChildren(GridColumnComponent)
     public set columns(value: QueryList<GridColumnComponent>) {
         this.gridColumns = value.map(c => c.column);
         this.gridService.columns = this.gridColumns;
+        this.gridService.columns.forEach((c, i) => (c.index = i));
     }
 
     @Input()
@@ -63,6 +73,9 @@ export class GridComponent implements OnInit, AfterViewInit {
     public pageSizeValues: number[] = [];
 
     @Input()
+    public reorderable: boolean = false;
+
+    @Input()
     public resizable: boolean = true;
 
     public constructor(public readonly gridService: GridService, private readonly cdr: ChangeDetectorRef) {}
@@ -72,6 +85,28 @@ export class GridComponent implements OnInit, AfterViewInit {
     }
 
     public ngOnInit(): void {}
+
+    public onColumnDragStart(event: CdkDragStart<Column>): void {
+        if (this.resizing) {
+            return;
+        }
+        this.columnDragging = true;
+        this.dragColumn = event.source.data;
+    }
+
+    public onColumnDrop(event: CdkDragDrop<Column>): void {
+        if (!this.dropColumn || !this.dragColumn || !this.columnDragging || this.resizing) {
+            return;
+        }
+        const dropColumnIndex = this.gridService.columns.findIndex(c => c.field === this.dropColumn?.field);
+        const dragColumnIndex = this.gridService.columns.findIndex(c => c.field === this.dragColumn?.field);
+        this.gridService.columns.splice(dropColumnIndex, 0, this.gridService.columns.splice(dragColumnIndex, 1)[0]);
+        this.gridService.columns.forEach((c, i) => (c.index = i));
+        this.gridService.columns = [...this.gridService.columns];
+        this.columnDragging = false;
+        this.dragColumn = undefined;
+        this.dropColumn = undefined;
+    }
 
     public onColumnFilter(column: Column, state: ColumnFilterState): void {
         if (state.filter && state.filter.filters.length > 0) {
@@ -85,6 +120,13 @@ export class GridComponent implements OnInit, AfterViewInit {
             p => p.key,
             p => p.value
         );
+    }
+
+    public onColumnMouseEnter(event: MouseEvent, column: Column): void {
+        if (!this.columnDragging || this.resizing) {
+            return;
+        }
+        this.dropColumn = column;
     }
 
     public onColumnSort(column: Column): void {

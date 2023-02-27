@@ -12,6 +12,7 @@ import { SlicePipe } from "../pipes/slice.pipe";
 import { GridPagePipe } from "./pipes/grid-page.pipe";
 import { GridColumnComponent } from "./components/grid-column/grid-column.component";
 import { GridCellTemplateDirective } from "./directives/grid-cell-template.directive";
+import { DragDropModule } from "@angular/cdk/drag-drop";
 
 @NgModule({
     declarations: [
@@ -24,7 +25,7 @@ import { GridCellTemplateDirective } from "./directives/grid-cell-template.direc
         GridColumnComponent,
         GridCellTemplateDirective
     ],
-    imports: [CommonModule, ButtonModule, FontAwesomeModule, PagerModule, SlicePipe],
+    imports: [CommonModule, ButtonModule, FontAwesomeModule, PagerModule, SlicePipe, DragDropModule],
     exports: [GridComponent, GridColumnComponent, GridCellTemplateDirective]
 })
 export class GridModule {}

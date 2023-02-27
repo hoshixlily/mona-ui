@@ -8,6 +8,7 @@ export class Column {
     public field: string = "";
     public filterType: FilterFieldType = "string";
     public filtered: boolean = false;
+    public index: number = 0; // 0-based
     public maxWidth?: number;
     public minWidth: number = 40;
     public sortDirection?: "asc" | "desc";

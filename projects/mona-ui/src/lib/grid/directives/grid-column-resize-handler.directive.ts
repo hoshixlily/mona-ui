@@ -1,4 +1,14 @@
-import { AfterViewInit, ChangeDetectorRef, Directive, ElementRef, Input, NgZone, OnDestroy } from "@angular/core";
+import {
+    AfterViewInit,
+    ChangeDetectorRef,
+    Directive,
+    ElementRef,
+    EventEmitter,
+    Input,
+    NgZone,
+    OnDestroy,
+    Output
+} from "@angular/core";
 import { Column } from "../models/Column";
 import { fromEvent, Subject, takeUntil } from "rxjs";
 
@@ -10,6 +20,12 @@ export class GridColumnResizeHandlerDirective implements AfterViewInit, OnDestro
 
     @Input()
     public column!: Column;
+
+    @Output()
+    public resizeEnd: EventEmitter<void> = new EventEmitter<void>();
+
+    @Output()
+    public resizeStart: EventEmitter<void> = new EventEmitter<void>();
 
     public constructor(
         private readonly elementRef: ElementRef<HTMLDivElement>,
@@ -37,6 +53,8 @@ export class GridColumnResizeHandlerDirective implements AfterViewInit, OnDestro
 
         document.onselectstart = () => false;
         // document.ondragstart = () => false;
+
+        this.resizeStart.emit();
 
         const onMouseMove = (event: MouseEvent) => {
             const deltaX = event.clientX - initialX;
@@ -72,6 +90,7 @@ export class GridColumnResizeHandlerDirective implements AfterViewInit, OnDestro
             document.removeEventListener("mouseup", onMouseUp);
             document.onselectstart = oldSelectStart;
             // document.ondragstart = oldDragStart;
+            this.resizeEnd.emit();
         };
 
         document.addEventListener("mousemove", onMouseMove);
@@ -82,7 +101,10 @@ export class GridColumnResizeHandlerDirective implements AfterViewInit, OnDestro
         this.zone.runOutsideAngular(() => {
             fromEvent<MouseEvent>(this.elementRef.nativeElement, "mousedown")
                 .pipe(takeUntil(this.destroy$))
-                .subscribe(event => this.onMouseDown(event));
+                .subscribe(event => {
+                    event.stopImmediatePropagation();
+                    this.onMouseDown(event);
+                });
         });
     }
 }

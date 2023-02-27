@@ -25,6 +25,9 @@ div.mona-grid {
         border-collapse: collapse;
         table-layout: fixed;
         width: 100%;
+        & tr {
+            position: relative;
+        }
         & th {
             white-space: nowrap;
             text-overflow: ellipsis;
@@ -69,4 +72,15 @@ span.mona-grid-column-title {
     white-space: nowrap;
     text-overflow: ellipsis;
     font-weight: bold;
+}
+
+span.mona-grid-column-drop-hint {
+    position: absolute;
+    display: flex;
+    width: 2px;
+    height: 100%;
+    background: var(--mona-primary);
+    z-index: 1;
+    top: 0;
+    bottom: 0;
 }

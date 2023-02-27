@@ -505,6 +505,18 @@ div.mona-filter-menu-item {
     background: var(--mona-background-dark) !important;
 }
 
+.mona-grid-column-drag-preview {
+    background-color: var(--mona-background);
+    border: 1px solid var(--mona-border-color);
+    box-shadow: var(--mona-popup-shadow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--mona-text);
+    font-weight: bold;
+    font-size: 13px;
+}
+
 
 /** Inputs */
 
