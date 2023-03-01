@@ -10,6 +10,7 @@ export class GridService {
     public appliedSorts: Dictionary<string, ColumnSortState> = new Dictionary<string, ColumnSortState>();
     public columns: Column[] = [];
     public gridHeaderElement?: HTMLDivElement;
+    public groupColumns: Column[] = [];
     public pageState: { skip: number; take: number } = { skip: 0, take: 10 };
     public rows: any[] = [];
     public constructor() {}

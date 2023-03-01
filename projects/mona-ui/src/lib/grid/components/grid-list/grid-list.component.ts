@@ -12,6 +12,7 @@ import {
 import { GridService } from "../../services/grid.service";
 import { fromEvent, Subject, takeUntil } from "rxjs";
 import { Column } from "../../models/Column";
+import { faChevronDown, faChevronRight, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 
 @Component({
     selector: "mona-grid-list",
@@ -20,6 +21,8 @@ import { Column } from "../../models/Column";
 })
 export class GridListComponent implements OnInit, AfterViewInit, OnDestroy {
     private readonly componentDestroy$: Subject<void> = new Subject<void>();
+    public readonly collapseIcon: IconDefinition = faChevronDown;
+    public readonly expandIcon: IconDefinition = faChevronRight;
 
     @Input()
     public columns: Column[] = [];

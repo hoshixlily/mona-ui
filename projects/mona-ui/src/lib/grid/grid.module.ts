@@ -13,6 +13,7 @@ import { GridPagePipe } from "./pipes/grid-page.pipe";
 import { GridColumnComponent } from "./components/grid-column/grid-column.component";
 import { GridCellTemplateDirective } from "./directives/grid-cell-template.directive";
 import { DragDropModule } from "@angular/cdk/drag-drop";
+import { GridGroupPipe } from "./pipes/grid-group.pipe";
 
 @NgModule({
     declarations: [
@@ -23,7 +24,8 @@ import { DragDropModule } from "@angular/cdk/drag-drop";
         GridFilterPipe,
         GridPagePipe,
         GridColumnComponent,
-        GridCellTemplateDirective
+        GridCellTemplateDirective,
+        GridGroupPipe
     ],
     imports: [CommonModule, ButtonModule, FontAwesomeModule, PagerModule, SlicePipe, DragDropModule],
     exports: [GridComponent, GridColumnComponent, GridCellTemplateDirective]

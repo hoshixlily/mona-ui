@@ -3,10 +3,12 @@
         <div class="mona-grid-header-wrap">
             <table>
                 <colgroup>
+                    <col *ngFor="let groupCol of gridService.groupColumns" style="width: 34px;">
                     <col *ngFor="let column of gridService.columns" [style.width.px]="column.calculatedWidth" [style.min-width.px]="column.minWidth">
                 </colgroup>
                 <thead>
                     <tr cdkDropList (cdkDropListDropped)="onColumnDrop($event)">
+                        <td *ngFor="let _ of gridService.groupColumns"></td>
                         <th *ngFor="let column of gridService.columns" cdkDrag cdkDragLockAxis="x" [cdkDragData]="column" [cdkDragDisabled]="!reorderable"
                             (mousemove)="onColumnMouseEnter($event, column)"
                             (cdkDragStarted)="onColumnDragStart($event)">

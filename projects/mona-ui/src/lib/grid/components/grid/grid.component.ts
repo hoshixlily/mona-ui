@@ -51,6 +51,7 @@ export class GridComponent implements OnInit, AfterViewInit {
         this.gridColumns = value.map(c => c.column);
         this.gridService.columns = this.gridColumns;
         this.gridService.columns.forEach((c, i) => (c.index = i));
+        this.gridService.groupColumns = [this.gridService.columns[7], this.gridService.columns[6]];
     }
 
     @Input()
