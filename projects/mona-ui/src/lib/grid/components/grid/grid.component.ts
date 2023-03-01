@@ -55,7 +55,7 @@ export class GridComponent implements OnInit, AfterViewInit {
 
     @Input()
     public set data(value: any[]) {
-        this.gridService.rows = value;
+        this.gridService.setRows(value);
     }
 
     @ViewChild("gridHeaderElement")

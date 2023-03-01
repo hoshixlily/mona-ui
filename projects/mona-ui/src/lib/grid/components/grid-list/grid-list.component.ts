@@ -12,6 +12,7 @@ import {
 import { GridService } from "../../services/grid.service";
 import { fromEvent, Subject, takeUntil } from "rxjs";
 import { Column } from "../../models/Column";
+import { Row } from "../../models/Row";
 
 @Component({
     selector: "mona-grid-list",
@@ -25,7 +26,7 @@ export class GridListComponent implements OnInit, AfterViewInit, OnDestroy {
     public columns: Column[] = [];
 
     @Input()
-    public data: any[] = [];
+    public data: Row[] = [];
 
     public constructor(
         public readonly gridService: GridService,

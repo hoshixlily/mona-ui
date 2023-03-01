@@ -39,13 +39,14 @@
                         <div style="padding: 40px;">
                             <mona-grid [data]="gridOrderData" [pageSize]="5" [pageSizeValues]="[5, 10, 15, 20, 25, 50, 100]" style="height: 400px;">
                                 <mona-grid-column *ngFor="let col of gridOrderColumns" [field]="col.field" [title]="col.title" [filterType]="col.filterType">
-                                    <ng-template monaGridCellTemplate let-dataItem>
+                                    <ng-template monaGridCellTemplate let-row>
                                         <ng-container *ngIf="col.field === 'OrderDate' || col.field==='ShippedDate'">
-                                            {{dataItem[col.field] | date: 'dd/MM/yyyy'}}
+                                            {{row.data[col.field] | date: 'dd/MM/yyyy'}}
                                         </ng-container>
                                         <ng-container *ngIf="col.field !== 'OrderDate' && col.field!=='ShippedDate'">
-                                            {{dataItem[col.field]}}
+                                            {{row.data[col.field]}}
                                         </ng-container>
+<!--                                        {{row|json}}-->
                                     </ng-template>
                                 </mona-grid-column>
                             </mona-grid>
