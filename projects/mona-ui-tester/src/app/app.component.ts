@@ -209,7 +209,12 @@ export class AppComponent implements OnInit {
         { field: "FirstOrderedOn", title: "First Ordered On", filterType: "date" }
     ];
 
-    public gridOrderData: any[] = GridOrderData;
+    public gridOrderData: any[] = GridOrderData.map(d => {
+        return {
+            ...d,
+            OrderDate: new Date(d.OrderDate)
+        };
+    });
     public gridProductData: any[] = GridProductData;
 
     public menuBarMenuVisible: boolean = false;

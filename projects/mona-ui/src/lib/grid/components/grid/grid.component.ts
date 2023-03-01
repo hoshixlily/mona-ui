@@ -78,7 +78,11 @@ export class GridComponent implements OnInit, AfterViewInit {
     @Input()
     public resizable: boolean = true;
 
-    public constructor(public readonly gridService: GridService, private readonly cdr: ChangeDetectorRef) {}
+    public constructor(
+        public readonly gridService: GridService,
+        private readonly cdr: ChangeDetectorRef,
+        private readonly elementRef: ElementRef<HTMLElement>
+    ) {}
 
     public ngAfterViewInit(): void {
         this.cdr.detectChanges();
@@ -164,6 +168,10 @@ export class GridComponent implements OnInit, AfterViewInit {
             skip: event.skip,
             take: event.take
         };
+        const scrollableElement = this.elementRef.nativeElement.querySelector("div.mona-grid-list") as HTMLElement;
+        if (scrollableElement) {
+            scrollableElement.scrollTop = 0;
+        }
         this.cdr.detectChanges();
     }
 
