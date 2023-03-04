@@ -3,6 +3,7 @@ import { Query } from "../../query/core/Query";
 import { Dictionary } from "@mirei/ts-collections";
 import { ColumnFilterState } from "../models/ColumnFilterState";
 import { ColumnSortState } from "../models/ColumnSortState";
+import { Row } from "../models/Row";
 
 @Pipe({
     name: "gridFilter"
@@ -11,15 +12,15 @@ export class GridFilterPipe implements PipeTransform {
     public constructor() {}
 
     public transform(
-        value: any[],
+        value: Row[],
         filterStateDict: Dictionary<string, ColumnFilterState>,
         sortStateDict: Dictionary<string, ColumnSortState>
-    ): any[] {
+    ): Row[] {
         let queryEnumerable = Query.from(value);
         if (filterStateDict.length > 0) {
-            for (const filter of filterStateDict) {
-                if (filter.value.filter) {
-                    queryEnumerable = queryEnumerable.filter(filter.value.filter);
+            for (const filterState of filterStateDict) {
+                if (filterState.value.filter) {
+                    queryEnumerable = queryEnumerable.filter(filterState.value.filter, r => r.data);
                 }
             }
         }
@@ -28,7 +29,8 @@ export class GridFilterPipe implements PipeTransform {
                 sortStateDict
                     .values()
                     .select(d => d.sort)
-                    .toArray()
+                    .toArray(),
+                r => r.data
             );
         }
         console.log(sortStateDict.values().toArray());

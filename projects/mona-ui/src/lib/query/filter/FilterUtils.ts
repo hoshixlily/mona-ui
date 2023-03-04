@@ -1,40 +1,48 @@
-import { Predicate } from "@mirei/ts-collections";
+import { Predicate, Selector } from "@mirei/ts-collections";
 import { CompositeFilterDescriptor, FilterDescriptor } from "./FilterDescriptor";
 import { DateTime } from "luxon";
 
 export abstract class FilterUtils {
-    public static compositeDescriptorToPredicate<T>(descriptor: CompositeFilterDescriptor): Predicate<T> {
+    public static compositeDescriptorToPredicate<T>(
+        descriptor: CompositeFilterDescriptor,
+        fieldSelector?: Selector<T, any>
+    ): Predicate<T> {
         return (item: T) => {
             const filters = descriptor.filters;
             const logic = descriptor.logic;
             if (logic === "and") {
-                const result = filters.every(f => {
+                return filters.every(f => {
                     if (f.hasOwnProperty("field")) {
-                        return FilterUtils.descriptorToPredicate(f as FilterDescriptor)(item);
+                        return FilterUtils.descriptorToPredicate(f as FilterDescriptor, fieldSelector)(item);
                     } else {
-                        return FilterUtils.compositeDescriptorToPredicate(f as CompositeFilterDescriptor)(item);
+                        return FilterUtils.compositeDescriptorToPredicate(
+                            f as CompositeFilterDescriptor,
+                            fieldSelector
+                        )(item);
                     }
                 });
-                // console.log([item, result]);
-                return result;
             } else if (logic === "or") {
-                const result = filters.some(f => {
+                return filters.some(f => {
                     if (f.hasOwnProperty("field")) {
-                        return FilterUtils.descriptorToPredicate(f as FilterDescriptor)(item);
+                        return FilterUtils.descriptorToPredicate(f as FilterDescriptor, fieldSelector)(item);
                     } else {
-                        return FilterUtils.compositeDescriptorToPredicate(f as CompositeFilterDescriptor)(item);
+                        return FilterUtils.compositeDescriptorToPredicate(
+                            f as CompositeFilterDescriptor,
+                            fieldSelector
+                        )(item);
                     }
                 });
-                // console.log([item, result]);
-                return result;
             } else {
                 return false;
             }
         };
     }
-    public static descriptorToPredicate<T>(descriptor: FilterDescriptor): Predicate<T> {
+    public static descriptorToPredicate<T>(
+        descriptor: FilterDescriptor,
+        fieldSelector?: Selector<T, any>
+    ): Predicate<T> {
         return (item: T) => {
-            const value = (item as any)[descriptor.field];
+            const value = (fieldSelector ? fieldSelector(item) : (item as any))[descriptor.field];
             switch (descriptor.operator) {
                 case "eq":
                     return value == null && descriptor.value == null
