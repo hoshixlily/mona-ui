@@ -199,14 +199,14 @@ export class AppComponent implements OnInit {
         { field: "ProductID", title: "Product ID", filterType: "number" },
         { field: "ProductName", title: "Product Name", filterType: "string" },
         { field: "SupplierID", title: "Supplier ID", filterType: "number" },
-        { field: "CategoryID", title: "Category ID", filterType: "number" },
-        { field: "QuantityPerUnit", title: "Quantity Per Unit", filterType: "string" },
-        { field: "UnitPrice", title: "Unit Price", filterType: "number" },
-        { field: "UnitsInStock", title: "Units In Stock", filterType: "number" },
-        { field: "UnitsOnOrder", title: "Units On Order", filterType: "number" },
-        { field: "ReorderLevel", title: "Reorder Level", filterType: "number" },
-        { field: "Discontinued", title: "Discontinued", filterType: "boolean" },
-        { field: "FirstOrderedOn", title: "First Ordered On", filterType: "date" }
+        { field: "CategoryID", title: "Category ID", filterType: "number" }
+        // { field: "QuantityPerUnit", title: "Quantity Per Unit", filterType: "string" },
+        // { field: "UnitPrice", title: "Unit Price", filterType: "number" },
+        // { field: "UnitsInStock", title: "Units In Stock", filterType: "number" },
+        // { field: "UnitsOnOrder", title: "Units On Order", filterType: "number" },
+        // { field: "ReorderLevel", title: "Reorder Level", filterType: "number" },
+        // { field: "Discontinued", title: "Discontinued", filterType: "boolean" },
+        // { field: "FirstOrderedOn", title: "First Ordered On", filterType: "date" }
     ];
 
     public gridOrderData: any[] = GridOrderData.map(d => {

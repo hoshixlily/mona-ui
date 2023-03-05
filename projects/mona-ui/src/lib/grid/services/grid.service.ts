@@ -11,7 +11,12 @@ export class GridService {
     public appliedSorts: Dictionary<string, ColumnSortState> = new Dictionary<string, ColumnSortState>();
     public columns: Column[] = [];
     public gridHeaderElement?: HTMLDivElement;
-    public pageState: { skip: number; take: number } = { skip: 0, take: 10 };
+    public groupColumns: Column[] = [];
+    public gridGroupExpandState: Dictionary<string, Dictionary<number, boolean>> = new Dictionary<
+        string,
+        Dictionary<number, boolean>
+    >();
+    public pageState: { page: number; skip: number; take: number } = { page: 1, skip: 0, take: 10 };
     public rows: Row[] = [];
     public constructor() {}
 
