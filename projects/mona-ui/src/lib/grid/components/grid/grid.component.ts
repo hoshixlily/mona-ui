@@ -11,26 +11,14 @@ import {
     ViewChild
 } from "@angular/core";
 import { GridService } from "../../services/grid.service";
-import {
-    faArrowDownLong,
-    faArrowUpLong,
-    faChevronDown,
-    faChevronUp,
-    IconDefinition
-} from "@fortawesome/free-solid-svg-icons";
+import { faArrowDownLong, faArrowUpLong, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { Column } from "../../models/Column";
 import { SortDescriptor } from "../../../query/sort/SortDescriptor";
 import { ColumnFilterState } from "../../models/ColumnFilterState";
 import { PageSizeChangeEvent } from "../../../pager/models/PageSizeChangeEvent";
 import { PageChangeEvent } from "../../../pager/models/PageChangeEvent";
 import { GridColumnComponent } from "../grid-column/grid-column.component";
-import { CdkDragDrop, CdkDragEnd, CdkDragEnter, CdkDragMove, CdkDragStart, CdkDropList } from "@angular/cdk/drag-drop";
-import { Node } from "../../../tree-view/data/Node";
-import { NodeDragEndEvent } from "../../../tree-view/data/NodeDragEndEvent";
-import { NodeDragEvent } from "../../../tree-view/data/NodeDragEvent";
-import { NodeDragStartEvent } from "../../../tree-view/data/NodeDragStartEvent";
-import { Dictionary } from "@mirei/ts-collections";
-import { ColumnSortState } from "../../models/ColumnSortState";
+import { CdkDragDrop, CdkDragEnter, CdkDragStart, CdkDropList } from "@angular/cdk/drag-drop";
 
 @Component({
     selector: "mona-grid",
