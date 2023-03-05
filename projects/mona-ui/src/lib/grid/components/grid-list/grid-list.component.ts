@@ -6,6 +6,7 @@ import { Row } from "../../models/Row";
 import { faChevronDown, faChevronRight, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { GridGroup } from "../../models/GridGroup";
 import { Dictionary, KeyValuePair } from "@mirei/ts-collections";
+import { SelectableSettings } from "../../models/SelectableSettings";
 
 @Component({
     selector: "mona-grid-list",
@@ -40,6 +41,39 @@ export class GridListComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     public ngOnInit(): void {}
+
+    public onGridRowClick(event: MouseEvent, row: Row): void {
+        // event.stopPropagation();
+        if (this.gridService.selectableSettings == null) {
+            return;
+        }
+        if (this.gridService.selectableSettings.mode === "single") {
+            if (row.selected) {
+                this.gridService.selectedRows = [];
+                row.selected = false;
+            } else {
+                if (this.gridService.selectedRows.length !== 0) {
+                    this.gridService.selectedRows.forEach(r => (r.selected = false));
+                }
+                this.gridService.selectedRows = [row];
+                row.selected = true;
+            }
+        } else if (this.gridService.selectableSettings.mode === "multiple") {
+            if (this.gridService.selectedRows.length === 0) {
+                this.gridService.selectedRows = [row];
+                row.selected = true;
+            } else {
+                const index = this.gridService.selectedRows.findIndex(r => r === row);
+                if (index === -1) {
+                    this.gridService.selectedRows = [...this.gridService.selectedRows, row];
+                    row.selected = true;
+                } else {
+                    this.gridService.selectedRows.splice(index, 1);
+                    row.selected = false;
+                }
+            }
+        }
+    }
 
     public onGroupExpandChange(group: GridGroup): void {
         group.collapsed = !group.collapsed;

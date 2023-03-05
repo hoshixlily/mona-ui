@@ -33,7 +33,6 @@ export class GridFilterPipe implements PipeTransform {
                 r => r.data
             );
         }
-        console.log(sortStateDict.values().toArray());
         return queryEnumerable.run();
     }
 }

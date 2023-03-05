@@ -4,6 +4,7 @@ import { Dictionary, Enumerable } from "@mirei/ts-collections";
 import { ColumnFilterState } from "../models/ColumnFilterState";
 import { ColumnSortState } from "../models/ColumnSortState";
 import { Row } from "../models/Row";
+import { SelectableSettings } from "../models/SelectableSettings";
 
 @Injectable()
 export class GridService {
@@ -18,6 +19,13 @@ export class GridService {
     >();
     public pageState: { page: number; skip: number; take: number } = { page: 1, skip: 0, take: 10 };
     public rows: Row[] = [];
+
+    public selectableSettings: SelectableSettings = {
+        enabled: false,
+        mode: "multiple"
+    };
+    public selectedRows: Row[] = [];
+
     public constructor() {}
 
     public setRows(value: any[]): void {

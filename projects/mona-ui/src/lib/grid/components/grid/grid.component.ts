@@ -19,6 +19,7 @@ import { PageSizeChangeEvent } from "../../../pager/models/PageSizeChangeEvent";
 import { PageChangeEvent } from "../../../pager/models/PageChangeEvent";
 import { GridColumnComponent } from "../grid-column/grid-column.component";
 import { CdkDragDrop, CdkDragEnter, CdkDragStart, CdkDropList } from "@angular/cdk/drag-drop";
+import { SelectableSettings } from "../../models/SelectableSettings";
 
 @Component({
     selector: "mona-grid",
@@ -59,7 +60,7 @@ export class GridComponent implements OnInit, AfterViewInit {
     public groupColumnList?: CdkDropList;
 
     @Input()
-    public groupable: boolean = true;
+    public groupable: boolean = false;
 
     @Input()
     public set pageSize(value: number) {
@@ -70,10 +71,24 @@ export class GridComponent implements OnInit, AfterViewInit {
     public pageSizeValues: number[] = [];
 
     @Input()
-    public reorderable: boolean = true;
+    public reorderable: boolean = false;
 
     @Input()
-    public resizable: boolean = true;
+    public resizable: boolean = false;
+
+    @Input()
+    public set selectable(value: boolean | SelectableSettings) {
+        let settings: SelectableSettings;
+        if (typeof value === "boolean") {
+            settings = { enabled: value };
+        } else {
+            settings = value;
+        }
+        this.gridService.selectableSettings = {
+            ...this.gridService.selectableSettings,
+            ...settings
+        };
+    }
 
     public constructor(
         public readonly gridService: GridService,
