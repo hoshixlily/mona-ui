@@ -1,9 +1,8 @@
 import { Column } from "./Column";
+import { Row } from "./Row";
 
 export interface GridGroup {
-    column?: Column | null;
-    rowData: {
-        groupHeaderRow: boolean;
-        rows: any[];
-    };
+    collapsed: boolean;
+    column: Column;
+    rows: Row[];
 }

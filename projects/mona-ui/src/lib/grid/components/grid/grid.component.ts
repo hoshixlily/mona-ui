@@ -24,11 +24,13 @@ import { ColumnFilterState } from "../../models/ColumnFilterState";
 import { PageSizeChangeEvent } from "../../../pager/models/PageSizeChangeEvent";
 import { PageChangeEvent } from "../../../pager/models/PageChangeEvent";
 import { GridColumnComponent } from "../grid-column/grid-column.component";
-import { CdkDragDrop, CdkDragEnd, CdkDragMove, CdkDragStart } from "@angular/cdk/drag-drop";
+import { CdkDragDrop, CdkDragEnd, CdkDragEnter, CdkDragMove, CdkDragStart, CdkDropList } from "@angular/cdk/drag-drop";
 import { Node } from "../../../tree-view/data/Node";
 import { NodeDragEndEvent } from "../../../tree-view/data/NodeDragEndEvent";
 import { NodeDragEvent } from "../../../tree-view/data/NodeDragEvent";
 import { NodeDragStartEvent } from "../../../tree-view/data/NodeDragStartEvent";
+import { Dictionary } from "@mirei/ts-collections";
+import { ColumnSortState } from "../../models/ColumnSortState";
 
 @Component({
     selector: "mona-grid",
@@ -44,6 +46,7 @@ export class GridComponent implements OnInit, AfterViewInit {
     public dragColumn?: Column;
     public dropColumn?: Column;
     public gridColumns: Column[] = [];
+    public groupPanelPlaceholderVisible: boolean = true;
     public resizing: boolean = false;
 
     @ContentChildren(GridColumnComponent)
@@ -51,7 +54,6 @@ export class GridComponent implements OnInit, AfterViewInit {
         this.gridColumns = value.map(c => c.column);
         this.gridService.columns = this.gridColumns;
         this.gridService.columns.forEach((c, i) => (c.index = i));
-        this.gridService.groupColumns = [this.gridService.columns[7], this.gridService.columns[6]];
     }
 
     @Input()
@@ -65,6 +67,12 @@ export class GridComponent implements OnInit, AfterViewInit {
         window.setTimeout(() => this.setInitialCalculatedWidthOfColumns());
     }
 
+    @ViewChild("groupColumnList")
+    public groupColumnList?: CdkDropList;
+
+    @Input()
+    public groupable: boolean = true;
+
     @Input()
     public set pageSize(value: number) {
         this.gridService.pageState.take = value;
@@ -74,7 +82,7 @@ export class GridComponent implements OnInit, AfterViewInit {
     public pageSizeValues: number[] = [];
 
     @Input()
-    public reorderable: boolean = false;
+    public reorderable: boolean = true;
 
     @Input()
     public resizable: boolean = true;
@@ -91,6 +99,14 @@ export class GridComponent implements OnInit, AfterViewInit {
 
     public ngOnInit(): void {}
 
+    public onColumnDragEnter(event: CdkDragEnter<void, Column>, column: Column): void {
+        if (event.container === this.groupColumnList) {
+            this.groupPanelPlaceholderVisible = false;
+        } else {
+            this.groupPanelPlaceholderVisible = true;
+        }
+    }
+
     public onColumnDragStart(event: CdkDragStart<Column>): void {
         if (this.resizing) {
             return;
@@ -100,7 +116,7 @@ export class GridComponent implements OnInit, AfterViewInit {
     }
 
     public onColumnDrop(event: CdkDragDrop<Column>): void {
-        if (!this.dropColumn || !this.dragColumn || !this.columnDragging || this.resizing) {
+        if (!this.dropColumn || !this.dragColumn || !this.columnDragging || this.resizing || !this.reorderable) {
             return;
         }
         const dropColumnIndex = this.gridService.columns.findIndex(c => c.field === this.dropColumn?.field);
@@ -108,6 +124,20 @@ export class GridComponent implements OnInit, AfterViewInit {
         this.gridService.columns.splice(dropColumnIndex, 0, this.gridService.columns.splice(dragColumnIndex, 1)[0]);
         this.gridService.columns.forEach((c, i) => (c.index = i));
         this.gridService.columns = [...this.gridService.columns];
+        this.columnDragging = false;
+        this.dragColumn = undefined;
+        this.dropColumn = undefined;
+    }
+
+    public onColumnDropForGrouping(event: CdkDragDrop<Column, void, Column>): void {
+        if (!this.groupable) {
+            return;
+        }
+        const column = event.item.data;
+        this.gridService.groupColumns = [...this.gridService.groupColumns, column];
+        if (!this.gridService.appliedSorts.containsKey(column.field)) {
+            this.onColumnSort(column);
+        }
         this.columnDragging = false;
         this.dragColumn = undefined;
         this.dropColumn = undefined;
@@ -140,32 +170,32 @@ export class GridComponent implements OnInit, AfterViewInit {
         } else if (column.sortDirection === "asc") {
             column.sortDirection = "desc";
         } else {
-            column.sortDirection = undefined;
-            column.sortIndex = undefined;
-        }
-        if (column.sortDirection != null) {
-            const sortDescriptor: SortDescriptor = {
-                field: column.field,
-                dir: column.sortDirection
-            };
-            this.gridService.appliedSorts.put(column.field, { sort: sortDescriptor });
-        } else {
-            this.gridService.appliedSorts.remove(column.field);
-        }
-        this.gridService.appliedSorts.keys().forEach((field, fx) => {
-            const col = this.gridService.columns.find(c => c.field === field);
-            if (col) {
-                col.sortIndex = fx + 1;
+            if (this.gridService.groupColumns.map(c => c.field).includes(column.field)) {
+                column.sortDirection = "asc";
+            } else {
+                column.sortDirection = undefined;
+                column.sortIndex = undefined;
             }
-        });
-        this.gridService.appliedSorts = this.gridService.appliedSorts.toDictionary(
-            p => p.key,
-            p => p.value
-        );
+        }
+        this.applyColumnSort(column, column.sortDirection);
+    }
+
+    public onGroupingColumnRemove(event: Event, column: Column): void {
+        event.stopPropagation();
+        this.gridService.groupColumns = this.gridService.groupColumns.filter(c => c.field !== column.field);
+        this.gridService.gridGroupExpandState = this.gridService.gridGroupExpandState
+            .where(p => !p.key.startsWith(column.field))
+            .toDictionary(
+                p => p.key,
+                p => p.value
+            );
+        this.applyColumnSort(column, undefined);
+        this.groupPanelPlaceholderVisible = this.gridService.groupColumns.length === 0;
     }
 
     public onPageChange(event: PageChangeEvent): void {
         this.gridService.pageState = {
+            page: event.page,
             skip: event.skip,
             take: event.take
         };
@@ -178,10 +208,35 @@ export class GridComponent implements OnInit, AfterViewInit {
 
     public onPageSizeChange(data: PageSizeChangeEvent): void {
         this.gridService.pageState = {
+            page: 1,
             skip: 0,
             take: data.newPageSize
         };
         this.cdr.detectChanges();
+    }
+
+    private applyColumnSort(column: Column, sortDirection: "asc" | "desc" | undefined): void {
+        column.sortDirection = sortDirection;
+        if (column.sortDirection != null) {
+            const sortDescriptor: SortDescriptor = {
+                field: column.field,
+                dir: column.sortDirection
+            };
+            this.gridService.appliedSorts.put(column.field, { sort: sortDescriptor });
+        } else {
+            this.gridService.appliedSorts.remove(column.field);
+            column.sortIndex = undefined;
+        }
+        this.gridService.appliedSorts.keys().forEach((field, fx) => {
+            const col = this.gridService.columns.find(c => c.field === field);
+            if (col) {
+                col.sortIndex = fx + 1;
+            }
+        });
+        this.gridService.appliedSorts = this.gridService.appliedSorts.toDictionary(
+            p => p.key,
+            p => p.value
+        );
     }
 
     private setInitialCalculatedWidthOfColumns(): void {

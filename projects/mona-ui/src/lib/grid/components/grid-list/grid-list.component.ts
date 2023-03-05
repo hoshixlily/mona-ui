@@ -1,19 +1,11 @@
-import {
-    AfterViewInit,
-    ChangeDetectorRef,
-    Component,
-    ElementRef,
-    EventEmitter,
-    Input,
-    OnDestroy,
-    OnInit,
-    Output
-} from "@angular/core";
+import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit } from "@angular/core";
 import { GridService } from "../../services/grid.service";
 import { fromEvent, Subject, takeUntil } from "rxjs";
 import { Column } from "../../models/Column";
 import { Row } from "../../models/Row";
 import { faChevronDown, faChevronRight, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { GridGroup } from "../../models/GridGroup";
+import { Dictionary, KeyValuePair } from "@mirei/ts-collections";
 
 @Component({
     selector: "mona-grid-list",
@@ -48,6 +40,30 @@ export class GridListComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     public ngOnInit(): void {}
+
+    public onGroupExpandChange(group: GridGroup): void {
+        group.collapsed = !group.collapsed;
+        const groupKey = `${group.column.field}-${group.rows[0].data[group.column.field]}`;
+        const state = this.gridService.gridGroupExpandState.get(groupKey);
+        if (state == null) {
+            this.gridService.gridGroupExpandState.add(
+                groupKey,
+                new Dictionary<number, boolean>(undefined, [
+                    new KeyValuePair<number, boolean>(this.gridService.pageState.page, group.collapsed)
+                ])
+            );
+        } else {
+            if (state.containsKey(this.gridService.pageState.page)) {
+                const value = state.get(this.gridService.pageState.page);
+                if (value != null) {
+                    state.remove(this.gridService.pageState.page);
+                    state.add(this.gridService.pageState.page, !value);
+                }
+            } else {
+                state.add(this.gridService.pageState.page, group.collapsed);
+            }
+        }
+    }
 
     private synchronizeHorizontalScroll(): void {
         const headerElement = this.gridService.gridHeaderElement;
