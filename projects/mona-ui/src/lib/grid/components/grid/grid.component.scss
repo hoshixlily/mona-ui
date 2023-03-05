@@ -12,9 +12,23 @@ div.mona-grid {
     border: 1px solid var(--mona-border-color);
 }
 
+.mona-grid-group-panel {
+    display: flex;
+    align-items: center;
+    padding: 5px 5px;
+    height: 40px;
+    border-bottom: 1px solid var(--mona-border-color);
+    & mona-chip {
+        margin-right: 5px;
+    }
+}
+
+.mona-grid-group-panel-placeholder {
+    opacity: 0.7;
+}
+
 .mona-grid-header {
     background-color: var(--mona-background-dark);
-    //border-bottom: 1px solid var(--mona-border-color);
     border-right: 1px solid var(--mona-border-color);
     overflow: hidden;
     display: flex;

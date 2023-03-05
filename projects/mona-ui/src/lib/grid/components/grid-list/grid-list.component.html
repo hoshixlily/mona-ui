@@ -10,24 +10,24 @@
                 <ng-container *ngIf="gridService.groupColumns.length === 0">
                     <tr *ngFor="let row of data">
                         <td *ngFor="let column of columns">
-                            <ng-container *ngIf="!column.cellTemplate">{{row[column.field]}}</ng-container>
+                            <ng-container *ngIf="!column.cellTemplate">{{row.data[column.field]}}</ng-container>
                             <ng-container [ngTemplateOutlet]="column.cellTemplate.templateRef ?? null" *ngIf="column.cellTemplate" [ngTemplateOutletContext]="{$implicit: row, column}"></ng-container>
                         </td>
                     </tr>
                 </ng-container>
                 <ng-container *ngIf="gridService.groupColumns.length !== 0">
                     <ng-template #gridGroupTemplate let-groupData let-column="column" let-cx="cx" let-depth="depth">
-                        <ng-container *ngIf="groupData|gridGroup:column as groupItem">
+                        <ng-container *ngIf="groupData|gridGroup:column:gridService.pageState.page as groupItem">
                             <ng-container *ngFor="let subGroup of groupItem">
                                 <tr class="mona-grid-grouping-row">
                                     <td *ngFor="let groupCol of gridService.groupColumns|monaSlice:0:cx"></td>
                                     <td [colSpan]="columns.length + gridService.groupColumns.length"
                                         *ngIf="subGroup.rows.length > 0">
-                                        <button monaButton [flat]="true" style="width: 34px;" (click)="subGroup.collapsed=!subGroup.collapsed">
+                                        <button monaButton [flat]="true" style="width: 34px;" (click)="onGroupExpandChange(subGroup)">
                                             <fa-icon [icon]="collapseIcon" *ngIf="!subGroup.collapsed"></fa-icon>
                                             <fa-icon [icon]="expandIcon" *ngIf="subGroup.collapsed"></fa-icon>
                                         </button>
-                                        <span class="mona-grid-grouping-row-text">{{column.title}}: {{subGroup.rows[0][column.field]}}</span>
+                                        <span class="mona-grid-grouping-row-text">{{column.title}}: {{subGroup.rows[0].data[column.field]}}</span>
                                     </td>
                                 </tr>
 
@@ -40,7 +40,7 @@
                                     <tr *ngFor="let row of subGroup.rows">
                                         <td *ngFor="let _ of gridService.groupColumns"></td>
                                         <td *ngFor="let column of columns">
-                                            <ng-container *ngIf="!column.cellTemplate">{{row[column.field]}}</ng-container>
+                                            <ng-container *ngIf="!column.cellTemplate">{{row.data[column.field]}}</ng-container>
                                             <ng-container [ngTemplateOutlet]="column.cellTemplate.templateRef ?? null"
                                                           *ngIf="column.cellTemplate" [ngTemplateOutletContext]="{$implicit: row, column}"></ng-container>
                                         </td>
