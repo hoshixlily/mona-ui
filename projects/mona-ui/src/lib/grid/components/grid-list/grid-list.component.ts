@@ -6,7 +6,6 @@ import { Row } from "../../models/Row";
 import { faChevronDown, faChevronRight, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { GridGroup } from "../../models/GridGroup";
 import { Dictionary, KeyValuePair } from "@mirei/ts-collections";
-import { SelectableSettings } from "../../models/SelectableSettings";
 
 @Component({
     selector: "mona-grid-list",
@@ -43,8 +42,7 @@ export class GridListComponent implements OnInit, AfterViewInit, OnDestroy {
     public ngOnInit(): void {}
 
     public onGridRowClick(event: MouseEvent, row: Row): void {
-        // event.stopPropagation();
-        if (this.gridService.selectableSettings == null) {
+        if (this.gridService.selectableSettings == null || !this.gridService.selectableSettings.enabled) {
             return;
         }
         if (this.gridService.selectableSettings.mode === "single") {
@@ -73,6 +71,7 @@ export class GridListComponent implements OnInit, AfterViewInit, OnDestroy {
                 }
             }
         }
+        this.gridService.selectedRowsChange$.next(this.gridService.selectedRows);
     }
 
     public onGroupExpandChange(group: GridGroup): void {

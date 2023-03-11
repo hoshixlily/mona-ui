@@ -19,7 +19,7 @@ import { PageSizeChangeEvent } from "../../../pager/models/PageSizeChangeEvent";
 import { PageChangeEvent } from "../../../pager/models/PageChangeEvent";
 import { GridColumnComponent } from "../grid-column/grid-column.component";
 import { CdkDragDrop, CdkDragEnter, CdkDragStart, CdkDropList } from "@angular/cdk/drag-drop";
-import { SelectableSettings } from "../../models/SelectableSettings";
+import { SelectableOptions } from "../../models/SelectableOptions";
 
 @Component({
     selector: "mona-grid",
@@ -76,20 +76,6 @@ export class GridComponent implements OnInit, AfterViewInit {
     @Input()
     public resizable: boolean = false;
 
-    @Input()
-    public set selectable(value: boolean | SelectableSettings) {
-        let settings: SelectableSettings;
-        if (typeof value === "boolean") {
-            settings = { enabled: value };
-        } else {
-            settings = value;
-        }
-        this.gridService.selectableSettings = {
-            ...this.gridService.selectableSettings,
-            ...settings
-        };
-    }
-
     public constructor(
         public readonly gridService: GridService,
         private readonly cdr: ChangeDetectorRef,
@@ -103,11 +89,7 @@ export class GridComponent implements OnInit, AfterViewInit {
     public ngOnInit(): void {}
 
     public onColumnDragEnter(event: CdkDragEnter<void, Column>, column: Column): void {
-        if (event.container === this.groupColumnList) {
-            this.groupPanelPlaceholderVisible = false;
-        } else {
-            this.groupPanelPlaceholderVisible = true;
-        }
+        this.groupPanelPlaceholderVisible = event.container !== this.groupColumnList;
     }
 
     public onColumnDragStart(event: CdkDragStart<Column>): void {

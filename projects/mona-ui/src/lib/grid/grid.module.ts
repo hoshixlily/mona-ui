@@ -14,7 +14,8 @@ import { GridColumnComponent } from "./components/grid-column/grid-column.compon
 import { GridCellTemplateDirective } from "./directives/grid-cell-template.directive";
 import { DragDropModule } from "@angular/cdk/drag-drop";
 import { GridGroupPipe } from "./pipes/grid-group.pipe";
-import {ChipModule} from "../buttons/modules/chip/chip.module";
+import { ChipModule } from "../buttons/modules/chip/chip.module";
+import { GridSelectableDirective } from "./directives/grid-selectable.directive";
 
 @NgModule({
     declarations: [
@@ -26,9 +27,10 @@ import {ChipModule} from "../buttons/modules/chip/chip.module";
         GridPagePipe,
         GridColumnComponent,
         GridCellTemplateDirective,
-        GridGroupPipe
+        GridGroupPipe,
+        GridSelectableDirective
     ],
     imports: [CommonModule, ButtonModule, FontAwesomeModule, PagerModule, SlicePipe, DragDropModule, ChipModule],
-    exports: [GridComponent, GridColumnComponent, GridCellTemplateDirective]
+    exports: [GridComponent, GridColumnComponent, GridCellTemplateDirective, GridSelectableDirective]
 })
 export class GridModule {}

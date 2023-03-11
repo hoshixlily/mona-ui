@@ -2,7 +2,7 @@
     <div class="mona-grid-list-wrap">
         <table>
             <colgroup>
-                <col *ngFor="let groupCol of gridService.groupColumns" style="width: 34px;">
+                <col *ngFor="let _ of gridService.groupColumns" style="width: 34px;">
                 <col *ngFor="let column of gridService.columns"
                      [style.width.px]="column.calculatedWidth" [style.min-width.px]="column.minWidth">
             </colgroup>
@@ -11,7 +11,8 @@
                     <tr *ngFor="let row of data" (click)="onGridRowClick($event, row)" [ngClass]="{'mona-selected': row.selected}">
                         <td *ngFor="let column of columns">
                             <ng-container *ngIf="!column.cellTemplate">{{row.data[column.field]}}</ng-container>
-                            <ng-container [ngTemplateOutlet]="column.cellTemplate.templateRef ?? null" *ngIf="column.cellTemplate" [ngTemplateOutletContext]="{$implicit: row, column}"></ng-container>
+                            <ng-container [ngTemplateOutlet]="column.cellTemplate.templateRef ?? null"
+                                          *ngIf="column.cellTemplate" [ngTemplateOutletContext]="{$implicit: row, column}"></ng-container>
                         </td>
                     </tr>
                 </ng-container>
@@ -37,7 +38,7 @@
                                     </ng-container>
                                 </ng-container>
                                 <ng-container *ngIf="depth===gridService.groupColumns.length-1 && !subGroup.collapsed">
-                                    <tr *ngFor="let row of subGroup.rows" (click)="onGridRowClick($event, row)">
+                                    <tr *ngFor="let row of subGroup.rows" (click)="onGridRowClick($event, row)" [ngClass]="{'mona-selected': row.selected}">
                                         <td *ngFor="let _ of gridService.groupColumns"></td>
                                         <td *ngFor="let column of columns">
                                             <ng-container *ngIf="!column.cellTemplate">{{row.data[column.field]}}</ng-container>

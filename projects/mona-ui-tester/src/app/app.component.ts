@@ -216,6 +216,7 @@ export class AppComponent implements OnInit {
         };
     });
     public gridProductData: any[] = GridProductData;
+    public gridSelectionKeys: number[] = [];
 
     public menuBarMenuVisible: boolean = false;
     public multiSelectTagCount: number = 2;
@@ -485,6 +486,11 @@ export class AppComponent implements OnInit {
             .run();
         // console.log(data);
         console.log(result);
+    }
+
+    public onGridSelectionKeysChange(keys: unknown[]): void {
+        this.gridSelectionKeys = keys as number[];
+        console.log(keys);
     }
 
     public onMultiSelectValueChange(value: unknown[]): void {
