@@ -498,6 +498,12 @@ div.mona-filter-menu-item {
 
 .mona-grid-list {
     @include scrollbars-thick;
+    & tr {
+        &.mona-selected {
+            background-color: var(--mona-primary) !important;
+            color: var(--mona-text) !important;
+        }
+    }
 }
 
 .mona-grid-filter-menu-popup-content {

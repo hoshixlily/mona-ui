@@ -41,6 +41,39 @@ export class GridListComponent implements OnInit, AfterViewInit, OnDestroy {
 
     public ngOnInit(): void {}
 
+    public onGridRowClick(event: MouseEvent, row: Row): void {
+        if (this.gridService.selectableSettings == null || !this.gridService.selectableSettings.enabled) {
+            return;
+        }
+        if (this.gridService.selectableSettings.mode === "single") {
+            if (row.selected) {
+                this.gridService.selectedRows = [];
+                row.selected = false;
+            } else {
+                if (this.gridService.selectedRows.length !== 0) {
+                    this.gridService.selectedRows.forEach(r => (r.selected = false));
+                }
+                this.gridService.selectedRows = [row];
+                row.selected = true;
+            }
+        } else if (this.gridService.selectableSettings.mode === "multiple") {
+            if (this.gridService.selectedRows.length === 0) {
+                this.gridService.selectedRows = [row];
+                row.selected = true;
+            } else {
+                const index = this.gridService.selectedRows.findIndex(r => r === row);
+                if (index === -1) {
+                    this.gridService.selectedRows = [...this.gridService.selectedRows, row];
+                    row.selected = true;
+                } else {
+                    this.gridService.selectedRows.splice(index, 1);
+                    row.selected = false;
+                }
+            }
+        }
+        this.gridService.selectedRowsChange$.next(this.gridService.selectedRows);
+    }
+
     public onGroupExpandChange(group: GridGroup): void {
         group.collapsed = !group.collapsed;
         const groupKey = `${group.column.field}-${group.rows[0].data[group.column.field]}`;
