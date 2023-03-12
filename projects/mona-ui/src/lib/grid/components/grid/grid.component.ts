@@ -1,13 +1,19 @@
 import {
+    AfterContentInit,
     AfterViewInit,
     ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
     ContentChildren,
     ElementRef,
+    EventEmitter,
     Input,
+    OnChanges,
+    OnDestroy,
     OnInit,
+    Output,
     QueryList,
+    SimpleChanges,
     ViewChild
 } from "@angular/core";
 import { GridService } from "../../services/grid.service";
@@ -19,16 +25,23 @@ import { PageSizeChangeEvent } from "../../../pager/models/PageSizeChangeEvent";
 import { PageChangeEvent } from "../../../pager/models/PageChangeEvent";
 import { GridColumnComponent } from "../grid-column/grid-column.component";
 import { CdkDragDrop, CdkDragEnter, CdkDragStart, CdkDropList } from "@angular/cdk/drag-drop";
-import { SelectableOptions } from "../../models/SelectableOptions";
+import { CompositeFilterDescriptor } from "../../../query/filter/FilterDescriptor";
+import { Subject, takeUntil } from "rxjs";
+import { SortableOptions } from "../../models/SortableOptions";
+import { ColumnSortState } from "../../models/ColumnSortState";
+import { Dictionary, Enumerable } from "@mirei/ts-collections";
 
 @Component({
     selector: "mona-grid",
     templateUrl: "./grid.component.html",
     styleUrls: ["./grid.component.scss"],
-    changeDetection: ChangeDetectionStrategy.Default,
+    changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [GridService]
 })
-export class GridComponent implements OnInit, AfterViewInit {
+export class GridComponent implements OnInit, AfterViewInit, OnDestroy, OnChanges, AfterContentInit {
+    #destroy$: Subject<void> = new Subject<void>();
+    #filter: CompositeFilterDescriptor[] = [];
+    #sort: SortDescriptor[] = [];
     public readonly ascendingSortIcon: IconDefinition = faArrowUpLong;
     public readonly descendingSortIcon: IconDefinition = faArrowDownLong;
     public columnDragging: boolean = false;
@@ -39,16 +52,28 @@ export class GridComponent implements OnInit, AfterViewInit {
     public resizing: boolean = false;
 
     @ContentChildren(GridColumnComponent)
-    public set columns(value: QueryList<GridColumnComponent>) {
-        this.gridColumns = value.map(c => c.column);
-        this.gridService.columns = this.gridColumns;
-        this.gridService.columns.forEach((c, i) => (c.index = i));
-    }
+    public columns: QueryList<GridColumnComponent> = new QueryList<GridColumnComponent>();
 
     @Input()
     public set data(value: any[]) {
         this.gridService.setRows(value);
     }
+
+    @Input()
+    public set filter(value: CompositeFilterDescriptor[]) {
+        if (this.#filter !== value) {
+            this.#filter = value;
+            this.gridService.loadFilters(value);
+        }
+    }
+    public get filter(): CompositeFilterDescriptor[] {
+        return this.#filter;
+    }
+
+    public filterable: boolean = false;
+
+    @Output()
+    public filterChange: EventEmitter<CompositeFilterDescriptor[]> = new EventEmitter<CompositeFilterDescriptor[]>();
 
     @ViewChild("gridHeaderElement")
     public set gridHeaderElement(value: ElementRef<HTMLDivElement>) {
@@ -76,17 +101,67 @@ export class GridComponent implements OnInit, AfterViewInit {
     @Input()
     public resizable: boolean = false;
 
+    @Input()
+    public set sort(value: SortDescriptor[]) {
+        if (this.#sort !== value) {
+            this.#sort = value;
+            this.gridService.loadSorts(value);
+        }
+    }
+    public get sort(): SortDescriptor[] {
+        return this.#sort;
+    }
+
+    @Output()
+    public sortChange: EventEmitter<SortDescriptor[]> = new EventEmitter<SortDescriptor[]>();
+
+    @Input()
+    public set sortable(options: boolean | SortableOptions) {
+        if (typeof options === "boolean") {
+            this.gridService.setSortableOptions({ enabled: true });
+        } else {
+            this.gridService.setSortableOptions(options);
+        }
+    }
+
     public constructor(
         public readonly gridService: GridService,
         private readonly cdr: ChangeDetectorRef,
         private readonly elementRef: ElementRef<HTMLElement>
     ) {}
 
+    public ngAfterContentInit(): void {
+        const processColumns = () => {
+            this.gridColumns = this.columns.map(c => c.column);
+            this.gridService.columns = this.gridColumns;
+            this.gridService.columns.forEach((c, i) => (c.index = i));
+            if (this.filter.length !== 0) {
+                this.gridService.loadFilters(this.filter);
+            }
+            if (this.sort.length !== 0) {
+                this.gridService.loadSorts(this.sort);
+            }
+        };
+        processColumns();
+        this.columns.changes.pipe(takeUntil(this.#destroy$)).subscribe(() => {
+            processColumns();
+        });
+    }
+
     public ngAfterViewInit(): void {
         this.cdr.detectChanges();
     }
 
-    public ngOnInit(): void {}
+    public ngOnChanges(changes: SimpleChanges): void {}
+
+    public ngOnDestroy(): void {
+        this.#destroy$.next();
+        this.#destroy$.complete();
+    }
+
+    public ngOnInit(): void {
+        this.setSubscriptions();
+    }
 
     public onColumnDragEnter(event: CdkDragEnter<void, Column>, column: Column): void {
         this.groupPanelPlaceholderVisible = event.container !== this.groupColumnList;
@@ -140,6 +215,16 @@ export class GridComponent implements OnInit, AfterViewInit {
             p => p.key,
             p => p.value
         );
+        const allFilters = this.gridService.appliedFilters
+            .values()
+            .select(p => p.filter)
+            .where(f => f != null);
+        if (allFilters.any()) {
+            this.#filter = allFilters.toArray() as CompositeFilterDescriptor[];
+        } else {
+            this.#filter = [];
+        }
+        this.filterChange.emit(this.#filter);
     }
 
     public onColumnMouseEnter(event: MouseEvent, column: Column): void {
@@ -150,6 +235,9 @@ export class GridComponent implements OnInit, AfterViewInit {
     }
 
     public onColumnSort(column: Column): void {
+        if (!this.gridService.sortableOptions.enabled) {
+            return;
+        }
         if (column.sortDirection == null) {
             column.sortDirection = "asc";
         } else if (column.sortDirection === "asc") {
@@ -158,11 +246,20 @@ export class GridComponent implements OnInit, AfterViewInit {
             if (this.gridService.groupColumns.map(c => c.field).includes(column.field)) {
                 column.sortDirection = "asc";
             } else {
-                column.sortDirection = undefined;
-                column.sortIndex = undefined;
+                if (this.gridService.sortableOptions.allowUnsort) {
+                    column.sortDirection = undefined;
+                    column.sortIndex = undefined;
+                } else {
+                    column.sortDirection = "asc";
+                }
             }
         }
         this.applyColumnSort(column, column.sortDirection);
+        this.#sort = this.gridService.appliedSorts
+            .values()
+            .select(s => s.sort)
+            .toArray();
+        this.sortChange.emit(this.#sort);
     }
 
     public onGroupingColumnRemove(event: Event, column: Column): void {
@@ -202,6 +299,15 @@ export class GridComponent implements OnInit, AfterViewInit {
 
     private applyColumnSort(column: Column, sortDirection: "asc" | "desc" | undefined): void {
         column.sortDirection = sortDirection;
+        if (this.gridService.sortableOptions.mode === "single") {
+            Enumerable.from(this.gridService.columns)
+                .where(c => c.field !== column.field)
+                .forEach(c => {
+                    c.sortDirection = undefined;
+                    c.sortIndex = undefined;
+                    this.gridService.appliedSorts.remove(c.field);
+                });
+        }
         if (column.sortDirection != null) {
             const sortDescriptor: SortDescriptor = {
                 field: column.field,
@@ -232,6 +338,8 @@ export class GridComponent implements OnInit, AfterViewInit {
             }
         }
     }
+
+    private setSubscriptions(): void {}
 
     public get headerMargin(): string {
         const rightMargin = 12;

@@ -42,7 +42,6 @@ export type FilterOperators =
 
 export type FieldDefinition = { field: string };
 export type CommonFilterDescriptor = FieldDefinition & { operator: CommonFilterOperators; value: any };
-
 export type NullFilterDescriptor = FieldDefinition & { operator: NullFilterOperators };
 export type EmptyFilterDescriptor = FieldDefinition & { operator: EmptyFilterOperators };
 export type NullOrEmptyFilterDescriptor = FieldDefinition & { operator: NullOrEmptyFilterOperators };

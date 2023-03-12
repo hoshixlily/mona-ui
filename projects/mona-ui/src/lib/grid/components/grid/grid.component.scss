@@ -88,6 +88,13 @@ span.mona-grid-column-title {
     font-weight: bold;
 }
 
+div.mona-grid-column-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+}
+
 span.mona-grid-column-drop-hint {
     position: absolute;
     display: flex;

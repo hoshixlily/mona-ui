@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, Input, OnDestroy, OnInit } from "@angular/core";
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, OnDestroy, OnInit } from "@angular/core";
 import { GridService } from "../../services/grid.service";
 import { fromEvent, Subject, takeUntil } from "rxjs";
 import { Column } from "../../models/Column";
@@ -10,7 +10,8 @@ import { Dictionary, KeyValuePair } from "@mirei/ts-collections";
 @Component({
     selector: "mona-grid-list",
     templateUrl: "./grid-list.component.html",
-    styleUrls: ["./grid-list.component.scss"]
+    styleUrls: ["./grid-list.component.scss"],
+    changeDetection: ChangeDetectionStrategy.Default
 })
 export class GridListComponent implements OnInit, AfterViewInit, OnDestroy {
     private readonly componentDestroy$: Subject<void> = new Subject<void>();
@@ -42,10 +43,10 @@ export class GridListComponent implements OnInit, AfterViewInit, OnDestroy {
     public ngOnInit(): void {}
 
     public onGridRowClick(event: MouseEvent, row: Row): void {
-        if (this.gridService.selectableSettings == null || !this.gridService.selectableSettings.enabled) {
+        if (this.gridService.selectableOptions == null || !this.gridService.selectableOptions.enabled) {
             return;
         }
-        if (this.gridService.selectableSettings.mode === "single") {
+        if (this.gridService.selectableOptions.mode === "single") {
             if (row.selected) {
                 this.gridService.selectedRows = [];
                 row.selected = false;
@@ -56,7 +57,7 @@ export class GridListComponent implements OnInit, AfterViewInit, OnDestroy {
                 this.gridService.selectedRows = [row];
                 row.selected = true;
             }
-        } else if (this.gridService.selectableSettings.mode === "multiple") {
+        } else if (this.gridService.selectableOptions.mode === "multiple") {
             if (this.gridService.selectedRows.length === 0) {
                 this.gridService.selectedRows = [row];
                 row.selected = true;

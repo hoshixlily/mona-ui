@@ -1,10 +1,12 @@
 import {
     ChangeDetectionStrategy,
+    ChangeDetectorRef,
     Component,
     ComponentRef,
     ElementRef,
     EventEmitter,
     Input,
+    OnDestroy,
     OnInit,
     Output
 } from "@angular/core";
@@ -16,6 +18,7 @@ import { faFilter, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { GridService } from "../../services/grid.service";
 import { ColumnFilterState } from "../../models/ColumnFilterState";
 import { Column } from "../../models/Column";
+import { Subject, takeUntil } from "rxjs";
 
 @Component({
     selector: "mona-grid-filter-menu",
@@ -23,7 +26,8 @@ import { Column } from "../../models/Column";
     styleUrls: ["./grid-filter-menu.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class GridFilterMenuComponent implements OnInit {
+export class GridFilterMenuComponent implements OnInit, OnDestroy {
+    readonly #destroy: Subject<void> = new Subject<void>();
     private popupRef?: PopupRef;
     public readonly filterIcon: IconDefinition = faFilter;
 
@@ -36,11 +40,20 @@ export class GridFilterMenuComponent implements OnInit {
     @Input()
     public type: FilterFieldType = "string";
     public constructor(
+        private readonly cdr: ChangeDetectorRef,
         private readonly popupService: PopupService,
         private readonly elementRef: ElementRef,
         private readonly gridService: GridService
     ) {}
-    public ngOnInit(): void {}
+
+    public ngOnDestroy(): void {
+        this.#destroy.next();
+        this.#destroy.complete();
+    }
+
+    public ngOnInit(): void {
+        this.setSubscriptions();
+    }
 
     public openPopup(): void {
         this.popupRef = this.popupService.create({
@@ -72,6 +85,12 @@ export class GridFilterMenuComponent implements OnInit {
             };
             this.popupRef?.close();
             this.apply.emit(filterState);
+        });
+    }
+
+    private setSubscriptions(): void {
+        this.gridService.filterLoad$.pipe(takeUntil(this.#destroy)).subscribe(() => {
+            this.cdr.detectChanges();
         });
     }
 }

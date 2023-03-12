@@ -15,7 +15,9 @@ import {
     Query,
     CompositeFilterDescriptor,
     FilterMenuComponent,
-    FilterMenuValue
+    FilterMenuValue,
+    SortDescriptor,
+    SortableOptions
 } from "mona-ui";
 import { TestComponentComponent } from "./test-component/test-component.component";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
@@ -178,6 +180,34 @@ export class AppComponent implements OnInit {
         logic: "or"
     };
 
+    public gridFilters: CompositeFilterDescriptor[] = [
+        // {
+        //     logic: "or",
+        //     filters: [
+        //         {
+        //             field: "ShipCountry",
+        //             operator: "startswith",
+        //             value: "A"
+        //         },
+        //         {
+        //             field: "ShipCountry",
+        //             operator: "startswith",
+        //             value: "E"
+        //         }
+        //     ]
+        // },
+        // {
+        //     logic: "and",
+        //     filters: [
+        //         {
+        //             field: "ShipCity",
+        //             operator: "contains",
+        //             value: "z"
+        //         }
+        //     ]
+        // }
+    ];
+
     public gridOrderColumns: any[] = [
         { field: "OrderID", title: "Order ID", filterType: "number" },
         { field: "ShipCountry", title: "Ship Country", filterType: "string" },
@@ -195,6 +225,13 @@ export class AppComponent implements OnInit {
         // { field: "ShipPostalCode", title: "Ship Postal Code", filterType: "string" }
     ];
 
+    public gridOrderData: any[] = GridOrderData.map(d => {
+        return {
+            ...d,
+            OrderDate: new Date(d.OrderDate)
+        };
+    });
+
     public gridProductColumns: any[] = [
         { field: "ProductID", title: "Product ID", filterType: "number" },
         { field: "ProductName", title: "Product Name", filterType: "string" },
@@ -209,15 +246,20 @@ export class AppComponent implements OnInit {
         // { field: "FirstOrderedOn", title: "First Ordered On", filterType: "date" }
     ];
 
-    public gridOrderData: any[] = GridOrderData.map(d => {
-        return {
-            ...d,
-            OrderDate: new Date(d.OrderDate)
-        };
-    });
     public gridProductData: any[] = GridProductData;
     public gridSelectionKeys: number[] = [];
-
+    public gridSort: SortDescriptor[] = [
+        // {
+        //     dir: "asc",
+        //     field: "ShipCountry"
+        // }
+    ];
+    public gridSortOptions: SortableOptions = {
+        enabled: true,
+        mode: "single",
+        allowUnsort: true,
+        showIndices: false
+    };
     public menuBarMenuVisible: boolean = false;
     public multiSelectTagCount: number = 2;
     public numericTextBoxValue: number = 629;
@@ -413,6 +455,9 @@ export class AppComponent implements OnInit {
         //         this.dropdownListDataItems[10]
         //     ];
         // }, 5000);
+        // window.setTimeout(() => {
+        //     this.gridFilters = [this.gridFilters[1]];
+        // }, 5000);
     }
 
     public numericTextBoxFormatter = (value: number | null): string => (value != null ? `${value} °C` : "");
@@ -488,9 +533,19 @@ export class AppComponent implements OnInit {
         console.log(result);
     }
 
+    public onGridFilterChange(filters: CompositeFilterDescriptor[]): void {
+        console.log(filters);
+        this.gridFilters = filters;
+    }
+
     public onGridSelectionKeysChange(keys: unknown[]): void {
         this.gridSelectionKeys = keys as number[];
         console.log(keys);
+    }
+
+    public onGridSortChange(sort: SortDescriptor[]): void {
+        this.gridSort = sort;
+        console.log(sort);
     }
 
     public onMultiSelectValueChange(value: unknown[]): void {

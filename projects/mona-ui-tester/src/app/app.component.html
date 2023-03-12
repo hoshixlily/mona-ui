@@ -38,7 +38,9 @@
                     <ng-template monaTabContentTemplate>
                         <div style="padding: 40px;">
                             <mona-grid [data]="gridOrderData" [pageSize]="5" [pageSizeValues]="[5, 10, 15, 20, 25, 50, 100]" style="height: 400px;"
-                                       [groupable]="true"
+                                       [groupable]="true" [filter]="gridFilters" (filterChange)="onGridFilterChange($event)"
+                                       [resizable]="true"
+                                       [sortable]="gridSortOptions" [reorderable]="true" [sort]="gridSort" (sortChange)="onGridSortChange($event)"
                                 monaGridSelectable selectionKey="OrderID" [selectedKeys]="gridSelectionKeys" (selectedKeysChange)="onGridSelectionKeysChange($event)">
                                 <mona-grid-column *ngFor="let col of gridOrderColumns" [field]="col.field" [title]="col.title" [filterType]="col.filterType">
                                     <ng-template monaGridCellTemplate let-row>
