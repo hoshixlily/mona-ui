@@ -41,7 +41,7 @@
                                        [groupable]="true" [filter]="gridFilters" (filterChange)="onGridFilterChange($event)"
                                        [resizable]="true"
                                        [sortable]="gridSortOptions" [reorderable]="true" [sort]="gridSort" (sortChange)="onGridSortChange($event)"
-                                monaGridSelectable selectionKey="OrderID" [selectedKeys]="gridSelectionKeys" (selectedKeysChange)="onGridSelectionKeysChange($event)">
+                                [monaGridSelectable]="{enabled: false}" selectionKey="OrderID" [selectedKeys]="gridSelectionKeys" (selectedKeysChange)="onGridSelectionKeysChange($event)">
                                 <mona-grid-column *ngFor="let col of gridOrderColumns" [field]="col.field" [title]="col.title" [filterType]="col.filterType">
                                     <ng-template monaGridCellTemplate let-row>
                                         <ng-container *ngIf="col.field === 'OrderDate' || col.field==='ShippedDate'">
@@ -50,7 +50,6 @@
                                         <ng-container *ngIf="col.field !== 'OrderDate' && col.field!=='ShippedDate'">
                                             {{row.data[col.field]}}
                                         </ng-container>
-<!--                                        {{row|json}}-->
                                     </ng-template>
                                 </mona-grid-column>
                             </mona-grid>

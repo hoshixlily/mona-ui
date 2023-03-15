@@ -16,6 +16,8 @@ import { CommonModule } from "@angular/common";
 import { Subject } from "rxjs";
 import { PopupRef } from "../../../popup/models/PopupRef";
 import { DateTime } from "luxon";
+import { ControlValueAccessor } from "@angular/forms";
+import { Action } from "../../../utils/Action";
 
 @Component({
     standalone: true,
@@ -24,8 +26,9 @@ import { DateTime } from "luxon";
     styleUrls: [],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export abstract class AbstractDateInputComponent implements OnInit, OnDestroy, OnChanges {
+export abstract class AbstractDateInputComponent implements OnInit, OnDestroy, OnChanges, ControlValueAccessor {
     #value: Date | null = null;
+    #propagateChange: Action<Date | null> | null = null;
     protected readonly componentDestroy$: Subject<void> = new Subject<void>();
     protected popupRef: PopupRef | null = null;
     public currentDateString: string = "";
@@ -83,10 +86,26 @@ export abstract class AbstractDateInputComponent implements OnInit, OnDestroy, O
     }
 
     public ngOnInit(): void {
-        this.navigatedDate = this.value ?? DateTime.now().toJSDate();
-        if (this.value) {
-            this.currentDateString = DateTime.fromJSDate(this.value).toFormat(this.format);
+        this.setDateValues();
+    }
+
+    public registerOnChange(fn: any): void {
+        this.#propagateChange = fn;
+    }
+
+    public registerOnTouched(fn: any): void {}
+
+    public setDisabledState(isDisabled: boolean): void {
+        this.disabled = isDisabled;
+    }
+
+    public writeValue(obj: any): void {
+        if (obj == null) {
+            this.value = null;
+        } else if (obj instanceof Date) {
+            this.value = obj;
         }
+        this.setDateValues();
     }
 
     protected setCurrentDate(date: Date | null): void {
@@ -97,6 +116,7 @@ export abstract class AbstractDateInputComponent implements OnInit, OnDestroy, O
             this.currentDateString = "";
         }
         this.valueChange.emit(date);
+        this.#propagateChange?.(date);
         this.cdr.markForCheck();
     }
 
@@ -107,5 +127,12 @@ export abstract class AbstractDateInputComponent implements OnInit, OnDestroy, O
             );
         }
         return date1 === date2;
+    }
+
+    private setDateValues(): void {
+        this.navigatedDate = this.value ?? DateTime.now().toJSDate();
+        if (this.value) {
+            this.currentDateString = DateTime.fromJSDate(this.value).toFormat(this.format);
+        }
     }
 }

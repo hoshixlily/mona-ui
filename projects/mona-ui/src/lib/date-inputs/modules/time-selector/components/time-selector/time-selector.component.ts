@@ -29,6 +29,9 @@ export class TimeSelectorComponent extends AbstractDateInputComponent implements
     public seconds: number[] = [];
 
     @Input()
+    public override format: string = "HH:mm";
+
+    @Input()
     public hourFormat: "12" | "24" = "24";
 
     @ViewChild("hoursListElement")

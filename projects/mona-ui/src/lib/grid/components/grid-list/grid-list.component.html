@@ -10,9 +10,7 @@
                 <ng-container *ngIf="gridService.groupColumns.length === 0">
                     <tr *ngFor="let row of data" (click)="onGridRowClick($event, row)" [ngClass]="{'mona-selected': row.selected}">
                         <td *ngFor="let column of columns">
-                            <ng-container *ngIf="!column.cellTemplate">{{row.data[column.field]}}</ng-container>
-                            <ng-container [ngTemplateOutlet]="column.cellTemplate.templateRef ?? null"
-                                          *ngIf="column.cellTemplate" [ngTemplateOutletContext]="{$implicit: row, column}"></ng-container>
+                            <mona-grid-cell [column]="column" [row]="row"></mona-grid-cell>
                         </td>
                     </tr>
                 </ng-container>
@@ -41,9 +39,7 @@
                                     <tr *ngFor="let row of subGroup.rows" (click)="onGridRowClick($event, row)" [ngClass]="{'mona-selected': row.selected}">
                                         <td *ngFor="let _ of gridService.groupColumns"></td>
                                         <td *ngFor="let column of columns">
-                                            <ng-container *ngIf="!column.cellTemplate">{{row.data[column.field]}}</ng-container>
-                                            <ng-container [ngTemplateOutlet]="column.cellTemplate.templateRef ?? null"
-                                                          *ngIf="column.cellTemplate" [ngTemplateOutletContext]="{$implicit: row, column}"></ng-container>
+                                            <mona-grid-cell [column]="column" [row]="row"></mona-grid-cell>
                                         </td>
                                     </tr>
                                 </ng-container>

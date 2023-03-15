@@ -3,6 +3,7 @@ import {
     ChangeDetectorRef,
     Component,
     ElementRef,
+    forwardRef,
     Input,
     OnInit,
     TemplateRef,
@@ -12,15 +13,26 @@ import { faClock, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { PopupService } from "../../../../../popup/services/popup.service";
 import { FocusMonitor } from "@angular/cdk/a11y";
 import { AbstractDatePickerComponent } from "../../../../components/abstract-date-picker/abstract-date-picker.component";
+import { NG_VALUE_ACCESSOR } from "@angular/forms";
 
 @Component({
     selector: "mona-date-time-picker",
     templateUrl: "./date-time-picker.component.html",
     styleUrls: ["./date-time-picker.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [
+        {
+            provide: NG_VALUE_ACCESSOR,
+            useExisting: forwardRef(() => DateTimePickerComponent),
+            multi: true
+        }
+    ]
 })
 export class DateTimePickerComponent extends AbstractDatePickerComponent implements OnInit {
     public readonly timeIcon: IconDefinition = faClock;
+
+    @Input()
+    public override format: string = "dd/MM/yyyy HH:mm";
 
     @Input()
     public hourFormat: "12" | "24" = "24";

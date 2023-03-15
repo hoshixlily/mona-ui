@@ -33,10 +33,6 @@ table {
     }
 
     & td {
-        padding: 8px 10px;
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
         &:not(:last-child) {
             border-right: 1px solid var(--mona-border-color);
         }
@@ -54,3 +50,4 @@ span.mona-grid-grouping-row-text {
     font-weight: bolder;
     margin-left: 8px;
 }
+

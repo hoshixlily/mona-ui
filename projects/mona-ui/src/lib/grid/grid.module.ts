@@ -16,6 +16,13 @@ import { DragDropModule } from "@angular/cdk/drag-drop";
 import { GridGroupPipe } from "./pipes/grid-group.pipe";
 import { ChipModule } from "../buttons/modules/chip/chip.module";
 import { GridSelectableDirective } from "./directives/grid-selectable.directive";
+import { GridCellComponent } from "./components/grid-cell/grid-cell.component";
+import { TextBoxModule } from "../inputs/modules/text-box/text-box.module";
+import { ReactiveFormsModule } from "@angular/forms";
+import { NumericTextBoxModule } from "../inputs/modules/numeric-text-box/numeric-text-box.module";
+import { A11yModule } from "@angular/cdk/a11y";
+import { DatePickerModule } from "../date-inputs/modules/date-picker/date-picker.module";
+import { CheckBoxModule } from "../inputs/modules/check-box/check-box.module";
 
 @NgModule({
     declarations: [
@@ -28,9 +35,24 @@ import { GridSelectableDirective } from "./directives/grid-selectable.directive"
         GridColumnComponent,
         GridCellTemplateDirective,
         GridGroupPipe,
-        GridSelectableDirective
+        GridSelectableDirective,
+        GridCellComponent
     ],
-    imports: [CommonModule, ButtonModule, FontAwesomeModule, PagerModule, SlicePipe, DragDropModule, ChipModule],
+    imports: [
+        CommonModule,
+        ButtonModule,
+        FontAwesomeModule,
+        PagerModule,
+        SlicePipe,
+        DragDropModule,
+        ChipModule,
+        TextBoxModule,
+        ReactiveFormsModule,
+        NumericTextBoxModule,
+        A11yModule,
+        DatePickerModule,
+        CheckBoxModule
+    ],
     exports: [GridComponent, GridColumnComponent, GridCellTemplateDirective, GridSelectableDirective]
 })
 export class GridModule {}

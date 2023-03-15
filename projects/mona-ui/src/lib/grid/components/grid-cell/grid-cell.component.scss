@@ -1,0 +1,11 @@
+div.mona-grid-cell {
+    padding: 8px 10px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    outline: none;
+}
+
+div.mona-grid-cell-editing {
+    padding: 0;
+}
