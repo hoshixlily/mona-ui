@@ -504,6 +504,15 @@ div.mona-filter-menu-item {
             color: var(--mona-text) !important;
         }
     }
+    & td {
+        &:focus,
+        &:focus-within {
+            & div.mona-grid-cell {
+                outline: none;
+                box-shadow: 0 0 0 1px var(--mona-primary) inset;
+            }
+        }
+    }
 }
 
 .mona-grid-filter-menu-popup-content {
@@ -546,6 +555,7 @@ div.mona-filter-menu-item {
         }
     }
 }
+
 
 
 /** Inputs */

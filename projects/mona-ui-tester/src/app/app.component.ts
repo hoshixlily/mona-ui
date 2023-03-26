@@ -458,6 +458,9 @@ export class AppComponent implements OnInit {
         // window.setTimeout(() => {
         //     this.gridFilters = [this.gridFilters[1]];
         // }, 5000);
+        // window.setInterval(() => {
+        //     console.log(this.gridOrderData[0]);
+        // }, 3000);
     }
 
     public numericTextBoxFormatter = (value: number | null): string => (value != null ? `${value} °C` : "");

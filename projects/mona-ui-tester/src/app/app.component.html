@@ -43,19 +43,19 @@
                                        [sortable]="gridSortOptions" [reorderable]="true" [sort]="gridSort" (sortChange)="onGridSortChange($event)"
                                 [monaGridSelectable]="{enabled: false, mode:'multiple'}" selectionKey="OrderID" [selectedKeys]="gridSelectionKeys" (selectedKeysChange)="onGridSelectionKeysChange($event)">
                                 <mona-grid-column *ngFor="let col of gridOrderColumns" [field]="col.field" [title]="col.title" [filterType]="col.filterType">
-                                    <ng-template monaGridCellTemplate let-row>
-                                        <ng-container *ngIf="col.field === 'OrderDate' || col.field==='ShippedDate'">
-                                            {{row.data[col.field] | date: 'dd/MM/yyyy'}}
-                                        </ng-container>
-                                        <ng-container *ngIf="col.field !== 'OrderDate' && col.field!=='ShippedDate'">
-                                            {{row.data[col.field]}}
-                                        </ng-container>
-                                    </ng-template>
+<!--                                    <ng-template monaGridCellTemplate let-row>-->
+<!--                                        <ng-container *ngIf="col.field === 'OrderDate' || col.field==='ShippedDate'">-->
+<!--                                            {{row.data[col.field] | date: 'dd/MM/yyyy'}}-->
+<!--                                        </ng-container>-->
+<!--                                        <ng-container *ngIf="col.field !== 'OrderDate' && col.field!=='ShippedDate'">-->
+<!--                                            {{row.data[col.field]}}-->
+<!--                                        </ng-container>-->
+<!--                                    </ng-template>-->
                                 </mona-grid-column>
                             </mona-grid>
-<!--                            <mona-grid [data]="gridProductData" [pageSize]="5" [pageSizeValues]="[5,10,15,20,25,50,100]" style="height: 400px">-->
-<!--                                <mona-grid-column *ngFor="let col of gridProductColumns" [field]="col.field" [title]="col.title"></mona-grid-column>-->
-<!--                            </mona-grid>-->
+                            <mona-grid [data]="gridProductData" [pageSize]="5" [pageSizeValues]="[5,10,15,20,25,50,100]" style="height: 400px">
+                                <mona-grid-column *ngFor="let col of gridProductColumns" [field]="col.field" [title]="col.title"></mona-grid-column>
+                            </mona-grid>
                         </div>
                     </ng-template>
                 </mona-tab>

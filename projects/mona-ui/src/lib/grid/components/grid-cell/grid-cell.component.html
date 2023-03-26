@@ -1,4 +1,5 @@
-<div class="mona-grid-cell" [attr.tabindex]="editing ? -1 : 0" cdkMonitorSubtreeFocus (cdkFocusChange)="onFocusChange($event)" [ngClass]="{'mona-grid-cell-editing': editing}">
+<div class="mona-grid-cell" [attr.tabindex]="editing ? -1 : 0" cdkMonitorSubtreeFocus (cdkFocusChange)="onFocusChange($event)"
+     [ngClass]="{'mona-grid-cell-editing': editing}" [attr.data-ruid]="row.uid" [attr.data-field]="column.field" [attr.data-col-index]="column.index">
     <ng-container *ngIf="!editing">
         <ng-container *ngIf="!column.cellTemplate">
             <span class="mona-grid-cell-text">{{row.data[column.field]}}</span>
@@ -15,7 +16,7 @@
             <mona-text-box [formControlName]="column.field" #stringEditElement></mona-text-box>
         </ng-container>
         <ng-container *ngIf="column.filterType==='number'">
-            <mona-numeric-text-box [formControlName]="column.field"></mona-numeric-text-box>
+            <mona-numeric-text-box [formControlName]="column.field" [decimals]="3"></mona-numeric-text-box>
         </ng-container>
         <ng-container *ngIf="column.filterType==='date'">
             <mona-date-picker [formControlName]="column.field" (valueChange)="onDateChange($event)"></mona-date-picker>

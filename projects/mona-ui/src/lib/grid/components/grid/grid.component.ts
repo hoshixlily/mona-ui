@@ -28,8 +28,7 @@ import { CdkDragDrop, CdkDragEnter, CdkDragStart, CdkDropList } from "@angular/c
 import { CompositeFilterDescriptor } from "../../../query/filter/FilterDescriptor";
 import { Subject, takeUntil } from "rxjs";
 import { SortableOptions } from "../../models/SortableOptions";
-import { ColumnSortState } from "../../models/ColumnSortState";
-import { Dictionary, Enumerable } from "@mirei/ts-collections";
+import { Enumerable } from "@mirei/ts-collections";
 
 @Component({
     selector: "mona-grid",
@@ -66,6 +65,7 @@ export class GridComponent implements OnInit, AfterViewInit, OnDestroy, OnChange
             this.gridService.loadFilters(value);
         }
     }
+
     public get filter(): CompositeFilterDescriptor[] {
         return this.#filter;
     }
@@ -108,6 +108,7 @@ export class GridComponent implements OnInit, AfterViewInit, OnDestroy, OnChange
             this.gridService.loadSorts(value);
         }
     }
+
     public get sort(): SortDescriptor[] {
         return this.#sort;
     }

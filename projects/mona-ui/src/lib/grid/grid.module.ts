@@ -23,6 +23,7 @@ import { NumericTextBoxModule } from "../inputs/modules/numeric-text-box/numeric
 import { A11yModule } from "@angular/cdk/a11y";
 import { DatePickerModule } from "../date-inputs/modules/date-picker/date-picker.module";
 import { CheckBoxModule } from "../inputs/modules/check-box/check-box.module";
+import { GridRowValuePipe } from './pipes/grid-row-value.pipe';
 
 @NgModule({
     declarations: [
@@ -36,7 +37,8 @@ import { CheckBoxModule } from "../inputs/modules/check-box/check-box.module";
         GridCellTemplateDirective,
         GridGroupPipe,
         GridSelectableDirective,
-        GridCellComponent
+        GridCellComponent,
+        GridRowValuePipe
     ],
     imports: [
         CommonModule,
