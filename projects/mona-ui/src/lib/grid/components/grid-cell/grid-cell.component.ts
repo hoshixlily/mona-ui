@@ -71,14 +71,12 @@ export class GridCellComponent implements OnInit, OnDestroy {
                 .subscribe(() => {
                     if (this.column.filterType !== "date") {
                         this.editing = false;
-                        this.gridService.isInEditMode = false;
                         this.row.data[this.column.field] = this.editForm.value[this.column.field];
                     } else {
                         this.row.data[this.column.field] = this.editForm.value[this.column.field];
                         const datePopup = document.querySelector(".mona-date-input-popup");
                         if (!datePopup) {
                             this.editing = false;
-                            this.gridService.isInEditMode = false;
                         }
                     }
                     this.cdr.markForCheck();

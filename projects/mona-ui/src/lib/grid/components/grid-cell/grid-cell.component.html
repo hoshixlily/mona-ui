@@ -1,4 +1,4 @@
-<div class="mona-grid-cell" [attr.tabindex]="0" cdkMonitorSubtreeFocus (cdkFocusChange)="onFocusChange($event)" [ngClass]="{'mona-grid-cell-editing': editing}">
+<div class="mona-grid-cell" [attr.tabindex]="editing ? -1 : 0" cdkMonitorSubtreeFocus (cdkFocusChange)="onFocusChange($event)" [ngClass]="{'mona-grid-cell-editing': editing}">
     <ng-container *ngIf="!editing">
         <ng-container *ngIf="!column.cellTemplate">
             <span class="mona-grid-cell-text">{{row.data[column.field]}}</span>
