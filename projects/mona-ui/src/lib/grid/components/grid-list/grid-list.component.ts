@@ -47,7 +47,7 @@ export class GridListComponent implements OnInit, AfterViewInit, OnDestroy {
             return;
         }
         if (this.gridService.selectableOptions.mode === "single") {
-            if (row.selected) {
+            if (row.selected && (event.ctrlKey || event.metaKey)) {
                 this.gridService.selectedRows = [];
                 row.selected = false;
             } else {
@@ -67,8 +67,10 @@ export class GridListComponent implements OnInit, AfterViewInit, OnDestroy {
                     this.gridService.selectedRows = [...this.gridService.selectedRows, row];
                     row.selected = true;
                 } else {
-                    this.gridService.selectedRows.splice(index, 1);
-                    row.selected = false;
+                    if (event.ctrlKey || event.metaKey) {
+                        this.gridService.selectedRows.splice(index, 1);
+                        row.selected = false;
+                    }
                 }
             }
         }

@@ -30,7 +30,7 @@ export class GridService {
     public selectionKeyField: string = ""; // set by GridSelectableDirective
     public selectableOptions: SelectableOptions = {
         enabled: false,
-        mode: "multiple"
+        mode: "single"
     };
     public selectedKeysChange: EventEmitter<unknown[]> = new EventEmitter<unknown[]>();
     public selectedRows: Row[] = [];

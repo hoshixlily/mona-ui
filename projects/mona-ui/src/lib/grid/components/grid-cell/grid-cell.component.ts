@@ -24,7 +24,6 @@ import { TextBoxComponent } from "../../../inputs/modules/text-box/components/te
 })
 export class GridCellComponent implements OnInit, OnDestroy {
     readonly #destroy: Subject<void> = new Subject<void>();
-
     public editForm!: FormGroup;
     public editing: boolean = false;
 
@@ -105,7 +104,7 @@ export class GridCellComponent implements OnInit, OnDestroy {
     }
 
     private setSubscriptions(): void {
-        fromEvent<MouseEvent>(this.elementRef.nativeElement, "click")
+        fromEvent<MouseEvent>(this.elementRef.nativeElement, "dblclick")
             .pipe(
                 takeUntil(this.#destroy),
                 tap(event => event.stopPropagation())
@@ -117,6 +116,23 @@ export class GridCellComponent implements OnInit, OnDestroy {
                 asyncScheduler.schedule(() => {
                     this.focusCellInput();
                 });
+            });
+        fromEvent<KeyboardEvent>(this.elementRef.nativeElement, "keydown")
+            .pipe(
+                takeUntil(this.#destroy),
+                tap(event => event.stopPropagation()),
+                filter(event => event.key === "Enter" || event.key === "Escape")
+            )
+            .subscribe(event => {
+                if (event.key === "Enter") {
+                    this.editing = false;
+                    this.gridService.isInEditMode = false;
+                    this.row.data[this.column.field] = this.editForm.value[this.column.field];
+                } else {
+                    this.editing = false;
+                    this.gridService.isInEditMode = false;
+                }
+                this.cdr.markForCheck();
             });
     }
 }
