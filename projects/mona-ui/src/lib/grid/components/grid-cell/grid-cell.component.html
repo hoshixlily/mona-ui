@@ -13,7 +13,7 @@
 <ng-template #cellEditTemplate>
     <form [formGroup]="editForm">
         <ng-container *ngIf="column.filterType==='string'">
-            <mona-text-box [formControlName]="column.field" #stringEditElement></mona-text-box>
+            <mona-text-box [formControlName]="column.field"></mona-text-box>
         </ng-container>
         <ng-container *ngIf="column.filterType==='number'">
             <mona-numeric-text-box [formControlName]="column.field" [decimals]="3"></mona-numeric-text-box>

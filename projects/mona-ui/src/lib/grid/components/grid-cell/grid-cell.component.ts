@@ -34,9 +34,6 @@ export class GridCellComponent implements OnInit, OnDestroy {
     @Input()
     public row!: Row;
 
-    @ViewChild("stringEditElement")
-    public stringEditElement?: TextBoxComponent;
-
     public constructor(
         private readonly cdr: ChangeDetectorRef,
         private readonly elementRef: ElementRef<HTMLElement>,
@@ -92,10 +89,12 @@ export class GridCellComponent implements OnInit, OnDestroy {
         } else {
             this.focused = true;
             if (this.gridService.isInEditMode) {
-                this.editing = true;
-                asyncScheduler.schedule(() => {
-                    this.focusCellInput();
-                });
+                if (origin !== "mouse") {
+                    this.editing = true;
+                    asyncScheduler.schedule(() => {
+                        this.focusCellInput();
+                    });
+                }
             }
         }
     }
@@ -127,6 +126,16 @@ export class GridCellComponent implements OnInit, OnDestroy {
                 asyncScheduler.schedule(() => {
                     this.focusCellInput();
                 });
+            });
+        fromEvent<MouseEvent>(this.elementRef.nativeElement, "click")
+            .pipe(
+                takeUntil(this.#destroy),
+                tap(event => event.stopPropagation())
+            )
+            .subscribe(() => {
+                if (!this.editing && this.gridService.isInEditMode) {
+                    this.gridService.isInEditMode = false;
+                }
             });
         fromEvent<KeyboardEvent>(this.elementRef.nativeElement, "keydown")
             .pipe(
