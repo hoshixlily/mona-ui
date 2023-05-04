@@ -24,10 +24,10 @@ export class DropDownListComponent extends AbstractDropDownListComponent impleme
     public filterable: boolean = false;
 
     @ContentChild(DropDownListGroupTemplateDirective, { read: TemplateRef })
-    public groupTemplate?: TemplateRef<void>;
+    public groupTemplate?: TemplateRef<any>;
 
     @ContentChild(DropDownListItemTemplateDirective, { read: TemplateRef })
-    public itemTemplate?: TemplateRef<void>;
+    public itemTemplate?: TemplateRef<any>;
 
     @Input()
     public override value?: any;
@@ -36,7 +36,7 @@ export class DropDownListComponent extends AbstractDropDownListComponent impleme
     public override valueChange: EventEmitter<any | any[]> = new EventEmitter<any>();
 
     @ContentChild(DropDownListValueTemplateDirective, { read: TemplateRef })
-    public valueTemplate?: TemplateRef<void>;
+    public valueTemplate?: TemplateRef<any>;
 
     public constructor(
         protected override readonly elementRef: ElementRef<HTMLElement>,

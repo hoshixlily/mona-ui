@@ -23,7 +23,7 @@ export class TooltipComponent implements OnInit {
     public target!: Element | ElementRef;
 
     @ViewChild(TemplateRef)
-    public templateRef!: TemplateRef<void>;
+    public templateRef!: TemplateRef<any>;
 
     public constructor(
         private readonly elementRef: ElementRef<HTMLElement>,

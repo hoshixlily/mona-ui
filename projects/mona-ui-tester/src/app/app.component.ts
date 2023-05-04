@@ -365,10 +365,10 @@ export class AppComponent implements OnInit {
     public italicButtonRef!: ElementRef<HTMLButtonElement>;
 
     @ViewChild("popupContentTemplate")
-    public readonly popupContentTemplate!: TemplateRef<void>;
+    public readonly popupContentTemplate!: TemplateRef<any>;
 
     @ViewChild("popupContentTemplate2")
-    public readonly popupContentTemplate2!: TemplateRef<void>;
+    public readonly popupContentTemplate2!: TemplateRef<any>;
 
     @ViewChild("testButtonRef", { read: ElementRef })
     public testButtonRef!: ElementRef<HTMLButtonElement>;
@@ -730,7 +730,7 @@ export class AppComponent implements OnInit {
         this.timePickerValue = value;
     }
 
-    public openWindow(titleTemplate?: TemplateRef<void>): void {
+    public openWindow(titleTemplate?: TemplateRef<any>): void {
         const ref = this.windowService.open({
             content: TestComponentComponent,
             height: 600,

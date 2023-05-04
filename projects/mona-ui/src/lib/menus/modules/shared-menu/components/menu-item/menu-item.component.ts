@@ -51,7 +51,7 @@ export class MenuItemComponent implements OnInit, AfterContentInit, OnDestroy {
     }
 
     @ContentChildren(MenuItemIconTemplateDirective, { read: TemplateRef, descendants: false })
-    public iconTemplate: QueryList<TemplateRef<void>> = new QueryList<TemplateRef<void>>();
+    public iconTemplate: QueryList<TemplateRef<any>> = new QueryList<TemplateRef<any>>();
 
     @Output()
     public menuClick: EventEmitter<void> = new EventEmitter<void>();
@@ -65,7 +65,7 @@ export class MenuItemComponent implements OnInit, AfterContentInit, OnDestroy {
     }
 
     @ContentChildren(MenuItemTextTemplateDirective, { read: TemplateRef, descendants: false })
-    public textTemplate: QueryList<TemplateRef<void>> = new QueryList<TemplateRef<void>>();
+    public textTemplate: QueryList<TemplateRef<any>> = new QueryList<TemplateRef<any>>();
 
     @Input()
     public set visible(visible: boolean) {

@@ -56,7 +56,7 @@ export class SplitButtonComponent implements AfterViewInit, AfterContentInit, On
     public text: string = "";
 
     @ContentChild(SplitButtonTextTemplateDirective, { read: TemplateRef })
-    public textTemplate: TemplateRef<void> | null = null;
+    public textTemplate: TemplateRef<any> | null = null;
 
     @ViewChild("wrapperElementRef")
     private readonly wrapperElementRef!: ElementRef<HTMLDivElement>;

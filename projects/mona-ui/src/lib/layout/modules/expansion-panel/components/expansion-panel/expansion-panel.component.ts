@@ -15,7 +15,7 @@ export class ExpansionPanelComponent implements OnInit {
     public readonly expandIcon: IconDefinition = faPlus;
 
     @ContentChild(ExpansionPanelActionsTemplateDirective, { read: TemplateRef })
-    public actionsTemplate: TemplateRef<void> | null = null;
+    public actionsTemplate: TemplateRef<any> | null = null;
 
     @Input()
     public expanded: boolean = false;
@@ -24,7 +24,7 @@ export class ExpansionPanelComponent implements OnInit {
     public title: string = "";
 
     @ContentChild(ExpansionPanelTitleTemplateDirective, { read: TemplateRef })
-    public titleTemplate: TemplateRef<void> | null = null;
+    public titleTemplate: TemplateRef<any> | null = null;
 
     public constructor() {}
 

@@ -50,7 +50,7 @@ export class PopupListComponent implements OnInit, OnChanges, AfterViewInit, OnD
     public groupField?: string;
 
     @ContentChild(ListGroupTemplateDirective, { read: TemplateRef })
-    public groupTemplate?: TemplateRef<void>;
+    public groupTemplate?: TemplateRef<any>;
 
     @Input()
     public set highlightedValues(values: any[]) {
@@ -58,7 +58,7 @@ export class PopupListComponent implements OnInit, OnChanges, AfterViewInit, OnD
     }
 
     @ContentChild(ListItemTemplateDirective, { read: TemplateRef })
-    public itemTemplate?: TemplateRef<void>;
+    public itemTemplate?: TemplateRef<any>;
 
     @Input()
     public navigable: boolean = true;

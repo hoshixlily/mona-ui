@@ -58,7 +58,7 @@ export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy
     public placeholder?: string;
 
     @ViewChild("popupTemplate")
-    public popupTemplate!: TemplateRef<void>;
+    public popupTemplate!: TemplateRef<any>;
 
     @Input()
     public showClearButton: boolean = false;

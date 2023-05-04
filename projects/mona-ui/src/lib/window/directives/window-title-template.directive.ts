@@ -4,5 +4,5 @@ import { Directive, TemplateRef } from "@angular/core";
     selector: "ng-template[monaWindowTitleTemplate]"
 })
 export class WindowTitleTemplateDirective {
-    public constructor(public readonly templateRef: TemplateRef<void>) {}
+    public constructor(public readonly templateRef: TemplateRef<any>) {}
 }

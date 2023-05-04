@@ -1,4 +1,6 @@
 import { TemplateRef } from "@angular/core";
+import { ContextMenuItemTextTemplateContext } from "./ContextMenuItemTextTemplateContext";
+import { ContextMenuItemIconTemplateContext } from "./ContextMenuItemIconTemplateContext";
 
 export interface MenuItem<T = unknown> {
     data?: T;
@@ -6,11 +8,11 @@ export interface MenuItem<T = unknown> {
     disabled?: boolean;
     divider?: boolean;
     iconClass?: string;
-    iconTemplate?: TemplateRef<void>;
+    iconTemplate?: TemplateRef<ContextMenuItemIconTemplateContext>;
     menuClick?: () => void;
     parent: MenuItem | null;
     subMenuItems?: MenuItem[];
     text?: string;
-    textTemplate?: TemplateRef<void>;
+    textTemplate?: TemplateRef<ContextMenuItemTextTemplateContext>;
     visible?: boolean;
 }
