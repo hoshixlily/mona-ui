@@ -64,6 +64,7 @@ export * from "./lib/filter/filter.module";
 
 /** Grid */
 export * from "./lib/query/sort/SortDescriptor";
+export * from "./lib/grid/models/CellEditEvent";
 export * from "./lib/grid/models/SelectableOptions";
 export * from "./lib/grid/models/SortableOptions";
 export * from "./lib/grid/directives/grid-selectable.directive";

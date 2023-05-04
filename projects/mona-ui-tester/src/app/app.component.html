@@ -41,6 +41,7 @@
                                        [groupable]="true" [filter]="gridFilters" (filterChange)="onGridFilterChange($event)"
                                        [resizable]="true"
                                        [sortable]="gridSortOptions" [reorderable]="true" [sort]="gridSort" (sortChange)="onGridSortChange($event)"
+                                       (cellEdit)="onGridCellEdit($event)"
                                 [monaGridSelectable]="{enabled: false, mode:'multiple'}" selectionKey="OrderID" [selectedKeys]="gridSelectionKeys" (selectedKeysChange)="onGridSelectionKeysChange($event)">
                                 <mona-grid-column *ngFor="let col of gridOrderColumns" [field]="col.field" [title]="col.title" [filterType]="col.filterType">
 <!--                                    <ng-template monaGridCellTemplate let-row>-->

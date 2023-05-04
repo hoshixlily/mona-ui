@@ -29,6 +29,7 @@ import { CompositeFilterDescriptor } from "../../../query/filter/FilterDescripto
 import { Subject, takeUntil } from "rxjs";
 import { SortableOptions } from "../../models/SortableOptions";
 import { Enumerable } from "@mirei/ts-collections";
+import { CellEditEvent } from "../../models/CellEditEvent";
 
 @Component({
     selector: "mona-grid",
@@ -49,6 +50,9 @@ export class GridComponent implements OnInit, AfterViewInit, OnDestroy, OnChange
     public gridColumns: Column[] = [];
     public groupPanelPlaceholderVisible: boolean = true;
     public resizing: boolean = false;
+
+    @Output()
+    public cellEdit: EventEmitter<CellEditEvent> = new EventEmitter<CellEditEvent>();
 
     @ContentChildren(GridColumnComponent)
     public columns: QueryList<GridColumnComponent> = new QueryList<GridColumnComponent>();
@@ -340,7 +344,11 @@ export class GridComponent implements OnInit, AfterViewInit, OnDestroy, OnChange
         }
     }
 
-    private setSubscriptions(): void {}
+    private setSubscriptions(): void {
+        this.gridService.cellEdit$
+            .pipe(takeUntil(this.#destroy$))
+            .subscribe((event: CellEditEvent) => this.cellEdit.emit(event));
+    }
 
     public get headerMargin(): string {
         const rightMargin = 12;

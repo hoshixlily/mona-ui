@@ -9,9 +9,11 @@ import { Subject } from "rxjs";
 import { CompositeFilterDescriptor, FilterDescriptor } from "../../query/filter/FilterDescriptor";
 import { SortableOptions } from "../models/SortableOptions";
 import { SortDescriptor } from "../../query/sort/SortDescriptor";
+import { CellEditEvent } from "../models/CellEditEvent";
 
 @Injectable()
 export class GridService {
+    public readonly cellEdit$: Subject<CellEditEvent> = new Subject<CellEditEvent>();
     public readonly selectedRowsChange$: Subject<Row[]> = new Subject<Row[]>();
     public appliedFilters: Dictionary<string, ColumnFilterState> = new Dictionary<string, ColumnFilterState>();
     public appliedSorts: Dictionary<string, ColumnSortState> = new Dictionary<string, ColumnSortState>();

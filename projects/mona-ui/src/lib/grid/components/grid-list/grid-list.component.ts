@@ -106,15 +106,17 @@ export class GridListComponent implements OnInit, AfterViewInit, OnDestroy {
     private setSubscriptions(): void {
         fromEvent<MouseEvent>(document, "click")
             .pipe(mergeWith(fromEvent<KeyboardEvent>(document, "keyup")), takeUntil(this.#destroy))
-            .subscribe(event => {
-                if (event.type === "click") {
+            .subscribe(e => {
+                if (e.type === "click") {
+                    const event = e as MouseEvent;
                     const target = event.target as HTMLElement;
                     if (target.closest(".mona-grid-cell") == null) {
                         this.gridService.isInEditMode = false;
                     }
                 }
-                if (event.type === "keyup") {
-                    if ((event as KeyboardEvent).key === "Escape") {
+                if (e.type === "keyup") {
+                    const event = e as KeyboardEvent;
+                    if (event.key === "Escape") {
                         this.gridService.isInEditMode = false;
                     }
                 }

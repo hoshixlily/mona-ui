@@ -17,7 +17,8 @@ import {
     FilterMenuComponent,
     FilterMenuValue,
     SortDescriptor,
-    SortableOptions
+    SortableOptions,
+    CellEditEvent
 } from "mona-ui";
 import { TestComponentComponent } from "./test-component/test-component.component";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
@@ -534,6 +535,14 @@ export class AppComponent implements OnInit {
             .run();
         // console.log(data);
         console.log(result);
+    }
+
+    public onGridCellEdit(event: CellEditEvent): void {
+        if (!event.newValue) {
+            event.preventDefault();
+            event.setNewValue("--");
+        }
+        console.log(event);
     }
 
     public onGridFilterChange(filters: CompositeFilterDescriptor[]): void {

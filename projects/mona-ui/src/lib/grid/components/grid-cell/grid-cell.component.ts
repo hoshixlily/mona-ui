@@ -5,16 +5,15 @@ import {
     ElementRef,
     Input,
     OnDestroy,
-    OnInit,
-    ViewChild
+    OnInit
 } from "@angular/core";
 import { Column } from "../../models/Column";
 import { Row } from "../../models/Row";
 import { FormControl, FormGroup } from "@angular/forms";
 import { FocusMonitor, FocusOrigin } from "@angular/cdk/a11y";
 import { GridService } from "../../services/grid.service";
-import { asyncScheduler, filter, fromEvent, mergeWith, Subject, take, takeUntil, tap, timer } from "rxjs";
-import { TextBoxComponent } from "../../../inputs/modules/text-box/components/text-box/text-box.component";
+import { asyncScheduler, filter, fromEvent, Subject, take, takeUntil, tap, timer } from "rxjs";
+import { CellEditEvent } from "../../models/CellEditEvent";
 
 @Component({
     selector: "mona-grid-cell",
@@ -74,13 +73,17 @@ export class GridCellComponent implements OnInit, OnDestroy {
                 .pipe(take(1))
                 .subscribe(() => {
                     if (this.column.filterType !== "date") {
-                        this.editing = false;
-                        this.updateCellValue();
+                        if (this.editing) {
+                            this.editing = false;
+                            this.updateCellValue();
+                        }
                     } else {
-                        this.updateCellValue();
                         const datePopup = document.querySelector(".mona-date-input-popup");
                         if (!datePopup) {
                             this.editing = false;
+                        }
+                        if (this.editing) {
+                            this.updateCellValue();
                         }
                     }
                     this.cdr.markForCheck();
@@ -97,6 +100,23 @@ export class GridCellComponent implements OnInit, OnDestroy {
                 }
             }
         }
+    }
+
+    private notifyCellEdit(): CellEditEvent {
+        const event = new CellEditEvent({
+            field: this.column.field,
+            oldValue: this.row.data[this.column.field],
+            newValue: this.editForm.value[this.column.field],
+            rowData: this.row.data,
+            setNewValue: (value: any) => {
+                this.editForm.get(this.column.field)?.setValue(value);
+                this.row.data[this.column.field] = value;
+            }
+        });
+        if (event.oldValue !== event.newValue) {
+            this.gridService.cellEdit$.next(event);
+        }
+        return event;
     }
 
     private focus(): void {
@@ -154,9 +174,11 @@ export class GridCellComponent implements OnInit, OnDestroy {
             )
             .subscribe(event => {
                 if (event.key === "Enter") {
-                    this.editing = false;
+                    if (this.editing) {
+                        this.updateCellValue();
+                    }
                     this.gridService.isInEditMode = false;
-                    this.updateCellValue();
+                    this.editing = false;
                     this.focus();
                 } else if (event.key === "Escape") {
                     this.editing = false;
@@ -164,11 +186,11 @@ export class GridCellComponent implements OnInit, OnDestroy {
                     this.focus();
                 } else if (event.key === "ArrowUp") {
                     if (!this.editing) {
-                        const previousRow = document.querySelector(
+                        const previousRowElement = document.querySelector(
                             `tr[data-ruid='${this.row.uid}']`
                         )?.previousElementSibling;
-                        if (previousRow) {
-                            const cell = previousRow.querySelector(
+                        if (previousRowElement) {
+                            const cell = previousRowElement.querySelector(
                                 `td .mona-grid-cell[data-field='${this.column.field}']`
                             ) as HTMLElement;
                             if (cell) {
@@ -178,9 +200,11 @@ export class GridCellComponent implements OnInit, OnDestroy {
                     }
                 } else if (event.key === "ArrowDown") {
                     if (!this.editing) {
-                        const nextRow = document.querySelector(`tr[data-ruid='${this.row.uid}']`)?.nextElementSibling;
-                        if (nextRow) {
-                            const cell = nextRow.querySelector(
+                        const nextRowElement = document.querySelector(
+                            `tr[data-ruid='${this.row.uid}']`
+                        )?.nextElementSibling;
+                        if (nextRowElement) {
+                            const cell = nextRowElement.querySelector(
                                 `td .mona-grid-cell[data-field='${this.column.field}']`
                             ) as HTMLElement;
                             if (cell) {
@@ -191,23 +215,24 @@ export class GridCellComponent implements OnInit, OnDestroy {
                 } else if (event.key === "ArrowLeft") {
                     if (!this.editing) {
                         const row = document.querySelector(`tr[data-ruid='${this.row.uid}']`);
-                        if (row) {
-                            if (this.column.index > 0) {
-                                const cell = row.querySelector(
-                                    `td .mona-grid-cell[data-col-index='${this.column.index - 1}']`
+                        if (!row) {
+                            return;
+                        }
+                        if (this.column.index > 0) {
+                            const cell = row.querySelector(
+                                `td .mona-grid-cell[data-col-index='${this.column.index - 1}']`
+                            ) as HTMLElement;
+                            if (cell) {
+                                cell.focus();
+                            }
+                        } else {
+                            const previousRowElement = row.previousElementSibling;
+                            if (previousRowElement) {
+                                const cell = previousRowElement.querySelector(
+                                    "td:last-child .mona-grid-cell"
                                 ) as HTMLElement;
                                 if (cell) {
                                     cell.focus();
-                                }
-                            } else {
-                                const previousRow = row.previousElementSibling;
-                                if (previousRow) {
-                                    const cell = previousRow.querySelector(
-                                        "td:last-child .mona-grid-cell"
-                                    ) as HTMLElement;
-                                    if (cell) {
-                                        cell.focus();
-                                    }
                                 }
                             }
                         }
@@ -215,21 +240,24 @@ export class GridCellComponent implements OnInit, OnDestroy {
                 } else if (event.key === "ArrowRight") {
                     if (!this.editing) {
                         const row = document.querySelector(`tr[data-ruid='${this.row.uid}']`);
-                        if (row) {
-                            if (this.column.index < this.gridService.columns.length - 1) {
-                                const cell = row.querySelector(
-                                    `td .mona-grid-cell[data-col-index='${this.column.index + 1}']`
+                        if (!row) {
+                            return;
+                        }
+                        if (this.column.index < this.gridService.columns.length - 1) {
+                            const cell = row.querySelector(
+                                `td .mona-grid-cell[data-col-index='${this.column.index + 1}']`
+                            ) as HTMLElement;
+                            if (cell) {
+                                cell.focus();
+                            }
+                        } else {
+                            const nextRowElement = row.nextElementSibling;
+                            if (nextRowElement) {
+                                const cell = nextRowElement.querySelector(
+                                    "td:first-child .mona-grid-cell"
                                 ) as HTMLElement;
                                 if (cell) {
                                     cell.focus();
-                                }
-                            } else {
-                                const nextRow = row.nextElementSibling;
-                                if (nextRow) {
-                                    const cell = nextRow.querySelector("td:first-child .mona-grid-cell") as HTMLElement;
-                                    if (cell) {
-                                        cell.focus();
-                                    }
                                 }
                             }
                         }
@@ -248,6 +276,13 @@ export class GridCellComponent implements OnInit, OnDestroy {
     }
 
     private updateCellValue(): void {
-        this.row.data[this.column.field] = this.editForm.value[this.column.field];
+        const event = this.notifyCellEdit();
+        if (!event.isDefaultPrevented()) {
+            this.row.data[this.column.field] = this.editForm.value[this.column.field];
+            return;
+        }
+        this.editForm.patchValue({
+            [this.column.field]: this.row.data[this.column.field]
+        });
     }
 }
