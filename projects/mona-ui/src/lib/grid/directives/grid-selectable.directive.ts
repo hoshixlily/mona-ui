@@ -8,7 +8,7 @@ import { Subject, takeUntil } from "rxjs";
     selector: "mona-grid[monaGridSelectable]"
 })
 export class GridSelectableDirective implements OnInit, OnChanges, OnDestroy {
-    private readonly destroy$: Subject<void> = new Subject<void>();
+    readonly #destroy$: Subject<void> = new Subject<void>();
     @Input()
     public set selectedKeys(selectedKeys: Iterable<unknown>) {
         this.gridService.selectedKeys.clear();
@@ -35,8 +35,8 @@ export class GridSelectableDirective implements OnInit, OnChanges, OnDestroy {
     }
 
     public ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
+        this.#destroy$.next();
+        this.#destroy$.complete();
     }
 
     public ngOnInit(): void {
@@ -51,7 +51,7 @@ export class GridSelectableDirective implements OnInit, OnChanges, OnDestroy {
     }
 
     private setSubscriptions(): void {
-        this.gridService.selectedRowsChange$.pipe(takeUntil(this.destroy$)).subscribe(selectedRows => {
+        this.gridService.selectedRowsChange$.pipe(takeUntil(this.#destroy$)).subscribe(selectedRows => {
             const selectedKeys = selectedRows.map(r =>
                 this.gridService.selectionKeyField ? r.data[this.gridService.selectionKeyField] : r.data
             );

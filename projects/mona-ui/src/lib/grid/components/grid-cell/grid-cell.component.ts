@@ -72,6 +72,9 @@ export class GridCellComponent implements OnInit, OnDestroy {
             timer(duration)
                 .pipe(take(1))
                 .subscribe(() => {
+                    if (!this.gridEditable) {
+                        return;
+                    }
                     if (this.column.filterType !== "date") {
                         if (this.editing) {
                             this.editing = false;
@@ -140,6 +143,9 @@ export class GridCellComponent implements OnInit, OnDestroy {
                 tap(event => event.stopPropagation())
             )
             .subscribe(() => {
+                if (!this.gridEditable) {
+                    return;
+                }
                 this.editing = true;
                 this.gridService.isInEditMode = true;
                 this.cdr.markForCheck();
@@ -263,6 +269,9 @@ export class GridCellComponent implements OnInit, OnDestroy {
                         }
                     }
                 } else if (event.key === "F2") {
+                    if (!this.gridEditable) {
+                        return;
+                    }
                     if (this.focused) {
                         this.editing = true;
                         this.gridService.isInEditMode = true;
@@ -284,5 +293,9 @@ export class GridCellComponent implements OnInit, OnDestroy {
         this.editForm.patchValue({
             [this.column.field]: this.row.data[this.column.field]
         });
+    }
+
+    private get gridEditable(): boolean {
+        return !!this.gridService.editableOptions && !!this.gridService.editableOptions.enabled;
     }
 }

@@ -10,6 +10,7 @@ import { CompositeFilterDescriptor, FilterDescriptor } from "../../query/filter/
 import { SortableOptions } from "../models/SortableOptions";
 import { SortDescriptor } from "../../query/sort/SortDescriptor";
 import { CellEditEvent } from "../models/CellEditEvent";
+import { EditableOptions } from "../models/EditableOptions";
 
 @Injectable()
 export class GridService {
@@ -18,6 +19,7 @@ export class GridService {
     public appliedFilters: Dictionary<string, ColumnFilterState> = new Dictionary<string, ColumnFilterState>();
     public appliedSorts: Dictionary<string, ColumnSortState> = new Dictionary<string, ColumnSortState>();
     public columns: Column[] = [];
+    public editableOptions: EditableOptions = { enabled: false };
     public filterLoad$: Subject<void> = new Subject<void>();
     public gridHeaderElement?: HTMLDivElement;
     public groupColumns: Column[] = [];
@@ -99,6 +101,10 @@ export class GridService {
         }
         this.appliedSorts = newAppliedSorts;
         this.sortLoad$.next();
+    }
+
+    public setEditableOptions(options: EditableOptions): void {
+        this.editableOptions = { ...this.editableOptions, ...options };
     }
 
     public setRows(value: any[]): void {
