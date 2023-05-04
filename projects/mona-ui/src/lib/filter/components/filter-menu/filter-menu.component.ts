@@ -380,33 +380,43 @@ export class FilterMenuComponent implements OnInit {
         switch (this.type) {
             case "string":
                 return {
+                    operator1: this.selectedFilterMenuDataItemList[0]?.value,
                     value1: this.stringFilterValues[0],
-                    value2: this.stringFilterValues[1],
-                    logic: this.selectedConnectorItem?.value
+                    logic: this.selectedConnectorItem?.value,
+                    operator2: this.selectedFilterMenuDataItemList[1]?.value,
+                    value2: this.stringFilterValues[1]
                 };
             case "number":
                 return {
+                    operator1: this.selectedFilterMenuDataItemList[0]?.value,
                     value1: this.numberFilterValues[0],
-                    value2: this.numberFilterValues[1],
-                    logic: this.selectedConnectorItem?.value
+                    logic: this.selectedConnectorItem?.value,
+                    operator2: this.selectedFilterMenuDataItemList[1]?.value,
+                    value2: this.numberFilterValues[1]
                 };
             case "date":
                 return {
+                    operator1: this.selectedFilterMenuDataItemList[0]?.value,
                     value1: this.dateFilterValues[0],
-                    value2: this.dateFilterValues[1],
-                    logic: this.selectedConnectorItem?.value
+                    logic: this.selectedConnectorItem?.value,
+                    operator2: this.selectedFilterMenuDataItemList[1]?.value,
+                    value2: this.dateFilterValues[1]
                 };
             case "boolean":
                 return {
+                    operator1: this.selectedFilterMenuDataItemList[0]?.value,
                     value1: this.booleanFilterValues[0],
-                    value2: this.booleanFilterValues[1],
-                    logic: this.selectedConnectorItem?.value
+                    logic: this.selectedConnectorItem?.value,
+                    operator2: this.selectedFilterMenuDataItemList[1]?.value,
+                    value2: this.booleanFilterValues[1]
                 };
             default:
                 return {
+                    operator1: undefined,
                     value1: null,
-                    value2: null,
-                    logic: undefined
+                    logic: undefined,
+                    operator2: undefined,
+                    value2: null
                 };
         }
     }
@@ -414,16 +424,32 @@ export class FilterMenuComponent implements OnInit {
     private setFilterValues(values: FilterMenuValue): void {
         switch (this.type) {
             case "string":
+                this.selectedFilterMenuDataItemList = [
+                    this.stringFilterMenuDataItems.find(f => f.value === values.operator1) ?? undefined,
+                    this.stringFilterMenuDataItems.find(f => f.value === values.operator2) ?? undefined
+                ];
                 this.stringFilterValues = [values.value1 ?? "", values.value2 ?? ""];
                 this.selectedConnectorItem = this.connectorDataItems.find(c => c.value === values.logic) ?? null;
                 break;
             case "number":
+                this.selectedFilterMenuDataItemList = [
+                    this.numericFilterMenuDataItems.find(f => f.value === values.operator1) ?? undefined,
+                    this.numericFilterMenuDataItems.find(f => f.value === values.operator2) ?? undefined
+                ];
                 this.numberFilterValues = [values.value1 ?? null, values.value2 ?? null];
                 break;
             case "date":
+                this.selectedFilterMenuDataItemList = [
+                    this.dateFilterMenuDataItems.find(f => f.value === values.operator1) ?? undefined,
+                    this.dateFilterMenuDataItems.find(f => f.value === values.operator2) ?? undefined
+                ];
                 this.dateFilterValues = [values.value1 ?? null, values.value2 ?? null];
                 break;
             case "boolean":
+                this.selectedFilterMenuDataItemList = [
+                    this.booleanFilterMenuDataItems.find(f => f.value === values.operator1) ?? undefined,
+                    this.booleanFilterMenuDataItems.find(f => f.value === values.operator2) ?? undefined
+                ];
                 this.booleanFilterValues = [values.value1 ?? null, values.value2 ?? null];
                 break;
             default:

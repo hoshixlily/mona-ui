@@ -62,6 +62,17 @@ export * from "./lib/filter/models/FilterMenuValue";
 export * from "./lib/filter/components/filter-menu/filter-menu.component";
 export * from "./lib/filter/filter.module";
 
+/** Grid */
+export * from "./lib/query/sort/SortDescriptor";
+export * from "./lib/grid/models/CellEditEvent";
+export * from "./lib/grid/models/SelectableOptions";
+export * from "./lib/grid/models/SortableOptions";
+export * from "./lib/grid/directives/grid-selectable.directive";
+export * from "./lib/grid/directives/grid-cell-template.directive";
+export * from "./lib/grid/components/grid-column/grid-column.component";
+export * from "./lib/grid/components/grid/grid.component";
+export * from "./lib/grid/grid.module";
+
 /** Inputs */
 export * from "./lib/inputs/modules/check-box/directives/check-box.directive";
 export * from "./lib/inputs/modules/check-box/check-box.module";

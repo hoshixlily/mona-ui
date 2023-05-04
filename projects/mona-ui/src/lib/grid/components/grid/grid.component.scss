@@ -1,0 +1,107 @@
+:host {
+    position: relative;
+    display: block;
+    overflow: hidden;
+}
+
+div.mona-grid {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: var(--mona-background-dark);
+    border: 1px solid var(--mona-border-color);
+}
+
+.mona-grid-group-panel {
+    display: flex;
+    align-items: center;
+    padding: 5px 5px;
+    height: 40px;
+    border-bottom: 1px solid var(--mona-border-color);
+    & mona-chip {
+        margin-right: 5px;
+    }
+}
+
+.mona-grid-group-panel-placeholder {
+    opacity: 0.7;
+}
+
+.mona-grid-header {
+    background-color: var(--mona-background-dark);
+    border-right: 1px solid var(--mona-border-color);
+    overflow: hidden;
+    display: flex;
+    flex-direction: row;
+    flex: 0 0 auto;
+
+    & table {
+        border-collapse: collapse;
+        table-layout: fixed;
+        width: 100%;
+        & tr {
+            position: relative;
+        }
+        & th {
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            text-align: left;
+            position: relative;
+            user-select: none;
+            &:not(:last-child) {
+                border-right: 1px solid var(--mona-border-color);
+            }
+        }
+    }
+}
+
+mona-grid-list {
+    border-top: 1px solid var(--mona-border-color);
+}
+
+div.mona-grid-column-resizer {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 10px;
+    background-color: transparent;
+    cursor: col-resize;
+    z-index: 1;
+    right: -5px;
+}
+
+div.mona-grid-column-wrap {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+}
+
+span.mona-grid-column-title {
+    flex: 1;
+    padding: 10px 10px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-weight: bold;
+}
+
+div.mona-grid-column-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+}
+
+span.mona-grid-column-drop-hint {
+    position: absolute;
+    display: flex;
+    width: 2px;
+    height: 100%;
+    background: var(--mona-primary);
+    z-index: 1;
+    top: 0;
+    bottom: 0;
+}

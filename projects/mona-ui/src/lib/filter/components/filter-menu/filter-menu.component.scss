@@ -4,8 +4,6 @@ div.mona-filter-menu {
     display: flex;
     flex-direction: column;
     row-gap: 5px;
-    background: var(--mona-background);
-    border: 1px solid var(--mona-border-color); // TODO: These are temporary
 }
 
 div.mona-filter-menu-item {

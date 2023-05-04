@@ -7,7 +7,7 @@ import { WindowReference } from "../models/WindowReference";
     selector: "div[monaWindowResizeHandler]"
 })
 export class WindowResizeHandlerDirective implements AfterViewInit, OnDestroy {
-    private readonly componentDestroy$: Subject<void> = new Subject<void>();
+    private readonly destroy$: Subject<void> = new Subject<void>();
 
     @Input()
     public direction!: WindowResizeHandlerDirection;
@@ -34,8 +34,8 @@ export class WindowResizeHandlerDirective implements AfterViewInit, OnDestroy {
     }
 
     public ngOnDestroy(): void {
-        this.componentDestroy$.next();
-        this.componentDestroy$.complete();
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     public onMouseDown(event: MouseEvent) {
@@ -224,7 +224,7 @@ export class WindowResizeHandlerDirective implements AfterViewInit, OnDestroy {
     private setEvents(): void {
         this.zone.runOutsideAngular(() => {
             fromEvent<MouseEvent>(this.elementRef.nativeElement, "mousedown")
-                .pipe(takeUntil(this.componentDestroy$))
+                .pipe(takeUntil(this.destroy$))
                 .subscribe(event => this.onMouseDown(event));
         });
     }

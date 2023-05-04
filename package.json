@@ -25,7 +25,7 @@
         "@fortawesome/angular-fontawesome": "^0.11.1",
         "@fortawesome/fontawesome-svg-core": "^6.1.2",
         "@fortawesome/free-solid-svg-icons": "^6.1.2",
-        "@mirei/ts-collections": "^11.0.3",
+        "@mirei/ts-collections": "^11.1.0",
         "luxon": "^3.2.1",
         "rxjs": "~7.5.6",
         "tslib": "^2.3.0",

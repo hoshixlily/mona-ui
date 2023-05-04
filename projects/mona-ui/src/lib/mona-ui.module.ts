@@ -12,6 +12,7 @@ import { WindowModule } from "./window/window.module";
 import { PagerModule } from "./pager/pager.module";
 import { ProgressBarsModule } from "./progress-bars/progress-bars.module";
 import { FilterModule } from "./filter/filter.module";
+import { GridModule } from "./grid/grid.module";
 
 @NgModule({
     exports: [
@@ -19,6 +20,7 @@ import { FilterModule } from "./filter/filter.module";
         DateInputsModule,
         DropDownsModule,
         FilterModule,
+        GridModule,
         InputsModule,
         LayoutModule,
         MenusModule,

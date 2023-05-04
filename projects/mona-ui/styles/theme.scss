@@ -63,10 +63,10 @@ input {
 }
 
 @mixin scrollbars {
-    scrollbar-width: thin;
     scrollbar-color: var(--mona-background-darker) var(--mona-background-dark);
     &::-webkit-scrollbar {
         width: 8px;
+        height: 8px;
     }
     &::-webkit-scrollbar-track {
         background: var(--mona-background-dark);
@@ -76,6 +76,22 @@ input {
         &:hover {
             background-color: var(--mona-background-light);
         }
+    }
+    &::-webkit-scrollbar-corner {
+        background: var(--mona-background-dark);
+    }
+}
+
+@mixin scrollbars-thin {
+    scrollbar-width: thin;
+    @include scrollbars;
+}
+
+@mixin scrollbars-thick {
+    @include scrollbars;
+    &::-webkit-scrollbar {
+        width: 12px;
+        height: 12px;
     }
 }
 
@@ -160,7 +176,7 @@ ul.mona-list {
             @include disabled;
         }
     }
-    @include scrollbars;
+    @include scrollbars-thin;
 }
 
 li.mona-list-group-header {
@@ -467,6 +483,80 @@ div.mona-filter-menu-item {
         }
     }
 }
+
+
+/** Grid */
+.mona-grid {
+    color: var(--mona-text);
+    & mona-pager {
+        & .mona-pager {
+            border: none;
+            border-top: 1px solid var(--mona-border-color);
+        }
+    }
+}
+
+.mona-grid-list {
+    @include scrollbars-thick;
+    & tr {
+        &.mona-selected {
+            background-color: var(--mona-primary) !important;
+            color: var(--mona-text) !important;
+        }
+    }
+    & td {
+        &:focus,
+        &:focus-within {
+            & div.mona-grid-cell {
+                outline: none;
+                box-shadow: 0 0 0 1px var(--mona-primary) inset;
+            }
+        }
+    }
+}
+
+.mona-grid-filter-menu-popup-content {
+    padding: 0 !important;
+    background: var(--mona-background-dark) !important;
+}
+
+.mona-grid-column-drag-preview {
+    background-color: var(--mona-background);
+    border: 1px solid var(--mona-border-color);
+    box-shadow: var(--mona-popup-shadow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--mona-text);
+    font-weight: bold;
+    font-size: 13px;
+}
+
+.mona-grid-cell-editing {
+    & mona-text-box {
+        & div.mona-text-box {
+            border: none;
+        }
+        & input {
+            padding-left: 10px;
+            padding-right: 10px;
+            background: #242528; // TODO: use variable
+        }
+    }
+
+    & mona-numeric-text-box {
+        & div.mona-numeric-text-box {
+            border: none;
+        }
+        & input {
+            padding-left: 10px;
+            padding-right: 10px;
+            background: #242528; // TODO: use variable
+        }
+    }
+}
+
+
 
 /** Inputs */
 

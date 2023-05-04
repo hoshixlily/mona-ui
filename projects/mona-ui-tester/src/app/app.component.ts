@@ -13,16 +13,21 @@ import {
     PageSizeChangeEvent,
     PageChangeEvent,
     Query,
+    CompositeFilterDescriptor,
     FilterMenuComponent,
-    FilterMenuValue
+    FilterMenuValue,
+    SortDescriptor,
+    SortableOptions,
+    CellEditEvent
 } from "mona-ui";
 import { TestComponentComponent } from "./test-component/test-component.component";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { faFilter, faMoon, faSearch, faSnowflake, faSun } from "@fortawesome/free-solid-svg-icons";
 import { Enumerable, IndexableList } from "@mirei/ts-collections";
 import { map, Observable } from "rxjs";
-import { CompositeFilterDescriptor } from "../../../mona-ui/src/lib/query/filter/FilterDescriptor";
 import { DateTime } from "luxon";
+import { GridProductData } from "./GridProductData";
+import { GridOrderData } from "./GridOrderData";
 
 @Component({
     selector: "app-root",
@@ -174,6 +179,87 @@ export class AppComponent implements OnInit {
         value1: "Item 2",
         value2: "Item 63",
         logic: "or"
+    };
+
+    public gridFilters: CompositeFilterDescriptor[] = [
+        // {
+        //     logic: "or",
+        //     filters: [
+        //         {
+        //             field: "ShipCountry",
+        //             operator: "startswith",
+        //             value: "A"
+        //         },
+        //         {
+        //             field: "ShipCountry",
+        //             operator: "startswith",
+        //             value: "E"
+        //         }
+        //     ]
+        // },
+        // {
+        //     logic: "and",
+        //     filters: [
+        //         {
+        //             field: "ShipCity",
+        //             operator: "contains",
+        //             value: "z"
+        //         }
+        //     ]
+        // }
+    ];
+
+    public gridOrderColumns: any[] = [
+        { field: "OrderID", title: "Order ID", filterType: "number" },
+        { field: "ShipCountry", title: "Ship Country", filterType: "string" },
+        { field: "OrderDate", title: "Order Date", filterType: "date" },
+        { field: "Freight", title: "Freight", filterType: "number" },
+        // { field: "CustomerID", title: "Customer ID", filterType: "string" },
+        // { field: "EmployeeID", title: "Employee ID", filterType: "number" },
+        // { field: "RequiredDate", title: "Required Date", filterType: "date" },
+        { field: "ShippedDate", title: "Shipped Date", filterType: "date" },
+        // { field: "ShipVia", title: "Ship Via", filterType: "number" },
+        { field: "ShipName", title: "Ship Name", filterType: "string" },
+        // { field: "ShipAddress", title: "Ship Address", filterType: "string" },
+        { field: "ShipCity", title: "Ship City", filterType: "string" },
+        { field: "ShipRegion", title: "Ship Region", filterType: "string" }
+        // { field: "ShipPostalCode", title: "Ship Postal Code", filterType: "string" }
+    ];
+
+    public gridOrderData: any[] = GridOrderData.map(d => {
+        return {
+            ...d,
+            OrderDate: new Date(d.OrderDate)
+        };
+    });
+
+    public gridProductColumns: any[] = [
+        { field: "ProductID", title: "Product ID", filterType: "number" },
+        { field: "ProductName", title: "Product Name", filterType: "string" },
+        { field: "SupplierID", title: "Supplier ID", filterType: "number" },
+        { field: "CategoryID", title: "Category ID", filterType: "number" }
+        // { field: "QuantityPerUnit", title: "Quantity Per Unit", filterType: "string" },
+        // { field: "UnitPrice", title: "Unit Price", filterType: "number" },
+        // { field: "UnitsInStock", title: "Units In Stock", filterType: "number" },
+        // { field: "UnitsOnOrder", title: "Units On Order", filterType: "number" },
+        // { field: "ReorderLevel", title: "Reorder Level", filterType: "number" },
+        // { field: "Discontinued", title: "Discontinued", filterType: "boolean" },
+        // { field: "FirstOrderedOn", title: "First Ordered On", filterType: "date" }
+    ];
+
+    public gridProductData: any[] = GridProductData;
+    public gridSelectionKeys: number[] = [];
+    public gridSort: SortDescriptor[] = [
+        // {
+        //     dir: "asc",
+        //     field: "ShipCountry"
+        // }
+    ];
+    public gridSortOptions: SortableOptions = {
+        enabled: true,
+        mode: "single",
+        allowUnsort: true,
+        showIndices: false
     };
     public menuBarMenuVisible: boolean = false;
     public multiSelectTagCount: number = 2;
@@ -370,6 +456,12 @@ export class AppComponent implements OnInit {
         //         this.dropdownListDataItems[10]
         //     ];
         // }, 5000);
+        // window.setTimeout(() => {
+        //     this.gridFilters = [this.gridFilters[1]];
+        // }, 5000);
+        // window.setInterval(() => {
+        //     console.log(this.gridOrderData[0]);
+        // }, 3000);
     }
 
     public numericTextBoxFormatter = (value: number | null): string => (value != null ? `${value} °C` : "");
@@ -443,6 +535,29 @@ export class AppComponent implements OnInit {
             .run();
         // console.log(data);
         console.log(result);
+    }
+
+    public onGridCellEdit(event: CellEditEvent): void {
+        if (!event.newValue) {
+            event.preventDefault();
+            event.setNewValue("--");
+        }
+        console.log(event);
+    }
+
+    public onGridFilterChange(filters: CompositeFilterDescriptor[]): void {
+        console.log(filters);
+        this.gridFilters = filters;
+    }
+
+    public onGridSelectionKeysChange(keys: unknown[]): void {
+        this.gridSelectionKeys = keys as number[];
+        console.log(keys);
+    }
+
+    public onGridSortChange(sort: SortDescriptor[]): void {
+        this.gridSort = sort;
+        console.log(sort);
     }
 
     public onMultiSelectValueChange(value: unknown[]): void {
