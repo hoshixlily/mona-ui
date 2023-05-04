@@ -1,0 +1,17 @@
+:host {
+    display: block;
+    height: 100%;
+}
+
+div.mona-grid-cell {
+    padding: 9px 10px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    outline: none;
+    height: 100%;
+}
+
+div.mona-grid-cell-editing {
+    padding: 1px;
+}

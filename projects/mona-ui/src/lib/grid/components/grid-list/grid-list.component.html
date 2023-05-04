@@ -8,11 +8,10 @@
             </colgroup>
             <tbody>
                 <ng-container *ngIf="gridService.groupColumns.length === 0">
-                    <tr *ngFor="let row of data" (click)="onGridRowClick($event, row)" [ngClass]="{'mona-selected': row.selected}">
+                    <tr *ngFor="let row of data; let rx=index;" (click)="onGridRowClick($event, row)" [ngClass]="{'mona-selected': row.selected}"
+                        [attr.data-ruid]="row.uid" [attr.data-row-view-index]="rx">
                         <td *ngFor="let column of columns">
-                            <ng-container *ngIf="!column.cellTemplate">{{row.data[column.field]}}</ng-container>
-                            <ng-container [ngTemplateOutlet]="column.cellTemplate.templateRef ?? null"
-                                          *ngIf="column.cellTemplate" [ngTemplateOutletContext]="{$implicit: row, column}"></ng-container>
+                            <mona-grid-cell [column]="column" [row]="row"></mona-grid-cell>
                         </td>
                     </tr>
                 </ng-container>
@@ -38,12 +37,11 @@
                                     </ng-container>
                                 </ng-container>
                                 <ng-container *ngIf="depth===gridService.groupColumns.length-1 && !subGroup.collapsed">
-                                    <tr *ngFor="let row of subGroup.rows" (click)="onGridRowClick($event, row)" [ngClass]="{'mona-selected': row.selected}">
+                                    <tr *ngFor="let row of subGroup.rows; let rx=index;" (click)="onGridRowClick($event, row)" [ngClass]="{'mona-selected': row.selected}"
+                                        [attr.data-ruid]="row.uid" [attr.data-row-view-index]="rx">
                                         <td *ngFor="let _ of gridService.groupColumns"></td>
                                         <td *ngFor="let column of columns">
-                                            <ng-container *ngIf="!column.cellTemplate">{{row.data[column.field]}}</ng-container>
-                                            <ng-container [ngTemplateOutlet]="column.cellTemplate.templateRef ?? null"
-                                                          *ngIf="column.cellTemplate" [ngTemplateOutletContext]="{$implicit: row, column}"></ng-container>
+                                            <mona-grid-cell [column]="column" [row]="row"></mona-grid-cell>
                                         </td>
                                     </tr>
                                 </ng-container>

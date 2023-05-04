@@ -9,9 +9,11 @@ import { Subject } from "rxjs";
 import { CompositeFilterDescriptor, FilterDescriptor } from "../../query/filter/FilterDescriptor";
 import { SortableOptions } from "../models/SortableOptions";
 import { SortDescriptor } from "../../query/sort/SortDescriptor";
+import { CellEditEvent } from "../models/CellEditEvent";
 
 @Injectable()
 export class GridService {
+    public readonly cellEdit$: Subject<CellEditEvent> = new Subject<CellEditEvent>();
     public readonly selectedRowsChange$: Subject<Row[]> = new Subject<Row[]>();
     public appliedFilters: Dictionary<string, ColumnFilterState> = new Dictionary<string, ColumnFilterState>();
     public appliedSorts: Dictionary<string, ColumnSortState> = new Dictionary<string, ColumnSortState>();
@@ -23,13 +25,14 @@ export class GridService {
         string,
         Dictionary<number, boolean>
     >();
+    public isInEditMode: boolean = false;
     public pageState: { page: number; skip: number; take: number } = { page: 1, skip: 0, take: 10 };
     public rows: Row[] = [];
     public selectedKeys: EnumerableSet<unknown> = new EnumerableSet<unknown>();
     public selectionKeyField: string = ""; // set by GridSelectableDirective
     public selectableOptions: SelectableOptions = {
         enabled: false,
-        mode: "multiple"
+        mode: "single"
     };
     public selectedKeysChange: EventEmitter<unknown[]> = new EventEmitter<unknown[]>();
     public selectedRows: Row[] = [];

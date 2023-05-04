@@ -29,7 +29,8 @@
                                     <span *ngIf="gridService.sortableOptions.showIndices && column.sortIndex != null">{{column.sortIndex}}</span>
                                     <fa-icon [icon]="ascendingSortIcon" *ngIf="column.sortDirection==='asc'"></fa-icon>
                                     <fa-icon [icon]="descendingSortIcon" *ngIf="column.sortDirection==='desc'"></fa-icon>
-                                    <mona-grid-filter-menu [column]="column" [type]="column.filterType" (apply)="onColumnFilter(column, $event)" *ngIf="filterable"></mona-grid-filter-menu>
+                                    <mona-grid-filter-menu [column]="column" [type]="column.filterType" (apply)="onColumnFilter(column, $event)"
+                                                           *ngIf="filterable"></mona-grid-filter-menu>
                                 </div>
                             </div>
                             <span class="mona-grid-column-drop-hint" *ngIf="dropColumn === column && dragColumn && reorderable"

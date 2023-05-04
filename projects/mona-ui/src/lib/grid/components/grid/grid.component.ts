@@ -28,8 +28,8 @@ import { CdkDragDrop, CdkDragEnter, CdkDragStart, CdkDropList } from "@angular/c
 import { CompositeFilterDescriptor } from "../../../query/filter/FilterDescriptor";
 import { Subject, takeUntil } from "rxjs";
 import { SortableOptions } from "../../models/SortableOptions";
-import { ColumnSortState } from "../../models/ColumnSortState";
-import { Dictionary, Enumerable } from "@mirei/ts-collections";
+import { Enumerable } from "@mirei/ts-collections";
+import { CellEditEvent } from "../../models/CellEditEvent";
 
 @Component({
     selector: "mona-grid",
@@ -51,6 +51,9 @@ export class GridComponent implements OnInit, AfterViewInit, OnDestroy, OnChange
     public groupPanelPlaceholderVisible: boolean = true;
     public resizing: boolean = false;
 
+    @Output()
+    public cellEdit: EventEmitter<CellEditEvent> = new EventEmitter<CellEditEvent>();
+
     @ContentChildren(GridColumnComponent)
     public columns: QueryList<GridColumnComponent> = new QueryList<GridColumnComponent>();
 
@@ -66,6 +69,7 @@ export class GridComponent implements OnInit, AfterViewInit, OnDestroy, OnChange
             this.gridService.loadFilters(value);
         }
     }
+
     public get filter(): CompositeFilterDescriptor[] {
         return this.#filter;
     }
@@ -108,6 +112,7 @@ export class GridComponent implements OnInit, AfterViewInit, OnDestroy, OnChange
             this.gridService.loadSorts(value);
         }
     }
+
     public get sort(): SortDescriptor[] {
         return this.#sort;
     }
@@ -339,7 +344,11 @@ export class GridComponent implements OnInit, AfterViewInit, OnDestroy, OnChange
         }
     }
 
-    private setSubscriptions(): void {}
+    private setSubscriptions(): void {
+        this.gridService.cellEdit$
+            .pipe(takeUntil(this.#destroy$))
+            .subscribe((event: CellEditEvent) => this.cellEdit.emit(event));
+    }
 
     public get headerMargin(): string {
         const rightMargin = 12;

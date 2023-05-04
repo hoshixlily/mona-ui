@@ -12,6 +12,7 @@ div.mona-grid-list {
 table {
     border-collapse: collapse;
     width: 100%;
+    height: 100%;
     table-layout: fixed;
 
     & tbody {
@@ -33,10 +34,7 @@ table {
     }
 
     & td {
-        padding: 8px 10px;
-        overflow: hidden;
-        white-space: nowrap;
-        text-overflow: ellipsis;
+        position: relative;
         &:not(:last-child) {
             border-right: 1px solid var(--mona-border-color);
         }
@@ -54,3 +52,4 @@ span.mona-grid-grouping-row-text {
     font-weight: bolder;
     margin-left: 8px;
 }
+

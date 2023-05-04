@@ -1,6 +1,6 @@
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, OnDestroy, OnInit } from "@angular/core";
 import { GridService } from "../../services/grid.service";
-import { fromEvent, Subject, takeUntil } from "rxjs";
+import { fromEvent, mergeWith, Subject, takeUntil } from "rxjs";
 import { Column } from "../../models/Column";
 import { Row } from "../../models/Row";
 import { faChevronDown, faChevronRight, IconDefinition } from "@fortawesome/free-solid-svg-icons";
@@ -14,7 +14,7 @@ import { Dictionary, KeyValuePair } from "@mirei/ts-collections";
     changeDetection: ChangeDetectionStrategy.Default
 })
 export class GridListComponent implements OnInit, AfterViewInit, OnDestroy {
-    private readonly componentDestroy$: Subject<void> = new Subject<void>();
+    readonly #destroy: Subject<void> = new Subject<void>();
     public readonly collapseIcon: IconDefinition = faChevronDown;
     public readonly expandIcon: IconDefinition = faChevronRight;
 
@@ -36,18 +36,20 @@ export class GridListComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     public ngOnDestroy(): void {
-        this.componentDestroy$.next();
-        this.componentDestroy$.complete();
+        this.#destroy.next();
+        this.#destroy.complete();
     }
 
-    public ngOnInit(): void {}
+    public ngOnInit(): void {
+        this.setSubscriptions();
+    }
 
     public onGridRowClick(event: MouseEvent, row: Row): void {
         if (this.gridService.selectableOptions == null || !this.gridService.selectableOptions.enabled) {
             return;
         }
         if (this.gridService.selectableOptions.mode === "single") {
-            if (row.selected) {
+            if (row.selected && (event.ctrlKey || event.metaKey)) {
                 this.gridService.selectedRows = [];
                 row.selected = false;
             } else {
@@ -67,8 +69,10 @@ export class GridListComponent implements OnInit, AfterViewInit, OnDestroy {
                     this.gridService.selectedRows = [...this.gridService.selectedRows, row];
                     row.selected = true;
                 } else {
-                    this.gridService.selectedRows.splice(index, 1);
-                    row.selected = false;
+                    if (event.ctrlKey || event.metaKey) {
+                        this.gridService.selectedRows.splice(index, 1);
+                        row.selected = false;
+                    }
                 }
             }
         }
@@ -99,6 +103,26 @@ export class GridListComponent implements OnInit, AfterViewInit, OnDestroy {
         }
     }
 
+    private setSubscriptions(): void {
+        fromEvent<MouseEvent>(document, "click")
+            .pipe(mergeWith(fromEvent<KeyboardEvent>(document, "keyup")), takeUntil(this.#destroy))
+            .subscribe(e => {
+                if (e.type === "click") {
+                    const event = e as MouseEvent;
+                    const target = event.target as HTMLElement;
+                    if (target.closest(".mona-grid-cell") == null) {
+                        this.gridService.isInEditMode = false;
+                    }
+                }
+                if (e.type === "keyup") {
+                    const event = e as KeyboardEvent;
+                    if (event.key === "Escape") {
+                        this.gridService.isInEditMode = false;
+                    }
+                }
+            });
+    }
+
     private synchronizeHorizontalScroll(): void {
         const headerElement = this.gridService.gridHeaderElement;
         const gridElement = this.elementRef.nativeElement.querySelector(".mona-grid-list") as HTMLDivElement;
@@ -106,7 +130,7 @@ export class GridListComponent implements OnInit, AfterViewInit, OnDestroy {
             return;
         }
         fromEvent(gridElement, "scroll")
-            .pipe(takeUntil(this.componentDestroy$))
+            .pipe(takeUntil(this.#destroy))
             .subscribe(() => {
                 headerElement.scrollLeft = gridElement.scrollLeft;
             });

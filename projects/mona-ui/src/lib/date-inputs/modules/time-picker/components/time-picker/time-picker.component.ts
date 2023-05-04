@@ -3,6 +3,7 @@ import {
     ChangeDetectorRef,
     Component,
     ElementRef,
+    forwardRef,
     Input,
     OnChanges,
     OnInit,
@@ -16,12 +17,20 @@ import { FocusMonitor } from "@angular/cdk/a11y";
 import { PopupService } from "../../../../../popup/services/popup.service";
 import { DateTime } from "luxon";
 import { take } from "rxjs";
+import { NG_VALUE_ACCESSOR } from "@angular/forms";
 
 @Component({
     selector: "mona-time-picker",
     templateUrl: "./time-picker.component.html",
     styleUrls: ["./time-picker.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [
+        {
+            provide: NG_VALUE_ACCESSOR,
+            useExisting: forwardRef(() => TimePickerComponent),
+            multi: true
+        }
+    ]
 })
 export class TimePickerComponent extends AbstractDateInputComponent implements OnInit, OnChanges {
     public readonly timeIcon: IconDefinition = faClock;

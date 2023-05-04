@@ -504,6 +504,15 @@ div.mona-filter-menu-item {
             color: var(--mona-text) !important;
         }
     }
+    & td {
+        &:focus,
+        &:focus-within {
+            & div.mona-grid-cell {
+                outline: none;
+                box-shadow: 0 0 0 1px var(--mona-primary) inset;
+            }
+        }
+    }
 }
 
 .mona-grid-filter-menu-popup-content {
@@ -522,6 +531,31 @@ div.mona-filter-menu-item {
     font-weight: bold;
     font-size: 13px;
 }
+
+.mona-grid-cell-editing {
+    & mona-text-box {
+        & div.mona-text-box {
+            border: none;
+        }
+        & input {
+            padding-left: 10px;
+            padding-right: 10px;
+            background: #242528; // TODO: use variable
+        }
+    }
+
+    & mona-numeric-text-box {
+        & div.mona-numeric-text-box {
+            border: none;
+        }
+        & input {
+            padding-left: 10px;
+            padding-right: 10px;
+            background: #242528; // TODO: use variable
+        }
+    }
+}
+
 
 
 /** Inputs */
