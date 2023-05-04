@@ -82,7 +82,7 @@ export class WindowComponent implements OnInit, OnDestroy, AfterViewInit {
     public widthChange: EventEmitter<number> = new EventEmitter<number>();
 
     @ViewChild("windowTemplate")
-    public windowTemplate!: TemplateRef<void>;
+    public windowTemplate!: TemplateRef<any>;
 
     public constructor(private readonly windowService: WindowService) {}
 

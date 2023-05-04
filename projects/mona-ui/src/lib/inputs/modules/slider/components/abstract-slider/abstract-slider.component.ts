@@ -84,7 +84,7 @@ export abstract class AbstractSliderComponent
     private tickListElementRef!: ElementRef<HTMLDivElement>;
 
     @ContentChild(SliderTickValueTemplateDirective, { read: TemplateRef })
-    public tickValueTemplate?: TemplateRef<void>;
+    public tickValueTemplate?: TemplateRef<any>;
 
     public abstract value: unknown | null;
     public abstract valueChange: EventEmitter<any>;

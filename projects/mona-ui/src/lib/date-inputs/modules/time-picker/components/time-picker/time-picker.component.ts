@@ -42,7 +42,7 @@ export class TimePickerComponent extends AbstractDateInputComponent implements O
     public showSeconds: boolean = false;
 
     @ViewChild("timePopupTemplate")
-    public timePopupTemplateRef?: TemplateRef<void>;
+    public timePopupTemplateRef?: TemplateRef<any>;
 
     public constructor(
         protected override readonly cdr: ChangeDetectorRef,

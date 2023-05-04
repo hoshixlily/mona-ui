@@ -14,7 +14,7 @@ export class PopupListItemComponent implements OnInit {
     public item: PopupListItem | null = null;
 
     @Input()
-    public itemTemplate?: TemplateRef<void>;
+    public itemTemplate?: TemplateRef<any>;
 
     public constructor(public readonly elementRef: ElementRef<HTMLElement>) {}
     public ngOnInit(): void {}

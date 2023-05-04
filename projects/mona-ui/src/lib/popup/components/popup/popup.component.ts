@@ -38,7 +38,7 @@ export class PopupComponent implements OnInit, OnDestroy, AfterViewInit {
     public closeOnEscape: boolean = true;
 
     @ContentChild(TemplateRef)
-    public contentTemplate!: TemplateRef<void>;
+    public contentTemplate!: TemplateRef<any>;
 
     @Input()
     public height?: number | string;

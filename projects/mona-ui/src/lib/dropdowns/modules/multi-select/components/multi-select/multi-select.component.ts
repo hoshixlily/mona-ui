@@ -41,10 +41,10 @@ export class MultiSelectComponent extends AbstractDropDownListComponent implemen
     public filterable: boolean = false;
 
     @ContentChild(MultiSelectGroupTemplateDirective, { read: TemplateRef })
-    public groupTemplate?: TemplateRef<void>;
+    public groupTemplate?: TemplateRef<any>;
 
     @ContentChild(MultiSelectItemTemplateDirective, { read: TemplateRef })
-    public itemTemplate?: TemplateRef<void>;
+    public itemTemplate?: TemplateRef<any>;
 
     @ContentChild(MultiSelectTagTemplateDirective, { read: TemplateRef })
     public tagTemplate: TemplateRef<any> | null = null;

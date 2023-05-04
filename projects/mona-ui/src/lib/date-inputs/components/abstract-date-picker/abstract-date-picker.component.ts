@@ -27,7 +27,7 @@ export abstract class AbstractDatePickerComponent extends AbstractDateInputCompo
     public readonly dateIcon: IconDefinition = faCalendar;
 
     @ViewChild("datePopupTemplate")
-    public datePopupTemplateRef?: TemplateRef<void>;
+    public datePopupTemplateRef?: TemplateRef<any>;
 
     protected constructor(
         protected override readonly cdr: ChangeDetectorRef,

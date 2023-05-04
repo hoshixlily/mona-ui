@@ -44,10 +44,10 @@ export class ComboBoxComponent extends AbstractDropDownListComponent implements 
     public filterable: boolean = false;
 
     @ContentChild(ComboBoxGroupTemplateDirective, { read: TemplateRef })
-    public groupTemplate?: TemplateRef<void>;
+    public groupTemplate?: TemplateRef<any>;
 
     @ContentChild(ComboBoxItemTemplateDirective, { read: TemplateRef })
-    public itemTemplate?: TemplateRef<void>;
+    public itemTemplate?: TemplateRef<any>;
 
     @Input()
     public override value?: any;

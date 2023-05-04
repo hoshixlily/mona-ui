@@ -43,13 +43,13 @@ export class TextBoxComponent implements OnInit, ControlValueAccessor {
     public inputFocus: EventEmitter<Event> = new EventEmitter<Event>();
 
     @ContentChildren(TextBoxPrefixTemplateDirective, { read: TemplateRef })
-    public prefixTemplateList: QueryList<TemplateRef<void>> = new QueryList<TemplateRef<void>>();
+    public prefixTemplateList: QueryList<TemplateRef<any>> = new QueryList<TemplateRef<any>>();
 
     @Input()
     public readonly: boolean = false;
 
     @ContentChildren(TextBoxSuffixTemplateDirective, { read: TemplateRef })
-    public suffixTemplateList: QueryList<TemplateRef<void>> = new QueryList<TemplateRef<void>>();
+    public suffixTemplateList: QueryList<TemplateRef<any>> = new QueryList<TemplateRef<any>>();
 
     public constructor(public readonly elementRef: ElementRef<HTMLDivElement>) {}
 
