@@ -1,6 +1,9 @@
 {
-    "name": "mona-ui",
+    "name": "@mirei/mona-ui",
     "version": "1.0.0",
+    "description": "A very light Angular UI framework",
+    "module": "dist/mona-ui/fesm2015/mona-ui.mjs",
+    "typings": "dist/mona-ui/index.d.ts",
     "scripts": {
         "ng": "ng",
         "start": "ng serve",
@@ -11,7 +14,18 @@
         "watch": "ng build mona-ui --watch --configuration development",
         "test": "ng test"
     },
-    "private": true,
+    "author": "Lumine",
+    "files": [
+        "dist",
+        "README.md"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/merophise/mona-ui"
+    },
+    "publishConfig": {
+        "access": "public"
+    },
     "dependencies": {
         "@angular/animations": "^16.0.0",
         "@angular/cdk": "^16.0.0",
