@@ -1,0 +1,22 @@
+import { NgModule } from "@angular/core";
+import { CommonModule } from "@angular/common";
+import { TextBoxDirective } from "./directives/text-box.directive";
+import { TextBoxComponent } from "./components/text-box/text-box.component";
+import { TextBoxPrefixTemplateDirective } from "./directives/text-box-prefix-template.directive";
+import { TextBoxSuffixTemplateDirective } from "./directives/text-box-suffix-template.directive";
+import { FormsModule } from "@angular/forms";
+import * as i0 from "@angular/core";
+export class TextBoxModule {
+    static { this.ɵfac = i0.ɵɵngDeclareFactory({ minVersion: "12.0.0", version: "16.0.0", ngImport: i0, type: TextBoxModule, deps: [], target: i0.ɵɵFactoryTarget.NgModule }); }
+    static { this.ɵmod = i0.ɵɵngDeclareNgModule({ minVersion: "14.0.0", version: "16.0.0", ngImport: i0, type: TextBoxModule, declarations: [TextBoxDirective, TextBoxComponent, TextBoxPrefixTemplateDirective, TextBoxSuffixTemplateDirective], imports: [CommonModule, FormsModule], exports: [TextBoxDirective, TextBoxComponent, TextBoxPrefixTemplateDirective, TextBoxSuffixTemplateDirective] }); }
+    static { this.ɵinj = i0.ɵɵngDeclareInjector({ minVersion: "12.0.0", version: "16.0.0", ngImport: i0, type: TextBoxModule, imports: [CommonModule, FormsModule] }); }
+}
+i0.ɵɵngDeclareClassMetadata({ minVersion: "12.0.0", version: "16.0.0", ngImport: i0, type: TextBoxModule, decorators: [{
+            type: NgModule,
+            args: [{
+                    declarations: [TextBoxDirective, TextBoxComponent, TextBoxPrefixTemplateDirective, TextBoxSuffixTemplateDirective],
+                    imports: [CommonModule, FormsModule],
+                    exports: [TextBoxDirective, TextBoxComponent, TextBoxPrefixTemplateDirective, TextBoxSuffixTemplateDirective]
+                }]
+        }] });
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoidGV4dC1ib3gubW9kdWxlLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vLi4vLi4vLi4vLi4vLi4vLi4vcHJvamVjdHMvbW9uYS11aS9zcmMvbGliL2lucHV0cy9tb2R1bGVzL3RleHQtYm94L3RleHQtYm94Lm1vZHVsZS50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQSxPQUFPLEVBQUUsUUFBUSxFQUFFLE1BQU0sZUFBZSxDQUFDO0FBQ3pDLE9BQU8sRUFBRSxZQUFZLEVBQUUsTUFBTSxpQkFBaUIsQ0FBQztBQUMvQyxPQUFPLEVBQUUsZ0JBQWdCLEVBQUUsTUFBTSxpQ0FBaUMsQ0FBQztBQUNuRSxPQUFPLEVBQUUsZ0JBQWdCLEVBQUUsTUFBTSwwQ0FBMEMsQ0FBQztBQUM1RSxPQUFPLEVBQUUsOEJBQThCLEVBQUUsTUFBTSxpREFBaUQsQ0FBQztBQUNqRyxPQUFPLEVBQUUsOEJBQThCLEVBQUUsTUFBTSxpREFBaUQsQ0FBQztBQUNqRyxPQUFPLEVBQUUsV0FBVyxFQUFFLE1BQU0sZ0JBQWdCLENBQUM7O0FBTzdDLE1BQU0sT0FBTyxhQUFhOzhHQUFiLGFBQWE7K0dBQWIsYUFBYSxpQkFKUCxnQkFBZ0IsRUFBRSxnQkFBZ0IsRUFBRSw4QkFBOEIsRUFBRSw4QkFBOEIsYUFDdkcsWUFBWSxFQUFFLFdBQVcsYUFDekIsZ0JBQWdCLEVBQUUsZ0JBQWdCLEVBQUUsOEJBQThCLEVBQUUsOEJBQThCOytHQUVuRyxhQUFhLFlBSFosWUFBWSxFQUFFLFdBQVc7OzJGQUcxQixhQUFhO2tCQUx6QixRQUFRO21CQUFDO29CQUNOLFlBQVksRUFBRSxDQUFDLGdCQUFnQixFQUFFLGdCQUFnQixFQUFFLDhCQUE4QixFQUFFLDhCQUE4QixDQUFDO29CQUNsSCxPQUFPLEVBQUUsQ0FBQyxZQUFZLEVBQUUsV0FBVyxDQUFDO29CQUNwQyxPQUFPLEVBQUUsQ0FBQyxnQkFBZ0IsRUFBRSxnQkFBZ0IsRUFBRSw4QkFBOEIsRUFBRSw4QkFBOEIsQ0FBQztpQkFDaEgiLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyBOZ01vZHVsZSB9IGZyb20gXCJAYW5ndWxhci9jb3JlXCI7XG5pbXBvcnQgeyBDb21tb25Nb2R1bGUgfSBmcm9tIFwiQGFuZ3VsYXIvY29tbW9uXCI7XG5pbXBvcnQgeyBUZXh0Qm94RGlyZWN0aXZlIH0gZnJvbSBcIi4vZGlyZWN0aXZlcy90ZXh0LWJveC5kaXJlY3RpdmVcIjtcbmltcG9ydCB7IFRleHRCb3hDb21wb25lbnQgfSBmcm9tIFwiLi9jb21wb25lbnRzL3RleHQtYm94L3RleHQtYm94LmNvbXBvbmVudFwiO1xuaW1wb3J0IHsgVGV4dEJveFByZWZpeFRlbXBsYXRlRGlyZWN0aXZlIH0gZnJvbSBcIi4vZGlyZWN0aXZlcy90ZXh0LWJveC1wcmVmaXgtdGVtcGxhdGUuZGlyZWN0aXZlXCI7XG5pbXBvcnQgeyBUZXh0Qm94U3VmZml4VGVtcGxhdGVEaXJlY3RpdmUgfSBmcm9tIFwiLi9kaXJlY3RpdmVzL3RleHQtYm94LXN1ZmZpeC10ZW1wbGF0ZS5kaXJlY3RpdmVcIjtcbmltcG9ydCB7IEZvcm1zTW9kdWxlIH0gZnJvbSBcIkBhbmd1bGFyL2Zvcm1zXCI7XG5cbkBOZ01vZHVsZSh7XG4gICAgZGVjbGFyYXRpb25zOiBbVGV4dEJveERpcmVjdGl2ZSwgVGV4dEJveENvbXBvbmVudCwgVGV4dEJveFByZWZpeFRlbXBsYXRlRGlyZWN0aXZlLCBUZXh0Qm94U3VmZml4VGVtcGxhdGVEaXJlY3RpdmVdLFxuICAgIGltcG9ydHM6IFtDb21tb25Nb2R1bGUsIEZvcm1zTW9kdWxlXSxcbiAgICBleHBvcnRzOiBbVGV4dEJveERpcmVjdGl2ZSwgVGV4dEJveENvbXBvbmVudCwgVGV4dEJveFByZWZpeFRlbXBsYXRlRGlyZWN0aXZlLCBUZXh0Qm94U3VmZml4VGVtcGxhdGVEaXJlY3RpdmVdXG59KVxuZXhwb3J0IGNsYXNzIFRleHRCb3hNb2R1bGUge31cbiJdfQ==

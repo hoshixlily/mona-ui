@@ -1,0 +1,34 @@
+import { AfterViewInit, ElementRef, EventEmitter, OnDestroy, OnInit, TemplateRef } from "@angular/core";
+import { WindowService } from "../../services/window.service";
+import { WindowTitleTemplateDirective } from "../../directives/window-title-template.directive";
+import * as i0 from "@angular/core";
+export declare class WindowComponent implements OnInit, OnDestroy, AfterViewInit {
+    private readonly windowService;
+    private readonly componentDestroy$;
+    private windowRef;
+    draggable?: boolean;
+    focusedElement?: HTMLElement | ElementRef<HTMLElement> | string;
+    height?: number;
+    heightChange: EventEmitter<number>;
+    left?: number;
+    leftChange: EventEmitter<number>;
+    maxHeight?: number;
+    maxWidth?: number;
+    minHeight?: number;
+    minWidth?: number;
+    modal?: boolean;
+    resizable?: boolean;
+    title?: string;
+    titleTemplateDirective?: WindowTitleTemplateDirective;
+    top?: number;
+    topChange: EventEmitter<number>;
+    width?: number;
+    widthChange: EventEmitter<number>;
+    windowTemplate: TemplateRef<any>;
+    constructor(windowService: WindowService);
+    ngAfterViewInit(): void;
+    ngOnDestroy(): void;
+    ngOnInit(): void;
+    static ɵfac: i0.ɵɵFactoryDeclaration<WindowComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<WindowComponent, "mona-window", never, { "draggable": { "alias": "draggable"; "required": false; }; "focusedElement": { "alias": "focusedElement"; "required": false; }; "height": { "alias": "height"; "required": false; }; "left": { "alias": "left"; "required": false; }; "maxHeight": { "alias": "maxHeight"; "required": false; }; "maxWidth": { "alias": "maxWidth"; "required": false; }; "minHeight": { "alias": "minHeight"; "required": false; }; "minWidth": { "alias": "minWidth"; "required": false; }; "modal": { "alias": "modal"; "required": false; }; "resizable": { "alias": "resizable"; "required": false; }; "title": { "alias": "title"; "required": false; }; "top": { "alias": "top"; "required": false; }; "width": { "alias": "width"; "required": false; }; }, { "heightChange": "heightChange"; "leftChange": "leftChange"; "topChange": "topChange"; "widthChange": "widthChange"; }, ["titleTemplateDirective"], ["*"], false, never>;
+}

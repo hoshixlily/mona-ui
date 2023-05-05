@@ -1,0 +1,33 @@
+import { AfterViewInit, ChangeDetectorRef, ElementRef, OnDestroy, OnInit } from "@angular/core";
+import { AbstractDateInputComponent } from "../../../../components/abstract-date-input/abstract-date-input.component";
+import * as i0 from "@angular/core";
+export declare class TimeSelectorComponent extends AbstractDateInputComponent implements OnInit, OnDestroy, AfterViewInit {
+    protected readonly cdr: ChangeDetectorRef;
+    private readonly elementRef;
+    hour: number | null;
+    hours: number[];
+    meridiem: "AM" | "PM";
+    minute: number | null;
+    minutes: number[];
+    second: number | null;
+    seconds: number[];
+    format: string;
+    hourFormat: "12" | "24";
+    hoursListElement: ElementRef<HTMLOListElement>;
+    minutesListElement: ElementRef<HTMLOListElement>;
+    secondsListElement: ElementRef<HTMLOListElement>;
+    showSeconds: boolean;
+    constructor(cdr: ChangeDetectorRef, elementRef: ElementRef);
+    ngAfterViewInit(): void;
+    ngOnInit(): void;
+    onHourChange(value: number): void;
+    onMeridiemClick(meridiem: "AM" | "PM"): void;
+    onMinuteChange(value: number): void;
+    onSecondChange(value: number): void;
+    private scrollList;
+    private updateHour;
+    private updateMinute;
+    private updateSecond;
+    static ɵfac: i0.ɵɵFactoryDeclaration<TimeSelectorComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<TimeSelectorComponent, "mona-time-selector", never, { "format": { "alias": "format"; "required": false; }; "hourFormat": { "alias": "hourFormat"; "required": false; }; "showSeconds": { "alias": "showSeconds"; "required": false; }; }, {}, never, never, false, never>;
+}

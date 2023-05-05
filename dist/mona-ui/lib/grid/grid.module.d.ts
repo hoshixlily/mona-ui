@@ -1,0 +1,31 @@
+import * as i0 from "@angular/core";
+import * as i1 from "./components/grid/grid.component";
+import * as i2 from "./components/grid-list/grid-list.component";
+import * as i3 from "./directives/grid-column-resize-handler.directive";
+import * as i4 from "./components/grid-filter-menu/grid-filter-menu.component";
+import * as i5 from "./pipes/grid-filter.pipe";
+import * as i6 from "./pipes/grid-page.pipe";
+import * as i7 from "./components/grid-column/grid-column.component";
+import * as i8 from "./directives/grid-cell-template.directive";
+import * as i9 from "./pipes/grid-group.pipe";
+import * as i10 from "./directives/grid-selectable.directive";
+import * as i11 from "./components/grid-cell/grid-cell.component";
+import * as i12 from "./directives/grid-editable.directive";
+import * as i13 from "@angular/common";
+import * as i14 from "../buttons/modules/button/button.module";
+import * as i15 from "@fortawesome/angular-fontawesome";
+import * as i16 from "../pager/pager.module";
+import * as i17 from "../pipes/slice.pipe";
+import * as i18 from "@angular/cdk/drag-drop";
+import * as i19 from "../buttons/modules/chip/chip.module";
+import * as i20 from "../inputs/modules/text-box/text-box.module";
+import * as i21 from "@angular/forms";
+import * as i22 from "../inputs/modules/numeric-text-box/numeric-text-box.module";
+import * as i23 from "@angular/cdk/a11y";
+import * as i24 from "../date-inputs/modules/date-picker/date-picker.module";
+import * as i25 from "../inputs/modules/check-box/check-box.module";
+export declare class GridModule {
+    static ɵfac: i0.ɵɵFactoryDeclaration<GridModule, never>;
+    static ɵmod: i0.ɵɵNgModuleDeclaration<GridModule, [typeof i1.GridComponent, typeof i2.GridListComponent, typeof i3.GridColumnResizeHandlerDirective, typeof i4.GridFilterMenuComponent, typeof i5.GridFilterPipe, typeof i6.GridPagePipe, typeof i7.GridColumnComponent, typeof i8.GridCellTemplateDirective, typeof i9.GridGroupPipe, typeof i10.GridSelectableDirective, typeof i11.GridCellComponent, typeof i12.GridEditableDirective], [typeof i13.CommonModule, typeof i14.ButtonModule, typeof i15.FontAwesomeModule, typeof i16.PagerModule, typeof i17.SlicePipe, typeof i18.DragDropModule, typeof i19.ChipModule, typeof i20.TextBoxModule, typeof i21.ReactiveFormsModule, typeof i22.NumericTextBoxModule, typeof i23.A11yModule, typeof i24.DatePickerModule, typeof i25.CheckBoxModule], [typeof i1.GridComponent, typeof i7.GridColumnComponent, typeof i8.GridCellTemplateDirective, typeof i12.GridEditableDirective, typeof i10.GridSelectableDirective]>;
+    static ɵinj: i0.ɵɵInjectorDeclaration<GridModule>;
+}

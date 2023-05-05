@@ -1,0 +1,35 @@
+import { AfterViewInit, EventEmitter, NgZone, OnDestroy, OnInit, Renderer2, TemplateRef } from "@angular/core";
+import { PopupRef } from "../../models/PopupRef";
+import { FlexibleConnectedPositionStrategyOrigin } from "@angular/cdk/overlay";
+import { PopupOffset } from "../../models/PopupOffset";
+import { PopupService } from "../../services/popup.service";
+import * as i0 from "@angular/core";
+export declare class PopupComponent implements OnInit, OnDestroy, AfterViewInit {
+    private readonly popupService;
+    private readonly renderer;
+    private readonly zone;
+    private popupOpened;
+    private popupRef;
+    private popupTriggerListener;
+    anchor: FlexibleConnectedPositionStrategyOrigin;
+    close: EventEmitter<void>;
+    closeOnEscape: boolean;
+    contentTemplate: TemplateRef<any>;
+    height?: number | string;
+    maxHeight?: number | string;
+    maxWidth?: number | string;
+    minHeight?: number | string;
+    minWidth?: number | string;
+    offset?: PopupOffset;
+    open: EventEmitter<PopupRef>;
+    popupClass: string | string[];
+    trigger: string;
+    width?: number | string;
+    constructor(popupService: PopupService, renderer: Renderer2, zone: NgZone);
+    ngAfterViewInit(): void;
+    ngOnDestroy(): void;
+    ngOnInit(): void;
+    private setEventListeners;
+    static ɵfac: i0.ɵɵFactoryDeclaration<PopupComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<PopupComponent, "mona-popup", never, { "anchor": { "alias": "anchor"; "required": false; }; "closeOnEscape": { "alias": "closeOnEscape"; "required": false; }; "height": { "alias": "height"; "required": false; }; "maxHeight": { "alias": "maxHeight"; "required": false; }; "maxWidth": { "alias": "maxWidth"; "required": false; }; "minHeight": { "alias": "minHeight"; "required": false; }; "minWidth": { "alias": "minWidth"; "required": false; }; "offset": { "alias": "offset"; "required": false; }; "popupClass": { "alias": "popupClass"; "required": false; }; "trigger": { "alias": "trigger"; "required": false; }; "width": { "alias": "width"; "required": false; }; }, { "close": "close"; "open": "open"; }, ["contentTemplate"], ["*"], false, never>;
+}

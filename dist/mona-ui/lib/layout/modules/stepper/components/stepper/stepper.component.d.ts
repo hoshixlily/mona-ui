@@ -1,0 +1,36 @@
+import { ChangeDetectorRef, ElementRef, EventEmitter, OnDestroy, OnInit } from "@angular/core";
+import { Step, StepOptions } from "../../models/Step";
+import { StepperLabelTemplateDirective } from "../../directives/stepper-label-template.directive";
+import { StepperIndicatorTemplateDirective } from "../../directives/stepper-indicator-template.directive";
+import { StepperStepTemplateDirective } from "../../directives/stepper-step-template.directive";
+import * as i0 from "@angular/core";
+export declare class StepperComponent implements OnInit, OnDestroy {
+    private readonly elementRef;
+    private readonly cdr;
+    private readonly componentDestroy$;
+    activeStep: Step | null;
+    stepList: Step[];
+    indicatorTemplateDirective: StepperIndicatorTemplateDirective | null;
+    linear: boolean;
+    labelTemplateDirective: StepperLabelTemplateDirective | null;
+    orientation: "horizontal" | "vertical";
+    stepTemplateDirective: StepperStepTemplateDirective | null;
+    set step(step: number);
+    get step(): number;
+    set steps(steps: StepOptions[]);
+    stepChange: EventEmitter<number>;
+    constructor(elementRef: ElementRef<HTMLElement>, cdr: ChangeDetectorRef);
+    ngOnDestroy(): void;
+    ngOnInit(): void;
+    onStepClick(step: Step): void;
+    setActiveStep(step: Step, bypassLinear?: boolean): boolean;
+    private setSubscriptions;
+    get gridTemplateColumns(): Partial<CSSStyleDeclaration>;
+    get trackInnerStyles(): Partial<CSSStyleDeclaration>;
+    get trackItemSize(): number;
+    get trackItemStyles(): Partial<CSSStyleDeclaration>;
+    get trackLength(): string;
+    get trackStyles(): Partial<CSSStyleDeclaration>;
+    static ɵfac: i0.ɵɵFactoryDeclaration<StepperComponent, never>;
+    static ɵcmp: i0.ɵɵComponentDeclaration<StepperComponent, "mona-stepper", never, { "linear": { "alias": "linear"; "required": false; }; "orientation": { "alias": "orientation"; "required": false; }; "step": { "alias": "step"; "required": false; }; "steps": { "alias": "steps"; "required": false; }; }, { "stepChange": "stepChange"; }, ["indicatorTemplateDirective", "labelTemplateDirective", "stepTemplateDirective"], never, false, never>;
+}
