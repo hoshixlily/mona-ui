@@ -2,7 +2,6 @@ import { Injectable, Injector, NgZone, OnDestroy, Renderer2, RendererFactory2, T
 import { PopupSettings } from "../models/PopupSettings";
 import { Overlay, PositionStrategy } from "@angular/cdk/overlay";
 import { ComponentPortal, TemplatePortal } from "@angular/cdk/portal";
-import { PopupAnchorDirective } from "../directives/popup-anchor.directive";
 import { PopupRef } from "../models/PopupRef";
 import { PopupInjectionToken } from "../models/PopupInjectionToken";
 import { DefaultPositions } from "../models/DefaultPositions";
@@ -12,12 +11,12 @@ import { Dictionary } from "@mirei/ts-collections";
 import { PopupState } from "../models/PopupState";
 import { v4 } from "uuid";
 import { PopupReference } from "../models/PopupReference";
+import { PopupWrapperComponent } from "../components/popup-wrapper/popup-wrapper.component";
 
 @Injectable({
     providedIn: "root"
 })
 export class PopupService implements OnDestroy {
-    public static popupAnchorDirective: PopupAnchorDirective;
     private readonly outsideEventsToClose = ["click", "mousedown", "dblclick", "contextmenu", "auxclick"];
     private readonly popupStateMap: Dictionary<string, PopupState> = new Dictionary<string, PopupState>();
     private readonly serviceDestroy$: Subject<void> = new Subject<void>();
@@ -76,21 +75,14 @@ export class PopupService implements OnDestroy {
             ]
         });
 
-        let portal: TemplatePortal | ComponentPortal<void>;
+        let portal: TemplatePortal | ComponentPortal<any>;
         if (settings.content instanceof TemplateRef) {
-            portal = new TemplatePortal(
-                settings.content,
-                PopupService.popupAnchorDirective.viewContainerRef,
-                null,
-                injector
-            );
-            overlayRef.attach(portal);
+            portal = new ComponentPortal(PopupWrapperComponent, null, injector);
+            popupReference.componentRef = overlayRef.attach(portal);
+            (popupReference.componentRef.instance as PopupWrapperComponent).templateRef = settings.content;
+            popupReference.componentRef.changeDetectorRef.detectChanges();
         } else {
-            portal = new ComponentPortal(
-                settings.content,
-                PopupService.popupAnchorDirective.viewContainerRef,
-                injector
-            );
+            portal = new ComponentPortal(settings.content, null, injector);
             popupReference.componentRef = overlayRef.attach(portal);
         }
 
