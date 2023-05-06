@@ -18,7 +18,7 @@ import { ButtonService } from "../../../services/button.service";
 })
 export class ButtonDirective implements OnInit, OnDestroy {
     #selected: boolean = false;
-    private readonly destroy$: Subject<void> = new Subject<void>();
+    readonly #destroy$: Subject<void> = new Subject<void>();
 
     @HostBinding("class.mona-disabled")
     @Input()
@@ -35,8 +35,10 @@ export class ButtonDirective implements OnInit, OnDestroy {
     @HostBinding("class.mona-selected")
     @Input()
     public set selected(selected: boolean) {
-        this.#selected = selected;
-        this.buttonService?.buttonSelected$.next(this);
+        if (selected !== this.#selected) {
+            this.#selected = selected;
+            this.buttonService?.buttonSelected$.next(this);
+        }
     }
 
     public get selected(): boolean {
@@ -55,14 +57,14 @@ export class ButtonDirective implements OnInit, OnDestroy {
     ) {}
 
     public ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
+        this.#destroy$.next();
+        this.#destroy$.complete();
     }
 
     public ngOnInit(): void {
         if (this.toggleable) {
             fromEvent<MouseEvent>(this.elementRef.nativeElement, "click")
-                .pipe(takeUntil(this.destroy$))
+                .pipe(takeUntil(this.#destroy$))
                 .subscribe(() => {
                     if (this.buttonService) {
                         this.buttonService.buttonClick$.next(this);
@@ -72,7 +74,7 @@ export class ButtonDirective implements OnInit, OnDestroy {
                     }
                 });
         }
-        this.buttonService?.buttonSelect$.pipe(takeUntil(this.destroy$)).subscribe(result => {
+        this.buttonService?.buttonSelect$.pipe(takeUntil(this.#destroy$)).subscribe(result => {
             const [button, selected] = result;
             if (button === this) {
                 this.#selected = selected;

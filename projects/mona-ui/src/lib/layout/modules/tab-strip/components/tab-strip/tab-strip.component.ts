@@ -1,41 +1,39 @@
 import {
     AfterContentInit,
     AfterViewInit,
+    ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
     ContentChildren,
+    ElementRef,
     EventEmitter,
     Input,
     OnDestroy,
     OnInit,
     Output,
-    QueryList
+    QueryList,
+    ViewChild
 } from "@angular/core";
 import { TabComponent } from "../tab/tab.component";
 import { interval, Subject, takeUntil, timer } from "rxjs";
 import { ScrollDirection } from "../../data/ScrollDirection";
-import {
-    faChevronLeft,
-    faChevronRight,
-    faTimes,
-    faTimesCircle,
-    faXmark,
-    IconDefinition
-} from "@fortawesome/free-solid-svg-icons";
+import { faChevronLeft, faChevronRight, faXmark, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { TabCloseEvent } from "../../data/TabCloseEvent";
 
 @Component({
     selector: "mona-tab-strip",
     templateUrl: "./tab-strip.component.html",
-    styleUrls: ["./tab-strip.component.scss"]
+    styleUrls: ["./tab-strip.component.scss"],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TabStripComponent implements OnInit, AfterContentInit, OnDestroy, AfterViewInit {
-    private readonly componentDestroy$: Subject<void> = new Subject<void>();
+    readonly #destroy$: Subject<void> = new Subject<void>();
+    #resizeObserver: ResizeObserver | null = null;
     private scroll$: Subject<void> = new Subject<void>();
     public readonly scrollLeftIcon: IconDefinition = faChevronLeft;
     public readonly scrollRightIcon: IconDefinition = faChevronRight;
     public readonly tabCloseIcon: IconDefinition = faXmark;
-    // public selectedTab?: TabComponent;
+    public scrollsVisible: boolean = false;
 
     @Input()
     public closable: boolean = false;
@@ -49,28 +47,35 @@ export class TabStripComponent implements OnInit, AfterContentInit, OnDestroy, A
     @ContentChildren(TabComponent)
     public tabComponents: QueryList<TabComponent> = new QueryList<TabComponent>();
 
+    @ViewChild("tabListElement")
+    public tabListElement!: ElementRef<HTMLUListElement>;
+
     public constructor(private readonly cdr: ChangeDetectorRef) {}
 
     public ngAfterContentInit(): void {
         this.tabComponents.forEach((t, tx) => (t.index = tx));
-        this.tabComponents.changes
-            .pipe(takeUntil(this.componentDestroy$))
-            .subscribe((tabs: QueryList<TabComponent>) => {
-                tabs.forEach((t, tx) => (t.index = tx));
-            });
+        this.tabComponents.changes.pipe(takeUntil(this.#destroy$)).subscribe((tabs: QueryList<TabComponent>) => {
+            tabs.forEach((t, tx) => (t.index = tx));
+            this.updateScrollVisibility();
+        });
     }
 
     public ngAfterViewInit(): void {
-        // this.selectedTab = this.tabComponents.find(t => t.selected)
-        // if (this.selectedTab) {
-        //     this.selectedTab.active = true;
-        // }
-        this.cdr.detectChanges();
+        this.#resizeObserver = new ResizeObserver(entries => {
+            window.requestAnimationFrame(() => {
+                if (!Array.isArray(entries) || !entries.length) {
+                    return;
+                }
+                this.updateScrollVisibility();
+            });
+        });
+        this.#resizeObserver.observe(this.tabListElement.nativeElement);
     }
 
     public ngOnDestroy(): void {
-        this.componentDestroy$.next();
-        this.componentDestroy$.complete();
+        this.#destroy$.next();
+        this.#destroy$.complete();
+        this.#resizeObserver?.disconnect();
     }
 
     public ngOnInit(): void {}
@@ -89,6 +94,7 @@ export class TabStripComponent implements OnInit, AfterContentInit, OnDestroy, A
     public onTabClose(tab: TabComponent, event: MouseEvent): void {
         event.stopPropagation();
         const tabCloseEvent = new TabCloseEvent(tab.index, tab);
+        this.cdr.detectChanges();
         this.tabClose.emit(tabCloseEvent);
     }
 
@@ -115,5 +121,11 @@ export class TabStripComponent implements OnInit, AfterContentInit, OnDestroy, A
         this.scroll$.next();
         this.scroll$.complete();
         this.scroll$ = new Subject<void>();
+    }
+
+    private updateScrollVisibility(): void {
+        this.scrollsVisible =
+            this.tabListElement.nativeElement.scrollWidth > this.tabListElement.nativeElement.clientWidth;
+        this.cdr.detectChanges();
     }
 }

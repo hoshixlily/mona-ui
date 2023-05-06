@@ -291,6 +291,22 @@ export class AppComponent implements OnInit {
         { label: "Review", data: { review: true } },
         { label: "Complete" }
     ];
+    public tabData: Array<{ title: string; id: string }> = [
+        { title: "Tab 1", id: "tab1" },
+        { title: "Tab 2", id: "tab2" },
+        { title: "Tab 3", id: "tab3" },
+        { title: "Tab 4", id: "tab4" },
+        { title: "Tab 5", id: "tab5" },
+        { title: "Tab 6", id: "tab6" },
+        { title: "Tab 7", id: "tab7" },
+        { title: "Tab 8", id: "tab8" },
+        { title: "Tab 9", id: "tab9" },
+        { title: "Tab 10", id: "tab10" },
+        { title: "Tab 11", id: "tab11" },
+        { title: "Tab 12", id: "tab12" },
+        { title: "Tab 13", id: "tab13" },
+        { title: "Tab 14", id: "tab14" }
+    ];
     public textBoxValue: string = "TEXT BOX VALUE";
     public textBoxValue2: string = "a";
     public timePickerValue: Date | null = new Date(2018, 0, 1, 17, 13, 37);
@@ -611,8 +627,7 @@ export class AppComponent implements OnInit {
 
     public onTabStripTabClose(event: TabCloseEvent): void {
         console.log(event);
-        this.dropdownPrimitiveDataItems.splice(event.index - 1, 1);
-        this.dropdownPrimitiveDataItems = [...this.dropdownPrimitiveDataItems];
+        this.tabData = this.tabData.filter((_, index) => index !== event.index - 4);
     }
 
     public onTextBoxValueChange(value: string): void {

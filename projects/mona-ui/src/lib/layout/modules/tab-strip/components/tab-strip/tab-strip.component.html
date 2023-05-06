@@ -1,24 +1,26 @@
 <div class="mona-tab-strip">
     <div class="mona-tab-strip-tabs">
-        <div class="mona-tab-strip-scroll">
+        <div class="mona-tab-strip-scroll" *ngIf="scrollsVisible">
             <button monaButton (click)="startScrolling(tabListElement, 'left', 'single')"
                     (mousedown)="startScrolling(tabListElement, 'left', 'continuous')" (mouseup)="stopScrolling()">
                 <fa-icon [icon]="scrollLeftIcon"></fa-icon>
             </button>
         </div>
-        <ul class="mona-tab-list" #tabListElement>
-            <li *ngFor="let tab of tabComponents" [ngClass]="{'mona-tab-active': tab.selected, 'mona-disabled': tab.disabled}"
-                (click)="onTabClick(tab, tabListElement)">
-                <div class="mona-tab-title">
-                    <span *ngIf="!tab.titleTemplate">{{tab.title}}</span>
-                    <ng-container [ngTemplateOutlet]="tab.titleTemplate" *ngIf="!!tab.titleTemplate"></ng-container>
-                </div>
-                <button monaButton [flat]="true" [disabled]="tab.disabled" *ngIf="(tab.closable===true) || (closable && tab.closable==null)" class="mona-tab-close" (click)="onTabClose(tab, $event)">
-                    <fa-icon [icon]="tabCloseIcon"></fa-icon>
-                </button>
-            </li>
-        </ul>
-        <div class="mona-tab-strip-scroll">
+        <div class="mona-tab-list-wrapper">
+            <ul class="mona-tab-list" #tabListElement>
+                <li *ngFor="let tab of tabComponents" [ngClass]="{'mona-tab-active': tab.selected, 'mona-disabled': tab.disabled}"
+                    (click)="onTabClick(tab, tabListElement)">
+                    <div class="mona-tab-title">
+                        <span *ngIf="!tab.titleTemplate">{{tab.title}}</span>
+                        <ng-container [ngTemplateOutlet]="tab.titleTemplate" *ngIf="!!tab.titleTemplate"></ng-container>
+                    </div>
+                    <button monaButton [flat]="true" [disabled]="tab.disabled" *ngIf="(tab.closable===true) || (closable && tab.closable !== false)" class="mona-tab-close" (click)="onTabClose(tab, $event)">
+                        <fa-icon [icon]="tabCloseIcon"></fa-icon>
+                    </button>
+                </li>
+            </ul>
+        </div>
+        <div class="mona-tab-strip-scroll" *ngIf="scrollsVisible">
             <button monaButton (click)="startScrolling(tabListElement, 'right', 'single')"
                     (mousedown)="startScrolling(tabListElement, 'right', 'continuous')" (mouseup)="stopScrolling()">
                 <fa-icon [icon]="scrollRightIcon"></fa-icon>

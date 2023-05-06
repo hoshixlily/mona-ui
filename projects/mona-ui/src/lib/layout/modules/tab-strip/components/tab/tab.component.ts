@@ -5,8 +5,8 @@ import { v4 } from "uuid";
 
 @Component({
     selector: "mona-tab",
-    templateUrl: "./tab.component.html",
-    styleUrls: ["./tab.component.scss"]
+    template: "",
+    styleUrls: []
 })
 export class TabComponent implements OnInit {
     public readonly uid: string = v4();

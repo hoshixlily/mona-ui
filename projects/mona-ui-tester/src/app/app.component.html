@@ -33,8 +33,8 @@
             </mona-tree-view>
         </mona-splitter-pane>
         <mona-splitter-pane>
-            <mona-tab-strip [keepTabContent]="true" [closable]="true" (tabClose)="onTabStripTabClose($event)">
-                <mona-tab [title]="'Grid Tab'" [selected]="true">
+            <mona-tab-strip [keepTabContent]="true" [closable]="false" (tabClose)="onTabStripTabClose($event)">
+                <mona-tab [title]="'Grid Tab'" >
                     <ng-template monaTabContentTemplate>
                         <div style="padding: 40px;">
                             <mona-grid [data]="gridOrderData" [pageSize]="5" [pageSizeValues]="[5, 10, 15, 20, 25, 50, 100]" style="height: 400px;"
@@ -61,7 +61,7 @@
                         </div>
                     </ng-template>
                 </mona-tab>
-                <mona-tab [title]="'TAB I'" [closable]="false">
+                <mona-tab [title]="'TAB I'" [closable]="false" [selected]="true">
                     <ng-template monaTabTitleTemplate>
                         <span style="color: deeppink; font-weight: bold;">Components</span>
                     </ng-template>
@@ -508,7 +508,7 @@
                 <!--                        {{item}}-->
                 <!--                    </ng-template>-->
                 <!--                </mona-tab>-->
-                <mona-tab title="Splitter" [selected]="true">
+                <mona-tab title="Splitter" >
                     <ng-template monaTabContentTemplate>
                         <div style="width: 100%; height: 100%;">
                             <mona-splitter style="height: 100%;" orientation="vertical">
@@ -541,7 +541,8 @@
                             </mona-splitter>
                         </div>
                     </ng-template>
-                </mona-tab>
+                </mona-tab >
+                <mona-tab *ngFor="let t of tabData" title="TAB TITLE: {{t.title}}" [closable]="true"></mona-tab>
             </mona-tab-strip>
         </mona-splitter-pane>
     </mona-splitter>
