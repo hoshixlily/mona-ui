@@ -2,8 +2,6 @@
     "name": "@mirei/mona-ui",
     "version": "1.0.0",
     "description": "A very light Angular UI framework",
-    "module": "dist/mona-ui/fesm2015/mona-ui.mjs",
-    "typings": "dist/mona-ui/index.d.ts",
     "scripts": {
         "ng": "ng",
         "start": "ng serve",
@@ -25,6 +23,16 @@
     },
     "publishConfig": {
         "access": "public"
+    },
+    "release": {
+        "plugins": [
+            "@semantic-release/commit-analyzer",
+            "@semantic-release/release-notes-generator",
+            "@semantic-release/npm",
+            "@semantic-release/git",
+            "@semantic-release/github"
+        ],
+        "branches": ["main"]
     },
     "dependencies": {
         "@angular/animations": "^16.0.0",
