@@ -1,8 +1,10 @@
 import {
     AfterViewInit,
+    ApplicationRef,
     ChangeDetectionStrategy,
     Component,
     ComponentRef,
+    createComponent,
     ElementRef,
     Inject,
     Injector,
@@ -17,7 +19,6 @@ import { WindowInjectorData } from "../../models/WindowInjectorData";
 import { faClose, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { WindowCloseEvent } from "../../models/WindowCloseEvent";
 import { PopupCloseSource } from "../../../popup/models/PopupCloseEvent";
-import { PopupService } from "../../../popup/services/popup.service";
 
 @Component({
     selector: "mona-window-content",
@@ -34,28 +35,28 @@ export class WindowContentComponent implements OnInit, AfterViewInit {
     public componentAnchor!: ViewContainerRef;
 
     public constructor(
+        private readonly appRef: ApplicationRef,
         private injector: Injector,
         @Inject(PopupInjectionToken) public windowData: WindowInjectorData,
-        private readonly elementRef: ElementRef<HTMLElement>
+        private readonly elementRef: ElementRef<HTMLElement>,
+        private readonly viewContainerRef: ViewContainerRef
     ) {
         if (windowData.content instanceof TemplateRef) {
             this.contentType = "template";
         } else {
             this.contentType = "component";
-            this.componentRef = PopupService.popupAnchorDirective.viewContainerRef.createComponent(
-                windowData.content as Type<any>,
-                {
-                    injector: this.injector
-                }
-            );
+            this.componentRef = createComponent(windowData.content as Type<any>, {
+                environmentInjector: this.appRef.injector,
+                elementInjector: this.injector
+            });
         }
     }
 
     public ngAfterViewInit(): void {
         if (this.contentType === "component" && this.componentAnchor && this.componentRef) {
-            const index = PopupService.popupAnchorDirective.viewContainerRef.indexOf(this.componentRef.hostView);
+            const index = this.viewContainerRef.indexOf(this.componentRef.hostView);
             if (index !== -1) {
-                PopupService.popupAnchorDirective.viewContainerRef.detach(index);
+                this.viewContainerRef.detach(index);
             }
             this.componentAnchor.insert(this.componentRef.hostView, 0);
             this.componentRef.changeDetectorRef.detectChanges();
