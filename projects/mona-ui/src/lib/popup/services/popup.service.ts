@@ -1,7 +1,7 @@
 import { Injectable, Injector, NgZone, OnDestroy, Renderer2, RendererFactory2, TemplateRef } from "@angular/core";
 import { PopupSettings } from "../models/PopupSettings";
 import { Overlay, PositionStrategy } from "@angular/cdk/overlay";
-import { ComponentPortal, TemplatePortal } from "@angular/cdk/portal";
+import { ComponentPortal } from "@angular/cdk/portal";
 import { PopupRef } from "../models/PopupRef";
 import { PopupInjectionToken } from "../models/PopupInjectionToken";
 import { DefaultPositions } from "../models/DefaultPositions";
@@ -75,7 +75,7 @@ export class PopupService implements OnDestroy {
             ]
         });
 
-        let portal: TemplatePortal | ComponentPortal<any>;
+        let portal: ComponentPortal<any>;
         if (settings.content instanceof TemplateRef) {
             portal = new ComponentPortal(PopupWrapperComponent, null, injector);
             popupReference.componentRef = overlayRef.attach(portal);
