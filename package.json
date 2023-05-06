@@ -2,9 +2,9 @@
     "name": "@mirei/mona-ui",
     "version": "1.0.1",
     "description": "A very light Angular UI framework",
-    "main": "dist/mona-ui/fesm2015/mona-ui.mjs",
+    "main": "dist/mona-ui/fesm2022/mona-ui.mjs",
     "exports": {
-        ".": "./dist/mona-ui/fesm2015/mona-ui.mjs"
+        ".": "./dist/mona-ui/fesm2022/mona-ui.mjs"
     },
     "typings": "dist/mona-ui/index.d.ts",
     "scripts": {
