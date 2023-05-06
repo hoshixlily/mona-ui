@@ -104,6 +104,6 @@ export class TooltipComponent implements OnInit {
     }
 
     private get tooltipOverlayElement(): HTMLElement | null {
-        return this.tooltipElement?.parentElement ?? null;
+        return this.tooltipElement?.parentElement?.parentElement ?? null;
     }
 }

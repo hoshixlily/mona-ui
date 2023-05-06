@@ -1,4 +1,4 @@
-@import '~@angular/cdk/overlay-prebuilt.css';
+@import '@angular/cdk/overlay-prebuilt.css';
 
 *,
 *::before,
@@ -14,10 +14,6 @@
 *::-moz-selection {
     background-color: var(--mona-primary-dark) !important;
     color: var(--mona-text) !important;
-}
-
-input {
-    //font-size: 12px;
 }
 
 @mixin active-background {
