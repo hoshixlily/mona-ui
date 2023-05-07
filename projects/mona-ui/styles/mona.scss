@@ -3,15 +3,24 @@
 :root {
     --mona-active-shadow: 0 0 10px -3px var(--mona-shadow-color);
 
-    --mona-background: #1C1D1F;
-    --mona-background-hover: #1F2022;
-    --mona-background-active: #232427;
+    --mona-background-1: #000000;
+    --mona-background-2: #0B0C0E;
+    --mona-background-3: #161719;
+    --mona-background-4: #1C1D1F;
+    --mona-background-5: #232427;
+    --mona-background-6: #262729;
+    --mona-background-7: #2A2B2E;
+    --mona-background-8: #2D2E31;
+    --mona-background-9: #303135;
+    --mona-background-10: #333438;
+    --mona-background-11: #36373B;
 
-    --mona-background-dark: #161719;
-    --mona-background-darker: #0B0C0E;
-    --mona-background-darker-2: #000000;
-    --mona-background-light: #232427;
-    --mona-background-lighter: #3E3F41;
+    --mona-background: var(--mona-background-4);
+    --mona-background-dark: var(--mona-background-3);
+    --mona-background-darker: var(--mona-background-2);
+    --mona-background-light: var(--mona-background-5);
+    --mona-background-hover: #1F2022;
+    --mona-background-active: #1D1E20;
 
     --mona-border-color: #101114;
     --mona-focus-border-color: darkgray;
@@ -19,8 +28,9 @@
     --mona-input-height: 30px;
 
     --mona-primary: #595fa4;
+    --mona-primary-hover: #6d75ca;
+    --mona-primary-active: #6369b5;
     --mona-primary-dark: #3d4171;
-    --mona-primary-light: #6d75ca;
 
     --mona-popup-shadow: 0 5px 10px -3px var(--mona-shadow-color);
     --mona-shadow-color: #101114;

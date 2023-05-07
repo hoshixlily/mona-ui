@@ -78,7 +78,7 @@ export class ContextMenuComponent implements OnInit, OnDestroy, AfterContentInit
         private readonly contextMenuService: ContextMenuService,
         private readonly elementRef: ElementRef,
         private readonly renderer: Renderer2,
-        private zone: NgZone
+        private readonly zone: NgZone
     ) {}
 
     public closeMenu(): void {
