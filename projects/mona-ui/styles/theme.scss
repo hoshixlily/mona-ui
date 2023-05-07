@@ -365,6 +365,12 @@ mona-button-group button[monaButton] {
     & mona-text-box {
         width: 100%;
     }
+    & .mona-text-box-suffix button {
+        &:first-child {
+            border-left: none;
+        }
+
+    }
 }
 
 .mona-date-picker {

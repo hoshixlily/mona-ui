@@ -8,10 +8,8 @@
             <ng-container [ngTemplateOutlet]="valueTemplate" [ngTemplateOutletContext]="{$implicit: valuePopupListItem?.data, listItem: valuePopupListItem}"></ng-container>
         </ng-container>
     </div>
-    <div class="mona-input-selector-icon" *ngIf="showClearButton && valuePopupListItem">
-        <button monaButton [flat]="true" (click)="clearValue($event)" class="mona-dropdown-clear-icon">
-            <fa-icon [icon]="clearIcon"></fa-icon>
-        </button>
+    <div class="mona-input-selector-icon" *ngIf="showClearButton && valuePopupListItem" (click)="clearValue($event)">
+        <fa-icon [icon]="clearIcon"></fa-icon>
     </div>
     <div class="mona-input-selector-icon">
         <fa-icon [icon]="dropdownIcon"></fa-icon>

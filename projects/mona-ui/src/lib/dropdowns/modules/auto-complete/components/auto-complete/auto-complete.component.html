@@ -2,10 +2,8 @@
     <div class="mona-input-selector-value">
         <mona-text-box [ngModel]="autoCompleteValue" (ngModelChange)="autoCompleteValue$.next($event)" (keydown)="onKeydown($event)"></mona-text-box>
     </div>
-    <div class="mona-input-selector-icon" *ngIf="showClearButton && value">
-        <button monaButton [flat]="true" (click)="clearValue($event)" class="mona-dropdown-clear-icon" tabindex="-1">
-            <fa-icon [icon]="clearIcon"></fa-icon>
-        </button>
+    <div class="mona-input-selector-icon" *ngIf="showClearButton && value" (click)="clearValue($event)">
+        <fa-icon [icon]="clearIcon"></fa-icon>
     </div>
 </div>
 
