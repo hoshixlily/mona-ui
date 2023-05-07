@@ -18,7 +18,7 @@
 
 @mixin active-background {
     &:active {
-        background-color: var(--mona-background-darker);
+        background-color: var(--mona-background-active);
     }
 }
 
@@ -54,7 +54,7 @@
 
 @mixin hover-background {
     &:hover {
-        background-color: var(--mona-background-dark);
+        background-color: var(--mona-background-hover);
     }
 }
 
@@ -70,7 +70,7 @@
     &::-webkit-scrollbar-thumb {
         background-color: var(--mona-background-darker);
         &:hover {
-            background-color: var(--mona-background-light);
+            background-color: var(--mona-background-hover);
         }
     }
     &::-webkit-scrollbar-corner {
@@ -270,13 +270,8 @@ mona-button-group button[monaButton] {
     font-size: 14px;
 
     @include background-transition;
-
-    &:hover {
-        background-color: var(--mona-background-darker);
-    }
-    &:active {
-        background-color: var(--mona-background-darker-2);
-    }
+    @include hover-background;
+    @include active-background;
 }
 
 /** Split Button */
@@ -454,6 +449,12 @@ div.mona-time-picker-popup {
 
 /** Multi Select */
 .mona-multi-select {
+    & .mona-input-selector {
+        &:hover,
+        &:active {
+            background-color: var(--mona-background);
+        }
+    }
     & .mona-input-selector-value {
         & mona-text-box {
             box-shadow: none;
@@ -468,6 +469,9 @@ div.mona-time-picker-popup {
                 height: calc(var(--mona-input-height) - 6px);
             }
         }
+    }
+    & .mona-input-selector-icon {
+        border-left: 1px solid var(--mona-border-color);
     }
 }
 
@@ -784,13 +788,6 @@ input[type="radio"][monaRadioButton] {
     }
 }
 
-/** Stepper */
-//.mona-stepper {
-//    & .mona-disabled {
-//        @include disabled;
-//    }
-//}
-
 /** Switch */
 .mona-switch {
     background-color: var(--mona-background);
@@ -888,14 +885,45 @@ input[monaTextBox] {
 }
 
 /** Tab Strip */
+div.mona-tab-strip {
+    border: 1px solid var(--mona-border-color);
+}
+div.mona-tab-strip-tabs {
+    height: var(--mona-input-height);
+    background: 1px solid var(--mona-background-dark);
+    border-bottom: 1px solid var(--mona-border-color);
+}
+div.mona-tab-list-wrapper {
+    background: var(--mona-background-dark);
+}
 ul.mona-tab-list {
     & li {
+        color: var(--mona-text);
+        border-right: 1px solid var(--mona-border-color);
         &.mona-disabled {
             @include disabled;
         }
+        &.mona-tab-active {
+            background: var(--mona-background);
+            color: var(--mona-primary);
+        }
+        @include hover-background;
+        @include active-background;
     }
 }
-
+div.mona-tab-strip-scroll {
+    background: var(--mona-background-dark);
+    color: var(--mona-text);
+    & button[monaButton] {
+        color: var(--mona-text);
+        background: transparent;
+        @include hover-background;
+        box-shadow: none;
+    }
+}
+div.mona-tab-content {
+    background: var(--mona-background-light);
+}
 
 /** Menu */
 /** Context Menu */
