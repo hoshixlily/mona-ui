@@ -13,7 +13,7 @@
         "build": "npm run build:prod",
         "build:dev": "ng build mona-ui --configuration development",
         "build:prod": "ng build mona-ui --configuration production",
-        "build:watch": "ng build mona-ui  --watch --configuration development",
+        "build:watch": "ng build mona-ui --watch --configuration development",
         "watch": "ng build mona-ui --watch --configuration development",
         "test": "ng test"
     },
