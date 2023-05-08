@@ -8,12 +8,19 @@
     box-sizing: border-box;
     font-family: 'Roboto', sans-serif;
     font-weight: 400;
+    //font-size: 12px;
 }
 
 *::selection,
 *::-moz-selection {
     background-color: var(--mona-primary-dark) !important;
     color: var(--mona-text) !important;
+}
+
+[class^="mona-"] {
+    &, & * {
+        font-size: 12px;
+    }
 }
 
 @mixin active-background {
@@ -574,7 +581,7 @@ input[type="checkbox"][monaCheckBox] {
         align-items: center;
         cursor: pointer;
         color: var(--mona-text);
-        font-size: 1.1rem;
+        font-size: 1rem;
         user-select: none;
         &:before {
             content: "\2714";
@@ -587,6 +594,7 @@ input[type="checkbox"][monaCheckBox] {
             width: calc(var(--mona-input-height) - 8px);
             height: calc(var(--mona-input-height) - 8px);
             margin-right: 4px;
+            padding-bottom: 3px;
             vertical-align: middle;
             color: transparent;
             transition:background-color 0.15s ease-out, color 0.15s ease-out, border 0.15s ease-out;
@@ -598,10 +606,7 @@ input[type="checkbox"][monaCheckBox] {
     &:checked + label:before {
         background-color: var(--mona-primary-dark);
         color: var(--mona-text);
-        padding-bottom: 2px;
-        padding-right: 1px;
-        font-weight: bold;
-        font-size: 1.1rem;
+        font-size: 1rem;
     }
     &:disabled + label {
         cursor: default;
@@ -623,11 +628,11 @@ input[type="checkbox"][monaCheckBox] {
         content: " ";
         background-color: var(--mona-primary);
         color: var(--mona-background);
-        border: 3px solid var(--mona-background);
+        border: 2px solid var(--mona-background);
     }
     &:indeterminate:disabled + label:before {
         @include disabled;
-        border: 3px solid var(--mona-border-color);
+        border: 2px solid var(--mona-border-color);
     }
 }
 
@@ -691,7 +696,7 @@ input[type="radio"][monaRadioButton] {
         &:before {
             content: " ";
             background-color: var(--mona-background);
-            border: 3px solid var(--mona-background);
+            border: 1px solid var(--mona-background);
             border-radius: 50%;
             display: inline-flex;
             align-items: center;
@@ -701,7 +706,7 @@ input[type="radio"][monaRadioButton] {
             margin-right: 4px;
             vertical-align: middle;
             color: transparent;
-            transition: all 0.15s ease-out, border 0.1s ease-out;
+            transition: all 0.15s ease-out, border 0.05s ease-out;
         }
         &:active:before:not(:disabled) {
             box-shadow: var(--mona-active-shadow);
@@ -713,7 +718,7 @@ input[type="radio"][monaRadioButton] {
     }
     &:disabled + label:before {
         @include disabled;
-        border: 3px solid var(--mona-border-color);
+        border: 1px solid var(--mona-border-color);
     }
     &:not(:disabled) + label:before {
         border: 1px solid var(--mona-border-color);
@@ -722,12 +727,12 @@ input[type="radio"][monaRadioButton] {
         content: " ";
         background-color: var(--mona-primary-dark);
         color: var(--mona-text);
-        border-width: 3px;
+        border-width: 2px;
     }
     &:checked:disabled + label:before {
         @include disabled;
         background-color: var(--mona-primary-dark);
-        border: 3px solid var(--mona-border-color);
+        border: 2px solid var(--mona-border-color);
     }
 }
 
@@ -1058,7 +1063,7 @@ div.mona-progress-bar-indeterminate {
         height: calc(var(--mona-input-height) - 12px);
     }
     & > input[monaCheckBox]:checked + label:before {
-        font-size: 1.0rem;
+        font-size: 0.8rem;
     }
 }
 
