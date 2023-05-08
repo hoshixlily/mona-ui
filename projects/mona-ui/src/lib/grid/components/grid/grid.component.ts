@@ -74,6 +74,7 @@ export class GridComponent implements OnInit, AfterViewInit, OnDestroy, OnChange
         return this.#filter;
     }
 
+    @Input()
     public filterable: boolean = false;
 
     @Output()

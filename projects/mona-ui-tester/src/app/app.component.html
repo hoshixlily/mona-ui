@@ -38,7 +38,8 @@
                     <ng-template monaTabContentTemplate>
                         <div style="padding: 40px;">
                             <mona-grid [data]="gridOrderData" [pageSize]="5" [pageSizeValues]="[5, 10, 15, 20, 25, 50, 100]" style="height: 400px;"
-                                       [groupable]="true" [filter]="gridFilters" (filterChange)="onGridFilterChange($event)"
+                                       [groupable]="true"
+                                       [filterable]="true" [filter]="gridFilters" (filterChange)="onGridFilterChange($event)"
                                        [resizable]="true"
                                        [sortable]="gridSortOptions" [reorderable]="true" [sort]="gridSort" (sortChange)="onGridSortChange($event)"
                                        (cellEdit)="onGridCellEdit($event)"
