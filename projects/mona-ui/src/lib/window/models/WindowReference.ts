@@ -13,9 +13,10 @@ import { WindowReferenceOptions } from "./WindowReferenceOptions";
  * @internal - used by WindowService. Do not export.
  */
 export class WindowReference<R = unknown> implements WindowRefParams<R> {
-    // public readonly popupReference: PopupRef;
-    public readonly move$: Subject<MoveEvent> = new Subject<MoveEvent>();
-    public readonly resize$: Subject<ResizeEvent> = new Subject<ResizeEvent>();
+    public readonly move$$: Subject<MoveEvent> = new Subject<MoveEvent>();
+    public readonly moveEnd$$: Subject<void> = new Subject<void>();
+    public readonly moveStart$$: Subject<void> = new Subject<void>();
+    public readonly resize$$: Subject<ResizeEvent> = new Subject<ResizeEvent>();
 
     public constructor(private readonly options: WindowReferenceOptions) {}
 
@@ -57,7 +58,7 @@ export class WindowReference<R = unknown> implements WindowRefParams<R> {
         }
     }
 
-    public get closed$(): Observable<WindowCloseEvent> {
+    public get close$(): Observable<WindowCloseEvent> {
         return this.options.popupRef.closed.pipe(
             map(event => {
                 if (event.type === "windowClose") {
@@ -73,20 +74,28 @@ export class WindowReference<R = unknown> implements WindowRefParams<R> {
         return (this.popupRef.component as ComponentRef<any>).instance.componentRef ?? null;
     }
 
+    public get drag$(): Observable<MoveEvent> {
+        return this.move$$;
+    }
+
     public get element(): HTMLElement {
         return this.options.popupRef.overlayRef.overlayElement;
     }
 
-    public get moved$(): Observable<MoveEvent> {
-        return this.move$;
+    public get dragEnd$(): Observable<void> {
+        return this.moveEnd$$;
+    }
+
+    public get dragStart$(): Observable<void> {
+        return this.moveStart$$;
     }
 
     public get popupRef(): PopupRef {
         return this.options.popupRef;
     }
 
-    public get resized$(): Observable<ResizeEvent> {
-        return this.resize$;
+    public get resize$(): Observable<ResizeEvent> {
+        return this.resize$$;
     }
 
     public get windowRef(): WindowRef<R> {

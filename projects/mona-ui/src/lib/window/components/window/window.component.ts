@@ -16,6 +16,7 @@ import { asapScheduler, Subject, takeUntil } from "rxjs";
 import { WindowService } from "../../services/window.service";
 import { WindowTitleTemplateDirective } from "../../directives/window-title-template.directive";
 import { WindowRef } from "../../models/WindowRef";
+import { WindowCloseEvent } from "../../models/WindowCloseEvent";
 
 @Component({
     selector: "mona-window",
@@ -26,6 +27,15 @@ import { WindowRef } from "../../models/WindowRef";
 export class WindowComponent implements OnInit, OnDestroy, AfterViewInit {
     private readonly componentDestroy$: Subject<void> = new Subject<void>();
     private windowRef!: WindowRef;
+
+    @Output()
+    public close: EventEmitter<WindowCloseEvent> = new EventEmitter<WindowCloseEvent>();
+
+    @Output()
+    public dragEnd: EventEmitter<void> = new EventEmitter<void>();
+
+    @Output()
+    public dragStart: EventEmitter<void> = new EventEmitter<void>();
 
     @Input()
     public draggable?: boolean;
@@ -104,7 +114,7 @@ export class WindowComponent implements OnInit, OnDestroy, AfterViewInit {
                 top: this.top,
                 width: this.width
             });
-            this.windowRef.resized$.pipe(takeUntil(this.componentDestroy$)).subscribe(event => {
+            this.windowRef.resize$.pipe(takeUntil(this.componentDestroy$)).subscribe(event => {
                 if (event.width != null) {
                     this.widthChange.emit(event.width);
                 }
@@ -118,13 +128,22 @@ export class WindowComponent implements OnInit, OnDestroy, AfterViewInit {
                     this.topChange.emit(event.top);
                 }
             });
-            this.windowRef.moved$.pipe(takeUntil(this.componentDestroy$)).subscribe(event => {
+            this.windowRef.close$.pipe(takeUntil(this.componentDestroy$)).subscribe(event => {
+                this.close.emit(event);
+            });
+            this.windowRef.drag$.pipe(takeUntil(this.componentDestroy$)).subscribe(event => {
                 if (event.left != null) {
                     this.leftChange.emit(event.left);
                 }
                 if (event.top != null) {
                     this.topChange.emit(event.top);
                 }
+            });
+            this.windowRef.dragEnd$.pipe(takeUntil(this.componentDestroy$)).subscribe(() => {
+                this.dragEnd.emit();
+            });
+            this.windowRef.dragStart$.pipe(takeUntil(this.componentDestroy$)).subscribe(() => {
+                this.dragStart.emit();
             });
         });
     }

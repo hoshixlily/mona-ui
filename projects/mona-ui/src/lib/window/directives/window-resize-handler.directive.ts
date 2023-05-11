@@ -203,7 +203,7 @@ export class WindowResizeHandlerDirective implements AfterViewInit, OnDestroy {
                     break;
             }
 
-            this.windowRef.resize$.next({
+            this.windowRef.resize$$.next({
                 width: width ?? initialWidth,
                 height: height ?? initialHeight,
                 left: left ?? initialLeft,

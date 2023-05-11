@@ -15,15 +15,19 @@ export interface WindowRefParams<R = unknown> {
     move: (params: { top?: number; left?: number }) => void;
     resize: (params: { width?: number; hight?: number; center?: boolean }) => void;
 
-    get closed$(): Observable<WindowCloseEvent>;
+    get close$(): Observable<WindowCloseEvent>;
 
     get component(): ComponentRef<any> | null;
 
     get element(): HTMLElement;
 
-    get moved$(): Observable<MoveEvent>;
+    get drag$(): Observable<MoveEvent>;
+
+    get dragEnd$(): Observable<void>;
+
+    get dragStart$(): Observable<void>;
 
     get popupRef(): PopupRef;
 
-    get resized$(): Observable<ResizeEvent>;
+    get resize$(): Observable<ResizeEvent>;
 }

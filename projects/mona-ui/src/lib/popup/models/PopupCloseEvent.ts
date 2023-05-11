@@ -1,18 +1,18 @@
 import { PreventableEvent } from "../../utils/PreventableEvent";
 
 export class PopupCloseEvent<R = unknown> extends PreventableEvent {
-    protected readonly options?: Partial<PopupCloseEventOptions<R>>;
+    readonly #options?: Partial<PopupCloseEventOptions<R>>;
     public constructor(options?: Partial<PopupCloseEventOptions<R>>) {
         super(options?.type ?? "popupClose", options?.event);
-        this.options = options;
+        this.#options = options;
     }
 
     public get result(): R | undefined {
-        return this.options?.result;
+        return this.#options?.result;
     }
 
     public get via(): PopupCloseSource | undefined {
-        return this.options?.via;
+        return this.#options?.via;
     }
 }
 

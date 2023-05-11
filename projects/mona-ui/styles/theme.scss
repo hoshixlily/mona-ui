@@ -1105,6 +1105,16 @@ div.mona-progress-bar-indeterminate {
 }
 
 /** Window */
+
+.mona-window-title-bar {
+    border-bottom: 1px solid var(--mona-border-color);
+    background-color: var(--mona-window-header-background);
+}
+
+.mona-window-content {
+    background-color: var(--mona-window-background);
+}
+
 .mona-window-invisible {
     visibility: hidden;
 }

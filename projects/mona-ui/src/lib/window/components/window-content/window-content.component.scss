@@ -17,8 +17,6 @@ div.mona-window-title-bar {
     align-items: center;
     justify-content: flex-start;
     height: var(--mona-input-height);
-    border-bottom: 1px solid var(--mona-border-color);
-    background-color: var(--mona-background-dark);
 }
 
 div.mona-window-title-container {
@@ -47,7 +45,6 @@ div.mona-window-title-bar-actions {
     overflow: auto;
     padding: 10px;
 }
-
 
 .mona-window-resizer {
     position: absolute;

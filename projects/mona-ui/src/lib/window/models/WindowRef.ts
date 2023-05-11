@@ -29,27 +29,35 @@ export class WindowRef<R = unknown> {
         this.#options.resize(params);
     }
 
-    public get closed$(): Observable<WindowCloseEvent> {
-        return this.#options.closed$;
+    public get close$(): Observable<WindowCloseEvent> {
+        return this.#options.close$;
     }
 
     public get component(): ComponentRef<any> | null {
         return this.#options.component;
     }
 
-    public get element(): HTMLElement {
-        return this.#options.element;
+    public get drag$(): Observable<MoveEvent> {
+        return this.#options.drag$;
     }
 
-    public get moved$(): Observable<MoveEvent> {
-        return this.#options.moved$;
+    public get dragEnd$(): Observable<void> {
+        return this.#options.dragEnd$;
+    }
+
+    public get dragStart$(): Observable<void> {
+        return this.#options.dragStart$;
+    }
+
+    public get element(): HTMLElement {
+        return this.#options.element;
     }
 
     public get popupRef(): PopupRef {
         return this.#options.popupRef;
     }
 
-    public get resized$(): Observable<ResizeEvent> {
-        return this.#options.resized$;
+    public get resize$(): Observable<ResizeEvent> {
+        return this.#options.resize$;
     }
 }

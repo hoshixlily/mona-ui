@@ -381,7 +381,8 @@
                                 <mona-switch labelOn="ON" labelOff="OFF" [(ngModel)]="windowVisible"></mona-switch>
 
                                 <mona-window [(width)]="windowWidth" [(height)]="windowHeight" [modal]="false" [draggable]="true"
-                                             [(left)]="windowLeft" [(top)]="windowTop"
+                                             [(left)]="windowLeft" [(top)]="windowTop" (close)="print($event)"
+                                             (dragStart)="print('drag start')" (dragEnd)="print('drag end')"
                                              [resizable]="true" [focusedElement]="'#tbx2'" *ngIf="windowVisible">
                                     <button monaButton (click)="openWindow(winTemplate);">Inner Window</button>
                                     <input monaTextBox style="width: 150px;" #textBox1/>
@@ -547,7 +548,6 @@
             </mona-tab-strip>
         </mona-splitter-pane>
     </mona-splitter>
-
 </div>
 
 <ng-template #popupContentTemplate>

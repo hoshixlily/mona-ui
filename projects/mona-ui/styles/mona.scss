@@ -5,20 +5,21 @@
 
     --mona-background-1: #000000;
     --mona-background-2: #0B0C0E;
-    --mona-background-3: #161719;
-    --mona-background-4: #1C1D1F;
-    --mona-background-5: #232427;
-    --mona-background-6: #262729;
-    --mona-background-7: #2A2B2E;
-    --mona-background-8: #2D2E31;
-    --mona-background-9: #303135;
-    --mona-background-10: #333438;
-    --mona-background-11: #36373B;
+    --mona-background-3: #131416;
+    --mona-background-4: #161719;
+    --mona-background-5: #1C1D1F;
+    --mona-background-6: #232427;
+    --mona-background-7: #262729;
+    --mona-background-8: #2A2B2E;
+    --mona-background-9: #2D2E31;
+    --mona-background-10: #303135;
+    --mona-background-11: #333438;
+    --mona-background-12: #36373B;
 
-    --mona-background: var(--mona-background-4);
-    --mona-background-dark: var(--mona-background-3);
-    --mona-background-darker: var(--mona-background-2);
-    --mona-background-light: var(--mona-background-5);
+    --mona-background: var(--mona-background-5); // #1C1D1F;
+    --mona-background-dark: var(--mona-background-4); // #161719;
+    --mona-background-darker: var(--mona-background-2); // #0B0C0E;
+    --mona-background-light: var(--mona-background-6); // #232427;
     --mona-background-hover: #1F2022;
     --mona-background-active: #1D1E20;
 
@@ -37,6 +38,9 @@
 
     --mona-text: #CCCCCC;
     --mona-text-light: #FFFFFF;
+
+    --mona-window-background: #17181A;
+    --mona-window-header-background: #131416;
 }
 
 
