@@ -1,13 +1,19 @@
 import {
+    AfterViewInit,
     ChangeDetectionStrategy,
     Component,
+    ElementRef,
     EventEmitter,
     Input,
+    NgZone,
     OnChanges,
+    OnDestroy,
     OnInit,
     Output,
+    signal,
     SimpleChanges,
-    ViewChild
+    ViewChild,
+    WritableSignal
 } from "@angular/core";
 import { Page } from "../../models/Page";
 import {
@@ -21,6 +27,7 @@ import {
 import { PageChangeEvent } from "../../models/PageChangeEvent";
 import { PageSizeChangeEvent } from "../../models/PageSizeChangeEvent";
 import { DropDownListComponent } from "../../../dropdowns/modules/drop-down-list/components/drop-down-list/drop-down-list.component";
+import { Enumerable } from "@mirei/ts-collections";
 
 @Component({
     selector: "mona-pager",
@@ -28,16 +35,21 @@ import { DropDownListComponent } from "../../../dropdowns/modules/drop-down-list
     styleUrls: ["./pager.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PagerComponent implements OnInit, OnChanges {
+export class PagerComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
+    #widthObserver: ResizeObserver | null = null;
     private previousPageSize: number = 10;
     public readonly ellipsisIcon: IconDefinition = faEllipsis;
     public readonly firstPageIcon: IconDefinition = faAngleDoubleLeft;
     public readonly lastPageIcon: IconDefinition = faAngleDoubleRight;
     public readonly nextIcon: IconDefinition = faAngleRight;
     public readonly previousIcon: IconDefinition = faAngleLeft;
+    public infoVisible: WritableSignal<boolean> = signal(true);
     public inputValue: number | null = null;
-    public pageCount: number = 10;
     public page: number = 1;
+    public pageCount: number = 10;
+    public pageInputVisible: WritableSignal<boolean> = signal(true);
+    public pageList: WritableSignal<number[]> = signal([]);
+    public pageListVisible: WritableSignal<boolean> = signal(true);
     public pageSizeValueList: number[] = [];
     public pages: Page[] = [];
 
@@ -63,6 +75,9 @@ export class PagerComponent implements OnInit, OnChanges {
     public previousNext: boolean = true;
 
     @Input()
+    public responsive: boolean = true;
+
+    @Input()
     public set pageSizeValues(values: number[] | boolean) {
         if (values === false || (Array.isArray(values) && values.length === 0)) {
             this.pageSizeValueList = [];
@@ -85,7 +100,18 @@ export class PagerComponent implements OnInit, OnChanges {
     @Input()
     public visiblePages: number = 5;
 
-    public constructor() {}
+    public constructor(private readonly elementRef: ElementRef<HTMLDivElement>) {}
+
+    public ngAfterViewInit(): void {
+        if (this.responsive) {
+            this.#widthObserver = new ResizeObserver(() => {
+                this.infoVisible.set(this.elementRef.nativeElement.clientWidth >= 790);
+                this.pageInputVisible.set(this.elementRef.nativeElement.clientWidth >= 640);
+                this.pageListVisible.set(this.elementRef.nativeElement.clientWidth >= 480);
+            });
+            this.#widthObserver.observe(this.elementRef.nativeElement);
+        }
+    }
 
     public ngOnChanges(changes: SimpleChanges) {
         if (changes["pageSize"] || changes["total"] || changes["visiblePages"] || changes["skip"]) {
@@ -100,6 +126,13 @@ export class PagerComponent implements OnInit, OnChanges {
             }
             this.pageCount = Math.ceil(total / pageSize);
             this.preparePages(this.page, visiblePages, this.pageCount);
+        }
+        this.pageList.set(Enumerable.range(1, this.pageCount).toArray());
+    }
+
+    public ngOnDestroy(): void {
+        if (this.#widthObserver) {
+            this.#widthObserver.disconnect();
         }
     }
 
