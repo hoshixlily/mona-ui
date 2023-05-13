@@ -104,7 +104,7 @@
                     <fa-icon [icon]="previousIcon"></fa-icon>
                 </button>
             </li>
-            <li>
+            <li *ngIf="pageCount !== 0">
                 <mona-drop-down-list [data]="pageList()" [value]="page" (valueChange)="onPageClick($event)" style="width: 75px;"></mona-drop-down-list>
             </li>
             <li *ngIf="previousNext">
