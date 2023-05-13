@@ -1,4 +1,5 @@
 import {
+    ChangeDetectorRef,
     Directive,
     ElementRef,
     EventEmitter,
@@ -53,7 +54,8 @@ export class ButtonDirective implements OnInit, OnDestroy {
 
     public constructor(
         @Host() @Optional() private readonly buttonService: ButtonService,
-        public readonly elementRef: ElementRef<HTMLButtonElement>
+        public readonly elementRef: ElementRef<HTMLButtonElement>,
+        private readonly cdr: ChangeDetectorRef
     ) {}
 
     public ngOnDestroy(): void {
@@ -77,6 +79,7 @@ export class ButtonDirective implements OnInit, OnDestroy {
         this.buttonService?.buttonSelect$.pipe(takeUntil(this.#destroy$)).subscribe(result => {
             const [button, selected] = result;
             if (button === this) {
+                this.cdr.markForCheck();
                 this.#selected = selected;
                 this.selectedChange.emit(selected);
             }
