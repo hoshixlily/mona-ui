@@ -41,7 +41,6 @@ export class SplitterComponent implements OnInit, AfterViewInit, AfterContentIni
             const percentage = 100 / this.paneList.length;
             this.paneList.forEach(p => {
                 p.setSize(`${percentage}%`);
-                // p.isStatic = false;
             });
             return;
         }

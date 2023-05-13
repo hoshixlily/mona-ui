@@ -152,7 +152,17 @@ export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy
             positions: [
                 new ConnectionPositionPair(
                     { originX: "start", originY: "bottom" },
-                    { overlayX: "start", overlayY: "top" }
+                    { overlayX: "start", overlayY: "top" },
+                    0,
+                    0,
+                    "mona-dropdown-popup-content-bottom"
+                ),
+                new ConnectionPositionPair(
+                    { originX: "start", originY: "top" },
+                    { overlayX: "start", overlayY: "bottom" },
+                    0,
+                    -1,
+                    "mona-dropdown-popup-content-top"
                 )
             ],
             ...options

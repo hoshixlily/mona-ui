@@ -445,7 +445,6 @@ div.mona-time-picker-popup {
     user-select: none;
     padding: 0 !important;
     overflow: hidden auto;
-    border-top: 1px solid transparent !important;
     max-height: 250px;
 
     & mona-text-box.filter-box {
@@ -458,6 +457,15 @@ div.mona-time-picker-popup {
     }
 
     @include scrollbars;
+}
+
+.mona-dropdown-popup-content-bottom {
+    border-top: 1px solid transparent !important;
+}
+
+.mona-dropdown-popup-content-top {
+    border-bottom: 1px solid transparent !important;
+    box-shadow: 0 -3px 10px -3px var(--mona-shadow-color) !important;
 }
 
 /** Multi Select */
