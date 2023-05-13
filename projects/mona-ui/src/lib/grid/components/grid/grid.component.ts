@@ -107,6 +107,9 @@ export class GridComponent implements OnInit, AfterViewInit, OnDestroy, OnChange
     public resizable: boolean = false;
 
     @Input()
+    public responsivePager: boolean = true;
+
+    @Input()
     public set sort(value: SortDescriptor[]) {
         if (this.#sort !== value) {
             this.#sort = value;

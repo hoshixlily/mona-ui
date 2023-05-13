@@ -52,8 +52,8 @@
         <ng-container *ngIf="filteredData|gridPage:gridService.pageState.skip:gridService.pageState.take as viewData">
             <mona-grid-list [columns]="gridService.columns" [data]="viewData"></mona-grid-list>
             <mona-pager [skip]="gridService.pageState.skip" [pageSize]="gridService.pageState.take" [total]="filteredData.length"
-                        [pageInput]="true" [pageSizeValues]="pageSizeValues" (pageSizeChange)="onPageSizeChange($event)"
-                        (pageChange)="onPageChange($event)"></mona-pager>
+                        [pageInput]="true" [pageSizeValues]="pageSizeValues" [responsive]="responsivePager"
+                        (pageSizeChange)="onPageSizeChange($event)" (pageChange)="onPageChange($event)"></mona-pager>
         </ng-container>
     </ng-container>
 </div>
