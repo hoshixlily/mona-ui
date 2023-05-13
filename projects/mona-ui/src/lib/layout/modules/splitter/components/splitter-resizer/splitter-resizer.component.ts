@@ -1,4 +1,15 @@
-import { Component, ElementRef, Input, OnChanges, OnInit, QueryList, SimpleChanges } from "@angular/core";
+import {
+    ChangeDetectionStrategy,
+    ChangeDetectorRef,
+    Component,
+    ElementRef,
+    Input,
+    NgZone,
+    OnChanges,
+    OnInit,
+    QueryList,
+    SimpleChanges
+} from "@angular/core";
 import { SplitterPaneComponent } from "../splitter-pane/splitter-pane.component";
 import { Orientation } from "../../data/Orientation";
 import {
@@ -15,7 +26,8 @@ import { fromEvent } from "rxjs";
 @Component({
     selector: "mona-splitter-resizer",
     templateUrl: "./splitter-resizer.component.html",
-    styleUrls: ["./splitter-resizer.component.scss"]
+    styleUrls: ["./splitter-resizer.component.scss"],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SplitterResizerComponent implements OnInit, OnChanges {
     public readonly horizontalCollapseNextIcon: IconDefinition = faCaretRight;
@@ -43,7 +55,7 @@ export class SplitterResizerComponent implements OnInit, OnChanges {
     @Input()
     public previousResizer: SplitterResizerComponent | null = null;
 
-    public constructor(private readonly elementRef: ElementRef<HTMLElement>) {}
+    public constructor(private readonly elementRef: ElementRef<HTMLElement>, private readonly cdr: ChangeDetectorRef) {}
 
     public ngOnChanges(changes: SimpleChanges): void {
         if (changes && (changes["panes"] || changes["pane"])) {
@@ -71,7 +83,7 @@ export class SplitterResizerComponent implements OnInit, OnChanges {
                     }
                 } else {
                     this.nextPane.setCollapsed(false);
-                    if (this.previousPane.uid === this.panes.first.uid && this.previousPane.paneSize != null) {
+                    if (this.previousPane.uid === this.panes.first.uid && this.previousPane.paneSize() != null) {
                         this.previousPane.isStatic = true;
                     }
                 }
@@ -87,7 +99,7 @@ export class SplitterResizerComponent implements OnInit, OnChanges {
                     }
                 } else {
                     this.previousPane.setCollapsed(false);
-                    if (this.nextPane.uid === this.panes.last.uid && this.nextPane.paneSize != null) {
+                    if (this.nextPane.uid === this.panes.last.uid && this.nextPane.paneSize() != null) {
                         this.nextPane.isStatic = true;
                     }
                 }

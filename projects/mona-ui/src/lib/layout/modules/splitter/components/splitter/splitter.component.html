@@ -1,7 +1,7 @@
 <div class="mona-splitter" [ngClass]="{'mona-splitter-vertical': orientation==='vertical'}">
     <ng-container *ngFor="let pane of paneList; let px = index;">
         <div class="mona-splitter-pane" [attr.data-px]="px" [attr.data-pid]="pane.uid"
-             [ngStyle]="{'order': px*2, 'flex-basis': pane.paneSize}" [ngClass]="{'mona-splitter-static': pane.isStatic, 'mona-splitter-hidden': pane.collapsed}">
+             [ngStyle]="{'order': px*2, 'flex-basis': pane.paneSize()}" [ngClass]="{'mona-splitter-static': pane.isStatic, 'mona-splitter-hidden': pane.collapsed}">
             <ng-container [ngTemplateOutlet]="pane.templateRef" *ngIf="pane.templateRef"></ng-container>
         </div>
         <mona-splitter-resizer [orientation]="orientation" [previousResizer]="px===0?null:resizers[px]"

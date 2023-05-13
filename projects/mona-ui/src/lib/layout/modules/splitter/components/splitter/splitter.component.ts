@@ -1,6 +1,7 @@
 import {
     AfterContentInit,
     AfterViewInit,
+    ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
     ContentChildren,
@@ -17,7 +18,8 @@ import { IndexableList } from "@mirei/ts-collections";
 @Component({
     selector: "mona-splitter",
     templateUrl: "./splitter.component.html",
-    styleUrls: ["./splitter.component.scss"]
+    styleUrls: ["./splitter.component.scss"],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SplitterComponent implements OnInit, AfterViewInit, AfterContentInit {
     public resizers: IndexableList<SplitterResizerComponent> = new IndexableList<SplitterResizerComponent>();
