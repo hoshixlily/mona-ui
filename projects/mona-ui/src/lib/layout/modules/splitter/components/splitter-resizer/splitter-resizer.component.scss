@@ -14,7 +14,7 @@ div.mona-splitter-resizer {
 
     &.vertical {
         width: 100%;
-        height: 5px;
+        height: 8px;
         cursor: row-resize;
         border-top: 1px solid var(--mona-border-color);
         border-bottom: 1px solid var(--mona-border-color);
@@ -28,7 +28,7 @@ div.mona-splitter-resizer {
     }
 
     &.horizontal {
-        width: 5px;
+        width: 8px;
         height: 100%;
         cursor: col-resize;
         border-left: 1px solid var(--mona-border-color);

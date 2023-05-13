@@ -134,6 +134,8 @@ export class SplitterResizerComponent implements OnInit, OnChanges {
         fromEvent<MouseEvent>(this.elementRef.nativeElement, "mousedown").subscribe(event => {
             this.resizing = true;
             const mouseMoveSubscription = fromEvent<MouseEvent>(document, "mousemove").subscribe(event => {
+                event.stopPropagation();
+                event.preventDefault();
                 if (!this.previousPane.resizable || !this.nextPane.resizable) {
                     return;
                 }
