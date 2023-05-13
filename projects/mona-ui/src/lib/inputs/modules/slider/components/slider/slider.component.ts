@@ -1,5 +1,6 @@
 import {
     AfterViewInit,
+    ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
     ElementRef,
@@ -27,7 +28,8 @@ import { AbstractSliderComponent } from "../abstract-slider/abstract-slider.comp
             useExisting: forwardRef(() => SliderComponent),
             multi: true
         }
-    ]
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SliderComponent
     extends AbstractSliderComponent
@@ -55,6 +57,7 @@ export class SliderComponent
         super.ngOnInit();
         this.ensureCorrectValueType(this.value);
         if (this.value != null) {
+            this.cdr.markForCheck();
             this.handlerValues = [
                 Math.max(this.minValue, Math.min(this.maxValue, this.value)),
                 Math.max(this.minValue, Math.min(this.maxValue, this.value))

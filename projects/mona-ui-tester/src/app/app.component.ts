@@ -1,4 +1,12 @@
-import { ChangeDetectorRef, Component, ElementRef, OnInit, TemplateRef, ViewChild } from "@angular/core";
+import {
+    ChangeDetectionStrategy,
+    ChangeDetectorRef,
+    Component,
+    ElementRef,
+    OnInit,
+    TemplateRef,
+    ViewChild
+} from "@angular/core";
 import {
     PopupRef,
     NodeDragStartEvent,
@@ -32,7 +40,8 @@ import { GridOrderData } from "./GridOrderData";
 @Component({
     selector: "app-root",
     templateUrl: "./app.component.html",
-    styleUrls: ["./app.component.scss"]
+    styleUrls: ["./app.component.scss"],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent implements OnInit {
     public readonly filterIcon: IconDefinition = faFilter;

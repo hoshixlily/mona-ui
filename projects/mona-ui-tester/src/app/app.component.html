@@ -42,7 +42,7 @@
                                        [filterable]="true" [filter]="gridFilters" (filterChange)="onGridFilterChange($event)"
                                        [resizable]="true"
                                        [sortable]="gridSortOptions" [reorderable]="true" [sort]="gridSort" (sortChange)="onGridSortChange($event)"
-                                       (cellEdit)="onGridCellEdit($event)"
+                                       (cellEdit)="onGridCellEdit($event)" [responsivePager]="false"
                                        monaGridEditable
                                 [monaGridSelectable]="{enabled: false, mode:'multiple'}" selectionKey="OrderID" [selectedKeys]="gridSelectionKeys" (selectedKeysChange)="onGridSelectionKeysChange($event)">
                                 <mona-grid-column *ngFor="let col of gridOrderColumns" [field]="col.field" [title]="col.title" [filterType]="col.filterType">
@@ -120,6 +120,9 @@
                             </mona-menubar>
                         </div>
                         <div class="content">
+
+                            <div style="color: deeppink; font-weight: bold;">OnPush change detection is enabled. Fix any components that do not work as expected.</div>
+
                             <div style="color: #95c5cb;">{{selectedDropdownListDataItem | json}}</div>
 
                             <div style="display: flex;">
@@ -152,8 +155,8 @@
                                 </ng-template>
                             </div>
 
-                            <div style="flex-direction: column;">
-                                <mona-button-group selection="single" style="margin-bottom: 10px;">
+                            <div style="flex-direction: row;">
+                                <mona-button-group selection="single" style="margin-right: 10px;">
                                     <button monaButton [toggleable]="true">B</button>
                                     <button monaButton [toggleable]="true" (click)="openPopup2($event)"
                                             #italicButtonRef>I
@@ -169,8 +172,8 @@
                                 </mona-button-group>
                             </div>
 
-                            <div style="flex-direction: column;">
-                                <button monaButton #popupComponentAnchor style="margin-bottom: 5px;">Popup Component Anchor</button>
+                            <div style="flex-direction: row;">
+                                <button monaButton #popupComponentAnchor style="margin-right: 5px;">Popup Component Anchor</button>
                                 <mona-popup [anchor]="popupComponentAnchor" trigger="click"
                                             [offset]="{vertical: 0.5}"
                                             (close)="onPopupClose()" (open)="onPopupOpen($event)">
@@ -184,45 +187,8 @@
                                     <span style="color: #95c5cb; font-weight: bold;">Tempest</span>
                                 </mona-tooltip>
 
-                            </div>
-
-                            <div>
-                                <mona-split-button text="Split Button"
-                                                   (buttonClick)="print('Split Button Main Button Clicked.')"
-                                                   [disabled]="false">
-                                    <ng-template monaSplitButtonTextTemplate>
-                                        <span style="color: mediumspringgreen;">Split Button</span>
-                                    </ng-template>
-                                    <mona-menu-item text="Split Menu I"></mona-menu-item>
-                                    <mona-menu-item text="Split Menu II" iconClass="fa fa-file">
-                                        <mona-menu-item text="Split Menu II I"></mona-menu-item>
-                                        <mona-menu-item text="Split Menu II II"
-                                                        (menuClick)="print('SMIIII')"></mona-menu-item>
-                                    </mona-menu-item>
-                                    <mona-menu-item text="Split Menu III" iconClass="fa fa-search"></mona-menu-item>
-                                </mona-split-button>
-                            </div>
-
-                            <div>
-
-                                <mona-switch [labelOff]="'12'" labelOn="24" [(ngModel)]="dateFormat24Hours"></mona-switch>
-
-                                <mona-date-time-picker format="dd/MM/yyyy hh:mm a" style="width: 250px; margin-right: 20px;"
-                                                       [hourFormat]="dateFormat24Hours ? '24' : '12'" [readonly]="false" [value]="dateTimePickerValue"
-                                                       (valueChange)="onDateTimePickerValueChange($event)"></mona-date-time-picker>
-
-                                <mona-date-picker format="d/M/yyyy" style="width: 250px;" [readonly]="false"
-                                                  [min]="dateMin" [max]="dateMax" [value]="datePickerValue"
-                                                  (valueChange)="onDatePickerValueChange($event)"></mona-date-picker>
-
-                                <mona-time-picker [hourFormat]="dateFormat24Hours ? '24':'12'" [showSeconds]="true" [value]="timePickerValue"
-                                                  (valueChange)="onTimePickerValueChange($event)"
-                                                  [format]="dateFormat24Hours ? 'HH:mm:ss' : 'hh:mm:ss a'" style="width: 200px; margin-left: 40px;"></mona-time-picker>
-                            </div>
-
-                            <div>
                                 <button monaButton [disabled]="false" [toggleable]="true" [selected]="toggleableButtonSelected"
-                                        (selectedChange)="toggleableButtonSelected=$event" #contextMenuAnchor>
+                                        (selectedChange)="toggleableButtonSelected=$event" style="margin-right: 5px;" #contextMenuAnchor>
                                     <span style="color: lightcoral;">Context Menu Target</span>
                                 </button>
                                 <mona-contextmenu [target]="contextMenuAnchor" (navigate)="print($event)">
@@ -260,6 +226,41 @@
                                         <mona-menu-item text="Replace"></mona-menu-item>
                                     </mona-menu-item>
                                 </mona-contextmenu>
+
+                            </div>
+
+                            <div>
+                                <mona-split-button text="Split Button"
+                                                   (buttonClick)="print('Split Button Main Button Clicked.')"
+                                                   [disabled]="false">
+                                    <ng-template monaSplitButtonTextTemplate>
+                                        <span style="color: mediumspringgreen;">Split Button</span>
+                                    </ng-template>
+                                    <mona-menu-item text="Split Menu I"></mona-menu-item>
+                                    <mona-menu-item text="Split Menu II" iconClass="fa fa-file">
+                                        <mona-menu-item text="Split Menu II I"></mona-menu-item>
+                                        <mona-menu-item text="Split Menu II II"
+                                                        (menuClick)="print('SMIIII')"></mona-menu-item>
+                                    </mona-menu-item>
+                                    <mona-menu-item text="Split Menu III" iconClass="fa fa-search"></mona-menu-item>
+                                </mona-split-button>
+                            </div>
+
+                            <div>
+
+                                <mona-switch [labelOff]="'12'" labelOn="24" [(ngModel)]="dateFormat24Hours"></mona-switch>
+
+                                <mona-date-time-picker format="dd/MM/yyyy hh:mm a" style="width: 250px; margin-right: 20px;"
+                                                       [hourFormat]="dateFormat24Hours ? '24' : '12'" [readonly]="false" [value]="dateTimePickerValue"
+                                                       (valueChange)="onDateTimePickerValueChange($event)"></mona-date-time-picker>
+
+                                <mona-date-picker format="d/M/yyyy" style="width: 250px;" [readonly]="false"
+                                                  [min]="dateMin" [max]="dateMax" [value]="datePickerValue"
+                                                  (valueChange)="onDatePickerValueChange($event)"></mona-date-picker>
+
+                                <mona-time-picker [hourFormat]="dateFormat24Hours ? '24':'12'" [showSeconds]="true" [value]="timePickerValue"
+                                                  (valueChange)="onTimePickerValueChange($event)"
+                                                  [format]="dateFormat24Hours ? 'HH:mm:ss' : 'hh:mm:ss a'" style="width: 200px; margin-left: 40px;"></mona-time-picker>
                             </div>
 
                             <div style="display: flex;">

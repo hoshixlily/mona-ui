@@ -1,4 +1,5 @@
 import {
+    ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
     ElementRef,
@@ -24,7 +25,8 @@ import { Action } from "../../../../../utils/Action";
             useExisting: forwardRef(() => RangeSliderComponent),
             multi: true
         }
-    ]
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class RangeSliderComponent extends AbstractSliderComponent implements OnInit {
     protected override propagateChange: Action<any> | null = null;

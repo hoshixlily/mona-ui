@@ -11,9 +11,11 @@ import {
     OnDestroy,
     OnInit,
     Renderer2,
+    signal,
     SimpleChanges,
     TemplateRef,
-    ViewChild
+    ViewChild,
+    WritableSignal
 } from "@angular/core";
 import { fromEvent, Subject, take, takeUntil, timer } from "rxjs";
 import { SliderHandlerType } from "../../models/SliderHandlerType";
@@ -38,15 +40,14 @@ export abstract class AbstractSliderComponent
 {
     private readonly componentDestroy$: Subject<void> = new Subject();
     private documentMouseMoveListener: Action | null = null;
-    private previousUserSelect: string = "";
     public activeHandlerType: SliderHandlerType | null = null;
-    public dragging: boolean = false;
-    public handlerOnePosition: number = 0;
-    public handlerTwoPosition: number = 0;
+    public dragging: WritableSignal<boolean> = signal(false);
+    public handlerOnePosition: WritableSignal<number> = signal(0);
+    public handlerTwoPosition: WritableSignal<number> = signal(0);
     public handlerValues: [number, number] = [0, 0];
     public initialized: boolean = false;
     public ticks: SliderTick[] = [];
-    public trackData: SliderTrackData = { position: 0, size: 0 };
+    public trackData: WritableSignal<SliderTrackData> = signal({ position: 0, size: 0 });
     protected abstract propagateChange: Action<any> | null;
     public abstract ranged: boolean;
 
@@ -159,14 +160,14 @@ export abstract class AbstractSliderComponent
         }
     }
 
-    public onHandlerMouseDown(handlerType: SliderHandlerType): void {
-        if (this.dragging) {
+    public onHandlerMouseDown(event: MouseEvent, handlerType: SliderHandlerType): void {
+        event.stopPropagation();
+        event.preventDefault();
+        if (this.dragging()) {
             return;
         }
         this.activeHandlerType = handlerType;
-        this.dragging = true;
-        this.previousUserSelect = document.documentElement.style.userSelect;
-        document.documentElement.style.userSelect = "none";
+        this.dragging.set(true);
         this.setEventListeners();
     }
 
@@ -216,15 +217,15 @@ export abstract class AbstractSliderComponent
                     (Math.abs(rectOne.left - rectTwo.left) * 100.0) /
                     this.sliderTrackElementRef.nativeElement.getBoundingClientRect().width;
                 const leftmostRect = rectOne.left < rectTwo.left ? rectOne : rectTwo;
-                this.trackData = {
+                this.trackData.set({
                     position: leftmostRect.left - this.sliderTrackElementRef.nativeElement.getBoundingClientRect().left,
                     size: width
-                };
+                });
             } else {
-                this.trackData = {
+                this.trackData.set({
                     position: 0,
-                    size: this.handlerOnePosition <= 0 ? 0 : this.handlerOnePosition
-                };
+                    size: this.handlerOnePosition() <= 0 ? 0 : this.handlerOnePosition()
+                });
             }
         } else {
             if (this.ranged) {
@@ -234,16 +235,16 @@ export abstract class AbstractSliderComponent
                     (Math.abs(rectOne.bottom - rectTwo.bottom) * 100.0) /
                     this.sliderTrackElementRef.nativeElement.getBoundingClientRect().height;
                 const bottommostRect = rectOne.bottom > rectTwo.bottom ? rectOne : rectTwo;
-                this.trackData = {
+                this.trackData.set({
                     position:
                         this.sliderTrackElementRef.nativeElement.getBoundingClientRect().bottom - bottommostRect.bottom,
                     size: height
-                };
+                });
             } else {
-                this.trackData = {
+                this.trackData.set({
                     position: 0,
-                    size: this.handlerOnePosition <= 0 ? 0 : this.handlerOnePosition
-                };
+                    size: this.handlerOnePosition() <= 0 ? 0 : this.handlerOnePosition()
+                });
             }
         }
     }
@@ -363,7 +364,7 @@ export abstract class AbstractSliderComponent
     private setEventListeners(): void {
         this.zone.runOutsideAngular(() => {
             this.documentMouseMoveListener = this.renderer.listen(document, "mousemove", (event: MouseEvent) => {
-                if (!this.dragging) {
+                if (!this.dragging()) {
                     return;
                 }
                 const tickElement = this.findClosestTickElement(event);
@@ -373,7 +374,7 @@ export abstract class AbstractSliderComponent
                         ? this.sliderPrimaryHandlerElementRef.nativeElement
                         : this.sliderSecondaryHandlerElementRef.nativeElement
                 );
-                if (this.activeHandlerType === "primary" && positionData.position !== this.handlerOnePosition) {
+                if (this.activeHandlerType === "primary" && positionData.position !== this.handlerOnePosition()) {
                     this.zone.run(() => {
                         const value = this.ticks[positionData.tickIndex].value;
                         if (this.handlerValues[0] !== value) {
@@ -383,7 +384,7 @@ export abstract class AbstractSliderComponent
                     });
                 } else if (
                     this.activeHandlerType === "secondary" &&
-                    positionData.position !== this.handlerTwoPosition
+                    positionData.position !== this.handlerTwoPosition()
                 ) {
                     this.zone.run(() => {
                         const value = this.ticks[positionData.tickIndex].value;
@@ -397,16 +398,11 @@ export abstract class AbstractSliderComponent
             const sub = fromEvent(document, "mouseup")
                 .pipe(takeUntil(this.componentDestroy$))
                 .subscribe(() => {
-                    if (!this.dragging) {
+                    if (!this.dragging()) {
                         return;
                     }
                     this.zone.run(() => {
-                        this.dragging = false;
-                        if (this.previousUserSelect) {
-                            document.documentElement.style.userSelect = this.previousUserSelect;
-                        } else {
-                            document.documentElement.style.removeProperty("user-select");
-                        }
+                        this.dragging.set(false);
                         this.documentMouseMoveListener?.();
                         sub.unsubscribe();
                     });
@@ -418,30 +414,34 @@ export abstract class AbstractSliderComponent
         const sliderValue = Math.max(this.minValue, Math.min(this.maxValue, value));
         if (this.orientation === "horizontal") {
             if (handlerType === "primary") {
-                this.handlerOnePosition =
+                const position =
                     ((sliderValue - this.minValue) * 100.0) / (this.maxValue - this.minValue) -
                     ((this.sliderPrimaryHandlerElementRef.nativeElement.getBoundingClientRect().width / 2) * 100.0) /
                         this.sliderTrackElementRef.nativeElement.getBoundingClientRect().width;
+                this.handlerOnePosition.set(position);
                 this.handlerValues[0] = sliderValue;
             } else {
-                this.handlerTwoPosition =
+                const position =
                     ((sliderValue - this.minValue) * 100.0) / (this.maxValue - this.minValue) -
                     ((this.sliderSecondaryHandlerElementRef.nativeElement.getBoundingClientRect().width / 2) * 100.0) /
                         this.sliderTrackElementRef.nativeElement.getBoundingClientRect().width;
+                this.handlerTwoPosition.set(position);
                 this.handlerValues[1] = sliderValue;
             }
         } else {
             if (handlerType === "primary") {
-                this.handlerOnePosition =
+                const position =
                     ((sliderValue - this.minValue) * 100.0) / (this.maxValue - this.minValue) -
                     ((this.sliderPrimaryHandlerElementRef.nativeElement.getBoundingClientRect().height / 2) * 100.0) /
                         this.sliderTrackElementRef.nativeElement.getBoundingClientRect().height;
+                this.handlerOnePosition.set(position);
                 this.handlerValues[0] = sliderValue;
             } else {
-                this.handlerTwoPosition =
+                const position =
                     ((sliderValue - this.minValue) * 100.0) / (this.maxValue - this.minValue) -
                     ((this.sliderSecondaryHandlerElementRef.nativeElement.getBoundingClientRect().height / 2) * 100.0) /
                         this.sliderTrackElementRef.nativeElement.getBoundingClientRect().height;
+                this.handlerTwoPosition.set(position);
                 this.handlerValues[1] = sliderValue;
             }
         }
