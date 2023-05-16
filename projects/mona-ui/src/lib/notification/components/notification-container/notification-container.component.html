@@ -1,0 +1,4 @@
+<div class="wrapper mona-notification-container"
+     [ngClass]="{'bottomleft':position==='bottomleft', 'bottomright': position==='bottomright', 'topleft':position==='topleft', 'topright': position==='topright'}">
+    <mona-notification *ngFor="let notificationData of notificationDataList; trackBy: trackByFn;" [data]="notificationData"></mona-notification>
+</div>

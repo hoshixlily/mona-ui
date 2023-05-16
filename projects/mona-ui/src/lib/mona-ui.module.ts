@@ -13,6 +13,7 @@ import { PagerModule } from "./pager/pager.module";
 import { ProgressBarsModule } from "./progress-bars/progress-bars.module";
 import { FilterModule } from "./filter/filter.module";
 import { GridModule } from "./grid/grid.module";
+import { NotificationModule } from "./notification/notification.module";
 
 @NgModule({
     exports: [
@@ -24,6 +25,7 @@ import { GridModule } from "./grid/grid.module";
         InputsModule,
         LayoutModule,
         MenusModule,
+        NotificationModule,
         PagerModule,
         PopupModule,
         ProgressBarsModule,

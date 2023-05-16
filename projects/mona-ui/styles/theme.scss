@@ -985,6 +985,19 @@ ul.mona-menubar {
     }
 }
 
+/** Notification */
+div.mona-notification-icon {
+    & fa-icon svg {
+        font-size: 20px;
+    }
+}
+
+div.mona-notification-progress {
+    & .mona-progress-bar {
+        border: none;
+    }
+}
+
 /** Pager */
 .mona-pager {
     background: var(--mona-background);

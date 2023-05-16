@@ -1,0 +1,96 @@
+.wrapper {
+    width: 350px;
+    min-height: 80px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 8px;
+    background-color: var(--mona-background);
+    border: 1px solid var(--mona-border-color);
+    color: var(--mona-text);
+    box-shadow: 0 0 10px 0 var(--mona-background-3);
+}
+
+div.mona-notification-container {
+    display: flex;
+    flex: 1;
+    padding: 10px;
+}
+
+div.mona-notification-line {
+    width: 2px;
+    display: flex;
+    &-success {
+        background-color: var(--mona-success);
+    }
+    &-info {
+        background-color: var(--mona-info);
+    }
+    &-warning {
+        background-color: var(--mona-warning);
+    }
+    &-error {
+        background-color: var(--mona-error);
+    }
+}
+
+div.mona-notification-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 16px;
+    &-success {
+        color: var(--mona-success);
+    }
+    &-info {
+        color: var(--mona-info);
+    }
+    &-warning {
+        color: var(--mona-warning);
+    }
+    &-error {
+        color: var(--mona-error);
+    }
+}
+
+div.mona-notification-actions {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    & fa-icon {
+        cursor: pointer;
+    }
+}
+
+div.mona-notification-content-wrapper {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+div.mona-notification-header {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    flex: 1;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 600;
+    user-select: none;
+}
+
+div.mona-notification-content {
+    display: flex;
+    width: 100%;
+    flex: 1;
+    align-items: center;
+}
+
+div.mona-notification-text {
+    color: var(--mona-text);
+}
+
+div.mona-notification-progress {
+    width: 100%;
+    height: 5px;
+}

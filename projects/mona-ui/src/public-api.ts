@@ -157,6 +157,11 @@ export * from "./lib/menus/modules/menubar/components/menubar/menubar.component"
 export * from "./lib/menus/modules/menubar/menubar.module";
 export * from "./lib/menus/menus.module";
 
+/** Notification */
+export * from "./lib/notification/services/notification.service";
+export * from "./lib/notification/components/notification/notification.component";
+export * from "./lib/notification/notification.module";
+
 /** Pager */
 export * from "./lib/pager/models/PageChangeEvent";
 export * from "./lib/pager/models/PageSizeChangeEvent";

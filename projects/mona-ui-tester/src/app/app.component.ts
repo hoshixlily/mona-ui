@@ -26,7 +26,8 @@ import {
     FilterMenuValue,
     SortDescriptor,
     SortableOptions,
-    CellEditEvent
+    CellEditEvent,
+    NotificationService
 } from "mona-ui";
 import { TestComponentComponent } from "./test-component/test-component.component";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
@@ -401,7 +402,8 @@ export class AppComponent implements OnInit {
     public constructor(
         private readonly popupService: PopupService,
         public readonly windowService: WindowService,
-        private readonly cdr: ChangeDetectorRef
+        private readonly cdr: ChangeDetectorRef,
+        private readonly notificationService: NotificationService
     ) {}
 
     public dropdownItemDisabler = (item: any): boolean => !item.active;
@@ -814,6 +816,14 @@ export class AppComponent implements OnInit {
         } else {
             return "green";
         }
+    }
+
+    public showNotification(): void {
+        this.notificationService.show({
+            text: "Hello World!",
+            title: "Notification",
+            type: "error"
+        });
     }
 
     public updateTreeData(): void {

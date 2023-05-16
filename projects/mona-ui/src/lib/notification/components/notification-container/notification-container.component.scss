@@ -1,0 +1,21 @@
+div.wrapper {
+    position: absolute;
+    padding: 10px;
+    z-index: 40000;
+    &.bottomleft {
+        bottom: 0;
+        left: 0;
+    }
+    &.bottomright {
+        bottom: 0;
+        right: 0;
+    }
+    &.topleft {
+        top: 0;
+        left: 0;
+    }
+    &.topright {
+        top: 0;
+        right: 0;
+    }
+}
