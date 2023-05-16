@@ -8,7 +8,6 @@
     box-sizing: border-box;
     font-family: 'Roboto', sans-serif;
     font-weight: 400;
-    //font-size: 12px;
 }
 
 *::selection,
@@ -18,9 +17,7 @@
 }
 
 [class^="mona-"] {
-    &, & * {
-        font-size: 12px;
-    }
+    font-size: 12px;
 }
 
 @mixin active-background {
@@ -208,9 +205,18 @@ button[monaButton] {
     cursor: pointer;
 
     &.mona-primary {
-        background-color: var(--mona-primary);
-        color: var(--mona-background);
-        border: 1px solid var(--mona-primary);
+        transition: background 0.2s ease-in-out;
+        background: radial-gradient(circle, var(--mona-primary) 0%, var(--mona-primary-dark) 120%);
+        background-size: 200%;
+        &:hover {
+            background: radial-gradient(circle, var(--mona-primary) 0%, var(--mona-primary-dark) 120%);
+            background-size: 125%;
+        }
+        &:active {
+            background: radial-gradient(circle, var(--mona-primary) 0%, var(--mona-primary-dark) 120%);
+            background-size: 100%;
+        }
+        border: 1px solid var(--mona-border-color);
         &.mona-selected {
             background-color: var(--mona-primary-dark);
             color: var(--mona-background-light);
@@ -239,9 +245,12 @@ button[monaButton] {
         @include disabled;
     }
 
-    @include background-transition;
+    &:not(.mona-primary) {
+        @include background-transition;
+    }
 
-    &:not(.mona-selected) {
+    &:not(.mona-selected),
+    &:not(.mona-primary) {
         @include hover-background;
         @include active-background;
     }
@@ -1147,4 +1156,10 @@ div.mona-progress-bar-indeterminate {
 .mona-window-popup-content {
     padding: 0 !important;
     position: absolute !important;
+}
+
+.mona-dialog-window {
+    & .mona-window-content {
+        padding: 0 !important;
+    }
 }

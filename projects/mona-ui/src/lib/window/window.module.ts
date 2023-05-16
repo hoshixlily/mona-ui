@@ -7,6 +7,10 @@ import { WindowResizeHandlerDirective } from "./directives/window-resize-handler
 import { WindowDragHandlerDirective } from "./directives/window-drag-handler.directive";
 import { WindowComponent } from "./components/window/window.component";
 import { WindowTitleTemplateDirective } from "./directives/window-title-template.directive";
+import { DialogContentComponent } from "./components/dialog-content/dialog-content.component";
+import { TextBoxModule } from "../inputs/modules/text-box/text-box.module";
+import { FormsModule } from "@angular/forms";
+import { NumericTextBoxModule } from "../inputs/modules/numeric-text-box/numeric-text-box.module";
 
 @NgModule({
     declarations: [
@@ -14,9 +18,10 @@ import { WindowTitleTemplateDirective } from "./directives/window-title-template
         WindowResizeHandlerDirective,
         WindowDragHandlerDirective,
         WindowComponent,
-        WindowTitleTemplateDirective
+        WindowTitleTemplateDirective,
+        DialogContentComponent
     ],
-    imports: [CommonModule, ButtonModule, FontAwesomeModule],
+    imports: [CommonModule, ButtonModule, FontAwesomeModule, TextBoxModule, FormsModule, NumericTextBoxModule],
     exports: [WindowComponent, WindowTitleTemplateDirective]
 })
 export class WindowModule {}

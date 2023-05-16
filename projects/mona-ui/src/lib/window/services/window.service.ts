@@ -80,7 +80,13 @@ export class WindowService {
         });
         asapScheduler.schedule(() => {
             const element = windowReferenceOptions.popupRef.overlayRef.overlayElement;
+            const windowClassList = !settings.windowClass
+                ? []
+                : settings.windowClass instanceof Array
+                ? settings.windowClass
+                : [settings.windowClass];
             element.classList.add("mona-window");
+            windowClassList.forEach(c => element.classList.add(c));
             element.style.position = "absolute";
             if (settings.minWidth != null) {
                 element.style.minWidth = `${settings.minWidth}px`;
