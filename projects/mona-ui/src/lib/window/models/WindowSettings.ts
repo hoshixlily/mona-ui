@@ -19,4 +19,5 @@ export interface WindowSettings {
     title?: string | TemplateRef<unknown>;
     top?: number;
     width?: number;
+    windowClass?: string | string[];
 }

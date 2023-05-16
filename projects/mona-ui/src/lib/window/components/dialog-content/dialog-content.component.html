@@ -1,0 +1,32 @@
+<div class="wrapper mona-dialog-content">
+    <ng-container>
+        <div class="mona-dialog-content-inner">
+            <div class="mona-dialog-icon-wrapper">
+                <div class="mona-dialog-icon mona-dialog-icon-{{type}}">
+                    <fa-icon [icon]="confirmIcon" *ngIf="type === 'confirm'"></fa-icon>
+                    <fa-icon [icon]="errorIcon" *ngIf="type === 'error'"></fa-icon>
+                    <fa-icon [icon]="infoIcon" *ngIf="type === 'info'"></fa-icon>
+                    <fa-icon [icon]="inputIcon" *ngIf="type === 'input'"></fa-icon>
+                    <fa-icon [icon]="successIcon" *ngIf="type === 'success'"></fa-icon>
+                    <fa-icon [icon]="warningIcon" *ngIf="type === 'warning'"></fa-icon>
+                </div>
+            </div>
+            <div class="mona-dialog-text-wrapper" *ngIf="type !== 'input'">
+                <div class="mona-dialog-text-container">{{ text }}</div>
+            </div>
+            <div class="mona-dialog-input-wrapper" *ngIf="type === 'input'">
+                <div class="mona-dialog-text-container">{{text}}</div>
+                <mona-text-box [(ngModel)]="valueString" *ngIf="inputType === 'string'"></mona-text-box>
+                <mona-numeric-text-box [(ngModel)]="valueNumber" [spinners]="false" *ngIf="inputType === 'number'"></mona-numeric-text-box>
+            </div>
+        </div>
+        <div class="mona-dialog-actions">
+            <ng-container *ngFor="let action of actions">
+                <button monaButton class="mona-dialog-action" [ngClass]="{'mona-dialog-action-primary': action.primary}" [primary]="action.primary ?? false"
+                        (click)="onActionClick($event, action, inputType==='number' ? valueNumber : valueString)">
+                    {{action.text}}
+                </button>
+            </ng-container>
+        </div>
+    </ng-container>
+</div>

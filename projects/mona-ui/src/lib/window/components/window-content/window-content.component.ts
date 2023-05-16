@@ -71,7 +71,7 @@ export class WindowContentComponent implements OnInit, AfterViewInit {
         if (this.windowData.preventClose && this.windowData.preventClose(closeEvent)) {
             return;
         }
-        this.windowData.windowReference.close();
+        this.windowData.windowReference.close(closeEvent);
     }
 
     private focusElement(): void {

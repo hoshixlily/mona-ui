@@ -206,7 +206,14 @@ export * from "./lib/tree-view/directives/tree-view-node-text-template.directive
 export * from "./lib/tree-view/tree-view.module";
 
 /** Window */
+export * from "./lib/window/models/DialogAction";
+export * from "./lib/window/models/DialogRef";
+export * from "./lib/window/models/DialogResult";
+export * from "./lib/window/models/DialogSettings";
+export * from "./lib/window/models/DialogType";
+export * from "./lib/window/services/dialog.service";
 export { WindowRef } from "./lib/window/models/WindowRef";
+export * from "./lib/window/models/WindowSettings";
 export * from "./lib/window/services/window.service";
 export * from "./lib/window/directives/window-title-template.directive";
 export * from "./lib/window/components/window/window.component";

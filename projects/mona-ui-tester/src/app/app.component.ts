@@ -27,13 +27,14 @@ import {
     SortDescriptor,
     SortableOptions,
     CellEditEvent,
-    NotificationService
+    NotificationService,
+    DialogService
 } from "mona-ui";
 import { TestComponentComponent } from "./test-component/test-component.component";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import { faFilter, faMoon, faSearch, faSnowflake, faSun } from "@fortawesome/free-solid-svg-icons";
 import { Enumerable, IndexableList } from "@mirei/ts-collections";
-import { map, Observable } from "rxjs";
+import { map, Observable, take } from "rxjs";
 import { DateTime } from "luxon";
 import { GridProductData } from "./GridProductData";
 import { GridOrderData } from "./GridOrderData";
@@ -403,7 +404,8 @@ export class AppComponent implements OnInit {
         private readonly popupService: PopupService,
         public readonly windowService: WindowService,
         private readonly cdr: ChangeDetectorRef,
-        private readonly notificationService: NotificationService
+        private readonly notificationService: NotificationService,
+        private readonly dialogService: DialogService
     ) {}
 
     public dropdownItemDisabler = (item: any): boolean => !item.active;
@@ -816,6 +818,21 @@ export class AppComponent implements OnInit {
         } else {
             return "green";
         }
+    }
+
+    public showDialog(): void {
+        const dialogRef = this.dialogService.show({
+            text: "Enter title: ",
+            title: "Dialog",
+            type: "input",
+            inputType: "string"
+        });
+        dialogRef.result.pipe(take(1)).subscribe({
+            next: result => {
+                console.log(result);
+                // dialogRef.close();
+            }
+        });
     }
 
     public showNotification(): void {
