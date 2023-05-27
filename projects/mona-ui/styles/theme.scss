@@ -16,7 +16,7 @@
     color: var(--mona-text) !important;
 }
 
-[class^="mona-"] {
+[class^="mona-"], [attribute^="mona-"] {
     font-size: 12px;
 }
 
@@ -121,7 +121,6 @@
 /** Shared Components **/
 .mona-input-selector {
     width: auto;
-    height: var(--mona-input-height);
     border: 1px solid var(--mona-border-color);
     background: var(--mona-background);
     color: var(--mona-text);
@@ -137,17 +136,26 @@
     display: flex;
     align-items: center;
     white-space: nowrap;
-    padding: 0 8px;
+    padding: 5px 8px;
     flex: 1;
     overflow: hidden;
     & > span {
         overflow: hidden;
         text-overflow: ellipsis;
+        &::before {
+            content: "\200b";
+        }
+    }
+    & > mona-text-box {
+        height: 100%;
+        & div.mona-text-box {
+            border-top: none;
+            border-bottom: none;
+        }
     }
 }
 
 .mona-input-selector-icon {
-    min-width: var(--mona-input-height);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -194,15 +202,14 @@ li.mona-list-group-header {
 
 /** Button */
 button[monaButton] {
-    min-width: var(--mona-input-height); // default is square
-    min-height: var(--mona-input-height);
-    padding: 0 10px;
+    padding: 8px 10px;
     background-color: var(--mona-background);
     color: var(--mona-text);
     border: 1px solid var(--mona-border-color);
     outline: none;
     user-select: none;
     cursor: pointer;
+    font-size: 12px;
 
     &.mona-primary {
         transition: background 0.2s ease-in-out;
@@ -249,8 +256,7 @@ button[monaButton] {
         @include background-transition;
     }
 
-    &:not(.mona-selected),
-    &:not(.mona-primary) {
+    &:not(.mona-selected) {
         @include hover-background;
         @include active-background;
     }
@@ -261,6 +267,7 @@ button[monaButton] {
 
 /** Button Group */
 mona-button-group button[monaButton] {
+    min-width: 32px;
     &:not(:last-child) {
         border-right: none;
     }
@@ -293,7 +300,7 @@ mona-button-group button[monaButton] {
 /** Split Button */
 .mona-split-button-popup {
     & ul li {
-        height: var(--mona-input-height) !important;
+        height: 30px !important;
     }
 }
 
@@ -318,6 +325,7 @@ mona-button-group button[monaButton] {
 /** Auto Complete */
 .mona-auto-complete {
     & .mona-input-selector-value {
+        padding: 0;
         & mona-text-box {
             box-shadow: none;
             & div:first-child {
@@ -325,30 +333,36 @@ mona-button-group button[monaButton] {
                 border-right: none;
             }
             & input {
-                padding: 2px 8px;
                 overflow: hidden;
                 white-space: nowrap;
                 text-overflow: ellipsis;
             }
         }
     }
+    & .mona-input-selector-icon {
+        border-left: 1px solid var(--mona-border-color);
+    }
 }
 
 /** Combo Box */
 .mona-combo-box {
     & .mona-input-selector-value {
+        padding: 0;
         & mona-text-box {
             box-shadow: none;
             & div:first-child {
                 border-left: none;
+                border-right: none;
             }
             & input {
-                padding: 2px 8px;
                 overflow: hidden;
                 white-space: nowrap;
                 text-overflow: ellipsis;
             }
         }
+    }
+    & .mona-input-selector-icon {
+        border-left: 1px solid var(--mona-border-color);
     }
 }
 
@@ -381,16 +395,13 @@ mona-button-group button[monaButton] {
     & mona-text-box {
         width: 100%;
     }
-    & .mona-text-box-suffix button {
-        &:first-child {
-            border-left: none;
+    & span.mona-text-box-suffix {
+        padding: 0 12px !important;
+        & button {
+            border: none;
+            box-shadow: none;
         }
-
     }
-}
-
-.mona-date-picker {
-
 }
 
 .mona-date-input-popup {
@@ -490,13 +501,13 @@ div.mona-time-picker-popup {
             box-shadow: none;
             & div:first-child {
                 border: none;
-                height: calc(var(--mona-input-height) - 2px);
             }
         }
         & mona-chip {
             & div.mona-chip {
                 margin-top: 1px;
-                height: calc(var(--mona-input-height) - 6px);
+                //height: auto;
+                height: calc(100% - 4px);
             }
         }
     }
@@ -532,6 +543,15 @@ div.mona-filter-menu-item {
         &.mona-selected {
             background-color: var(--mona-primary) !important;
             color: var(--mona-text) !important;
+            & td {
+                &:focus,
+                &:focus-within {
+                    & div.mona-grid-cell {
+                        outline: none;
+                        box-shadow: 0 0 0 1px darkgray inset;
+                    }
+                }
+            }
         }
     }
     & td {
@@ -608,8 +628,8 @@ input[type="checkbox"][monaCheckBox] {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: calc(var(--mona-input-height) - 8px);
-            height: calc(var(--mona-input-height) - 8px);
+            width: 22px;
+            height: 22px;
             margin-right: 4px;
             padding-bottom: 3px;
             vertical-align: middle;
@@ -698,6 +718,9 @@ input[type="checkbox"][monaCheckBox] {
     &.mona-disabled {
         @include disabled;
     }
+    & input[monaTextBox] {
+        padding: 7px 8px;
+    }
 }
 
 /** Radio Button */
@@ -718,8 +741,8 @@ input[type="radio"][monaRadioButton] {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: calc(var(--mona-input-height) - 8px);
-            height: calc(var(--mona-input-height) - 8px);
+            width: 22px;
+            height: 22px;
             margin-right: 4px;
             vertical-align: middle;
             color: transparent;
@@ -848,7 +871,6 @@ textarea[monaTextArea] {
     color: var(--mona-text);
     border: 1px solid var(--mona-border-color);
     outline: none;
-    min-height: var(--mona-input-height);
     overflow: auto;
     resize: both;
     transition: box-shadow 0.15s ease-in-out;
@@ -866,8 +888,7 @@ textarea[monaTextArea] {
 /** Text Box */
 
 input[monaTextBox] {
-    height: var(--mona-input-height);
-    padding: 2px 4px;
+    padding: 7px 8px;
     border: 1px solid var(--mona-border-color);
     outline: none;
     background-color: var(--mona-background);
@@ -892,6 +913,8 @@ input[monaTextBox] {
     }
     & span.mona-text-box-prefix,
     & span.mona-text-box-suffix {
+        width: 30px;
+        overflow: hidden;
         color: var(--mona-text);
         &.mona-disabled {
             @include disabled;
@@ -903,6 +926,21 @@ input[monaTextBox] {
     span.mona-text-box-suffix {
         border-left: 1px solid var(--mona-border-color);
     }
+}
+
+.mona-input-button {
+    border: none !important;
+    height: 100%;
+    &:not(.mona-dropdown-list-input-button) {
+        background-color: var(--mona-background);
+    }
+    &:hover, &:focus, &:active {
+        background-color: unset !important;
+    }
+}
+
+.mona-dropdown-list-input-button {
+    background-color: transparent !important;
 }
 
 /** Layouts */
@@ -917,7 +955,6 @@ div.mona-tab-strip {
     border: 1px solid var(--mona-border-color);
 }
 div.mona-tab-strip-tabs {
-    height: var(--mona-input-height);
     background: 1px solid var(--mona-background-dark);
     border-bottom: 1px solid var(--mona-border-color);
 }
@@ -1087,16 +1124,6 @@ div.mona-progress-bar-indeterminate {
 
 
 /** TreeView */
-.mona-tree-node-content {
-    & > input[monaCheckBox] + label::before {
-        width: calc(var(--mona-input-height) - 12px);
-        height: calc(var(--mona-input-height) - 12px);
-    }
-    & > input[monaCheckBox]:checked + label:before {
-        font-size: 0.8rem;
-    }
-}
-
 .mona-tree-view-node {
     &.mona-disabled {
         @include disabled;

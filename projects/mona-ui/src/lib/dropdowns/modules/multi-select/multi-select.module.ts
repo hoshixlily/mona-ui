@@ -12,6 +12,7 @@ import { MultiSelectItemTemplateDirective } from "./directives/multi-select-item
 import { MultiSelectTagTemplateDirective } from "./directives/multi-select-tag-template.directive";
 import { MultiSelectSummaryTagTemplateDirective } from "./directives/multi-select-summary-tag-template.directive";
 import { MultiSelectSummaryTagDirective } from "./directives/multi-select-summary-tag.directive";
+import {ButtonModule} from "../../../buttons/modules/button/button.module";
 
 @NgModule({
     declarations: [
@@ -29,7 +30,8 @@ import { MultiSelectSummaryTagDirective } from "./directives/multi-select-summar
         TextBoxModule,
         PopupListComponent,
         ListItemTemplateDirective,
-        ListGroupTemplateDirective
+        ListGroupTemplateDirective,
+        ButtonModule
     ],
     exports: [
         MultiSelectComponent,

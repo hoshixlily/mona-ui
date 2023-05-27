@@ -1,7 +1,10 @@
+$switch-width: 60px;
+$switch-height: 32px;
+
 div.mona-switch {
     position: relative;
-    width: calc(var(--mona-input-height) * 2);
-    height: var(--mona-input-height);
+    width: $switch-width;
+    height: $switch-height;
     display: flex;
     padding: 2px;
     align-items: center;
@@ -21,13 +24,13 @@ span.mona-switch-label {
 }
 
 span.mona-switch-handle {
-    height: calc(var(--mona-input-height) - 4px);
     position: absolute;
-    width: calc(var(--mona-input-height) - 4px);
-    transition: left ease-out 200ms, background 200ms ease-in-out;
     display: inline-flex;
+    height: ($switch-height - 4px);
+    width: ($switch-height - 4px);
+    transition: left ease-out 200ms, background 200ms ease-in-out;
     &.mona-switch-on {
-        left: calc(100% - calc(var(--mona-input-height) - 2px));
+        left: calc(100% - ($switch-height - 2px));
     }
     &.mona-switch-off {
         left: 2px;

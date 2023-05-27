@@ -1,6 +1,6 @@
 div.mona-chip {
     display: flex;
-    height: calc(var(--mona-input-height) - 4px);
+    height: 100%; // TODO: Maybe a little bit smaller?
     cursor: pointer;
     user-select: none;
     outline: none;
@@ -20,8 +20,11 @@ div.mona-chip-close {
     align-items: center;
     justify-content: center;
     height: 100%;
-    width: calc(var(--mona-input-height) - 2px);
-    padding: 5px;
+    & button[monaButton] {
+        border: none;
+        padding: 4px 8px;
+        background: var(--mona-background-dark);
+    }
 }
 
 span.mona-chip-close-icon {

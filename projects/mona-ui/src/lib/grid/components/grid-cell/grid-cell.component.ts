@@ -155,8 +155,8 @@ export class GridCellComponent implements OnInit, OnDestroy {
             });
         fromEvent<MouseEvent>(this.elementRef.nativeElement, "click")
             .pipe(
-                takeUntil(this.#destroy),
-                tap(event => event.stopPropagation())
+                takeUntil(this.#destroy)
+                // tap(event => event.stopPropagation())
             )
             .subscribe(() => {
                 if (!this.editing && this.gridService.isInEditMode) {

@@ -44,7 +44,7 @@
                                        [sortable]="gridSortOptions" [reorderable]="true" [sort]="gridSort" (sortChange)="onGridSortChange($event)"
                                        (cellEdit)="onGridCellEdit($event)" [responsivePager]="false"
                                        monaGridEditable
-                                [monaGridSelectable]="{enabled: false, mode:'multiple'}" selectionKey="OrderID" [selectedKeys]="gridSelectionKeys" (selectedKeysChange)="onGridSelectionKeysChange($event)">
+                                [monaGridSelectable]="{enabled: true, mode:'multiple'}" selectionKey="OrderID" [selectedKeys]="gridSelectionKeys" (selectedKeysChange)="onGridSelectionKeysChange($event)">
                                 <mona-grid-column *ngFor="let col of gridOrderColumns" [field]="col.field" [title]="col.title" [filterType]="col.filterType">
 <!--                                    <ng-template monaGridCellTemplate let-row>-->
 <!--                                        <ng-container *ngIf="col.field === 'OrderDate' || col.field==='ShippedDate'">-->
@@ -186,7 +186,7 @@
                                     </ng-template>
                                 </mona-popup>
 
-                                <button monaButton #tooltipComponentAnchor>Tooltip Component Anchor</button>
+                                <button monaButton #tooltipComponentAnchor style="margin-right: 5px;">Tooltip Component Anchor</button>
                                 <mona-tooltip [target]="tooltipComponentAnchor" position="right">
                                     <span style="color: #95c5cb; font-weight: bold;">Tempest</span>
                                 </mona-tooltip>
@@ -195,6 +195,9 @@
                                         (selectedChange)="toggleableButtonSelected=$event" style="margin-right: 5px;" #contextMenuAnchor>
                                     <span style="color: lightcoral;">Context Menu Target</span>
                                 </button>
+
+                                <button monaButton [primary]="true">Primary Button</button>
+
                                 <mona-contextmenu [target]="contextMenuAnchor" (navigate)="print($event)">
                                     <mona-menu-item text="File">
                                         <ng-template monaMenuItemTextTemplate let-menuItem>
@@ -360,6 +363,9 @@
 
                             <div>
                                 <input type="text" [(ngModel)]="textBoxValue2" monaTextBox style="margin-right: 10px;"/>
+
+                            </div>
+                            <div>
                                 <mona-text-box [ngModel]="textBoxValue" (ngModelChange)="onTextBoxValueChange($event)">
                                     <ng-template monaTextBoxPrefixTemplate>
                                         <fa-icon [icon]="searchIcon"></fa-icon>

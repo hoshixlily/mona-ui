@@ -7,6 +7,8 @@
         </ng-container>
     </div>
     <div class="mona-chip-close" (click)="remove.emit($event)" *ngIf="removable">
-        <span class="mona-chip-close-icon">⨯</span>
+        <button monaButton>
+            <span class="mona-chip-close-icon">⨯</span>
+        </button>
     </div>
 </div>

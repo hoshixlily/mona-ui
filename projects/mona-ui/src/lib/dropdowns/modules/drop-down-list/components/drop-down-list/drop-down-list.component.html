@@ -9,10 +9,14 @@
         </ng-container>
     </div>
     <div class="mona-input-selector-icon" *ngIf="showClearButton && valuePopupListItem" (click)="clearValue($event)">
-        <fa-icon [icon]="clearIcon"></fa-icon>
+        <button monaButton class="mona-input-button mona-dropdown-list-input-button">
+            <fa-icon [icon]="clearIcon"></fa-icon>
+        </button>
     </div>
     <div class="mona-input-selector-icon">
-        <fa-icon [icon]="dropdownIcon"></fa-icon>
+        <button monaButton class="mona-input-button mona-dropdown-list-input-button">
+            <fa-icon [icon]="dropdownIcon"></fa-icon>
+        </button>
     </div>
 </div>
 

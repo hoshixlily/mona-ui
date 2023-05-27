@@ -5,7 +5,7 @@ div.mona-contextmenu-item {
     align-items: center;
 
     &-icon {
-        width: var(--mona-input-height);
+        width: 30px;
         height: 100%;
         display: flex;
         align-items: center;
@@ -21,7 +21,7 @@ div.mona-contextmenu-item {
     }
 
     &-link {
-        width: calc(var(--mona-input-height) / 2);
+        width: 15px;
         height: 100%;
         display: flex;
         align-items: center;

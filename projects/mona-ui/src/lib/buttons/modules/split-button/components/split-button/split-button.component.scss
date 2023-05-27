@@ -3,12 +3,10 @@ div.mona-split-button {
     align-items: center;
     background-color: var(--mona-background);
     border: 1px solid var(--mona-border-color);
-    height: var(--mona-input-height);
     width: fit-content;
     & > [monaButton] {
         height: calc(100% - 2px);
-        border-left: none;
-        border-right: none;
+        border: none;
         &:first-child {
             border-right: 1px solid var(--mona-border-color);
         }
