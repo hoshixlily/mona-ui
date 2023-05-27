@@ -22,13 +22,3 @@ ol {
         color: var(--mona-text);
     }
 }
-
-span.mona-time-picker-highlight {
-    display: block;
-    position: absolute;
-    height: var(--mona-input-height);
-    background-color: var(--mona-background-light);
-    border: 1px solid var(--mona-border-color);
-    top: calc(50% + 10px);
-    width: 100%;
-}

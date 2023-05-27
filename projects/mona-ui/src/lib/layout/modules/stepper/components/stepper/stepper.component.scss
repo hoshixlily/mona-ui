@@ -1,3 +1,6 @@
+$step-width: 32px;
+$step-height: 32px;
+
 div.mona-stepper {
     position: relative;
     width: auto;
@@ -24,8 +27,8 @@ ol.mona-stepper-step-list {
             z-index: 1;
             cursor: pointer;
             & > span:first-child {
-                width: var(--mona-input-height);
-                height: var(--mona-input-height);
+                width: $step-width;
+                height: $step-height;
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -59,7 +62,7 @@ ol.mona-stepper-step-list {
         flex-direction: column;
         height: 100%;
         width: max-content;
-        left: calc(-1 * (calc(calc(var(--mona-input-height) - 8px) / 2)));
+        left: calc(-1 * (calc(calc($step-width - 8px) / 2)));
         & > li {
             & > div:first-child {
                 flex-direction: row;
@@ -81,7 +84,7 @@ div.mona-stepper-track {
     &-horizontal {
         width: 100%;
         height: 8px;
-        top: calc(calc(var(--mona-input-height) - 8px) / 2);
+        top: calc(calc($step-height - 8px) / 2);
         & > div {
             height: 100%;
             transition: width 150ms ease-in-out;

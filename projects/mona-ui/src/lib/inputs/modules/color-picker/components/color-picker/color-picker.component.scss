@@ -1,5 +1,5 @@
+$color-size: 22px;
 .mona-color-picker {
-    height: var(--mona-input-height);
     display: flex;
     align-items: center;
     & > div {
@@ -9,8 +9,8 @@
     }
     & > div:first-child {
         display: flex;
-        width: calc(var(--mona-input-height) - 8px);
-        height: calc(var(--mona-input-height) - 8px);
+        width: $color-size;
+        height: $color-size;
         margin-left: 4px;
     }
 }

@@ -1,16 +1,19 @@
 div.mona-input-selector {
     height: auto;
-    min-height: var(--mona-input-height);
 }
 
 div.mona-input-selector-value {
-    padding: 0 1px 1px 1px;
+    padding: 0 1px 0;
     & > div:first-child {
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
         width: 100%;
         height: 100%;
+        &::before {
+            content: "\200b";
+            padding: 8px 0;
+        }
     }
     & mona-text-box {
         flex: 1;
@@ -22,6 +25,3 @@ div.mona-input-selector-value {
     }
 }
 
-div.mona-input-selector-icon {
-    min-width: var(--mona-input-height);
-}

@@ -1,6 +1,6 @@
 div.mona-text-box {
-    height: var(--mona-input-height);
     display: flex;
+    height: 100%;
     & > [monaTextBox] {
         border: none;
         height: 100%;
@@ -13,11 +13,8 @@ div.mona-text-box {
 
 span.mona-text-box-prefix,
 span.mona-text-box-suffix {
-    min-width: var(--mona-input-height);
-    max-width: var(--mona-input-height);
-    height: 100%;
-    display: inline-flex;
+    display: flex;
     align-items: center;
     justify-content: center;
-
+    padding: 8px 15px;
 }

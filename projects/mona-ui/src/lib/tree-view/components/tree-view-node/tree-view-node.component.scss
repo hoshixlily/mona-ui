@@ -4,8 +4,9 @@
 
 .mona-tree-view-node {
     display: flex;
-    height: var(--mona-input-height);
     position: relative;
+    padding: 1px 0;
+    align-items: center;
 }
 
 div.mona-tree-node-expander {
@@ -18,6 +19,7 @@ div.mona-tree-node-expander {
     user-select: none;
     cursor: default;
     pointer-events: none;
+    padding: 4px 0;
     &.mona-interactive {
         cursor: pointer;
         pointer-events: auto;

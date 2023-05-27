@@ -6,6 +6,8 @@
 div.mona-tab-strip {
     width: 100%;
     height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 div.mona-tab-strip-tabs {
@@ -30,7 +32,6 @@ ul.mona-tab-list {
     overflow: hidden;
     & li {
         list-style-type: none;
-        height: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -50,11 +51,10 @@ ul.mona-tab-list {
 }
 
 div.mona-tab-title {
-    padding: 5px 10px;
+    padding: 8px 10px 6px;
 }
 
 div.mona-tab-strip-scroll {
-    width: var(--mona-input-height);
     height: 100%;
     display: flex;
     align-items: center;
@@ -72,8 +72,8 @@ div.mona-tab-strip-scroll {
 
 div.mona-tab-content {
     width: 100%;
-    height: calc(100% - var(--mona-input-height));
     overflow: auto;
+    flex: 1;
 }
 
 div.mona-tab-hidden {
