@@ -44,7 +44,7 @@
                                        [sortable]="gridSortOptions" [reorderable]="true" [sort]="gridSort" (sortChange)="onGridSortChange($event)"
                                        (cellEdit)="onGridCellEdit($event)" [responsivePager]="false"
                                        monaGridEditable
-                                [monaGridSelectable]="{enabled: false, mode:'multiple'}" selectionKey="OrderID" [selectedKeys]="gridSelectionKeys" (selectedKeysChange)="onGridSelectionKeysChange($event)">
+                                [monaGridSelectable]="{enabled: true, mode:'multiple'}" selectionKey="OrderID" [selectedKeys]="gridSelectionKeys" (selectedKeysChange)="onGridSelectionKeysChange($event)">
                                 <mona-grid-column *ngFor="let col of gridOrderColumns" [field]="col.field" [title]="col.title" [filterType]="col.filterType">
 <!--                                    <ng-template monaGridCellTemplate let-row>-->
 <!--                                        <ng-container *ngIf="col.field === 'OrderDate' || col.field==='ShippedDate'">-->
