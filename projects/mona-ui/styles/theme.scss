@@ -543,6 +543,15 @@ div.mona-filter-menu-item {
         &.mona-selected {
             background-color: var(--mona-primary) !important;
             color: var(--mona-text) !important;
+            & td {
+                &:focus,
+                &:focus-within {
+                    & div.mona-grid-cell {
+                        outline: none;
+                        box-shadow: 0 0 0 1px darkgray inset;
+                    }
+                }
+            }
         }
     }
     & td {
