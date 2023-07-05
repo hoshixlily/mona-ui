@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 
 @Component({
     selector: "mona-chip",
@@ -6,6 +7,8 @@ import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
     styleUrls: ["./chip.component.scss"]
 })
 export class ChipComponent implements OnInit {
+    public readonly closeIcon: IconDefinition = faTimes;
+
     @Input()
     public disabled: boolean = false;
 

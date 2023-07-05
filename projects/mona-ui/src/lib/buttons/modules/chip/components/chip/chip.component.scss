@@ -1,10 +1,9 @@
 div.mona-chip {
     display: flex;
-    height: 100%; // TODO: Maybe a little bit smaller?
     cursor: pointer;
     user-select: none;
     outline: none;
-    box-sizing: content-box;
+    height: 100%;
 }
 
 div.mona-chip-content {
@@ -12,22 +11,24 @@ div.mona-chip-content {
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    padding: 0 8px;
 }
 
-div.mona-chip-close {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    & button[monaButton] {
-        border: none;
-        padding: 4px 8px;
-        background: var(--mona-background-dark);
-    }
+span.mona-chip-label {
+    display: inline-flex;
+    padding: 4px 8px;
+}
+
+
+button[monaButton] {
+    padding: 0 7px;
+    background: var(--mona-background-dark) !important;
 }
 
 span.mona-chip-close-icon {
     font-weight: bold;
-    font-size: 15px;
+    font-size: 14px;
+}
+
+div.mona-closable-chip {
+    border-right: 1px solid var(--mona-border-color);
 }

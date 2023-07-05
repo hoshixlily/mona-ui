@@ -1,12 +1,12 @@
 <div class="mona-date-time-picker" [ngClass]="{'mona-disabled': disabled}" #popupAnchor>
     <mona-text-box [disabled]="disabled" [readonly]="readonly" [ngModel]="currentDateString" (ngModelChange)="onDateStringEdit($event)" (inputBlur)="onDateInputBlur()">
         <ng-template monaTextBoxSuffixTemplate>
-            <button monaButton [flat]="false" (click)="onDateInputButtonClick()" [disabled]="disabled" [tabIndex]="-1" class="mona-input-button">
+            <button monaButton [flat]="true" (click)="onDateInputButtonClick()" [disabled]="disabled" [tabIndex]="-1" class="mona-input-button">
                 <fa-icon [icon]="dateIcon"></fa-icon>
             </button>
         </ng-template>
         <ng-template monaTextBoxSuffixTemplate>
-            <button monaButton [flat]="false" (click)="onTimeInputButtonClick()" [disabled]="disabled" [tabIndex]="-1" class="mona-input-button">
+            <button monaButton [flat]="true" (click)="onTimeInputButtonClick()" [disabled]="disabled" [tabIndex]="-1" class="mona-input-button">
                 <fa-icon [icon]="timeIcon"></fa-icon>
             </button>
         </ng-template>

@@ -64,6 +64,11 @@ export class MultiSelectComponent extends AbstractDropDownListComponent implemen
         super(elementRef, popupListService, popupService);
     }
 
+    public clearValue(event: MouseEvent): void {
+        event.stopImmediatePropagation();
+        this.updateValue(undefined);
+    }
+
     public override ngOnChanges(changes: SimpleChanges) {
         super.ngOnChanges(changes);
         if (changes["value"]) {

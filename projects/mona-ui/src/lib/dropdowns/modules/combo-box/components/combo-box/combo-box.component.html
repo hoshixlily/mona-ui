@@ -1,17 +1,26 @@
 <div class="mona-dropdown mona-combo-box mona-input-selector" [ngClass]="{'mona-disabled': disabled}" [attr.tabindex]="disabled ? -1 : 0" #dropdownWrapper>
     <div class="mona-input-selector-value">
-        <mona-text-box [ngModel]="comboBoxValue" (ngModelChange)="comboBoxValue$.next($event)" (keydown)="onKeydown($event)"></mona-text-box>
+        <mona-text-box [ngModel]="comboBoxValue" (ngModelChange)="comboBoxValue$.next($event)" (keydown)="onKeydown($event)">
+            <ng-template monaTextBoxSuffixTemplate>
+                <button monaButton [flat]="true" class="mona-input-button" *ngIf="showClearButton && valuePopupListItem" (click)="clearValue($event)">
+                    <fa-icon [icon]="clearIcon"></fa-icon>
+                </button>
+                <button monaButton [flat]="true" class="mona-input-button" (click)="open()">
+                    <fa-icon [icon]="dropdownIcon"></fa-icon>
+                </button>
+            </ng-template>
+        </mona-text-box>
     </div>
-    <div class="mona-input-selector-icon" *ngIf="showClearButton && valuePopupListItem" (click)="clearValue($event)">
-        <button monaButton class="mona-input-button">
-            <fa-icon [icon]="clearIcon"></fa-icon>
-        </button>
-    </div>
-    <div class="mona-input-selector-icon" (click)="open()">
-        <button monaButton class="mona-input-button">
-            <fa-icon [icon]="dropdownIcon"></fa-icon>
-        </button>
-    </div>
+<!--    <div class="mona-input-selector-icon" *ngIf="showClearButton && valuePopupListItem" (click)="clearValue($event)">-->
+<!--        <button monaButton [flat]="true" class="mona-input-button">-->
+<!--            <fa-icon [icon]="clearIcon"></fa-icon>-->
+<!--        </button>-->
+<!--    </div>-->
+<!--    <div class="mona-input-selector-icon" (click)="open()">-->
+<!--        <button monaButton [flat]="true" class="mona-input-button">-->
+<!--            <fa-icon [icon]="dropdownIcon"></fa-icon>-->
+<!--        </button>-->
+<!--    </div>-->
 </div>
 
 <ng-template #popupTemplate>

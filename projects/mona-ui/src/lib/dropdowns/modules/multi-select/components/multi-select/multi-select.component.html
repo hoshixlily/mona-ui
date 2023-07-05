@@ -5,19 +5,24 @@
         <div>
             <mona-chip *ngFor="let item of valuePopupListItem | slice:0:visibleTagCount"
                        [tabindex]="-1" [removable]="true" (remove)="onSelectedItemRemove($event, item)">
-                <span *ngIf="!tagTemplate">{{item.text}}</span>
+                <span class="mona-multi-select-label" *ngIf="!tagTemplate">{{item.text}}</span>
                 <ng-container [ngTemplateOutlet]="tagTemplate" [ngTemplateOutletContext]="{$implicit: item.data}" *ngIf="tagTemplate"></ng-container>
             </mona-chip>
             <mona-chip [tabindex]="-1" [removable]="true" (remove)="onSelectedItemGroupRemove($event)"
                        *ngIf="tagCount >= 0 && valuePopupListItem.length > tagCount">
-                <span *ngIf="!summaryTagTemplate">{{summaryTagText}}</span>
+                <span class="mona-multi-select-label" *ngIf="!summaryTagTemplate">{{summaryTagText}}</span>
                 <ng-container [ngTemplateOutlet]="summaryTagTemplate" [ngTemplateOutletContext]="{$implicit: valuePopupListItem}"
                               *ngIf="summaryTagTemplate"></ng-container>
             </mona-chip>
         </div>
     </div>
+    <div class="mona-input-selector-icon" *ngIf="showClearButton && valuePopupListItem.length !== 0" (click)="clearValue($event)" [ngStyle]="{'width': clearElement.clientHeight+'px'}" #clearElement>
+        <button monaButton [flat]="true" class="mona-input-button">
+            <fa-icon [icon]="clearIcon"></fa-icon>
+        </button>
+    </div>
     <div class="mona-input-selector-icon">
-        <button monaButton class="mona-input-button">
+        <button monaButton [flat]="true" class="mona-input-button">
             <fa-icon [icon]="dropdownIcon"></fa-icon>
         </button>
     </div>
