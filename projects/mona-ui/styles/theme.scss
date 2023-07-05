@@ -220,7 +220,7 @@ button[monaButton] {
     cursor: pointer;
 
     @include font-small;
-    padding: 4px 8px;
+    padding: 5px 8px;
 
     &.mona-primary {
         transition: background 0.2s ease-in-out;
@@ -331,6 +331,10 @@ mona-popup-list-item {
     &.mona-disabled {
         @include disabled;
     }
+
+    & button[monaButton] {
+        padding: 4px 8px;
+    }
 }
 
 .mona-dropdown-clear-icon {
@@ -376,6 +380,7 @@ mona-popup-list-item {
                 overflow: hidden;
                 white-space: nowrap;
                 text-overflow: ellipsis;
+                padding: 6px 8px;
             }
         }
     }
@@ -412,6 +417,12 @@ mona-popup-list-item {
     }
     & mona-text-box {
         width: 100%;
+        & input[monaTextBox] {
+            padding: 6px 8px;
+        }
+        & button[monaButton] {
+            padding: 4px 8px;
+        }
     }
 }
 
@@ -906,7 +917,7 @@ input[monaTextBox] {
     color: var(--mona-text);
     transition: box-shadow 0.15s ease-in-out;
     @include font-medium;
-    padding: 6px 8px;
+    padding: 7px;
 
     &:focus:not(:disabled),
     &:focus-within:not(:disabled),
@@ -943,6 +954,7 @@ input[monaTextBox] {
     &:hover, &:focus, &:active {
         background-color: unset !important;
     }
+    //padding: 2px 7px;
 }
 
 .mona-dropdown-list-input-button {
