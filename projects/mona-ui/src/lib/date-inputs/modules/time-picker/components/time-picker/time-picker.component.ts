@@ -4,6 +4,7 @@ import {
     Component,
     ElementRef,
     forwardRef,
+    HostBinding,
     Input,
     OnChanges,
     OnInit,
@@ -34,6 +35,9 @@ import { NG_VALUE_ACCESSOR } from "@angular/forms";
 })
 export class TimePickerComponent extends AbstractDateInputComponent implements OnInit, OnChanges {
     public readonly timeIcon: IconDefinition = faClock;
+
+    @HostBinding("class.mona-dropdown")
+    public readonly hostClass: boolean = true;
 
     @Input()
     public hourFormat: "12" | "24" = "24";

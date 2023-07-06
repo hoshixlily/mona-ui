@@ -45,12 +45,14 @@ ul.mona-tab-list {
             & fa-icon {
                 margin-top: 2px;
             }
+            padding-top: 2px;
+            padding-bottom: 2px;
         }
     }
 }
 
 div.mona-tab-title {
-    padding: 8px 10px 6px;
+    padding: 6px 10px 4px;
 }
 
 div.mona-tab-strip-scroll {

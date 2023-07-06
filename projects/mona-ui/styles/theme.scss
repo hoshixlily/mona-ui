@@ -461,6 +461,7 @@ div.mona-time-selector {
     }
     & ol {
         @include scrollbars;
+        font-size: 14px;
         user-select: none;
         & li {
             cursor: pointer;
@@ -1002,12 +1003,13 @@ div.mona-tab-strip {
 div.mona-tab-strip-tabs {
     background: 1px solid var(--mona-background-dark);
     border-bottom: 1px solid var(--mona-border-color);
-    @include font-small;
+    //@include font-small;
 }
 div.mona-tab-list-wrapper {
     background: var(--mona-background-dark);
 }
 ul.mona-tab-list {
+    @include font-medium;
     & li {
         color: var(--mona-text);
         border-right: 1px solid var(--mona-border-color);

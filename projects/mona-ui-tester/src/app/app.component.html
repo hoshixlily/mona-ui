@@ -155,6 +155,14 @@
                                                   [min]="dateMin" [max]="dateMax" [value]="datePickerValue"
                                                   (valueChange)="onDatePickerValueChange($event)"></mona-date-picker>
 
+                                <mona-time-picker [hourFormat]="dateFormat24Hours ? '24':'12'" [showSeconds]="true" [value]="timePickerValue"
+                                                  (valueChange)="onTimePickerValueChange($event)"
+                                                  [format]="dateFormat24Hours ? 'HH:mm:ss' : 'hh:mm:ss a'" style="width: 200px; margin-left: 40px;"></mona-time-picker>
+
+                                <mona-date-time-picker format="dd/MM/yyyy hh:mm a" style="width: 250px; margin-right: 20px;"
+                                                       [hourFormat]="dateFormat24Hours ? '24' : '12'" [readonly]="false" [value]="dateTimePickerValue"
+                                                       (valueChange)="onDateTimePickerValueChange($event)"></mona-date-time-picker>
+
                                 <mona-drop-down-list [data]="dropdownListDataItems" textField="text" valueField="value"
                                                      groupField="group" [filterable]="true" [disabled]="false"
                                                      [showClearButton]="true" placeholder="Select an item..."
