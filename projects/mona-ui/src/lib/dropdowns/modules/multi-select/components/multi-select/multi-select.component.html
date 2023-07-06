@@ -1,7 +1,7 @@
-<div class="mona-dropdown mona-multi-select mona-input-selector" [attr.tabindex]="disabled ? -1 : 0"
+<div class="mona-multi-select" [attr.tabindex]="disabled ? -1 : 0"
      [ngClass]="{'mona-disabled': disabled}"  (click)="open()"
      #dropdownWrapper>
-    <div class="mona-input-selector-value">
+    <div class="mona-multi-select-value">
         <div>
             <mona-chip *ngFor="let item of valuePopupListItem | slice:0:visibleTagCount"
                        [tabindex]="-1" [removable]="true" (remove)="onSelectedItemRemove($event, item)">
@@ -16,16 +16,12 @@
             </mona-chip>
         </div>
     </div>
-    <div class="mona-input-selector-icon" *ngIf="showClearButton && valuePopupListItem.length !== 0" (click)="clearValue($event)" [ngStyle]="{'width': clearElement.clientHeight+'px'}" #clearElement>
-        <button monaButton [flat]="true" class="mona-input-button">
-            <fa-icon [icon]="clearIcon"></fa-icon>
-        </button>
-    </div>
-    <div class="mona-input-selector-icon">
-        <button monaButton [flat]="true" class="mona-input-button">
-            <fa-icon [icon]="dropdownIcon"></fa-icon>
-        </button>
-    </div>
+    <span class="mona-input-clear-icon" *ngIf="showClearButton && valuePopupListItem.length !== 0" (click)="clearValue($event)">
+        <fa-icon [icon]="clearIcon"></fa-icon>
+    </span>
+    <button monaButton class="mona-input-button" (click)="open()">
+        <fa-icon [icon]="dropdownIcon"></fa-icon>
+    </button>
 </div>
 
 <ng-template #popupTemplate>

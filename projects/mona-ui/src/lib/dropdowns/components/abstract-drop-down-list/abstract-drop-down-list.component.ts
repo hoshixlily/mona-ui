@@ -2,6 +2,7 @@ import {
     Component,
     ElementRef,
     EventEmitter,
+    HostBinding,
     Input,
     OnChanges,
     OnDestroy,
@@ -38,6 +39,9 @@ export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy
     public readonly clearIcon: IconDefinition = faTimes;
     public readonly dropdownIcon: IconDefinition = faChevronDown;
     public popupRef: PopupRef | null = null;
+
+    @HostBinding("class.mona-dropdown")
+    public readonly hostClass: boolean = true;
 
     @Input()
     public data: Iterable<any> = [];
@@ -153,14 +157,14 @@ export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy
                 new ConnectionPositionPair(
                     { originX: "start", originY: "bottom" },
                     { overlayX: "start", overlayY: "top" },
-                    0,
+                    -1,
                     0,
                     "mona-dropdown-popup-content-bottom"
                 ),
                 new ConnectionPositionPair(
                     { originX: "start", originY: "top" },
                     { overlayX: "start", overlayY: "bottom" },
-                    0,
+                    -1,
                     -1,
                     "mona-dropdown-popup-content-top"
                 )

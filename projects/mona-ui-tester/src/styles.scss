@@ -12,13 +12,9 @@ html, body {
 //body { font-size: 0.75rem; }
 
 body {
-    font-family: Helvetica Neue,Helvetica,Arial,sans-serif;
+    font-family: Helvetica Neue,Helvetica,Arial,sans-serif !important;
 }
 
-button[monaButton] {
-    font-weight: 600;
-    //font-size: 12px;
-}
 
 .popup-noselect {
     user-select: none;

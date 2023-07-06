@@ -6,14 +6,16 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Roboto', sans-serif;
-    font-weight: 400;
 }
 
 *::selection,
 *::-moz-selection {
     background-color: var(--mona-primary-dark) !important;
     color: var(--mona-text) !important;
+}
+
+input, textarea, button {
+    font-family: inherit
 }
 
 [class^="mona-"], [attribute^="mona"] {
@@ -63,7 +65,7 @@
 
 @mixin font-medium {
     font-size: 14px;
-    line-height: 1.1428571429;
+    line-height: 1.428571429;
 }
 
 @mixin hover-background {
@@ -219,8 +221,8 @@ button[monaButton] {
     user-select: none;
     cursor: pointer;
 
-    @include font-small;
-    padding: 5px 8px;
+    @include font-medium;
+    padding: 4px 8px;
 
     &.mona-primary {
         transition: background 0.2s ease-in-out;
@@ -324,23 +326,26 @@ mona-popup-list-item {
 }
 
 .mona-dropdown {
-    width: 100%;
-    overflow: hidden;
     @include font-medium;
-
+    @include focus-shadow;
+    display: inline-flex;
+    border: 1px solid var(--mona-border-color);
+    background: var(--mona-background);
     &.mona-disabled {
         @include disabled;
     }
-
-    & button[monaButton] {
-        padding: 4px 8px;
-    }
 }
 
-.mona-dropdown-clear-icon {
+.mona-input-clear-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 8px;
+    cursor: pointer;
+    color: var(--mona-text);
+    @include font-small;
     &:hover {
         color: var(--mona-text-light);
-        font-weight: bold;
     }
 }
 
@@ -380,7 +385,6 @@ mona-popup-list-item {
                 overflow: hidden;
                 white-space: nowrap;
                 text-overflow: ellipsis;
-                padding: 6px 8px;
             }
         }
     }
@@ -393,6 +397,7 @@ mona-popup-list-item {
 .mona-calendar {
     background: var(--mona-background);
     color: var(--mona-text);
+    @include font-medium;
     & table {
         & td {
             @include hover-background;
@@ -407,6 +412,12 @@ mona-popup-list-item {
     }
 }
 
+table.mona-calendar-month-view-table {
+    & thead {
+        @include font-small;
+    }
+}
+
 /** Date Picker */
 .mona-date-picker,
 .mona-date-time-picker,
@@ -418,10 +429,10 @@ mona-popup-list-item {
     & mona-text-box {
         width: 100%;
         & input[monaTextBox] {
-            padding: 6px 8px;
+            padding: 4.5px 8px;
         }
         & button[monaButton] {
-            padding: 4px 8px;
+            padding: 0.25em 0.5em;
         }
     }
 }
@@ -470,7 +481,9 @@ div.mona-time-picker-popup {
 
 /** Dropdown List */
 .mona-dropdown-list {
-
+    & .mona-dropdown-value {
+        color: var(--mona-text);
+    }
 }
 
 .mona-dropdown-no-data {
@@ -526,9 +539,9 @@ div.mona-time-picker-popup {
             }
         }
         & mona-chip {
-            height: calc(100% - 2px);
+            //height: calc(100% - 2px);
             & div.mona-chip {
-                margin-top: 1px;
+                margin-top: 0.5px;
             }
         }
     }
@@ -799,6 +812,8 @@ input[type="radio"][monaRadioButton] {
 
 /** Slider */
 .mona-slider {
+    @include font-medium;
+
     & .mona-slider-highlight {
         background-color: var(--mona-primary);
     }
@@ -860,6 +875,11 @@ input[type="radio"][monaRadioButton] {
     }
 }
 
+/** Stepper */
+ol.mona-stepper-step-list {
+    @include font-medium;
+}
+
 /** Switch */
 .mona-switch {
     background-color: var(--mona-background);
@@ -916,8 +936,8 @@ input[monaTextBox] {
     background-color: var(--mona-background);
     color: var(--mona-text);
     transition: box-shadow 0.15s ease-in-out;
+    padding: 4px 8px;
     @include font-medium;
-    padding: 7px;
 
     &:focus:not(:disabled),
     &:focus-within:not(:disabled),
@@ -927,6 +947,15 @@ input[monaTextBox] {
     &[disabled] {
         @include disabled;
     }
+}
+
+input[monaTextBox].mona-input-inner {
+    border: 0;
+    outline: 0;
+    flex: 1;
+    box-shadow: none !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .mona-text-box {
@@ -946,15 +975,13 @@ input[monaTextBox] {
     }
 }
 
-.mona-input-button {
-    height: 100%;
-    &:not(.mona-dropdown-list-input-button) {
-        background-color: var(--mona-background);
-    }
+button[monaButton].mona-input-button {
     &:hover, &:focus, &:active {
-        background-color: unset !important;
+        background: none !important;
+        box-shadow: none !important;
     }
-    //padding: 2px 7px;
+    border-width: 0;
+    aspect-ratio: auto;
 }
 
 .mona-dropdown-list-input-button {
@@ -975,6 +1002,7 @@ div.mona-tab-strip {
 div.mona-tab-strip-tabs {
     background: 1px solid var(--mona-background-dark);
     border-bottom: 1px solid var(--mona-border-color);
+    @include font-small;
 }
 div.mona-tab-list-wrapper {
     background: var(--mona-background-dark);
@@ -1013,6 +1041,7 @@ div.mona-tab-strip-scroll {
 }
 
 .mona-contextmenu-item {
+    @include font-medium;
     @include hover-background;
     @include background-transition;
     &:active {
@@ -1034,6 +1063,7 @@ div.mona-tab-strip-scroll {
 ul.mona-menubar {
     background: var(--mona-background);
     border-bottom: 1px solid var(--mona-border-color);
+    @include font-medium;
     & li {
         color: var(--mona-text);
         &.mona-active {

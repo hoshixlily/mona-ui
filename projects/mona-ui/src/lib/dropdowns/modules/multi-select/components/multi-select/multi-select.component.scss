@@ -1,26 +1,27 @@
-div.mona-input-selector {
-    height: auto;
+div.mona-multi-select {
+    display: inherit;
+    width: 100%;
 }
 
-div.mona-input-selector-value {
-    padding: 0 1px 0;
+span.mona-multi-select-label {
+    padding: 4px 8px;
+}
+
+
+div.mona-multi-select-value {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0 2px;
     & > div:first-child {
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
         width: 100%;
-        padding-bottom: 1px;
-    }
-    & mona-text-box {
-        flex: 1;
     }
     & mona-chip {
         &:not(:last-child) {
             margin: 0 1px 0 0;
         }
     }
-}
-
-span.mona-multi-select-label {
-    padding: 4px 8px;
 }

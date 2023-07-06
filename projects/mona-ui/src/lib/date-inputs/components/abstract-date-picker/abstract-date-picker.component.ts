@@ -3,6 +3,7 @@ import {
     ChangeDetectorRef,
     Component,
     ElementRef,
+    HostBinding,
     OnInit,
     TemplateRef,
     ViewChild
@@ -14,6 +15,7 @@ import { take } from "rxjs";
 import { FocusMonitor } from "@angular/cdk/a11y";
 import { PopupService } from "../../../popup/services/popup.service";
 import { DateTime } from "luxon";
+import { ConnectionPositionPair } from "@angular/cdk/overlay";
 
 @Component({
     selector: "mona-abstract-date-picker",
@@ -25,6 +27,9 @@ import { DateTime } from "luxon";
 })
 export abstract class AbstractDatePickerComponent extends AbstractDateInputComponent implements OnInit {
     public readonly dateIcon: IconDefinition = faCalendar;
+
+    @HostBinding("class.mona-dropdown")
+    public readonly hostClass: boolean = true;
 
     @ViewChild("datePopupTemplate")
     public datePopupTemplateRef?: TemplateRef<any>;
@@ -93,7 +98,23 @@ export abstract class AbstractDatePickerComponent extends AbstractDateInputCompo
             popupClass: "mona-date-input-popup",
             hasBackdrop: false,
             withPush: false,
-            closeOnOutsideClick: true
+            closeOnOutsideClick: true,
+            positions: [
+                new ConnectionPositionPair(
+                    { originX: "start", originY: "bottom" },
+                    { overlayX: "start", overlayY: "top" },
+                    -1,
+                    0,
+                    "mona-dropdown-popup-content-bottom"
+                ),
+                new ConnectionPositionPair(
+                    { originX: "start", originY: "top" },
+                    { overlayX: "start", overlayY: "bottom" },
+                    -1,
+                    -1,
+                    "mona-dropdown-popup-content-top"
+                )
+            ]
         });
         this.popupRef.closed.pipe(take(1)).subscribe(() => {
             this.popupRef = null;
