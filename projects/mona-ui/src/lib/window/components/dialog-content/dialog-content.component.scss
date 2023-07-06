@@ -35,6 +35,10 @@ div.mona-dialog-text-container {
 
 div.mona-dialog-input-wrapper {
     width: 100%;
+    & mona-text-box,
+    & mona-numeric-text-box {
+        width: 100%;
+    }
 }
 
 div.mona-dialog-icon-wrapper {
