@@ -12,7 +12,7 @@ import { Row } from "../../models/Row";
 import { FormControl, FormGroup } from "@angular/forms";
 import { FocusMonitor, FocusOrigin } from "@angular/cdk/a11y";
 import { GridService } from "../../services/grid.service";
-import { asyncScheduler, filter, fromEvent, Subject, take, takeUntil, tap, timer } from "rxjs";
+import { asyncScheduler, filter, fromEvent, ReplaySubject, Subject, take, takeUntil, tap, timer } from "rxjs";
 import { CellEditEvent } from "../../models/CellEditEvent";
 
 @Component({
@@ -22,6 +22,7 @@ import { CellEditEvent } from "../../models/CellEditEvent";
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class GridCellComponent implements OnInit, OnDestroy {
+    readonly #date$: ReplaySubject<Date | null> = new ReplaySubject<Date | null>(1);
     readonly #destroy: Subject<void> = new Subject<void>();
     private focused: boolean = false;
     public editForm!: FormGroup;
@@ -64,6 +65,7 @@ export class GridCellComponent implements OnInit, OnDestroy {
     public onDateChange(date: Date | null): void {
         this.editing = false;
         this.gridService.isInEditMode = false;
+        this.#date$.next(date);
     }
 
     public onFocusChange(origin: FocusOrigin): void {
@@ -81,13 +83,12 @@ export class GridCellComponent implements OnInit, OnDestroy {
                             this.updateCellValue();
                         }
                     } else {
-                        const datePopup = document.querySelector(".mona-date-input-popup");
-                        if (!datePopup) {
+                        this.#date$.pipe(take(1)).subscribe(date => {
+                            if (date) {
+                                this.updateCellValue();
+                            }
                             this.editing = false;
-                        }
-                        if (this.editing) {
-                            this.updateCellValue();
-                        }
+                        });
                     }
                     this.cdr.markForCheck();
                 });

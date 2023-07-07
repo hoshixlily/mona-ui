@@ -1,4 +1,13 @@
-import { Component, ContentChild, Input, OnInit, TemplateRef } from "@angular/core";
+import {
+    AfterViewInit,
+    Component,
+    ContentChild,
+    EmbeddedViewRef,
+    Input,
+    OnInit,
+    TemplateRef,
+    ViewContainerRef
+} from "@angular/core";
 import { TabContentTemplateDirective } from "../../directives/tab-content-template.directive";
 import { TabTitleTemplateDirective } from "../../directives/tab-title-template.directive";
 import { v4 } from "uuid";
@@ -8,7 +17,8 @@ import { v4 } from "uuid";
     template: "",
     styleUrls: []
 })
-export class TabComponent implements OnInit {
+export class TabComponent implements OnInit, AfterViewInit {
+    #viewRef?: EmbeddedViewRef<any>;
     public readonly uid: string = v4();
     public index: number = 0;
 
@@ -30,7 +40,21 @@ export class TabComponent implements OnInit {
     @ContentChild(TabTitleTemplateDirective, { read: TemplateRef })
     public titleTemplate: TemplateRef<any> | null = null;
 
-    public constructor() {}
+    public constructor(private readonly vcr: ViewContainerRef) {}
+
+    public createView(): void {
+        if (this.contentTemplate) {
+            this.#viewRef = this.vcr.createEmbeddedView(this.contentTemplate);
+        }
+    }
+
+    public ngAfterViewInit(): void {
+        this.createView();
+    }
 
     public ngOnInit(): void {}
+
+    public get viewRef(): EmbeddedViewRef<any> | undefined {
+        return this.#viewRef;
+    }
 }

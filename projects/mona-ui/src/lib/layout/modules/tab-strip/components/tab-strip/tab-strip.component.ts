@@ -12,7 +12,8 @@ import {
     OnInit,
     Output,
     QueryList,
-    ViewChild
+    ViewChild,
+    ViewContainerRef
 } from "@angular/core";
 import { TabComponent } from "../tab/tab.component";
 import { interval, Subject, takeUntil, timer } from "rxjs";
@@ -38,6 +39,16 @@ export class TabStripComponent implements OnInit, AfterContentInit, OnDestroy, A
     @Input()
     public closable: boolean = false;
 
+    /**
+     * Used internally to determine if the tab strip should be rendered with a border.
+     * @private
+     */
+    @ViewChild("initialLoadAnchor", { read: ViewContainerRef })
+    private initialLoadAnchor!: ViewContainerRef;
+
+    @ViewChild("initialLoadContainer")
+    private initialLoadContainer!: ElementRef<HTMLDivElement>;
+
     @Input()
     public keepTabContent: boolean = false;
 
@@ -46,6 +57,9 @@ export class TabStripComponent implements OnInit, AfterContentInit, OnDestroy, A
 
     @ContentChildren(TabComponent)
     public tabComponents: QueryList<TabComponent> = new QueryList<TabComponent>();
+
+    @ViewChild("tabContentContainer", { read: ViewContainerRef })
+    public tabContentVcr!: ViewContainerRef;
 
     @ViewChild("tabListElement")
     public tabListElement!: ElementRef<HTMLUListElement>;
@@ -61,6 +75,7 @@ export class TabStripComponent implements OnInit, AfterContentInit, OnDestroy, A
     }
 
     public ngAfterViewInit(): void {
+        this.initializeTabContents();
         this.#resizeObserver = new ResizeObserver(entries => {
             window.requestAnimationFrame(() => {
                 if (!Array.isArray(entries) || !entries.length) {
@@ -70,6 +85,11 @@ export class TabStripComponent implements OnInit, AfterContentInit, OnDestroy, A
             });
         });
         this.#resizeObserver.observe(this.tabListElement.nativeElement);
+
+        const selectedTab = this.tabComponents.find(t => t.selected);
+        if (selectedTab) {
+            this.loadTabContent(selectedTab);
+        }
     }
 
     public ngOnDestroy(): void {
@@ -89,6 +109,7 @@ export class TabStripComponent implements OnInit, AfterContentInit, OnDestroy, A
                 listElement.scrollIntoView({ behavior: "smooth", block: "center" });
             }
         });
+        this.loadTabContent(tab);
     }
 
     public onTabClose(tab: TabComponent, event: MouseEvent): void {
@@ -121,6 +142,41 @@ export class TabStripComponent implements OnInit, AfterContentInit, OnDestroy, A
         this.scroll$.next();
         this.scroll$.complete();
         this.scroll$ = new Subject<void>();
+    }
+
+    private initializeTabContents(): void {
+        this.tabComponents.forEach(t => {
+            if (this.initialLoadAnchor.length > 0) {
+                this.initialLoadAnchor.detach(0);
+            }
+            if (t.viewRef) {
+                this.initialLoadAnchor.insert(t.viewRef);
+            }
+        });
+        if (this.initialLoadAnchor.length > 0) {
+            this.initialLoadAnchor.detach(0);
+        }
+        if (this.initialLoadContainer) {
+            this.initialLoadContainer.nativeElement.remove();
+        }
+    }
+
+    private loadTabContent(tab: TabComponent): void {
+        if (this.tabContentVcr.length > 0) {
+            if (this.keepTabContent) {
+                this.tabContentVcr.detach(0);
+            } else {
+                this.tabContentVcr.clear();
+            }
+        }
+        if (tab.viewRef) {
+            if (this.keepTabContent) {
+                this.tabContentVcr.insert(tab.viewRef);
+            } else {
+                tab.createView();
+                this.tabContentVcr.insert(tab.viewRef);
+            }
+        }
     }
 
     private updateScrollVisibility(): void {

@@ -1,8 +1,10 @@
-import { ColumnOptions } from "./ColumnOptions";
 import { FilterFieldType } from "../../filter/models/FilterFieldType";
 import { GridCellTemplateDirective } from "../directives/grid-cell-template.directive";
 
 export class Column {
+    /**
+     * Only used internally for column resizing
+     */
     public calculatedWidth?: number;
     public cellTemplate?: GridCellTemplateDirective;
     public field: string = "";
