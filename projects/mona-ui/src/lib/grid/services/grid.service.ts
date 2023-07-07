@@ -27,6 +27,7 @@ export class GridService {
         string,
         Dictionary<number, boolean>
     >();
+    public isFirstResize: boolean = true;
     public isInEditMode: boolean = false;
     public pageState: { page: number; skip: number; take: number } = { page: 1, skip: 0, take: 10 };
     public rows: Row[] = [];

@@ -243,6 +243,13 @@ export class GridComponent implements OnInit, AfterViewInit, OnDestroy, OnChange
         this.dropColumn = column;
     }
 
+    public onColumnResizeStart(first: boolean): void {
+        this.resizing = true;
+        if (first) {
+            this.setInitialCalculatedWidthOfColumns();
+        }
+    }
+
     public onColumnSort(column: Column): void {
         if (!this.gridService.sortableOptions.enabled) {
             return;

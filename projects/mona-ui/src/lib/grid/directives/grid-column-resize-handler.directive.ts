@@ -11,6 +11,7 @@ import {
 } from "@angular/core";
 import { Column } from "../models/Column";
 import { fromEvent, Subject, takeUntil } from "rxjs";
+import { GridService } from "../services/grid.service";
 
 @Directive({
     selector: "[monaGridColumnResizeHandler]"
@@ -25,10 +26,11 @@ export class GridColumnResizeHandlerDirective implements AfterViewInit, OnDestro
     public resizeEnd: EventEmitter<void> = new EventEmitter<void>();
 
     @Output()
-    public resizeStart: EventEmitter<void> = new EventEmitter<void>();
+    public resizeStart: EventEmitter<boolean> = new EventEmitter<boolean>();
 
     public constructor(
         private readonly elementRef: ElementRef<HTMLDivElement>,
+        private readonly gridService: GridService,
         private readonly zone: NgZone,
         private readonly cdr: ChangeDetectorRef
     ) {}
@@ -44,7 +46,7 @@ export class GridColumnResizeHandlerDirective implements AfterViewInit, OnDestro
 
     private onMouseDown(event: MouseEvent) {
         const element = this.elementRef.nativeElement;
-        const initialWidth = this.column.calculatedWidth ?? element.offsetWidth;
+
         const initialX = event.clientX;
         const oldSelectStart = document.onselectstart;
         const oldDragStart = document.ondragstart;
@@ -54,7 +56,15 @@ export class GridColumnResizeHandlerDirective implements AfterViewInit, OnDestro
         document.onselectstart = () => false;
         // document.ondragstart = () => false;
 
-        this.resizeStart.emit();
+        let initialWidth = element.parentElement?.offsetWidth ?? 0;
+        if (this.gridService.isFirstResize) {
+            initialWidth = element.parentElement?.offsetWidth ?? 0;
+        } else {
+            initialWidth = this.column.calculatedWidth || element.offsetWidth;
+        }
+
+        this.resizeStart.emit(this.gridService.isFirstResize);
+        this.gridService.isFirstResize = false;
 
         const onMouseMove = (event: MouseEvent) => {
             const deltaX = event.clientX - initialX;
@@ -69,7 +79,7 @@ export class GridColumnResizeHandlerDirective implements AfterViewInit, OnDestro
                 return;
             }
 
-            const oldWidth = this.column.calculatedWidth ?? element.offsetWidth;
+            const oldWidth = this.column.calculatedWidth || element.offsetWidth;
             this.column.calculatedWidth = initialWidth + deltaX;
             if (headerTableElement) {
                 headerTableElement.style.width = `${

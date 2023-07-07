@@ -36,7 +36,7 @@
                             <span class="mona-grid-column-drop-hint" *ngIf="dropColumn === column && dragColumn && reorderable"
                                   [ngStyle]="{'right': dragColumn.index < dropColumn.index ? '-1px': null, 'left': dragColumn.index > dropColumn.index ? '-1px': null}"></span>
                             <div monaGridColumnResizeHandler [column]="column" class="mona-grid-column-resizer" *ngIf="resizable && !columnDragging"
-                                 (resizeStart)="resizing=true;" (resizeEnd)="resizing=false;"></div>
+                                 (resizeStart)="onColumnResizeStart($event)" (resizeEnd)="resizing=false;"></div>
                             <ng-template cdkDragPreview>
                                 <div class="mona-grid-column-drag-preview">
                                     <span class="mona-grid-column-title">{{column.title}}</span>
