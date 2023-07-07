@@ -289,7 +289,38 @@
                                                        [(ngModel)]="numericTextBoxValue"
                                                        [formatter]="numericTextBoxFormatter"
                                                        style="width: 200px;"></mona-numeric-text-box>
+
+                                <mona-split-button text="Split Button"
+                                                   (buttonClick)="print('Split Button Main Button Clicked.')"
+                                                   [disabled]="false">
+                                    <ng-template monaSplitButtonTextTemplate>
+                                        <span style="color: mediumspringgreen;">Split Button</span>
+                                    </ng-template>
+                                    <mona-menu-item text="Split Menu I"></mona-menu-item>
+                                    <mona-menu-item text="Split Menu II" iconClass="fa fa-file">
+                                        <mona-menu-item text="Split Menu II I"></mona-menu-item>
+                                        <mona-menu-item text="Split Menu II II"
+                                                        (menuClick)="print('SMIIII')"></mona-menu-item>
+                                    </mona-menu-item>
+                                    <mona-menu-item text="Split Menu III" iconClass="fa fa-search"></mona-menu-item>
+                                </mona-split-button>
                             </div>
+
+                            <div style="display: flex; align-items: center">
+                                <mona-stepper orientation="horizontal" [steps]="stepperSteps" [step]="stepperStep" (stepChange)="onStepperStepChange($event)" [linear]="true" style="width: 600px;">
+                                    <ng-template monaStepperLabelTemplate let-step let-index="index" let-active="active">
+                                        <span *ngIf="!active" style="color: snow; font-weight: bolder;">{{index+1}}. {{step.label}}</span>
+                                        <span *ngIf="active" style="color: teal; font-weight: bolder;">{{index+1}}. {{step.label}}</span>
+                                    </ng-template>
+                                    <ng-template monaStepperIndicatorTemplate let-step let-index="index">
+                                        <span style="color: snow; font-weight: bold;">{{step.label.substring(0,2).toUpperCase()}}</span>
+                                    </ng-template>
+                                    <ng-template monaStepperStepTemplate let-step let-index="index" let-active="active">
+                                        <fa-icon [icon]="snowflakeIcon" style="font-size: 24px; margin-top: 0px;" [ngStyle]="{'color': active?'#6daf76':'#95c5cb'}"></fa-icon>
+                                    </ng-template>
+                                </mona-stepper>
+                            </div>
+
                         </div>
                     </ng-template>
                 </mona-tab>
