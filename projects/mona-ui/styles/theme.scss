@@ -669,10 +669,10 @@ input[type="checkbox"][monaCheckBox] {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 22px;
-            height: 22px;
+            width: 20px;
+            height: 20px;
             margin-right: 4px;
-            padding-bottom: 3px;
+            //padding-bottom: 3px;
             vertical-align: middle;
             color: transparent;
             transition:background-color 0.15s ease-out, color 0.15s ease-out, border 0.15s ease-out;
@@ -769,7 +769,6 @@ input[type="radio"][monaRadioButton] {
         align-items: center;
         cursor: pointer;
         color: var(--mona-text);
-        //font-size: 1.1rem;
         user-select: none;
         &:before {
             content: " ";
@@ -779,8 +778,8 @@ input[type="radio"][monaRadioButton] {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 22px;
-            height: 22px;
+            width: 20px;
+            height: 20px;
             margin-right: 4px;
             vertical-align: middle;
             color: transparent;
@@ -996,8 +995,15 @@ button[monaButton].mona-input-button {
 /** Layouts */
 
 /** Expansion Panel */
-.mona-expansion-panel + .mona-expansion-panel {
-    border-top: none;
+
+mona-expansion-panel + mona-expansion-panel {
+    & .mona-expansion-panel {
+        border-top: none !important;
+    }
+}
+
+.mona-expansion-panel-header {
+    @include font-medium;
 }
 
 /** Tab Strip */
@@ -1179,6 +1185,9 @@ div.mona-progress-bar-indeterminate {
 
 
 /** TreeView */
+.mona-tree-view {
+    @include font-medium;
+}
 .mona-tree-view-node {
     &.mona-disabled {
         @include disabled;

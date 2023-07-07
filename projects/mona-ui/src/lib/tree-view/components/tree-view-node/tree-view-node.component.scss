@@ -37,7 +37,7 @@ div.mona-tree-node-content {
 
 div.mona-tree-view-node-text {
     color: var(--mona-text);
-    padding: 5px 5px;
+    padding: 2px 4px;
     min-width: 0;
     user-select: none;
     white-space: nowrap;
@@ -62,9 +62,9 @@ div.mona-tree-view-drop-magnet {
         background-color: var(--mona-primary);
     }
     &:first-child {
-        top: 2px;
+        top: 0px;
     }
     &:last-child {
-        bottom: 2px;
+        bottom: 0px;
     }
 }
