@@ -1,6 +1,6 @@
 <div class="wrapper">
     <mona-splitter orientation="horizontal">
-        <mona-splitter-pane [size]="300" [collapsible]="true" >
+        <mona-splitter-pane [size]="300" [collapsible]="true">
             <mona-tree-view [data]="treeData" textField="text" childrenField="items" keyField="id"
                             [monaTreeViewCheckable]="{enabled: true, checkChildren: true, checkParents: true, mode: 'multiple'}"
                             [checkedKeys]="treeCheckedKeys" (checkedKeysChange)="onTreeCheckedKeysChange($event)"
@@ -32,31 +32,66 @@
             </mona-tree-view>
         </mona-splitter-pane>
         <mona-splitter-pane>
-            <mona-tab-strip [keepTabContent]="true" [closable]="false" (tabClose)="onTabStripTabClose($event)">
-                <mona-tab [title]="'Grid Tab'" >
+            <mona-tab-strip [keepTabContent]="false" [closable]="false" (tabClose)="onTabStripTabClose($event)">
+                <mona-tab [title]="'Grid Tab'">
                     <ng-template monaTabContentTemplate>
                         <div style="padding: 40px;">
-                            <mona-grid [data]="gridOrderData" [pageSize]="5" [pageSizeValues]="[5, 10, 15, 20, 25, 50, 100]" style="height: 400px;"
+                            <mona-grid [data]="gridOrderData" [pageSize]="5"
+                                       [pageSizeValues]="[5, 10, 15, 20, 25, 50, 100]" style="height: 400px; margin-bottom: 10px;"
                                        [groupable]="true"
-                                       [filterable]="true" [filter]="gridFilters" (filterChange)="onGridFilterChange($event)"
+                                       [filterable]="true" [filter]="gridFilters"
+                                       (filterChange)="onGridFilterChange($event)"
                                        [resizable]="true"
-                                       [sortable]="gridSortOptions" [reorderable]="true" [sort]="gridSort" (sortChange)="onGridSortChange($event)"
+                                       [sortable]="gridSortOptions" [reorderable]="true" [sort]="gridSort"
+                                       (sortChange)="onGridSortChange($event)"
                                        (cellEdit)="onGridCellEdit($event)" [responsivePager]="false"
                                        monaGridEditable
-                                [monaGridSelectable]="{enabled: true, mode:'multiple'}" selectionKey="OrderID" [selectedKeys]="gridSelectionKeys" (selectedKeysChange)="onGridSelectionKeysChange($event)">
-                                <mona-grid-column *ngFor="let col of gridOrderColumns" [field]="col.field" [title]="col.title" [filterType]="col.filterType">
-<!--                                    <ng-template monaGridCellTemplate let-row>-->
-<!--                                        <ng-container *ngIf="col.field === 'OrderDate' || col.field==='ShippedDate'">-->
-<!--                                            {{row.data[col.field] | date: 'dd/MM/yyyy'}}-->
-<!--                                        </ng-container>-->
-<!--                                        <ng-container *ngIf="col.field !== 'OrderDate' && col.field!=='ShippedDate'">-->
-<!--                                            {{row.data[col.field]}}-->
-<!--                                        </ng-container>-->
-<!--                                    </ng-template>-->
+                                       [monaGridSelectable]="{enabled: true, mode:'single'}" selectionKey="OrderID"
+                                       [selectedKeys]="gridSelectionKeys"
+                                       (selectedKeysChange)="onGridSelectionKeysChange($event)">
+                                <mona-grid-column *ngFor="let col of gridOrderColumns" [field]="col.field"
+                                                  [title]="col.title" [filterType]="col.filterType">
+                                    <!--                                    <ng-template monaGridCellTemplate let-row>-->
+                                    <!--                                        <ng-container *ngIf="col.field === 'OrderDate' || col.field==='ShippedDate'">-->
+                                    <!--                                            {{row.data[col.field] | date: 'dd/MM/yyyy'}}-->
+                                    <!--                                        </ng-container>-->
+                                    <!--                                        <ng-container *ngIf="col.field !== 'OrderDate' && col.field!=='ShippedDate'">-->
+                                    <!--                                            {{row.data[col.field]}}-->
+                                    <!--                                        </ng-container>-->
+                                    <!--                                    </ng-template>-->
                                 </mona-grid-column>
                             </mona-grid>
-                            <mona-grid [data]="gridProductData" [pageSize]="5" [pageSizeValues]="[5,10,15,20,25,50,100]" style="height: 400px">
-                                <mona-grid-column *ngFor="let col of gridProductColumns" [field]="col.field" [title]="col.title"></mona-grid-column>
+                            <mona-grid [data]="gridProductData" [pageSize]="5" [pageSizeValues]="[5,10,15,20,25,50,100]"
+                                       style="height: 400px">
+                                <mona-grid-column title="Avatar" [width]="70">
+                                    <ng-template monaGridColumnTitleTemplate>
+                                        <span style="color: red; width: 100%; display: flex; justify-content: center;">Avatar</span>
+                                    </ng-template>
+                                    <ng-template monaGridCellTemplate>
+                                        <img
+                                            [ngSrc]="'https://photos.smugmug.com/photos/i-ZfvdSzh/0/Ti/i-ZfvdSzh-Ti.png'"
+                                            [width]="60" [height]="60" style="border: 2px solid black;">
+                                    </ng-template>
+                                </mona-grid-column>
+                                <mona-grid-column *ngFor="let col of gridProductColumns" [field]="col.field"
+                                                  [title]="col.title"></mona-grid-column>
+                                <mona-grid-column title="Slider">
+                                    <ng-template monaGridCellTemplate>
+                                        <mona-slider style="width: 200px;" [value]="sliderValue"
+                                                     (valueChange)="onSliderValueChange($event)"></mona-slider>
+                                    </ng-template>
+                                </mona-grid-column>
+                                <mona-grid-column [title]="'Progress'">
+                                    <ng-template monaGridCellTemplate>
+                                        <mona-progress-bar [value]="sliderValue*10" [disabled]="false" [min]="0"
+                                                           [max]="100"
+                                                           [color]="progressBarColorSelector"
+                                                           [labelStyles]="{'font-weight': 'bolder'}"
+                                                           [labelVisible]="false" [labelFormat]="progressLabelFormatter"
+                                                           [indeterminate]="switchValue"
+                                                           labelPosition="end"></mona-progress-bar>
+                                    </ng-template>
+                                </mona-grid-column>
                             </mona-grid>
                         </div>
                     </ng-template>
@@ -69,13 +104,14 @@
                         <div>
                             <mona-menubar>
                                 <mona-menu text="File" [disabled]="menuBarMenuVisible">
-                                    <mona-menu-item text="New" ></mona-menu-item>
-                                    <mona-menu-item text="Open" ></mona-menu-item>
+                                    <mona-menu-item text="New"></mona-menu-item>
+                                    <mona-menu-item text="Open"></mona-menu-item>
                                     <mona-menu-item text="Save"></mona-menu-item>
                                     <mona-menu-item text="Save As"></mona-menu-item>
                                     <mona-menu-item text="Exit">
                                         <ng-template monaMenuItemTextTemplate>
-                                            <span style="color: crimson; font-weight: bolder; font-size: 14px;">Exit</span>
+                                            <span
+                                                style="color: crimson; font-weight: bolder; font-size: 14px;">Exit</span>
                                         </ng-template>
                                     </mona-menu-item>
                                 </mona-menu>
@@ -93,7 +129,8 @@
                                         <mona-menu-item text="Paste 2">
                                             <mona-menu-item text="Paste 2.1"></mona-menu-item>
                                             <mona-menu-item text="Paste 2.2"></mona-menu-item>
-                                            <mona-menu-item text="Paste 2.3" (menuClick)="print($event)"></mona-menu-item>
+                                            <mona-menu-item text="Paste 2.3"
+                                                            (menuClick)="print($event)"></mona-menu-item>
                                         </mona-menu-item>
                                         <mona-menu-item text="Paste 3"></mona-menu-item>
                                     </mona-menu-item>
@@ -149,7 +186,7 @@
                                                     (valueChange)="onAutoCompleteValueChange($event)"
                                                     style="width: 200px;"></mona-auto-complete>
                                 <input monaTextBox [ngModel]="textBoxValue">
-<!--                                <mona-text-box [ngModel]="textBoxValue"></mona-text-box>-->
+                                <!--                                <mona-text-box [ngModel]="textBoxValue"></mona-text-box>-->
 
                                 <mona-drop-down-list [data]="dropdownListDataItems" textField="text" valueField="value"
                                                      groupField="group" [filterable]="true" [disabled]="false"
@@ -159,8 +196,10 @@
                                                      (valueChange)="onDropDownValueChange($event)"
                                                      style="width: 200px; ">
                                     <ng-template monaDropDownListItemTemplate let-dataItem let-listItem="listItem">
-                                        <span style="color: deeppink;" *ngIf="dataItem.value % 3 === 0 && !listItem.disabled">{{dataItem.text}}</span>
-                                        <span style="color: dodgerblue;" *ngIf="dataItem.value % 3 !== 0 && !listItem.disabled">{{dataItem.text}}</span>
+                                        <span style="color: deeppink;"
+                                              *ngIf="dataItem.value % 3 === 0 && !listItem.disabled">{{dataItem.text}}</span>
+                                        <span style="color: dodgerblue;"
+                                              *ngIf="dataItem.value % 3 !== 0 && !listItem.disabled">{{dataItem.text}}</span>
                                         <span *ngIf="listItem.disabled">{{dataItem.text}}</span>
                                     </ng-template>
                                     <ng-template monaDropDownListValueTemplate let-dataItem>
@@ -197,14 +236,19 @@
                                                   [min]="dateMin" [max]="dateMax" [value]="datePickerValue"
                                                   (valueChange)="onDatePickerValueChange($event)"></mona-date-picker>
 
-                                <mona-time-picker [hourFormat]="dateFormat24Hours ? '24':'12'" [showSeconds]="true" [value]="timePickerValue"
+                                <mona-time-picker [hourFormat]="dateFormat24Hours ? '24':'12'" [showSeconds]="true"
+                                                  [value]="timePickerValue"
                                                   (valueChange)="onTimePickerValueChange($event)"
-                                                  [format]="dateFormat24Hours ? 'HH:mm:ss' : 'hh:mm:ss a'" style="width: 200px;"></mona-time-picker>
+                                                  [format]="dateFormat24Hours ? 'HH:mm:ss' : 'hh:mm:ss a'"
+                                                  style="width: 200px;"></mona-time-picker>
 
                                 <mona-date-time-picker format="dd/MM/yyyy hh:mm a" style="width: 250px;"
-                                                       [hourFormat]="dateFormat24Hours ? '24' : '12'" [readonly]="false" [value]="dateTimePickerValue"
+                                                       [hourFormat]="dateFormat24Hours ? '24' : '12'" [readonly]="false"
+                                                       [value]="dateTimePickerValue"
                                                        (valueChange)="onDateTimePickerValueChange($event)"></mona-date-time-picker>
 
+                                <mona-switch [labelOff]="'12'" labelOn="24" [(ngModel)]="dateFormat24Hours"
+                                             style="margin-right: 5px;"></mona-switch>
                             </div>
                             <div style="display: flex; align-items: center;">
                                 <button monaButton [disabled]="false" [primary]="false" [selected]="false"
@@ -213,7 +257,9 @@
                                         #testButtonRef>Test Button
                                     <mona-tooltip [target]="testButtonRef" position="bottom">
                                         <!--                                        <span style="font-weight: bold; font-size: 24px;">Test Button Tooltip</span>-->
-                                        <img src="https://photos.smugmug.com/Shared/Image/i-WG27Dmp/0/38cbf7f2/4K/colorful-liquid-flow-abstract-digital-art-uhdpaper.com-4K-8.1392-4K.jpg" style="width: 480px; height: 270px;" alt="Tooltip Image" />
+                                        <img
+                                            src="https://photos.smugmug.com/Shared/Image/i-WG27Dmp/0/38cbf7f2/4K/colorful-liquid-flow-abstract-digital-art-uhdpaper.com-4K-8.1392-4K.jpg"
+                                            style="width: 480px; height: 270px;" alt="Tooltip Image"/>
                                     </mona-tooltip>
                                 </button>
 
@@ -223,7 +269,9 @@
 
                                 <button monaButton (click)="showDialog()">Show Dialog</button>
 
-                                <button monaButton #tooltipComponentAnchor style="margin-right: 5px;">Tooltip Component Anchor</button>
+                                <button monaButton #tooltipComponentAnchor style="margin-right: 5px;">Tooltip Component
+                                    Anchor
+                                </button>
                                 <mona-tooltip [target]="tooltipComponentAnchor" position="top">
                                     <span style="color: #95c5cb; font-weight: bold;">Tempest</span>
                                 </mona-tooltip>
@@ -278,21 +326,22 @@
                 <!--                        {{item}}-->
                 <!--                    </ng-template>-->
                 <!--                </mona-tab>-->
-                <mona-tab title="Splitter" >
+                <mona-tab title="Splitter">
                     <ng-template monaTabContentTemplate>
                         <div style="width: 100%; height: 100%;">
                             <mona-splitter style="height: 100%;" orientation="vertical">
-                                <mona-splitter-pane  [collapsible]="true">
+                                <mona-splitter-pane [collapsible]="true">
                                     <div style="width: 100%; height: 100%; padding: 20px;">
                                         <button monaButton>Open Dialog</button>
                                     </div>
                                 </mona-splitter-pane>
-                                <mona-splitter-pane  [collapsible]="true">
+                                <mona-splitter-pane [collapsible]="true">
 
                                     <mona-splitter orientation="horizontal">
                                         <mona-splitter-pane [collapsible]="true">
                                             <div style="width: 100%; height: 100%; padding: 20px;">
-                                                <mona-calendar [(value)]="calendarValue" style="width: 300px;"></mona-calendar>
+                                                <mona-calendar [(value)]="calendarValue"
+                                                               style="width: 300px;"></mona-calendar>
                                             </div>
                                         </mona-splitter-pane>
                                         <mona-splitter-pane [collapsible]="true">
@@ -303,9 +352,9 @@
                                     </mona-splitter>
 
                                 </mona-splitter-pane>
-                                <mona-splitter-pane  [collapsible]="true" [resizable]="false" [size]="40">
+                                <mona-splitter-pane [collapsible]="true" [resizable]="false" [size]="40">
                                     <div style="width: 100%; height: 100%; padding: 2px;">
-<!--                                        <button monaButton>Open Dialog</button>-->
+                                        <!--                                        <button monaButton>Open Dialog</button>-->
                                         <mona-drop-down-list [data]="[1,2,3,4,5,6,7,8,9]"></mona-drop-down-list>
 
                                     </div>
@@ -313,7 +362,7 @@
                             </mona-splitter>
                         </div>
                     </ng-template>
-                </mona-tab >
+                </mona-tab>
                 <mona-tab *ngFor="let t of tabData" title="TAB TITLE: {{t.title}}" [closable]="true"></mona-tab>
             </mona-tab-strip>
         </mona-splitter-pane>

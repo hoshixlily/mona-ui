@@ -1,5 +1,6 @@
 import { FilterFieldType } from "../../filter/models/FilterFieldType";
 import { GridCellTemplateDirective } from "../directives/grid-cell-template.directive";
+import { GridColumnTitleTemplateDirective } from "../directives/grid-column-title-template.directive";
 
 export class Column {
     /**
@@ -16,6 +17,7 @@ export class Column {
     public sortDirection?: "asc" | "desc";
     public sortIndex?: number; // 1-based
     public title: string = "";
+    public titleTemplate?: GridColumnTitleTemplateDirective;
     public width?: number;
 
     public constructor() {}

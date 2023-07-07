@@ -24,7 +24,12 @@
                             (mousemove)="onColumnMouseEnter($event, column)" (cdkDragEntered)="onColumnDragEnter($event, column)"
                             (cdkDragStarted)="onColumnDragStart($event)">
                             <div class="mona-grid-column-wrap">
-                                <span class="mona-grid-column-title" (click)="onColumnSort(column)">{{column.title}}</span>
+                                <ng-container *ngIf="column.titleTemplate; else defaultTitle;">
+                                    <ng-container [ngTemplateOutlet]="column.titleTemplate.templateRef"></ng-container>
+                                </ng-container>
+                                <ng-template #defaultTitle>
+                                    <span class="mona-grid-column-title" (click)="onColumnSort(column)">{{column.title}}</span>
+                                </ng-template>
                                 <div class="mona-grid-column-actions">
                                     <span *ngIf="gridService.sortableOptions.showIndices && column.sortIndex != null">{{column.sortIndex}}</span>
                                     <fa-icon [icon]="ascendingSortIcon" *ngIf="column.sortDirection==='asc'"></fa-icon>

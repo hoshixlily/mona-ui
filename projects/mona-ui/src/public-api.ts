@@ -71,6 +71,7 @@ export * from "./lib/grid/models/SortableOptions";
 export * from "./lib/grid/directives/grid-editable.directive";
 export * from "./lib/grid/directives/grid-selectable.directive";
 export * from "./lib/grid/directives/grid-cell-template.directive";
+export * from "./lib/grid/directives/grid-column-title-template.directive";
 export * from "./lib/grid/components/grid-column/grid-column.component";
 export * from "./lib/grid/components/grid/grid.component";
 export * from "./lib/grid/grid.module";
