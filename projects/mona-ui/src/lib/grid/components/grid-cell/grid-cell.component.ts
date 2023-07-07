@@ -83,12 +83,31 @@ export class GridCellComponent implements OnInit, OnDestroy {
                             this.updateCellValue();
                         }
                     } else {
+                        const popupElement = document.querySelector(".mona-date-input-popup");
                         this.#date$.pipe(take(1)).subscribe(date => {
                             if (date) {
                                 this.updateCellValue();
                             }
-                            this.editing = false;
                         });
+                        if (!popupElement) {
+                            this.editing = false;
+                        } else {
+                            const popupClick$ = new Subject<void>();
+                            fromEvent(popupElement, "click")
+                                .pipe(
+                                    takeUntil(popupClick$),
+                                    filter((event: Event) => {
+                                        const target = event.target as HTMLElement;
+                                        return !target.closest(".mona-date-input-popup");
+                                    })
+                                )
+                                .subscribe(() => {
+                                    this.editing = false;
+                                    this.updateCellValue();
+                                    popupClick$.next();
+                                    popupClick$.complete();
+                                });
+                        }
                     }
                     this.cdr.markForCheck();
                 });

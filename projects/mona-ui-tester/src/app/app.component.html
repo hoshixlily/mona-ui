@@ -46,7 +46,7 @@
                                        (sortChange)="onGridSortChange($event)"
                                        (cellEdit)="onGridCellEdit($event)" [responsivePager]="false"
                                        monaGridEditable
-                                       [monaGridSelectable]="{enabled: true, mode:'single'}" selectionKey="OrderID"
+                                       [monaGridSelectable]="{enabled: false, mode:'single'}" selectionKey="OrderID"
                                        [selectedKeys]="gridSelectionKeys"
                                        (selectedKeysChange)="onGridSelectionKeysChange($event)">
                                 <mona-grid-column *ngFor="let col of gridOrderColumns" [field]="col.field"
@@ -168,7 +168,7 @@
                                 </mona-button-group>
                             </div>
                             <div style="display: flex; align-items: center;">
-                                <button monaButton>Dropdowns</button>
+                                <button monaButton>Line 1</button>
                                 <mona-combo-box [data]="dropdownListDataItems" textField="text" valueField="value"
                                                 groupField="group" [filterable]="false"
                                                 style="width: 200px;" [disabled]="false"
@@ -230,7 +230,7 @@
                                 </mona-multi-select>
                             </div>
                             <div style="display: flex; align-items: center;">
-                                <button monaButton>Dropdowns</button>
+                                <button monaButton>Line 2</button>
 
                                 <mona-date-picker format="d/M/yyyy" style="width: 250px;" [readonly]="false"
                                                   [min]="dateMin" [max]="dateMax" [value]="datePickerValue"
@@ -249,12 +249,17 @@
 
                                 <mona-switch [labelOff]="'12'" labelOn="24" [(ngModel)]="dateFormat24Hours"
                                              style="margin-right: 5px;"></mona-switch>
+
+                                <mona-color-picker [palette]="colorPalette" [ngModel]="colorPickerValue"
+                                                   (ngModelChange)="onColorPickerValueChange($event)"
+                                                   [value]="colorPickerValue" (valueChange)="onColorPickerValueChange($event)"
+                                                   ></mona-color-picker>
                             </div>
                             <div style="display: flex; align-items: center;">
                                 <button monaButton [disabled]="false" [primary]="false" [selected]="false"
                                         [toggleable]="false" [flat]="false"
                                         (selectedChange)="onButtonSelectedChange($event)" (click)="openPopup($event)"
-                                        #testButtonRef>Test Button
+                                        #testButtonRef>Line 3
                                     <mona-tooltip [target]="testButtonRef" position="bottom">
                                         <!--                                        <span style="font-weight: bold; font-size: 24px;">Test Button Tooltip</span>-->
                                         <img
@@ -288,7 +293,7 @@
                         </div>
                     </ng-template>
                 </mona-tab>
-                <mona-tab title="Expansion Panel" [disabled]="true">
+                <mona-tab title="Expansion Panel" [disabled]="false">
                     <ng-template monaTabContentTemplate>
                         <div style="width: 100%; height: 100%; padding: 20px;">
                             <mona-expansion-panel title="Panel {{x}}" *ngFor="let x of [1,2,3]">
@@ -305,7 +310,7 @@
                             </mona-expansion-panel>
 
                             <textarea monaTextArea [(ngModel)]="numericTextBoxValue" rows="4"
-                                      style="width: 422px;"></textarea>
+                                      style="width: 422px; margin-top: 10px;"></textarea>
 
                             <div>
                                 <input type="checkbox" monaCheckBox id="checkbox1" [indeterminate]="true"/>
