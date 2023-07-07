@@ -70,7 +70,7 @@ input, textarea, button {
 
 @mixin hover-background {
     &:hover {
-        background-color: var(--mona-background-hover) !important;
+        background-color: var(--mona-background-hover);
     }
 }
 
@@ -243,19 +243,22 @@ button[monaButton] {
         }
     }
 
-    &.mona-flat {
-        border-color: transparent !important;
-        background: none !important;
-        box-shadow: none !important;
-        transition: none;
-        &:hover {
-            @include hover-background;
-        }
-    }
-
     &.mona-selected {
         background: var(--mona-primary);
         color: var(--mona-background);
+        &:hover {
+            background: hsl(var(--mona-primary-dark), 50%) !important;
+        }
+    }
+
+    &.mona-flat {
+        border-color: transparent !important;
+        background: none;
+        box-shadow: none !important;
+        transition: none;
+        &:hover:not(.mona-selected) {
+            @include hover-background;
+        }
     }
 
     &.mona-disabled {
@@ -564,6 +567,7 @@ div.mona-filter-menu-item {
 /** Grid */
 .mona-grid {
     color: var(--mona-text);
+    @include font-medium;
     & mona-pager {
         & .mona-pager {
             border: none;
@@ -582,8 +586,10 @@ div.mona-filter-menu-item {
                 &:focus,
                 &:focus-within {
                     & div.mona-grid-cell {
-                        outline: none;
-                        box-shadow: 0 0 0 1px darkgray inset;
+                        &:not(.mona-grid-cell-editing) {
+                            outline: none;
+                            box-shadow: 0 0 0 1px darkgray inset;
+                        }
                     }
                 }
             }
@@ -752,9 +758,6 @@ input[type="checkbox"][monaCheckBox] {
     }
     &.mona-disabled {
         @include disabled;
-    }
-    & input[monaTextBox] {
-        padding: 7px 8px;
     }
 }
 
@@ -1083,6 +1086,10 @@ ul.mona-menubar {
 }
 
 /** Notification */
+div.mona-notification-container {
+    @include font-medium;
+}
+
 div.mona-notification-icon {
     & fa-icon svg {
         font-size: 20px;
@@ -1102,10 +1109,7 @@ div.mona-notification-progress {
     color: var(--mona-text);
     & li.mona-pager-active {
         & button {
-            background-color: var(--mona-primary);
-            &:hover, &:active, &:focus {
-                background-color: var(--mona-primary);
-            }
+            background-color: var(--mona-primary) !important;
         }
     }
     & mona-numeric-text-box input {

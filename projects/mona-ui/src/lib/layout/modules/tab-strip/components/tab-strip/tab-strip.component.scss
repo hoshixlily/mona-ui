@@ -35,9 +35,6 @@ ul.mona-tab-list {
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        &.mona-tab-active {
-            font-weight: bold;
-        }
         & button.mona-tab-close {
             display: flex;
             align-items: center;

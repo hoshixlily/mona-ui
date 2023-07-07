@@ -2,7 +2,6 @@ div.mona-numeric-text-box {
     display: flex;
     & > [monaTextBox] {
         width: 100%;
-        height: 100%;
         border: none;
     }
 }
@@ -19,7 +18,7 @@ div.mona-numeric-text-box-spinners {
         border-right: none;
         border-left: none;
         flex: 1 1 50%;
-        padding: 2px 8px;
+        padding: 1px 8px;
         font-size: 10px;
 
         & fa-icon {
@@ -29,15 +28,12 @@ div.mona-numeric-text-box-spinners {
         &:first-child {
             border-bottom: none;
             border-top: none;
-            & > span {
-                transform: rotate(270deg);
-            }
         }
 
         &:last-child {
             border-bottom: none;
-            & > span {
-                transform: rotate(270deg);
+            & fa-icon {
+                margin-top: -1px;
             }
         }
 

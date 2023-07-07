@@ -268,9 +268,9 @@ export class AppComponent implements OnInit {
     ];
     public gridSortOptions: SortableOptions = {
         enabled: true,
-        mode: "single",
+        mode: "multiple",
         allowUnsort: true,
-        showIndices: false
+        showIndices: true
     };
     public menuBarMenuVisible: boolean = false;
     public multiSelectTagCount: number = 2;
@@ -839,7 +839,8 @@ export class AppComponent implements OnInit {
         this.notificationService.show({
             text: "Hello World!",
             title: "Notification",
-            type: "error"
+            type: "error",
+            duration: 5000
         });
     }
 

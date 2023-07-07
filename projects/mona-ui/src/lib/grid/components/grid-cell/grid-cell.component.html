@@ -11,7 +11,7 @@
 </div>
 
 <ng-template #cellEditTemplate>
-    <form [formGroup]="editForm">
+    <form [formGroup]="editForm" class="mona-grid-cell-edit-form">
         <ng-container *ngIf="column.filterType==='string'">
             <mona-text-box [formControlName]="column.field"></mona-text-box>
         </ng-container>
