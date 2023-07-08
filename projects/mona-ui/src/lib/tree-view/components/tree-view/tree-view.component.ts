@@ -102,17 +102,7 @@ export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit, OnDe
     ) {}
 
     private flattenComponents(): TreeViewNodeComponent[] {
-        const flatten = (items: Node[]): Node[] => {
-            const flat: Node[] = [];
-            items.forEach(item => {
-                flat.push(item);
-                if (item.nodes.length > 0) {
-                    flat.push(...flatten(item.nodes));
-                }
-            });
-            return flat;
-        };
-        const flatNodes = flatten(this.treeViewService.viewNodeList);
+        const flatNodes = TreeViewService.flattenNodes(this.treeViewService.viewNodeList);
         const flatComponents: TreeViewNodeComponent[] = [];
         flatNodes.forEach(node => {
             const component = this.nodeComponents.find(c => c.node.uid === node.uid);
@@ -120,15 +110,18 @@ export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit, OnDe
                 flatComponents.push(component);
             }
         });
-        return flatComponents;
+        return Enumerable.from(flatComponents)
+            .orderBy(c => c.node.index)
+            .toArray();
     }
 
     public ngAfterViewInit(): void {
-        const flatComponents = this.flattenComponents();
+        let flatComponents = this.flattenComponents();
         this.keyManager = new ActiveDescendantKeyManager(flatComponents).skipPredicate(
             n => n.node.disabled || n.node.anyParentCollapsed()
         );
         this.nodeComponents.changes.subscribe(result => {
+            flatComponents = this.flattenComponents();
             const lastActiveItem = this.keyManager?.activeItem;
             this.keyManager = new ActiveDescendantKeyManager(flatComponents).skipPredicate(
                 n => n.node.disabled || n.node.anyParentCollapsed()
@@ -140,7 +133,7 @@ export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit, OnDe
                     .where(n => n.node.selected)
                     .lastOrDefault();
                 const focusedItem = Enumerable.from(flatComponents)
-                    .where(n => n.node.focused)
+                    .where(n => n.node.focused())
                     .lastOrDefault();
                 this.keyManager?.setActiveItem(focusedItem || selectedItem || flatComponents[0]);
             }
@@ -250,7 +243,6 @@ export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit, OnDe
             //     this.treeViewService.updateNodeCheckStatus(draggedNode.parent);
             // }
             this.treeViewService.updateNodeCheckStatus(draggedNode.parent);
-            this.treeViewService.viewNodeList = [...this.treeViewService.nodeList];
         } else if (this.dropPosition === "before") {
             if (draggedNode.parent) {
                 draggedNode.parent.nodes = draggedNode.parent.nodes.filter(node => node.uid !== draggedNode.uid);
@@ -276,7 +268,6 @@ export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit, OnDe
                         this.treeViewService.updateNodeCheckStatus(draggedNode.parent);
                     }
                     draggedNode.parent = undefined;
-                    this.treeViewService.viewNodeList = [...this.treeViewService.nodeList];
                 }
             }
         } else if (this.dropPosition === "after") {
@@ -304,11 +295,12 @@ export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit, OnDe
                         this.treeViewService.updateNodeCheckStatus(draggedNode.parent);
                     }
                     draggedNode.parent = undefined;
-                    this.treeViewService.viewNodeList = [...this.treeViewService.nodeList];
                 }
             }
         }
         this.dragging = false;
+        this.treeViewService.updateNodeIndices();
+        this.treeViewService.viewNodeList = [...this.treeViewService.nodeList];
     }
 
     public onNodeDropPositionChange(event: DropPositionChangeEvent): void {
@@ -328,16 +320,22 @@ export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit, OnDe
         this.treeViewService.nodeList = [];
         this.treeViewService.viewNodeList = [];
         this.treeViewService.nodeDictionary.clear();
-        this.prepareNodeListRecursively(this.data, undefined, this.treeViewService.nodeList);
+        this.prepareNodeListRecursively(this.data, 0, undefined, this.treeViewService.nodeList);
         this.treeViewService.loadCheckedKeys(this.treeViewService.checkedKeys);
         this.treeViewService.loadExpandedKeys(this.treeViewService.expandedKeys);
         this.treeViewService.loadSelectedKeys(this.treeViewService.selectedKeys);
         this.treeViewService.loadDisabledKeys(this.treeViewService.disabledKeys);
+        this.treeViewService.updateNodeIndices();
         this.updateDisabledState();
         this.treeViewService.viewNodeList = [...this.treeViewService.nodeList];
     }
 
-    private prepareNodeListRecursively(root: Iterable<any>, parentNode?: Node, childNodes?: any[]): void {
+    private prepareNodeListRecursively(
+        root: Iterable<any>,
+        index: number,
+        parentNode?: Node,
+        childNodes?: any[]
+    ): void {
         const rootList = new List(root ?? []);
         if (rootList.length === 0) {
             return;
@@ -352,10 +350,11 @@ export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit, OnDe
                 selected: false,
                 text: dataItem[this.textField],
                 nodes: [],
-                parent: parentNode
+                parent: parentNode,
+                index: index++
             });
             if (this.childrenField) {
-                this.prepareNodeListRecursively(dataItem[this.childrenField], node, node.nodes);
+                this.prepareNodeListRecursively(dataItem[this.childrenField], index, node, node.nodes);
             }
             childNodes?.push(node);
             this.treeViewService.nodeDictionary.add(node.uid, node);
@@ -410,7 +409,7 @@ export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit, OnDe
         fromEvent<FocusEvent>(this.elementRef.nativeElement, "focusout")
             .pipe(takeUntil(this.componentDestroy$))
             .subscribe(() => {
-                this.treeViewService.nodeDictionary.values().forEach(n => (n.focused = false));
+                this.treeViewService.nodeDictionary.values().forEach(n => n.focused.set(false));
             });
     }
 

@@ -1,6 +1,7 @@
 import { NodeCheckOptions } from "./NodeCheckOptions";
 import { NodeLookupItem } from "./NodeLookupItem";
 import { v4 } from "uuid";
+import { signal, WritableSignal } from "@angular/core";
 
 export interface NodeOptions<T = any> {
     checked?: boolean;
@@ -8,6 +9,7 @@ export interface NodeOptions<T = any> {
     disabled?: boolean;
     expanded?: boolean;
     indeterminate?: boolean;
+    index: number;
     key: string;
     nodes?: NodeOptions<T>[];
     parent?: Node<T>;
@@ -21,8 +23,9 @@ export class Node<T = any> {
     public data?: T;
     public disabled: boolean = false;
     public expanded: boolean = false;
-    public focused: boolean = false;
+    public focused: WritableSignal<boolean> = signal(false);
     public indeterminate: boolean = false;
+    public index: number = 0;
     public key: string;
     public nodes: Node<T>[] = [];
     public parent?: Node<T>;
@@ -34,6 +37,7 @@ export class Node<T = any> {
         this.disabled = options.disabled ?? false;
         this.expanded = options.expanded ?? false;
         this.indeterminate = options.indeterminate ?? false;
+        this.index = options.index;
         this.key = options.key;
         this.nodes = options.nodes?.map(node => new Node(node)) ?? [];
         this.parent = options.parent;

@@ -12,7 +12,7 @@
         <input type="checkbox" id="mona-tree-node-checkbox-{{node.uid}}" [indeterminate]="node.indeterminate" [disabled]="node.disabled"
                [ngModel]="node.checked" (ngModelChange)="onCheckToggle($event)" monaCheckBox *ngIf="treeViewService.checkableOptions.enabled">
         <label for="mona-tree-node-checkbox-{{node.uid}}"></label>
-        <div class="mona-tree-view-node-text" [ngClass]="{'mona-tree-view-node-selected': node.selected, 'mona-tree-view-node-dropping': dragging && dropPosition==='inside', 'mona-tree-view-node-focused': node.focused}"
+        <div class="mona-tree-view-node-text" [ngClass]="{'mona-tree-view-node-selected': node.selected, 'mona-tree-view-node-dropping': dragging && dropPosition==='inside', 'mona-tree-view-node-focused': node.focused()}"
              (click)="click$.next($event)"
              (dblclick)="click$.next($event)"
              (contextmenu)="onNodeClick($event, 'contextmenu')">

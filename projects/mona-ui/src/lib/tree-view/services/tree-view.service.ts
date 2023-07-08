@@ -34,6 +34,17 @@ export class TreeViewService {
 
     public constructor() {}
 
+    public static flattenNodes(nodes: Node[]): Node[] {
+        const flattenedNodeList: Node[] = [];
+        nodes.forEach(node => {
+            flattenedNodeList.push(node);
+            if (node.nodes.length > 0) {
+                flattenedNodeList.push(...TreeViewService.flattenNodes(node.nodes));
+            }
+        });
+        return flattenedNodeList;
+    }
+
     public static getNodeDisablerAction(disabler: NodeDisabler): NodeDisablerAction {
         if (typeof disabler === "string") {
             return (item: any): boolean => !!item?.[disabler] ?? false;
@@ -155,7 +166,7 @@ export class TreeViewService {
                 }
             }
             node.setSelected(true);
-            node.focused = true;
+            node.focused.set(true);
             this.lastSelectedNode = node;
         }
         const selectedKeys = this.nodeDictionary
@@ -193,5 +204,10 @@ export class TreeViewService {
             .select(n => n.value.key)
             .toArray();
         this.checkedKeysChange.emit(checkedKeys);
+    }
+
+    public updateNodeIndices(): void {
+        const flattenedNodes = TreeViewService.flattenNodes(this.nodeList);
+        flattenedNodes.forEach((node, index) => (node.index = index));
     }
 }
