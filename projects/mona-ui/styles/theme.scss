@@ -8,18 +8,18 @@
     box-sizing: border-box;
 }
 
-*::selection,
-*::-moz-selection {
-    background-color: var(--mona-primary-dark) !important;
-    color: var(--mona-text) !important;
+::-moz-selection {
+    background: var(--mona-primary) !important;
+    color: var(--mona-text-inverted) !important;
+}
+
+::selection {
+    background: var(--mona-primary) !important;
+    color: var(--mona-text-inverted) !important;
 }
 
 input, textarea, button {
     font-family: inherit
-}
-
-[class^="mona-"], [attribute^="mona"] {
-    //font-size: 14px;
 }
 
 @mixin active-background {
@@ -185,6 +185,7 @@ ul.mona-list {
 
         &.mona-selected {
             background-color: var(--mona-primary);
+            color: var(--mona-text-inverted);
         }
 
         // TODO: Update this to a better visual style
@@ -224,58 +225,54 @@ button[monaButton] {
     @include font-medium;
     padding: 4px 8px;
 
-    &.mona-primary {
-        transition: background 0.2s ease-in-out;
-        background: radial-gradient(circle, var(--mona-primary) 0%, var(--mona-primary-dark) 120%);
-        background-size: 200%;
-        &:hover {
-            background: radial-gradient(circle, var(--mona-primary) 0%, var(--mona-primary-dark) 120%);
-            background-size: 125%;
-        }
-        &:active {
-            background: radial-gradient(circle, var(--mona-primary) 0%, var(--mona-primary-dark) 120%);
-            background-size: 100%;
-        }
-        border: 1px solid var(--mona-border-color);
-        &.mona-selected {
-            background-color: var(--mona-primary-dark);
-            color: var(--mona-background-light);
-        }
-    }
-
-    &.mona-selected {
-        background: var(--mona-primary);
-        color: var(--mona-background);
-        &:hover {
-            background: hsl(var(--mona-primary-dark), 50%) !important;
-        }
-    }
-
-    &.mona-flat {
-        border-color: transparent !important;
-        background: none;
-        box-shadow: none !important;
-        transition: none;
-        &:hover:not(.mona-selected) {
-            @include hover-background;
-        }
-    }
+    transition: background-color 0.1s ease-in;
 
     &.mona-disabled {
         @include disabled;
     }
 
-    &:not(.mona-primary) {
-        @include background-transition;
+    &:hover {
+        background-color: var(--mona-background-hover);
+    }
+    &:active {
+        background-color: var(--mona-background-active);
     }
 
-    &:not(.mona-selected) {
-        @include hover-background;
-        @include active-background;
+    &.mona-primary {
+        background-color: var(--mona-primary);
+        color: var(--mona-text-inverted);
+        &:hover {
+            background-color: var(--mona-primary-hover);
+        }
+        &:active {
+            background-color: var(--mona-primary-active);
+        }
     }
+
+    &.mona-flat {
+        background-color: transparent;
+        border-color: transparent;
+        &:hover {
+            background-color: var(--mona-background-hover-dark);
+        }
+        &:active {
+            background-color: var(--mona-background-active-dark);
+        }
+    }
+
+    &.mona-selected {
+        background-color: var(--mona-primary);
+        color: var(--mona-text-inverted);
+        &:hover {
+            background-color: var(--mona-primary-hover);
+        }
+        &:active {
+            background-color: var(--mona-primary-active);
+        }
+    }
+
 
     @include focus-styles;
-
 }
 
 /** Button Group */
@@ -407,6 +404,7 @@ mona-popup-list-item {
             @include active-background;
             &.mona-selected {
                 background-color: var(--mona-primary);
+                color: var(--mona-text-inverted);
             }
             &.mona-disabled {
                 @include disabled;
@@ -470,6 +468,7 @@ div.mona-time-selector {
             cursor: pointer;
             &.mona-selected {
                 background-color: var(--mona-primary);
+                color: var(--mona-text-inverted);
             }
             &:not(.mona-selected):hover {
                 @include hover-background;
@@ -581,7 +580,7 @@ div.mona-filter-menu-item {
     & tr {
         &.mona-selected {
             background-color: var(--mona-primary) !important;
-            color: var(--mona-text) !important;
+            color: var(--mona-text-inverted) !important;
             & td {
                 &:focus,
                 &:focus-within {
@@ -682,8 +681,8 @@ input[type="checkbox"][monaCheckBox] {
         }
     }
     &:checked + label:before {
-        background-color: var(--mona-primary-dark);
-        color: var(--mona-text);
+        background-color: var(--mona-primary);
+        color: var(--mona-text-inverted);
         //font-size: 1rem;
     }
     &:disabled + label {
@@ -802,13 +801,13 @@ input[type="radio"][monaRadioButton] {
     }
     &:checked + label:before {
         content: " ";
-        background-color: var(--mona-primary-dark);
-        color: var(--mona-text);
+        background-color: var(--mona-primary);
+        color: var(--mona-text-inverted);
         border-width: 2px;
     }
     &:checked:disabled + label:before {
         @include disabled;
-        background-color: var(--mona-primary-dark);
+        background-color: var(--mona-primary);
         border: 2px solid var(--mona-border-color);
     }
 }
@@ -891,7 +890,7 @@ ol.mona-stepper-step-list {
 
     &.mona-switch-active {
         & .mona-switch-handle {
-            background-color: var(--mona-primary-dark);
+            background-color: var(--mona-primary);
         }
     }
 }
@@ -1059,6 +1058,7 @@ div.mona-tab-strip-scroll {
     @include background-transition;
     &:active {
         background-color: var(--mona-primary);
+        color: var(--mona-text-inverted);
     }
 }
 
@@ -1081,7 +1081,7 @@ ul.mona-menubar {
         color: var(--mona-text);
         &.mona-active {
             background-color: var(--mona-primary);
-            color: var(--mona-text);
+            color: var(--mona-text-inverted);
         }
         &.mona-disabled {
             @include disabled;
@@ -1193,8 +1193,13 @@ div.mona-progress-bar-indeterminate {
     box-shadow: 0 0 0 1px var(--mona-focus-border-color);
 }
 
-.mona-tree-view-node-selected {
+div.mona-tree-view-node-text {
+    color: var(--mona-text);
+}
+
+div.mona-tree-view-node-selected {
     background-color: var(--mona-primary);
+    color: var(--mona-text-inverted);
     box-shadow: 0 0 0 1px var(--mona-border-color);
 }
 

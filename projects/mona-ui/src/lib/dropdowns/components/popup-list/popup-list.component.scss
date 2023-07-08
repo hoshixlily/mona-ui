@@ -26,4 +26,8 @@ li.mona-list-group-header {
 
 mona-text-box.filter-box {
     border: none;
+    & fa-icon {
+        margin-left: 8px;
+        font-size: 14px;
+    }
 }

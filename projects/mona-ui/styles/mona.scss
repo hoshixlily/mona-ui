@@ -29,10 +29,12 @@
     --mona-border-color: #101114;
     --mona-focus-border-color: darkgray;
 
-    --mona-primary: #595fa4;
-    --mona-primary-hover: #505799;
-    --mona-primary-active: #4a5192;
-    --mona-primary-dark: #3d4171;
+    --mona-primary-base: 46, 100%;
+    --mona-primary-base-lightness: 46%;
+    --mona-primary: hsl(var(--mona-primary-base), var(--mona-primary-base-lightness));
+    --mona-primary-hover: hsl(var(--mona-primary-base), calc(var(--mona-primary-base-lightness) - 5%));
+    --mona-primary-active: hsl(var(--mona-primary-base), calc(var(--mona-primary-base-lightness) - 10%));
+    --mona-primary-dark: hsl(var(--mona-primary-base), calc(var(--mona-primary-base-lightness) - 15%));
 
     --mona-success: #32BEA6;
     --mona-error: #FF3055;
