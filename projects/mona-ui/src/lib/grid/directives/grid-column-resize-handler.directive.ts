@@ -16,7 +16,7 @@ import { fromEvent, Subject, takeUntil } from "rxjs";
     selector: "[monaGridColumnResizeHandler]"
 })
 export class GridColumnResizeHandlerDirective implements AfterViewInit, OnDestroy {
-    private readonly destroy$: Subject<void> = new Subject<void>();
+    readonly #destroy$: Subject<void> = new Subject<void>();
 
     @Input()
     public column!: Column;
@@ -38,8 +38,8 @@ export class GridColumnResizeHandlerDirective implements AfterViewInit, OnDestro
     }
 
     public ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
+        this.#destroy$.next();
+        this.#destroy$.complete();
     }
 
     private onMouseDown(event: MouseEvent) {
@@ -69,7 +69,7 @@ export class GridColumnResizeHandlerDirective implements AfterViewInit, OnDestro
                 return;
             }
 
-            const oldWidth = this.column.calculatedWidth ?? element.offsetWidth;
+            const oldWidth = this.column.calculatedWidth || element.offsetWidth;
             this.column.calculatedWidth = initialWidth + deltaX;
             if (headerTableElement) {
                 headerTableElement.style.width = `${
@@ -100,7 +100,7 @@ export class GridColumnResizeHandlerDirective implements AfterViewInit, OnDestro
     private setEvents(): void {
         this.zone.runOutsideAngular(() => {
             fromEvent<MouseEvent>(this.elementRef.nativeElement, "mousedown")
-                .pipe(takeUntil(this.destroy$))
+                .pipe(takeUntil(this.#destroy$))
                 .subscribe(event => {
                     event.stopImmediatePropagation();
                     this.onMouseDown(event);

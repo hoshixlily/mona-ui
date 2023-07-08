@@ -243,6 +243,10 @@ export class GridComponent implements OnInit, AfterViewInit, OnDestroy, OnChange
         this.dropColumn = column;
     }
 
+    public onColumnResizeStart(): void {
+        this.resizing = true;
+    }
+
     public onColumnSort(column: Column): void {
         if (!this.gridService.sortableOptions.enabled) {
             return;
@@ -342,8 +346,9 @@ export class GridComponent implements OnInit, AfterViewInit, OnDestroy, OnChange
     private setInitialCalculatedWidthOfColumns(): void {
         if (this.gridService.gridHeaderElement) {
             const thList = this.gridService.gridHeaderElement?.querySelectorAll("th");
-            for (const [cx, column] of Array.from(thList).entries()) {
-                this.gridService.columns[cx].calculatedWidth = column.offsetWidth;
+            for (const [cx, columnTh] of Array.from(thList).entries()) {
+                const gridCol = this.gridService.columns[cx];
+                gridCol.calculatedWidth = gridCol.width ?? columnTh.offsetWidth;
             }
         }
     }

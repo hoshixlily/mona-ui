@@ -24,7 +24,12 @@
                             (mousemove)="onColumnMouseEnter($event, column)" (cdkDragEntered)="onColumnDragEnter($event, column)"
                             (cdkDragStarted)="onColumnDragStart($event)">
                             <div class="mona-grid-column-wrap">
-                                <span class="mona-grid-column-title" (click)="onColumnSort(column)">{{column.title}}</span>
+                                <ng-container *ngIf="column.titleTemplate; else defaultTitle;">
+                                    <ng-container [ngTemplateOutlet]="column.titleTemplate.templateRef"></ng-container>
+                                </ng-container>
+                                <ng-template #defaultTitle>
+                                    <span class="mona-grid-column-title" (click)="onColumnSort(column)">{{column.title}}</span>
+                                </ng-template>
                                 <div class="mona-grid-column-actions">
                                     <span *ngIf="gridService.sortableOptions.showIndices && column.sortIndex != null">{{column.sortIndex}}</span>
                                     <fa-icon [icon]="ascendingSortIcon" *ngIf="column.sortDirection==='asc'"></fa-icon>
@@ -36,7 +41,7 @@
                             <span class="mona-grid-column-drop-hint" *ngIf="dropColumn === column && dragColumn && reorderable"
                                   [ngStyle]="{'right': dragColumn.index < dropColumn.index ? '-1px': null, 'left': dragColumn.index > dropColumn.index ? '-1px': null}"></span>
                             <div monaGridColumnResizeHandler [column]="column" class="mona-grid-column-resizer" *ngIf="resizable && !columnDragging"
-                                 (resizeStart)="resizing=true;" (resizeEnd)="resizing=false;"></div>
+                                 (resizeStart)="onColumnResizeStart()" (resizeEnd)="resizing=false;"></div>
                             <ng-template cdkDragPreview>
                                 <div class="mona-grid-column-drag-preview">
                                     <span class="mona-grid-column-title">{{column.title}}</span>

@@ -1,5 +1,5 @@
 <div class="wrapper mona-notification" *ngIf="data.visible" @notificationSlide @notificationFade>
-    <div class="mona-notification-container">
+    <div class="mona-notification-inner">
         <div class="mona-notification-line mona-notification-line-{{type}}"></div>
         <div class="mona-notification-icon mona-notification-icon-{{type}}">
             <fa-icon [icon]="errorIcon" *ngIf="type === 'error'"></fa-icon>

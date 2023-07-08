@@ -12,7 +12,7 @@
                 </button>
             </li>
             <li *ngIf="pages.length !== 0" [ngClass]="{'mona-pager-active': page===1}">
-                <button monaButton [flat]="true" (click)="onPageClick(1)">1</button>
+                <button monaButton [flat]="true" [selected]="page===1" (click)="onPageClick(1)">1</button>
             </li>
             <li *ngIf="pages.length > visiblePages && pages[1].page - 1 > 1">
                 <button monaButton [flat]="true" (click)="onJumpPreviousClick()">
@@ -21,7 +21,7 @@
             </li>
             <ng-container *ngFor="let pageItem of pages|monaSlice:1:pages.length-1; let px = index;">
                 <li [attr.data-page]="pageItem.page" [ngClass]="{'mona-pager-active': page===pageItem.page}">
-                    <button monaButton [flat]="true" (click)="onPageClick(pageItem.page)">{{pageItem.text}}</button>
+                    <button monaButton [flat]="true" [selected]="page===pageItem.page" (click)="onPageClick(pageItem.page)">{{pageItem.text}}</button>
                 </li>
             </ng-container>
             <li *ngIf="pages.length > visiblePages && pages[pages.length-1].page - pages[pages.length-2].page > 1">
@@ -30,7 +30,7 @@
                 </button>
             </li>
             <li *ngIf="pages.length > 1" [ngClass]="{'mona-pager-active': page===pageCount}">
-                <button monaButton [flat]="true" (click)="onPageClick(pageCount)">{{pageCount}}</button>
+                <button monaButton [flat]="true" [selected]="page===pageCount" (click)="onPageClick(pageCount)">{{pageCount}}</button>
             </li>
             <li *ngIf="previousNext">
                 <button monaButton [flat]="true" [disabled]="page < 1 || page === pageCount" (click)="onNextPageClick()">

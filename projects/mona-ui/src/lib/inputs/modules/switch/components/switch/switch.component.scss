@@ -1,5 +1,5 @@
 $switch-width: 60px;
-$switch-height: 32px;
+$switch-height: 30px;
 
 div.mona-switch {
     position: relative;
@@ -17,7 +17,6 @@ div.mona-switch {
 span.mona-switch-label {
     height: 100%;
     flex: 1;
-    font-weight: 600;
     display: flex;
     align-items: center;
     justify-content: center;

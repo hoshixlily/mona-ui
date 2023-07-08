@@ -1,4 +1,4 @@
-.wrapper {
+.mona-notification {
     width: 350px;
     min-height: 80px;
     overflow: hidden;
@@ -11,7 +11,7 @@
     box-shadow: 0 0 10px 0 var(--mona-background-3);
 }
 
-div.mona-notification-container {
+div.mona-notification-inner {
     display: flex;
     flex: 1;
     padding: 10px;

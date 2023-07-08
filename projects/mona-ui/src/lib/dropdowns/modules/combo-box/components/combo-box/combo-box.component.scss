@@ -1,5 +1,5 @@
-div.mona-input-selector-value {
-    & mona-text-box {
-        width: 100%;
-    }
+div.mona-combo-box {
+    display: inherit;
+    width: 100%;
+    outline: none;
 }

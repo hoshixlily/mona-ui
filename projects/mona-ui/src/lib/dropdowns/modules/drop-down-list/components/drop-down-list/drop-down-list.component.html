@@ -1,5 +1,5 @@
-<div class="mona-dropdown mona-dropdown-list mona-input-selector" [ngClass]="{'mona-disabled': disabled}" [attr.tabindex]="disabled ? -1 : 0" (click)="open()" #dropdownWrapper>
-    <div class="mona-input-selector-value">
+<div class="mona-dropdown-list" [ngClass]="{'mona-disabled': disabled}" [attr.tabindex]="disabled ? -1 : 0" (click)="open()" #dropdownWrapper>
+    <div class="mona-dropdown-value">
         <ng-container *ngIf="!valueTemplate">
             <span *ngIf="valuePopupListItem">{{valuePopupListItem?.text}}</span>
             <span *ngIf="!valuePopupListItem">{{placeholder}}</span>
@@ -8,16 +8,12 @@
             <ng-container [ngTemplateOutlet]="valueTemplate" [ngTemplateOutletContext]="{$implicit: valuePopupListItem?.data, listItem: valuePopupListItem}"></ng-container>
         </ng-container>
     </div>
-    <div class="mona-input-selector-icon" *ngIf="showClearButton && valuePopupListItem" (click)="clearValue($event)">
-        <button monaButton class="mona-input-button mona-dropdown-list-input-button">
-            <fa-icon [icon]="clearIcon"></fa-icon>
-        </button>
-    </div>
-    <div class="mona-input-selector-icon">
-        <button monaButton class="mona-input-button mona-dropdown-list-input-button">
-            <fa-icon [icon]="dropdownIcon"></fa-icon>
-        </button>
-    </div>
+    <span class="mona-input-clear-icon" *ngIf="showClearButton && valuePopupListItem" (click)="clearValue($event)">
+        <fa-icon [icon]="clearIcon"></fa-icon>
+    </span>
+    <button monaButton class="mona-input-button" (click)="open()">
+        <fa-icon [icon]="dropdownIcon"></fa-icon>
+    </button>
 </div>
 
 <ng-template #popupTemplate>

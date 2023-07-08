@@ -27,7 +27,6 @@ ul.mona-tab-list {
     display: flex;
     cursor: default;
     user-select: none;
-    font-size: 12px;
     white-space: nowrap;
     overflow: hidden;
     & li {
@@ -36,9 +35,6 @@ ul.mona-tab-list {
         align-items: center;
         justify-content: center;
         cursor: pointer;
-        &.mona-tab-active {
-            font-weight: bold;
-        }
         & button.mona-tab-close {
             display: flex;
             align-items: center;
@@ -46,12 +42,14 @@ ul.mona-tab-list {
             & fa-icon {
                 margin-top: 2px;
             }
+            padding-top: 2px;
+            padding-bottom: 2px;
         }
     }
 }
 
 div.mona-tab-title {
-    padding: 8px 10px 6px;
+    padding: 6px 10px 4px;
 }
 
 div.mona-tab-strip-scroll {

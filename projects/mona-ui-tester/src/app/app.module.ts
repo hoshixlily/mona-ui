@@ -25,6 +25,7 @@ import { TestComponentComponent } from "./test-component/test-component.componen
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { FormsModule } from "@angular/forms";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { NgOptimizedImage } from "@angular/common";
 
 @NgModule({
     declarations: [AppComponent, TestComponentComponent],
@@ -49,7 +50,8 @@ import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
         PagerModule,
         FilterModule,
         GridModule,
-        NotificationModule
+        NotificationModule,
+        NgOptimizedImage
     ],
     bootstrap: [AppComponent]
 })

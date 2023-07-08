@@ -1,11 +1,12 @@
 <div class="mona-date-picker" [ngClass]="{'mona-disabled': disabled}" #popupAnchor>
-    <mona-text-box [disabled]="disabled" [readonly]="readonly" [ngModel]="currentDateString" (ngModelChange)="onDateStringEdit($event)" (inputBlur)="onDateInputBlur()">
-        <ng-template monaTextBoxSuffixTemplate>
-            <button monaButton [flat]="false" (click)="onDateInputButtonClick()" [disabled]="disabled" [tabIndex]="-1">
-                <fa-icon [icon]="dateIcon"></fa-icon>
-            </button>
-        </ng-template>
-    </mona-text-box>
+    <input monaTextBox class="mona-input-inner" [disabled]="disabled" [readonly]="readonly" [ngModel]="currentDateString"
+           (ngModelChange)="onDateStringEdit($event)" (blur)="onDateInputBlur()">
+<!--    <span class="mona-input-clear-icon" *ngIf="showClearButton && valuePopupListItem" (click)="clearValue($event)">-->
+<!--        <fa-icon [icon]="clearIcon"></fa-icon>-->
+<!--    </span>-->
+    <button monaButton class="mona-input-button" (click)="onDateInputButtonClick()" [disabled]="disabled" [tabIndex]="-1">
+        <fa-icon [icon]="dateIcon"></fa-icon>
+    </button>
 </div>
 
 <ng-template #datePopupTemplate>

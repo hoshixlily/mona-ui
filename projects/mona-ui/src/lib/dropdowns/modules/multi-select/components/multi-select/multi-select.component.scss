@@ -1,22 +1,19 @@
-div.mona-input-selector {
-    height: auto;
+div.mona-multi-select {
+    display: inherit;
+    width: 100%;
+    outline: none;
 }
 
-div.mona-input-selector-value {
-    padding: 0 1px 0;
+div.mona-multi-select-value {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0 2px;
     & > div:first-child {
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
         width: 100%;
-        height: 100%;
-        &::before {
-            content: "\200b";
-            padding: 8px 0;
-        }
-    }
-    & mona-text-box {
-        flex: 1;
     }
     & mona-chip {
         &:not(:last-child) {
@@ -24,4 +21,3 @@ div.mona-input-selector-value {
         }
     }
 }
-

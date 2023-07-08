@@ -24,6 +24,7 @@ import { A11yModule } from "@angular/cdk/a11y";
 import { DatePickerModule } from "../date-inputs/modules/date-picker/date-picker.module";
 import { CheckBoxModule } from "../inputs/modules/check-box/check-box.module";
 import { GridEditableDirective } from "./directives/grid-editable.directive";
+import { GridColumnTitleTemplateDirective } from "./directives/grid-column-title-template.directive";
 
 @NgModule({
     declarations: [
@@ -38,7 +39,8 @@ import { GridEditableDirective } from "./directives/grid-editable.directive";
         GridGroupPipe,
         GridSelectableDirective,
         GridCellComponent,
-        GridEditableDirective
+        GridEditableDirective,
+        GridColumnTitleTemplateDirective
     ],
     imports: [
         CommonModule,
@@ -58,6 +60,7 @@ import { GridEditableDirective } from "./directives/grid-editable.directive";
     exports: [
         GridComponent,
         GridColumnComponent,
+        GridColumnTitleTemplateDirective,
         GridCellTemplateDirective,
         GridEditableDirective,
         GridSelectableDirective

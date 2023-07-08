@@ -4,14 +4,32 @@
 }
 
 div.mona-grid-cell {
-    padding: 9px 10px;
+    display: flex;
+    align-items: center;
     overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+    padding: 8px 11px;
     outline: none;
     height: 100%;
 }
 
+span.mona-grid-cell-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 div.mona-grid-cell-editing {
     padding: 1px;
+}
+
+
+form.mona-grid-cell-edit-form {
+    width: 100%;
+    height: 100%;
+    display: inline-flex;
+    & > *:first-child {
+        display: inline-flex;
+        height: 100%;
+        width: 100%;
+    }
 }

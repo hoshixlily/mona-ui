@@ -1,20 +1,12 @@
 import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, TemplateRef } from "@angular/core";
 import { Node } from "../../data/Node";
-import {
-    faArrowDown,
-    faArrowUp,
-    faCaretRight,
-    faChevronDown,
-    faChevronRight,
-    faPlus,
-    IconDefinition
-} from "@fortawesome/free-solid-svg-icons";
+import { faCaretRight, faChevronDown, faChevronRight, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { TreeViewService } from "../../services/tree-view.service";
 import { DropPosition } from "../../data/DropPosition";
 import { DropPositionChangeEvent } from "../../data/DropPositionChangeEvent";
 import { NodeClickEvent } from "../../data/NodeClickEvent";
-import { debounceTime, distinctUntilChanged, map, of, Subject, switchMap, takeUntil } from "rxjs";
-import { FocusableOption, FocusOrigin, Highlightable } from "@angular/cdk/a11y";
+import { of, Subject, switchMap, takeUntil } from "rxjs";
+import { Highlightable } from "@angular/cdk/a11y";
 
 @Component({
     selector: "mona-tree-view-node",
@@ -139,11 +131,11 @@ export class TreeViewNodeComponent implements OnInit, OnDestroy, Highlightable {
     }
 
     public setActiveStyles(): void {
-        this.node.focused = true;
+        this.node.focused.set(true);
     }
 
     public setInactiveStyles(): void {
-        this.node.focused = false;
+        this.node.focused.set(false);
     }
 
     private setSubscriptions(): void {

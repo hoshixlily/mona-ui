@@ -11,6 +11,10 @@ div.mona-stepper {
     }
 }
 
+div.mona-stepper-horizontal {
+    margin-top: $step-height / -2;
+}
+
 ol.mona-stepper-step-list {
     position: absolute;
     display: flex;

@@ -1,3 +1,12 @@
-.mona-input-selector-value {
-    padding: 8px;
+.mona-dropdown-list {
+    display: inherit;
+    width: 100%;
+    outline: none;
+}
+
+div.mona-dropdown-value {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0 8px;
 }

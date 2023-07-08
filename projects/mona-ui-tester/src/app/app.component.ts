@@ -127,7 +127,7 @@ export class AppComponent implements OnInit {
         new Date(2023, 1, 21),
         new Date(2023, 1, 28)
     ];
-    public dateMax: Date = new Date(2023, 1, 27);
+    public dateMax: Date = new Date(2023, 9, 27);
     public dateMin: Date = new Date(2023, 0, 6);
     public dropdownListDataItems: IndexableList<any> = new IndexableList([
         { text: "Cherry", value: 1, group: "Fruit", active: true },
@@ -268,9 +268,9 @@ export class AppComponent implements OnInit {
     ];
     public gridSortOptions: SortableOptions = {
         enabled: true,
-        mode: "single",
+        mode: "multiple",
         allowUnsort: true,
-        showIndices: false
+        showIndices: true
     };
     public menuBarMenuVisible: boolean = false;
     public multiSelectTagCount: number = 2;
@@ -839,7 +839,8 @@ export class AppComponent implements OnInit {
         this.notificationService.show({
             text: "Hello World!",
             title: "Notification",
-            type: "error"
+            type: "error",
+            duration: 5000
         });
     }
 

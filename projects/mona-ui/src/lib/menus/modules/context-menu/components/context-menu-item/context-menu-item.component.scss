@@ -15,6 +15,9 @@ div.mona-contextmenu-item {
     &-text {
         padding: 0 10px;
         flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
         &.icon-visible {
             padding-left: 0;
         }

@@ -2,6 +2,7 @@ import { Component, ContentChild, Input, OnInit } from "@angular/core";
 import { Column } from "../../models/Column";
 import { GridCellTemplateDirective } from "../../directives/grid-cell-template.directive";
 import { FilterFieldType } from "../../../filter/models/FilterFieldType";
+import { GridColumnTitleTemplateDirective } from "../../directives/grid-column-title-template.directive";
 
 @Component({
     selector: "mona-grid-column",
@@ -39,6 +40,11 @@ export class GridColumnComponent implements OnInit {
     @Input()
     public set title(value: string) {
         this.column.title = value;
+    }
+
+    @ContentChild(GridColumnTitleTemplateDirective)
+    public set titleTemplate(value: GridColumnTitleTemplateDirective) {
+        this.column.titleTemplate = value;
     }
 
     @Input()
