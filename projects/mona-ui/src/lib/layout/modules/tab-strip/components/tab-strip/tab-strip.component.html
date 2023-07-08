@@ -14,7 +14,8 @@
                         <span *ngIf="!tab.titleTemplate">{{tab.title}}</span>
                         <ng-container [ngTemplateOutlet]="tab.titleTemplate" *ngIf="!!tab.titleTemplate"></ng-container>
                     </div>
-                    <button monaButton [flat]="true" [disabled]="tab.disabled" *ngIf="(tab.closable===true) || (closable && tab.closable !== false)" class="mona-tab-close" (click)="onTabClose(tab, $event)">
+                    <button monaButton [flat]="true" [disabled]="tab.disabled" *ngIf="(tab.closable===true) || (closable && tab.closable !== false)" class="mona-tab-close"
+                            (click)="onTabClose(tab, $event)">
                         <fa-icon [icon]="tabCloseIcon"></fa-icon>
                     </button>
                 </li>

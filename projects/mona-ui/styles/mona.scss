@@ -22,14 +22,16 @@
     --mona-background-darker: var(--mona-background-2); // #0B0C0E;
     --mona-background-light: var(--mona-background-7); // #232427;
     --mona-background-hover: #1F2022;
+    --mona-background-hover-dark: #1A1B1D;
     --mona-background-active: #1D1E20;
+    --mona-background-active-dark: #18191B;
 
     --mona-border-color: #101114;
     --mona-focus-border-color: darkgray;
 
     --mona-primary: #595fa4;
-    --mona-primary-hover: #6d75ca;
-    --mona-primary-active: #6369b5;
+    --mona-primary-hover: #505799;
+    --mona-primary-active: #4a5192;
     --mona-primary-dark: #3d4171;
 
     --mona-success: #32BEA6;
@@ -42,6 +44,7 @@
     --mona-shadow-color: #101114;
 
     --mona-text: #CCCCCC;
+    --mona-text-inverted: #000000;
     --mona-text-light: #FFFFFF;
 
     --mona-window-background: #17181A;

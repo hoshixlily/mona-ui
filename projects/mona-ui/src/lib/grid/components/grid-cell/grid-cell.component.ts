@@ -22,7 +22,6 @@ import { CellEditEvent } from "../../models/CellEditEvent";
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class GridCellComponent implements OnInit, OnDestroy {
-    readonly #date$: ReplaySubject<Date | null> = new ReplaySubject<Date | null>(1);
     readonly #destroy: Subject<void> = new Subject<void>();
     private focused: boolean = false;
     public editForm!: FormGroup;
@@ -65,7 +64,6 @@ export class GridCellComponent implements OnInit, OnDestroy {
     public onDateChange(date: Date | null): void {
         this.editing = false;
         this.gridService.isInEditMode = false;
-        this.#date$.next(date);
     }
 
     public onFocusChange(origin: FocusOrigin): void {
@@ -84,11 +82,6 @@ export class GridCellComponent implements OnInit, OnDestroy {
                         }
                     } else {
                         const popupElement = document.querySelector(".mona-date-input-popup");
-                        this.#date$.pipe(take(1)).subscribe(date => {
-                            if (date) {
-                                this.updateCellValue();
-                            }
-                        });
                         if (!popupElement) {
                             this.editing = false;
                         } else {

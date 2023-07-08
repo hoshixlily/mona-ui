@@ -1,4 +1,6 @@
-<div class="mona-stepper" [ngStyle]="gridTemplateColumns" [ngClass]="{'mona-stepper-vertical': orientation==='vertical', 'mona-stepper-linear': linear}" [attr.tabindex]="1">
+<div class="mona-stepper" [ngStyle]="gridTemplateColumns"
+     [ngClass]="{'mona-stepper-vertical': orientation==='vertical', 'mona-stepper-horizontal': orientation==='horizontal', 'mona-stepper-linear': linear}"
+     [attr.tabindex]="1">
     <ol class="mona-stepper-step-list" [ngClass]="{'mona-stepper-step-list-horizontal': orientation==='horizontal', 'mona-stepper-step-list-vertical': orientation==='vertical'}">
         <li *ngFor="let step of stepList"
             [ngStyle]="trackItemStyles"

@@ -330,7 +330,7 @@ mona-popup-list-item {
 
 .mona-dropdown {
     @include font-medium;
-    @include focus-shadow;
+    @include focus-styles;
     display: inline-flex;
     border: 1px solid var(--mona-border-color);
     background: var(--mona-background);
@@ -1030,8 +1030,9 @@ ul.mona-tab-list {
             background: var(--mona-background);
             color: var(--mona-primary);
         }
-        @include hover-background;
-        @include active-background;
+        & .mona-tab-title:hover {
+            color: var(--mona-primary);
+        }
     }
 }
 div.mona-tab-strip-scroll {
@@ -1113,11 +1114,6 @@ div.mona-notification-progress {
     background: var(--mona-background);
     border: 1px solid var(--mona-border-color);
     color: var(--mona-text);
-    & li.mona-pager-active {
-        & button {
-            background-color: var(--mona-primary) !important;
-        }
-    }
     & mona-numeric-text-box input {
         text-align: center;
         background: var(--mona-background-light);
@@ -1174,7 +1170,6 @@ div.mona-progress-bar-indeterminate {
     border: 1px solid var(--mona-border-color);
     padding: 0 !important;
     box-shadow: var(--mona-popup-shadow);
-    //overflow: hidden;
 }
 
 .mona-invisible-tooltip {
@@ -1195,17 +1190,17 @@ div.mona-progress-bar-indeterminate {
 }
 
 .mona-tree-view-node-focused {
-    border: 1px solid var(--mona-focus-border-color);
+    box-shadow: 0 0 0 1px var(--mona-focus-border-color);
 }
 
 .mona-tree-view-node-selected {
     background-color: var(--mona-primary);
-    border: 1px solid var(--mona-border-color);
+    box-shadow: 0 0 0 1px var(--mona-border-color);
 }
 
 .mona-tree-view-node-dropping {
     background-color: var(--mona-primary);
-    border: 1px solid var(--mona-border-color);
+    box-shadow: 0 0 0 1px var(--mona-border-color);
 }
 
 .mona-tree-view-node-dragging {
@@ -1218,7 +1213,6 @@ div.mona-progress-bar-indeterminate {
     justify-content: center;
     color: var(--mona-text);
     font-weight: bold;
-    //font-size: 13px;
     top: 10px;
     & fa-icon {
         margin-right: 4px;
