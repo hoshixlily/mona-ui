@@ -623,8 +623,6 @@ button.mona-grid-filtered {
     align-items: center;
     justify-content: center;
     color: var(--mona-text);
-    font-weight: bold;
-    //font-size: 13px;
 }
 
 .mona-grid-cell-editing {
@@ -635,7 +633,7 @@ button.mona-grid-filtered {
         & input {
             padding-left: 10px;
             padding-right: 10px;
-            background: #242528; // TODO: use variable
+            background: var(--mona-background-lighter);
         }
     }
 
@@ -646,7 +644,7 @@ button.mona-grid-filtered {
         & input {
             padding-left: 10px;
             padding-right: 10px;
-            background: #242528; // TODO: use variable
+            background: var(--mona-background-lighter);
         }
     }
 }

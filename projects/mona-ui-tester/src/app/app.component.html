@@ -261,6 +261,16 @@
                                 <mona-switch [labelOff]="'12'" labelOn="24" [(ngModel)]="dateFormat24Hours"
                                              style="margin-right: 5px;"></mona-switch>
 
+                                <mona-switch labelOn="ON" labelOff="OFF" [ngModel]="switchValue"
+                                             (ngModelChange)="onSwitchValueChange($event)">
+                                    <ng-template monaSwitchOffLabelTemplate>
+                                        <fa-icon [icon]="moonIcon" style="color: orange;"></fa-icon>
+                                    </ng-template>
+                                    <ng-template monaSwitchOnLabelTemplate>
+                                        <fa-icon [icon]="sunIcon" style="color: yellow;"></fa-icon>
+                                    </ng-template>
+                                </mona-switch>
+
                                 <mona-color-picker [palette]="colorPalette" [ngModel]="colorPickerValue"
                                                    (ngModelChange)="onColorPickerValueChange($event)"
                                                    [value]="colorPickerValue" (valueChange)="onColorPickerValueChange($event)"
@@ -352,7 +362,7 @@
                                 This is the content for panel {{x}}.
                                 <ng-template monaExpansionPanelTitleTemplate>
                                     <fa-icon [icon]="snowflakeIcon" style="color: powderblue;"></fa-icon>
-                                    <span style="color: snow; margin-left: 5px; font-weight: bold;">Panel {{x}}</span>
+                                    <span style="color: var(--mona-text); margin-left: 5px; font-weight: bold;">Panel {{x}}</span>
                                 </ng-template>
                                 <ng-template monaExpansionPanelActionsTemplate>
                                     <button monaButton [flat]="true">

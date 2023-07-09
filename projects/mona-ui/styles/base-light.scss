@@ -1,24 +1,24 @@
 @import "theme";
 
 :root {
-    --mona-background-base: 220, 5%;
-    --mona-background-base-lightness: 12%;
+    --mona-background-base: 210, 9%;
+    --mona-background-base-lightness: 100%;
     --mona-background: hsl(var(--mona-background-base), var(--mona-background-base-lightness));
     --mona-background-dark: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) - 3%));
     --mona-background-darker: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) - 4%));
     --mona-background-light: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) + 2%));
     --mona-background-lighter: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) + 4%));
 
-    --mona-background-hover: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) + 2%));
-    --mona-background-hover-dark: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) + 1%));
-    --mona-background-active: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) + 3%));
-    --mona-background-active-dark: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) + 2%));
+    --mona-background-hover: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) - 2%));
+    --mona-background-hover-dark: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) - 1%));
+    --mona-background-active: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) - 3%));
+    --mona-background-active-dark: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) - 2%));
 
-    --mona-border-color: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) - 6%));
+    --mona-border-color: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) - 12%));
     --mona-focus-border-color: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) + 18%));
 
-    --mona-primary-base: 46, 100%;
-    --mona-primary-base-lightness: 46%;
+    --mona-primary-base: 346, 54%;
+    --mona-primary-base-lightness: 50%;
     --mona-primary: hsl(var(--mona-primary-base), var(--mona-primary-base-lightness));
     --mona-primary-hover: hsl(var(--mona-primary-base), calc(var(--mona-primary-base-lightness) - 4%));
     --mona-primary-active: hsl(var(--mona-primary-base), calc(var(--mona-primary-base-lightness) - 8%));
@@ -35,10 +35,10 @@
     --mona-popup-shadow: 0 5px 10px -3px var(--mona-shadow-color);
 
     --mona-text-base: 0, 0%;
-    --mona-text-base-lightness: 80%;
+    --mona-text-base-lightness: 0%;
 
     --mona-text: hsl(var(--mona-text-base), var(--mona-text-base-lightness));
-    --mona-text-inverted: hsl(var(--mona-text-base), calc(var(--mona-text-base-lightness) - 100%));
+    --mona-text-inverted: hsl(var(--mona-text-base), calc(var(--mona-text-base-lightness) + 100%));
     --mona-text-light: hsl(var(--mona-text-base), calc(var(--mona-text-base-lightness) + 20%));
 
     --mona-window-background: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) - 2%));
