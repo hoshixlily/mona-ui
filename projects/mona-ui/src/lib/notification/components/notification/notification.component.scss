@@ -8,7 +8,7 @@
     background-color: var(--mona-background);
     border: 1px solid var(--mona-border-color);
     color: var(--mona-text);
-    box-shadow: 0 0 10px 0 var(--mona-background-3);
+    box-shadow: var(--mona-popup-shadow);
 }
 
 div.mona-notification-inner {

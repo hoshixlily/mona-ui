@@ -12,7 +12,7 @@ div.mona-stepper {
 }
 
 div.mona-stepper-horizontal {
-    margin-top: $step-height / -2;
+    margin-top: calc($step-height / -2);
 }
 
 ol.mona-stepper-step-list {

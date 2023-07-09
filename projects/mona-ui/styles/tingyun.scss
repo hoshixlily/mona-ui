@@ -1,0 +1,9 @@
+@import "base";
+
+:root {
+    --mona-primary-base: 49, 59%;
+    --mona-primary-base-lightness: 84%;
+    --mona-text-base: 0, 0%;
+    --mona-text-base-lightness: 80%;
+    --mona-text-inverted: hsl(var(--mona-text-base), calc(var(--mona-text-base-lightness) - 80%));
+}

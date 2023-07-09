@@ -85,14 +85,7 @@ div.mona-dialog-actions {
 }
 
 button.mona-dialog-action {
-    padding: 7px 15px;
-    & span {
-        font-weight: bold;
-    }
     &:not(:last-child) {
         margin-right: 5px;
-    }
-    &-primary {
-        box-shadow: 2px 2px 5px 10px var(--mona-background-4);
     }
 }

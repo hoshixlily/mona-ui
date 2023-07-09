@@ -1,6 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
-
-@import "dist/mona-ui/styles/mona";
+@import "dist/mona-ui/styles/lumine";
 
 html, body {
     width: 100%;
@@ -22,4 +21,8 @@ body {
 
 .popup-padded {
     padding: 20px;
+}
+
+div.mona-tab-strip {
+    border: none;
 }
