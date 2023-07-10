@@ -240,7 +240,8 @@ export class AppComponent implements OnInit {
     public gridOrderData: any[] = GridOrderData.map(d => {
         return {
             ...d,
-            OrderDate: new Date(d.OrderDate)
+            OrderDate: new Date(d.OrderDate),
+            ShippedDate: d.ShippedDate != null ? new Date(d.ShippedDate) : null
         };
     });
 

@@ -14,9 +14,6 @@
     --mona-background-active: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) + 3%));
     --mona-background-active-dark: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) + 2%));
 
-    --mona-border-color: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) - 6%));
-    --mona-focus-border-color: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) + 18%));
-
     --mona-primary-base: 46, 100%;
     --mona-primary-base-lightness: 46%;
     --mona-primary: hsl(var(--mona-primary-base), var(--mona-primary-base-lightness));
@@ -31,6 +28,11 @@
     --mona-info: #2196F3;
     --mona-confirm: #CCCCFC;
 
+    --mona-border-color: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) - 6%));
+    --mona-focus-border-color: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) + 18%));
+    --mona-primary-border-color: var(--mona-border-color);
+    --mona-selected-border-color: var(--mona-primary-border-color);
+
     --mona-shadow-color: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) - 6%));
     --mona-popup-shadow: 0 5px 10px -3px var(--mona-shadow-color);
 
@@ -43,4 +45,8 @@
 
     --mona-window-background: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) - 2%));
     --mona-window-header-background: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) - 3.5%));
+
+    --mona-scrollbar-thumb: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) - 5%));
+    --mona-scrollbar-thumb-hover: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) - 3.5%));
+    --mona-scrollbar-track: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) - 0%));
 }

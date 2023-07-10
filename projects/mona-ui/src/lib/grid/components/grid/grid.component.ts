@@ -44,6 +44,8 @@ export class GridComponent implements OnInit, AfterViewInit, OnDestroy, OnChange
     #sort: SortDescriptor[] = [];
     public readonly ascendingSortIcon: IconDefinition = faArrowUpLong;
     public readonly descendingSortIcon: IconDefinition = faArrowDownLong;
+    public readonly headerMargin =
+        navigator.userAgent.toLowerCase().indexOf("firefox") > -1 ? "0 16px 0 0" : "0 12px 0 0";
     public columnDragging: boolean = false;
     public dragColumn?: Column;
     public dropColumn?: Column;
@@ -357,10 +359,5 @@ export class GridComponent implements OnInit, AfterViewInit, OnDestroy, OnChange
         this.gridService.cellEdit$
             .pipe(takeUntil(this.#destroy$))
             .subscribe((event: CellEditEvent) => this.cellEdit.emit(event));
-    }
-
-    public get headerMargin(): string {
-        const rightMargin = 12;
-        return `0 ${rightMargin}px 0 0`;
     }
 }
