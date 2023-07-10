@@ -9,6 +9,7 @@ import { SliderModule } from "./modules/slider/slider.module";
 import { NumericTextBoxModule } from "./modules/numeric-text-box/numeric-text-box.module";
 import { ColorPaletteModule } from "./modules/color-palette/color-palette.module";
 import { ColorPickerModule } from "./modules/color-picker/color-picker.module";
+import { Slider2Module } from "./modules/slider2/slider2.module";
 
 @NgModule({
     declarations: [],
@@ -20,6 +21,7 @@ import { ColorPickerModule } from "./modules/color-picker/color-picker.module";
         NumericTextBoxModule,
         RadioButtonModule,
         SliderModule,
+        Slider2Module,
         SwitchModule,
         TextAreaModule,
         TextBoxModule

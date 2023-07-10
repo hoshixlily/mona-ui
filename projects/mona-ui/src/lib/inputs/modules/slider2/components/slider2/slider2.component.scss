@@ -1,0 +1,103 @@
+$track-thickness: 6px;
+
+div.mona-slider2 {
+    position: relative;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    user-select: none;
+}
+
+div.mona-slider2-track {
+    position: relative;
+    width: 100%;
+    height: $track-thickness;
+    border: 1px solid var(--mona-border-color);
+    background-color: var(--mona-background);
+    z-index: 2;
+}
+
+div.mona-slider2-selection {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    border: none;
+    transition: width ease-out 0.3s;
+    background-color: var(--mona-primary);
+    &.mona-slider2-dragging {
+        transition: none;
+    }
+}
+
+div.mona-slider2-tick-list {
+    display: grid;
+    width: 100%;
+    height: calc($track-thickness * 3);
+    position: absolute;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    align-items: center;
+}
+
+span.mona-slider2-tick {
+    display: flex;
+    height: 100%;
+    &.mona-slider2-tick-visible {
+        &:first-child {
+            border-left: 1px solid var(--mona-border-color);
+        }
+        &:nth-child(even) {
+            border-right: 1px solid var(--mona-border-color);
+        }
+    }
+    & > span {
+        flex: 1;
+        cursor: pointer;
+        z-index: 4;
+    }
+}
+
+div.mona-slider2-tick-label-list {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    -webkit-user-select: none;
+    user-select: none;
+    &.mona-slider-position-after {
+        align-items: flex-end;
+    }
+    &.mona-slider-position-before {
+        align-items: flex-start;
+    }
+}
+
+span.mona-slider2-tick-label {
+    position: relative;
+    align-items: center;
+    justify-content: center;
+    height: 19px;
+    display: flex;
+    width: 0;
+    color: var(--mona-text);
+    font-size: 12px;
+    line-height: 1.667;
+}
+
+
+div.mona-slider2-handler {
+    width: calc($track-thickness * 3);
+    height: calc($track-thickness * 3);
+    position: absolute;
+    left: calc($track-thickness * 3 / -2);
+    background-color: var(--mona-primary);
+    border: 1px solid var(--mona-primary-border-color);
+    z-index: 5;
+    cursor: pointer;
+    transition: left ease-out 0.3s;
+    &.mona-slider2-dragging {
+        transition: none;
+    }
+}
