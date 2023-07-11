@@ -92,17 +92,11 @@ export * from "./lib/inputs/modules/numeric-text-box/numeric-text-box.module";
 export * from "./lib/inputs/modules/radio-button/directives/radio-button.directive";
 export * from "./lib/inputs/modules/radio-button/radio-button.module";
 
-export * from "./lib/inputs/modules/slider/components/range-slider/range-slider.component";
-
-export * from "./lib/inputs/modules/range-slider2/components/range-slider2/range-slider2.component";
-export * from "./lib/inputs/modules/range-slider2/range-slider2.module";
-
-export * from "./lib/inputs/modules/slider/directives/slider-tick-value-template.directive";
-export * from "./lib/inputs/modules/slider/components/slider/slider.component";
-export * from "./lib/inputs/modules/slider/slider.module";
-
-export * from "./lib/inputs/modules/slider2/components/slider2/slider2.component";
-export * from "./lib/inputs/modules/slider2/slider2.module";
+export * from "./lib/inputs/modules/range-slider2/components/range-slider2/range-slider.component";
+export * from "./lib/inputs/modules/range-slider2/range-slider.module";
+export * from "./lib/inputs/modules/slider2/directives/slider-tick-value-template.directive";
+export * from "./lib/inputs/modules/slider2/components/slider2/slider.component";
+export * from "./lib/inputs/modules/slider2/slider.module";
 
 export * from "./lib/inputs/modules/switch/directives/switch-off-label-template.directive";
 export * from "./lib/inputs/modules/switch/directives/switch-on-label-template.directive";

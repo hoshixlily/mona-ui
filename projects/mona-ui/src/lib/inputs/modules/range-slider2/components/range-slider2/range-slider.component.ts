@@ -15,20 +15,20 @@ import {
     ViewChild,
     WritableSignal
 } from "@angular/core";
-import { SliderLabelPosition } from "../../../slider/models/SliderLabelPosition";
-import { SliderTickValueTemplateDirective } from "../../../slider/directives/slider-tick-value-template.directive";
-import { SliderTick } from "../../../slider/models/SliderTick";
-import { SliderHandlerData } from "../../../slider/models/SliderHandlerData";
-import { SliderHandlerType } from "../../../slider/models/SliderHandlerType";
+import { SliderLabelPosition } from "../../../../models/slider/SliderLabelPosition";
+import { SliderTickValueTemplateDirective } from "../../../slider2/directives/slider-tick-value-template.directive";
+import { SliderTick } from "../../../../models/slider/SliderTick";
+import { SliderHandlerData } from "../../../../models/slider/SliderHandlerData";
+import { SliderHandlerType } from "../../../../models/slider/SliderHandlerType";
 import { distinctUntilChanged, fromEvent, map, take, tap } from "rxjs";
 
 @Component({
     selector: "mona-range-slider2",
-    templateUrl: "./range-slider2.component.html",
-    styleUrls: ["./range-slider2.component.scss"],
+    templateUrl: "./range-slider.component.html",
+    styleUrls: ["./range-slider.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class RangeSlider2Component implements AfterViewInit {
+export class RangeSliderComponent implements AfterViewInit {
     #value: [number, number] = [0, 0];
     public dragging: WritableSignal<boolean> = signal(false);
     public handlerValue: WritableSignal<[number, number]> = signal([0, 0]);

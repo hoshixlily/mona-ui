@@ -77,8 +77,8 @@
                                                   [title]="col.title"></mona-grid-column>
                                 <mona-grid-column title="Slider">
                                     <ng-template monaGridCellTemplate>
-                                        <mona-slider style="width: 200px;" [value]="sliderValue"
-                                                     (valueChange)="onSliderValueChange($event)"></mona-slider>
+                                        <mona-slider2 style="width: 200px;" [value]="sliderValue"
+                                                     (valueChange)="onSliderValueChange($event)"></mona-slider2>
                                     </ng-template>
                                 </mona-grid-column>
                                 <mona-grid-column [title]="'Progress'">
@@ -340,16 +340,6 @@
                                         <fa-icon [icon]="snowflakeIcon" style="font-size: 24px; margin-top: 0px;" [ngStyle]="{'color': active?'#6daf76':'#95c5cb'}"></fa-icon>
                                     </ng-template>
                                 </mona-stepper>
-                                <mona-range-slider [labelStep]="1" [(value)]="rangedSliderValues"
-                                                   orientation="horizontal" labelPosition="after"
-                                                   style="width: 500px;" [min]="0" [max]="24" [step]="1">
-                                    <ng-template monaSliderTickValueTemplate let-value>
-                                        <fa-icon [icon]="moonIcon" *ngIf="value < 6 || value > 22"
-                                                 style="color: mediumpurple;"></fa-icon>
-                                        <fa-icon [icon]="sunIcon" *ngIf="value >= 6 && value <= 22"
-                                                 style="color: #fafd0f;"></fa-icon>
-                                    </ng-template>
-                                </mona-range-slider>
                             </div>
 
                             <div style="display: flex; align-items: center; justify-content: center; margin-top: 40px;">

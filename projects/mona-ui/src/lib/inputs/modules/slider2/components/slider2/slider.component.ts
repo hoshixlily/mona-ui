@@ -14,18 +14,18 @@ import {
     ViewChild,
     WritableSignal
 } from "@angular/core";
-import { SliderTick } from "../../../slider/models/SliderTick";
-import { SliderLabelPosition } from "../../../slider/models/SliderLabelPosition";
-import { SliderTickValueTemplateDirective } from "../../../slider/directives/slider-tick-value-template.directive";
+import { SliderTick } from "../../../../models/slider/SliderTick";
+import { SliderLabelPosition } from "../../../../models/slider/SliderLabelPosition";
+import { SliderTickValueTemplateDirective } from "../../directives/slider-tick-value-template.directive";
 import { distinctUntilChanged, fromEvent, map, take, tap } from "rxjs";
 
 @Component({
     selector: "mona-slider2",
-    templateUrl: "./slider2.component.html",
-    styleUrls: ["./slider2.component.scss"],
+    templateUrl: "./slider.component.html",
+    styleUrls: ["./slider.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class Slider2Component implements OnInit {
+export class SliderComponent implements OnInit {
     #value: number = 0;
     public dragging: WritableSignal<boolean> = signal(false);
     public handlerValue: WritableSignal<number> = signal(0);
