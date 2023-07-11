@@ -101,6 +101,9 @@ export class TabStripComponent implements OnInit, AfterContentInit, OnDestroy, A
     public ngOnInit(): void {}
 
     public onTabClick(tab: TabComponent, tabListElement: HTMLUListElement): void {
+        if (tab.selected) {
+            return;
+        }
         this.tabComponents.forEach(t => (t.selected = false));
         tab.selected = true;
         window.setTimeout(() => {

@@ -8,15 +8,11 @@ div.mona-slider {
 
 div.mona-slider-track {
     position: relative;
-    border: 1px solid var(--mona-border-color);
-    background-color: var(--mona-background);
     z-index: 2;
 }
 
 div.mona-slider-selection {
     position: absolute;
-    border: none;
-    background-color: var(--mona-primary);
 }
 
 div.mona-slider-tick-list {
@@ -64,14 +60,9 @@ div.mona-slider-handler {
     width: calc($track-thickness * 3);
     height: calc($track-thickness * 3);
     position: absolute;
-    background-color: var(--mona-primary);
-    border: 1px solid var(--mona-primary-border-color);
     z-index: 5;
     cursor: pointer;
     outline: none;
-    &:focus {
-        box-shadow: 0 0 10px 1px var(--mona-primary-border-color);
-    }
 }
 
 div.mona-slider-horizontal {
@@ -104,14 +95,6 @@ div.mona-slider-horizontal {
 
     & span.mona-slider-tick {
         height: 100%;
-        &.mona-slider-tick-visible {
-            &:first-child {
-                border-left: 1px solid var(--mona-border-color);
-            }
-            &:nth-child(even) {
-                border-right: 1px solid var(--mona-border-color);
-            }
-        }
     }
 
     & div.mona-slider-tick-label-list {
@@ -162,16 +145,6 @@ div.mona-slider-vertical {
 
     & span.mona-slider-tick {
         flex-direction: column;
-        &.mona-slider-tick-visible {
-            &:first-child {
-                border-left: none;
-                border-top: 1px solid var(--mona-border-color);
-            }
-            &:nth-child(even) {
-                border-right: none;
-                border-bottom: 1px solid var(--mona-border-color);
-            }
-        }
     }
 
     & div.mona-slider-tick-label-list {

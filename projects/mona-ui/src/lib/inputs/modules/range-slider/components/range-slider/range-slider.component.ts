@@ -7,6 +7,7 @@ import {
     ContentChild,
     ElementRef,
     EventEmitter,
+    forwardRef,
     Input,
     Output,
     Signal,
@@ -21,15 +22,24 @@ import { SliderHandlerData } from "../../../../models/slider/SliderHandlerData";
 import { SliderHandlerType } from "../../../../models/slider/SliderHandlerType";
 import { distinctUntilChanged, fromEvent, map, take, tap } from "rxjs";
 import { RangeSliderTickValueTemplateDirective } from "../../directives/range-slider-tick-value-template.directive";
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
+import { Action } from "../../../../../utils/Action";
 
 @Component({
     selector: "mona-range-slider",
     templateUrl: "./range-slider.component.html",
     styleUrls: ["./range-slider.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [
+        {
+            provide: NG_VALUE_ACCESSOR,
+            useExisting: forwardRef(() => RangeSliderComponent),
+            multi: true
+        }
+    ]
 })
-export class RangeSliderComponent implements AfterViewInit {
-    #value: [number, number] = [0, 0];
+export class RangeSliderComponent implements AfterViewInit, ControlValueAccessor {
+    #propagateChange: Action<[number, number]> | null = null;
     public dragging: WritableSignal<boolean> = signal(false);
     public handlerValue: WritableSignal<[number, number]> = signal([0, 0]);
     public handlerPosition: Signal<[number, number]> = computed(() => {
@@ -71,15 +81,6 @@ export class RangeSliderComponent implements AfterViewInit {
 
     @ContentChild(RangeSliderTickValueTemplateDirective, { read: TemplateRef })
     public tickValueTemplate?: TemplateRef<any>;
-
-    @Input()
-    public set value(value: [number, number]) {
-        this.#value = value;
-        this.handlerValue.set(value);
-    }
-    public get value(): [number, number] {
-        return this.#value;
-    }
 
     @Output()
     public valueChange: EventEmitter<[number, number]> = new EventEmitter<[number, number]>();
@@ -146,6 +147,21 @@ export class RangeSliderComponent implements AfterViewInit {
     public onTickClick(event: MouseEvent, tick: SliderTick): void {
         const handlerData = this.getClosestHandlerDataToMouse(event);
         this.setHandlerValue(tick.value, handlerData.type);
+        handlerData.element.focus();
+    }
+
+    public registerOnChange(fn: any): void {
+        this.#propagateChange = fn;
+    }
+
+    public registerOnTouched(fn: any): void {
+        void 0;
+    }
+
+    public writeValue(obj: [number, number]) {
+        if (obj !== undefined) {
+            this.handlerValue.set(obj);
+        }
     }
 
     private findClosestTickElement(event: MouseEvent): HTMLSpanElement {
@@ -207,6 +223,10 @@ export class RangeSliderComponent implements AfterViewInit {
             const primaryHandlerRect = this.primaryHandlerRef.nativeElement.getBoundingClientRect();
             const secondaryHandlerRect = this.secondaryHandlerRef.nativeElement.getBoundingClientRect();
             const distance = this.orientation === "horizontal" ? rect.right - rect.left : rect.bottom - rect.top;
+
+            if (!this.handlerValue()) {
+                return [0, 0];
+            }
             const primaryValue = Math.max(this.min, Math.min(this.handlerValue()[0], this.max));
             const secondaryValue = Math.max(this.min, Math.min(this.handlerValue()[1], this.max));
             const primaryPercentage = (primaryValue - this.min) / (this.max - this.min);
@@ -229,7 +249,7 @@ export class RangeSliderComponent implements AfterViewInit {
         } else {
             this.handlerValue.update(currentValue => [currentValue[0], value]);
         }
-        this.valueChange.emit(this.handlerValue());
+        this.#propagateChange?.(this.handlerValue());
     }
 
     private setTrackSelectionSignal(): void {

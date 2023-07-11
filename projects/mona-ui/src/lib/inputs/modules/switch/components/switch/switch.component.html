@@ -1,4 +1,4 @@
-<div class="mona-switch" [ngClass]="{'mona-switch-active': active}" (click)="toggle($event)">
+<div class="mona-switch" [ngClass]="{'mona-switch-active': active, 'mona-disabled': disabled}" (click)="toggle($event)">
     <span class="mona-switch-label mona-switch-on">
         <span *ngIf="active && !onLabelTemplate" @fadeInOut>{{labelOn}}</span>
         <span *ngIf="active && onLabelTemplate" @fadeInOut>
@@ -11,5 +11,6 @@
             <ng-template [ngTemplateOutlet]="offLabelTemplate"></ng-template>
         </span>
     </span>
-    <span class="mona-switch-handle" [ngClass]="{'mona-switch-on': active, 'mona-switch-off': !active}"></span>
+    <span class="mona-switch-handle" [ngClass]="{'mona-switch-on': active, 'mona-switch-off': !active}"
+          [attr.tabindex]="disabled?-1:0"></span>
 </div>

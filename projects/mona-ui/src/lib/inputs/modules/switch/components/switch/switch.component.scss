@@ -27,6 +27,7 @@ span.mona-switch-handle {
     display: inline-flex;
     height: ($switch-height - 4px);
     width: ($switch-height - 4px);
+    outline: none;
     transition: left ease-out 200ms, background 200ms ease-in-out;
     &.mona-switch-on {
         left: calc(100% - ($switch-height - 2px));

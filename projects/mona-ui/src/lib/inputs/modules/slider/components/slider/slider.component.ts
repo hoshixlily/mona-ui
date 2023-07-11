@@ -129,6 +129,7 @@ export class SliderComponent implements OnInit {
 
     public onTickClick(event: MouseEvent, tick: SliderTick): void {
         this.setHandlerValue(tick.value);
+        this.handlerElementRef.nativeElement.focus();
     }
 
     private findClosestTickElement(event: MouseEvent): HTMLSpanElement {

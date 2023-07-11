@@ -23,6 +23,9 @@ export class SwitchComponent implements OnInit, ControlValueAccessor {
     public active: boolean = false;
 
     @Input()
+    public disabled: boolean = false;
+
+    @Input()
     public labelOff: string = "OFF";
 
     @Input()

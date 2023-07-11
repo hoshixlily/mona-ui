@@ -261,7 +261,7 @@
                                 <mona-switch [labelOff]="'12'" labelOn="24" [(ngModel)]="dateFormat24Hours"
                                              style="margin-right: 5px;"></mona-switch>
 
-                                <mona-switch labelOn="ON" labelOff="OFF" [ngModel]="switchValue"
+                                <mona-switch labelOn="ON" labelOff="OFF" [ngModel]="switchValue" [disabled]="true"
                                              (ngModelChange)="onSwitchValueChange($event)">
                                     <ng-template monaSwitchOffLabelTemplate>
                                         <fa-icon [icon]="moonIcon" style="color: orange;"></fa-icon>
@@ -327,7 +327,7 @@
                                 </mona-split-button>
                             </div>
 
-                            <div style="display: flex; align-items: center">
+                            <div style="display: flex; align-items: center; margin-top: 40px;">
                                 <mona-stepper orientation="horizontal" [steps]="stepperSteps" [step]="stepperStep" (stepChange)="onStepperStepChange($event)" [linear]="true" style="width: 600px;">
                                     <ng-template monaStepperLabelTemplate let-step let-index="index" let-active="active">
                                         <span *ngIf="!active" style="color: snow; font-weight: bolder;">{{index+1}}. {{step.label}}</span>
@@ -356,8 +356,8 @@
 
                             <div style="display: flex; align-items: center; justify-content: center;">
                                 <mona-range-slider orientation="horizontal"
-                                                    [value]="rangedSliderValues"
-                                                    (valueChange)="print($event)"
+                                                    [ngModel]="rangedSliderValues"
+                                                    (ngModelChange)="onRangedSliderValueChange($event)"
                                                     style="width: 400px;">
                                     <ng-template monaRangeSliderTickValueTemplate let-value>
                                         <fa-icon [icon]="moonIcon" *ngIf="value % 2 === 0"
@@ -380,8 +380,8 @@
 <!--                                    </ng-template>-->
                                 </mona-slider>
                                 <mona-range-slider orientation="vertical"
-                                                    [value]="[7, 13]"
-                                                    (valueChange)="print($event)"
+                                                    [ngModel]="[7, 13]"
+                                                    (ngModelChange)="print($event)"
                                                     style="height: 400px;">
                                     <ng-template monaRangeSliderTickValueTemplate let-value>
                                         <fa-icon [icon]="moonIcon" *ngIf="value % 2 === 0"

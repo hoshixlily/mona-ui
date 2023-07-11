@@ -303,6 +303,7 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
                     }
                 });
         });
+        this.inputFocus.pipe(takeUntil(this.componentDestroy$)).subscribe(() => this.elementRef.nativeElement.focus());
     }
 
     private updateValue(value: string | null, emit: boolean = true): void {
