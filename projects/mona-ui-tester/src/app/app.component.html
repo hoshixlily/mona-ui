@@ -353,7 +353,25 @@
                             </div>
 
                             <div style="display: flex; align-items: center; justify-content: center; margin-top: 40px;">
-                                <mona-slider2 orientation="horizontal" [value]="7" (valueChange)="print($event)" style="width: 400px;"></mona-slider2>
+                                <mona-slider2 orientation="horizontal" labelPosition="before" [value]="7" (valueChange)="print($event)" style="width: 400px;">
+                                    <ng-template monaSliderTickValueTemplate let-value>
+                                        <fa-icon [icon]="moonIcon" *ngIf="value % 2 === 0"
+                                                 style="color: mediumpurple;"></fa-icon>
+                                        <fa-icon [icon]="sunIcon" *ngIf="value % 2 !== 0"
+                                                 style="color: #fafd0f;"></fa-icon>
+                                    </ng-template>
+                                </mona-slider2>
+                            </div>
+
+                            <div style="display: flex; align-items: center; justify-content: center; margin-top: 40px;">
+                                <mona-slider2 orientation="vertical" labelPosition="after" [value]="11" (valueChange)="print($event)" style="height: 400px; margin-right: 0;">
+<!--                                    <ng-template monaSliderTickValueTemplate let-value>-->
+<!--                                        <fa-icon [icon]="moonIcon" *ngIf="value % 2 === 0"-->
+<!--                                                 style="color: mediumpurple;"></fa-icon>-->
+<!--                                        <fa-icon [icon]="sunIcon" *ngIf="value % 2 !== 0"-->
+<!--                                                 style="color: #fafd0f;"></fa-icon>-->
+<!--                                    </ng-template>-->
+                                </mona-slider2>
                             </div>
                         </div>
                     </ng-template>

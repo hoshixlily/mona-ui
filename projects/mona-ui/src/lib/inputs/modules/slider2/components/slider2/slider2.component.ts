@@ -17,7 +17,7 @@ import {
 import { SliderTick } from "../../../slider/models/SliderTick";
 import { SliderLabelPosition } from "../../../slider/models/SliderLabelPosition";
 import { SliderTickValueTemplateDirective } from "../../../slider/directives/slider-tick-value-template.directive";
-import { distinctUntilChanged, fromEvent, map, take, tap } from "rxjs";
+import { distinctUntilChanged, fromEvent, map, tap } from "rxjs";
 
 @Component({
     selector: "mona-slider2",
@@ -35,7 +35,7 @@ export class Slider2Component implements OnInit {
     public trackSelectionWidth: Signal<number> = computed(() => {
         const element = this.elementRef.nativeElement;
         const rect = element.getBoundingClientRect();
-        const distance = rect.right - rect.left;
+        const distance = this.orientation === "horizontal" ? rect.right - rect.left : rect.bottom - rect.top;
         const percentage = (this.handlerValue() - this.min) / (this.max - this.min);
         return Math.max(distance * percentage - 2, 0);
     });
@@ -84,6 +84,22 @@ export class Slider2Component implements OnInit {
         this.prepareTicks();
     }
 
+    public onHandlerKeyDown(event: KeyboardEvent): void {
+        if (event.key === "ArrowLeft" || event.key === "ArrowDown") {
+            if (this.handlerValue() - this.step >= this.min) {
+                this.setHandlerValue(this.handlerValue() - this.step);
+            } else {
+                this.setHandlerValue(this.min);
+            }
+        } else if (event.key === "ArrowRight" || event.key === "ArrowUp") {
+            if (this.handlerValue() + this.step <= this.max) {
+                this.setHandlerValue(this.handlerValue() + this.step);
+            } else {
+                this.setHandlerValue(this.max);
+            }
+        }
+    }
+
     public onHandlerMouseDown(event: MouseEvent): void {
         const moveSubscription = fromEvent(document, "mousemove")
             .pipe(
@@ -96,13 +112,11 @@ export class Slider2Component implements OnInit {
             )
             .subscribe((tickValue: number) => {
                 this.setHandlerValue(tickValue);
-                fromEvent(document, "mouseup")
-                    .pipe(take(1))
-                    .subscribe(() => {
-                        moveSubscription.unsubscribe();
-                        this.dragging.set(false);
-                    });
             });
+        fromEvent(document, "mouseup").subscribe(() => {
+            this.dragging.set(false);
+            moveSubscription.unsubscribe();
+        });
     }
 
     public onTickClick(event: MouseEvent, tick: SliderTick): void {
@@ -135,6 +149,9 @@ export class Slider2Component implements OnInit {
             index++;
         }
         this.ticks.push({ index, value: Math.min(value + this.step, this.max) });
+        if (this.orientation === "vertical") {
+            this.ticks.reverse();
+        }
     }
 
     private setHandlerValue(value: number): void {
