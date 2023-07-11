@@ -4,10 +4,9 @@ import {
     computed,
     ContentChild,
     ElementRef,
-    EventEmitter,
+    forwardRef,
     Input,
     OnInit,
-    Output,
     Signal,
     signal,
     TemplateRef,
@@ -18,15 +17,24 @@ import { SliderTick } from "../../../../models/slider/SliderTick";
 import { SliderLabelPosition } from "../../../../models/slider/SliderLabelPosition";
 import { SliderTickValueTemplateDirective } from "../../directives/slider-tick-value-template.directive";
 import { distinctUntilChanged, fromEvent, map, take, tap } from "rxjs";
+import { Action } from "../../../../../utils/Action";
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 
 @Component({
     selector: "mona-slider",
     templateUrl: "./slider.component.html",
     styleUrls: ["./slider.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [
+        {
+            provide: NG_VALUE_ACCESSOR,
+            useExisting: forwardRef(() => SliderComponent),
+            multi: true
+        }
+    ]
 })
-export class SliderComponent implements OnInit {
-    #value: number = 0;
+export class SliderComponent implements OnInit, ControlValueAccessor {
+    #propagateChange: Action<number> | null = null;
     public dragging: WritableSignal<boolean> = signal(false);
     public handlerValue: WritableSignal<number> = signal(0);
     public handlerPosition: Signal<number> = computed(() => {
@@ -70,19 +78,6 @@ export class SliderComponent implements OnInit {
 
     @ContentChild(SliderTickValueTemplateDirective, { read: TemplateRef })
     public tickValueTemplate?: TemplateRef<any>;
-
-    @Input()
-    public set value(value: number) {
-        this.#value = value;
-        this.handlerValue.set(value);
-    }
-
-    public get value(): number {
-        return this.#value;
-    }
-
-    @Output()
-    public valueChange: EventEmitter<number> = new EventEmitter<number>();
 
     public constructor(private readonly elementRef: ElementRef<HTMLDivElement>) {}
 
@@ -132,6 +127,20 @@ export class SliderComponent implements OnInit {
         this.handlerElementRef.nativeElement.focus();
     }
 
+    public registerOnChange(fn: any): void {
+        this.#propagateChange = fn;
+    }
+
+    public registerOnTouched(fn: any): void {
+        void 0;
+    }
+
+    public writeValue(obj: number) {
+        if (obj !== undefined) {
+            this.handlerValue.set(obj);
+        }
+    }
+
     private findClosestTickElement(event: MouseEvent): HTMLSpanElement {
         const elements = Array.from(
             this.elementRef.nativeElement.querySelectorAll(".mona-slider-tick > span")
@@ -165,6 +174,6 @@ export class SliderComponent implements OnInit {
 
     private setHandlerValue(value: number): void {
         this.handlerValue.set(value);
-        this.valueChange.emit(value);
+        this.#propagateChange?.(value);
     }
 }

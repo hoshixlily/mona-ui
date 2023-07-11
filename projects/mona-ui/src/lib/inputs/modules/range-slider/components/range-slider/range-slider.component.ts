@@ -6,10 +6,8 @@ import {
     computed,
     ContentChild,
     ElementRef,
-    EventEmitter,
     forwardRef,
     Input,
-    Output,
     Signal,
     signal,
     TemplateRef,
@@ -81,9 +79,6 @@ export class RangeSliderComponent implements AfterViewInit, ControlValueAccessor
 
     @ContentChild(RangeSliderTickValueTemplateDirective, { read: TemplateRef })
     public tickValueTemplate?: TemplateRef<any>;
-
-    @Output()
-    public valueChange: EventEmitter<[number, number]> = new EventEmitter<[number, number]>();
 
     public constructor(
         private readonly elementRef: ElementRef<HTMLDivElement>,
