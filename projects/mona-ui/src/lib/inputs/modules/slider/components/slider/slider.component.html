@@ -1,0 +1,38 @@
+<div class="mona-slider"
+     [ngClass]="{'mona-slider-horizontal': orientation==='horizontal',
+                 'mona-slider-vertical': orientation==='vertical'}">
+    <div class="mona-slider-track">
+        <div class="mona-slider-selection" [ngClass]="{'mona-slider-dragging': dragging()}"
+             [style.width.px]="orientation==='horizontal' ? trackSelectionWidth() : undefined"
+             [style.height.px]="orientation==='vertical' ? trackSelectionWidth() : undefined"></div>
+    </div>
+    <div class="mona-slider-tick-list">
+        <ng-container *ngFor="let tick of ticks; let tx = index;">
+            <span class="mona-slider-tick" [ngClass]="{'mona-slider-tick-visible': showTicks}" *ngIf="tx !== 0">
+                <span (click)="onTickClick($event, tick)" [attr.data-value]="tick.value"></span>
+            </span>
+            <span class="mona-slider-tick" [ngClass]="{'mona-slider-tick-visible': showTicks}" *ngIf="tx !== ticks.length - 1">
+                <span (click)="onTickClick($event, tick)" [attr.data-value]="tick.value"></span>
+            </span>
+        </ng-container>
+    </div>
+    <div class="mona-slider-tick-label-list"
+         [ngClass]="{'mona-slider-position-before': labelPosition==='before', 'mona-slider-position-after': labelPosition==='after'}">
+        <ng-container *ngFor="let tick of ticks; let tx = index;">
+            <span class="mona-slider-tick-label">
+                <span *ngIf="!tickValueTemplate">{{tick.value}}</span>
+                <span *ngIf="tickValueTemplate">
+                    <ng-container
+                        *ngTemplateOutlet="tickValueTemplate; context: {$implicit: tick.value}"></ng-container>
+                </span>
+            </span>
+        </ng-container>
+    </div>
+    <div class="mona-slider-handler" [ngClass]="{'mona-slider-dragging': dragging()}"
+         [attr.tabindex]="0"
+         [style.left.px]="orientation==='horizontal' ? handlerPosition() : undefined"
+         [style.bottom.px]="orientation==='vertical' ? handlerPosition() : undefined"
+         (mousedown)="onHandlerMouseDown($event)"
+         (keydown)="onHandlerKeyDown($event)"
+         #handlerElementRef></div>
+</div>
