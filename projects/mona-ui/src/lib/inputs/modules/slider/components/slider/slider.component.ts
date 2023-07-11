@@ -20,7 +20,7 @@ import { SliderTickValueTemplateDirective } from "../../directives/slider-tick-v
 import { distinctUntilChanged, fromEvent, map, take, tap } from "rxjs";
 
 @Component({
-    selector: "mona-slider2",
+    selector: "mona-slider",
     templateUrl: "./slider.component.html",
     styleUrls: ["./slider.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush
@@ -133,7 +133,7 @@ export class SliderComponent implements OnInit {
 
     private findClosestTickElement(event: MouseEvent): HTMLSpanElement {
         const elements = Array.from(
-            this.elementRef.nativeElement.querySelectorAll(".mona-slider2-tick > span")
+            this.elementRef.nativeElement.querySelectorAll(".mona-slider-tick > span")
         ) as HTMLSpanElement[];
         let maxDistance = Number.MAX_VALUE;
         let index = 0;

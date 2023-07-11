@@ -16,14 +16,14 @@ import {
     WritableSignal
 } from "@angular/core";
 import { SliderLabelPosition } from "../../../../models/slider/SliderLabelPosition";
-import { SliderTickValueTemplateDirective } from "../../../slider2/directives/slider-tick-value-template.directive";
 import { SliderTick } from "../../../../models/slider/SliderTick";
 import { SliderHandlerData } from "../../../../models/slider/SliderHandlerData";
 import { SliderHandlerType } from "../../../../models/slider/SliderHandlerType";
 import { distinctUntilChanged, fromEvent, map, take, tap } from "rxjs";
+import { RangeSliderTickValueTemplateDirective } from "../../directives/range-slider-tick-value-template.directive";
 
 @Component({
-    selector: "mona-range-slider2",
+    selector: "mona-range-slider",
     templateUrl: "./range-slider.component.html",
     styleUrls: ["./range-slider.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush
@@ -69,7 +69,7 @@ export class RangeSliderComponent implements AfterViewInit {
     @Input()
     public step: number = 1;
 
-    @ContentChild(SliderTickValueTemplateDirective, { read: TemplateRef })
+    @ContentChild(RangeSliderTickValueTemplateDirective, { read: TemplateRef })
     public tickValueTemplate?: TemplateRef<any>;
 
     @Input()
@@ -150,7 +150,7 @@ export class RangeSliderComponent implements AfterViewInit {
 
     private findClosestTickElement(event: MouseEvent): HTMLSpanElement {
         const elements = Array.from(
-            this.elementRef.nativeElement.querySelectorAll(".mona-range-slider2-tick > span")
+            this.elementRef.nativeElement.querySelectorAll(".mona-range-slider-tick > span")
         ) as HTMLSpanElement[];
         let maxDistance = Number.MAX_VALUE;
         let index = 0;
