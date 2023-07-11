@@ -17,7 +17,7 @@ import {
 import { SliderTick } from "../../../slider/models/SliderTick";
 import { SliderLabelPosition } from "../../../slider/models/SliderLabelPosition";
 import { SliderTickValueTemplateDirective } from "../../../slider/directives/slider-tick-value-template.directive";
-import { distinctUntilChanged, fromEvent, map, tap } from "rxjs";
+import { distinctUntilChanged, fromEvent, map, take, tap } from "rxjs";
 
 @Component({
     selector: "mona-slider2",
@@ -26,6 +26,7 @@ import { distinctUntilChanged, fromEvent, map, tap } from "rxjs";
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class Slider2Component implements OnInit {
+    #value: number = 0;
     public dragging: WritableSignal<boolean> = signal(false);
     public handlerValue: WritableSignal<number> = signal(0);
     public handlerPosition: Signal<number> = computed(() => {
@@ -36,7 +37,8 @@ export class Slider2Component implements OnInit {
         const element = this.elementRef.nativeElement;
         const rect = element.getBoundingClientRect();
         const distance = this.orientation === "horizontal" ? rect.right - rect.left : rect.bottom - rect.top;
-        const percentage = (this.handlerValue() - this.min) / (this.max - this.min);
+        const value = Math.max(this.min, Math.min(this.handlerValue(), this.max));
+        const percentage = (value - this.min) / (this.max - this.min);
         return Math.max(distance * percentage - 2, 0);
     });
 
@@ -70,7 +72,14 @@ export class Slider2Component implements OnInit {
     public tickValueTemplate?: TemplateRef<any>;
 
     @Input()
-    public value: number = 0;
+    public set value(value: number) {
+        this.#value = value;
+        this.handlerValue.set(value);
+    }
+
+    public get value(): number {
+        return this.#value;
+    }
 
     @Output()
     public valueChange: EventEmitter<number> = new EventEmitter<number>();
@@ -78,9 +87,6 @@ export class Slider2Component implements OnInit {
     public constructor(private readonly elementRef: ElementRef<HTMLDivElement>) {}
 
     public ngOnInit(): void {
-        if (this.value != null) {
-            this.handlerValue.set(this.value);
-        }
         this.prepareTicks();
     }
 
@@ -113,10 +119,12 @@ export class Slider2Component implements OnInit {
             .subscribe((tickValue: number) => {
                 this.setHandlerValue(tickValue);
             });
-        fromEvent(document, "mouseup").subscribe(() => {
-            this.dragging.set(false);
-            moveSubscription.unsubscribe();
-        });
+        fromEvent(document, "mouseup")
+            .pipe(take(1))
+            .subscribe(() => {
+                this.dragging.set(false);
+                moveSubscription.unsubscribe();
+            });
     }
 
     public onTickClick(event: MouseEvent, tick: SliderTick): void {

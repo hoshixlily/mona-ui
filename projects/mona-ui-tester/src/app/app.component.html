@@ -353,7 +353,7 @@
                             </div>
 
                             <div style="display: flex; align-items: center; justify-content: center; margin-top: 40px;">
-                                <mona-slider2 orientation="horizontal" labelPosition="before" [value]="7" (valueChange)="print($event)" style="width: 400px;">
+                                <mona-slider2 orientation="horizontal" labelPosition="before" [value]="sliderValue" (valueChange)="print($event)" style="width: 400px;">
                                     <ng-template monaSliderTickValueTemplate let-value>
                                         <fa-icon [icon]="moonIcon" *ngIf="value % 2 === 0"
                                                  style="color: mediumpurple;"></fa-icon>
@@ -361,6 +361,23 @@
                                                  style="color: #fafd0f;"></fa-icon>
                                     </ng-template>
                                 </mona-slider2>
+                                <mona-numeric-text-box [(ngModel)]="sliderValue"></mona-numeric-text-box>
+                            </div>
+
+                            <div style="display: flex; align-items: center; justify-content: center;">
+                                <mona-range-slider2 orientation="horizontal"
+                                                    [value]="rangedSliderValues"
+                                                    (valueChange)="print($event)"
+                                                    style="width: 400px;">
+                                    <ng-template monaSliderTickValueTemplate let-value>
+                                        <fa-icon [icon]="moonIcon" *ngIf="value % 2 === 0"
+                                                 style="color: mediumpurple;"></fa-icon>
+                                        <fa-icon [icon]="sunIcon" *ngIf="value % 2 !== 0"
+                                                 style="color: #fafd0f;"></fa-icon>
+                                    </ng-template>
+                                </mona-range-slider2>
+                                <mona-numeric-text-box [ngModel]="rangedSliderValues[0]" (valueChange)="rangedSliderValues=[+$event!, rangedSliderValues[1]]"></mona-numeric-text-box>
+                                <mona-numeric-text-box [ngModel]="rangedSliderValues[1]" (valueChange)="rangedSliderValues=[rangedSliderValues[0], +$event!]"></mona-numeric-text-box>
                             </div>
 
                             <div style="display: flex; align-items: center; justify-content: center; margin-top: 40px;">
@@ -372,6 +389,17 @@
 <!--                                                 style="color: #fafd0f;"></fa-icon>-->
 <!--                                    </ng-template>-->
                                 </mona-slider2>
+                                <mona-range-slider2 orientation="vertical"
+                                                    [value]="[7, 13]"
+                                                    (valueChange)="print($event)"
+                                                    style="height: 400px;">
+                                    <ng-template monaSliderTickValueTemplate let-value>
+                                        <fa-icon [icon]="moonIcon" *ngIf="value % 2 === 0"
+                                                 style="color: mediumpurple;"></fa-icon>
+                                        <fa-icon [icon]="sunIcon" *ngIf="value % 2 !== 0"
+                                                 style="color: #fafd0f;"></fa-icon>
+                                    </ng-template>
+                                </mona-range-slider2>
                             </div>
                         </div>
                     </ng-template>
