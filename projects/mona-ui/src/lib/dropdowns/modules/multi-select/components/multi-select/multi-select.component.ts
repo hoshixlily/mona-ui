@@ -21,13 +21,15 @@ import { PopupListValueChangeEvent } from "../../../../data/PopupListValueChange
 import { MultiSelectTagTemplateDirective } from "../../directives/multi-select-tag-template.directive";
 import { MultiSelectItemTemplateDirective } from "../../directives/multi-select-item-template.directive";
 import { MultiSelectGroupTemplateDirective } from "../../directives/multi-select-group-template.directive";
+import { PopupSettings } from "../../../../../popup/models/PopupSettings";
+import { PopupRef } from "../../../../../popup/models/PopupRef";
 
 @Component({
     selector: "mona-multi-select",
     templateUrl: "./multi-select.component.html",
     styleUrls: ["./multi-select.component.scss"],
     providers: [PopupListService],
-    changeDetection: ChangeDetectionStrategy.Default
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MultiSelectComponent extends AbstractDropDownListComponent implements OnInit, OnDestroy {
     private resizeObserver: ResizeObserver | null = null;
@@ -115,6 +117,10 @@ export class MultiSelectComponent extends AbstractDropDownListComponent implemen
         const remainingItems = this.valuePopupListItem.slice(0, this.visibleTagCount);
         this.updateValue(remainingItems);
     }
+
+    // public override open(options: Partial<PopupSettings> = {}): PopupRef {
+    //     return super.open({ width: this.elementRef.nativeElement.offsetWidth + 2 });
+    // }
 
     private containsValue(popupListItems: PopupListItem[], value: any): boolean {
         return popupListItems.some(popupListItem => popupListItem.dataEquals(value));

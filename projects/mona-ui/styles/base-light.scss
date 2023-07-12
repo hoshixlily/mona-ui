@@ -9,10 +9,10 @@
     --mona-background-light: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) + 2%));
     --mona-background-lighter: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) + 4%));
 
-    --mona-background-hover: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) - 2%));
-    --mona-background-hover-dark: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) - 1%));
-    --mona-background-active: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) - 3%));
-    --mona-background-active-dark: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) - 2%));
+    --mona-background-hover: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) - 3%));
+    --mona-background-hover-dark: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) - 2%));
+    --mona-background-active: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) - 6%));
+    --mona-background-active-dark: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) - 3%));
 
     --mona-primary-base: 346, 54%;
     --mona-primary-base-lightness: 50%;
@@ -29,12 +29,16 @@
     --mona-confirm: #CCCCFC;
 
     --mona-border-color: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) - 12%));
+    --mona-border-color-dark: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) - 14%));
     --mona-focus-border-color: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) - 18%));
     --mona-primary-border-color: hsl(var(--mona-primary-base), calc(var(--mona-primary-base-lightness) - 6%));
     --mona-selected-border-color: var(--mona-primary-border-color);
 
-    --mona-shadow-color: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) - 20%));
-    --mona-popup-shadow: 0 5px 10px -3px var(--mona-shadow-color);
+    --mona-focus-shadow-color: var(--mona-focus-border-color);
+    --mona-focus-shadow: 0 0 2px 0 var(--mona-focus-shadow-color);
+    --mona-focus-shadow-dark: 0 0 2px 0px hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) - 100%));
+    --mona-popup-shadow-color: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) - 20%));
+    --mona-popup-shadow: 0 5px 10px -3px var(--mona-popup-shadow-color);
 
     --mona-text-base: 0, 0%;
     --mona-text-base-lightness: 0%;

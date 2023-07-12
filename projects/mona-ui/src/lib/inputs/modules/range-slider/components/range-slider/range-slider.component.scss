@@ -155,7 +155,7 @@ div.mona-range-slider-vertical {
 
     & div.mona-range-slider-handler {
         bottom: calc($track-thickness * 3 / -2);
-        transition: bottom ease-out 0.3s;
+        transition: bottom ease-out 0.3s, box-shadow 0.15s ease-in;
         &.mona-range-slider-dragging {
             transition: none;
         }
