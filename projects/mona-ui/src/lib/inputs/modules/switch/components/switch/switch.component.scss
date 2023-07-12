@@ -30,7 +30,7 @@ span.mona-switch-handle {
     outline: none;
     transition: left ease-out 200ms, background 200ms ease-in-out;
     &.mona-switch-on {
-        left: calc(100% - ($switch-height - 2px));
+        left: calc(100% - ($switch-height - 4px));
     }
     &.mona-switch-off {
         left: 2px;
