@@ -25,8 +25,8 @@ span.mona-switch-label {
 span.mona-switch-handle {
     position: absolute;
     display: inline-flex;
-    height: ($switch-height - 4px);
-    width: ($switch-height - 4px);
+    height: ($switch-height - 6px);
+    width: ($switch-height - 6px);
     outline: none;
     transition: left ease-out 200ms, background 200ms ease-in-out;
     &.mona-switch-on {

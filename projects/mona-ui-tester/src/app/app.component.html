@@ -162,6 +162,45 @@
                                 <button monaButton [flat]="true">Flat Button</button>
                                 <button monaButton [primary]="true">Primary Button</button>
                                 <button monaButton [disabled]="true">Disabled Button</button>
+                                <button monaButton [disabled]="false"#contextMenuAnchor>
+                                    <span style="color: lightcoral;">Context Menu Target</span>
+                                </button>
+                                <mona-contextmenu [target]="contextMenuAnchor" (navigate)="print($event)">
+                                    <mona-menu-item text="File">
+                                        <ng-template monaMenuItemTextTemplate let-menuItem>
+                                            <span style="color: mediumseagreen;">File</span>
+                                        </ng-template>
+                                    </mona-menu-item>
+                                    <mona-menu-item [divider]="true"></mona-menu-item>
+                                    <mona-menu-item text="Edit" [disabled]="false">
+                                        <mona-menu-item text="Undo"
+                                                        (menuClick)="print('Undo clicked.')"></mona-menu-item>
+                                        <mona-menu-item text="Redo"></mona-menu-item>
+                                    </mona-menu-item>
+                                    <mona-menu-item text="View" (menuClick)="print('View clicked.')">
+                                        <ng-template monaMenuItemIconTemplate>
+                                            <span style="color: deeppink; font-size: 16px;">♫</span>
+                                        </ng-template>
+                                    </mona-menu-item>
+                                    <mona-menu-item [divider]="true"></mona-menu-item>
+                                    <mona-menu-item text="Cut"></mona-menu-item>
+                                    <mona-menu-item text="Copy"></mona-menu-item>
+                                    <mona-menu-item text="Paste" [disabled]="true"></mona-menu-item>
+                                    <mona-menu-item text="Select All"></mona-menu-item>
+                                    <mona-menu-item [divider]="true"></mona-menu-item>
+                                    <mona-menu-item text="Search" [visible]="contextMenuItemVisible"
+                                                    iconClass="fa fa-star">
+                                        <mona-menu-item text="Find">
+                                            <mona-menu-item text="Find Next" [disabled]="true"
+                                                            iconClass="fa fa-arrow-right"></mona-menu-item>
+                                            <mona-menu-item text="Find Previous" [disabled]="false"
+                                                            iconClass="fa fa-arrow-left"
+                                                            (menuClick)="print('Find Previous clicked.')"></mona-menu-item>
+                                        </mona-menu-item>
+                                        <mona-menu-item text="Replace"></mona-menu-item>
+                                    </mona-menu-item>
+                                </mona-contextmenu>
+
                             </div>
                             <div style="display: flex; align-items: center;">
                                 <mona-button-group selection="multiple">
@@ -343,13 +382,13 @@
                             </div>
 
                             <div style="display: flex; align-items: center; justify-content: center; margin-top: 40px;">
-                                <mona-slider orientation="horizontal" labelPosition="before" [ngModel]="sliderValue" (ngModelChange)="print($event)" style="width: 400px;">
-                                    <ng-template monaSliderTickValueTemplate let-value>
-                                        <fa-icon [icon]="moonIcon" *ngIf="value % 2 === 0"
-                                                 style="color: mediumpurple;"></fa-icon>
-                                        <fa-icon [icon]="sunIcon" *ngIf="value % 2 !== 0"
-                                                 style="color: #fafd0f;"></fa-icon>
-                                    </ng-template>
+                                <mona-slider orientation="horizontal" labelPosition="before" [max]="25" [ngModel]="sliderValue" (ngModelChange)="print($event)" style="width: 400px;">
+<!--                                    <ng-template monaSliderTickValueTemplate let-value>-->
+<!--                                        <fa-icon [icon]="moonIcon" *ngIf="value % 2 === 0"-->
+<!--                                                 style="color: mediumpurple;"></fa-icon>-->
+<!--                                        <fa-icon [icon]="sunIcon" *ngIf="value % 2 !== 0"-->
+<!--                                                 style="color: #fafd0f;"></fa-icon>-->
+<!--                                    </ng-template>-->
                                 </mona-slider>
                                 <mona-numeric-text-box [(ngModel)]="sliderValue"></mona-numeric-text-box>
                             </div>
