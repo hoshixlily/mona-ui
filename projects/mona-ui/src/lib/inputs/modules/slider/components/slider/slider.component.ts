@@ -62,7 +62,7 @@ export class SliderComponent implements OnInit, ControlValueAccessor {
     public labelStep: number = 1;
 
     @Input()
-    public max: number = 20;
+    public max: number = 10;
 
     @Input()
     public min: number = 0;

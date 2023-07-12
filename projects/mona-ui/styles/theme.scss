@@ -1231,7 +1231,7 @@ div.mona-progress-bar-indeterminate {
 }
 
 .mona-tree-view-node-focused {
-    box-shadow: 0 0 0 1px var(--mona-selected-border-color);
+    box-shadow: 0 0 0 1px var(--mona-focus-border-color);
 }
 
 div.mona-tree-view-node-text {
@@ -1241,7 +1241,7 @@ div.mona-tree-view-node-text {
 div.mona-tree-view-node-selected {
     background-color: var(--mona-primary);
     color: var(--mona-text-inverted);
-    box-shadow: 0 0 0 1px var(--mona-primary-dark);
+    box-shadow: 0 0 0 1px var(--mona-selected-border-color);
 }
 
 div.mona-tree-view-node-dropping {
