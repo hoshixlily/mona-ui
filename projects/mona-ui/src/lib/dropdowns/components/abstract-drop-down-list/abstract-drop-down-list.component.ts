@@ -151,7 +151,7 @@ export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy
             content: this.popupTemplate,
             hasBackdrop: true,
             withPush: false,
-            width: this.elementRef.nativeElement.offsetWidth,
+            width: this.elementRef.nativeElement.getBoundingClientRect().width,
             popupClass: ["mona-dropdown-popup-content"],
             positions: [
                 new ConnectionPositionPair(
