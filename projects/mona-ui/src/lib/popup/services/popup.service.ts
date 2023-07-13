@@ -1,4 +1,4 @@
-import { Injectable, Injector, NgZone, OnDestroy, Renderer2, RendererFactory2, TemplateRef } from "@angular/core";
+import { Injectable, Injector, NgZone, OnDestroy, TemplateRef } from "@angular/core";
 import { PopupSettings } from "../models/PopupSettings";
 import { Overlay, PositionStrategy } from "@angular/cdk/overlay";
 import { ComponentPortal } from "@angular/cdk/portal";
@@ -20,16 +20,12 @@ export class PopupService implements OnDestroy {
     private readonly outsideEventsToClose = ["click", "mousedown", "dblclick", "contextmenu", "auxclick"];
     private readonly popupStateMap: Dictionary<string, PopupState> = new Dictionary<string, PopupState>();
     private readonly serviceDestroy$: Subject<void> = new Subject<void>();
-    private renderer: Renderer2;
 
     public constructor(
         private readonly injector: Injector,
         private readonly overlay: Overlay,
-        private readonly rendererFactory: RendererFactory2,
         private readonly zone: NgZone
-    ) {
-        this.renderer = rendererFactory.createRenderer(null, null);
-    }
+    ) {}
 
     public create(settings: PopupSettings): PopupRef {
         const uid = v4();
