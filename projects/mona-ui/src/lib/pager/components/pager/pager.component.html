@@ -47,8 +47,8 @@
                                        (inputBlur)="onPageInputBlur()" *ngIf="pageInput"></mona-numeric-text-box>
             </li>
             <li *ngIf="pageInputVisible() && pageSizeValueList.length !== 0">
-                <mona-drop-down-list [data]="pageSizeValueList" [value]="pageSize"
-                                     (valueChange)="onPageSizeValueChange($event)" #pageSizeDropdownList></mona-drop-down-list>
+                <mona-drop-down-list [data]="pageSizeValueList" [ngModel]="pageSize"
+                                     (ngModelChange)="onPageSizeValueChange($event)" #pageSizeDropdownList></mona-drop-down-list>
                 <span>items per page</span>
             </li>
         </ol>
@@ -105,7 +105,7 @@
                 </button>
             </li>
             <li *ngIf="pageCount !== 0">
-                <mona-drop-down-list [data]="pageList()" [value]="page" (valueChange)="onPageClick($event)" style="width: 75px;"></mona-drop-down-list>
+                <mona-drop-down-list [data]="pageList()" [ngModel]="page" (ngModelChange)="onPageClick($event)" style="width: 75px;"></mona-drop-down-list>
             </li>
             <li *ngIf="previousNext">
                 <button monaButton [flat]="true" [disabled]="page < 1 || page === pageCount" (click)="onNextPageClick()">

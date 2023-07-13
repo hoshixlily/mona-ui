@@ -241,9 +241,9 @@
                                 <mona-drop-down-list [data]="dropdownListDataItems" textField="text" valueField="value"
                                                      groupField="group" [filterable]="true" [disabled]="false"
                                                      [showClearButton]="true" placeholder="Select an item..."
-                                                     [value]="selectedDropdownListDataItem"
+                                                     [ngModel]="selectedDropdownListDataItem"
                                                      [itemDisabler]="dropdownItemDisabler"
-                                                     (valueChange)="onDropDownValueChange($event)"
+                                                     (ngModelChange)="onDropDownValueChange($event)"
                                                      style="width: 200px; ">
                                     <ng-template monaDropDownListItemTemplate let-dataItem let-listItem="listItem">
                                         <span style="color: deeppink;"
