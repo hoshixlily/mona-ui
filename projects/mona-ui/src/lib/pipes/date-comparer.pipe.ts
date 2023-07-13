@@ -8,56 +8,37 @@ type DateComparisonOperator = "==" | "!=" | "<" | "<=" | ">" | ">=";
 })
 export class DateComparerPipe implements PipeTransform {
     public transform(value: Date | null, other: Date | null, operator: DateComparisonOperator): boolean {
-        if (value === null || other === null) {
+        if (!value || !other) {
             return false;
         }
-        switch (operator) {
-            case "==":
-                return (
-                    value.getDate() === other.getDate() &&
-                    value.getMonth() === other.getMonth() &&
-                    value.getFullYear() === other.getFullYear()
-                );
-            case "!=":
-                return (
-                    value.getDate() !== other.getDate() ||
-                    value.getMonth() !== other.getMonth() ||
-                    value.getFullYear() !== other.getFullYear()
-                );
-            case "<":
-                return (
-                    value.getFullYear() < other.getFullYear() ||
-                    (value.getFullYear() === other.getFullYear() && value.getMonth() < other.getMonth()) ||
-                    (value.getFullYear() === other.getFullYear() &&
-                        value.getMonth() === other.getMonth() &&
-                        value.getDate() < other.getDate())
-                );
-            case "<=":
-                return (
-                    value.getFullYear() < other.getFullYear() ||
-                    (value.getFullYear() === other.getFullYear() && value.getMonth() < other.getMonth()) ||
-                    (value.getFullYear() === other.getFullYear() &&
-                        value.getMonth() === other.getMonth() &&
-                        value.getDate() <= other.getDate())
-                );
-            case ">":
-                return (
-                    value.getFullYear() > other.getFullYear() ||
-                    (value.getFullYear() === other.getFullYear() && value.getMonth() > other.getMonth()) ||
-                    (value.getFullYear() === other.getFullYear() &&
-                        value.getMonth() === other.getMonth() &&
-                        value.getDate() > other.getDate())
-                );
-            case ">=":
-                return (
-                    value.getFullYear() > other.getFullYear() ||
-                    (value.getFullYear() === other.getFullYear() && value.getMonth() > other.getMonth()) ||
-                    (value.getFullYear() === other.getFullYear() &&
-                        value.getMonth() === other.getMonth() &&
-                        value.getDate() >= other.getDate())
-                );
-            default:
-                return false;
+
+        const valueDateParts = [value.getFullYear(), value.getMonth(), value.getDate()];
+        const otherDateParts = [other.getFullYear(), other.getMonth(), other.getDate()];
+
+        for (let i = 0; i < 3; i++) {
+            switch (operator) {
+                case "==":
+                    if (valueDateParts[i] !== otherDateParts[i]) return false;
+                    break;
+                case "!=":
+                    if (valueDateParts[i] !== otherDateParts[i]) return true;
+                    break;
+                case "<":
+                case "<=":
+                    if (valueDateParts[i] < otherDateParts[i]) return true;
+                    if (valueDateParts[i] > otherDateParts[i]) return false;
+                    if (operator === "<=" && i === 2 && valueDateParts[i] === otherDateParts[i]) return true;
+                    break;
+                case ">":
+                case ">=":
+                    if (valueDateParts[i] > otherDateParts[i]) return true;
+                    if (valueDateParts[i] < otherDateParts[i]) return false;
+                    if (operator === ">=" && i === 2 && valueDateParts[i] === otherDateParts[i]) return true;
+                    break;
+                default:
+                    return false;
+            }
         }
+        return operator === "==";
     }
 }
