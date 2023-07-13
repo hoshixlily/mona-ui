@@ -45,38 +45,53 @@ export class GridListComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     public onGridRowClick(event: MouseEvent, row: Row): void {
-        if (this.gridService.selectableOptions == null || !this.gridService.selectableOptions.enabled) {
+        if (!this.isSelectableGrid()) {
             return;
         }
-        if (this.gridService.selectableOptions.mode === "single") {
-            if (row.selected && (event.ctrlKey || event.metaKey)) {
-                this.gridService.selectedRows = [];
+
+        this.gridService.selectableOptions.mode === "single"
+            ? this.handleSingleSelection(event, row)
+            : this.handleMultipleSelection(event, row);
+
+        this.gridService.selectedRowsChange$.next(this.gridService.selectedRows);
+    }
+
+    private isSelectableGrid(): boolean {
+        return this.gridService.selectableOptions != null && !!this.gridService.selectableOptions.enabled;
+    }
+
+    private handleSingleSelection(event: MouseEvent, row: Row): void {
+        if (row.selected && (event.ctrlKey || event.metaKey)) {
+            this.deselectAllRows();
+        } else {
+            row.selected ? this.deselectAllRows() : this.selectRow(row);
+        }
+    }
+
+    private handleMultipleSelection(event: MouseEvent, row: Row): void {
+        const rowIndex = this.gridService.selectedRows.findIndex(r => r === row);
+
+        if (rowIndex === -1) {
+            this.selectRow(row);
+        } else {
+            if (event.ctrlKey || event.metaKey) {
+                this.gridService.selectedRows.splice(rowIndex, 1);
                 row.selected = false;
-            } else {
-                if (this.gridService.selectedRows.length !== 0) {
-                    this.gridService.selectedRows.forEach(r => (r.selected = false));
-                }
-                this.gridService.selectedRows = [row];
-                row.selected = true;
-            }
-        } else if (this.gridService.selectableOptions.mode === "multiple") {
-            if (this.gridService.selectedRows.length === 0) {
-                this.gridService.selectedRows = [row];
-                row.selected = true;
-            } else {
-                const index = this.gridService.selectedRows.findIndex(r => r === row);
-                if (index === -1) {
-                    this.gridService.selectedRows = [...this.gridService.selectedRows, row];
-                    row.selected = true;
-                } else {
-                    if (event.ctrlKey || event.metaKey) {
-                        this.gridService.selectedRows.splice(index, 1);
-                        row.selected = false;
-                    }
-                }
             }
         }
-        this.gridService.selectedRowsChange$.next(this.gridService.selectedRows);
+    }
+
+    private selectRow(row: Row): void {
+        this.deselectAllRows();
+        this.gridService.selectedRows = [row];
+        row.selected = true;
+    }
+
+    private deselectAllRows(): void {
+        if (this.gridService.selectedRows.length !== 0) {
+            this.gridService.selectedRows.forEach(r => (r.selected = false));
+        }
+        this.gridService.selectedRows = [];
     }
 
     public onGroupExpandChange(group: GridGroup): void {
