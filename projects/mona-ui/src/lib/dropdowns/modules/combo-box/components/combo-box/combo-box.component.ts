@@ -3,101 +3,156 @@ import {
     Component,
     ContentChild,
     ElementRef,
-    EventEmitter,
+    forwardRef,
+    HostBinding,
     Input,
+    OnDestroy,
     OnInit,
-    Output,
+    signal,
     SimpleChanges,
-    TemplateRef
+    TemplateRef,
+    ViewChild,
+    WritableSignal
 } from "@angular/core";
-import { AbstractDropDownListComponent } from "../../../../components/abstract-drop-down-list/abstract-drop-down-list.component";
 import { PopupListService } from "../../../../services/popup-list.service";
 import { PopupService } from "../../../../../popup/services/popup.service";
 import { PopupListItem } from "../../../../data/PopupListItem";
-import { SelectionMode } from "../../../../../models/SelectionMode";
 import { PopupListValueChangeEvent } from "../../../../data/PopupListValueChangeEvent";
-import { PopupSettings } from "../../../../../popup/models/PopupSettings";
 import { distinctUntilChanged, fromEvent, map, Observable, of, Subject, take, takeUntil } from "rxjs";
 import { Group } from "@mirei/ts-collections";
 import { PopupRef } from "../../../../../popup/models/PopupRef";
 import { Action } from "../../../../../utils/Action";
 import { ComboBoxGroupTemplateDirective } from "../../directives/combo-box-group-template.directive";
 import { ComboBoxItemTemplateDirective } from "../../directives/combo-box-item-template.directive";
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
+import { faChevronDown, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { ConnectionPositionPair } from "@angular/cdk/overlay";
 
 @Component({
     selector: "mona-combo-box",
     templateUrl: "./combo-box.component.html",
     styleUrls: ["./combo-box.component.scss"],
-    providers: [PopupListService],
+    providers: [
+        PopupListService,
+        {
+            provide: NG_VALUE_ACCESSOR,
+            useExisting: forwardRef(() => ComboBoxComponent),
+            multi: true
+        }
+    ],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ComboBoxComponent extends AbstractDropDownListComponent implements OnInit {
-    protected selectionMode: SelectionMode = "single";
+export class ComboBoxComponent implements OnInit, OnDestroy, ControlValueAccessor {
+    readonly #destroy$: Subject<void> = new Subject<void>();
+    #propagateChange: any = () => {};
+    #value: any;
+    public readonly clearIcon: IconDefinition = faTimes;
+    public readonly dropdownIcon: IconDefinition = faChevronDown;
     public readonly comboBoxValue$: Subject<string> = new Subject<string>();
-    public comboBoxValue: string = "";
-    public override valuePopupListItem?: PopupListItem;
+    public comboBoxValue: WritableSignal<string> = signal("");
+    public popupRef: PopupRef | null = null;
+    public valuePopupListItem?: PopupListItem;
+
+    @HostBinding("class.mona-dropdown")
+    public readonly hostClass: boolean = true;
 
     @Input()
     public allowCustomValue: boolean = true;
 
     @Input()
+    public data: Iterable<any> = [];
+
+    @Input()
+    public disabled: boolean = false;
+
+    @ViewChild("dropdownWrapper")
+    public dropdownWrapper!: ElementRef<HTMLDivElement>;
+
+    @Input()
     public filterable: boolean = false;
+
+    @Input()
+    public groupField?: string;
 
     @ContentChild(ComboBoxGroupTemplateDirective, { read: TemplateRef })
     public groupTemplate?: TemplateRef<any>;
+
+    @Input()
+    public itemDisabler?: Action<any, boolean> | string;
 
     @ContentChild(ComboBoxItemTemplateDirective, { read: TemplateRef })
     public itemTemplate?: TemplateRef<any>;
 
     @Input()
-    public override value?: any;
+    public placeholder?: string;
 
-    @Output()
-    public override valueChange: EventEmitter<any | any[]> = new EventEmitter<any>();
+    @ViewChild("popupTemplate")
+    public popupTemplate!: TemplateRef<any>;
+
+    @Input()
+    public showClearButton: boolean = false;
+
+    @Input()
+    public textField?: string;
+
+    @Input()
+    public valueField?: string;
 
     @Input()
     public valueNormalizer: Action<Observable<string>, Observable<any>> = (text$: Observable<string>) =>
         text$.pipe(map(value => value));
 
     public constructor(
-        protected override readonly elementRef: ElementRef<HTMLElement>,
-        protected override readonly popupListService: PopupListService,
-        protected override readonly popupService: PopupService
-    ) {
-        super(elementRef, popupListService, popupService);
-    }
+        private readonly elementRef: ElementRef<HTMLElement>,
+        private readonly popupListService: PopupListService,
+        private readonly popupService: PopupService
+    ) {}
 
     public clearValue(event: MouseEvent): void {
         event.stopImmediatePropagation();
-        this.comboBoxValue = "";
+        this.comboBoxValue.set("");
         this.updateValue(undefined);
+        this.#propagateChange?.(undefined);
     }
 
-    public override ngOnChanges(changes: SimpleChanges): void {
-        super.ngOnChanges(changes);
+    public close(): void {
+        this.popupRef?.close();
+        this.popupRef = null;
+    }
+
+    public ngOnChanges(changes: SimpleChanges): void {
         if (changes["data"] && !changes["data"].isFirstChange()) {
-            this.comboBoxValue = this.valuePopupListItem?.text ?? "";
+            this.initialize();
         }
     }
 
-    public override ngOnInit(): void {
-        super.ngOnInit();
+    public ngOnDestroy(): void {
+        this.#destroy$.next();
+        this.#destroy$.complete();
+    }
+
+    public ngOnInit(): void {
+        this.initialize();
         this.setEventListeners();
         this.setSubscriptions();
-        this.comboBoxValue = this.valuePopupListItem?.text ?? "";
     }
 
     public onKeydown(event: KeyboardEvent): void {
         if (event.key === "Enter") {
             const item = this.popupListService.viewListData
                 .selectMany(g => g.source)
-                .firstOrDefault(i => i.text.toLowerCase() === this.comboBoxValue.toLowerCase());
+                .firstOrDefault(i => i.text.toLowerCase() === this.comboBoxValue().toLowerCase());
             if (item) {
-                this.popupListService.selectItem(item, this.selectionMode);
-                this.updateValue(item);
+                if (item.dataEquals(this.value)) {
+                    this.close();
+                    return;
+                }
+                this.popupListService.selectItem(item, "single");
+                this.updateValue(item.data);
+                this.#propagateChange?.(item.data);
             } else {
                 if (this.allowCustomValue) {
-                    this.valueNormalizer(of(this.comboBoxValue)).subscribe(normalizedValue => {
+                    this.valueNormalizer(of(this.comboBoxValue())).subscribe(normalizedValue => {
                         this.data = [...this.data, normalizedValue];
                         this.popupListService.initializeListData({
                             data: [...this.data],
@@ -108,15 +163,26 @@ export class ComboBoxComponent extends AbstractDropDownListComponent implements 
                         });
                         const item = this.popupListService.viewListData
                             .selectMany(g => g.source)
-                            .firstOrDefault(i => i.text.toLowerCase() === this.comboBoxValue.toLowerCase());
+                            .firstOrDefault(i => i.text.toLowerCase() === this.comboBoxValue().toLowerCase());
                         if (item) {
-                            this.popupListService.selectItem(item, this.selectionMode);
-                            this.updateValue(item);
+                            this.popupListService.selectItem(item, "single");
+                            this.updateValue(item.data);
+                            this.#propagateChange?.(item.data);
                         }
                     });
                 } else {
-                    this.comboBoxValue = "";
+                    this.comboBoxValue.set("");
                 }
+            }
+            this.close();
+        } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+            if (this.popupRef) {
+                return;
+            }
+            const listItem = this.popupListService.navigate(event, "single");
+            if (listItem && !listItem.dataEquals(this.value)) {
+                this.updateValue(listItem.data);
+                this.#propagateChange?.(this.value);
             }
         } else if (event.key === "Escape") {
             this.close();
@@ -125,8 +191,9 @@ export class ComboBoxComponent extends AbstractDropDownListComponent implements 
 
     public onPopupListValueChange(event: PopupListValueChangeEvent): void {
         if (!event.value || event.value.length === 0) {
-            this.comboBoxValue = "";
+            this.comboBoxValue.set("");
             this.updateValue(undefined);
+            this.#propagateChange?.(undefined);
             return;
         }
         if (this.value && event.value[0].dataEquals(this.value)) {
@@ -138,14 +205,35 @@ export class ComboBoxComponent extends AbstractDropDownListComponent implements 
         if (event.via === "selection") {
             this.close();
         }
-        this.updateValue(event.value[0]);
+        this.updateValue(event.value[0].data);
+        this.#propagateChange?.(event.value[0].data);
     }
 
-    public override open(options: Partial<PopupSettings> = {}): PopupRef {
-        this.popupRef = super.open({
-            ...options,
-            hasBackdrop: false,
-            closeOnOutsideClick: false
+    public open(): void {
+        this.dropdownWrapper.nativeElement.focus();
+        this.popupRef = this.popupService.create({
+            anchor: this.dropdownWrapper,
+            content: this.popupTemplate,
+            hasBackdrop: true,
+            withPush: false,
+            width: this.elementRef.nativeElement.getBoundingClientRect().width,
+            popupClass: ["mona-dropdown-popup-content"],
+            positions: [
+                new ConnectionPositionPair(
+                    { originX: "start", originY: "bottom" },
+                    { overlayX: "start", overlayY: "top" },
+                    -1,
+                    0,
+                    "mona-dropdown-popup-content-bottom"
+                ),
+                new ConnectionPositionPair(
+                    { originX: "start", originY: "top" },
+                    { overlayX: "start", overlayY: "bottom" },
+                    -1,
+                    -1,
+                    "mona-dropdown-popup-content-top"
+                )
+            ]
         });
         window.setTimeout(() => {
             const input = this.elementRef.nativeElement.querySelector("input");
@@ -154,25 +242,55 @@ export class ComboBoxComponent extends AbstractDropDownListComponent implements 
                 input.setSelectionRange(-1, -1);
             }
         });
-        this.popupRef?.closed.pipe(take(1)).subscribe(() => {
+        this.popupRef.closed.pipe(take(1)).subscribe(() => {
+            this.popupRef = null;
+            (this.elementRef.nativeElement.firstElementChild as HTMLElement)?.focus();
+            this.popupListService.clearFilters();
             const item = this.popupListService.viewListData
                 .selectMany(g => g.source)
-                .firstOrDefault(i => i.text.toLowerCase() === this.comboBoxValue.toLowerCase());
+                .firstOrDefault(i => i.text.toLowerCase() === this.comboBoxValue().toLowerCase());
             if (!item) {
-                this.comboBoxValue = "";
+                this.comboBoxValue.set("");
             }
         });
-        return this.popupRef;
     }
 
-    protected override updateValue(listItem?: PopupListItem) {
-        super.updateValue(listItem);
-        this.comboBoxValue = listItem?.text ?? "";
+    public registerOnChange(fn: any): void {
+        this.#propagateChange = fn;
+    }
+
+    public registerOnTouched(fn: any): void {
+        void 0;
+    }
+
+    public setDisabledState(isDisabled: boolean): void {
+        this.disabled = isDisabled;
+    }
+
+    public writeValue(obj: any): void {
+        this.updateValue(obj);
+    }
+
+    private initialize(): void {
+        this.popupListService.initializeListData({
+            data: this.data,
+            disabler: this.itemDisabler,
+            textField: this.textField,
+            valueField: this.valueField,
+            groupField: this.groupField
+        });
+        this.valuePopupListItem = this.popupListService.viewListData
+            .selectMany(g => g.source)
+            .singleOrDefault(d => d.dataEquals(this.value));
+        if (this.valuePopupListItem) {
+            this.valuePopupListItem.selected = true;
+        }
+        this.comboBoxValue.set(this.valuePopupListItem?.text ?? "");
     }
 
     private setEventListeners(): void {
         fromEvent<FocusEvent>(this.elementRef.nativeElement, "focusout")
-            .pipe(takeUntil(this.componentDestroy$))
+            .pipe(takeUntil(this.#destroy$))
             .subscribe(event => {
                 const target = event.relatedTarget as HTMLElement;
                 if (
@@ -185,7 +303,7 @@ export class ComboBoxComponent extends AbstractDropDownListComponent implements 
                 this.close();
             });
         fromEvent<FocusEvent>(this.elementRef.nativeElement, "focusin")
-            .pipe(takeUntil(this.componentDestroy$))
+            .pipe(takeUntil(this.#destroy$))
             .subscribe(() => {
                 const input = this.elementRef.nativeElement.querySelector("input");
                 if (input) {
@@ -196,7 +314,7 @@ export class ComboBoxComponent extends AbstractDropDownListComponent implements 
     }
 
     private setSubscriptions(): void {
-        this.comboBoxValue$.pipe(takeUntil(this.componentDestroy$), distinctUntilChanged()).subscribe(value => {
+        this.comboBoxValue$.pipe(takeUntil(this.#destroy$), distinctUntilChanged()).subscribe(value => {
             if (this.filterable) {
                 if (!value) {
                     this.popupListService.viewListData = this.popupListService.sourceListData.toList();
@@ -226,7 +344,19 @@ export class ComboBoxComponent extends AbstractDropDownListComponent implements 
                 popupListItem.highlighted = true;
                 this.popupListService.scrollToListItem$.next(popupListItem);
             }
-            this.comboBoxValue = value;
+            this.comboBoxValue.set(value);
         });
+    }
+
+    private updateValue(value: any) {
+        this.#value = value;
+        this.valuePopupListItem = this.popupListService.viewListData
+            .selectMany(g => g.source)
+            .singleOrDefault(d => d.dataEquals(this.value));
+        this.comboBoxValue.set(this.valuePopupListItem?.text ?? "");
+    }
+
+    public get value(): any {
+        return this.#value;
     }
 }

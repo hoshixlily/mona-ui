@@ -224,16 +224,16 @@
                                                 style="width: 200px;" [disabled]="false"
                                                 [showClearButton]="true" [allowCustomValue]="true"
                                                 [valueNormalizer]="comboBoxValueNormalizer$"
-                                                [value]="selectedComboBoxDataItem" [itemDisabler]="dropdownItemDisabler"
-                                                (valueChange)="onComboBoxValueChange($event)">
+                                                [ngModel]="selectedComboBoxDataItem" [itemDisabler]="dropdownItemDisabler"
+                                                (ngModelChange)="onComboBoxValueChange($event)">
                                     <ng-template monaComboBoxGroupTemplate let-group>
                                         <span style="color: crimson; font-weight: bold;">{{group}}</span>
                                     </ng-template>
                                 </mona-combo-box>
                                 <mona-auto-complete [data]="dropdownListDataItems" textField="text" valueField="value"
                                                     groupField="group" [showClearButton]="true"
-                                                    [value]="autoCompleteValue"
-                                                    (valueChange)="onAutoCompleteValueChange($event)"
+                                                    [ngModel]="autoCompleteValue"
+                                                    (ngModelChange)="onAutoCompleteValueChange($event)"
                                                     style="width: 200px;"></mona-auto-complete>
                                 <input monaTextBox [ngModel]="textBoxValue">
                                 <!--                                <mona-text-box [ngModel]="textBoxValue"></mona-text-box>-->
@@ -241,9 +241,9 @@
                                 <mona-drop-down-list [data]="dropdownListDataItems" textField="text" valueField="value"
                                                      groupField="group" [filterable]="true" [disabled]="false"
                                                      [showClearButton]="true" placeholder="Select an item..."
-                                                     [value]="selectedDropdownListDataItem"
+                                                     [ngModel]="selectedDropdownListDataItem"
                                                      [itemDisabler]="dropdownItemDisabler"
-                                                     (valueChange)="onDropDownValueChange($event)"
+                                                     (ngModelChange)="onDropDownValueChange($event)"
                                                      style="width: 200px; ">
                                     <ng-template monaDropDownListItemTemplate let-dataItem let-listItem="listItem">
                                         <span style="color: deeppink;"
@@ -264,8 +264,8 @@
                                                    style="width: auto; min-width: 200px;"
                                                    [monaMultiSelectSummaryTag]="multiSelectTagCount" [filterable]="true"
                                                    [showClearButton]="true"
-                                                   [value]="selectedMultiSelectDataItems"
-                                                   (valueChange)="onMultiSelectValueChange($event)">
+                                                   [ngModel]="selectedMultiSelectDataItems"
+                                                   (ngModelChange)="onMultiSelectValueChange($event)">
                                     <ng-template monaMultiSelectItemTemplate let-dataItem>
                                         <span style="color: greenyellow; font-weight: bold">{{dataItem.text}}</span>
                                     </ng-template>

@@ -1,73 +1,92 @@
 <div class="mona-filter-menu">
     <div class="mona-filter-menu-item">
         <ng-container *ngIf="type==='string'">
-            <mona-drop-down-list [data]="stringFilterMenuDataItems|operatorFilter:operators" textField="text" valueField="value" [value]="selectedFilterMenuDataItemList[0]"
-                                 (valueChange)="onFilterOperatorChange(0, $event)"></mona-drop-down-list>
-            <mona-text-box [(ngModel)]="stringFilterValues[0]" [disabled]="selectedFilterMenuDataItemList[0]?.value|valuelessOperator"></mona-text-box>
+            <mona-drop-down-list [data]="stringFilterMenuDataItems|operatorFilter:operators" textField="text"
+                                 valueField="value" [ngModel]="selectedFilterMenuDataItemList[0]"
+                                 (ngModelChange)="onFilterOperatorChange(0, $event)"></mona-drop-down-list>
+            <mona-text-box [(ngModel)]="stringFilterValues[0]"
+                           [disabled]="selectedFilterMenuDataItemList[0]?.value|valuelessOperator"></mona-text-box>
         </ng-container>
 
         <ng-container *ngIf="type==='number'">
-            <mona-drop-down-list [data]="numericFilterMenuDataItems|operatorFilter:operators" textField="text" valueField="value" [value]="selectedFilterMenuDataItemList[0]"
-                                 (valueChange)="onFilterOperatorChange(0, $event)"></mona-drop-down-list>
-            <mona-numeric-text-box [(ngModel)]="numberFilterValues[0]" [disabled]="selectedFilterMenuDataItemList[0]?.value|valuelessOperator"></mona-numeric-text-box>
+            <mona-drop-down-list [data]="numericFilterMenuDataItems|operatorFilter:operators" textField="text"
+                                 valueField="value" [ngModel]="selectedFilterMenuDataItemList[0]"
+                                 (ngModelChange)="onFilterOperatorChange(0, $event)"></mona-drop-down-list>
+            <mona-numeric-text-box [(ngModel)]="numberFilterValues[0]"
+                                   [disabled]="selectedFilterMenuDataItemList[0]?.value|valuelessOperator"></mona-numeric-text-box>
         </ng-container>
 
         <ng-container *ngIf="type==='date'">
-            <mona-drop-down-list [data]="dateFilterMenuDataItems|operatorFilter:operators" textField="text" valueField="value" [value]="selectedFilterMenuDataItemList[0]"
-                                 (valueChange)="onFilterOperatorChange(0, $event)"></mona-drop-down-list>
+            <mona-drop-down-list [data]="dateFilterMenuDataItems|operatorFilter:operators" textField="text"
+                                 valueField="value" [ngModel]="selectedFilterMenuDataItemList[0]"
+                                 (ngModelChange)="onFilterOperatorChange(0, $event)"></mona-drop-down-list>
 
-            <mona-date-picker [(ngModel)]="dateFilterValues[0]" [format]="dateOptions.format" *ngIf="dateOptions.type==='date'"
+            <mona-date-picker [(ngModel)]="dateFilterValues[0]" [format]="dateOptions.format"
+                              *ngIf="dateOptions.type==='date'"
                               [disabled]="selectedFilterMenuDataItemList[0]?.value|valuelessOperator"></mona-date-picker>
 
-            <mona-date-time-picker [(ngModel)]="dateFilterValues[0]" [format]="dateOptions.format" *ngIf="dateOptions.type==='datetime'"
+            <mona-date-time-picker [(ngModel)]="dateFilterValues[0]" [format]="dateOptions.format"
+                                   *ngIf="dateOptions.type==='datetime'"
                                    [disabled]="selectedFilterMenuDataItemList[0]?.value|valuelessOperator"></mona-date-time-picker>
 
-            <mona-time-picker [(ngModel)]="dateFilterValues[0]" [format]="dateOptions.format" *ngIf="dateOptions.type==='time'"
+            <mona-time-picker [(ngModel)]="dateFilterValues[0]" [format]="dateOptions.format"
+                              *ngIf="dateOptions.type==='time'"
                               [disabled]="selectedFilterMenuDataItemList[0]?.value|valuelessOperator"></mona-time-picker>
         </ng-container>
 
         <ng-container *ngIf="type==='boolean'">
-            <mona-drop-down-list [data]="booleanFilterMenuDataItems|operatorFilter:operators" textField="text" valueField="value" [value]="selectedFilterMenuDataItemList[0]"
-                                 (valueChange)="onFilterOperatorChange(0, $event)"></mona-drop-down-list>
+            <mona-drop-down-list [data]="booleanFilterMenuDataItems|operatorFilter:operators" textField="text"
+                                 valueField="value" [ngModel]="selectedFilterMenuDataItemList[0]"
+                                 (ngModelChange)="onFilterOperatorChange(0, $event)"></mona-drop-down-list>
         </ng-container>
 
     </div>
     <div class="mona-filter-menu-item" *ngIf="firstFilterValid">
         <mona-button-group selection="single" [disabled]="!firstFilterValid">
-            <button monaButton [selected]="item.value === selectedConnectorItem?.value" (click)="onConnectorChange(item)" *ngFor="let item of connectorDataItems">{{item.text}}</button>
+            <button monaButton [selected]="item.value === selectedConnectorItem?.value"
+                    (click)="onConnectorChange(item)" *ngFor="let item of connectorDataItems">{{item.text}}</button>
         </mona-button-group>
     </div>
     <div class="mona-filter-menu-item" *ngIf="!!selectedConnectorItem">
         <ng-container *ngIf="type==='string'">
-            <mona-drop-down-list [data]="stringFilterMenuDataItems|operatorFilter:operators" textField="text" valueField="value" [value]="selectedFilterMenuDataItemList[1]"
-                                 (valueChange)="onFilterOperatorChange(1, $event)"></mona-drop-down-list>
-            <mona-text-box [(ngModel)]="stringFilterValues[1]" [disabled]="selectedFilterMenuDataItemList[1]?.value|valuelessOperator"></mona-text-box>
+            <mona-drop-down-list [data]="stringFilterMenuDataItems|operatorFilter:operators" textField="text"
+                                 valueField="value" [ngModel]="selectedFilterMenuDataItemList[1]"
+                                 (ngModelChange)="onFilterOperatorChange(1, $event)"></mona-drop-down-list>
+            <mona-text-box [(ngModel)]="stringFilterValues[1]"
+                           [disabled]="selectedFilterMenuDataItemList[1]?.value|valuelessOperator"></mona-text-box>
         </ng-container>
 
         <ng-container *ngIf="type==='number'">
-            <mona-drop-down-list [data]="numericFilterMenuDataItems|operatorFilter:operators" textField="text" valueField="value" [value]="selectedFilterMenuDataItemList[1]"
-                                 (valueChange)="onFilterOperatorChange(1, $event)"></mona-drop-down-list>
+            <mona-drop-down-list [data]="numericFilterMenuDataItems|operatorFilter:operators" textField="text"
+                                 valueField="value" [ngModel]="selectedFilterMenuDataItemList[1]"
+                                 (ngModelChange)="onFilterOperatorChange(1, $event)"></mona-drop-down-list>
 
-            <mona-numeric-text-box [(ngModel)]="numberFilterValues[1]" [disabled]="selectedFilterMenuDataItemList[0]?.value|valuelessOperator"></mona-numeric-text-box>
+            <mona-numeric-text-box [(ngModel)]="numberFilterValues[1]"
+                                   [disabled]="selectedFilterMenuDataItemList[0]?.value|valuelessOperator"></mona-numeric-text-box>
         </ng-container>
 
         <ng-container *ngIf="type==='date'">
-            <mona-drop-down-list [data]="dateFilterMenuDataItems|operatorFilter:operators" textField="text" valueField="value" [value]="selectedFilterMenuDataItemList[1]"
-                                 (valueChange)="onFilterOperatorChange(1, $event)"></mona-drop-down-list>
+            <mona-drop-down-list [data]="dateFilterMenuDataItems|operatorFilter:operators" textField="text"
+                                 valueField="value" [ngModel]="selectedFilterMenuDataItemList[1]"
+                                 (ngModelChange)="onFilterOperatorChange(1, $event)"></mona-drop-down-list>
 
-            <mona-date-picker [(ngModel)]="dateFilterValues[1]" [format]="dateOptions.format" *ngIf="dateOptions.type==='date'"
+            <mona-date-picker [(ngModel)]="dateFilterValues[1]" [format]="dateOptions.format"
+                              *ngIf="dateOptions.type==='date'"
                               [disabled]="selectedFilterMenuDataItemList[1]?.value|valuelessOperator"></mona-date-picker>
 
-            <mona-date-time-picker [(ngModel)]="dateFilterValues[1]" [format]="dateOptions.format" *ngIf="dateOptions.type==='datetime'"
+            <mona-date-time-picker [(ngModel)]="dateFilterValues[1]" [format]="dateOptions.format"
+                                   *ngIf="dateOptions.type==='datetime'"
                                    [disabled]="selectedFilterMenuDataItemList[1]?.value|valuelessOperator"></mona-date-time-picker>
 
-            <mona-time-picker [(ngModel)]="dateFilterValues[1]" [format]="dateOptions.format" *ngIf="dateOptions.type==='time'"
+            <mona-time-picker [(ngModel)]="dateFilterValues[1]" [format]="dateOptions.format"
+                              *ngIf="dateOptions.type==='time'"
                               [disabled]="selectedFilterMenuDataItemList[1]?.value|valuelessOperator"></mona-time-picker>
         </ng-container>
 
         <ng-container *ngIf="type==='boolean'">
-            <mona-drop-down-list [data]="booleanFilterMenuDataItems|operatorFilter:operators" textField="text" valueField="value" [value]="selectedFilterMenuDataItemList[1]"
-                                 (valueChange)="onFilterOperatorChange(1, $event)"></mona-drop-down-list>
+            <mona-drop-down-list [data]="booleanFilterMenuDataItems|operatorFilter:operators" textField="text"
+                                 valueField="value" [ngModel]="selectedFilterMenuDataItemList[1]"
+                                 (ngModelChange)="onFilterOperatorChange(1, $event)"></mona-drop-down-list>
         </ng-container>
 
     </div>
