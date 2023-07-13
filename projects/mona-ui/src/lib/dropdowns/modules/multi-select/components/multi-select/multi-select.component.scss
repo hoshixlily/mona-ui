@@ -8,12 +8,13 @@ div.mona-multi-select-value {
     display: flex;
     align-items: center;
     width: 100%;
-    padding: 0 2px;
+    padding: 1px 2px;
     & > div:first-child {
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
         width: 100%;
+        row-gap: 1px;
     }
     & mona-chip {
         &:not(:last-child) {
