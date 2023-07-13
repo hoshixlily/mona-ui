@@ -470,6 +470,9 @@ div.mona-time-selector {
                 background-color: var(--mona-background-hover);
             }
         }
+        &:not(:last-child) {
+            border-right: 1px solid var(--mona-border-color);
+        }
     }
 }
 

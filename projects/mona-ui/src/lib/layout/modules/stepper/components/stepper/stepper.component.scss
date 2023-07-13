@@ -87,7 +87,7 @@ div.mona-stepper-track {
     }
     &-horizontal {
         width: 100%;
-        height: 8px;
+        height: 6px;
         top: calc(calc($step-height - 8px) / 2);
         & > div {
             height: 100%;

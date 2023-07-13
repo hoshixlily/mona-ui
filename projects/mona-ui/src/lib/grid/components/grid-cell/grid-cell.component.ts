@@ -12,7 +12,19 @@ import { Row } from "../../models/Row";
 import { FormControl, FormGroup } from "@angular/forms";
 import { FocusMonitor, FocusOrigin } from "@angular/cdk/a11y";
 import { GridService } from "../../services/grid.service";
-import { asyncScheduler, filter, fromEvent, ReplaySubject, Subject, take, takeUntil, tap, timer } from "rxjs";
+import {
+    asyncScheduler,
+    debounceTime,
+    distinctUntilChanged,
+    filter,
+    fromEvent,
+    map,
+    Subject,
+    take,
+    takeUntil,
+    tap,
+    timer
+} from "rxjs";
 import { CellEditEvent } from "../../models/CellEditEvent";
 
 @Component({
@@ -295,6 +307,20 @@ export class GridCellComponent implements OnInit, OnDestroy {
                 }
                 this.cdr.markForCheck();
             });
+        if (this.column.filterType === "date") {
+            this.editForm.controls[this.column.field].valueChanges
+                .pipe(
+                    takeUntil(this.#destroy),
+                    map(value => {
+                        return value as Date;
+                    })
+                )
+                .subscribe(value => {
+                    const activeElement = document.activeElement as HTMLElement;
+                    this.editing = false;
+                    this.gridService.isInEditMode = false;
+                });
+        }
     }
 
     private updateCellValue(): void {

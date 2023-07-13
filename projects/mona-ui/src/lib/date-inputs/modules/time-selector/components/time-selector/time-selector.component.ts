@@ -4,6 +4,7 @@ import {
     ChangeDetectorRef,
     Component,
     ElementRef,
+    forwardRef,
     Input,
     OnDestroy,
     OnInit,
@@ -12,12 +13,20 @@ import {
 import { DateTime } from "luxon";
 import { Enumerable } from "@mirei/ts-collections";
 import { AbstractDateInputComponent } from "../../../../components/abstract-date-input/abstract-date-input.component";
+import { NG_VALUE_ACCESSOR } from "@angular/forms";
 
 @Component({
     selector: "mona-time-selector",
     templateUrl: "./time-selector.component.html",
     styleUrls: ["./time-selector.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [
+        {
+            provide: NG_VALUE_ACCESSOR,
+            useExisting: forwardRef(() => TimeSelectorComponent),
+            multi: true
+        }
+    ]
 })
 export class TimeSelectorComponent extends AbstractDateInputComponent implements OnInit, OnDestroy, AfterViewInit {
     public hour: number | null = null;

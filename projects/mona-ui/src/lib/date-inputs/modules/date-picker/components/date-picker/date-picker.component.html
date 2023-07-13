@@ -7,5 +7,5 @@
 </div>
 
 <ng-template #datePopupTemplate>
-    <mona-calendar [disabledDates]="disabledDates" [min]="min" [max]="max" [value]="value" (valueChange)="onCalendarValueChange($event)"></mona-calendar>
+    <mona-calendar [disabledDates]="disabledDates" [min]="min" [max]="max" [ngModel]="value" (ngModelChange)="onCalendarValueChange($event)"></mona-calendar>
 </ng-template>

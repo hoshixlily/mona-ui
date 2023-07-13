@@ -55,22 +55,9 @@ export abstract class AbstractDateInputComponent implements OnInit, OnDestroy, O
     @Input()
     public readonly: boolean = false;
 
-    @Input()
-    public set value(date: Date | null) {
-        this.#value = date;
-        if (date) {
-            this.currentDateString = DateTime.fromJSDate(date).toFormat(this.format);
-        } else {
-            this.currentDateString = "";
-        }
-    }
-
     public get value(): Date | null {
         return this.#value;
     }
-
-    @Output()
-    public valueChange: EventEmitter<Date | null> = new EventEmitter<Date | null>();
 
     protected constructor(protected readonly cdr: ChangeDetectorRef) {}
 
@@ -99,11 +86,12 @@ export abstract class AbstractDateInputComponent implements OnInit, OnDestroy, O
         this.disabled = isDisabled;
     }
 
-    public writeValue(obj: any): void {
-        if (obj == null) {
-            this.value = null;
-        } else if (obj instanceof Date) {
-            this.value = obj;
+    public writeValue(date: Date | null | undefined): void {
+        this.#value = date ?? null;
+        if (date == null) {
+            this.currentDateString = "";
+        } else {
+            this.currentDateString = DateTime.fromJSDate(date).toFormat(this.format);
         }
         this.setDateValues();
     }
@@ -115,7 +103,6 @@ export abstract class AbstractDateInputComponent implements OnInit, OnDestroy, O
         } else {
             this.currentDateString = "";
         }
-        this.valueChange.emit(date);
         this.#propagateChange?.(date);
         this.cdr.markForCheck();
     }

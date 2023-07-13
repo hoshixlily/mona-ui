@@ -1,15 +1,23 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnInit } from "@angular/core";
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, forwardRef, OnInit } from "@angular/core";
 import { DateTime } from "luxon";
 import { CalendarView } from "../../../../models/CalendarView";
 import { Dictionary } from "@mirei/ts-collections";
 import { faChevronLeft, faChevronRight, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { AbstractDateInputComponent } from "../../../../components/abstract-date-input/abstract-date-input.component";
+import { NG_VALUE_ACCESSOR } from "@angular/forms";
 
 @Component({
     selector: "mona-calendar",
     templateUrl: "./calendar.component.html",
     styleUrls: ["./calendar.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    providers: [
+        {
+            provide: NG_VALUE_ACCESSOR,
+            useExisting: forwardRef(() => CalendarComponent),
+            multi: true
+        }
+    ]
 })
 export class CalendarComponent extends AbstractDateInputComponent implements OnInit {
     public readonly nextMonthIcon: IconDefinition = faChevronRight;
