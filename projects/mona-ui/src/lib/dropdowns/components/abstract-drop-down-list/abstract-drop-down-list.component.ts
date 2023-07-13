@@ -216,33 +216,36 @@ export abstract class AbstractDropDownListComponent implements OnInit, OnDestroy
     }
 
     protected updateValue(listItem: PopupListItem | PopupListItem[] | null | undefined): void {
-        if (this.selectionMode === "single") {
-            if (!listItem) {
-                this.value = undefined;
-                this.valuePopupListItem = undefined;
-                this.valueChange.emit(undefined);
-                return;
-            }
-            const item = listItem as PopupListItem;
-            if (item.dataEquals(this.value)) {
-                return;
-            }
-            this.value = item.data;
-            this.valuePopupListItem = item;
-            this.valueChange.emit(item.data);
-        } else {
-            if (!listItem) {
-                this.value = [];
-                this.valuePopupListItem = [];
-                this.valueChange.emit([]);
-                return;
-            }
-            const items = listItem as PopupListItem[];
-            this.valuePopupListItem = [...items];
-            const values = items.map(v => v.data);
-            this.value = values;
-            this.valueChange.emit(values);
+        if (!listItem) {
+            const isSingleSelectionMode = this.selectionMode === "single";
+            this.value = isSingleSelectionMode ? undefined : [];
+            this.valuePopupListItem = isSingleSelectionMode ? undefined : [];
+            this.valueChange.emit(isSingleSelectionMode ? undefined : []);
+            return;
         }
+
+        if (this.selectionMode === "single") {
+            this.updateForSingleSelection(listItem as PopupListItem);
+        } else {
+            this.updateForMultipleSelection(listItem as PopupListItem[]);
+        }
+    }
+
+    private updateForSingleSelection(item: PopupListItem): void {
+        if (item.dataEquals(this.value)) {
+            return;
+        }
+
+        this.value = item.data;
+        this.valuePopupListItem = item;
+        this.valueChange.emit(item.data);
+    }
+
+    private updateForMultipleSelection(items: PopupListItem[]): void {
+        this.valuePopupListItem = [...items];
+        const values = items.map(v => v.data);
+        this.value = values;
+        this.valueChange.emit(values);
     }
 
     protected updateValuePopupListItems(): void {
