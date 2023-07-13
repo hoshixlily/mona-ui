@@ -224,8 +224,8 @@
                                                 style="width: 200px;" [disabled]="false"
                                                 [showClearButton]="true" [allowCustomValue]="true"
                                                 [valueNormalizer]="comboBoxValueNormalizer$"
-                                                [value]="selectedComboBoxDataItem" [itemDisabler]="dropdownItemDisabler"
-                                                (valueChange)="onComboBoxValueChange($event)">
+                                                [ngModel]="selectedComboBoxDataItem" [itemDisabler]="dropdownItemDisabler"
+                                                (ngModelChange)="onComboBoxValueChange($event)">
                                     <ng-template monaComboBoxGroupTemplate let-group>
                                         <span style="color: crimson; font-weight: bold;">{{group}}</span>
                                     </ng-template>
