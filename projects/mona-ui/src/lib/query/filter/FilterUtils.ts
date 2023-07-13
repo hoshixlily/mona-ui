@@ -10,28 +10,22 @@ export abstract class FilterUtils {
         return (item: T) => {
             const filters = descriptor.filters;
             const logic = descriptor.logic;
+
+            const processFilter = (f: any) => {
+                if (f.hasOwnProperty("field")) {
+                    return FilterUtils.descriptorToPredicate(f as FilterDescriptor, fieldSelector)(item);
+                } else {
+                    return FilterUtils.compositeDescriptorToPredicate(
+                        f as CompositeFilterDescriptor,
+                        fieldSelector
+                    )(item);
+                }
+            };
+
             if (logic === "and") {
-                return filters.every(f => {
-                    if (f.hasOwnProperty("field")) {
-                        return FilterUtils.descriptorToPredicate(f as FilterDescriptor, fieldSelector)(item);
-                    } else {
-                        return FilterUtils.compositeDescriptorToPredicate(
-                            f as CompositeFilterDescriptor,
-                            fieldSelector
-                        )(item);
-                    }
-                });
+                return filters.every(processFilter);
             } else if (logic === "or") {
-                return filters.some(f => {
-                    if (f.hasOwnProperty("field")) {
-                        return FilterUtils.descriptorToPredicate(f as FilterDescriptor, fieldSelector)(item);
-                    } else {
-                        return FilterUtils.compositeDescriptorToPredicate(
-                            f as CompositeFilterDescriptor,
-                            fieldSelector
-                        )(item);
-                    }
-                });
+                return filters.some(processFilter);
             } else {
                 return false;
             }
@@ -69,13 +63,21 @@ export abstract class FilterUtils {
                 case "lte":
                     return value == null || descriptor.value == null ? false : value <= descriptor.value;
                 case "startswith":
-                    return value == null || descriptor.value == null ? false : value.startsWith(descriptor.value);
+                    return typeof value === "string"
+                        ? value.toLowerCase().startsWith(descriptor.value.toLowerCase())
+                        : false;
                 case "endswith":
-                    return value == null || descriptor.value == null ? false : value.endsWith(descriptor.value);
+                    return typeof value === "string"
+                        ? value.toLowerCase().endsWith(descriptor.value.toLowerCase())
+                        : false;
                 case "contains":
-                    return value == null || descriptor.value == null ? false : value.includes(descriptor.value);
+                    return typeof value === "string"
+                        ? value.toLowerCase().includes(descriptor.value.toLowerCase())
+                        : false;
                 case "doesnotcontain":
-                    return value == null || descriptor.value == null ? false : !value.includes(descriptor.value);
+                    return typeof value === "string"
+                        ? !value.toLowerCase().includes(descriptor.value.toLowerCase())
+                        : false;
                 case "isnull":
                     return value == null;
                 case "isnotnull":
