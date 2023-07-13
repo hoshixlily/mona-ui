@@ -69,7 +69,7 @@
                                     </ng-template>
                                     <ng-template monaGridCellTemplate>
                                         <img
-                                            [ngSrc]="'https://photos.smugmug.com/photos/i-ZfvdSzh/0/Ti/i-ZfvdSzh-Ti.png'"
+                                            [ngSrc]="'https://photos.smugmug.com/photos/i-ZfvdSzh/0/Th/i-ZfvdSzh-Th.png'"
                                             [width]="60" [height]="60" style="border: 2px solid black;">
                                     </ng-template>
                                 </mona-grid-column>
@@ -283,19 +283,19 @@
                                 <button monaButton>Line 2</button>
 
                                 <mona-date-picker format="d/M/yyyy" style="width: 250px;" [readonly]="false"
-                                                  [min]="dateMin" [max]="dateMax" [value]="datePickerValue"
-                                                  (valueChange)="onDatePickerValueChange($event)"></mona-date-picker>
+                                                  [min]="dateMin" [max]="dateMax" [ngModel]="datePickerValue"
+                                                  (ngModelChange)="onDatePickerValueChange($event)"></mona-date-picker>
 
                                 <mona-time-picker [hourFormat]="dateFormat24Hours ? '24':'12'" [showSeconds]="true"
-                                                  [value]="timePickerValue"
-                                                  (valueChange)="onTimePickerValueChange($event)"
+                                                  [ngModel]="timePickerValue"
+                                                  (ngModelChange)="onTimePickerValueChange($event)"
                                                   [format]="dateFormat24Hours ? 'HH:mm:ss' : 'hh:mm:ss a'"
                                                   style="width: 200px;"></mona-time-picker>
 
                                 <mona-date-time-picker format="dd/MM/yyyy hh:mm a" style="width: 250px;"
                                                        [hourFormat]="dateFormat24Hours ? '24' : '12'" [readonly]="false"
-                                                       [value]="dateTimePickerValue"
-                                                       (valueChange)="onDateTimePickerValueChange($event)"></mona-date-time-picker>
+                                                       [ngModel]="dateTimePickerValue"
+                                                       (ngModelChange)="onDateTimePickerValueChange($event)"></mona-date-time-picker>
 
                                 <mona-switch [labelOff]="'12'" labelOn="24" [(ngModel)]="dateFormat24Hours"
                                              style="margin-right: 5px;"></mona-switch>
@@ -488,7 +488,7 @@
                                     <mona-splitter orientation="horizontal">
                                         <mona-splitter-pane [collapsible]="true">
                                             <div style="width: 100%; height: 100%; padding: 20px;">
-                                                <mona-calendar [(value)]="calendarValue"
+                                                <mona-calendar [(ngModel)]="calendarValue"
                                                                style="width: 300px;"></mona-calendar>
                                             </div>
                                         </mona-splitter-pane>
