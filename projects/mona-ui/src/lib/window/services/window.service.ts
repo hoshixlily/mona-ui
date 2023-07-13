@@ -100,8 +100,12 @@ export class WindowService {
             if (settings.maxHeight != null) {
                 element.style.maxHeight = `${settings.maxHeight}px`;
             }
-            element.style.top = settings.top ? `${settings.top}px` : `calc(50% - ${element.offsetHeight / 2}px)`;
-            element.style.left = settings.left ? `${settings.left}px` : `calc(50% - ${element.offsetWidth / 2}px)`;
+            element.style.top = settings.top
+                ? `${settings.top}px`
+                : `calc(50% - ${element.getBoundingClientRect().height / 2}px)`;
+            element.style.left = settings.left
+                ? `${settings.left}px`
+                : `calc(50% - ${element.getBoundingClientRect().width / 2}px)`;
             element.classList.remove("mona-window-invisible");
         });
         return windowReferenceHolder.windowReference.windowRef;

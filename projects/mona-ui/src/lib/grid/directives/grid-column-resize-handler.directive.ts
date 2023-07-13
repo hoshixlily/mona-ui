@@ -44,7 +44,7 @@ export class GridColumnResizeHandlerDirective implements AfterViewInit, OnDestro
 
     private onMouseDown(event: MouseEvent) {
         const element = this.elementRef.nativeElement;
-        const initialWidth = this.column.calculatedWidth ?? element.offsetWidth;
+        const initialWidth = this.column.calculatedWidth ?? element.getBoundingClientRect().width;
         const initialX = event.clientX;
         const oldSelectStart = document.onselectstart;
         const oldDragStart = document.ondragstart;
@@ -69,16 +69,16 @@ export class GridColumnResizeHandlerDirective implements AfterViewInit, OnDestro
                 return;
             }
 
-            const oldWidth = this.column.calculatedWidth || element.offsetWidth;
+            const oldWidth = this.column.calculatedWidth || element.getBoundingClientRect().width;
             this.column.calculatedWidth = initialWidth + deltaX;
             if (headerTableElement) {
                 headerTableElement.style.width = `${
-                    headerTableElement.offsetWidth + (this.column.calculatedWidth - oldWidth)
+                    headerTableElement.getBoundingClientRect().width + (this.column.calculatedWidth - oldWidth)
                 }px`;
             }
             if (bodyTableElement) {
                 bodyTableElement.style.width = `${
-                    bodyTableElement.offsetWidth + (this.column.calculatedWidth - oldWidth)
+                    bodyTableElement.getBoundingClientRect().width + (this.column.calculatedWidth - oldWidth)
                 }px`;
             }
 

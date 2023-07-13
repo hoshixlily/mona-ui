@@ -32,8 +32,8 @@ export class SplitButtonComponent implements AfterViewInit, AfterContentInit, On
     public readonly menuIcon: IconDefinition = faChevronDown;
     public menuItems: MenuItem[] = [];
     public popupOffset: PopupOffset = {
-        horizontal: 0,
-        vertical: 0.5
+        horizontal: -1,
+        vertical: 0
     };
     public popupWidth: number = 0;
 
@@ -73,7 +73,7 @@ export class SplitButtonComponent implements AfterViewInit, AfterContentInit, On
     public ngAfterViewInit(): void {
         window.setTimeout(() => {
             this.popupWidth = this.wrapperElementRef.nativeElement.getBoundingClientRect().width - 1;
-            this.popupOffset.horizontal = -this.mainButtonElementRef.nativeElement.offsetWidth - 1;
+            this.popupOffset.horizontal = -this.mainButtonElementRef.nativeElement.getBoundingClientRect().width - 1;
             this.contextMenuComponent.setPrecise(false);
             this.cdr.detectChanges();
         });

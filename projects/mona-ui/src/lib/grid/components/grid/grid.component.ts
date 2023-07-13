@@ -8,12 +8,10 @@ import {
     ElementRef,
     EventEmitter,
     Input,
-    OnChanges,
     OnDestroy,
     OnInit,
     Output,
     QueryList,
-    SimpleChanges,
     ViewChild
 } from "@angular/core";
 import { GridService } from "../../services/grid.service";
@@ -38,7 +36,7 @@ import { CellEditEvent } from "../../models/CellEditEvent";
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [GridService]
 })
-export class GridComponent implements OnInit, AfterViewInit, OnDestroy, OnChanges, AfterContentInit {
+export class GridComponent implements OnInit, AfterViewInit, OnDestroy, AfterContentInit {
     #destroy$: Subject<void> = new Subject<void>();
     #filter: CompositeFilterDescriptor[] = [];
     #sort: SortDescriptor[] = [];
@@ -85,7 +83,6 @@ export class GridComponent implements OnInit, AfterViewInit, OnDestroy, OnChange
     @ViewChild("gridHeaderElement")
     public set gridHeaderElement(value: ElementRef<HTMLDivElement>) {
         this.gridService.gridHeaderElement = value.nativeElement;
-        window.setTimeout(() => this.setInitialCalculatedWidthOfColumns());
     }
 
     @ViewChild("groupColumnList")
@@ -160,10 +157,9 @@ export class GridComponent implements OnInit, AfterViewInit, OnDestroy, OnChange
     }
 
     public ngAfterViewInit(): void {
+        this.setInitialCalculatedWidthOfColumns();
         this.cdr.detectChanges();
     }
-
-    public ngOnChanges(changes: SimpleChanges): void {}
 
     public ngOnDestroy(): void {
         this.#destroy$.next();
@@ -350,7 +346,7 @@ export class GridComponent implements OnInit, AfterViewInit, OnDestroy, OnChange
             const thList = this.gridService.gridHeaderElement?.querySelectorAll("th");
             for (const [cx, columnTh] of Array.from(thList).entries()) {
                 const gridCol = this.gridService.columns[cx];
-                gridCol.calculatedWidth = gridCol.width ?? columnTh.offsetWidth;
+                gridCol.calculatedWidth = gridCol.width ?? columnTh.getBoundingClientRect().width;
             }
         }
     }

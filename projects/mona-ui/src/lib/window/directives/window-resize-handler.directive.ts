@@ -40,12 +40,12 @@ export class WindowResizeHandlerDirective implements AfterViewInit, OnDestroy {
 
     public onMouseDown(event: MouseEvent) {
         const element = this.windowRef.element;
-        const initialWidth = element.offsetWidth;
-        const initialHeight = element.offsetHeight;
+        const initialWidth = element.getBoundingClientRect().width;
+        const initialHeight = element.getBoundingClientRect().height;
         const initialX = event.clientX;
         const initialY = event.clientY;
-        const initialTop = element.offsetTop;
-        const initialLeft = element.offsetLeft;
+        const initialTop = element.getBoundingClientRect().top;
+        const initialLeft = element.getBoundingClientRect().left;
         const oldSelectStart = document.onselectstart;
         const oldDragStart = document.ondragstart;
 

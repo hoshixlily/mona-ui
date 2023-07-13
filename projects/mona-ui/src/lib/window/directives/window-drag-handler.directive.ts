@@ -33,8 +33,8 @@ export class WindowDragHandlerDirective implements AfterViewInit, OnDestroy {
         const element = this.elementRef.nativeElement.parentElement?.parentElement?.parentElement as HTMLElement;
         const initialX = event.clientX;
         const initialY = event.clientY;
-        const initialTop = element.offsetTop;
-        const initialLeft = element.offsetLeft;
+        const initialTop = element.getBoundingClientRect().top;
+        const initialLeft = element.getBoundingClientRect().left;
         let dragInitiated = false;
 
         const onMouseMove = (event: MouseEvent) => {

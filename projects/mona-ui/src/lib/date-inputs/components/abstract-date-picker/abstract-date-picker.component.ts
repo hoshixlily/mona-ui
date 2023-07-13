@@ -36,7 +36,7 @@ export abstract class AbstractDatePickerComponent extends AbstractDateInputCompo
 
     protected constructor(
         protected override readonly cdr: ChangeDetectorRef,
-        protected readonly elementRef: ElementRef,
+        protected readonly elementRef: ElementRef<HTMLElement>,
         protected readonly focusMonitor: FocusMonitor,
         protected readonly popupService: PopupService
     ) {
@@ -93,7 +93,7 @@ export abstract class AbstractDatePickerComponent extends AbstractDateInputCompo
         this.popupRef = this.popupService.create({
             anchor: this.popupAnchor,
             content: this.datePopupTemplateRef,
-            width: this.elementRef.nativeElement.offsetWidth,
+            width: this.elementRef.nativeElement.getBoundingClientRect().width,
             minWidth: 200,
             popupClass: "mona-date-input-popup",
             hasBackdrop: false,

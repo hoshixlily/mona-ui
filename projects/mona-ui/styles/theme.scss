@@ -195,7 +195,7 @@ button[monaButton] {
     @include font-medium;
     padding: 4px 8px;
 
-    transition: background-color 0.15s ease-in, border 0.15s ease-in, color 0.15s ease-in, box-shadow 0.15s ease-in;
+    transition: background-color 0.15s ease-out, border 0.15s ease-out, color 0.15s ease-out, box-shadow 0.15s ease-out;
 
     &.mona-disabled {
         @include disabled;
@@ -669,7 +669,6 @@ input[type="checkbox"][monaCheckBox] {
             width: 20px;
             height: 20px;
             margin-right: 4px;
-            vertical-align: middle;
             color: transparent;
             transition: background-color 0.3s ease-out, color 0.3s ease-out, border 0.3s ease-out, box-shadow 0.3s ease-out;
         }

@@ -41,14 +41,14 @@ export class TooltipComponent implements OnInit {
         let popupLeft = 0;
         const anchorWidth =
             this.target instanceof Element
-                ? (this.target as HTMLElement).offsetWidth
-                : this.target.nativeElement.offsetWidth;
+                ? (this.target as HTMLElement).getBoundingClientRect().width
+                : (this.target.nativeElement as HTMLElement).getBoundingClientRect().width;
         const anchorHeight =
             this.target instanceof Element
-                ? (this.target as HTMLElement).offsetHeight
-                : this.target.nativeElement.offsetHeight;
-        const popupWidth = this.tooltipElement?.offsetWidth ?? 0;
-        const popupHeight = this.tooltipElement?.offsetHeight ?? 0;
+                ? (this.target as HTMLElement).getBoundingClientRect().height
+                : (this.target.nativeElement as HTMLElement).getBoundingClientRect().height;
+        const popupWidth = this.tooltipElement?.getBoundingClientRect()?.width ?? 0;
+        const popupHeight = this.tooltipElement?.getBoundingClientRect()?.height ?? 0;
         if (!this.tooltipOverlayElement) {
             return;
         }

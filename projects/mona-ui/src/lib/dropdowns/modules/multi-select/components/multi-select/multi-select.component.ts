@@ -118,10 +118,6 @@ export class MultiSelectComponent extends AbstractDropDownListComponent implemen
         this.updateValue(remainingItems);
     }
 
-    // public override open(options: Partial<PopupSettings> = {}): PopupRef {
-    //     return super.open({ width: this.elementRef.nativeElement.offsetWidth + 2 });
-    // }
-
     private containsValue(popupListItems: PopupListItem[], value: any): boolean {
         return popupListItems.some(popupListItem => popupListItem.dataEquals(value));
     }

@@ -21,8 +21,8 @@ export class WindowReference<R = unknown> implements WindowRefParams<R> {
     public constructor(private readonly options: WindowReferenceOptions) {}
 
     public center(): void {
-        const width = this.options.popupRef.overlayRef.overlayElement.offsetWidth;
-        const height = this.options.popupRef.overlayRef.overlayElement.offsetHeight;
+        const width = this.options.popupRef.overlayRef.overlayElement.getBoundingClientRect().width;
+        const height = this.options.popupRef.overlayRef.overlayElement.getBoundingClientRect().height;
         const left = (window.innerWidth - width) / 2;
         const top = (window.innerHeight - height) / 2;
         this.options.popupRef.overlayRef.overlayElement.style.left = `${left}px`;

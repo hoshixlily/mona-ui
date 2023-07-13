@@ -110,9 +110,9 @@ export class PopupComponent implements OnInit, OnDestroy, AfterViewInit {
             const width =
                 this.width ??
                 (this.anchor instanceof HTMLElement
-                    ? this.anchor.offsetWidth
+                    ? this.anchor.getBoundingClientRect().width
                     : this.anchor instanceof ElementRef
-                    ? this.anchor.nativeElement.offsetWidth
+                    ? this.anchor.nativeElement.getBoundingClientRect().width
                     : undefined);
             this.popupTriggerListener = this.renderer.listen(target, this.trigger, (event: Event) => {
                 event.preventDefault();
