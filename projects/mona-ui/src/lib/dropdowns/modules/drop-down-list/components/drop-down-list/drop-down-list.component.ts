@@ -6,6 +6,7 @@ import {
     forwardRef,
     HostBinding,
     Input,
+    OnDestroy,
     OnInit,
     TemplateRef,
     ViewChild
@@ -23,7 +24,7 @@ import { faChevronDown, faTimes, IconDefinition } from "@fortawesome/free-solid-
 import { PopupRef } from "../../../../../popup/models/PopupRef";
 import { PopupSettings } from "../../../../../popup/models/PopupSettings";
 import { ConnectionPositionPair } from "@angular/cdk/overlay";
-import { take } from "rxjs";
+import { fromEvent, Subject, take, takeUntil } from "rxjs";
 
 @Component({
     selector: "mona-drop-down-list",
@@ -39,7 +40,8 @@ import { take } from "rxjs";
         }
     ]
 })
-export class DropDownListComponent implements OnInit, ControlValueAccessor {
+export class DropDownListComponent implements OnInit, OnDestroy, ControlValueAccessor {
+    readonly #destroy$: Subject<void> = new Subject<void>();
     #propagateChange: any = () => {};
     #value: any;
     public readonly clearIcon: IconDefinition = faTimes;
@@ -109,12 +111,21 @@ export class DropDownListComponent implements OnInit, ControlValueAccessor {
         this.popupRef = null;
     }
 
+    public ngOnDestroy(): void {
+        this.#destroy$.next();
+        this.#destroy$.complete();
+    }
+
     public ngOnInit(): void {
         this.initialize();
+        this.setEventListeners();
     }
 
     public onPopupListValueChange(event: PopupListValueChangeEvent): void {
         if (!event.value || event.value.length === 0) {
+            if (this.#value === undefined) {
+                return;
+            }
             this.#value = undefined;
             this.valuePopupListItem = undefined;
             this.#propagateChange?.(undefined);
@@ -206,6 +217,33 @@ export class DropDownListComponent implements OnInit, ControlValueAccessor {
         if (this.valuePopupListItem) {
             this.valuePopupListItem.selected = true;
         }
+    }
+
+    private setEventListeners(): void {
+        fromEvent<KeyboardEvent>(this.elementRef.nativeElement, "keydown")
+            .pipe(takeUntil(this.#destroy$))
+            .subscribe(event => {
+                if (event.key === "Enter") {
+                    if (this.popupRef) {
+                        this.close();
+                        return;
+                    }
+                    this.open();
+                } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+                    if (this.popupRef) {
+                        return;
+                    }
+                    const listItem = this.popupListService.navigate(event, "single");
+                    if (listItem) {
+                        if (!listItem.dataEquals(this.value)) {
+                            this.updateValue(listItem.data);
+                            this.#propagateChange?.(this.value);
+                        }
+                    }
+                } else if (event.key === "Escape") {
+                    this.close();
+                }
+            });
     }
 
     private updateValue(value: any): void {
