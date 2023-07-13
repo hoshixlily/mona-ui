@@ -1,5 +1,5 @@
 <div class="mona-auto-complete" [ngClass]="{'mona-disabled': disabled}" [attr.tabindex]="disabled ? -1 : 0" #dropdownWrapper>
-    <input monaTextBox class="mona-input-inner" [ngModel]="autoCompleteValue" (ngModelChange)="autoCompleteValue$.next($event)" (keydown)="onKeydown($event)">
+    <input monaTextBox class="mona-input-inner" [ngModel]="autoCompleteValue()" (ngModelChange)="autoCompleteValue$.next($event)" (keydown)="onKeydown($event)">
     <span class="mona-input-clear-icon" *ngIf="showClearButton && value" (click)="clearValue($event)">
         <fa-icon [icon]="clearIcon"></fa-icon>
     </span>

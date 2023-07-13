@@ -50,7 +50,6 @@ export class ComboBoxComponent implements OnInit, OnDestroy, ControlValueAccesso
     public readonly clearIcon: IconDefinition = faTimes;
     public readonly dropdownIcon: IconDefinition = faChevronDown;
     public readonly comboBoxValue$: Subject<string> = new Subject<string>();
-    protected selectionMode: SelectionMode = "single";
     public comboBoxValue: WritableSignal<string> = signal("");
     public popupRef: PopupRef | null = null;
     public valuePopupListItem?: PopupListItem;
@@ -149,7 +148,7 @@ export class ComboBoxComponent implements OnInit, OnDestroy, ControlValueAccesso
                     this.close();
                     return;
                 }
-                this.popupListService.selectItem(item, this.selectionMode);
+                this.popupListService.selectItem(item, "single");
                 this.updateValue(item.data);
                 this.#propagateChange?.(item.data);
             } else {
@@ -167,7 +166,7 @@ export class ComboBoxComponent implements OnInit, OnDestroy, ControlValueAccesso
                             .selectMany(g => g.source)
                             .firstOrDefault(i => i.text.toLowerCase() === this.comboBoxValue().toLowerCase());
                         if (item) {
-                            this.popupListService.selectItem(item, this.selectionMode);
+                            this.popupListService.selectItem(item, "single");
                             this.updateValue(item.data);
                             this.#propagateChange?.(item.data);
                         }
@@ -274,14 +273,6 @@ export class ComboBoxComponent implements OnInit, OnDestroy, ControlValueAccesso
         this.updateValue(obj);
     }
 
-    protected updateValue(value: any) {
-        this.#value = value;
-        this.valuePopupListItem = this.popupListService.viewListData
-            .selectMany(g => g.source)
-            .singleOrDefault(d => d.dataEquals(this.value));
-        this.comboBoxValue.set(this.valuePopupListItem?.text ?? "");
-    }
-
     private initialize(): void {
         this.popupListService.initializeListData({
             data: this.data,
@@ -357,6 +348,14 @@ export class ComboBoxComponent implements OnInit, OnDestroy, ControlValueAccesso
             }
             this.comboBoxValue.set(value);
         });
+    }
+
+    private updateValue(value: any) {
+        this.#value = value;
+        this.valuePopupListItem = this.popupListService.viewListData
+            .selectMany(g => g.source)
+            .singleOrDefault(d => d.dataEquals(this.value));
+        this.comboBoxValue.set(this.valuePopupListItem?.text ?? "");
     }
 
     public get value(): any {

@@ -232,8 +232,8 @@
                                 </mona-combo-box>
                                 <mona-auto-complete [data]="dropdownListDataItems" textField="text" valueField="value"
                                                     groupField="group" [showClearButton]="true"
-                                                    [value]="autoCompleteValue"
-                                                    (valueChange)="onAutoCompleteValueChange($event)"
+                                                    [ngModel]="autoCompleteValue"
+                                                    (ngModelChange)="onAutoCompleteValueChange($event)"
                                                     style="width: 200px;"></mona-auto-complete>
                                 <input monaTextBox [ngModel]="textBoxValue">
                                 <!--                                <mona-text-box [ngModel]="textBoxValue"></mona-text-box>-->
