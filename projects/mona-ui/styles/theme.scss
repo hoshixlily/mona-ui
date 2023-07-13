@@ -72,6 +72,10 @@ input, textarea, button {
     }
 }
 
+div.cdk-overlay-connected-position-bounding-box {
+    width: unset !important;
+}
+
 /** General **/
 .mona-no-animation {
     &, & * {
@@ -517,11 +521,11 @@ div.mona-time-picker-popup {
 }
 
 .mona-dropdown-popup-content-bottom {
-    border-top: 1px solid transparent !important;
+    //border-top: 1px solid transparent !important;
 }
 
 .mona-dropdown-popup-content-top {
-    border-bottom: 1px solid transparent !important;
+    //border-bottom: 1px solid transparent !important;
     box-shadow: 0 -3px 10px -3px var(--mona-popup-shadow-color) !important;
 }
 

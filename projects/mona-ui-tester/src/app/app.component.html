@@ -264,8 +264,8 @@
                                                    style="width: auto; min-width: 200px;"
                                                    [monaMultiSelectSummaryTag]="multiSelectTagCount" [filterable]="true"
                                                    [showClearButton]="true"
-                                                   [value]="selectedMultiSelectDataItems"
-                                                   (valueChange)="onMultiSelectValueChange($event)">
+                                                   [ngModel]="selectedMultiSelectDataItems"
+                                                   (ngModelChange)="onMultiSelectValueChange($event)">
                                     <ng-template monaMultiSelectItemTemplate let-dataItem>
                                         <span style="color: greenyellow; font-weight: bold">{{dataItem.text}}</span>
                                     </ng-template>

@@ -22,7 +22,6 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { Action } from "../../../../../utils/Action";
 import { faChevronDown, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { PopupRef } from "../../../../../popup/models/PopupRef";
-import { PopupSettings } from "../../../../../popup/models/PopupSettings";
 import { ConnectionPositionPair } from "@angular/cdk/overlay";
 import { fromEvent, Subject, take, takeUntil } from "rxjs";
 
@@ -145,10 +144,7 @@ export class DropDownListComponent implements OnInit, OnDestroy, ControlValueAcc
         this.#propagateChange?.(this.value);
     }
 
-    public open(options: Partial<PopupSettings> = {}): PopupRef {
-        if (this.popupRef) {
-            return this.popupRef;
-        }
+    public open(): void {
         this.dropdownWrapper.nativeElement.focus();
         this.popupRef = this.popupService.create({
             anchor: this.dropdownWrapper,
@@ -172,15 +168,13 @@ export class DropDownListComponent implements OnInit, OnDestroy, ControlValueAcc
                     -1,
                     "mona-dropdown-popup-content-top"
                 )
-            ],
-            ...options
+            ]
         });
         this.popupRef.closed.pipe(take(1)).subscribe(() => {
             this.popupRef = null;
             (this.elementRef.nativeElement.firstElementChild as HTMLElement)?.focus();
             this.popupListService.clearFilters();
         });
-        return this.popupRef;
     }
 
     public registerOnChange(fn: any): void {

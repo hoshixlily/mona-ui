@@ -184,7 +184,7 @@ export class AutoCompleteComponent implements OnInit, OnChanges, OnDestroy, Cont
         }
     }
 
-    public open(options: Partial<PopupSettings> = {}): PopupRef {
+    public open(): void {
         this.dropdownWrapper.nativeElement.focus();
         this.popupRef = this.popupService.create({
             anchor: this.dropdownWrapper,
@@ -208,8 +208,7 @@ export class AutoCompleteComponent implements OnInit, OnChanges, OnDestroy, Cont
                     -1,
                     "mona-dropdown-popup-content-top"
                 )
-            ],
-            ...options
+            ]
         });
         window.setTimeout(() => {
             const input = this.elementRef.nativeElement.querySelector("input");
@@ -227,7 +226,6 @@ export class AutoCompleteComponent implements OnInit, OnChanges, OnDestroy, Cont
                 input.focus();
             }
         });
-        return this.popupRef;
     }
 
     public registerOnChange(fn: any): void {

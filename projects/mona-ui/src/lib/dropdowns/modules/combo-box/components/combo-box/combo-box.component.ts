@@ -17,7 +17,6 @@ import {
 import { PopupListService } from "../../../../services/popup-list.service";
 import { PopupService } from "../../../../../popup/services/popup.service";
 import { PopupListItem } from "../../../../data/PopupListItem";
-import { SelectionMode } from "../../../../../models/SelectionMode";
 import { PopupListValueChangeEvent } from "../../../../data/PopupListValueChangeEvent";
 import { distinctUntilChanged, fromEvent, map, Observable, of, Subject, take, takeUntil } from "rxjs";
 import { Group } from "@mirei/ts-collections";
@@ -210,7 +209,7 @@ export class ComboBoxComponent implements OnInit, OnDestroy, ControlValueAccesso
         this.#propagateChange?.(event.value[0].data);
     }
 
-    public open(): PopupRef {
+    public open(): void {
         this.dropdownWrapper.nativeElement.focus();
         this.popupRef = this.popupService.create({
             anchor: this.dropdownWrapper,
@@ -254,7 +253,6 @@ export class ComboBoxComponent implements OnInit, OnDestroy, ControlValueAccesso
                 this.comboBoxValue.set("");
             }
         });
-        return this.popupRef;
     }
 
     public registerOnChange(fn: any): void {
