@@ -12,13 +12,14 @@ import {
     TemplateRef,
     ViewChild
 } from "@angular/core";
-import { AbstractDateInputComponent } from "../../../../components/abstract-date-input/abstract-date-input.component";
 import { faClock, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { FocusMonitor } from "@angular/cdk/a11y";
 import { PopupService } from "../../../../../popup/services/popup.service";
 import { DateTime } from "luxon";
 import { take } from "rxjs";
-import { NG_VALUE_ACCESSOR } from "@angular/forms";
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
+import { Action } from "../../../../../utils/Action";
+import { PopupRef } from "../../../../../popup/models/PopupRef";
 
 @Component({
     selector: "mona-time-picker",
@@ -33,14 +34,31 @@ import { NG_VALUE_ACCESSOR } from "@angular/forms";
         }
     ]
 })
-export class TimePickerComponent extends AbstractDateInputComponent implements OnInit, OnChanges {
+export class TimePickerComponent implements OnInit, OnChanges, ControlValueAccessor {
+    #value: Date | null = null;
+    #propagateChange: Action<Date | null> | null = null;
+    private popupRef: PopupRef | null = null;
     public readonly timeIcon: IconDefinition = faClock;
+    public currentDateString: string = "";
+    public navigatedDate: Date = new Date();
 
     @HostBinding("class.mona-dropdown")
     public readonly hostClass: boolean = true;
 
     @Input()
+    public disabled: boolean = false;
+
+    @Input()
+    public format: string = "HH:mm";
+
+    @Input()
     public hourFormat: "12" | "24" = "24";
+
+    @ViewChild("popupAnchor")
+    public popupAnchor!: ElementRef<HTMLDivElement>;
+
+    @Input()
+    public readonly: boolean = false;
 
     @Input()
     public showSeconds: boolean = false;
@@ -49,20 +67,20 @@ export class TimePickerComponent extends AbstractDateInputComponent implements O
     public timePopupTemplateRef?: TemplateRef<any>;
 
     public constructor(
-        protected override readonly cdr: ChangeDetectorRef,
-        public readonly elementRef: ElementRef<HTMLElement>,
+        private readonly cdr: ChangeDetectorRef,
+        private readonly elementRef: ElementRef<HTMLElement>,
         private readonly focusMonitor: FocusMonitor,
         private readonly popupService: PopupService
-    ) {
-        super(cdr);
+    ) {}
+
+    public ngOnChanges(changes: SimpleChanges): void {
+        if (changes["hourFormat"] && this.value) {
+            this.currentDateString = DateTime.fromJSDate(this.value).toFormat(this.format);
+        }
     }
 
-    public override ngOnChanges(changes: SimpleChanges): void {
-        super.ngOnChanges(changes);
-    }
-
-    public override ngOnInit(): void {
-        super.ngOnInit();
+    public ngOnInit(): void {
+        this.setDateValues();
     }
 
     public onDateStringEdit(dateString: string): void {
@@ -104,5 +122,56 @@ export class TimePickerComponent extends AbstractDateInputComponent implements O
 
     public onTimeSelectorValueChange(date: Date | null): void {
         this.setCurrentDate(date);
+    }
+
+    public registerOnChange(fn: any): void {
+        this.#propagateChange = fn;
+    }
+
+    public registerOnTouched(fn: any): void {}
+
+    public setDisabledState(isDisabled: boolean): void {
+        this.disabled = isDisabled;
+    }
+
+    public writeValue(date: Date | null | undefined): void {
+        this.#value = date ?? null;
+        if (date == null) {
+            this.currentDateString = "";
+        } else {
+            this.currentDateString = DateTime.fromJSDate(date).toFormat(this.format);
+        }
+        this.setDateValues();
+    }
+
+    private dateStringEquals(date1: Date | null, date2: Date | null): boolean {
+        if (date1 && date2) {
+            return (
+                DateTime.fromJSDate(date1).toFormat(this.format) === DateTime.fromJSDate(date2).toFormat(this.format)
+            );
+        }
+        return date1 === date2;
+    }
+
+    private setCurrentDate(date: Date | null): void {
+        this.#value = date;
+        if (date) {
+            this.currentDateString = DateTime.fromJSDate(date).toFormat(this.format);
+        } else {
+            this.currentDateString = "";
+        }
+        this.#propagateChange?.(date);
+        this.cdr.markForCheck();
+    }
+
+    private setDateValues(): void {
+        this.navigatedDate = this.value ?? DateTime.now().toJSDate();
+        if (this.value) {
+            this.currentDateString = DateTime.fromJSDate(this.value).toFormat(this.format);
+        }
+    }
+
+    public get value(): Date | null {
+        return this.#value;
     }
 }
