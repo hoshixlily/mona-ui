@@ -96,7 +96,6 @@ export class TimeSelectorComponent implements OnInit, AfterViewInit, ControlValu
         });
         this.minute = computed(() => this.navigatedDate().getMinutes());
         this.second = computed(() => this.navigatedDate().getSeconds());
-        this.meridiem = this.navigatedDate().getHours() >= 12 ? "PM" : "AM";
     }
 
     public onHourChange(value: number): void {
@@ -182,6 +181,7 @@ export class TimeSelectorComponent implements OnInit, AfterViewInit, ControlValu
 
     private setDateValues(): void {
         this.navigatedDate.set(this.value ?? DateTime.now().toJSDate());
+        this.meridiem = this.navigatedDate().getHours() >= 12 ? "PM" : "AM";
         if (this.value) {
             this.currentDateString = DateTime.fromJSDate(this.value).toFormat(this.format);
         }
