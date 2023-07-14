@@ -1,19 +1,23 @@
 import {
     AfterViewInit,
     ChangeDetectionStrategy,
-    ChangeDetectorRef,
     Component,
+    computed,
     ElementRef,
     forwardRef,
     Input,
-    OnDestroy,
     OnInit,
-    ViewChild
+    Signal,
+    signal,
+    ViewChild,
+    WritableSignal
 } from "@angular/core";
 import { DateTime } from "luxon";
 import { Enumerable } from "@mirei/ts-collections";
-import { AbstractDateInputComponent } from "../../../../components/abstract-date-input/abstract-date-input.component";
-import { NG_VALUE_ACCESSOR } from "@angular/forms";
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
+import { Action } from "../../../../../utils/Action";
+import { Meridiem } from "../../../../models/Meridiem";
+import { Hour } from "../../models/Hour";
 
 @Component({
     selector: "mona-time-selector",
@@ -28,17 +32,24 @@ import { NG_VALUE_ACCESSOR } from "@angular/forms";
         }
     ]
 })
-export class TimeSelectorComponent extends AbstractDateInputComponent implements OnInit, OnDestroy, AfterViewInit {
-    public hour: number | null = null;
-    public hours: number[] = [];
-    public meridiem: "AM" | "PM" = "AM";
-    public minute: number | null = null;
+export class TimeSelectorComponent implements OnInit, AfterViewInit, ControlValueAccessor {
+    #propagateChange: Action<Date | null> | null = null;
+    #value: Date | null = null;
+    public currentDateString: string = "";
+    public hour: Signal<number> = signal(0);
+    public hours: Hour[] = [];
+    public meridiem: Meridiem = "AM";
+    public minute: Signal<number> = signal(0);
     public minutes: number[] = [];
-    public second: number | null = null;
+    public navigatedDate: WritableSignal<Date> = signal(new Date());
+    public second: Signal<number> = signal(0);
     public seconds: number[] = [];
 
     @Input()
-    public override format: string = "HH:mm";
+    public disabled: boolean = false;
+
+    @Input()
+    public format: string = "HH:mm";
 
     @Input()
     public hourFormat: "12" | "24" = "24";
@@ -49,15 +60,16 @@ export class TimeSelectorComponent extends AbstractDateInputComponent implements
     @ViewChild("minutesListElement")
     public minutesListElement!: ElementRef<HTMLOListElement>;
 
+    @Input()
+    public readonly: boolean = false;
+
     @ViewChild("secondsListElement")
     public secondsListElement!: ElementRef<HTMLOListElement>;
 
     @Input()
     public showSeconds: boolean = false;
 
-    public constructor(protected override readonly cdr: ChangeDetectorRef, private readonly elementRef: ElementRef) {
-        super(cdr);
-    }
+    public constructor(private readonly elementRef: ElementRef) {}
 
     public ngAfterViewInit(): void {
         window.setTimeout(() => {
@@ -68,85 +80,78 @@ export class TimeSelectorComponent extends AbstractDateInputComponent implements
         }, 0);
     }
 
-    public override ngOnInit(): void {
-        super.ngOnInit();
-        this.hours = this.hourFormat === "24" ? Enumerable.range(0, 24).toArray() : Enumerable.range(1, 12).toArray();
+    public ngOnInit(): void {
+        this.setDateValues();
         this.minutes = Enumerable.range(0, 60).toArray();
         this.seconds = Enumerable.range(0, 60).toArray();
         if (this.value) {
-            this.navigatedDate = this.value;
-            this.meridiem = this.navigatedDate.getHours() >= 12 ? "PM" : "AM";
-            this.updateHour();
-            this.updateMinute();
-            this.updateSecond();
+            this.navigatedDate.set(this.value);
         }
+        this.hour = computed(() => {
+            const hour = this.navigatedDate().getHours();
+            if (this.hourFormat === "24") {
+                return hour;
+            }
+            return hour % 12 || 12;
+        });
+        this.minute = computed(() => this.navigatedDate().getMinutes());
+        this.second = computed(() => this.navigatedDate().getSeconds());
+        this.meridiem = this.navigatedDate().getHours() >= 12 ? "PM" : "AM";
     }
 
     public onHourChange(value: number): void {
-        this.hour = value;
-        if (!this.navigatedDate) {
-            const now = this.minute != null ? DateTime.now().set({ minute: this.minute }) : DateTime.now();
-            this.navigatedDate = now.toJSDate();
-        }
-        if (this.hour < 0) {
-            this.hour = 23;
-        }
-        let newHour: number;
-        if (this.hourFormat === "24") {
-            newHour = this.hour % 24;
-        } else {
-            newHour = this.hour % 12;
-            if (this.meridiem === "PM") {
-                newHour += 12;
-            }
-        }
-        this.navigatedDate = DateTime.fromJSDate(this.navigatedDate).set({ hour: newHour }).toJSDate();
-        if (this.hourFormat === "12") {
-            this.hour = newHour % 12 || 12;
-        }
-        this.setCurrentDate(this.navigatedDate);
-        this.scrollList(this.hoursListElement.nativeElement, newHour);
+        const updatedDate = DateTime.fromJSDate(this.navigatedDate()).set({ hour: value });
+        this.navigatedDate.set(updatedDate.toJSDate());
+        this.setCurrentDate(this.navigatedDate());
+        this.scrollList(this.hoursListElement.nativeElement, value);
     }
 
     public onMeridiemClick(meridiem: "AM" | "PM"): void {
-        if (this.readonly && this.meridiem === meridiem) {
+        if (this.readonly || this.meridiem === meridiem) {
             return;
         }
-        const date = DateTime.now().toJSDate();
+        const hour = this.navigatedDate().getHours();
+
+        if (meridiem === "PM" && hour < 12) {
+            this.navigatedDate().setHours(hour + 12);
+        } else if (meridiem === "AM" && hour >= 12) {
+            this.navigatedDate().setHours(hour - 12);
+        }
+
         this.meridiem = meridiem;
-        this.navigatedDate = DateTime.fromJSDate(this.navigatedDate ?? date)
-            .set({ hour: (this.navigatedDate ?? date).getHours() + (meridiem === "AM" ? -12 : 12) })
-            .toJSDate();
-        this.updateHour();
-        this.updateMinute();
-        this.updateSecond();
-        this.setCurrentDate(this.navigatedDate);
+        this.setCurrentDate(this.navigatedDate());
     }
 
     public onMinuteChange(value: number): void {
-        this.minute = value;
-        if (!this.navigatedDate) {
-            const now = this.hour != null ? DateTime.now().set({ hour: this.hour }) : DateTime.now();
-            this.navigatedDate = now.toJSDate();
-        }
-        const minute = +this.minute > 59 ? 0 : +this.minute < 0 ? 59 : +this.minute;
-        this.navigatedDate = DateTime.fromJSDate(this.navigatedDate).set({ minute }).toJSDate();
-        this.minute = minute;
-        this.setCurrentDate(this.navigatedDate);
-        this.scrollList(this.minutesListElement.nativeElement, minute);
+        this.navigatedDate.set(DateTime.fromJSDate(this.navigatedDate()).set({ minute: value }).toJSDate());
+        this.setCurrentDate(this.navigatedDate());
+        this.scrollList(this.minutesListElement.nativeElement, value);
     }
 
     public onSecondChange(value: number): void {
-        this.second = value;
-        if (!this.navigatedDate) {
-            const now = this.hour != null ? DateTime.now().set({ hour: this.hour }) : DateTime.now();
-            this.navigatedDate = now.toJSDate();
+        this.navigatedDate.set(DateTime.fromJSDate(this.navigatedDate()).set({ second: value }).toJSDate());
+        this.setCurrentDate(this.navigatedDate());
+        this.scrollList(this.secondsListElement.nativeElement, value);
+    }
+
+    public registerOnChange(fn: any): void {
+        this.#propagateChange = fn;
+    }
+
+    public registerOnTouched(fn: any): void {}
+
+    public setDisabledState(isDisabled: boolean): void {
+        this.disabled = isDisabled;
+    }
+
+    public writeValue(date: Date | null | undefined): void {
+        this.#value = date ?? null;
+        if (date == null) {
+            this.currentDateString = "";
+        } else {
+            this.currentDateString = DateTime.fromJSDate(date).toFormat(this.format);
         }
-        const second = +this.second > 59 ? 0 : +this.second < 0 ? 59 : +this.second;
-        this.navigatedDate = DateTime.fromJSDate(this.navigatedDate).set({ second }).toJSDate();
-        this.second = second;
-        this.scrollList(this.secondsListElement.nativeElement, second);
-        this.setCurrentDate(this.navigatedDate);
+        this.setDateValues();
     }
 
     private scrollList(list: HTMLOListElement, value?: number): void {
@@ -165,22 +170,24 @@ export class TimeSelectorComponent extends AbstractDateInputComponent implements
         }
     }
 
-    private updateHour(): void {
-        if (this.navigatedDate) {
-            this.hour =
-                this.hourFormat === "12" ? this.navigatedDate.getHours() % 12 || 12 : this.navigatedDate.getHours();
+    private setCurrentDate(date: Date | null): void {
+        this.#value = date;
+        if (date) {
+            this.currentDateString = DateTime.fromJSDate(date).toFormat(this.format);
+        } else {
+            this.currentDateString = "";
+        }
+        this.#propagateChange?.(date);
+    }
+
+    private setDateValues(): void {
+        this.navigatedDate.set(this.value ?? DateTime.now().toJSDate());
+        if (this.value) {
+            this.currentDateString = DateTime.fromJSDate(this.value).toFormat(this.format);
         }
     }
 
-    private updateMinute(): void {
-        if (this.navigatedDate) {
-            this.minute = this.navigatedDate.getMinutes();
-        }
-    }
-
-    private updateSecond(): void {
-        if (this.navigatedDate) {
-            this.second = this.navigatedDate.getSeconds();
-        }
+    public get value(): Date | null {
+        return this.#value;
     }
 }

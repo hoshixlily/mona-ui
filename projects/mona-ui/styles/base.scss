@@ -50,7 +50,7 @@
     --mona-window-background: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) - 2%));
     --mona-window-header-background: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) - 3.5%));
 
-    --mona-scrollbar-thumb: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) - 5%));
-    --mona-scrollbar-thumb-hover: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) - 3.5%));
-    --mona-scrollbar-track: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) - 0%));
+    --mona-scrollbar-thumb: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) + 2%));
+    --mona-scrollbar-thumb-hover: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) + 6%));
+    --mona-scrollbar-track: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) - 3%));
 }

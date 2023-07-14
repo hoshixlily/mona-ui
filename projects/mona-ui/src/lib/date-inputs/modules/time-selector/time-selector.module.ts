@@ -5,9 +5,10 @@ import { NumericTextBoxModule } from "../../../inputs/modules/numeric-text-box/n
 import { FormsModule } from "@angular/forms";
 import { ButtonGroupModule } from "../../../buttons/modules/button-group/button-group.module";
 import { ButtonModule } from "../../../buttons/modules/button/button.module";
+import { HourSelectorPipe } from './pipes/hour-selector.pipe';
 
 @NgModule({
-    declarations: [TimeSelectorComponent],
+    declarations: [TimeSelectorComponent, HourSelectorPipe],
     imports: [CommonModule, NumericTextBoxModule, FormsModule, ButtonGroupModule, ButtonModule],
     exports: [TimeSelectorComponent]
 })
