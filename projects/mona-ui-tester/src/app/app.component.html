@@ -50,7 +50,7 @@
                                        [selectedKeys]="gridSelectionKeys"
                                        (selectedKeysChange)="onGridSelectionKeysChange($event)">
                                 <mona-grid-column *ngFor="let col of gridOrderColumns" [field]="col.field"
-                                                  [title]="col.title" [filterType]="col.filterType">
+                                                  [title]="col.title" [type]="col.filterType">
                                     <!--                                    <ng-template monaGridCellTemplate let-row>-->
                                     <!--                                        <ng-container *ngIf="col.field === 'OrderDate' || col.field==='ShippedDate'">-->
                                     <!--                                            {{row.data[col.field] | date: 'dd/MM/yyyy'}}-->

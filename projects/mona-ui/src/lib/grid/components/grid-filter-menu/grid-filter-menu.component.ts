@@ -13,7 +13,7 @@ import {
 import { PopupService } from "../../../popup/services/popup.service";
 import { PopupRef } from "../../../popup/models/PopupRef";
 import { FilterMenuComponent } from "../../../filter/components/filter-menu/filter-menu.component";
-import { FilterFieldType } from "../../../filter/models/FilterFieldType";
+import { DataType } from "../../../models/DataType";
 import { faFilter, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { GridService } from "../../services/grid.service";
 import { ColumnFilterState } from "../../models/ColumnFilterState";
@@ -38,7 +38,7 @@ export class GridFilterMenuComponent implements OnInit, OnDestroy {
     public apply: EventEmitter<ColumnFilterState> = new EventEmitter<ColumnFilterState>();
 
     @Input()
-    public type: FilterFieldType = "string";
+    public type: DataType = "string";
     public constructor(
         private readonly cdr: ChangeDetectorRef,
         private readonly popupService: PopupService,

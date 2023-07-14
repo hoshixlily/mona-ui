@@ -1,7 +1,7 @@
 import { Component, ContentChild, Input, OnInit } from "@angular/core";
 import { Column } from "../../models/Column";
 import { GridCellTemplateDirective } from "../../directives/grid-cell-template.directive";
-import { FilterFieldType } from "../../../filter/models/FilterFieldType";
+import { DataType } from "../../../models/DataType";
 import { GridColumnTitleTemplateDirective } from "../../directives/grid-column-title-template.directive";
 
 @Component({
@@ -23,11 +23,6 @@ export class GridColumnComponent implements OnInit {
     }
 
     @Input()
-    public set filterType(value: FilterFieldType) {
-        this.column.filterType = value;
-    }
-
-    @Input()
     public set maxWidth(value: number) {
         this.column.maxWidth = value;
     }
@@ -45,6 +40,11 @@ export class GridColumnComponent implements OnInit {
     @ContentChild(GridColumnTitleTemplateDirective)
     public set titleTemplate(value: GridColumnTitleTemplateDirective) {
         this.column.titleTemplate = value;
+    }
+
+    @Input()
+    public set type(value: DataType) {
+        this.column.dataType = value;
     }
 
     @Input()

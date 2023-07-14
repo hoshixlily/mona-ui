@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from "@angular/core";
-import { Query } from "../../query/core/Query";
+import { IQuery, Query } from "../../query/core/Query";
 import { Dictionary } from "@mirei/ts-collections";
 import { ColumnFilterState } from "../models/ColumnFilterState";
 import { ColumnSortState } from "../models/ColumnSortState";
@@ -17,6 +17,15 @@ export class GridFilterPipe implements PipeTransform {
         sortStateDict: Dictionary<string, ColumnSortState>
     ): Row[] {
         let queryEnumerable = Query.from(value);
+        queryEnumerable = this.applyFilterStatesIfExists(filterStateDict, queryEnumerable);
+        queryEnumerable = this.applySortStatesIfExists(sortStateDict, queryEnumerable);
+        return queryEnumerable.run();
+    }
+
+    private applyFilterStatesIfExists(
+        filterStateDict: Dictionary<string, ColumnFilterState>,
+        queryEnumerable: IQuery<Row>
+    ): IQuery<Row> {
         if (filterStateDict.length > 0) {
             for (const filterState of filterStateDict) {
                 if (filterState.value.filter) {
@@ -24,15 +33,20 @@ export class GridFilterPipe implements PipeTransform {
                 }
             }
         }
+        return queryEnumerable;
+    }
+
+    private applySortStatesIfExists(
+        sortStateDict: Dictionary<string, ColumnSortState>,
+        queryEnumerable: IQuery<Row>
+    ): IQuery<Row> {
         if (sortStateDict.length > 0) {
-            queryEnumerable = queryEnumerable.sort(
-                sortStateDict
-                    .values()
-                    .select(d => d.sort)
-                    .toArray(),
-                r => r.data
-            );
+            const sortState = sortStateDict
+                .values()
+                .select(d => d.sort)
+                .toArray();
+            queryEnumerable = queryEnumerable.sort(sortState, r => r.data);
         }
-        return queryEnumerable.run();
+        return queryEnumerable;
     }
 }

@@ -7,13 +7,7 @@ import { Row } from "../models/Row";
 })
 export class GridPagePipe implements PipeTransform {
     public transform<T>(value: T[], skip: number, take: number): T[] {
-        if (!value) {
-            return [];
-        }
-        if (value.length === 0) {
-            return value;
-        }
-        if (skip >= value.length) {
+        if (!value || value.length === 0 || skip >= value.length) {
             return [];
         }
         return Enumerable.from(value).skip(skip).take(take).toArray();

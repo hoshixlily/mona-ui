@@ -1,10 +1,10 @@
-import { FilterFieldType } from "../../filter/models/FilterFieldType";
+import { DataType } from "../../models/DataType";
 
 export interface ColumnOptions {
+    dataType?: DataType;
+    field: string;
     maxWidth?: number;
     minWidth?: number;
-    field: string;
-    filterType?: FilterFieldType;
     title: string;
     width?: number;
 }

@@ -58,7 +58,7 @@ export * from "./lib/dropdowns/drop-downs.module";
 /** Filters */
 export * from "./lib/query/filter/FilterDescriptor";
 export { Query, IQuery } from "./lib/query/core/Query";
-export * from "./lib/filter/models/FilterFieldType";
+export * from "./lib/models/DataType";
 export * from "./lib/filter/models/FilterMenuValue";
 export * from "./lib/filter/components/filter-menu/filter-menu.component";
 export * from "./lib/filter/filter.module";

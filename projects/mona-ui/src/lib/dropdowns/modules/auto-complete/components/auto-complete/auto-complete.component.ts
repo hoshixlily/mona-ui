@@ -22,7 +22,6 @@ import { ComboBoxGroupTemplateDirective } from "../../../combo-box/directives/co
 import { ComboBoxItemTemplateDirective } from "../../../combo-box/directives/combo-box-item-template.directive";
 import { PopupListValueChangeEvent } from "../../../../data/PopupListValueChangeEvent";
 import { PopupRef } from "../../../../../popup/models/PopupRef";
-import { PopupSettings } from "../../../../../popup/models/PopupSettings";
 import { Group } from "@mirei/ts-collections";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { ConnectionPositionPair } from "@angular/cdk/overlay";

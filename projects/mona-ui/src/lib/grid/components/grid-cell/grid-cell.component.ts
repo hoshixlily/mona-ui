@@ -80,14 +80,14 @@ export class GridCellComponent implements OnInit, OnDestroy {
 
     public onFocusChange(origin: FocusOrigin): void {
         if (!origin) {
-            const duration = this.column.filterType === "date" ? 50 : 25;
+            const duration = this.column.dataType === "date" ? 50 : 25;
             timer(duration)
                 .pipe(take(1))
                 .subscribe(() => {
                     if (!this.gridEditable) {
                         return;
                     }
-                    if (this.column.filterType !== "date") {
+                    if (this.column.dataType !== "date") {
                         if (this.editing) {
                             this.editing = false;
                             this.updateCellValue();
@@ -152,11 +152,11 @@ export class GridCellComponent implements OnInit, OnDestroy {
     }
 
     private focusCellInput(): void {
-        if (this.column.filterType === "string" || this.column.filterType === "number") {
+        if (this.column.dataType === "string" || this.column.dataType === "number") {
             this.elementRef.nativeElement.querySelector("input")?.focus();
-        } else if (this.column.filterType === "date") {
+        } else if (this.column.dataType === "date") {
             this.elementRef.nativeElement.querySelector("input")?.focus();
-        } else if (this.column.filterType === "boolean") {
+        } else if (this.column.dataType === "boolean") {
             this.elementRef.nativeElement.querySelector("input")?.focus();
         }
     }
@@ -307,7 +307,7 @@ export class GridCellComponent implements OnInit, OnDestroy {
                 }
                 this.cdr.markForCheck();
             });
-        if (this.column.filterType === "date") {
+        if (this.column.dataType === "date") {
             this.editForm.controls[this.column.field].valueChanges
                 .pipe(
                     takeUntil(this.#destroy),

@@ -1,4 +1,4 @@
-import { FilterFieldType } from "../../filter/models/FilterFieldType";
+import { DataType } from "../../models/DataType";
 import { GridCellTemplateDirective } from "../directives/grid-cell-template.directive";
 import { GridColumnTitleTemplateDirective } from "../directives/grid-column-title-template.directive";
 
@@ -8,8 +8,8 @@ export class Column {
      */
     public calculatedWidth?: number;
     public cellTemplate?: GridCellTemplateDirective;
+    public dataType: DataType = "string";
     public field: string = "";
-    public filterType: FilterFieldType = "string";
     public filtered: boolean = false;
     public index: number = 0; // 0-based
     public maxWidth?: number;

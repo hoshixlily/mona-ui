@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { FilterFieldType } from "../../models/FilterFieldType";
+import { DataType } from "../../../models/DataType";
 import { FilterMenuDataItem } from "../../models/FilterMenuDataItem";
 import { FilterMenuConnectorItem } from "../../models/FilterMenuConnectorItem";
 import {
@@ -105,7 +105,7 @@ export class FilterMenuComponent implements OnInit {
     }
 
     @Input()
-    public type: FilterFieldType = "string";
+    public type: DataType = "string";
 
     public constructor() {}
 
@@ -377,39 +377,26 @@ export class FilterMenuComponent implements OnInit {
     }
 
     public getFilterValues(): FilterMenuValue {
+        type TargetType = string | number | Date | boolean | null;
+        const filterValue = (target: [TargetType, TargetType]) => {
+            return {
+                operator1: this.selectedFilterMenuDataItemList[0]?.value,
+                value1: target[0],
+                logic: this.selectedConnectorItem?.value,
+                operator2: this.selectedFilterMenuDataItemList[1]?.value,
+                value2: target[1]
+            };
+        };
+
         switch (this.type) {
             case "string":
-                return {
-                    operator1: this.selectedFilterMenuDataItemList[0]?.value,
-                    value1: this.stringFilterValues[0],
-                    logic: this.selectedConnectorItem?.value,
-                    operator2: this.selectedFilterMenuDataItemList[1]?.value,
-                    value2: this.stringFilterValues[1]
-                };
+                return filterValue(this.stringFilterValues);
             case "number":
-                return {
-                    operator1: this.selectedFilterMenuDataItemList[0]?.value,
-                    value1: this.numberFilterValues[0],
-                    logic: this.selectedConnectorItem?.value,
-                    operator2: this.selectedFilterMenuDataItemList[1]?.value,
-                    value2: this.numberFilterValues[1]
-                };
+                return filterValue(this.numberFilterValues);
             case "date":
-                return {
-                    operator1: this.selectedFilterMenuDataItemList[0]?.value,
-                    value1: this.dateFilterValues[0],
-                    logic: this.selectedConnectorItem?.value,
-                    operator2: this.selectedFilterMenuDataItemList[1]?.value,
-                    value2: this.dateFilterValues[1]
-                };
+                return filterValue(this.dateFilterValues);
             case "boolean":
-                return {
-                    operator1: this.selectedFilterMenuDataItemList[0]?.value,
-                    value1: this.booleanFilterValues[0],
-                    logic: this.selectedConnectorItem?.value,
-                    operator2: this.selectedFilterMenuDataItemList[1]?.value,
-                    value2: this.booleanFilterValues[1]
-                };
+                return filterValue(this.booleanFilterValues);
             default:
                 return {
                     operator1: undefined,
@@ -422,39 +409,55 @@ export class FilterMenuComponent implements OnInit {
     }
 
     private setFilterValues(values: FilterMenuValue): void {
+        type TargetType = string | number | Date | boolean | null;
+        let filterMenuDataItems: FilterMenuDataItem[];
+        let filterValues: [TargetType, TargetType];
+
         switch (this.type) {
             case "string":
-                this.selectedFilterMenuDataItemList = [
-                    this.stringFilterMenuDataItems.find(f => f.value === values.operator1) ?? undefined,
-                    this.stringFilterMenuDataItems.find(f => f.value === values.operator2) ?? undefined
-                ];
-                this.stringFilterValues = [values.value1 ?? "", values.value2 ?? ""];
-                this.selectedConnectorItem = this.connectorDataItems.find(c => c.value === values.logic) ?? null;
+                filterMenuDataItems = this.stringFilterMenuDataItems;
+                filterValues = [values.value1 ?? "", values.value2 ?? ""];
                 break;
             case "number":
-                this.selectedFilterMenuDataItemList = [
-                    this.numericFilterMenuDataItems.find(f => f.value === values.operator1) ?? undefined,
-                    this.numericFilterMenuDataItems.find(f => f.value === values.operator2) ?? undefined
-                ];
-                this.numberFilterValues = [values.value1 ?? null, values.value2 ?? null];
+                filterMenuDataItems = this.numericFilterMenuDataItems;
+                filterValues = [values.value1 ?? null, values.value2 ?? null];
                 break;
             case "date":
-                this.selectedFilterMenuDataItemList = [
-                    this.dateFilterMenuDataItems.find(f => f.value === values.operator1) ?? undefined,
-                    this.dateFilterMenuDataItems.find(f => f.value === values.operator2) ?? undefined
-                ];
-                this.dateFilterValues = [values.value1 ?? null, values.value2 ?? null];
-                break;
             case "boolean":
-                this.selectedFilterMenuDataItemList = [
-                    this.booleanFilterMenuDataItems.find(f => f.value === values.operator1) ?? undefined,
-                    this.booleanFilterMenuDataItems.find(f => f.value === values.operator2) ?? undefined
-                ];
-                this.booleanFilterValues = [values.value1 ?? null, values.value2 ?? null];
+                filterMenuDataItems =
+                    this.type === "date" ? this.dateFilterMenuDataItems : this.booleanFilterMenuDataItems;
+                filterValues = [values.value1 ?? null, values.value2 ?? null];
+                break;
+            default:
+                filterMenuDataItems = [];
+                filterValues = [null, null];
+                break;
+        }
+
+        this.selectedFilterMenuDataItemList = [
+            filterMenuDataItems.find(f => f.value === values.operator1) ?? undefined,
+            filterMenuDataItems.find(f => f.value === values.operator2) ?? undefined
+        ];
+
+        switch (this.type) {
+            case "string":
+                this.stringFilterValues = filterValues as [string, string];
+                break;
+            case "number":
+                this.numberFilterValues = filterValues as [number, number];
+                break;
+            case "date":
+            case "boolean":
+                if (this.type === "date") {
+                    this.dateFilterValues = filterValues as [Date, Date];
+                } else {
+                    this.booleanFilterValues = filterValues as [boolean, boolean];
+                }
                 break;
             default:
                 break;
         }
+
         this.selectedConnectorItem = this.connectorDataItems.find(c => c.value === values.logic) ?? null;
     }
 

@@ -154,13 +154,15 @@ export class MultiSelectComponent implements OnInit, OnDestroy, ControlValueAcce
     public onSelectedItemRemove(event: Event, popupListItem: PopupListItem): void {
         event.stopImmediatePropagation();
         const remainingItems = this.valuePopupListItem.filter(item => !item.dataEquals(popupListItem.data)) ?? [];
-        this.updateValue(remainingItems);
+        this.updateValue(remainingItems.map(item => item.data));
+        this.#propagateChange(this.#value);
     }
 
     public onSelectedItemGroupRemove(event: Event): void {
         event.stopImmediatePropagation();
         const remainingItems = this.valuePopupListItem.slice(0, this.visibleTagCount);
         this.updateValue(remainingItems.map(item => item.data));
+        this.#propagateChange(this.#value);
     }
 
     public open(): void {
@@ -173,7 +175,7 @@ export class MultiSelectComponent implements OnInit, OnDestroy, ControlValueAcce
             content: this.popupTemplate,
             hasBackdrop: true,
             withPush: false,
-            minWidth: this.elementRef.nativeElement.getBoundingClientRect().width,
+            width: this.elementRef.nativeElement.getBoundingClientRect().width,
             popupClass: ["mona-dropdown-popup-content"],
             positions: [
                 new ConnectionPositionPair(

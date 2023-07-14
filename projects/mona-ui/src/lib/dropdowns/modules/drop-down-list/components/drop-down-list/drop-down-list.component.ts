@@ -94,9 +94,9 @@ export class DropDownListComponent implements OnInit, OnDestroy, ControlValueAcc
     public valueTemplate?: TemplateRef<any>;
 
     public constructor(
-        protected readonly elementRef: ElementRef<HTMLElement>,
-        protected readonly popupListService: PopupListService,
-        protected readonly popupService: PopupService
+        private readonly elementRef: ElementRef<HTMLElement>,
+        private readonly popupListService: PopupListService,
+        private readonly popupService: PopupService
     ) {}
 
     public clearValue(event: MouseEvent): void {
