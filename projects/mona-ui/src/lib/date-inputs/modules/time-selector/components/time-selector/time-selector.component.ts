@@ -18,6 +18,8 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { Action } from "../../../../../utils/Action";
 import { Meridiem } from "../../../../models/Meridiem";
 import { TimeUnit } from "../../models/TimeUnit";
+import { TimeLimiterPipe } from "../../pipes/time-limiter.pipe";
+import { HourSelectorPipe } from "../../pipes/hour-selector.pipe";
 
 @Component({
     selector: "mona-time-selector",
@@ -35,7 +37,6 @@ import { TimeUnit } from "../../models/TimeUnit";
 export class TimeSelectorComponent implements OnInit, AfterViewInit, ControlValueAccessor {
     #propagateChange: Action<Date | null> | null = null;
     #value: Date | null = null;
-    public currentDateString: string = "";
     public hour: Signal<number> = signal(0);
     public hours: TimeUnit[] = [];
     public meridiem: Meridiem = "AM";
@@ -111,8 +112,16 @@ export class TimeSelectorComponent implements OnInit, AfterViewInit, ControlValu
     public onHourChange(value: number): void {
         const updatedDate = DateTime.fromJSDate(this.navigatedDate()).set({ hour: value });
         this.navigatedDate.set(updatedDate.toJSDate());
+        const minuteData = this.updateMinuteToFitInMaxAndMin();
+        const secondData = this.updateSecondToFitInMaxAndMin();
         this.setCurrentDate(this.navigatedDate());
         this.scrollList(this.hoursListElement.nativeElement, value);
+        if (minuteData) {
+            this.scrollList(this.minutesListElement.nativeElement, minuteData.value);
+        }
+        if (secondData) {
+            this.scrollList(this.secondsListElement.nativeElement, secondData.value);
+        }
     }
 
     public onMeridiemClick(meridiem: "AM" | "PM"): void {
@@ -128,13 +137,29 @@ export class TimeSelectorComponent implements OnInit, AfterViewInit, ControlValu
         }
 
         this.meridiem = meridiem;
+        const hourData = this.updateHourToFitInMaxAndMin();
+        const minuteData = this.updateMinuteToFitInMaxAndMin();
+        const secondData = this.updateSecondToFitInMaxAndMin();
+        if (hourData) {
+            this.scrollList(this.hoursListElement.nativeElement, hourData.value);
+        }
+        if (minuteData) {
+            this.scrollList(this.minutesListElement.nativeElement, minuteData.value);
+        }
+        if (secondData) {
+            this.scrollList(this.secondsListElement.nativeElement, secondData.value);
+        }
         this.setCurrentDate(this.navigatedDate());
     }
 
     public onMinuteChange(value: number): void {
         this.navigatedDate.set(DateTime.fromJSDate(this.navigatedDate()).set({ minute: value }).toJSDate());
+        const secondData = this.updateSecondToFitInMaxAndMin();
         this.setCurrentDate(this.navigatedDate());
         this.scrollList(this.minutesListElement.nativeElement, value);
+        if (secondData) {
+            this.scrollList(this.secondsListElement.nativeElement, secondData.value);
+        }
     }
 
     public onSecondChange(value: number): void {
@@ -155,11 +180,6 @@ export class TimeSelectorComponent implements OnInit, AfterViewInit, ControlValu
 
     public writeValue(date: Date | null | undefined): void {
         this.#value = date ?? null;
-        // if (date == null) {
-        //     this.currentDateString = "";
-        // } else {
-        //     this.currentDateString = DateTime.fromJSDate(date).toFormat(this.format);
-        // }
         this.setDateValues();
     }
 
@@ -184,35 +204,60 @@ export class TimeSelectorComponent implements OnInit, AfterViewInit, ControlValu
                 }
             }, 0);
         } else {
-            const element = list.querySelector(`[data-value="${value}"]`) as HTMLOListElement;
-            if (element) {
-                element.scrollIntoView({ behavior: "auto", block: "center" });
-            }
+            window.setTimeout(() => {
+                const element = list.querySelector(`[data-value="${value}"]`) as HTMLOListElement;
+                if (element) {
+                    element.scrollIntoView({ behavior: "auto", block: "center" });
+                }
+            });
         }
     }
 
     private setCurrentDate(date: Date | null): void {
         this.#value = date;
-        this.updateCurrentDateString(date);
         this.#propagateChange?.(date);
     }
 
     private setDateValues(): void {
         this.initializeNavigatedDate(this.value);
         this.meridiem = this.navigatedDate().getHours() >= 12 ? "PM" : "AM";
-        if (this.value) {
-            this.updateCurrentDateString(this.navigatedDate());
-        } else {
-            this.updateCurrentDateString(null);
-        }
     }
 
-    private updateCurrentDateString(date: Date | null): void {
-        if (date) {
-            this.currentDateString = DateTime.fromJSDate(date).toFormat(this.format);
-        } else {
-            this.currentDateString = "";
+    private updateHourToFitInMaxAndMin(): TimeUnit | null {
+        const timeLimiterPipe = new TimeLimiterPipe();
+        const hours = new HourSelectorPipe().transform([], this.hourFormat, this.meridiem);
+        const hourRange = timeLimiterPipe.transform(hours, "h", this.navigatedDate(), this.min, this.max);
+        if (!hourRange.map(h => h.value).includes(this.hour())) {
+            const date = new Date(this.navigatedDate());
+            date.setHours(hourRange[0].value);
+            this.navigatedDate.set(date);
+            return hourRange[0];
         }
+        return null;
+    }
+
+    private updateMinuteToFitInMaxAndMin(): TimeUnit | null {
+        const timeLimiterPipe = new TimeLimiterPipe();
+        const minuteRange = timeLimiterPipe.transform(this.minutes, "m", this.navigatedDate(), this.min, this.max);
+        if (!minuteRange.map(m => m.value).includes(this.minute())) {
+            const date = new Date(this.navigatedDate());
+            date.setMinutes(minuteRange[0].value);
+            this.navigatedDate.set(date);
+            return minuteRange[0];
+        }
+        return null;
+    }
+
+    private updateSecondToFitInMaxAndMin(): TimeUnit | null {
+        const timeLimiterPipe = new TimeLimiterPipe();
+        const secondRange = timeLimiterPipe.transform(this.seconds, "s", this.navigatedDate(), this.min, this.max);
+        if (!secondRange.map(s => s.value).includes(this.second())) {
+            const date = new Date(this.navigatedDate());
+            date.setSeconds(secondRange[0].value);
+            this.navigatedDate.set(date);
+            return secondRange[0];
+        }
+        return null;
     }
 
     public get value(): Date | null {
