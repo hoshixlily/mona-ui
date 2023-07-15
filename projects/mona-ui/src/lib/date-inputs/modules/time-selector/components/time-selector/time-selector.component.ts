@@ -17,7 +17,7 @@ import { Enumerable } from "@mirei/ts-collections";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { Action } from "../../../../../utils/Action";
 import { Meridiem } from "../../../../models/Meridiem";
-import { Hour } from "../../models/Hour";
+import { TimeUnit } from "../../models/TimeUnit";
 
 @Component({
     selector: "mona-time-selector",
@@ -37,13 +37,13 @@ export class TimeSelectorComponent implements OnInit, AfterViewInit, ControlValu
     #value: Date | null = null;
     public currentDateString: string = "";
     public hour: Signal<number> = signal(0);
-    public hours: Hour[] = [];
+    public hours: TimeUnit[] = [];
     public meridiem: Meridiem = "AM";
     public minute: Signal<number> = signal(0);
-    public minutes: number[] = [];
+    public minutes: TimeUnit[] = [];
     public navigatedDate: WritableSignal<Date> = signal(new Date());
     public second: Signal<number> = signal(0);
-    public seconds: number[] = [];
+    public seconds: TimeUnit[] = [];
 
     @Input()
     public disabled: boolean = false;
@@ -56,6 +56,12 @@ export class TimeSelectorComponent implements OnInit, AfterViewInit, ControlValu
 
     @ViewChild("hoursListElement")
     public hoursListElement!: ElementRef<HTMLOListElement>;
+
+    @Input()
+    public max: Date | null = null;
+
+    @Input()
+    public min: Date | null = null;
 
     @ViewChild("minutesListElement")
     public minutesListElement!: ElementRef<HTMLOListElement>;
@@ -82,8 +88,12 @@ export class TimeSelectorComponent implements OnInit, AfterViewInit, ControlValu
 
     public ngOnInit(): void {
         this.setDateValues();
-        this.minutes = Enumerable.range(0, 60).toArray();
-        this.seconds = Enumerable.range(0, 60).toArray();
+        this.minutes = Enumerable.range(0, 60)
+            .select<TimeUnit>(m => ({ value: m, viewValue: m }))
+            .toArray();
+        this.seconds = Enumerable.range(0, 60)
+            .select<TimeUnit>(s => ({ value: s, viewValue: s }))
+            .toArray();
         if (this.value) {
             this.navigatedDate.set(this.value);
         }
@@ -145,12 +155,24 @@ export class TimeSelectorComponent implements OnInit, AfterViewInit, ControlValu
 
     public writeValue(date: Date | null | undefined): void {
         this.#value = date ?? null;
-        if (date == null) {
-            this.currentDateString = "";
-        } else {
-            this.currentDateString = DateTime.fromJSDate(date).toFormat(this.format);
-        }
+        // if (date == null) {
+        //     this.currentDateString = "";
+        // } else {
+        //     this.currentDateString = DateTime.fromJSDate(date).toFormat(this.format);
+        // }
         this.setDateValues();
+    }
+
+    private initializeNavigatedDate(date: Date | null): void {
+        if (!date) {
+            this.navigatedDate.set(DateTime.now().toJSDate());
+        } else if (this.min && date < this.min) {
+            this.navigatedDate.set(this.min);
+        } else if (this.max && date > this.max) {
+            this.navigatedDate.set(this.max);
+        } else {
+            this.navigatedDate.set(date);
+        }
     }
 
     private scrollList(list: HTMLOListElement, value?: number): void {
@@ -171,19 +193,25 @@ export class TimeSelectorComponent implements OnInit, AfterViewInit, ControlValu
 
     private setCurrentDate(date: Date | null): void {
         this.#value = date;
-        if (date) {
-            this.currentDateString = DateTime.fromJSDate(date).toFormat(this.format);
-        } else {
-            this.currentDateString = "";
-        }
+        this.updateCurrentDateString(date);
         this.#propagateChange?.(date);
     }
 
     private setDateValues(): void {
-        this.navigatedDate.set(this.value ?? DateTime.now().toJSDate());
+        this.initializeNavigatedDate(this.value);
         this.meridiem = this.navigatedDate().getHours() >= 12 ? "PM" : "AM";
         if (this.value) {
-            this.currentDateString = DateTime.fromJSDate(this.value).toFormat(this.format);
+            this.updateCurrentDateString(this.navigatedDate());
+        } else {
+            this.updateCurrentDateString(null);
+        }
+    }
+
+    private updateCurrentDateString(date: Date | null): void {
+        if (date) {
+            this.currentDateString = DateTime.fromJSDate(date).toFormat(this.format);
+        } else {
+            this.currentDateString = "";
         }
     }
 

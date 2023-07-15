@@ -54,6 +54,12 @@ export class TimePickerComponent implements OnInit, OnChanges, ControlValueAcces
     @Input()
     public hourFormat: "12" | "24" = "24";
 
+    @Input()
+    public max: Date | null = null;
+
+    @Input()
+    public min: Date | null = null;
+
     @ViewChild("popupAnchor")
     public popupAnchor!: ElementRef<HTMLDivElement>;
 
