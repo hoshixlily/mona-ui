@@ -23,16 +23,19 @@ export class TimeLimiterPipe implements PipeTransform {
                 let dateWithHour = new Date(normalizedDates.date);
                 dateWithHour.setHours(hour.value);
                 return (
-                    (normalizedDates.minDate ? dateWithHour.getHours() >= normalizedDates.minDate.getHours() : false) &&
-                    (normalizedDates.maxDate ? dateWithHour.getHours() <= normalizedDates.maxDate.getHours() : false)
+                    (normalizedDates.minDate ? dateWithHour.getHours() >= normalizedDates.minDate.getHours() : true) &&
+                    (normalizedDates.maxDate ? dateWithHour.getHours() <= normalizedDates.maxDate.getHours() : true)
                 );
             });
             return result;
         } else if (type === "m") {
             const result = timeValues.filter(minute => {
-                if (normalizedDates.date.getHours() === normalizedDates.minDate.getHours()) {
+                if (normalizedDates.minDate && normalizedDates.date.getHours() === normalizedDates.minDate.getHours()) {
                     return minute.value >= normalizedDates.minDate.getMinutes();
-                } else if (normalizedDates.date.getHours() === normalizedDates.maxDate.getHours()) {
+                } else if (
+                    normalizedDates.maxDate &&
+                    normalizedDates.date.getHours() === normalizedDates.maxDate.getHours()
+                ) {
                     return minute.value <= normalizedDates.maxDate.getMinutes();
                 } else {
                     return true;
@@ -42,11 +45,13 @@ export class TimeLimiterPipe implements PipeTransform {
         } else if (type === "s") {
             const result = timeValues.filter(second => {
                 if (
+                    normalizedDates.minDate &&
                     normalizedDates.date.getHours() === normalizedDates.minDate.getHours() &&
                     normalizedDates.date.getMinutes() === normalizedDates.minDate.getMinutes()
                 ) {
                     return second.value >= normalizedDates.minDate.getSeconds();
                 } else if (
+                    normalizedDates.maxDate &&
                     normalizedDates.date.getHours() === normalizedDates.maxDate.getHours() &&
                     normalizedDates.date.getMinutes() === normalizedDates.maxDate.getMinutes()
                 ) {
@@ -68,7 +73,7 @@ export class TimeLimiterPipe implements PipeTransform {
         date: Date,
         min?: Date | null,
         max?: Date | null
-    ): { minDate: Date; maxDate: Date; date: Date } {
+    ): { minDate?: Date; maxDate?: Date; date: Date } {
         if (!min && !max) {
             return { minDate: date, maxDate: date, date };
         }
@@ -85,7 +90,7 @@ export class TimeLimiterPipe implements PipeTransform {
                 date.getMinutes(),
                 date.getSeconds()
             );
-            return { minDate: newMin, maxDate: newMin, date: newDate };
+            return { minDate: newMin, maxDate: undefined, date: newDate };
         }
         if (!min && max) {
             const maxYears = Math.max(max.getFullYear(), date.getFullYear());
@@ -100,7 +105,7 @@ export class TimeLimiterPipe implements PipeTransform {
                 date.getMinutes(),
                 date.getSeconds()
             );
-            return { minDate: newMax, maxDate: newMax, date: newDate };
+            return { minDate: undefined, maxDate: newMax, date: newDate };
         }
         if (min && max) {
             const minYears = Math.min(min.getFullYear(), date.getFullYear());
