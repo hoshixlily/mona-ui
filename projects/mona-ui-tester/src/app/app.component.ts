@@ -321,7 +321,9 @@ export class AppComponent implements OnInit {
     ];
     public textBoxValue: string = "TEXT BOX VALUE";
     public textBoxValue2: string = "a";
-    public timePickerValue: Date | null = new Date(2018, 0, 1, 17, 13, 37);
+    public timePickerMaxValue: Date | null = new Date(2002, 2, 10, 17, 15, 9);
+    public timePickerMinValue: Date | null = new Date(2000, 2, 10, 8, 30, 0);
+    public timePickerValue: Date | null = new Date(2000, 2, 10, 10, 0, 0);
     public toggleableButtonSelected: boolean = true;
     public treeCheckedKeys: string[] = ["1-2", "1-3-1"];
 

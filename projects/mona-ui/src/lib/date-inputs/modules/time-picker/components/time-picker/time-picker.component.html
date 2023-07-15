@@ -10,5 +10,7 @@
 </div>
 
 <ng-template #timePopupTemplate>
-    <mona-time-selector [ngModel]="value" (ngModelChange)="onTimeSelectorValueChange($event)" [hourFormat]="hourFormat" [showSeconds]="showSeconds"></mona-time-selector>
+    <mona-time-selector [ngModel]="value" (ngModelChange)="onTimeSelectorValueChange($event)"
+                        [max]="max" [min]="min"
+                        [hourFormat]="hourFormat" [showSeconds]="showSeconds"></mona-time-selector>
 </ng-template>

@@ -1,13 +1,19 @@
 <div class="mona-time-selector" [ngClass]="{'mona-disabled': disabled}" #popupAnchor>
     <ol #hoursListElement>
-        <li *ngFor="let h of hours|hourSelector:hourFormat:meridiem" [ngClass]="{'mona-selected':h.viewValue===hour()}" (click)="onHourChange(h.value)"
+        <li *ngFor="let h of hours|hourSelector:hourFormat:meridiem|timeLimiter:'h':navigatedDate():min:max"
+            [ngClass]="{'mona-selected':h.viewValue===hour()}"
+            (click)="onHourChange(h.value)"
             [attr.data-value]="h.value">{{h.viewValue | number:'2.0'}}</li>
     </ol>
     <ol #minutesListElement>
-        <li *ngFor="let m of minutes" [ngClass]="{'mona-selected':m===minute()}" (click)="onMinuteChange(m)"  [attr.data-value]="m">{{m | number:'2.0'}}</li>
+        <li *ngFor="let m of minutes|timeLimiter:'m':navigatedDate():min:max"
+            [ngClass]="{'mona-selected':m.value===minute()}"
+            (click)="onMinuteChange(m.value)" [attr.data-value]="m.value">{{m.viewValue | number:'2.0'}}</li>
     </ol>
     <ol #secondsListElement *ngIf="showSeconds">
-        <li *ngFor="let s of seconds" [ngClass]="{'mona-selected':s===second()}" (click)="onSecondChange(s)" [attr.data-value]="s">{{s | number:'2.0'}}</li>
+        <li *ngFor="let s of seconds|timeLimiter:'s':navigatedDate():min:max"
+            [ngClass]="{'mona-selected':s.value===second()}"
+            (click)="onSecondChange(s.value)" [attr.data-value]="s.value">{{s.value | number:'2.0'}}</li>
     </ol>
     <ol *ngIf="hourFormat==='12'">
         <li [ngClass]="{'mona-selected': meridiem==='AM'}" (click)="onMeridiemClick('AM')">AM</li>

@@ -6,9 +6,10 @@ import { FormsModule } from "@angular/forms";
 import { ButtonGroupModule } from "../../../buttons/modules/button-group/button-group.module";
 import { ButtonModule } from "../../../buttons/modules/button/button.module";
 import { HourSelectorPipe } from './pipes/hour-selector.pipe';
+import { TimeLimiterPipe } from './pipes/time-limiter.pipe';
 
 @NgModule({
-    declarations: [TimeSelectorComponent, HourSelectorPipe],
+    declarations: [TimeSelectorComponent, HourSelectorPipe, TimeLimiterPipe],
     imports: [CommonModule, NumericTextBoxModule, FormsModule, ButtonGroupModule, ButtonModule],
     exports: [TimeSelectorComponent]
 })

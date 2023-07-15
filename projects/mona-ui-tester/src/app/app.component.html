@@ -287,6 +287,8 @@
                                                   (ngModelChange)="onDatePickerValueChange($event)"></mona-date-picker>
 
                                 <mona-time-picker [hourFormat]="dateFormat24Hours ? '24':'12'" [showSeconds]="true"
+                                                  [min]="timePickerMinValue"
+                                                  [max]="timePickerMaxValue"
                                                   [ngModel]="timePickerValue"
                                                   (ngModelChange)="onTimePickerValueChange($event)"
                                                   [format]="dateFormat24Hours ? 'HH:mm:ss' : 'hh:mm:ss a'"
