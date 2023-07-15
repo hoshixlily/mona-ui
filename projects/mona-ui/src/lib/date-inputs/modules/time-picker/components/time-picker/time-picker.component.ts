@@ -20,6 +20,7 @@ import { take } from "rxjs";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { Action } from "../../../../../utils/Action";
 import { PopupRef } from "../../../../../popup/models/PopupRef";
+import { ConnectionPositionPair } from "@angular/cdk/overlay";
 
 @Component({
     selector: "mona-time-picker",
@@ -121,10 +122,26 @@ export class TimePickerComponent implements OnInit, OnChanges, ControlValueAcces
         this.popupRef = this.popupService.create({
             anchor: this.elementRef.nativeElement,
             content: this.timePopupTemplateRef,
-            width: this.popupAnchor.nativeElement.clientWidth,
+            width: this.elementRef.nativeElement.getBoundingClientRect().width,
             popupClass: "mona-time-picker-popup",
             hasBackdrop: false,
-            closeOnOutsideClick: true
+            closeOnOutsideClick: true,
+            positions: [
+                new ConnectionPositionPair(
+                    { originX: "start", originY: "bottom" },
+                    { overlayX: "start", overlayY: "top" },
+                    -1,
+                    -1,
+                    "mona-dropdown-popup-content-bottom"
+                ),
+                new ConnectionPositionPair(
+                    { originX: "start", originY: "top" },
+                    { overlayX: "start", overlayY: "bottom" },
+                    -1,
+                    -1,
+                    "mona-dropdown-popup-content-top"
+                )
+            ]
         });
         this.popupRef.closed.pipe(take(1)).subscribe(() => {
             this.popupRef = null;
