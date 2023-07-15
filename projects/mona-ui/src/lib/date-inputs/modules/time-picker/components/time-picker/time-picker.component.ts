@@ -20,7 +20,6 @@ import { take } from "rxjs";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { Action } from "../../../../../utils/Action";
 import { PopupRef } from "../../../../../popup/models/PopupRef";
-import { TimeLimiterPipe } from "../../../time-selector/pipes/time-limiter.pipe";
 
 @Component({
     selector: "mona-time-picker",
@@ -98,15 +97,13 @@ export class TimePickerComponent implements OnInit, OnChanges, ControlValueAcces
         if (this.popupRef) {
             return;
         }
-        let dateTime = DateTime.fromFormat(this.currentDateString, this.format);
-        if (this.value) {
-            dateTime = dateTime.set({
-                year: this.value.getFullYear(),
-                month: this.value.getMonth() + 1,
-                day: this.value.getDate()
-            });
+        let dateTime = this.generateValidDateTime(this.currentDateString);
+        if (!dateTime) {
+            this.setCurrentDate(null);
+            return;
         }
         if (this.dateStringEquals(dateTime.toJSDate(), this.value)) {
+            this.setCurrentDateString(this.value);
             return;
         }
         if (dateTime.isValid) {
@@ -168,15 +165,50 @@ export class TimePickerComponent implements OnInit, OnChanges, ControlValueAcces
         return date1 === date2;
     }
 
+    /**
+     * Generates a valid date from a string.
+     * @param dateString
+     * @private
+     */
+    private generateValidDateTime(dateString: string): DateTime | null {
+        if (!this.value) {
+            return null;
+        }
+        const valueDate = DateTime.fromJSDate(this.value);
+        let dateTime = DateTime.fromFormat(dateString, this.format);
+        if (dateTime.isValid) {
+            return dateTime.set({
+                year: valueDate.year,
+                month: valueDate.month,
+                day: valueDate.day
+            });
+        }
+        const date = this.min ? this.min : this.max;
+        if (date) {
+            const newDate = DateTime.fromJSDate(date);
+            dateTime = newDate.set({
+                year: valueDate.year,
+                month: valueDate.month,
+                day: valueDate.day
+            });
+            return dateTime;
+        }
+        return null;
+    }
+
     private setCurrentDate(date: Date | null): void {
         this.#value = date;
+        this.setCurrentDateString(date);
+        this.#propagateChange?.(date);
+        this.cdr.markForCheck();
+    }
+
+    private setCurrentDateString(date: Date | null): void {
         if (date) {
             this.currentDateString = DateTime.fromJSDate(date).toFormat(this.format);
         } else {
             this.currentDateString = "";
         }
-        this.#propagateChange?.(date);
-        this.cdr.markForCheck();
     }
 
     private setDateValues(): void {
@@ -190,29 +222,35 @@ export class TimePickerComponent implements OnInit, OnChanges, ControlValueAcces
         const minDate = this.min ? DateTime.fromJSDate(this.min) : null;
         const maxDate = this.max ? DateTime.fromJSDate(this.max) : null;
         let currentDate = DateTime.fromJSDate(date);
-        if (minDate && currentDate.hour < minDate.hour) {
-            currentDate = currentDate.set({ hour: minDate.hour, minute: minDate.minute, second: minDate.second });
-        } else if (minDate && currentDate.hour === minDate.hour && currentDate.minute < minDate.minute) {
-            currentDate = currentDate.set({ minute: minDate.minute, second: minDate.second });
-        } else if (
-            minDate &&
-            currentDate.hour === minDate.hour &&
-            currentDate.minute === minDate.minute &&
-            currentDate.second < minDate.second
-        ) {
-            currentDate = currentDate.set({ second: minDate.second });
-        } else if (maxDate && currentDate.hour > maxDate.hour) {
-            currentDate = currentDate.set({ hour: maxDate.hour, minute: maxDate.minute, second: maxDate.second });
-        } else if (maxDate && currentDate.hour === maxDate.hour && currentDate.minute > maxDate.minute) {
-            currentDate = currentDate.set({ minute: maxDate.minute, second: maxDate.second });
-        } else if (
-            maxDate &&
-            currentDate.hour === maxDate.hour &&
-            currentDate.minute === maxDate.minute &&
-            currentDate.second > maxDate.second
-        ) {
-            currentDate = currentDate.set({ second: maxDate.second });
+
+        if (minDate) {
+            if (currentDate.hour < minDate.hour) {
+                currentDate = currentDate.set({ hour: minDate.hour, minute: minDate.minute, second: minDate.second });
+            } else if (currentDate.hour === minDate.hour && currentDate.minute < minDate.minute) {
+                currentDate = currentDate.set({ minute: minDate.minute, second: minDate.second });
+            } else if (
+                currentDate.hour === minDate.hour &&
+                currentDate.minute === minDate.minute &&
+                currentDate.second < minDate.second
+            ) {
+                currentDate = currentDate.set({ second: minDate.second });
+            }
         }
+
+        if (maxDate) {
+            if (currentDate.hour > maxDate.hour) {
+                currentDate = currentDate.set({ hour: maxDate.hour, minute: maxDate.minute, second: maxDate.second });
+            } else if (currentDate.hour === maxDate.hour && currentDate.minute > maxDate.minute) {
+                currentDate = currentDate.set({ minute: maxDate.minute, second: maxDate.second });
+            } else if (
+                currentDate.hour === maxDate.hour &&
+                currentDate.minute === maxDate.minute &&
+                currentDate.second > maxDate.second
+            ) {
+                currentDate = currentDate.set({ second: maxDate.second });
+            }
+        }
+
         return currentDate.toJSDate();
     }
 
