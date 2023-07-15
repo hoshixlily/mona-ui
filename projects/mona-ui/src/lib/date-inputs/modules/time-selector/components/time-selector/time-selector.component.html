@@ -16,7 +16,9 @@
             (click)="onSecondChange(s.value)" [attr.data-value]="s.value">{{s.value | number:'2.0'}}</li>
     </ol>
     <ol *ngIf="hourFormat==='12'">
-        <li [ngClass]="{'mona-selected': meridiem==='AM'}" (click)="onMeridiemClick('AM')">AM</li>
-        <li [ngClass]="{'mona-selected': meridiem==='PM'}" (click)="onMeridiemClick('PM')">PM</li>
+        <li [ngClass]="{'mona-selected': meridiem==='AM'}"
+            (click)="onMeridiemClick('AM')" *ngIf="amMeridiemVisible">AM</li>
+        <li [ngClass]="{'mona-selected': meridiem==='PM'}"
+            (click)="onMeridiemClick('PM')" *ngIf="pmMeridiemVisible">PM</li>
     </ol>
 </div>

@@ -296,6 +296,8 @@
 
                                 <mona-date-time-picker format="dd/MM/yyyy hh:mm a" style="width: 250px;"
                                                        [hourFormat]="dateFormat24Hours ? '24' : '12'" [readonly]="false"
+                                                       [min]="dateTimePickerMinValue"
+                                                       [max]="dateTimePickerMaxValue"
                                                        [ngModel]="dateTimePickerValue"
                                                        (ngModelChange)="onDateTimePickerValueChange($event)"></mona-date-time-picker>
 

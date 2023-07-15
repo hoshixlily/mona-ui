@@ -13,10 +13,12 @@
 </div>
 
 <ng-template #datePopupTemplate>
-    <mona-calendar [disabledDates]="disabledDates" [min]="min" [max]="max" [ngModel]="value" (ngModelChange)="onCalendarValueChange($event)"></mona-calendar>
+    <mona-calendar [disabledDates]="disabledDates" [min]="min" [max]="max"
+                   [ngModel]="navigatedDate" (ngModelChange)="onCalendarValueChange($event)"></mona-calendar>
 </ng-template>
 
 <ng-template #timePopupTemplate>
-    <mona-time-selector [ngModel]="value" (ngModelChange)="onTimeSelectorValueChange($event)"
+    <mona-time-selector [ngModel]="navigatedDate" (ngModelChange)="onTimeSelectorValueChange($event)"
+                        [max]="timePickerMax" [min]="timePickerMin"
                         [hourFormat]="hourFormat" [showSeconds]="showSeconds"></mona-time-selector>
 </ng-template>

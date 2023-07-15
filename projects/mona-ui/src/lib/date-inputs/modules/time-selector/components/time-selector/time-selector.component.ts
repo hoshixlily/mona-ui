@@ -37,12 +37,14 @@ import { HourSelectorPipe } from "../../pipes/hour-selector.pipe";
 export class TimeSelectorComponent implements OnInit, AfterViewInit, ControlValueAccessor {
     #propagateChange: Action<Date | null> | null = null;
     #value: Date | null = null;
+    public amMeridiemVisible: boolean = true;
     public hour: Signal<number> = signal(0);
     public hours: TimeUnit[] = [];
     public meridiem: Meridiem = "AM";
     public minute: Signal<number> = signal(0);
     public minutes: TimeUnit[] = [];
     public navigatedDate: WritableSignal<Date> = signal(new Date());
+    public pmMeridiemVisible: boolean = true;
     public second: Signal<number> = signal(0);
     public seconds: TimeUnit[] = [];
 
@@ -107,6 +109,18 @@ export class TimeSelectorComponent implements OnInit, AfterViewInit, ControlValu
         });
         this.minute = computed(() => this.navigatedDate().getMinutes());
         this.second = computed(() => this.navigatedDate().getSeconds());
+
+        if (this.min) {
+            if (this.min.getHours() >= 12) {
+                this.amMeridiemVisible = false;
+            }
+        }
+
+        if (this.max) {
+            if (this.max.getHours() < 12) {
+                this.pmMeridiemVisible = false;
+            }
+        }
     }
 
     public onHourChange(value: number): void {

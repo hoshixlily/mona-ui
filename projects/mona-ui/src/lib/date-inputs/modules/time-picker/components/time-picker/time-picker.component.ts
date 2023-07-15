@@ -108,8 +108,9 @@ export class TimePickerComponent implements OnInit, OnChanges, ControlValueAcces
             return;
         }
         if (dateTime.isValid) {
-            const inRangeDate = this.updateDateIfNotInMinMax(dateTime.toJSDate());
+            const inRangeDate = this.updateTimeIfNotInMinMax(dateTime.toJSDate());
             this.setCurrentDate(inRangeDate);
+            this.navigatedDate = inRangeDate;
         } else {
             this.setCurrentDate(null);
         }
@@ -235,7 +236,7 @@ export class TimePickerComponent implements OnInit, OnChanges, ControlValueAcces
         }
     }
 
-    private updateDateIfNotInMinMax(date: Date): Date {
+    private updateTimeIfNotInMinMax(date: Date): Date {
         const minDate = this.min ? DateTime.fromJSDate(this.min) : null;
         const maxDate = this.max ? DateTime.fromJSDate(this.max) : null;
         let currentDate = DateTime.fromJSDate(date);
