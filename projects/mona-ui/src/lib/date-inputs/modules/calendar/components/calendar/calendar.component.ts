@@ -25,7 +25,6 @@ export class CalendarComponent implements OnInit, ControlValueAccessor {
     public readonly nextMonthIcon: IconDefinition = faChevronRight;
     public readonly prevMonthIcon: IconDefinition = faChevronLeft;
     public calendarView: CalendarView = "month";
-    public currentDateString: string = "";
     public decadeYears: number[] = [];
     public monthBounds: { start: Date; end: Date } = { start: new Date(), end: new Date() };
     public monthlyViewDict: Dictionary<Date, number> = new Dictionary<Date, number>();
@@ -62,15 +61,15 @@ export class CalendarComponent implements OnInit, ControlValueAccessor {
             const newDate = DateTime.fromJSDate(this.value)
                 .set({ day: date1.day, month: date1.month, year: date1.year })
                 .toJSDate();
-            this.setCurrentDate(newDate);
             this.navigatedDate = newDate;
             if (oldMonth !== DateTime.fromJSDate(newDate).month) {
                 this.prepareMonthlyViewDictionary(newDate);
             }
+            this.setCurrentDate(newDate);
         } else {
-            this.setCurrentDate(date);
             this.navigatedDate = date;
             this.prepareMonthlyViewDictionary(date);
+            this.setCurrentDate(date);
         }
     }
 
@@ -128,12 +127,10 @@ export class CalendarComponent implements OnInit, ControlValueAccessor {
 
     public writeValue(date: Date | null | undefined): void {
         this.#value = date ?? null;
-        if (date == null) {
-            this.currentDateString = "";
-        } else {
-            this.currentDateString = DateTime.fromJSDate(date).toFormat(this.format);
-        }
         this.setDateValues();
+        if (date) {
+            this.prepareMonthlyViewDictionary(date);
+        }
     }
 
     private prepareDecadeYears(): void {
@@ -163,19 +160,11 @@ export class CalendarComponent implements OnInit, ControlValueAccessor {
 
     private setCurrentDate(date: Date | null): void {
         this.#value = date;
-        if (date) {
-            this.currentDateString = DateTime.fromJSDate(date).toFormat(this.format);
-        } else {
-            this.currentDateString = "";
-        }
         this.#propagateChange?.(date);
     }
 
     private setDateValues(): void {
         this.navigatedDate = this.value ?? DateTime.now().toJSDate();
-        if (this.value) {
-            this.currentDateString = DateTime.fromJSDate(this.value).toFormat(this.format);
-        }
     }
 
     public get timezone(): string {

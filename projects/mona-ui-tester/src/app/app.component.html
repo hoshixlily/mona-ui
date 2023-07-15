@@ -431,6 +431,11 @@
                                                  style="color: #fafd0f;"></fa-icon>
                                     </ng-template>
                                 </mona-range-slider>
+
+                                <mona-calendar [(ngModel)]="calendarValue"
+                                               [min]="calendarMinValue"
+                                                  [max]="calendarMaxValue"
+                                               style="width: 300px;"></mona-calendar>
                             </div>
                         </div>
                     </ng-template>
@@ -490,8 +495,8 @@
                                     <mona-splitter orientation="horizontal">
                                         <mona-splitter-pane [collapsible]="true">
                                             <div style="width: 100%; height: 100%; padding: 20px;">
-                                                <mona-calendar [(ngModel)]="calendarValue"
-                                                               style="width: 300px;"></mona-calendar>
+<!--                                                <mona-calendar [(ngModel)]="calendarValue"-->
+<!--                                                               style="width: 300px;"></mona-calendar>-->
                                             </div>
                                         </mona-splitter-pane>
                                         <mona-splitter-pane [collapsible]="true">

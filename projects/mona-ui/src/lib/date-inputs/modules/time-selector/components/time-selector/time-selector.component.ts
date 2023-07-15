@@ -140,6 +140,7 @@ export class TimeSelectorComponent implements OnInit, AfterViewInit, ControlValu
         const hourData = this.updateHourToFitInMaxAndMin();
         const minuteData = this.updateMinuteToFitInMaxAndMin();
         const secondData = this.updateSecondToFitInMaxAndMin();
+        this.setCurrentDate(this.navigatedDate());
         if (hourData) {
             this.scrollList(this.hoursListElement.nativeElement, hourData.value);
         }
@@ -149,7 +150,6 @@ export class TimeSelectorComponent implements OnInit, AfterViewInit, ControlValu
         if (secondData) {
             this.scrollList(this.secondsListElement.nativeElement, secondData.value);
         }
-        this.setCurrentDate(this.navigatedDate());
     }
 
     public onMinuteChange(value: number): void {
