@@ -283,10 +283,12 @@
                                 <button monaButton>Line 2</button>
 
                                 <mona-date-picker format="d/M/yyyy" style="width: 250px;" [readonly]="false"
-                                                  [min]="dateMin" [max]="dateMax" [ngModel]="datePickerValue"
+                                                  [min]="datePickerMinValue" [max]="datePickerMaxValue" [ngModel]="datePickerValue"
                                                   (ngModelChange)="onDatePickerValueChange($event)"></mona-date-picker>
 
                                 <mona-time-picker [hourFormat]="dateFormat24Hours ? '24':'12'" [showSeconds]="true"
+                                                  [min]="timePickerMinValue"
+                                                  [max]="timePickerMaxValue"
                                                   [ngModel]="timePickerValue"
                                                   (ngModelChange)="onTimePickerValueChange($event)"
                                                   [format]="dateFormat24Hours ? 'HH:mm:ss' : 'hh:mm:ss a'"
@@ -294,6 +296,8 @@
 
                                 <mona-date-time-picker format="dd/MM/yyyy hh:mm a" style="width: 250px;"
                                                        [hourFormat]="dateFormat24Hours ? '24' : '12'" [readonly]="false"
+                                                       [min]="dateTimePickerMinValue"
+                                                       [max]="dateTimePickerMaxValue"
                                                        [ngModel]="dateTimePickerValue"
                                                        (ngModelChange)="onDateTimePickerValueChange($event)"></mona-date-time-picker>
 
@@ -429,6 +433,11 @@
                                                  style="color: #fafd0f;"></fa-icon>
                                     </ng-template>
                                 </mona-range-slider>
+
+                                <mona-calendar [(ngModel)]="calendarValue"
+                                               [min]="calendarMinValue"
+                                                  [max]="calendarMaxValue"
+                                               style="width: 300px;"></mona-calendar>
                             </div>
                         </div>
                     </ng-template>
@@ -488,8 +497,8 @@
                                     <mona-splitter orientation="horizontal">
                                         <mona-splitter-pane [collapsible]="true">
                                             <div style="width: 100%; height: 100%; padding: 20px;">
-                                                <mona-calendar [(ngModel)]="calendarValue"
-                                                               style="width: 300px;"></mona-calendar>
+<!--                                                <mona-calendar [(ngModel)]="calendarValue"-->
+<!--                                                               style="width: 300px;"></mona-calendar>-->
                                             </div>
                                         </mona-splitter-pane>
                                         <mona-splitter-pane [collapsible]="true">
