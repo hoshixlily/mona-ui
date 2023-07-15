@@ -117,10 +117,15 @@ export class AppComponent implements OnInit {
 
     public contextMenuItemVisible: boolean = true;
     public dateFormat24Hours: boolean = false;
+
+    public datePickerMaxValue: Date = new Date(2023, 7, 10);
+    public datePickerMinValue: Date = new Date(2023, 6, 10);
     public datePickerValue: Date | null = new Date();
+
     public dateTimePickerMaxValue: Date = new Date(2019, 2, 15, 11, 30);
     public dateTimePickerMinValue: Date = new Date(2019, 2, 10, 12, 30);
-    public dateTimePickerValue: Date | null = null;
+    public dateTimePickerValue: Date | null = new Date(2019, 2, 16, 21, 40);
+
     public disabledDates: Date[] = [
         new Date(2023, 0, 1),
         new Date(2023, 0, 2),
@@ -131,8 +136,6 @@ export class AppComponent implements OnInit {
         new Date(2023, 1, 21),
         new Date(2023, 1, 28)
     ];
-    public dateMax: Date = new Date(2023, 9, 27);
-    public dateMin: Date = new Date(2023, 0, 6);
     public dropdownListDataItems: IndexableList<any> = new IndexableList([
         { text: "Cherry", value: 1, group: "Fruit", active: true },
         { text: "Cabbage", value: 2, group: "Vegetable", active: true },

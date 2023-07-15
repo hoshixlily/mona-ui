@@ -283,7 +283,7 @@
                                 <button monaButton>Line 2</button>
 
                                 <mona-date-picker format="d/M/yyyy" style="width: 250px;" [readonly]="false"
-                                                  [min]="dateMin" [max]="dateMax" [ngModel]="datePickerValue"
+                                                  [min]="datePickerMinValue" [max]="datePickerMaxValue" [ngModel]="datePickerValue"
                                                   (ngModelChange)="onDatePickerValueChange($event)"></mona-date-picker>
 
                                 <mona-time-picker [hourFormat]="dateFormat24Hours ? '24':'12'" [showSeconds]="true"

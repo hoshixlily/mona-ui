@@ -91,9 +91,10 @@ export class DateTimePickerComponent implements OnInit, ControlValueAccessor {
 
     public onCalendarValueChange(date: Date | null): void {
         if (date) {
-            this.navigatedDate = date;
+            const inRangeDate = this.updateDateIfNotInRange(date);
+            this.setCurrentDate(inRangeDate);
+            this.navigatedDate = inRangeDate;
         }
-        this.setCurrentDate(date);
         this.popupRef?.close();
         this.popupRef = null;
     }
@@ -208,9 +209,10 @@ export class DateTimePickerComponent implements OnInit, ControlValueAccessor {
     }
 
     public onTimeSelectorValueChange(date: Date | null): void {
-        this.setCurrentDate(date);
         if (date) {
-            this.navigatedDate = date;
+            const inRangeDate = this.updateDateIfNotInRange(date);
+            this.setCurrentDate(inRangeDate);
+            this.navigatedDate = inRangeDate;
         }
     }
 
