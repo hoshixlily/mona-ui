@@ -17,52 +17,47 @@ export class TimeLimiterPipe implements PipeTransform {
             return timeValues;
         }
         const normalizedDates = this.normalizeDates(currentDate, min, max);
-
-        if (type === "h") {
-            const result = timeValues.filter(hour => {
-                let dateWithHour = new Date(normalizedDates.date);
-                dateWithHour.setHours(hour.value);
+        const result = timeValues.filter(timeUnit => {
+            let dateWithTimeUnit = new Date(normalizedDates.date);
+            if (type === "h") {
+                dateWithTimeUnit.setHours(timeUnit.value);
                 return (
-                    (normalizedDates.minDate ? dateWithHour.getHours() >= normalizedDates.minDate.getHours() : true) &&
-                    (normalizedDates.maxDate ? dateWithHour.getHours() <= normalizedDates.maxDate.getHours() : true)
+                    (normalizedDates.minDate
+                        ? dateWithTimeUnit.getHours() >= normalizedDates.minDate.getHours()
+                        : true) &&
+                    (normalizedDates.maxDate ? dateWithTimeUnit.getHours() <= normalizedDates.maxDate.getHours() : true)
                 );
-            });
-            return result;
-        } else if (type === "m") {
-            const result = timeValues.filter(minute => {
+            } else if (type === "m") {
                 if (normalizedDates.minDate && normalizedDates.date.getHours() === normalizedDates.minDate.getHours()) {
-                    return minute.value >= normalizedDates.minDate.getMinutes();
+                    return timeUnit.value >= normalizedDates.minDate.getMinutes();
                 } else if (
                     normalizedDates.maxDate &&
                     normalizedDates.date.getHours() === normalizedDates.maxDate.getHours()
                 ) {
-                    return minute.value <= normalizedDates.maxDate.getMinutes();
+                    return timeUnit.value <= normalizedDates.maxDate.getMinutes();
                 } else {
                     return true;
                 }
-            });
-            return result;
-        } else if (type === "s") {
-            const result = timeValues.filter(second => {
+            } else if (type === "s") {
                 if (
                     normalizedDates.minDate &&
                     normalizedDates.date.getHours() === normalizedDates.minDate.getHours() &&
                     normalizedDates.date.getMinutes() === normalizedDates.minDate.getMinutes()
                 ) {
-                    return second.value >= normalizedDates.minDate.getSeconds();
+                    return timeUnit.value >= normalizedDates.minDate.getSeconds();
                 } else if (
                     normalizedDates.maxDate &&
                     normalizedDates.date.getHours() === normalizedDates.maxDate.getHours() &&
                     normalizedDates.date.getMinutes() === normalizedDates.maxDate.getMinutes()
                 ) {
-                    return second.value <= normalizedDates.maxDate.getSeconds();
+                    return timeUnit.value <= normalizedDates.maxDate.getSeconds();
                 } else {
                     return true;
                 }
-            });
-            return result;
-        }
-        return timeValues;
+            }
+            return false;
+        });
+        return result;
     }
 
     private cloneDate(date: Date): Date {
