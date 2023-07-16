@@ -37,7 +37,7 @@ export class ProgressBarComponent implements OnInit, AfterViewInit {
     public labelPosition: LabelPosition = "center";
 
     @Input()
-    public labelStyles: Partial<Record<string, string | number>> = {};
+    public labelStyles: Partial<CSSStyleDeclaration> = {};
 
     @Input()
     public labelVisible: boolean = true;

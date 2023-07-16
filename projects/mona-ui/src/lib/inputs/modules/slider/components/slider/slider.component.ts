@@ -16,7 +16,7 @@ import {
 import { SliderTick } from "../../../../models/slider/SliderTick";
 import { SliderLabelPosition } from "../../../../models/slider/SliderLabelPosition";
 import { SliderTickValueTemplateDirective } from "../../directives/slider-tick-value-template.directive";
-import { distinctUntilChanged, fromEvent, map, take, tap } from "rxjs";
+import { distinctUntilChanged, fromEvent, map, startWith, take, tap } from "rxjs";
 import { Action } from "../../../../../utils/Action";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 
@@ -109,6 +109,7 @@ export class SliderComponent implements OnInit, ControlValueAccessor {
                     const tickElement = this.findClosestTickElement(moveEvent as MouseEvent);
                     return Number(tickElement.getAttribute("data-value"));
                 }),
+                startWith(this.handlerValue()),
                 distinctUntilChanged()
             )
             .subscribe((tickValue: number) => {
@@ -173,6 +174,9 @@ export class SliderComponent implements OnInit, ControlValueAccessor {
     }
 
     private setHandlerValue(value: number): void {
+        if (this.handlerValue() === value) {
+            return;
+        }
         this.handlerValue.set(value);
         this.#propagateChange?.(value);
     }

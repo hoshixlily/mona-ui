@@ -86,8 +86,8 @@
                                         <mona-progress-bar [value]="sliderValue*10" [disabled]="false" [min]="0"
                                                            [max]="100"
                                                            [color]="progressBarColorSelector"
-                                                           [labelStyles]="{'font-weight': 'bolder'}"
-                                                           [labelVisible]="false" [labelFormat]="progressLabelFormatter"
+                                                           [labelStyles]="{fontWeight: 'bolder'}"
+                                                           [labelVisible]="true" [labelFormat]="progressLabelFormatter"
                                                            [indeterminate]="switchValue"
                                                            labelPosition="end"></mona-progress-bar>
                                     </ng-template>
@@ -414,7 +414,7 @@
                             </div>
 
                             <div style="display: flex; align-items: center; justify-content: center; margin-top: 40px;">
-                                <mona-slider orientation="vertical" labelPosition="after" [ngModel]="11" (ngModelChange)="print($event)" style="height: 400px; margin-right: 0;">
+                                <mona-slider orientation="vertical" labelPosition="before" [ngModel]="sliderValue" (ngModelChange)="print($event)" style="height: 400px; margin-right: 0;">
 <!--                                    <ng-template monaSliderTickValueTemplate let-value>-->
 <!--                                        <fa-icon [icon]="moonIcon" *ngIf="value % 2 === 0"-->
 <!--                                                 style="color: mediumpurple;"></fa-icon>-->
@@ -423,13 +423,15 @@
 <!--                                    </ng-template>-->
                                 </mona-slider>
                                 <mona-range-slider orientation="vertical"
-                                                    [ngModel]="[7, 13]"
+                                                   [min]="0"
+                                                    [max]="23"
+                                                    [ngModel]="[8, 17]"
                                                     (ngModelChange)="print($event)"
                                                     style="height: 400px;">
                                     <ng-template monaRangeSliderTickValueTemplate let-value>
-                                        <fa-icon [icon]="moonIcon" *ngIf="value % 2 === 0"
+                                        <fa-icon [icon]="moonIcon" *ngIf="value < 8 || value > 17"
                                                  style="color: mediumpurple;"></fa-icon>
-                                        <fa-icon [icon]="sunIcon" *ngIf="value % 2 !== 0"
+                                        <fa-icon [icon]="sunIcon" *ngIf="value >= 8 && value <= 17"
                                                  style="color: #fafd0f;"></fa-icon>
                                     </ng-template>
                                 </mona-range-slider>

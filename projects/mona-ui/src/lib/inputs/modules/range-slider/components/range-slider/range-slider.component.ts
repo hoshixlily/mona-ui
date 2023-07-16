@@ -18,7 +18,7 @@ import { SliderLabelPosition } from "../../../../models/slider/SliderLabelPositi
 import { SliderTick } from "../../../../models/slider/SliderTick";
 import { SliderHandlerData } from "../../../../models/slider/SliderHandlerData";
 import { SliderHandlerType } from "../../../../models/slider/SliderHandlerType";
-import { distinctUntilChanged, fromEvent, map, take, tap } from "rxjs";
+import { distinctUntilChanged, filter, fromEvent, map, startWith, take, tap } from "rxjs";
 import { RangeSliderTickValueTemplateDirective } from "../../directives/range-slider-tick-value-template.directive";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { Action } from "../../../../../utils/Action";
@@ -126,6 +126,9 @@ export class RangeSliderComponent implements AfterViewInit, ControlValueAccessor
                     const tickElement = this.findClosestTickElement(moveEvent as MouseEvent);
                     return Number(tickElement.getAttribute("data-value"));
                 }),
+                filter((value: number) =>
+                    type === "primary" ? value !== this.handlerValue()[0] : value !== this.handlerValue()[1]
+                ),
                 distinctUntilChanged()
             )
             .subscribe((value: number) => {
@@ -240,8 +243,14 @@ export class RangeSliderComponent implements AfterViewInit, ControlValueAccessor
 
     private setHandlerValue(value: number, type: SliderHandlerType): void {
         if (type === "primary") {
+            if (value === this.handlerValue()[0]) {
+                return;
+            }
             this.handlerValue.update(currentValue => [value, currentValue[1]]);
         } else {
+            if (value === this.handlerValue()[1]) {
+                return;
+            }
             this.handlerValue.update(currentValue => [currentValue[0], value]);
         }
         this.#propagateChange?.(this.handlerValue());
