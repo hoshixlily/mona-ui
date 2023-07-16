@@ -1,6 +1,6 @@
 <div class="mona-tab-strip">
     <div class="mona-tab-strip-tabs">
-        <div class="mona-tab-strip-scroll" *ngIf="scrollsVisible">
+        <div class="mona-tab-strip-scroll" *ngIf="scrollsVisible()">
             <button monaButton (click)="startScrolling(tabListElement, 'left', 'single')"
                     (mousedown)="startScrolling(tabListElement, 'left', 'continuous')" (mouseup)="stopScrolling()">
                 <fa-icon [icon]="scrollLeftIcon"></fa-icon>
@@ -21,7 +21,7 @@
                 </li>
             </ul>
         </div>
-        <div class="mona-tab-strip-scroll" *ngIf="scrollsVisible">
+        <div class="mona-tab-strip-scroll" *ngIf="scrollsVisible()">
             <button monaButton (click)="startScrolling(tabListElement, 'right', 'single')"
                     (mousedown)="startScrolling(tabListElement, 'right', 'continuous')" (mouseup)="stopScrolling()">
                 <fa-icon [icon]="scrollRightIcon"></fa-icon>

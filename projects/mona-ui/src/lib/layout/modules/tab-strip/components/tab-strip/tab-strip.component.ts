@@ -2,7 +2,6 @@ import {
     AfterContentInit,
     AfterViewInit,
     ChangeDetectionStrategy,
-    ChangeDetectorRef,
     Component,
     ContentChildren,
     ElementRef,
@@ -12,11 +11,13 @@ import {
     OnInit,
     Output,
     QueryList,
+    signal,
     ViewChild,
-    ViewContainerRef
+    ViewContainerRef,
+    WritableSignal
 } from "@angular/core";
 import { TabComponent } from "../tab/tab.component";
-import { interval, Subject, takeUntil, timer } from "rxjs";
+import { asapScheduler, interval, Subject, takeUntil, timer } from "rxjs";
 import { ScrollDirection } from "../../data/ScrollDirection";
 import { faChevronLeft, faChevronRight, faXmark, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { TabCloseEvent } from "../../data/TabCloseEvent";
@@ -30,24 +31,20 @@ import { TabCloseEvent } from "../../data/TabCloseEvent";
 export class TabStripComponent implements OnInit, AfterContentInit, OnDestroy, AfterViewInit {
     readonly #destroy$: Subject<void> = new Subject<void>();
     #resizeObserver: ResizeObserver | null = null;
-    private scroll$: Subject<void> = new Subject<void>();
+    #scroll$: Subject<void> = new Subject<void>();
     public readonly scrollLeftIcon: IconDefinition = faChevronLeft;
     public readonly scrollRightIcon: IconDefinition = faChevronRight;
     public readonly tabCloseIcon: IconDefinition = faXmark;
-    public scrollsVisible: boolean = false;
+    public scrollsVisible: WritableSignal<boolean> = signal(false);
 
-    @Input()
-    public closable: boolean = false;
-
-    /**
-     * Used internally to determine if the tab strip should be rendered with a border.
-     * @private
-     */
     @ViewChild("initialLoadAnchor", { read: ViewContainerRef })
     private initialLoadAnchor!: ViewContainerRef;
 
     @ViewChild("initialLoadContainer")
     private initialLoadContainer!: ElementRef<HTMLDivElement>;
+
+    @Input()
+    public closable: boolean = false;
 
     @Input()
     public keepTabContent: boolean = false;
@@ -64,7 +61,7 @@ export class TabStripComponent implements OnInit, AfterContentInit, OnDestroy, A
     @ViewChild("tabListElement")
     public tabListElement!: ElementRef<HTMLUListElement>;
 
-    public constructor(private readonly cdr: ChangeDetectorRef) {}
+    public constructor() {}
 
     public ngAfterContentInit(): void {
         this.tabComponents.forEach((t, tx) => (t.index = tx));
@@ -118,14 +115,13 @@ export class TabStripComponent implements OnInit, AfterContentInit, OnDestroy, A
     public onTabClose(tab: TabComponent, event: MouseEvent): void {
         event.stopPropagation();
         const tabCloseEvent = new TabCloseEvent(tab.index, tab);
-        this.cdr.detectChanges();
         this.tabClose.emit(tabCloseEvent);
     }
 
     public startScrolling(element: HTMLElement, direction: ScrollDirection, type: "single" | "continuous"): void {
         const timeFunction = type === "single" ? timer : interval;
         timeFunction(60)
-            .pipe(takeUntil(this.scroll$))
+            .pipe(takeUntil(this.#scroll$))
             .subscribe(() => {
                 let left: number = 0;
                 switch (direction) {
@@ -142,9 +138,9 @@ export class TabStripComponent implements OnInit, AfterContentInit, OnDestroy, A
     }
 
     public stopScrolling(): void {
-        this.scroll$.next();
-        this.scroll$.complete();
-        this.scroll$ = new Subject<void>();
+        this.#scroll$.next();
+        this.#scroll$.complete();
+        this.#scroll$ = new Subject<void>();
     }
 
     private initializeTabContents(): void {
@@ -183,8 +179,10 @@ export class TabStripComponent implements OnInit, AfterContentInit, OnDestroy, A
     }
 
     private updateScrollVisibility(): void {
-        this.scrollsVisible =
-            this.tabListElement.nativeElement.scrollWidth > this.tabListElement.nativeElement.clientWidth;
-        this.cdr.detectChanges();
+        asapScheduler.schedule(() => {
+            this.scrollsVisible.set(
+                this.tabListElement.nativeElement.scrollWidth > this.tabListElement.nativeElement.clientWidth
+            );
+        });
     }
 }
