@@ -19,13 +19,13 @@ div.mona-tooltip-arrow {
     transform-origin: center;
     transform: rotate(45deg);
     z-index: -1;
-    box-shadow: var(--mona-popup-shadow);
 
     &.bottom {
         top: -6px;
         left: calc(50% - 6px);
         border-left: 1px solid var(--mona-border-color);
         border-top: 1px solid var(--mona-border-color);
+        clip-path: inset(0 1px 1px 0);
     }
 
     &.top {
@@ -33,6 +33,7 @@ div.mona-tooltip-arrow {
         left: calc(50% - 6px);
         border-right: 1px solid var(--mona-border-color);
         border-bottom: 1px solid var(--mona-border-color);
+        clip-path: inset(1px 0 0 1px);
     }
 
     &.right {
@@ -40,6 +41,7 @@ div.mona-tooltip-arrow {
         top: calc(50% - 6px);
         border-left: 1px solid var(--mona-border-color);
         border-bottom: 1px solid var(--mona-border-color);
+        clip-path: inset(1px 1px 0 0);
     }
 
     &.left {
@@ -47,5 +49,6 @@ div.mona-tooltip-arrow {
         top: calc(50% - 6px);
         border-right: 1px solid var(--mona-border-color);
         border-top: 1px solid var(--mona-border-color);
+        clip-path: inset(0 0 1px 1px);
     }
 }

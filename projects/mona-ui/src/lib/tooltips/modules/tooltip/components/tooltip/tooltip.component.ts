@@ -1,5 +1,5 @@
 import { Component, ElementRef, Input, OnInit, TemplateRef, ViewChild } from "@angular/core";
-import { fromEvent, Subject, takeUntil } from "rxjs";
+import { fromEvent, Subject, take, takeUntil, tap } from "rxjs";
 import { PopupService } from "../../../../../popup/services/popup.service";
 import { PopupRef } from "../../../../../popup/models/PopupRef";
 import { Position } from "../../../../../models/Position";
@@ -12,8 +12,8 @@ import { v4 } from "uuid";
     styleUrls: ["./tooltip.component.scss"]
 })
 export class TooltipComponent implements OnInit {
-    private readonly componentDestroy$: Subject<void> = new Subject<void>();
-    private popupRef?: PopupRef;
+    readonly #destroy$: Subject<void> = new Subject<void>();
+    #popupRef?: PopupRef;
     public readonly uid: string = v4();
 
     @Input()
@@ -25,10 +25,7 @@ export class TooltipComponent implements OnInit {
     @ViewChild(TemplateRef)
     public templateRef!: TemplateRef<any>;
 
-    public constructor(
-        private readonly elementRef: ElementRef<HTMLElement>,
-        private readonly popupService: PopupService
-    ) {}
+    public constructor(private readonly popupService: PopupService) {}
     public ngOnInit(): void {
         if (!this.target) {
             throw new Error("Tooltip target is required.");
@@ -75,9 +72,18 @@ export class TooltipComponent implements OnInit {
     private setSubscriptions(): void {
         const target = this.target instanceof ElementRef ? this.target.nativeElement : this.target;
         fromEvent<MouseEvent>(target, "mouseenter")
-            .pipe(takeUntil(this.componentDestroy$))
-            .subscribe((event: MouseEvent) => {
-                this.popupRef = this.popupService.create({
+            .pipe(
+                takeUntil(this.#destroy$),
+                tap(() => {
+                    fromEvent(target, "mouseleave")
+                        .pipe(take(1))
+                        .subscribe(() => {
+                            this.#popupRef?.close();
+                        });
+                })
+            )
+            .subscribe(() => {
+                this.#popupRef = this.popupService.create({
                     content: this.templateRef,
                     anchor: target,
                     popupClass: "mona-tooltip-popup-content",
@@ -86,16 +92,11 @@ export class TooltipComponent implements OnInit {
                     closeOnOutsideClick: true,
                     withPush: false
                 });
-                this.popupRef.overlayRef.addPanelClass("mona-invisible-tooltip");
+                this.#popupRef.overlayRef.addPanelClass("mona-invisible-tooltip");
                 window.setTimeout(() => {
                     this.calculateTopAndLeft();
-                    this.popupRef?.overlayRef.removePanelClass("mona-invisible-tooltip");
+                    this.#popupRef?.overlayRef.removePanelClass("mona-invisible-tooltip");
                 }, 100);
-            });
-        fromEvent<MouseEvent>(target, "mouseleave")
-            .pipe(takeUntil(this.componentDestroy$))
-            .subscribe((event: MouseEvent) => {
-                this.popupRef?.close();
             });
     }
 
