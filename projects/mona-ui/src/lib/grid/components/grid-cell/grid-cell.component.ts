@@ -12,19 +12,7 @@ import { Row } from "../../models/Row";
 import { FormControl, FormGroup } from "@angular/forms";
 import { FocusMonitor, FocusOrigin } from "@angular/cdk/a11y";
 import { GridService } from "../../services/grid.service";
-import {
-    asyncScheduler,
-    debounceTime,
-    distinctUntilChanged,
-    filter,
-    fromEvent,
-    map,
-    Subject,
-    take,
-    takeUntil,
-    tap,
-    timer
-} from "rxjs";
+import { asyncScheduler, filter, fromEvent, map, Subject, take, takeUntil, tap, timer } from "rxjs";
 import { CellEditEvent } from "../../models/CellEditEvent";
 
 @Component({
@@ -316,7 +304,6 @@ export class GridCellComponent implements OnInit, OnDestroy {
                     })
                 )
                 .subscribe(value => {
-                    const activeElement = document.activeElement as HTMLElement;
                     this.editing = false;
                     this.gridService.isInEditMode = false;
                 });
@@ -335,6 +322,6 @@ export class GridCellComponent implements OnInit, OnDestroy {
     }
 
     private get gridEditable(): boolean {
-        return !!this.gridService.editableOptions && !!this.gridService.editableOptions.enabled;
+        return !!this.gridService.editableOptions && !!this.gridService.editableOptions.enabled && this.column.editable;
     }
 }

@@ -9,6 +9,7 @@ export class Column {
     public calculatedWidth?: number;
     public cellTemplate?: GridCellTemplateDirective;
     public dataType: DataType = "string";
+    public editable: boolean = true;
     public field: string = "";
     public filtered: boolean = false;
     public index: number = 0; // 0-based

@@ -18,6 +18,11 @@ export class GridColumnComponent implements OnInit {
     }
 
     @Input()
+    public set editable(value: boolean) {
+        this.column.editable = value;
+    }
+
+    @Input()
     public set field(value: string) {
         this.column.field = value;
     }

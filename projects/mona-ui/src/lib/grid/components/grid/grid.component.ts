@@ -252,6 +252,9 @@ export class GridComponent implements OnInit, AfterViewInit, OnDestroy, AfterCon
         if (!this.gridService.sortableOptions.enabled) {
             return;
         }
+        if (!column.field) {
+            return;
+        }
         if (column.sortDirection == null) {
             column.sortDirection = "asc";
         } else if (column.sortDirection === "asc") {
