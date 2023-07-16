@@ -228,10 +228,13 @@ export class GridComponent implements OnInit, AfterViewInit, OnDestroy, AfterCon
             .where(f => f != null);
         if (allFilters.any()) {
             this.#filter = allFilters.toArray() as CompositeFilterDescriptor[];
+            this.filterChange.emit(this.#filter);
         } else {
-            this.#filter = [];
+            if (this.#filter.length !== 0) {
+                this.#filter = [];
+                this.filterChange.emit(this.#filter);
+            }
         }
-        this.filterChange.emit(this.#filter);
     }
 
     public onColumnMouseEnter(event: MouseEvent, column: Column): void {
