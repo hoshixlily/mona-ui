@@ -1,5 +1,6 @@
 import {
     ChangeDetectionStrategy,
+    ChangeDetectorRef,
     Component,
     ContentChild,
     ElementRef,
@@ -94,6 +95,7 @@ export class DropDownListComponent implements OnInit, OnDestroy, ControlValueAcc
     public valueTemplate?: TemplateRef<any>;
 
     public constructor(
+        private readonly cdr: ChangeDetectorRef,
         private readonly elementRef: ElementRef<HTMLElement>,
         private readonly popupListService: PopupListService,
         private readonly popupService: PopupService
@@ -191,6 +193,7 @@ export class DropDownListComponent implements OnInit, OnDestroy, ControlValueAcc
 
     public setValue(value: any): void {
         this.updateValue(value);
+        this.cdr.markForCheck();
     }
 
     public writeValue(obj: any): void {
