@@ -53,9 +53,9 @@ export class AppComponent implements OnInit {
     public readonly sunIcon: IconDefinition = faSun;
     public autoCompleteValue: string = "Yakizakana";
     public buttonGroupButtonSelected: boolean = true;
-    public calendarMaxValue: Date | null = new Date(2019, 6, 15);
-    public calendarMinValue: Date | null = new Date(2019, 6, 10);
-    public calendarValue: Date | null = new Date(2019, 6, 12);
+    public calendarMaxValue: Date | null = new Date(2022, 6, 15);
+    public calendarMinValue: Date | null = new Date(2022, 6, 10);
+    public calendarValue: Date | null = new Date(2022, 6, 12);
     public colorPalette: string[] = [
         "#263400",
         "#d61dff",

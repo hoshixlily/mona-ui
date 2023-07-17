@@ -61,11 +61,6 @@ export class GridCellComponent implements OnInit, OnDestroy {
         }
     }
 
-    public onDateChange(date: Date | null): void {
-        this.editing = false;
-        this.gridService.isInEditMode = false;
-    }
-
     public onFocusChange(origin: FocusOrigin): void {
         if (!origin) {
             const duration = this.column.dataType === "date" ? 50 : 25;

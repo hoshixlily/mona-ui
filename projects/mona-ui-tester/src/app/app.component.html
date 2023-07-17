@@ -211,7 +211,7 @@
                                         <span style="text-decoration: line-through;">S</span>
                                     </button>
                                 </mona-button-group>
-                                <mona-button-group selection="multiple">
+                                <mona-button-group selection="single">
                                     <button monaButton [toggleable]="true">Left</button>
                                     <button monaButton [toggleable]="true">Center</button>
                                     <button monaButton [toggleable]="true" [(selected)]="buttonGroupButtonSelected">Right</button>
@@ -400,6 +400,7 @@
                             <div style="display: flex; align-items: center; justify-content: center;">
                                 <mona-range-slider orientation="horizontal"
                                                     [ngModel]="rangedSliderValues"
+                                                   [min]="1" [max]="24"
                                                     (ngModelChange)="onRangedSliderValueChange($event)"
                                                     style="width: 400px;">
                                     <ng-template monaRangeSliderTickValueTemplate let-value>
