@@ -122,6 +122,11 @@ export * from "./lib/layout/modules/expansion-panel/directives/expansion-panel-a
 export * from "./lib/layout/modules/expansion-panel/directives/expansion-panel-title-template.directive";
 export * from "./lib/layout/modules/expansion-panel/expansion-panel.module";
 
+/* Fieldset */
+export * from "./lib/layout/modules/fieldset/directives/fieldset-legend-template.directive";
+export * from "./lib/layout/modules/fieldset/components/fieldset/fieldset.component";
+export * from "./lib/layout/modules/fieldset/fieldset.module";
+
 /** Stepper */
 export { StepOptions } from "./lib/layout/modules/stepper/models/Step";
 export * from "./lib/layout/modules/stepper/directives/stepper-indicator-template.directive";

@@ -1035,6 +1035,21 @@ mona-expansion-panel + mona-expansion-panel {
     @include font-medium;
 }
 
+/** Field Set */
+fieldset.mona-fieldset {
+    background-color: var(--mona-background);
+    border: 1px solid var(--mona-border-color);
+    color: var(--mona-text);
+}
+
+legend.mona-fieldset-legend {
+    background-color: var(--mona-background-dark);
+    border: 1px solid var(--mona-border-color);
+    color: var(--mona-text);
+    font-weight: bold;
+    @include font-medium;
+}
+
 /** Tab Strip */
 div.mona-tab-strip {
     border: 1px solid var(--mona-border-color);
