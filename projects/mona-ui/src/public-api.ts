@@ -127,6 +127,10 @@ export * from "./lib/layout/modules/fieldset/directives/fieldset-legend-template
 export * from "./lib/layout/modules/fieldset/components/fieldset/fieldset.component";
 export * from "./lib/layout/modules/fieldset/fieldset.module";
 
+/** Scroll View */
+export * from "./lib/layout/modules/scroll-view/components/scroll-view/scroll-view.component";
+export * from "./lib/layout/modules/scroll-view/scroll-view.module";
+
 /** Stepper */
 export { StepOptions } from "./lib/layout/modules/stepper/models/Step";
 export * from "./lib/layout/modules/stepper/directives/stepper-indicator-template.directive";

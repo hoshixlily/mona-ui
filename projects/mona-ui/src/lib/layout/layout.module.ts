@@ -5,10 +5,11 @@ import { ExpansionPanelModule } from "./modules/expansion-panel/expansion-panel.
 import { SplitterModule } from "./modules/splitter/splitter.module";
 import { StepperModule } from "./modules/stepper/stepper.module";
 import { FieldsetModule } from "./modules/fieldset/fieldset.module";
+import { ScrollViewModule } from "./modules/scroll-view/scroll-view.module";
 
 @NgModule({
     declarations: [],
     imports: [CommonModule],
-    exports: [ExpansionPanelModule, FieldsetModule, SplitterModule, StepperModule, TabStripModule]
+    exports: [ExpansionPanelModule, FieldsetModule, ScrollViewModule, SplitterModule, StepperModule, TabStripModule]
 })
 export class LayoutModule {}

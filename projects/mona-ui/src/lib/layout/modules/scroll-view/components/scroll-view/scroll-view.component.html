@@ -1,0 +1,17 @@
+<div class="mona-scroll-view">
+    <div class="mona-scroll-view-content">
+        <ul class="mona-scroll-view-list">
+            <li *ngFor="let item of data" [ngStyle]="{'transform': 'translateX('+item.position()+')'}">
+                <ng-container [ngTemplateOutlet]="contentTemplate"
+                              [ngTemplateOutletContext]="{$implicit: item.data}"></ng-container>
+            </li>
+        </ul>
+    </div>
+    <div class="mona-scroll-view-arrow mona-scroll-view-arrow-left" (click)="onArrowClick('left')">
+        <fa-icon [icon]="leftArrow"></fa-icon>
+    </div>
+    <div class="mona-scroll-view-arrow mona-scroll-view-arrow-right" (click)="onArrowClick('right')">
+        <fa-icon [icon]="rightArrow"></fa-icon>
+    </div>
+    <div class="mona-scroll-view-pager"></div>
+</div>
