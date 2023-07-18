@@ -1050,6 +1050,46 @@ legend.mona-fieldset-legend {
     @include font-medium;
 }
 
+/** Scroll View */
+div.mona-scroll-view-arrow {
+    & fa-icon {
+        color: white;
+        filter: drop-shadow(0 0 15px #000);
+    }
+}
+
+div.mona-scroll-view-pager {
+    &-dark {
+        border-top: 1px solid var(--mona-border-color);
+        background-color: hsla(var(--mona-background-base), var(--mona-background-base-lightness), 60%);
+    }
+    &-light {
+        border-bottom: 1px solid var(--mona-border-color);
+        background-color: hsla(var(--mona-background-base), var(--mona-background-base-lightness), 20%);
+    }
+}
+
+ul.mona-scroll-view-pager-list {
+    & li {
+        border: 1px solid var(--mona-border-color);
+        background-color: white;
+        &.mona-scroll-view-active-page {
+            background-color: var(--mona-primary);
+        }
+    }
+}
+
+div.mona-scroll-view-pager-arrow {
+    @include font-medium;
+    & fa-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        filter: drop-shadow(0 0 15px #000);
+    }
+}
+
 /** Tab Strip */
 div.mona-tab-strip {
     border: 1px solid var(--mona-border-color);

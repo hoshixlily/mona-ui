@@ -19,6 +19,7 @@ div.mona-scroll-view-content {
 ul.mona-scroll-view-list {
     position: relative;
     transform: translateX(0%);
+    list-style: none;
     & li {
         position: absolute;
         top: 0;
@@ -40,9 +41,8 @@ div.mona-scroll-view-arrow {
 
     & fa-icon {
         font-size: 32px;
-        opacity: 0.7;
+        opacity: 0.4;
         transition: opacity 0.2s ease-in-out;
-        color: var(--mona-text);
         &:hover {
             opacity: 1;
         }
@@ -65,10 +65,44 @@ div.mona-scroll-view-arrow {
 
 div.mona-scroll-view-pager {
     position: absolute;
-    top: 0;
+    left: 0;
+    right: 0;
     bottom: 0;
-    height: 16px;
-    background: rgba(0, 0, 0, 0.5);
-    opacity: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+ul.mona-scroll-view-pager-list {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    overflow: hidden;
+    flex-wrap: nowrap;
+    padding: 12px 4px;
+
+    & li {
+        content: " ";
+        width: 12px;
+        height: 12px;
+        flex:  0 0 12px;
+        &:not(:last-child) {
+            margin-right: 12px;
+        }
+        cursor: pointer;
+    }
+}
+
+div.mona-scroll-view-pager-arrow {
+    padding: 10px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0.7;
     transition: opacity 0.2s ease-in-out;
+    user-select: none;
+    &:hover {
+        opacity: 1;
+    }
 }
