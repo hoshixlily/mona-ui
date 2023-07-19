@@ -1064,7 +1064,7 @@ div.mona-scroll-view-pager {
         background-color: hsla(var(--mona-background-base), var(--mona-background-base-lightness), 60%);
     }
     &-light {
-        border-bottom: 1px solid var(--mona-border-color);
+        border-top: 1px solid var(--mona-border-color);
         background-color: hsla(var(--mona-background-base), var(--mona-background-base-lightness), 20%);
     }
 }

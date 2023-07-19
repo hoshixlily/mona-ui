@@ -1,16 +1,20 @@
-<div class="mona-scroll-view">
+<div class="mona-scroll-view" [attr.tabindex]="0">
     <div class="mona-scroll-view-content">
         <ul class="mona-scroll-view-list">
-            <li *ngFor="let item of data" [ngStyle]="{'transform': 'translateX('+item.position()+')'}">
-                <ng-container [ngTemplateOutlet]="contentTemplate"
-                              [ngTemplateOutletContext]="{$implicit: item.data}"></ng-container>
-            </li>
+            <ng-container *ngFor="let item of allData(); let ix = index;">
+                <li *ngIf="ix === activeIndex()" @fadeInOut>
+                    <ng-container [ngTemplateOutlet]="contentTemplate"
+                                  [ngTemplateOutletContext]="{$implicit: item.data}"></ng-container>
+                </li>
+            </ng-container>
         </ul>
     </div>
-    <div class="mona-scroll-view-arrow mona-scroll-view-arrow-left" (click)="onArrowClick('left')">
+    <div class="mona-scroll-view-arrow mona-scroll-view-arrow-left" (click)="onArrowClick('left')"
+         *ngIf="infinite || activeIndex() !== 0">
         <fa-icon [icon]="leftArrow"></fa-icon>
     </div>
-    <div class="mona-scroll-view-arrow mona-scroll-view-arrow-right" (click)="onArrowClick('right')">
+    <div class="mona-scroll-view-arrow mona-scroll-view-arrow-right" (click)="onArrowClick('right')"
+         *ngIf="infinite || activeIndex() !== itemCount() - 1">
         <fa-icon [icon]="rightArrow"></fa-icon>
     </div>
     <div class="mona-scroll-view-pager"
@@ -25,7 +29,7 @@
         <div class="mona-scroll-view-pager-list-wrapper">
             <ul class="mona-scroll-view-pager-list" [ngStyle]="{'transform': 'translateX('+pagerPosition()+')'}"
                 #pagerListElement>
-                <li *ngFor="let item of viewData(); let ix = index;"
+                <li *ngFor="let item of allData(); let ix = index;"
                     [ngClass]="{'mona-scroll-view-active-page': ix===activeIndex()}"
                     (click)="onPageClick(ix, pagerItemElement)" #pagerItemElement></li>
             </ul>

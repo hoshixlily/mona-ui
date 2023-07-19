@@ -1,1 +1,1 @@
-export type PagerOverlay = "dark" | "light";
+export type PagerOverlay = "dark" | "light" | "none";
