@@ -18,13 +18,13 @@ div.mona-scroll-view-content {
 
 ul.mona-scroll-view-list {
     position: relative;
-    transform: translateX(0%);
     list-style: none;
+    height: 100%;
     & li {
         position: absolute;
         top: 0;
         left: 0;
-        transition: transform 0.35s ease-out;
+        transition: transform 0.65s ease-out;
     }
 }
 
@@ -73,9 +73,19 @@ div.mona-scroll-view-pager {
     justify-content: center;
 }
 
+div.mona-scroll-view-pager-list-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    overflow: hidden;
+}
+
 ul.mona-scroll-view-pager-list {
     display: flex;
     align-items: center;
+    justify-content: center;
+    flex: 1;
     list-style: none;
     overflow: hidden;
     flex-wrap: nowrap;

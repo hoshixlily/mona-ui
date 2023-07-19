@@ -1,4 +1,5 @@
 import {
+    AfterViewInit,
     ChangeDetectionStrategy,
     Component,
     computed,
@@ -6,15 +7,18 @@ import {
     ElementRef,
     HostBinding,
     Input,
+    OnDestroy,
     OnInit,
+    Signal,
     signal,
     TemplateRef,
+    ViewChild,
     WritableSignal
 } from "@angular/core";
 import { faChevronLeft, faChevronRight, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { ScrollViewListItem } from "../../models/ScrollViewListItem";
 import { PagerOverlay } from "../../models/PagerOverlay";
-import { interval, Subject, takeUntil, timer } from "rxjs";
+import { asyncScheduler, interval, Subject, takeUntil, timer } from "rxjs";
 import { ScrollDirection } from "../../../../../models/ScrollDirection";
 
 @Component({
@@ -25,12 +29,16 @@ import { ScrollDirection } from "../../../../../models/ScrollDirection";
 })
 export class ScrollViewComponent implements OnInit {
     #data: WritableSignal<Array<ScrollViewListItem>> = signal([]);
+export class ScrollViewComponent implements OnInit, OnDestroy, AfterViewInit {
     #height: WritableSignal<string> = signal("100%");
+    #resizeObserver: ResizeObserver | null = null;
     #scroll$: Subject<void> = new Subject<void>();
     #width: WritableSignal<string> = signal("100%");
     public readonly leftArrow: IconDefinition = faChevronLeft;
     public readonly rightArrow: IconDefinition = faChevronRight;
     public activeIndex: WritableSignal<number> = signal(0);
+    public itemCount: Signal<number> = signal(0);
+    public pagerArrowVisible: WritableSignal<boolean> = signal(false);
     public pagerPosition: WritableSignal<string> = signal("0");
 
     @ContentChild(TemplateRef)
@@ -58,6 +66,9 @@ export class ScrollViewComponent implements OnInit {
     @Input()
     public pagerBlur: number = 3;
 
+    @ViewChild("pagerListElement")
+    public pagerListElementRef?: ElementRef<HTMLUListElement>;
+
     @Input()
     public pagerOverlay: PagerOverlay = "dark";
 
@@ -73,7 +84,19 @@ export class ScrollViewComponent implements OnInit {
 
     public constructor(private readonly elementRef: ElementRef<HTMLElement>) {}
 
-    public ngOnInit(): void {}
+    public ngAfterViewInit(): void {
+        this.setPagerListResizeObserver();
+    }
+
+    public ngOnDestroy(): void {
+        if (this.#resizeObserver) {
+            this.#resizeObserver.disconnect();
+        }
+    }
+
+    public ngOnInit(): void {
+        this.itemCount = computed(() => this.viewData().length);
+    }
 
     public onArrowClick(direction: "left" | "right"): void {
         let index = this.activeIndex();
@@ -129,5 +152,18 @@ export class ScrollViewComponent implements OnInit {
                 };
             })
         );
+
+    private setPagerListResizeObserver(): void {
+        asyncScheduler.schedule(() => {
+            if (this.pagerListElementRef) {
+                const element = this.pagerListElementRef.nativeElement;
+                this.pagerArrowVisible.set(element.scrollWidth > element.clientWidth);
+                this.#resizeObserver = new ResizeObserver(() => {
+                    const scrollWidth = element.scrollWidth;
+                    const clientWidth = element.clientWidth;
+                    this.pagerArrowVisible.set(scrollWidth > clientWidth);
+                });
+            }
+        });
     }
 }
