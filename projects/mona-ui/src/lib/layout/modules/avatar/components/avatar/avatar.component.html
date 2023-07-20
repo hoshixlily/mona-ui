@@ -1,0 +1,10 @@
+<div class="mona-avatar" [ngStyle]="avatarStyles()">
+    <img [src]="avatarImage()" [ngStyle]="{'border-radius': avatarBorderRadius()}"
+         class="mona-avatar-image"
+         *ngIf="avatarImage()" />
+    <div class="mona-avatar-label" [ngStyle]="avatarLabelStyles()"
+         *ngIf="!avatarImage() && avatarLabel()">{{avatarLabel()}}</div>
+    <ng-container *ngIf="!avatarImage() && !avatarLabel()">
+        <ng-content></ng-content>
+    </ng-container>
+</div>
