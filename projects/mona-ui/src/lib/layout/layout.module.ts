@@ -6,10 +6,19 @@ import { SplitterModule } from "./modules/splitter/splitter.module";
 import { StepperModule } from "./modules/stepper/stepper.module";
 import { FieldsetModule } from "./modules/fieldset/fieldset.module";
 import { ScrollViewModule } from "./modules/scroll-view/scroll-view.module";
+import { AvatarModule } from "./modules/avatar/avatar.module";
 
 @NgModule({
     declarations: [],
     imports: [CommonModule],
-    exports: [ExpansionPanelModule, FieldsetModule, ScrollViewModule, SplitterModule, StepperModule, TabStripModule]
+    exports: [
+        AvatarModule,
+        ExpansionPanelModule,
+        FieldsetModule,
+        ScrollViewModule,
+        SplitterModule,
+        StepperModule,
+        TabStripModule
+    ]
 })
 export class LayoutModule {}

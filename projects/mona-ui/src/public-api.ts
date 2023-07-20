@@ -116,6 +116,10 @@ export * from "./lib/inputs/inputs.module";
 
 /** Layout */
 
+/** Avatar */
+export * from "./lib/layout/modules/avatar/components/avatar/avatar.component";
+export * from "./lib/layout/modules/avatar/avatar.module";
+
 /* Expansion Panel */
 export * from "./lib/layout/modules/expansion-panel/components/expansion-panel/expansion-panel.component";
 export * from "./lib/layout/modules/expansion-panel/directives/expansion-panel-actions-template.directive";

@@ -386,7 +386,7 @@
                             </div>
 
                             <div style="display: flex; align-items: center; justify-content: center; margin-top: 40px;">
-                                <mona-slider orientation="horizontal" labelPosition="before" [max]="25" [ngModel]="sliderValue" (ngModelChange)="print($event)" style="width: 400px;">
+                                <mona-slider orientation="horizontal" labelPosition="before" [max]="32" [(ngModel)]="sliderValue" style="width: 560px;">
 <!--                                    <ng-template monaSliderTickValueTemplate let-value>-->
 <!--                                        <fa-icon [icon]="moonIcon" *ngIf="value % 2 === 0"-->
 <!--                                                 style="color: mediumpurple;"></fa-icon>-->
@@ -450,6 +450,15 @@
                                         貴方は夜空を覆っている雲の狭間から輝いている一つの星のように私の人生を照らしてくれているよ。
                                     </div>
                                 </mona-fieldset>
+                            </div>
+                            <div style="display: flex; align-items: center; justify-content: center;">
+                                <mona-avatar [borderRadius]="sliderValue"
+                                             [customStyles]="{filter: 'drop-shadow(0 0 0.75rem crimson)'}"
+                                             [image]="'https://photos.smugmug.com/photos/i-ZfvdSzh/0/Th/i-ZfvdSzh-Th.png'"></mona-avatar>
+                                <mona-avatar [borderRadius]="'50%'" [label]="'HL'"></mona-avatar>
+                                <mona-avatar backgroundColor="transparent" [borderWidth]="0">
+                                    <fa-icon [icon]="snowflakeIcon" style="color: #95c5cb;"></fa-icon>
+                                </mona-avatar>
                             </div>
                         </div>
                     </ng-template>
