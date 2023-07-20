@@ -80,7 +80,7 @@ input, textarea, button {
 }
 
 .mona-hidden {
-    display: none;
+    display: none !important;
 }
 
 .mona-unselectable {

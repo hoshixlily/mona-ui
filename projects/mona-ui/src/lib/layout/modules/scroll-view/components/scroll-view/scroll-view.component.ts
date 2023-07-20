@@ -22,8 +22,7 @@ import { ScrollViewListItem } from "../../models/ScrollViewListItem";
 import { PagerOverlay } from "../../models/PagerOverlay";
 import { asyncScheduler, filter, fromEvent, interval, Subject, takeUntil, timer } from "rxjs";
 import { ScrollDirection } from "../../../../../models/ScrollDirection";
-import { transition, trigger, useAnimation } from "@angular/animations";
-import { fadeIn, fadeOut } from "../../models/ScrollViewAnimations";
+import { animate, style, transition, trigger } from "@angular/animations";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 
 @Component({
@@ -32,9 +31,15 @@ import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
     styleUrls: ["./scroll-view.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
     animations: [
-        trigger("fadeInOut", [
-            transition("void => *", [useAnimation(fadeIn)]),
-            transition("* => void", [useAnimation(fadeOut)])
+        trigger("slideInOut", [
+            transition(":enter", [
+                style({ transform: "translateX({{start}}100%)" }),
+                animate("0.3s ease-out", style({ transform: "translateX(0)" }))
+            ]),
+            transition(":leave", [
+                style({ transform: "translateX(0)" }),
+                animate("0.3s ease-out", style({ transform: "translateX({{end}}100%)" }))
+            ])
         ])
     ]
 })
@@ -49,12 +54,15 @@ export class ScrollViewComponent implements OnInit, OnDestroy, AfterViewInit {
     public activeIndex: WritableSignal<number> = signal(0);
     public allData: WritableSignal<Array<ScrollViewListItem>> = signal([]);
     public itemCount: Signal<number> = signal(0);
-    public lastDirection: ScrollDirection | "center" = "center";
+    public lastDirection: ScrollDirection | "none" = "none";
     public pagerArrowVisible: WritableSignal<boolean> = signal(false);
     public pagerPosition: WritableSignal<string> = signal("0");
 
     @ContentChild(TemplateRef)
     public contentTemplate: TemplateRef<any> | null = null;
+
+    @Input()
+    public arrows: boolean = false;
 
     @Input()
     public set data(data: Iterable<any>) {
@@ -72,7 +80,10 @@ export class ScrollViewComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     @Input()
-    public infinite: boolean = false;
+    public infinite: boolean = true;
+
+    @Input()
+    public pageable: boolean = false;
 
     @Input()
     public pagerBlur: number = 3;
@@ -113,38 +124,49 @@ export class ScrollViewComponent implements OnInit, OnDestroy, AfterViewInit {
     public onArrowClick(direction: "left" | "right"): void {
         let index = this.activeIndex();
         this.lastDirection = direction;
-        if (!this.infinite) {
-            if (direction === "left") {
-                index = Math.max(0, index - 1);
-                this.activeIndex.set(index);
-            } else {
-                index = Math.min(this.allData().length - 1, index + 1);
-                this.activeIndex.set(index);
-            }
-        } else {
-            if (direction === "left") {
-                index = index - 1;
-                if (index < 0) {
-                    index = this.allData().length - 1;
+
+        /**
+         * Scheduled because when the direction changed from left to right or right to left,
+         * the animation behaviour was erratic.
+         * Same for {@link onPageClick} method.
+         */
+        asyncScheduler.schedule(() => {
+            if (!this.infinite) {
+                if (direction === "left") {
+                    index = Math.max(0, index - 1);
+                    this.activeIndex.set(index);
+                } else {
+                    index = Math.min(this.allData().length - 1, index + 1);
+                    this.activeIndex.set(index);
                 }
-                this.activeIndex.set(index);
             } else {
-                index = index + 1;
-                if (index >= this.allData().length) {
-                    index = 0;
+                if (direction === "left") {
+                    index = index - 1;
+                    if (index < 0) {
+                        index = this.allData().length - 1;
+                    }
+                    this.activeIndex.set(index);
+                } else {
+                    index = index + 1;
+                    if (index >= this.allData().length) {
+                        index = 0;
+                    }
+                    this.activeIndex.set(index);
                 }
-                this.activeIndex.set(index);
             }
-        }
-        const element = this.elementRef.nativeElement.querySelector("li.mona-scroll-view-active-page");
-        if (element) {
-            element.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
-        }
+            const element = this.elementRef.nativeElement.querySelector("li.mona-scroll-view-active-page");
+            if (element) {
+                element.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+            }
+        });
     }
 
     public onPageClick(index: number, element: HTMLLIElement): void {
-        this.activeIndex.set(index);
-        element.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+        this.lastDirection = index < this.activeIndex() ? "left" : "right";
+        asyncScheduler.schedule(() => {
+            this.activeIndex.set(index);
+            element.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+        });
     }
 
     public onPagerScroll(element: HTMLUListElement, direction: ScrollDirection, type: "single" | "continuous"): void {
@@ -197,10 +219,31 @@ export class ScrollViewComponent implements OnInit, OnDestroy, AfterViewInit {
                 takeUntilDestroyed(this.#destroyRef)
             )
             .subscribe(event => {
+                /**
+                 * July 20, 2023 Thursday 3:54 AM
+                 * This strange code is to fix a strange behaviour of the scroll view animation.
+                 * When the user clicks on the arrow, the animation is smooth, but when the user
+                 * presses the arrow key, the animation is not smooth. I don't know why.
+                 * This only happens when the direction is changed from left to right or vice versa.
+                 * Subsequent presses of the same arrow key are smooth.
+                 * Instead of calling onArrowClick, I call the click event of the arrow element,
+                 * which strangely fixes the animation.
+                 * TODO: Investigate this issue and find a better solution.
+                 */
                 if (event.key === "ArrowLeft") {
-                    this.onArrowClick("left");
+                    const element = this.elementRef.nativeElement.querySelector(
+                        "div.mona-scroll-view-arrow-left"
+                    ) as HTMLDivElement;
+                    if (element) {
+                        element.click();
+                    }
                 } else {
-                    this.onArrowClick("right");
+                    const element = this.elementRef.nativeElement.querySelector(
+                        "div.mona-scroll-view-arrow-right"
+                    ) as HTMLDivElement;
+                    if (element) {
+                        element.click();
+                    }
                 }
             });
     }
