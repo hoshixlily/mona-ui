@@ -159,10 +159,7 @@ export class ScrollViewComponent implements OnInit, OnDestroy, AfterViewInit {
                     this.activeIndex.set(index);
                 }
             }
-            const element = this.elementRef.nativeElement.querySelector("li.mona-scroll-view-active-page");
-            if (element) {
-                element.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
-            }
+            this.scrollActivePageIntoView();
         });
     }
 
@@ -197,6 +194,13 @@ export class ScrollViewComponent implements OnInit, OnDestroy, AfterViewInit {
         this.#scroll$.next();
         this.#scroll$.complete();
         this.#scroll$ = new Subject<void>();
+    }
+
+    private scrollActivePageIntoView(): void {
+        const element = this.elementRef.nativeElement.querySelector("li.mona-scroll-view-active-page");
+        if (element) {
+            element.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+        }
     }
 
     private setData(data: Iterable<any>): void {
