@@ -18,7 +18,7 @@
         <fa-icon [icon]="leftArrow"></fa-icon>
     </div>
     <div class="mona-scroll-view-arrow mona-scroll-view-arrow-right" (click)="onArrowClick('right')"
-         [ngClass]="{'mona-hidden': !arrows || (infinite || activeIndex() !== itemCount() - 1)}">
+         [ngClass]="{'mona-hidden': !arrows || !(infinite || activeIndex() !== itemCount() - 1)}">
         <fa-icon [icon]="rightArrow"></fa-icon>
     </div>
     <div class="mona-scroll-view-pager"

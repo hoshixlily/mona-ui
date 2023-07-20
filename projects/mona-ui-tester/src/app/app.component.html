@@ -501,7 +501,9 @@
                             <mona-splitter style="height: 100%;" orientation="vertical">
                                 <mona-splitter-pane [collapsible]="true">
                                     <div style="width: 100%; height: 100%; padding: 20px;">
-                                        <mona-scroll-view [data]="scrollViewData" [width]="960" [height]="540" style="border: 1px solid var(--mona-border-color);">
+                                        <mona-scroll-view [data]="scrollViewData" [width]="960" [height]="540"
+                                                          [index]="3"
+                                                          [pageable]="true" [arrows]="true" style="border: 1px solid var(--mona-border-color);">
                                             <ng-template let-item>
                                                 <img [src]="item" style="width: 100%; height: 100%;" />
                                             </ng-template>

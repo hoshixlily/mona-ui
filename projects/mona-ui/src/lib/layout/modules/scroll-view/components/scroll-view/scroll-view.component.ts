@@ -80,7 +80,12 @@ export class ScrollViewComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     @Input()
-    public infinite: boolean = true;
+    public set index(index: number) {
+        this.activeIndex.set(index);
+    }
+
+    @Input()
+    public infinite: boolean = false;
 
     @Input()
     public pageable: boolean = false;
