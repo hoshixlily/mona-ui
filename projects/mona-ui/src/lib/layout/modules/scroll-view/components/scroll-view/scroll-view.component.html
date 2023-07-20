@@ -1,0 +1,48 @@
+<div class="mona-scroll-view" [attr.tabindex]="0">
+    <div class="mona-scroll-view-content">
+        <ul class="mona-scroll-view-list">
+            <ng-container *ngFor="let item of allData(); let ix = index;">
+                <li *ngIf="ix === activeIndex()"
+                    [@.disabled]="lastDirection==='none'"
+                    [@slideInOut]="{value: '', params:
+                        {start: lastDirection==='right'?'+':'-',
+                         end: lastDirection==='right'?'-':'+'}}">
+                    <ng-container [ngTemplateOutlet]="contentTemplate"
+                                  [ngTemplateOutletContext]="{$implicit: item.data}"></ng-container>
+                </li>
+            </ng-container>
+        </ul>
+    </div>
+    <div class="mona-scroll-view-arrow mona-scroll-view-arrow-left" (click)="onArrowClick('left')"
+         [ngClass]="{'mona-hidden': !arrows || !(infinite || activeIndex() !== 0)}">
+        <fa-icon [icon]="leftArrow"></fa-icon>
+    </div>
+    <div class="mona-scroll-view-arrow mona-scroll-view-arrow-right" (click)="onArrowClick('right')"
+         [ngClass]="{'mona-hidden': !arrows || !(infinite || activeIndex() !== itemCount() - 1)}">
+        <fa-icon [icon]="rightArrow"></fa-icon>
+    </div>
+    <div class="mona-scroll-view-pager"
+         [ngClass]="{'mona-scroll-view-pager-dark': pagerOverlay==='dark', 'mona-scroll-view-pager-light': pagerOverlay==='light'}"
+         [ngStyle]="{'backdrop-filter': 'blur('+pagerBlur+'px)'}" *ngIf="pageable">
+        <div class="mona-scroll-view-pager-arrow mona-scroll-view-pager-arrow-left"
+             (click)="onPagerScroll(pagerListElement, 'left', 'single')"
+             (mousedown)="onPagerScroll(pagerListElement, 'left', 'continuous')"
+             (mouseup)="onPagerScrollEnd()" *ngIf="pagerArrowVisible()">
+            <fa-icon [icon]="leftArrow"></fa-icon>
+        </div>
+        <div class="mona-scroll-view-pager-list-wrapper">
+            <ul class="mona-scroll-view-pager-list" [ngStyle]="{'transform': 'translateX('+pagerPosition()+')'}"
+                #pagerListElement>
+                <li *ngFor="let item of allData(); let ix = index;"
+                    [ngClass]="{'mona-scroll-view-active-page': ix===activeIndex()}"
+                    (click)="onPageClick(ix, pagerItemElement)" #pagerItemElement></li>
+            </ul>
+        </div>
+        <div class="mona-scroll-view-pager-arrow mona-scroll-view-pager-arrow-right"
+             (click)="onPagerScroll(pagerListElement, 'right', 'single')"
+             (mousedown)="onPagerScroll(pagerListElement, 'right', 'continuous')"
+             (mouseup)="onPagerScrollEnd()" *ngIf="pagerArrowVisible()">
+            <fa-icon [icon]="rightArrow"></fa-icon>
+        </div>
+    </div>
+</div>

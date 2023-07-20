@@ -18,7 +18,7 @@ import {
 } from "@angular/core";
 import { TabComponent } from "../tab/tab.component";
 import { asapScheduler, interval, Subject, takeUntil, timer } from "rxjs";
-import { ScrollDirection } from "../../data/ScrollDirection";
+import { ScrollDirection } from "../../../../../models/ScrollDirection";
 import { faChevronLeft, faChevronRight, faXmark, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { TabCloseEvent } from "../../data/TabCloseEvent";
 

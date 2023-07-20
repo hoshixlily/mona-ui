@@ -167,8 +167,8 @@ export class CalendarComponent implements OnInit, ControlValueAccessor {
         this.navigatedDate = this.value ?? DateTime.now().toJSDate();
     }
 
-    public get timezone(): string {
-        return DateTime.local().zoneName;
+    public get timezone(): string | undefined {
+        return DateTime.local().zoneName ?? undefined;
     }
 
     public get value(): Date | null {
