@@ -114,6 +114,7 @@ export class ScrollViewComponent implements OnInit, OnDestroy, AfterViewInit {
     public ngAfterViewInit(): void {
         this.setPagerListResizeObserver();
         this.setSubscriptions();
+        this.scrollActivePageIntoView();
     }
 
     public ngOnDestroy(): void {
@@ -197,10 +198,12 @@ export class ScrollViewComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     private scrollActivePageIntoView(): void {
-        const element = this.elementRef.nativeElement.querySelector("li.mona-scroll-view-active-page");
-        if (element) {
-            element.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
-        }
+        asyncScheduler.schedule(() => {
+            const element = this.elementRef.nativeElement.querySelector("li.mona-scroll-view-active-page");
+            if (element) {
+                element.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
+            }
+        });
     }
 
     private setData(data: Iterable<any>): void {
