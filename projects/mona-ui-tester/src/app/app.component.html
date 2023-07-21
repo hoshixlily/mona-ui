@@ -467,7 +467,19 @@
                     <ng-template monaTabContentTemplate>
                         <div style="width: 100%; height: 100%; padding: 20px;">
                             <mona-expansion-panel title="Panel {{x}}" *ngFor="let x of [1,2,3]">
-                                This is the content for panel {{x}}.
+                                <div style="padding: 10px;">
+                                    <mona-fieldset legend="Panel Header" >
+                                        <p style="color: var(--mona-text); padding: 10px; text-align: justify;">
+                                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse
+                                            lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras
+                                            elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod
+                                            non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non
+                                            fermentum diam nisl sit amet erat. Duis semper. Duis arcu massa, scelerisque vitae,
+                                            consequat in, pretium a, enim. Pellentesque congue. Ut in risus volutpat libero
+                                            pharetra tempor. Cras vestibulum bibendum augue. Praesent egestas leo in pede.
+                                        </p>
+                                    </mona-fieldset>
+                                </div>
                                 <ng-template monaExpansionPanelTitleTemplate>
                                     <fa-icon [icon]="snowflakeIcon" style="color: powderblue;"></fa-icon>
                                     <span style="color: var(--mona-text); margin-left: 5px; font-weight: bold;">Panel {{x}}</span>

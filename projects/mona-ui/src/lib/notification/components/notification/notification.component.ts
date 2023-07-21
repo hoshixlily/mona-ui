@@ -9,7 +9,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { NotificationType } from "../../models/NotificationType";
 import { NotificationData } from "../../models/NotificationData";
-import { NotificationFade, NotificationSlide } from "../../../animations/NotificationSlide";
+import { NotificationFade, NotificationSlide } from "../../animations/animation";
 import { asyncScheduler, interval, takeWhile } from "rxjs";
 
 @Component({

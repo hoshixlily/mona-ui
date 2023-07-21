@@ -1,7 +1,7 @@
 import { Component, ContentChild, forwardRef, Input, OnInit, TemplateRef } from "@angular/core";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { Action } from "../../../../../utils/Action";
-import { FadeInOut } from "../../../../../animations/FadeInOut";
+import { FadeAnimation } from "../../../../../animations/fade.animation";
 import { SwitchOffLabelTemplateDirective } from "../../directives/switch-off-label-template.directive";
 import { SwitchOnLabelTemplateDirective } from "../../directives/switch-on-label-template.directive";
 
@@ -9,7 +9,7 @@ import { SwitchOnLabelTemplateDirective } from "../../directives/switch-on-label
     selector: "mona-switch",
     templateUrl: "./switch.component.html",
     styleUrls: ["./switch.component.scss"],
-    animations: [FadeInOut()],
+    animations: [FadeAnimation()],
     providers: [
         {
             provide: NG_VALUE_ACCESSOR,

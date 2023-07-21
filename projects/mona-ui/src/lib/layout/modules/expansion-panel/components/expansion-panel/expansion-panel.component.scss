@@ -24,10 +24,6 @@ div.mona-expansion-panel-header-title {
 }
 
 div.mona-expansion-panel-content {
-    padding: 10px;
+    overflow: hidden;
     color: var(--mona-text);
-    &.hidden {
-        display: none;
-        border-bottom: none;
-    }
 }

@@ -12,7 +12,7 @@
             <ng-container [ngTemplateOutlet]="actionsTemplate" *ngIf="!!actionsTemplate"></ng-container>
         </div>
     </div>
-    <div class="mona-expansion-panel-content" [ngClass]="{'hidden': !expanded}" @slideDownHidden>
+    <div class="mona-expansion-panel-content" *ngIf="expanded" @slideVertical>
         <ng-content></ng-content>
     </div>
 </div>
