@@ -21,6 +21,9 @@ export class GridGroupPipe implements PipeTransform {
     private cellComparer(column: Column) {
         return (r1: any, r2: any) => {
             if (column.dataType === "date") {
+                if (r1 == null || r2 == null) {
+                    return Object.is(r1, r2);
+                }
                 return this.compareDates(r1 as Date, r2 as Date);
             }
             return Object.is(r1, r2);
