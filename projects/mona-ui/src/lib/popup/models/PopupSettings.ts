@@ -96,6 +96,11 @@ export interface PopupSettings<T = unknown, C = void> {
      */
     popupClass?: string | string[];
 
+    /**
+     * Classes to be applied to the popup wrapper content div.
+     */
+    popupWrapperClass?: string | string[];
+
     positionStrategy?: "global" | "connected";
 
     positions?: Array<ConnectedPosition | ConnectionPositionPair>;

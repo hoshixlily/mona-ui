@@ -12,6 +12,7 @@ import { PopupState } from "../models/PopupState";
 import { v4 } from "uuid";
 import { PopupReference } from "../models/PopupReference";
 import { PopupWrapperComponent } from "../components/popup-wrapper/popup-wrapper.component";
+import { PopupInjectorData } from "../models/PopupInjectorData";
 
 @Injectable({
     providedIn: "root"
@@ -58,23 +59,38 @@ export class PopupService implements OnDestroy {
         const preventClose = settings.preventClose;
         const popupReference = new PopupReference(overlayRef);
 
-        const injector = Injector.create({
-            parent: this.injector,
-            providers: [
-                { provide: PopupRef, useFactory: () => popupReference.popupRef },
-                { provide: PopupInjectionToken, useValue: settings.data },
-                ...(settings.providers ?? [])
-            ]
-        });
+        const createInjector = (isTemplate: boolean) => {
+            const tokenValue = !isTemplate
+                ? settings.data
+                : ({
+                      popupReference,
+                      closeOnBackdropClick: settings.closeOnBackdropClick ?? true,
+                      closeOnEscape: settings.closeOnEscape ?? true,
+                      closeOnOutsideClick: settings.closeOnOutsideClick ?? true,
+                      preventClose: settings.preventClose,
+                      wrapperClass: settings.popupWrapperClass
+                  } as PopupInjectorData);
+            return Injector.create({
+                parent: this.injector,
+                providers: [
+                    { provide: PopupRef, useFactory: () => popupReference.popupRef },
+                    { provide: PopupInjectionToken, useValue: tokenValue },
+                    ...(settings.providers ?? [])
+                ]
+            });
+        };
 
-        let portal: ComponentPortal<any>;
         if (settings.content instanceof TemplateRef) {
-            portal = new ComponentPortal(PopupWrapperComponent, null, injector);
+            const portal = new ComponentPortal(PopupWrapperComponent, null, createInjector(true));
             popupReference.componentRef = overlayRef.attach(portal);
-            (popupReference.componentRef.instance as PopupWrapperComponent).templateRef = settings.content;
+            const component = popupReference.componentRef.instance as PopupWrapperComponent;
+            settings.closeOnBackdropClick = false; // handled by wrapper component
+            settings.closeOnEscape = false; // handled by wrapper component
+            settings.closeOnOutsideClick = false; // handled by wrapper component
+            component.templateRef = settings.content;
             popupReference.componentRef.changeDetectorRef.detectChanges();
         } else {
-            portal = new ComponentPortal(settings.content, null, injector);
+            const portal = new ComponentPortal(settings.content, null, createInjector(false));
             popupReference.componentRef = overlayRef.attach(portal);
         }
 
