@@ -18,6 +18,7 @@ export class WindowService {
 
     public open(settings: WindowSettings): WindowRef {
         const injectorData: WindowInjectorData = {
+            closeOnEscape: settings.closeOnEscape ?? false,
             content: settings.content,
             draggable: settings.draggable ?? false,
             focusedElement: settings.focusedElement,
@@ -48,7 +49,7 @@ export class WindowService {
             anchor: document.body,
             content: WindowContentComponent,
             closeOnBackdropClick: false,
-            closeOnEscape: settings.closeOnEscape ?? false,
+            closeOnEscape: false, // handled by window component
             closeOnOutsideClick: false,
             hasBackdrop: settings.modal,
             backdropClass: settings.modal ? "mona-window-overlay" : "transparent",
@@ -80,7 +81,6 @@ export class WindowService {
         });
         const component = windowReferenceHolder.windowReference.popupRef.component?.instance as WindowContentComponent;
         if (component) {
-            component.isVisible = true;
             component.animationStateChange
                 .pipe(
                     filter(e => e.toState === "hidden"),

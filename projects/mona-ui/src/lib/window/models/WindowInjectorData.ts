@@ -4,6 +4,7 @@ import { WindowCloseEvent } from "./WindowCloseEvent";
 import { WindowReference } from "./WindowReference";
 
 export interface WindowInjectorData {
+    closeOnEscape?: boolean;
     content: TemplateRef<unknown> | Type<unknown>;
     draggable: boolean;
     focusedElement?: HTMLElement | ElementRef<HTMLElement> | string;
