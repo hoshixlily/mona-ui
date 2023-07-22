@@ -15,7 +15,7 @@ import {
 } from "@angular/core";
 import { PopupInjectionToken } from "../../models/PopupInjectionToken";
 import { PopupInjectorData } from "../../models/PopupInjectorData";
-import { animate, AnimationEvent, state, style, transition, trigger } from "@angular/animations";
+import { animate, AnimationEvent, AnimationMetadata, state, style, transition, trigger } from "@angular/animations";
 import { filter, fromEvent } from "rxjs";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { PopupCloseEvent, PopupCloseSource } from "../../models/PopupCloseEvent";
@@ -26,7 +26,7 @@ import { PopupCloseEvent, PopupCloseSource } from "../../models/PopupCloseEvent"
     styleUrls: ["./popup-wrapper.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
     animations: [
-        trigger("slide", [
+        trigger("display", [
             state("visible", style({ transform: "translateY(0)", opacity: 1 })),
             state("hidden", style({ transform: "translateY(-100%)", opacity: 1 })),
             transition(":enter", [
@@ -39,8 +39,9 @@ import { PopupCloseEvent, PopupCloseSource } from "../../models/PopupCloseEvent"
 export class PopupWrapperComponent implements OnInit, AfterViewInit {
     readonly #destroyRef = inject(DestroyRef);
     readonly #outsideEventsToClose = ["click", "mousedown", "dblclick", "contextmenu", "auxclick"];
-    public visible: WritableSignal<boolean> = signal(false);
+    public animationDisabled: WritableSignal<boolean> = signal(false);
     public templateRef: TemplateRef<any> | null = null;
+    public visible: WritableSignal<boolean> = signal(false);
     public wrapperClass: WritableSignal<string> = signal("");
 
     @Output()
@@ -69,6 +70,9 @@ export class PopupWrapperComponent implements OnInit, AfterViewInit {
             } else {
                 this.wrapperClass.set(this.popupData.wrapperClass);
             }
+        }
+        if (this.popupData.disableAnimation) {
+            this.animationDisabled.set(true);
         }
     }
 

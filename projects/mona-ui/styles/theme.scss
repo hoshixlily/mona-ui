@@ -747,7 +747,13 @@ input[type="checkbox"][monaCheckBox] {
 }
 
 .mona-color-picker-popup {
-    padding: 2px !important;
+    //padding: 2px !important;
+    overflow: hidden;
+}
+
+.mona-color-picker-popup-wrapper {
+    //background: var(--mona-background);
+    padding: 2px;
 }
 
 /** Numeric Text Box */
@@ -1144,6 +1150,8 @@ div.mona-tab-strip-scroll {
 .mona-contextmenu-content {
     user-select: none;
     padding: 4px 0 !important;
+    background: var(--mona-background);
+    border: 1px solid var(--mona-border-color);
 }
 
 .mona-contextmenu-item {
@@ -1273,10 +1281,13 @@ div.mona-progress-bar-indeterminate {
 }
 
 /** Tooltip */
+.mona-tooltip-popup-wrapper {
+    overflow: initial !important;
+}
+
 .mona-tooltip-popup-content {
     background-color: var(--mona-background);
     color: var(--mona-text);
-    border: 1px solid var(--mona-border-color);
     padding: 0 !important;
     box-shadow: var(--mona-popup-shadow);
 }

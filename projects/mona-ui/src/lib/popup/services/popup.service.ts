@@ -68,7 +68,8 @@ export class PopupService implements OnDestroy {
                       closeOnEscape: settings.closeOnEscape ?? true,
                       closeOnOutsideClick: settings.closeOnOutsideClick ?? true,
                       preventClose: settings.preventClose,
-                      wrapperClass: settings.popupWrapperClass
+                      wrapperClass: settings.popupWrapperClass,
+                      disableAnimation: settings.disableAnimation
                   } as PopupInjectorData);
             return Injector.create({
                 parent: this.injector,

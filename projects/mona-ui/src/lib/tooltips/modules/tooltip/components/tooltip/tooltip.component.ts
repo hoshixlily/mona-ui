@@ -86,7 +86,9 @@ export class TooltipComponent implements OnInit {
                 this.#popupRef = this.popupService.create({
                     content: this.templateRef,
                     anchor: target,
+                    disableAnimation: true,
                     popupClass: "mona-tooltip-popup-content",
+                    popupWrapperClass: "mona-tooltip-popup-wrapper",
                     hasBackdrop: false,
                     positions: DefaultTooltipPositionMap[this.position],
                     closeOnOutsideClick: true,
@@ -105,6 +107,6 @@ export class TooltipComponent implements OnInit {
     }
 
     private get tooltipOverlayElement(): HTMLElement | null {
-        return this.tooltipElement?.parentElement?.parentElement ?? null;
+        return this.tooltipElement?.parentElement?.parentElement?.parentElement ?? null;
     }
 }

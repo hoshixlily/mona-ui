@@ -315,9 +315,7 @@
                                 </mona-switch>
 
                                 <mona-color-picker [palette]="colorPalette" [ngModel]="colorPickerValue"
-                                                   (ngModelChange)="onColorPickerValueChange($event)"
-                                                   [value]="colorPickerValue" (valueChange)="onColorPickerValueChange($event)"
-                                                   ></mona-color-picker>
+                                                   (ngModelChange)="onColorPickerValueChange($event)"></mona-color-picker>
                             </div>
                             <div style="display: flex; align-items: center;">
                                 <button monaButton [disabled]="false" [primary]="false" [selected]="false"

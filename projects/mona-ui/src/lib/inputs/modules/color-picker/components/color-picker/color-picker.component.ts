@@ -24,14 +24,6 @@ export class ColorPickerComponent implements OnInit, ControlValueAccessor {
     @Input()
     public palette: string[] = [];
 
-    @Input()
-    public set value(value: string | null) {
-        this.color = value;
-    }
-    public get value(): string | null {
-        return this.color;
-    }
-
     @Output()
     public valueChange: EventEmitter<string | null> = new EventEmitter<string | null>();
 
@@ -41,7 +33,6 @@ export class ColorPickerComponent implements OnInit, ControlValueAccessor {
 
     public onColorPaletteValueChange(value: string | null): void {
         this.color = value;
-        this.valueChange.emit(value);
         this.propagateChange?.(value);
     }
 

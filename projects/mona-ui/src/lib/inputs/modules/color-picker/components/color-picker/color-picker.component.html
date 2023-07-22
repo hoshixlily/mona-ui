@@ -1,6 +1,6 @@
 <div class="mona-color-picker mona-input-selector" [attr.tabindex]="0" #colorPickerAnchor>
-    <div [style.background]="value" class="mona-input-selector-value">
-        <fa-icon [icon]="noColorIcon" *ngIf="!value"></fa-icon>
+    <div [style.background]="color" class="mona-input-selector-value">
+        <fa-icon [icon]="noColorIcon" *ngIf="!color"></fa-icon>
     </div>
     <div class="mona-input-selector-icon">
         <button monaButton [flat]="true" class="mona-input-button">
@@ -9,7 +9,8 @@
     </div>
 </div>
 
-<mona-popup [anchor]="colorPickerAnchor" popupClass="mona-color-picker-popup" width="auto">
+<mona-popup [anchor]="colorPickerAnchor" popupClass="mona-color-picker-popup"
+            popupWrapperClass="mona-color-picker-popup-wrapper" width="auto">
     <ng-template>
         <mona-color-palette [palette]="palette" [columns]="8" [value]="color"
                             (valueChange)="onColorPaletteValueChange($event)"></mona-color-palette>

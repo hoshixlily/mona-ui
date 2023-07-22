@@ -65,6 +65,9 @@ export class PopupComponent implements OnInit, OnDestroy, AfterViewInit {
     public popupClass: string | string[] = [];
 
     @Input()
+    public popupWrapperClass: string | string[] = [];
+
+    @Input()
     public trigger: string = "click";
 
     @Input()
@@ -133,6 +136,7 @@ export class PopupComponent implements OnInit, OnDestroy, AfterViewInit {
                         minWidth: this.minWidth,
                         offset: this.offset,
                         popupClass: this.popupClass,
+                        popupWrapperClass: this.popupWrapperClass,
                         width
                     };
                     this.popupRef = this.popupService.create(popupSettings);
