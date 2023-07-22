@@ -837,10 +837,11 @@ export class AppComponent implements OnInit {
             maxWidth: 1200,
             maxHeight: 768,
             title: titleTemplate,
-            preventClose: event => {
-                // console.log(event);
-                return event.via === "backdropClick";
-            }
+            closeOnEscape: true
+            // preventClose: event => {
+            //     console.log(event);
+            // return event.via === "backdropClick";
+            // }
         });
         // window.setTimeout(() => {
         //     ref.resize({ width: 1024, height: 768, center: true });

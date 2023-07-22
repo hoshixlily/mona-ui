@@ -5,31 +5,56 @@ import {
     Component,
     ComponentRef,
     createComponent,
+    DestroyRef,
     ElementRef,
+    EventEmitter,
+    inject,
     Inject,
     Injector,
     OnInit,
+    Output,
+    signal,
     TemplateRef,
     Type,
     ViewChild,
-    ViewContainerRef
+    ViewContainerRef,
+    WritableSignal
 } from "@angular/core";
 import { PopupInjectionToken } from "../../../popup/models/PopupInjectionToken";
 import { WindowInjectorData } from "../../models/WindowInjectorData";
 import { faClose, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { WindowCloseEvent } from "../../models/WindowCloseEvent";
 import { PopupCloseSource } from "../../../popup/models/PopupCloseEvent";
+import { animate, AnimationEvent, state, style, transition, trigger } from "@angular/animations";
+import { filter, fromEvent } from "rxjs";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 
 @Component({
     selector: "mona-window-content",
     templateUrl: "./window-content.component.html",
     styleUrls: ["./window-content.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    animations: [
+        trigger("scaleIn", [
+            state("visible", style({ transform: "scale(1)" })),
+            state("hidden", style({ transform: "scale(0)" })),
+            transition(":enter", [
+                style({ transform: "scale(0.37)" }),
+                animate("0.2s ease-out", style({ transform: "scale(1)" }))
+            ]),
+            transition("visible => hidden", [animate("0.2s ease-out")])
+        ])
+    ]
 })
 export class WindowContentComponent implements OnInit, AfterViewInit {
+    private readonly destroyRef = inject(DestroyRef);
     public readonly closeIcon: IconDefinition = faClose;
     public readonly componentRef?: ComponentRef<any>;
     public readonly contentType: "template" | "component" = "template";
+    public isVisible: WritableSignal<boolean> = signal(false);
+
+    @Output()
+    public animationStateChange: EventEmitter<AnimationEvent> = new EventEmitter<AnimationEvent>();
 
     @ViewChild("componentAnchor", { read: ViewContainerRef })
     public componentAnchor!: ViewContainerRef;
@@ -64,14 +89,25 @@ export class WindowContentComponent implements OnInit, AfterViewInit {
         this.focusElement();
     }
 
-    public ngOnInit(): void {}
+    public ngOnInit(): void {
+        this.setSubscriptions();
+        this.isVisible.set(true);
+    }
+
+    public onAnimationDone(event: AnimationEvent): void {
+        this.animationStateChange.emit(event);
+    }
 
     public onCloseClick(event: MouseEvent): void {
+        this.closeWindow();
+    }
+
+    private closeWindow(): void {
         const closeEvent = new WindowCloseEvent({ event, via: PopupCloseSource.CloseButton });
         if (this.windowData.preventClose && this.windowData.preventClose(closeEvent)) {
             return;
         }
-        this.windowData.windowReference.close(closeEvent);
+        this.isVisible.set(false);
     }
 
     private focusElement(): void {
@@ -89,6 +125,19 @@ export class WindowContentComponent implements OnInit, AfterViewInit {
             if (elements.length > 0) {
                 (elements[0] as HTMLElement).focus();
             }
+        }
+    }
+
+    private setSubscriptions(): void {
+        if (this.windowData.closeOnEscape) {
+            fromEvent<KeyboardEvent>(document, "keydown")
+                .pipe(
+                    filter(event => event.key === "Escape"),
+                    takeUntilDestroyed(this.destroyRef)
+                )
+                .subscribe(() => {
+                    this.closeWindow();
+                });
         }
     }
 }

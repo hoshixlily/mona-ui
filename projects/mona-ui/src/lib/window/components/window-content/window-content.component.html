@@ -1,4 +1,4 @@
-<div class="mona-window-content-container">
+<div class="mona-window-content-container" [@scaleIn]="isVisible()?'visible':'hidden'" (@scaleIn.done)="onAnimationDone($event)">
     <div class="mona-window-title-bar" monaWindowDragHandler [draggable]="windowData.draggable" [windowRef]="windowData.windowReference">
         <div class="mona-window-title-container">
             <span class="mona-window-title" *ngIf="!windowData.titleTemplate">{{windowData.title ?? ''}}</span>

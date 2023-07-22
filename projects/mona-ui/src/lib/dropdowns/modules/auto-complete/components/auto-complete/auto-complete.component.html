@@ -6,7 +6,7 @@
 </div>
 
 <ng-template #popupTemplate>
-    <div *ngIf="!!popupRef">
+    <div>
         <mona-popup-list [textField]="textField" [valueField]="valueField" [groupField]="groupField" [value]="value ? [value] : []"
                          (valueChange)="onPopupListValueChange($event)">
             <ng-container *ngIf="itemTemplate">

@@ -141,6 +141,7 @@ export class DateTimePickerComponent implements OnInit, ControlValueAccessor {
             width: this.elementRef.nativeElement.getBoundingClientRect().width,
             minWidth: 200,
             popupClass: "mona-date-input-popup",
+            popupWrapperClass: ["mona-calendar-popup-wrapper"],
             hasBackdrop: false,
             withPush: false,
             closeOnOutsideClick: true,

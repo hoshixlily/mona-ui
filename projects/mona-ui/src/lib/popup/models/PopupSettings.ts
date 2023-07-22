@@ -49,6 +49,11 @@ export interface PopupSettings<T = unknown, C = void> {
     data?: T;
 
     /**
+     * Disable the default animation of the popup.
+     */
+    disableAnimation?: boolean;
+
+    /**
      * Whether the popup will have a backdrop.
      * Default: true.
      */
@@ -95,6 +100,11 @@ export interface PopupSettings<T = unknown, C = void> {
      * @type {string | string[]}
      */
     popupClass?: string | string[];
+
+    /**
+     * Classes to be applied to the popup wrapper content div.
+     */
+    popupWrapperClass?: string | string[];
 
     positionStrategy?: "global" | "connected";
 

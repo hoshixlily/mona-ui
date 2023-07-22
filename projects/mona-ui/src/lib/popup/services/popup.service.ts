@@ -1,17 +1,18 @@
-import { Injectable, Injector, NgZone, OnDestroy, TemplateRef } from "@angular/core";
+import { Injectable, Injector, OnDestroy, TemplateRef } from "@angular/core";
 import { PopupSettings } from "../models/PopupSettings";
 import { Overlay, PositionStrategy } from "@angular/cdk/overlay";
 import { ComponentPortal } from "@angular/cdk/portal";
 import { PopupRef } from "../models/PopupRef";
 import { PopupInjectionToken } from "../models/PopupInjectionToken";
 import { DefaultPositions } from "../models/DefaultPositions";
-import { fromEvent, Subject, take, takeUntil } from "rxjs";
+import { filter, fromEvent, Subject, take, takeUntil } from "rxjs";
 import { PopupCloseEvent, PopupCloseSource } from "../models/PopupCloseEvent";
 import { Dictionary } from "@mirei/ts-collections";
 import { PopupState } from "../models/PopupState";
 import { v4 } from "uuid";
 import { PopupReference } from "../models/PopupReference";
 import { PopupWrapperComponent } from "../components/popup-wrapper/popup-wrapper.component";
+import { PopupInjectorData } from "../models/PopupInjectorData";
 
 @Injectable({
     providedIn: "root"
@@ -21,11 +22,7 @@ export class PopupService implements OnDestroy {
     private readonly popupStateMap: Dictionary<string, PopupState> = new Dictionary<string, PopupState>();
     private readonly serviceDestroy$: Subject<void> = new Subject<void>();
 
-    public constructor(
-        private readonly injector: Injector,
-        private readonly overlay: Overlay,
-        private readonly zone: NgZone
-    ) {}
+    public constructor(private readonly injector: Injector, private readonly overlay: Overlay) {}
 
     public create(settings: PopupSettings): PopupRef {
         const uid = v4();
@@ -62,23 +59,39 @@ export class PopupService implements OnDestroy {
         const preventClose = settings.preventClose;
         const popupReference = new PopupReference(overlayRef);
 
-        const injector = Injector.create({
-            parent: this.injector,
-            providers: [
-                { provide: PopupRef, useFactory: () => popupReference.popupRef },
-                { provide: PopupInjectionToken, useValue: settings.data },
-                ...(settings.providers ?? [])
-            ]
-        });
+        const createInjector = (isTemplate: boolean) => {
+            const tokenValue = !isTemplate
+                ? settings.data
+                : ({
+                      popupReference,
+                      closeOnBackdropClick: settings.closeOnBackdropClick ?? true,
+                      closeOnEscape: settings.closeOnEscape ?? true,
+                      closeOnOutsideClick: settings.closeOnOutsideClick ?? true,
+                      preventClose: settings.preventClose,
+                      wrapperClass: settings.popupWrapperClass,
+                      disableAnimation: settings.disableAnimation
+                  } as PopupInjectorData);
+            return Injector.create({
+                parent: this.injector,
+                providers: [
+                    { provide: PopupRef, useFactory: () => popupReference.popupRef },
+                    { provide: PopupInjectionToken, useValue: tokenValue },
+                    ...(settings.providers ?? [])
+                ]
+            });
+        };
 
-        let portal: ComponentPortal<any>;
         if (settings.content instanceof TemplateRef) {
-            portal = new ComponentPortal(PopupWrapperComponent, null, injector);
+            const portal = new ComponentPortal(PopupWrapperComponent, null, createInjector(true));
             popupReference.componentRef = overlayRef.attach(portal);
-            (popupReference.componentRef.instance as PopupWrapperComponent).templateRef = settings.content;
+            const component = popupReference.componentRef.instance as PopupWrapperComponent;
+            settings.closeOnBackdropClick = false; // handled by wrapper component
+            settings.closeOnEscape = false; // handled by wrapper component
+            settings.closeOnOutsideClick = false; // handled by wrapper component
+            component.templateRef = settings.content;
             popupReference.componentRef.changeDetectorRef.detectChanges();
         } else {
-            portal = new ComponentPortal(settings.content, null, injector);
+            const portal = new ComponentPortal(settings.content, null, createInjector(false));
             popupReference.componentRef = overlayRef.attach(portal);
         }
 
@@ -139,25 +152,25 @@ export class PopupService implements OnDestroy {
     }
 
     private setEventListeners(state: PopupState): void {
-        this.zone.runOutsideAngular(() => {
-            if (state.settings.closeOnEscape ?? true) {
-                fromEvent<KeyboardEvent>(document, "keydown")
-                    .pipe(takeUntil(state.popupRef.closed))
-                    .subscribe(event => {
-                        if (event.key === "Escape") {
-                            const closeEvent = new PopupCloseEvent({ event, via: PopupCloseSource.Escape });
-                            const prevented = state.settings.preventClose
-                                ? state.settings.preventClose(closeEvent) || closeEvent.isDefaultPrevented()
-                                : false;
-                            if (!prevented) {
-                                this.zone.run(() => {
-                                    state.popupRef.close(closeEvent);
-                                    this.popupStateMap.remove(state.uid);
-                                });
-                            }
+        if (state.settings.closeOnEscape ?? true) {
+            fromEvent<KeyboardEvent>(document, "keydown")
+                .pipe(
+                    filter(() => state.popupRef.overlayRef.hasAttached()),
+                    filter(event => event.key === "Escape"),
+                    takeUntil(state.popupRef.closed)
+                )
+                .subscribe(event => {
+                    if (event.key === "Escape") {
+                        const closeEvent = new PopupCloseEvent({ event, via: PopupCloseSource.Escape });
+                        const prevented = state.settings.preventClose
+                            ? state.settings.preventClose(closeEvent) || closeEvent.isDefaultPrevented()
+                            : false;
+                        if (!prevented) {
+                            state.popupRef.close(closeEvent);
+                            this.popupStateMap.remove(state.uid);
                         }
-                    });
-            }
-        });
+                    }
+                });
+        }
     }
 }

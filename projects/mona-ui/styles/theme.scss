@@ -436,7 +436,8 @@ table.mona-calendar-month-view-table {
 
 .mona-date-input-popup {
     flex-direction: column;
-    padding: 8px !important;
+    overflow: hidden;
+
     & mona-calendar  {
         & div.mona-calendar-month-view,
         & div.mona-calendar-year-view,
@@ -446,6 +447,10 @@ table.mona-calendar-month-view-table {
             border-bottom: 0;
         }
     }
+}
+
+.mona-calendar-popup-wrapper {
+    padding: 8px;
 }
 
 /** Time Selector */
@@ -477,6 +482,7 @@ div.mona-time-selector {
 
 div.mona-time-picker-popup {
     padding: 0 !important;
+    overflow: hidden;
 }
 
 /** Dropdown List */
@@ -609,7 +615,9 @@ button.mona-grid-filtered {
 
 .mona-grid-filter-menu-popup-content {
     padding: 0 !important;
-    background: var(--mona-background-dark) !important;
+    background: var(--mona-background-dark);
+    border: 1px solid var(--mona-border-color);
+    box-shadow: var(--mona-popup-shadow);
 }
 
 .mona-grid-column-drag-preview {
@@ -739,7 +747,13 @@ input[type="checkbox"][monaCheckBox] {
 }
 
 .mona-color-picker-popup {
-    padding: 2px !important;
+    //padding: 2px !important;
+    overflow: hidden;
+}
+
+.mona-color-picker-popup-wrapper {
+    //background: var(--mona-background);
+    padding: 2px;
 }
 
 /** Numeric Text Box */
@@ -1136,6 +1150,8 @@ div.mona-tab-strip-scroll {
 .mona-contextmenu-content {
     user-select: none;
     padding: 4px 0 !important;
+    background: var(--mona-background);
+    border: 1px solid var(--mona-border-color);
 }
 
 .mona-contextmenu-item {
@@ -1214,11 +1230,21 @@ div.mona-notification-progress {
 
 /** Popup */
 .mona-popup-content {
-    background-color: var(--mona-background);
     color: var(--mona-text);
-    border: 1px solid var(--mona-border-color);
-    padding: 8px 10px;
+    @include scrollbars;
+}
+
+.mona-popup-wrapper-host {
+    //background: var(--mona-background);
+    //border: 1px solid var(--mona-border-color);
     box-shadow: var(--mona-popup-shadow);
+    transition: box-shadow 0.2s ease-out;
+}
+
+.mona-popup-wrapper {
+    transform-origin: 50% 0%;
+    background-color: var(--mona-background);
+    border: 1px solid var(--mona-border-color);
     @include scrollbars;
 }
 
@@ -1255,10 +1281,13 @@ div.mona-progress-bar-indeterminate {
 }
 
 /** Tooltip */
+.mona-tooltip-popup-wrapper {
+    overflow: initial !important;
+}
+
 .mona-tooltip-popup-content {
     background-color: var(--mona-background);
     color: var(--mona-text);
-    border: 1px solid var(--mona-border-color);
     padding: 0 !important;
     box-shadow: var(--mona-popup-shadow);
 }
@@ -1323,6 +1352,11 @@ div.mona-tree-view-node-dropping {
     @include font-medium;
 }
 
+.mona-window-content-container {
+    border: 1px solid var(--mona-border-color);
+    box-shadow: var(--mona-popup-shadow);
+}
+
 .mona-window-content {
     background-color: var(--mona-window-background);
 }
@@ -1338,6 +1372,9 @@ div.mona-tree-view-node-dropping {
 .mona-window-popup-content {
     padding: 0 !important;
     position: absolute !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
 }
 
 .mona-dialog-window {
