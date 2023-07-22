@@ -10,7 +10,7 @@
                                          (nodeSelect)="onNodeSelect($event)"
                                          (nodeClick)="nodeClick.emit($event)"
                                          (nodeDoubleClick)="nodeDoubleClick.emit($event)"></mona-tree-view-node>
-                    <ul class="mona-subtree-list" *ngIf="node.nodes.length !== 0 && node.expanded">
+                    <ul class="mona-subtree-list" [@nodeExpand]="node.expanded" *ngIf="node.nodes.length !== 0 && node.expanded">
                         <ng-container [ngTemplateOutlet]="treeTemplate"
                                       [ngTemplateOutletContext]="{$implicit: node.nodes}"></ng-container>
                     </ul>

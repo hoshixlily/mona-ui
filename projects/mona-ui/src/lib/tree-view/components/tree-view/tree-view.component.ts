@@ -1,10 +1,8 @@
 import {
-    AfterContentInit,
     AfterViewInit,
     ChangeDetectorRef,
     Component,
     ContentChild,
-    ContentChildren,
     ElementRef,
     EventEmitter,
     Input,
@@ -32,14 +30,24 @@ import { NodeDropEvent } from "../../data/NodeDropEvent";
 import { NodeDragEndEvent } from "../../data/NodeDragEndEvent";
 import { NodeClickEvent } from "../../data/NodeClickEvent";
 import { TreeViewNodeComponent } from "../tree-view-node/tree-view-node.component";
-import { ActiveDescendantKeyManager, FocusKeyManager } from "@angular/cdk/a11y";
+import { ActiveDescendantKeyManager } from "@angular/cdk/a11y";
 import { filter, fromEvent, Subject, takeUntil } from "rxjs";
+import { animate, style, transition, trigger } from "@angular/animations";
 
 @Component({
     selector: "mona-tree-view",
     templateUrl: "./tree-view.component.html",
     styleUrls: ["./tree-view.component.scss"],
-    providers: [TreeViewService]
+    providers: [TreeViewService],
+    animations: [
+        trigger("nodeExpand", [
+            transition(":enter", [
+                style({ height: "0px", opacity: 0 }),
+                animate("0.15s ease-out", style({ height: "*", opacity: 1 }))
+            ]),
+            transition(":leave", [animate("0.15s ease-out", style({ height: "0px", opacity: 0 }))])
+        ])
+    ]
 })
 export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
     private readonly componentDestroy$: Subject<void> = new Subject<void>();
