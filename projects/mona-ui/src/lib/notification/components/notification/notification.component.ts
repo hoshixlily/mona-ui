@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, Input, OnDestroy, OnInit, signal, WritableSignal } from "@angular/core";
+import { Component, Input, OnDestroy, OnInit, signal, WritableSignal } from "@angular/core";
 import {
     faCheckCircle,
     faExclamationCircle,

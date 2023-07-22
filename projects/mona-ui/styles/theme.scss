@@ -1323,6 +1323,11 @@ div.mona-tree-view-node-dropping {
     @include font-medium;
 }
 
+.mona-window-content-container {
+    border: 1px solid var(--mona-border-color);
+    box-shadow: var(--mona-popup-shadow);
+}
+
 .mona-window-content {
     background-color: var(--mona-window-background);
 }
@@ -1338,6 +1343,9 @@ div.mona-tree-view-node-dropping {
 .mona-window-popup-content {
     padding: 0 !important;
     position: absolute !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
 }
 
 .mona-dialog-window {

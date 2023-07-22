@@ -3,7 +3,7 @@ import { PopupService } from "../../popup/services/popup.service";
 import { WindowContentComponent } from "../components/window-content/window-content.component";
 import { WindowInjectorData } from "../models/WindowInjectorData";
 import { WindowSettings } from "../models/WindowSettings";
-import { asapScheduler } from "rxjs";
+import { asapScheduler, filter, take } from "rxjs";
 import { WindowRef } from "../models/WindowRef";
 import { PopupCloseEvent } from "../../popup/models/PopupCloseEvent";
 import { WindowCloseEvent } from "../models/WindowCloseEvent";
@@ -78,6 +78,19 @@ export class WindowService {
                 return false;
             }
         });
+        const component = windowReferenceHolder.windowReference.popupRef.component?.instance as WindowContentComponent;
+        if (component) {
+            component.isVisible = true;
+            component.animationStateChange
+                .pipe(
+                    filter(e => e.toState === "hidden"),
+                    take(1)
+                )
+                .subscribe(() => {
+                    windowReferenceHolder.windowReference.close();
+                });
+        }
+
         asapScheduler.schedule(() => {
             const element = windowReferenceOptions.popupRef.overlayRef.overlayElement;
             const windowClassList = !settings.windowClass
