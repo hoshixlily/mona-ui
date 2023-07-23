@@ -104,7 +104,6 @@ export class DateTimePickerComponent implements OnInit, ControlValueAccessor {
             "hide"
         );
         this.popupRef?.closeWithDelay();
-        this.popupRef = null;
     }
 
     public onDateInputBlur(): void {
@@ -172,7 +171,6 @@ export class DateTimePickerComponent implements OnInit, ControlValueAccessor {
         });
         this.setAnimations(this.popupRef, "show");
         this.popupRef.closed.pipe(take(1)).subscribe(() => {
-            this.popupRef = null;
             this.focusMonitor.focusVia(input, "program");
         });
         this.cdr.detectChanges();
@@ -214,7 +212,6 @@ export class DateTimePickerComponent implements OnInit, ControlValueAccessor {
         this.setAnimations(this.popupRef, "show");
         const input = this.elementRef.nativeElement.querySelector("input") as HTMLElement;
         this.popupRef.closed.pipe(take(1)).subscribe(() => {
-            this.popupRef = null;
             this.focusMonitor.focusVia(input, "program");
         });
     }
