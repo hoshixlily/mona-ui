@@ -15,7 +15,7 @@ import {
 } from "@angular/core";
 import { PopupInjectionToken } from "../../models/PopupInjectionToken";
 import { PopupInjectorData } from "../../models/PopupInjectorData";
-import { animate, AnimationEvent, AnimationMetadata, state, style, transition, trigger } from "@angular/animations";
+import { animate, AnimationEvent, style, transition, trigger } from "@angular/animations";
 import { filter, fromEvent } from "rxjs";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { PopupCloseEvent, PopupCloseSource } from "../../models/PopupCloseEvent";
@@ -27,11 +27,9 @@ import { PopupCloseEvent, PopupCloseSource } from "../../models/PopupCloseEvent"
     changeDetection: ChangeDetectionStrategy.OnPush,
     animations: [
         trigger("display", [
-            state("visible", style({ transform: "translateY(0)", opacity: 1 })),
-            state("hidden", style({ transform: "translateY(-100%)", opacity: 1 })),
             transition(":enter", [
                 style({ transform: "translateY(-100%)", opacity: 1 }),
-                animate("0.15s ease-out", style({ transform: "translateY(0)", opacity: 1 }))
+                animate("0.25s ease-out", style({ transform: "translateY(0)", opacity: 1 }))
             ])
         ])
     ]
@@ -57,7 +55,7 @@ export class PopupWrapperComponent implements OnInit, AfterViewInit {
         if (parent) {
             window.setTimeout(() => {
                 parent.classList.add("mona-popup-wrapper-host");
-            }, 50);
+            }, 150);
         }
     }
 

@@ -1149,9 +1149,10 @@ div.mona-tab-strip-scroll {
 /** Context Menu */
 .mona-contextmenu-content {
     user-select: none;
-    padding: 4px 0 !important;
-    background: var(--mona-background);
-    border: 1px solid var(--mona-border-color);
+    overflow: hidden;
+    //padding: 4px 0 !important;
+    //background: var(--mona-background);
+    //border: 1px solid var(--mona-border-color);
 }
 
 .mona-contextmenu-item {
@@ -1163,6 +1164,12 @@ div.mona-tab-strip-scroll {
         background-color: var(--mona-primary);
         color: var(--mona-text-inverted);
     }
+}
+
+ul.mona-contextmenu-list {
+    background-color: var(--mona-background);
+    border: 1px solid var(--mona-border-color);
+    padding: 4px 0;
 }
 
 .mona-contextmenu-list-item {

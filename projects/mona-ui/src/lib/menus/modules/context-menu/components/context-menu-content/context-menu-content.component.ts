@@ -19,6 +19,7 @@ import { PopupRef } from "../../../../../popup/models/PopupRef";
 import { ContextMenuItemComponent } from "../context-menu-item/context-menu-item.component";
 import { ActiveDescendantKeyManager } from "@angular/cdk/a11y";
 import { Subject } from "rxjs";
+import { animate, AnimationBuilder, style } from "@angular/animations";
 
 @Component({
     selector: "mona-contextmenu-content",
@@ -38,6 +39,7 @@ export class ContextMenuContentComponent implements OnInit, OnDestroy, AfterView
     private contextMenuItemComponents: QueryList<ContextMenuItemComponent> = new QueryList<ContextMenuItemComponent>();
 
     public constructor(
+        private readonly animationBuilder: AnimationBuilder,
         private readonly cdr: ChangeDetectorRef,
         @Inject(PopupInjectionToken) public contextMenuData: ContextMenuInjectorData,
         private readonly contextMenuService: ContextMenuService,
@@ -47,6 +49,7 @@ export class ContextMenuContentComponent implements OnInit, OnDestroy, AfterView
     ) {}
 
     public ngAfterViewInit(): void {
+        this.animate();
         this.keyManager = new ActiveDescendantKeyManager<ContextMenuItemComponent>(this.contextMenuItemComponents)
             .withWrap()
             .skipPredicate(mi => !!mi.menuItem.disabled || !!mi.menuItem.divider);
@@ -81,6 +84,24 @@ export class ContextMenuContentComponent implements OnInit, OnDestroy, AfterView
         if (this.currentMenuItem.subMenuItems && this.currentMenuItem.subMenuItems.length > 0) {
             this.create(event.target as HTMLElement, this.currentMenuItem);
         }
+    }
+
+    private animate(): void {
+        this.animationBuilder
+            .build([
+                style({ transform: "translateY(-100%)", opacity: 1 }),
+                animate("0.15s ease-out", style({ transform: "translateY(0)", opacity: 1 }))
+            ])
+            .create(this.elementRef.nativeElement.firstElementChild)
+            .play();
+
+        this.animationBuilder
+            .build([
+                style({ boxShadow: "none" }),
+                animate("0.15s 0.1s ease-out", style({ boxShadow: "var(--mona-popup-shadow)" }))
+            ])
+            .create(this.elementRef.nativeElement.parentElement)
+            .play();
     }
 
     private create(anchor: HTMLElement, menuItem: MenuItem, viaKeyboard?: boolean): void {
