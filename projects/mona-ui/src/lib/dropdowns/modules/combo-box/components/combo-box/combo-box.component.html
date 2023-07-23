@@ -9,7 +9,7 @@
 </div>
 
 <ng-template #popupTemplate>
-    <div>
+    <div class="mona-dropdown-popup-list-wrapper">
         <mona-popup-list [textField]="textField" [valueField]="valueField" [groupField]="groupField" [value]="value ? [value] : []"
                          (valueChange)="onPopupListValueChange($event)">
             <ng-container *ngIf="itemTemplate">

@@ -20,7 +20,7 @@
                 </ng-container>
             </ng-container>
             <li class="mona-list-item" *ngFor="let item of group.source" (click)="onListItemClick(item, $event)"
-                [ngClass]="{'mona-selected': item.selected, 'mona-highlighted': item.highlighted, 'mona-disabled': item.disabled}">
+                [ngClass]="{'mona-selected': item.selected(), 'mona-highlighted': item.highlighted(), 'mona-disabled': item.disabled}">
                 <mona-popup-list-item [item]="item" [itemTemplate]="itemTemplate"></mona-popup-list-item>
             </li>
         </ng-container>

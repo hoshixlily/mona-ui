@@ -160,7 +160,8 @@ ul.mona-list {
 
         // TODO: Update this to a better visual style
         &.mona-highlighted {
-            border: 1px solid darkgray;
+            //border: 1px solid darkgray;
+            box-shadow: 0 0 0 1px var(--mona-focus-border-color) inset;
         }
 
         &.mona-disabled {
@@ -301,6 +302,10 @@ mona-button-group button[monaButton] {
 
 mona-popup-list-item {
     @include font-medium;
+}
+
+.mona-dropdown-popup-list-wrapper {
+    max-height: 250px;
 }
 
 ul.mona-list mona-text-box.filter-box {
@@ -506,7 +511,6 @@ div.mona-time-picker-popup {
     user-select: none;
     padding: 0 !important;
     overflow: hidden auto;
-    max-height: 250px;
 
     & mona-text-box.filter-box {
         & div.mona-text-box {
@@ -1149,9 +1153,10 @@ div.mona-tab-strip-scroll {
 /** Context Menu */
 .mona-contextmenu-content {
     user-select: none;
-    padding: 4px 0 !important;
-    background: var(--mona-background);
-    border: 1px solid var(--mona-border-color);
+    overflow: hidden;
+    //padding: 4px 0 !important;
+    //background: var(--mona-background);
+    //border: 1px solid var(--mona-border-color);
 }
 
 .mona-contextmenu-item {
@@ -1163,6 +1168,12 @@ div.mona-tab-strip-scroll {
         background-color: var(--mona-primary);
         color: var(--mona-text-inverted);
     }
+}
+
+ul.mona-contextmenu-list {
+    background-color: var(--mona-background);
+    border: 1px solid var(--mona-border-color);
+    padding: 4px 0;
 }
 
 .mona-contextmenu-list-item {

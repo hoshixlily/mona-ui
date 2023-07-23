@@ -1,7 +1,4 @@
 <div class="mona-popup-wrapper"
-     [ngClass]="wrapperClass()"
-     [@display]="visible()?'visible':'hidden'"
-     [@.disabled]="animationDisabled()"
-     (@display.done)="onAnimationDone($event)">
+     [ngClass]="wrapperClass()">
     <ng-container [ngTemplateOutlet]="templateRef"></ng-container>
 </div>

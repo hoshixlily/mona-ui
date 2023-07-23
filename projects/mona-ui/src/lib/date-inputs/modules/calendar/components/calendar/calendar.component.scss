@@ -14,6 +14,12 @@ table.mona-calendar-month-view-table {
             font-weight: 600;
             box-shadow: inset 0 -1px 0 var(--mona-text);
             color: var(--mona-text);
+            &:first-child {
+                clip-path: inset(0 -1px -1px 4px);
+            }
+            &:last-child {
+                clip-path: inset(0 4px -1px -1px);
+            }
         }
     }
     & tbody {

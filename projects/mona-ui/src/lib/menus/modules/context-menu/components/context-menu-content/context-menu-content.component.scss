@@ -6,6 +6,7 @@ ul {
     width: 100%;
     list-style: none;
     outline: none;
+    transform-origin: top left;
     & li {
         height: 26px;
         &.divider {

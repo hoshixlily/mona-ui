@@ -18,7 +18,8 @@ import { faFilter, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { GridService } from "../../services/grid.service";
 import { ColumnFilterState } from "../../models/ColumnFilterState";
 import { Column } from "../../models/Column";
-import { Subject, takeUntil } from "rxjs";
+import { Subject, take, takeUntil } from "rxjs";
+import { animate, AnimationBuilder, style } from "@angular/animations";
 
 @Component({
     selector: "mona-grid-filter-menu",
@@ -40,6 +41,7 @@ export class GridFilterMenuComponent implements OnInit, OnDestroy {
     @Input()
     public type: DataType = "string";
     public constructor(
+        private readonly animationBuilder: AnimationBuilder,
         private readonly cdr: ChangeDetectorRef,
         private readonly popupService: PopupService,
         private readonly elementRef: ElementRef,
@@ -60,6 +62,8 @@ export class GridFilterMenuComponent implements OnInit, OnDestroy {
             anchor: this.elementRef.nativeElement,
             content: FilterMenuComponent,
             popupClass: "mona-grid-filter-menu-popup-content",
+            closeOnBackdropClick: false,
+            hasBackdrop: true,
             preventClose: event => {
                 if (event.originalEvent instanceof MouseEvent) {
                     const target = event.originalEvent.target as HTMLElement;
@@ -70,6 +74,15 @@ export class GridFilterMenuComponent implements OnInit, OnDestroy {
                 return false;
             }
         });
+        this.popupRef.overlayRef
+            .backdropClick()
+            .pipe(take(1))
+            .subscribe(() => {
+                this.animateLeave();
+                this.popupRef?.closeWithDelay(100);
+            });
+
+        this.animateEnter();
         const filterState = this.gridService.appliedFilters.get(this.column.field);
         const componentRef = this.popupRef.component as ComponentRef<FilterMenuComponent>;
         componentRef.instance.type = this.type;
@@ -83,9 +96,36 @@ export class GridFilterMenuComponent implements OnInit, OnDestroy {
                 filter,
                 filterMenuValue: componentRef.instance.value
             };
-            this.popupRef?.close();
+            this.animateLeave();
+            this.popupRef?.closeWithDelay(100);
             this.apply.emit(filterState);
         });
+    }
+
+    private animateEnter(): void {
+        if (this.popupRef?.overlayRef?.overlayElement?.parentElement) {
+            this.popupRef.overlayRef.overlayElement.parentElement.style.overflow = "hidden";
+        }
+        this.animationBuilder
+            .build([
+                style({ transform: "translateY(-100%)", opacity: 1 }),
+                animate("0.15s ease-out", style({ transform: "translateY(0)", opacity: 1 }))
+            ])
+            .create(this.popupRef?.overlayRef?.overlayElement)
+            .play();
+    }
+
+    private animateLeave(): void {
+        if (this.popupRef?.overlayRef?.overlayElement?.parentElement) {
+            this.popupRef.overlayRef.overlayElement.parentElement.style.overflow = "hidden";
+        }
+        this.animationBuilder
+            .build([
+                style({ transform: "translateY(0)", opacity: 1 }),
+                animate("0.15s ease-out", style({ transform: "translateY(-100%)", opacity: 1 }))
+            ])
+            .create(this.popupRef?.overlayRef?.overlayElement)
+            .play();
     }
 
     private setSubscriptions(): void {

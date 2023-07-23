@@ -1,31 +1,31 @@
 import {
     AfterViewInit,
+    ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
     ElementRef,
     Inject,
-    NgZone,
-    OnDestroy,
     OnInit,
     QueryList,
-    Renderer2,
     ViewChildren
 } from "@angular/core";
 import { ContextMenuInjectorData } from "../../models/ContextMenuInjectorData";
-import { PopupInjectionToken } from "../../../../../popup/models/PopupInjectionToken";
+import { PopupDataInjectionToken } from "../../../../../popup/models/PopupInjectionToken";
 import { ContextMenuService } from "../../services/context-menu.service";
 import { MenuItem } from "../../models/MenuItem";
 import { PopupRef } from "../../../../../popup/models/PopupRef";
 import { ContextMenuItemComponent } from "../context-menu-item/context-menu-item.component";
 import { ActiveDescendantKeyManager } from "@angular/cdk/a11y";
-import { Subject } from "rxjs";
+import { filter, fromEvent, Subject } from "rxjs";
+import { AnimationService } from "../../../../../animations/animation.service";
 
 @Component({
     selector: "mona-contextmenu-content",
     templateUrl: "./context-menu-content.component.html",
-    styleUrls: ["./context-menu-content.component.scss"]
+    styleUrls: ["./context-menu-content.component.scss"],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ContextMenuContentComponent implements OnInit, OnDestroy, AfterViewInit {
+export class ContextMenuContentComponent implements OnInit, AfterViewInit {
     private contextMenuInjectorData: Partial<ContextMenuInjectorData> = { isRoot: false };
     public activeItemIndex: number = -1;
     public currentMenuItem: MenuItem | null = null;
@@ -38,15 +38,15 @@ export class ContextMenuContentComponent implements OnInit, OnDestroy, AfterView
     private contextMenuItemComponents: QueryList<ContextMenuItemComponent> = new QueryList<ContextMenuItemComponent>();
 
     public constructor(
+        private readonly animationService: AnimationService,
         private readonly cdr: ChangeDetectorRef,
-        @Inject(PopupInjectionToken) public contextMenuData: ContextMenuInjectorData,
+        @Inject(PopupDataInjectionToken) public contextMenuData: ContextMenuInjectorData,
         private readonly contextMenuService: ContextMenuService,
-        private readonly elementRef: ElementRef<HTMLElement>,
-        private readonly renderer: Renderer2,
-        private readonly zone: NgZone
+        private readonly elementRef: ElementRef<HTMLElement>
     ) {}
 
     public ngAfterViewInit(): void {
+        this.animateEnter();
         this.keyManager = new ActiveDescendantKeyManager<ContextMenuItemComponent>(this.contextMenuItemComponents)
             .withWrap()
             .skipPredicate(mi => !!mi.menuItem.disabled || !!mi.menuItem.divider);
@@ -57,8 +57,6 @@ export class ContextMenuContentComponent implements OnInit, OnDestroy, AfterView
             this.cdr.detectChanges();
         }
     }
-
-    public ngOnDestroy(): void {}
 
     public ngOnInit(): void {
         this.iconSpaceVisible = this.contextMenuData.menuItems.some(mi => mi.iconClass || mi.iconTemplate);
@@ -81,6 +79,24 @@ export class ContextMenuContentComponent implements OnInit, OnDestroy, AfterView
         if (this.currentMenuItem.subMenuItems && this.currentMenuItem.subMenuItems.length > 0) {
             this.create(event.target as HTMLElement, this.currentMenuItem);
         }
+    }
+
+    private animateEnter(): void {
+        this.animationService.animate({
+            element: this.elementRef.nativeElement.firstElementChild as HTMLElement,
+            duration: 150,
+            startStyles: { transform: "translateY(-100%)", opacity: 1 },
+            endStyles: { transform: "translateY(0)", opacity: 1 },
+            timingFunction: "ease-out"
+        });
+        this.animationService.animate({
+            element: this.elementRef.nativeElement.parentElement as HTMLElement,
+            duration: 150,
+            delay: 100,
+            startStyles: { boxShadow: "none" },
+            endStyles: { boxShadow: "var(--mona-popup-shadow)" },
+            timingFunction: "ease-out"
+        });
     }
 
     private create(anchor: HTMLElement, menuItem: MenuItem, viaKeyboard?: boolean): void {
@@ -121,23 +137,32 @@ export class ContextMenuContentComponent implements OnInit, OnDestroy, AfterView
     }
 
     private setEventListeners(): void {
-        this.zone.runOutsideAngular(() => {
-            this.renderer.listen(this.elementRef.nativeElement, "keydown", (event: KeyboardEvent) => {
+        fromEvent<KeyboardEvent>(this.elementRef.nativeElement, "keydown")
+            .pipe(
+                filter(
+                    e =>
+                        e.key === "ArrowDown" ||
+                        e.key === "ArrowUp" ||
+                        e.key === "ArrowRight" ||
+                        e.key === "ArrowLeft" ||
+                        e.key === "Enter" ||
+                        e.key === " "
+                )
+            )
+            .subscribe(event => {
                 this.activeItemIndex = this.keyManager.activeItemIndex ?? -1;
                 switch (event.key) {
                     case "ArrowDown":
                     case "ArrowUp":
-                        this.zone.run(() => {
-                            const previousItem = this.keyManager.activeItem;
-                            this.keyManager.onKeydown(event);
-                            if (this.keyManager.activeItem !== previousItem) {
-                                this.contextMenuData.navigate.emit({
-                                    previousItem: previousItem?.menuItem ?? null,
-                                    currentItem: this.keyManager.activeItem?.menuItem ?? null,
-                                    direction: event.key === "ArrowDown" ? "down" : "up"
-                                });
-                            }
-                        });
+                        const previousItem = this.keyManager.activeItem;
+                        this.keyManager.onKeydown(event);
+                        if (this.keyManager.activeItem !== previousItem) {
+                            this.contextMenuData.navigate.emit({
+                                previousItem: previousItem?.menuItem ?? null,
+                                currentItem: this.keyManager.activeItem?.menuItem ?? null,
+                                direction: event.key === "ArrowDown" ? "down" : "up"
+                            });
+                        }
                         break;
                     case "Enter":
                     case " ":
@@ -148,12 +173,10 @@ export class ContextMenuContentComponent implements OnInit, OnDestroy, AfterView
                             ) {
                                 return;
                             }
-                            this.zone.run(() => {
-                                if (this.keyManager.activeItem) {
-                                    this.keyManager.activeItem.menuItem.menuClick?.();
-                                    this.contextMenuData.menuClick?.next(this.keyManager.activeItem.menuItem);
-                                }
-                            });
+                            if (this.keyManager.activeItem) {
+                                this.keyManager.activeItem.menuItem.menuClick?.();
+                                this.contextMenuData.menuClick?.next(this.keyManager.activeItem.menuItem);
+                            }
                         }
                         break;
                     case "ArrowRight":
@@ -162,56 +185,50 @@ export class ContextMenuContentComponent implements OnInit, OnDestroy, AfterView
                             this.keyManager.activeItem.menuItem.subMenuItems &&
                             this.keyManager.activeItem.menuItem.subMenuItems.length > 0
                         ) {
-                            this.zone.run(() => {
-                                this.menuPopupRef?.close();
-                                const previousItem = this.keyManager.activeItem;
-                                if (this.keyManager.activeItem) {
-                                    this.create(
-                                        this.keyManager.activeItem.elementRef.nativeElement,
-                                        this.keyManager.activeItem.menuItem,
-                                        true
-                                    );
-                                }
-                                this.contextMenuData.navigate.emit({
-                                    previousItem: previousItem?.menuItem ?? null,
-                                    currentItem:
-                                        this.keyManager.activeItem?.menuItem.subMenuItems?.find(
-                                            mi => !mi.disabled && !mi.divider
-                                        ) ?? null,
-                                    direction: "right"
-                                });
+                            this.menuPopupRef?.close();
+                            const previousItem = this.keyManager.activeItem;
+                            if (this.keyManager.activeItem) {
+                                this.create(
+                                    this.keyManager.activeItem.elementRef.nativeElement,
+                                    this.keyManager.activeItem.menuItem,
+                                    true
+                                );
+                            }
+                            this.contextMenuData.navigate.emit({
+                                previousItem: previousItem?.menuItem ?? null,
+                                currentItem:
+                                    this.keyManager.activeItem?.menuItem.subMenuItems?.find(
+                                        mi => !mi.disabled && !mi.divider
+                                    ) ?? null,
+                                direction: "right"
                             });
                         } else {
-                            this.zone.run(() => {
-                                this.contextMenuData.navigate.emit({
-                                    previousItem: this.keyManager.activeItem?.menuItem ?? null,
-                                    currentItem: null,
-                                    direction: "right"
-                                });
+                            this.contextMenuData.navigate.emit({
+                                previousItem: this.keyManager.activeItem?.menuItem ?? null,
+                                currentItem: null,
+                                direction: "right"
                             });
                         }
                         break;
                     case "ArrowLeft":
-                        this.zone.run(() => {
-                            if (!this.contextMenuData.isRoot) {
-                                this.contextMenuData.parentMenuRef?.close();
-                                this.contextMenuData.subMenuClose?.next();
-                                this.contextMenuData.navigate.emit({
-                                    previousItem: this.keyManager.activeItem?.menuItem ?? null,
-                                    currentItem: this.keyManager.activeItem?.menuItem.parent ?? null,
-                                    direction: "left"
-                                });
-                            } else {
-                                this.contextMenuData.navigate.emit({
-                                    previousItem: this.keyManager.activeItem?.menuItem ?? null,
-                                    currentItem: null,
-                                    direction: "left"
-                                });
-                            }
-                        });
+                        if (!this.contextMenuData.isRoot) {
+                            this.contextMenuData.parentMenuRef?.close();
+                            this.contextMenuData.subMenuClose?.next();
+                            this.contextMenuData.navigate.emit({
+                                previousItem: this.keyManager.activeItem?.menuItem ?? null,
+                                currentItem: this.keyManager.activeItem?.menuItem.parent ?? null,
+                                direction: "left"
+                            });
+                        } else {
+                            this.contextMenuData.navigate.emit({
+                                previousItem: this.keyManager.activeItem?.menuItem ?? null,
+                                currentItem: null,
+                                direction: "left"
+                            });
+                        }
                         break;
                 }
+                this.cdr.markForCheck();
             });
-        });
     }
 }

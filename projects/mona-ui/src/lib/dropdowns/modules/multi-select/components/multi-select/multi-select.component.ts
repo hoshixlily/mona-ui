@@ -26,6 +26,7 @@ import { PopupRef } from "../../../../../popup/models/PopupRef";
 import { Action } from "../../../../../utils/Action";
 import { faChevronDown, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { ConnectionPositionPair } from "@angular/cdk/overlay";
+import { AnimationService } from "../../../../../animations/animation.service";
 
 @Component({
     selector: "mona-multi-select",
@@ -101,6 +102,7 @@ export class MultiSelectComponent implements OnInit, OnDestroy, ControlValueAcce
     public valueField?: string;
 
     public constructor(
+        private readonly animationService: AnimationService,
         private readonly cdr: ChangeDetectorRef,
         private readonly elementRef: ElementRef<HTMLElement>,
         private readonly popupListService: PopupListService,
@@ -194,6 +196,14 @@ export class MultiSelectComponent implements OnInit, OnDestroy, ControlValueAcce
                 )
             ]
         });
+        this.animationService.slideDown(this.popupRef.overlayRef.overlayElement.firstElementChild as HTMLElement);
+        this.animationService.animate({
+            element: this.popupRef.overlayRef.overlayElement as HTMLElement,
+            duration: 200,
+            delay: 150,
+            startStyles: { boxShadow: "none" },
+            endStyles: { boxShadow: "var(--mona-popup-shadow)" }
+        });
         this.popupRef.closed.pipe(take(1)).subscribe(() => {
             this.popupRef = null;
             (this.elementRef.nativeElement.firstElementChild as HTMLElement)?.focus();
@@ -231,7 +241,7 @@ export class MultiSelectComponent implements OnInit, OnDestroy, ControlValueAcce
             .selectMany(g => g.source)
             .where(d => this.value.some(v => d.dataEquals(v)))
             .toArray();
-        this.valuePopupListItem.forEach(d => (d.selected = true));
+        this.valuePopupListItem.forEach(d => d.selected.set(true));
     }
 
     private setEventListeners(): void {

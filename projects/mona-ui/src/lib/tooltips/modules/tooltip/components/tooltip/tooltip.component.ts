@@ -1,10 +1,11 @@
 import { Component, ElementRef, Input, OnInit, TemplateRef, ViewChild } from "@angular/core";
-import { fromEvent, Subject, take, takeUntil, tap } from "rxjs";
+import { filter, fromEvent, Subject, take, takeUntil, tap } from "rxjs";
 import { PopupService } from "../../../../../popup/services/popup.service";
 import { PopupRef } from "../../../../../popup/models/PopupRef";
 import { Position } from "../../../../../models/Position";
 import { DefaultTooltipPositionMap } from "../../../../models/DefaultTooltipPositionMap";
 import { v4 } from "uuid";
+import { AnimationService } from "../../../../../animations/animation.service";
 
 @Component({
     selector: "mona-tooltip",
@@ -25,12 +26,29 @@ export class TooltipComponent implements OnInit {
     @ViewChild(TemplateRef)
     public templateRef!: TemplateRef<any>;
 
-    public constructor(private readonly popupService: PopupService) {}
+    public constructor(
+        private readonly animationService: AnimationService,
+        private readonly elementRef: ElementRef<HTMLElement>,
+        private readonly popupService: PopupService
+    ) {}
+
     public ngOnInit(): void {
         if (!this.target) {
             throw new Error("Tooltip target is required.");
         }
         this.setSubscriptions();
+    }
+
+    private animateEnter(): void {
+        if (this.tooltipOverlayElement) {
+            this.animationService.fadeIn(this.tooltipOverlayElement);
+        }
+    }
+
+    private animateLeave(): void {
+        if (this.tooltipOverlayElement) {
+            this.animationService.fadeOut(this.tooltipOverlayElement);
+        }
     }
 
     private calculateTopAndLeft(): void {
@@ -73,12 +91,15 @@ export class TooltipComponent implements OnInit {
         const target = this.target instanceof ElementRef ? this.target.nativeElement : this.target;
         fromEvent<MouseEvent>(target, "mouseenter")
             .pipe(
+                filter(() => !this.#popupRef),
                 takeUntil(this.#destroy$),
                 tap(() => {
                     fromEvent(target, "mouseleave")
                         .pipe(take(1))
                         .subscribe(() => {
-                            this.#popupRef?.close();
+                            this.animateLeave();
+                            this.#popupRef?.closeWithDelay(100);
+                            this.#popupRef = undefined;
                         });
                 })
             )
@@ -98,6 +119,7 @@ export class TooltipComponent implements OnInit {
                 window.setTimeout(() => {
                     this.calculateTopAndLeft();
                     this.#popupRef?.overlayRef.removePanelClass("mona-invisible-tooltip");
+                    this.animateEnter();
                 }, 100);
             });
     }

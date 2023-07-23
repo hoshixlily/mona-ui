@@ -15,11 +15,11 @@ export class PopupListService {
     public constructor() {}
 
     public static findFirstSelectedItem(items: List<Group<string, PopupListItem>>): PopupListItem | null {
-        return items.selectMany(g => g.source).firstOrDefault(i => i.selected);
+        return items.selectMany(g => g.source).firstOrDefault(i => i.selected());
     }
 
     public static findLastSelectedItem(items: List<Group<string, PopupListItem>>): PopupListItem | null {
-        return items.selectMany(g => g.source).lastOrDefault(i => i.selected);
+        return items.selectMany(g => g.source).lastOrDefault(i => i.selected());
     }
 
     public static findNextSelectableItem(
@@ -66,7 +66,7 @@ export class PopupListService {
 
     public clearFilters(): void {
         this.viewListData = this.sourceListData.toList();
-        this.viewListData.selectMany(g => g.source).forEach(i => (i.highlighted = false));
+        this.viewListData.selectMany(g => g.source).forEach(i => i.highlighted.set(false));
         this.filterModeActive = false;
     }
 
@@ -84,27 +84,27 @@ export class PopupListService {
         if (selectionMode === "single") {
             const selectedItem = this.viewListData
                 .selectMany(g => g.source)
-                .where(i => i.selected)
+                .where(i => i.selected())
                 .firstOrDefault();
             if (selectedItem) {
-                selectedItem.highlighted = true;
+                selectedItem.highlighted.set(true);
             } else {
                 const firstItem = this.viewListData
                     .selectMany(g => g.source)
                     .where(i => !i.disabled)
                     .firstOrDefault();
                 if (firstItem) {
-                    firstItem.highlighted = true;
+                    firstItem.highlighted.set(true);
                 }
             }
         } else {
-            this.viewListData.selectMany(g => g.source).forEach(i => (i.highlighted = false));
+            this.viewListData.selectMany(g => g.source).forEach(i => i.highlighted.set(false));
             const firstItem = this.viewListData
                 .selectMany(g => g.source)
                 .where(i => !i.disabled)
                 .firstOrDefault();
             if (firstItem) {
-                firstItem.highlighted = true;
+                firstItem.highlighted.set(true);
             }
         }
         this.filterModeActive = true;
@@ -153,7 +153,7 @@ export class PopupListService {
 
         const selectedItems = this.sourceListData
             .selectMany(g => g.source)
-            .where(i => i.selected)
+            .where(i => i.selected())
             .toList();
 
         this.sourceListData = listItems;
@@ -162,7 +162,7 @@ export class PopupListService {
         this.sourceListData
             .selectMany(g => g.source)
             .forEach(i => {
-                i.selected = selectedItems.any(s => s.dataEquals(i.data));
+                i.selected.set(selectedItems.any(s => s.dataEquals(i.data)));
             });
 
         if (params.disabler) {
@@ -174,17 +174,17 @@ export class PopupListService {
     }
 
     public navigate(event: KeyboardEvent, selectionMode: SelectionMode): PopupListItem | null {
-        const selectedItem = this.viewListData.selectMany(g => g.source).firstOrDefault(i => i.selected);
-        const highlightedItem = this.viewListData.selectMany(g => g.source).firstOrDefault(i => i.highlighted);
+        const selectedItem = this.viewListData.selectMany(g => g.source).firstOrDefault(i => i.selected());
+        const highlightedItem = this.viewListData.selectMany(g => g.source).firstOrDefault(i => i.highlighted());
         const firstItem = this.viewListData.selectMany(g => g.source).firstOrDefault(i => !i.disabled);
         const focusedItem = highlightedItem ?? selectedItem ?? null;
         let newItem: PopupListItem | null = null;
         if (event.key === "ArrowDown") {
             event.preventDefault();
             if (focusedItem && PopupListService.isLastSelectableItem(this.viewListData, focusedItem)) {
-                if (this.filterModeActive && focusedItem.highlighted && !focusedItem.selected) {
-                    focusedItem.highlighted = false;
-                    focusedItem.selected = true;
+                if (this.filterModeActive && focusedItem.highlighted() && !focusedItem.selected()) {
+                    focusedItem.highlighted.set(false);
+                    focusedItem.selected.set(true);
                 }
                 return focusedItem;
             }
@@ -194,36 +194,36 @@ export class PopupListService {
             if (nextItem) {
                 if (selectionMode === "single") {
                     if (this.filterModeActive) {
-                        if (focusedItem && focusedItem.highlighted && !focusedItem.selected) {
-                            focusedItem.highlighted = false;
-                            focusedItem.selected = true;
+                        if (focusedItem && focusedItem.highlighted() && !focusedItem.selected()) {
+                            focusedItem.highlighted.set(false);
+                            focusedItem.selected.set(true);
                             newItem = focusedItem;
                             return newItem;
                         } else {
                             if (focusedItem) {
-                                focusedItem.selected = false;
-                                focusedItem.highlighted = false;
-                                nextItem.selected = true;
+                                focusedItem.selected.set(false);
+                                focusedItem.highlighted.set(false);
+                                nextItem.selected.set(true);
                             }
                         }
                     } else {
                         if (focusedItem) {
-                            if (focusedItem.highlighted && !focusedItem.selected) {
-                                focusedItem.highlighted = false;
-                                focusedItem.selected = true;
+                            if (focusedItem.highlighted() && !focusedItem.selected()) {
+                                focusedItem.highlighted.set(false);
+                                focusedItem.selected.set(true);
                                 newItem = focusedItem;
                                 return newItem;
                             } else {
-                                focusedItem.selected = false;
-                                focusedItem.highlighted = false;
+                                focusedItem.selected.set(false);
+                                focusedItem.highlighted.set(false);
                             }
                         }
-                        nextItem.selected = true;
+                        nextItem.selected.set(true);
                     }
                 } else {
-                    nextItem.highlighted = true;
+                    nextItem.highlighted.set(true);
                     if (focusedItem) {
-                        focusedItem.highlighted = false;
+                        focusedItem.highlighted.set(false);
                     }
                 }
                 newItem = nextItem;
@@ -238,30 +238,30 @@ export class PopupListService {
                 if (previousItem) {
                     if (selectionMode === "single") {
                         if (this.filterModeActive) {
-                            if (focusedItem.highlighted && !focusedItem.selected) {
-                                focusedItem.highlighted = false;
-                                focusedItem.selected = true;
+                            if (focusedItem.highlighted() && !focusedItem.selected()) {
+                                focusedItem.highlighted.set(false);
+                                focusedItem.selected.set(true);
                                 newItem = focusedItem;
                                 return newItem;
                             } else {
-                                focusedItem.selected = false;
-                                focusedItem.highlighted = false;
-                                previousItem.selected = true;
+                                focusedItem.selected.set(false);
+                                focusedItem.highlighted.set(false);
+                                previousItem.selected.set(true);
                             }
                         } else {
-                            if (focusedItem.highlighted && !focusedItem.selected) {
-                                focusedItem.highlighted = false;
-                                focusedItem.selected = true;
+                            if (focusedItem.highlighted() && !focusedItem.selected()) {
+                                focusedItem.highlighted.set(false);
+                                focusedItem.selected.set(true);
                                 newItem = focusedItem;
                                 return newItem;
                             } else {
-                                focusedItem.selected = false;
-                                previousItem.selected = true;
+                                focusedItem.selected.set(false);
+                                previousItem.selected.set(true);
                             }
                         }
                     } else {
-                        focusedItem.highlighted = false;
-                        previousItem.highlighted = true;
+                        focusedItem.highlighted.set(false);
+                        previousItem.highlighted.set(true);
                     }
                     newItem = previousItem;
                 }
@@ -272,10 +272,10 @@ export class PopupListService {
 
     public selectItem(item: PopupListItem, selectionMode: SelectionMode): void {
         if (selectionMode === "single") {
-            this.viewListData.selectMany(g => g.source).forEach(i => (i.selected = false));
-            item.selected = true;
+            this.viewListData.selectMany(g => g.source).forEach(i => i.selected.set(false));
+            item.selected.set(true);
         } else {
-            item.selected = !item.selected;
+            item.selected.set(!item.selected());
         }
     }
 

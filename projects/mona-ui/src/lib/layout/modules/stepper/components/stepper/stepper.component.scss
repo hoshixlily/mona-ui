@@ -39,14 +39,14 @@ ol.mona-stepper-step-list {
                 background-color: var(--mona-background);
                 border: 1px solid var(--mona-border-color);
                 color: var(--mona-text);
-                transition: background-color 150ms ease-out, color 150ms ease-out;
+                transition: background-color 250ms ease-out, color 250ms ease-out;
                 &.mona-stepper-step-active {
                     background-color: var(--mona-primary);
                 }
             }
             & > span:last-child {
                 color: var(--mona-text);
-                transition: color 150ms ease-in-out;
+                transition: color 250ms ease-in-out;
             }
         }
     }
@@ -91,7 +91,7 @@ div.mona-stepper-track {
         top: calc(calc($step-height - 8px) / 2);
         & > div {
             height: 100%;
-            transition: width 150ms ease-in-out;
+            transition: width 250ms ease-in-out;
         }
     }
     &-vertical {
@@ -99,7 +99,7 @@ div.mona-stepper-track {
         width: 8px;
         & > div {
             width: 100%;
-            transition: height 150ms ease-in-out;
+            transition: height 250ms ease-in-out;
         }
     }
 }
