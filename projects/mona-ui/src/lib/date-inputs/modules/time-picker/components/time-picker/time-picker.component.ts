@@ -21,6 +21,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { Action } from "../../../../../utils/Action";
 import { PopupRef } from "../../../../../popup/models/PopupRef";
 import { ConnectionPositionPair } from "@angular/cdk/overlay";
+import { DateService } from "../../../../services/date.service";
 
 @Component({
     selector: "mona-time-picker",
@@ -75,6 +76,7 @@ export class TimePickerComponent implements OnInit, OnChanges, ControlValueAcces
 
     public constructor(
         private readonly cdr: ChangeDetectorRef,
+        private readonly dateService: DateService,
         private readonly elementRef: ElementRef<HTMLElement>,
         private readonly focusMonitor: FocusMonitor,
         private readonly popupService: PopupService
@@ -126,7 +128,7 @@ export class TimePickerComponent implements OnInit, OnChanges, ControlValueAcces
             width: this.elementRef.nativeElement.getBoundingClientRect().width,
             popupClass: "mona-time-picker-popup",
             hasBackdrop: false,
-            closeOnOutsideClick: true,
+            closeOnOutsideClick: false,
             positions: [
                 new ConnectionPositionPair(
                     { originX: "start", originY: "bottom" },
@@ -144,6 +146,12 @@ export class TimePickerComponent implements OnInit, OnChanges, ControlValueAcces
                 )
             ]
         });
+        this.dateService.setupOutsideClickCloseAnimation(this.popupRef);
+        this.dateService.animate(
+            this.popupRef.overlayRef.overlayElement.firstElementChild as HTMLElement,
+            this.popupRef.overlayRef.overlayElement,
+            "show"
+        );
         this.popupRef.closed.pipe(take(1)).subscribe(() => {
             this.popupRef = null;
             this.focusMonitor.focusVia(this.elementRef.nativeElement.querySelector("input") as HTMLElement, "program");

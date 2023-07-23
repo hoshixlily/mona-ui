@@ -18,7 +18,8 @@ import { Action } from "../../../../../utils/Action";
 import { PopupRef } from "../../../../../popup/models/PopupRef";
 import { faCalendar, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { ConnectionPositionPair } from "@angular/cdk/overlay";
-import { take } from "rxjs";
+import { take, takeUntil } from "rxjs";
+import { DateService } from "../../../../services/date.service";
 
 @Component({
     selector: "mona-date-picker",
@@ -69,6 +70,7 @@ export class DatePickerComponent implements OnInit, ControlValueAccessor {
     public readonly: boolean = false;
 
     public constructor(
+        private readonly dateService: DateService,
         private readonly cdr: ChangeDetectorRef,
         private readonly elementRef: ElementRef<HTMLElement>,
         private readonly focusMonitor: FocusMonitor,
@@ -81,7 +83,8 @@ export class DatePickerComponent implements OnInit, ControlValueAccessor {
 
     public onCalendarValueChange(date: Date | null): void {
         this.setCurrentDate(date);
-        this.popupRef?.close();
+        this.animateClose();
+        this.popupRef?.closeWithDelay();
     }
 
     public onDateInputBlur(): void {
@@ -135,7 +138,7 @@ export class DatePickerComponent implements OnInit, ControlValueAccessor {
             popupWrapperClass: "mona-calendar-popup-wrapper",
             hasBackdrop: false,
             withPush: false,
-            closeOnOutsideClick: true,
+            closeOnOutsideClick: false,
             positions: [
                 new ConnectionPositionPair(
                     { originX: "start", originY: "bottom" },
@@ -153,6 +156,25 @@ export class DatePickerComponent implements OnInit, ControlValueAccessor {
                 )
             ]
         });
+        this.popupRef.overlayRef
+            .outsidePointerEvents()
+            .pipe(takeUntil(this.popupRef.closed))
+            .subscribe(e => {
+                if (e.type.includes("click") && this.popupRef) {
+                    this.dateService.animate(
+                        this.popupRef.overlayRef.overlayElement.firstElementChild as Element,
+                        this.popupRef.overlayRef.overlayElement,
+                        "hide"
+                    );
+                    this.popupRef.closeWithDelay();
+                }
+            });
+        this.dateService.setupOutsideClickCloseAnimation(this.popupRef);
+        this.dateService.animate(
+            this.popupRef.overlayRef.overlayElement.firstElementChild as Element,
+            this.popupRef.overlayRef.overlayElement,
+            "show"
+        );
         this.popupRef.closed.pipe(take(1)).subscribe(() => {
             this.popupRef = null;
             this.focusMonitor.focusVia(input, "program");
@@ -181,6 +203,17 @@ export class DatePickerComponent implements OnInit, ControlValueAccessor {
             this.currentDateString = DateTime.fromJSDate(date).toFormat(this.format);
         }
         this.setDateValues();
+    }
+
+    private animateClose(): void {
+        if (!this.popupRef) {
+            return;
+        }
+        this.dateService.animate(
+            this.popupRef.overlayRef.overlayElement.firstElementChild as Element,
+            this.popupRef.overlayRef.overlayElement,
+            "hide"
+        );
     }
 
     private dateStringEquals(date1: Date | null, date2: Date | null): boolean {

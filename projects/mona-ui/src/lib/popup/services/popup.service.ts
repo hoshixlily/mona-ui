@@ -12,7 +12,6 @@ import { PopupState } from "../models/PopupState";
 import { v4 } from "uuid";
 import { PopupReference } from "../models/PopupReference";
 import { PopupWrapperComponent } from "../components/popup-wrapper/popup-wrapper.component";
-import { PopupInjectorData } from "../models/PopupInjectorData";
 
 @Injectable({
     providedIn: "root"

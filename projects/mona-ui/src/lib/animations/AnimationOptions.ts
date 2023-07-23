@@ -3,7 +3,7 @@ export type StyleToken = "*" | Record<string, string | number> | Array<"*" | Rec
 export interface AnimationOptions {
     duration?: number;
     delay?: number;
-    element: HTMLElement;
+    element: Element;
     endStyles: StyleToken;
     startStyles: StyleToken;
     timingFunction?: string;

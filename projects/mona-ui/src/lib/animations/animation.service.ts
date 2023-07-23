@@ -20,7 +20,7 @@ export class AnimationService {
         animation.create(element).play();
     }
 
-    public collapseHorizontal(element: HTMLElement, duration: number = 200): void {
+    public collapseHorizontal(element: Element, duration: number = 200): void {
         this.animate({
             duration,
             element,
@@ -30,7 +30,7 @@ export class AnimationService {
         });
     }
 
-    public expandHorizontal(element: HTMLElement, duration: number = 200): void {
+    public expandHorizontal(element: Element, duration: number = 200): void {
         this.animate({
             duration,
             element,
@@ -40,7 +40,7 @@ export class AnimationService {
         });
     }
 
-    public collapseVertical(element: HTMLElement, duration: number = 200): void {
+    public collapseVertical(element: Element, duration: number = 200): void {
         this.animate({
             duration,
             element,
@@ -50,7 +50,7 @@ export class AnimationService {
         });
     }
 
-    public expandVertical(element: HTMLElement, duration: number = 200): void {
+    public expandVertical(element: Element, duration: number = 200): void {
         this.animate({
             duration,
             element,
@@ -60,7 +60,7 @@ export class AnimationService {
         });
     }
 
-    public fadeIn(element: HTMLElement, duration: number = 200): void {
+    public fadeIn(element: Element, duration: number = 200): void {
         this.animate({
             duration,
             element,
@@ -70,7 +70,7 @@ export class AnimationService {
         });
     }
 
-    public fadeOut(element: HTMLElement, duration: number = 200): void {
+    public fadeOut(element: Element, duration: number = 200): void {
         this.animate({
             duration,
             element,
@@ -80,7 +80,7 @@ export class AnimationService {
         });
     }
 
-    public scaleIn(element: HTMLElement, duration: number = 200): void {
+    public scaleIn(element: Element, duration: number = 200): void {
         this.animate({
             duration,
             element,
@@ -90,7 +90,7 @@ export class AnimationService {
         });
     }
 
-    public scaleOut(element: HTMLElement, duration: number = 200): void {
+    public scaleOut(element: Element, duration: number = 200): void {
         this.animate({
             duration,
             element,
@@ -100,7 +100,7 @@ export class AnimationService {
         });
     }
 
-    public slideDown(element: HTMLElement, duration: number = 200): void {
+    public slideDown(element: Element, duration: number = 200): void {
         this.animate({
             duration,
             element,
@@ -110,7 +110,7 @@ export class AnimationService {
         });
     }
 
-    public slideUp(element: HTMLElement, duration: number = 200): void {
+    public slideUp(element: Element, duration: number = 200): void {
         this.animate({
             duration,
             element,

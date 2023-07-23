@@ -25,7 +25,7 @@ export class PopupRef {
      * @param delay delay in milliseconds
      * @param result optional result to pass to the closed observable
      */
-    public closeWithDelay<R>(delay: number, result?: R): void {
+    public closeWithDelay<R>(delay: number = 100, result?: R): void {
         asapScheduler.schedule(() => this.close(result), delay);
     }
 

@@ -153,7 +153,7 @@ export class DropDownListComponent implements OnInit, OnDestroy, ControlValueAcc
         this.popupRef = this.popupService.create({
             anchor: this.dropdownWrapper,
             content: this.popupTemplate,
-            hasBackdrop: true,
+            hasBackdrop: false,
             withPush: false,
             width: this.elementRef.nativeElement.getBoundingClientRect().width,
             popupClass: ["mona-dropdown-popup-content"],
