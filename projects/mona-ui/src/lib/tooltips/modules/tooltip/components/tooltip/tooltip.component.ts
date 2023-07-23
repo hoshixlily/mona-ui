@@ -1,18 +1,18 @@
-import { AfterViewInit, Component, ElementRef, Input, OnInit, TemplateRef, ViewChild } from "@angular/core";
-import { asapScheduler, fromEvent, Subject, take, takeUntil, tap } from "rxjs";
+import { Component, ElementRef, Input, OnInit, TemplateRef, ViewChild } from "@angular/core";
+import { filter, fromEvent, Subject, take, takeUntil, tap } from "rxjs";
 import { PopupService } from "../../../../../popup/services/popup.service";
 import { PopupRef } from "../../../../../popup/models/PopupRef";
 import { Position } from "../../../../../models/Position";
 import { DefaultTooltipPositionMap } from "../../../../models/DefaultTooltipPositionMap";
 import { v4 } from "uuid";
-import { animate, AnimationBuilder, style } from "@angular/animations";
+import { AnimationService } from "../../../../../animations/animation.service";
 
 @Component({
     selector: "mona-tooltip",
     templateUrl: "./tooltip.component.html",
     styleUrls: ["./tooltip.component.scss"]
 })
-export class TooltipComponent implements OnInit, AfterViewInit {
+export class TooltipComponent implements OnInit {
     readonly #destroy$: Subject<void> = new Subject<void>();
     #popupRef?: PopupRef;
     public readonly uid: string = v4();
@@ -27,14 +27,10 @@ export class TooltipComponent implements OnInit, AfterViewInit {
     public templateRef!: TemplateRef<any>;
 
     public constructor(
-        private readonly animationBuilder: AnimationBuilder,
+        private readonly animationService: AnimationService,
         private readonly elementRef: ElementRef<HTMLElement>,
         private readonly popupService: PopupService
     ) {}
-
-    public ngAfterViewInit(): void {
-        // this.animation();
-    }
 
     public ngOnInit(): void {
         if (!this.target) {
@@ -44,17 +40,15 @@ export class TooltipComponent implements OnInit, AfterViewInit {
     }
 
     private animateEnter(): void {
-        this.animationBuilder
-            .build([style({ opacity: 0 }), animate("200ms ease-out", style({ opacity: 1 }))])
-            .create(this.tooltipOverlayElement)
-            .play();
+        if (this.tooltipOverlayElement) {
+            this.animationService.fadeIn(this.tooltipOverlayElement);
+        }
     }
 
     private animateLeave(): void {
-        this.animationBuilder
-            .build([style({ opacity: 1 }), animate("300ms ease-out", style({ opacity: 0 }))])
-            .create(this.tooltipOverlayElement)
-            .play();
+        if (this.tooltipOverlayElement) {
+            this.animationService.fadeOut(this.tooltipOverlayElement);
+        }
     }
 
     private calculateTopAndLeft(): void {
@@ -97,6 +91,7 @@ export class TooltipComponent implements OnInit, AfterViewInit {
         const target = this.target instanceof ElementRef ? this.target.nativeElement : this.target;
         fromEvent<MouseEvent>(target, "mouseenter")
             .pipe(
+                filter(() => !this.#popupRef),
                 takeUntil(this.#destroy$),
                 tap(() => {
                     fromEvent(target, "mouseleave")
@@ -104,6 +99,7 @@ export class TooltipComponent implements OnInit, AfterViewInit {
                         .subscribe(() => {
                             this.animateLeave();
                             this.#popupRef?.closeWithDelay(100);
+                            this.#popupRef = undefined;
                         });
                 })
             )

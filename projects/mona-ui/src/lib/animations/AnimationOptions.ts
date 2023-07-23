@@ -1,20 +1,10 @@
-export type StyleToken =
-    | "*"
-    | {
-          [key: string]: string | number;
-      }
-    | Array<
-          | "*"
-          | {
-                [key: string]: string | number;
-            }
-      >;
+export type StyleToken = "*" | Record<string, string | number> | Array<"*" | Record<string, string | number>>;
 
 export interface AnimationOptions {
-    duration: number;
+    duration?: number;
     delay?: number;
     element: HTMLElement;
     endStyles: StyleToken;
     startStyles: StyleToken;
-    timingFunction: string;
+    timingFunction?: string;
 }

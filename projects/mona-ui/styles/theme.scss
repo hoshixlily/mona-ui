@@ -160,7 +160,8 @@ ul.mona-list {
 
         // TODO: Update this to a better visual style
         &.mona-highlighted {
-            border: 1px solid darkgray;
+            //border: 1px solid darkgray;
+            box-shadow: 0 0 0 1px var(--mona-focus-border-color) inset;
         }
 
         &.mona-disabled {

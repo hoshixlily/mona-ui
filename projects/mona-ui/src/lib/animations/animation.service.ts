@@ -10,12 +10,54 @@ export class AnimationService {
 
     public animate(options: AnimationOptions): void {
         const { duration, delay, element, endStyles, startStyles, timingFunction } = options;
+        const durationValue = duration ? `${duration}ms` : "0ms";
         const delayValue = delay ? `${delay}ms` : "0ms";
+        const timingFunctionValue = timingFunction || "ease-out";
         const animation = this.animationBuilder.build([
             style(startStyles),
-            animate(`${duration}ms ${delayValue} ${timingFunction}`, style(endStyles))
+            animate(`${durationValue} ${delayValue} ${timingFunctionValue}`, style(endStyles))
         ]);
         animation.create(element).play();
+    }
+
+    public collapseHorizontal(element: HTMLElement, duration: number = 200): void {
+        this.animate({
+            duration,
+            element,
+            endStyles: { width: 0, opacity: 0 },
+            startStyles: { width: "*", opacity: 1 },
+            timingFunction: "ease-out"
+        });
+    }
+
+    public expandHorizontal(element: HTMLElement, duration: number = 200): void {
+        this.animate({
+            duration,
+            element,
+            endStyles: { width: "*", opacity: 1 },
+            startStyles: { width: 0, opacity: 0 },
+            timingFunction: "ease-out"
+        });
+    }
+
+    public collapseVertical(element: HTMLElement, duration: number = 200): void {
+        this.animate({
+            duration,
+            element,
+            endStyles: { height: 0, opacity: 0 },
+            startStyles: { height: "*", opacity: 1 },
+            timingFunction: "ease-out"
+        });
+    }
+
+    public expandVertical(element: HTMLElement, duration: number = 200): void {
+        this.animate({
+            duration,
+            element,
+            endStyles: { height: "*", opacity: 1 },
+            startStyles: { height: 0, opacity: 0 },
+            timingFunction: "ease-out"
+        });
     }
 
     public fadeIn(element: HTMLElement, duration: number = 200): void {
@@ -62,28 +104,8 @@ export class AnimationService {
         this.animate({
             duration,
             element,
-            endStyles: { height: "*", opacity: 1 },
-            startStyles: { height: 0, opacity: 0 },
-            timingFunction: "ease-out"
-        });
-    }
-
-    public slideLeft(element: HTMLElement, duration: number = 200): void {
-        this.animate({
-            duration,
-            element,
-            endStyles: { width: 0, opacity: 0 },
-            startStyles: { width: "*", opacity: 1 },
-            timingFunction: "ease-out"
-        });
-    }
-
-    public slideRight(element: HTMLElement, duration: number = 200): void {
-        this.animate({
-            duration,
-            element,
-            endStyles: { width: "*", opacity: 1 },
-            startStyles: { width: 0, opacity: 0 },
+            endStyles: { transform: "translateY(0)", opacity: 1 },
+            startStyles: { transform: "translateY(-100%)", opacity: 1 },
             timingFunction: "ease-out"
         });
     }
@@ -92,8 +114,8 @@ export class AnimationService {
         this.animate({
             duration,
             element,
-            endStyles: { height: 0, opacity: 0 },
-            startStyles: { height: "*", opacity: 1 },
+            endStyles: { transform: "translateY(-100%)", opacity: 1 },
+            startStyles: { transform: "translateY(0)", opacity: 1 },
             timingFunction: "ease-out"
         });
     }
