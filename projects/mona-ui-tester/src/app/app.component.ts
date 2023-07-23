@@ -32,7 +32,7 @@ import {
 } from "mona-ui";
 import { TestComponentComponent } from "./test-component/test-component.component";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
-import { faFilter, faMoon, faSearch, faSnowflake, faSun } from "@fortawesome/free-solid-svg-icons";
+import { faFilter, faHeart, faMoon, faSearch, faSnowflake, faSun } from "@fortawesome/free-solid-svg-icons";
 import { Enumerable, IndexableList } from "@mirei/ts-collections";
 import { map, Observable, take } from "rxjs";
 import { DateTime } from "luxon";
@@ -47,6 +47,7 @@ import { GridOrderData } from "./GridOrderData";
 })
 export class AppComponent implements OnInit {
     public readonly filterIcon: IconDefinition = faFilter;
+    public readonly heartIcon: IconDefinition = faHeart;
     public readonly moonIcon: IconDefinition = faMoon;
     public readonly searchIcon: IconDefinition = faSearch;
     public readonly snowflakeIcon: IconDefinition = faSnowflake;

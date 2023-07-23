@@ -5,7 +5,6 @@ import {
     Component,
     ElementRef,
     Inject,
-    OnDestroy,
     OnInit,
     QueryList,
     ViewChildren
@@ -26,7 +25,7 @@ import { animate, AnimationBuilder, style } from "@angular/animations";
     styleUrls: ["./context-menu-content.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ContextMenuContentComponent implements OnInit, OnDestroy, AfterViewInit {
+export class ContextMenuContentComponent implements OnInit, AfterViewInit {
     private contextMenuInjectorData: Partial<ContextMenuInjectorData> = { isRoot: false };
     public activeItemIndex: number = -1;
     public currentMenuItem: MenuItem | null = null;
@@ -58,8 +57,6 @@ export class ContextMenuContentComponent implements OnInit, OnDestroy, AfterView
             this.cdr.detectChanges();
         }
     }
-
-    public ngOnDestroy(): void {}
 
     public ngOnInit(): void {
         this.iconSpaceVisible = this.contextMenuData.menuItems.some(mi => mi.iconClass || mi.iconTemplate);
