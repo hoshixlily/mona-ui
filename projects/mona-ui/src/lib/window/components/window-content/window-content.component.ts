@@ -28,23 +28,13 @@ import { PopupCloseSource } from "../../../popup/models/PopupCloseEvent";
 import { animate, AnimationEvent, state, style, transition, trigger } from "@angular/animations";
 import { filter, fromEvent } from "rxjs";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { AnimationService } from "../../../animations/animation.service";
 
 @Component({
     selector: "mona-window-content",
     templateUrl: "./window-content.component.html",
     styleUrls: ["./window-content.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    animations: [
-        trigger("scaleIn", [
-            state("visible", style({ transform: "scale(1)" })),
-            state("hidden", style({ transform: "scale(0)" })),
-            transition(":enter", [
-                style({ transform: "scale(0.37)" }),
-                animate("0.2s ease-out", style({ transform: "scale(1)" }))
-            ]),
-            transition("visible => hidden", [animate("0.2s ease-out")])
-        ])
-    ]
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class WindowContentComponent implements OnInit, AfterViewInit {
     private readonly destroyRef = inject(DestroyRef);
@@ -53,13 +43,11 @@ export class WindowContentComponent implements OnInit, AfterViewInit {
     public readonly contentType: "template" | "component" = "template";
     public isVisible: WritableSignal<boolean> = signal(false);
 
-    @Output()
-    public animationStateChange: EventEmitter<AnimationEvent> = new EventEmitter<AnimationEvent>();
-
     @ViewChild("componentAnchor", { read: ViewContainerRef })
     public componentAnchor!: ViewContainerRef;
 
     public constructor(
+        private readonly animationService: AnimationService,
         private readonly appRef: ApplicationRef,
         private injector: Injector,
         @Inject(PopupInjectionToken) public windowData: WindowInjectorData,
@@ -94,10 +82,6 @@ export class WindowContentComponent implements OnInit, AfterViewInit {
         this.isVisible.set(true);
     }
 
-    public onAnimationDone(event: AnimationEvent): void {
-        this.animationStateChange.emit(event);
-    }
-
     public onCloseClick(event: MouseEvent): void {
         this.closeWindow();
     }
@@ -107,7 +91,8 @@ export class WindowContentComponent implements OnInit, AfterViewInit {
         if (this.windowData.preventClose && this.windowData.preventClose(closeEvent)) {
             return;
         }
-        this.isVisible.set(false);
+        this.animationService.scaleOut(this.windowData.windowReference.element);
+        this.windowData.windowReference.closeWithDelay(100, closeEvent);
     }
 
     private focusElement(): void {

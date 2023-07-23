@@ -9,12 +9,16 @@ import { PopupCloseEvent } from "../../popup/models/PopupCloseEvent";
 import { WindowCloseEvent } from "../models/WindowCloseEvent";
 import { WindowReference } from "../models/WindowReference";
 import { WindowReferenceOptions } from "../models/WindowReferenceOptions";
+import { AnimationService } from "../../animations/animation.service";
 
 @Injectable({
     providedIn: "root"
 })
 export class WindowService {
-    public constructor(private readonly popupService: PopupService) {}
+    public constructor(
+        private readonly animationService: AnimationService,
+        private readonly popupService: PopupService
+    ) {}
 
     public open(settings: WindowSettings): WindowRef {
         const injectorData: WindowInjectorData = {
@@ -79,16 +83,11 @@ export class WindowService {
                 return false;
             }
         });
-        const component = windowReferenceHolder.windowReference.popupRef.component?.instance as WindowContentComponent;
-        if (component) {
-            component.animationStateChange
-                .pipe(
-                    filter(e => e.toState === "hidden"),
-                    take(1)
-                )
-                .subscribe(() => {
-                    windowReferenceHolder.windowReference.close();
-                });
+        if (windowReferenceOptions.popupRef.overlayRef.overlayElement.firstElementChild) {
+            this.animationService.scaleIn(
+                windowReferenceOptions.popupRef.overlayRef.overlayElement.firstElementChild as HTMLElement,
+                200
+            );
         }
 
         asapScheduler.schedule(() => {

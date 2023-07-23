@@ -37,6 +37,10 @@ export class WindowReference<R = unknown> implements WindowRefParams<R> {
         this.options.popupRef.close(event);
     }
 
+    public closeWithDelay(delay: number, result?: R): void {
+        asapScheduler.schedule(() => this.close(result), delay);
+    }
+
     public move(params: { top?: number; left?: number }): void {
         if (params.top) {
             this.options.popupRef.overlayRef.overlayElement.style.top = `${params.top}px`;
