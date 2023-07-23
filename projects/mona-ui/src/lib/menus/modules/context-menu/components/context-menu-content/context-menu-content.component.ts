@@ -10,7 +10,7 @@ import {
     ViewChildren
 } from "@angular/core";
 import { ContextMenuInjectorData } from "../../models/ContextMenuInjectorData";
-import { PopupInjectionToken } from "../../../../../popup/models/PopupInjectionToken";
+import { PopupDataInjectionToken } from "../../../../../popup/models/PopupInjectionToken";
 import { ContextMenuService } from "../../services/context-menu.service";
 import { MenuItem } from "../../models/MenuItem";
 import { PopupRef } from "../../../../../popup/models/PopupRef";
@@ -40,7 +40,7 @@ export class ContextMenuContentComponent implements OnInit, AfterViewInit {
     public constructor(
         private readonly animationService: AnimationService,
         private readonly cdr: ChangeDetectorRef,
-        @Inject(PopupInjectionToken) public contextMenuData: ContextMenuInjectorData,
+        @Inject(PopupDataInjectionToken) public contextMenuData: ContextMenuInjectorData,
         private readonly contextMenuService: ContextMenuService,
         private readonly elementRef: ElementRef<HTMLElement>
     ) {}

@@ -20,7 +20,7 @@ import {
     ViewContainerRef,
     WritableSignal
 } from "@angular/core";
-import { PopupInjectionToken } from "../../../popup/models/PopupInjectionToken";
+import { PopupDataInjectionToken } from "../../../popup/models/PopupInjectionToken";
 import { WindowInjectorData } from "../../models/WindowInjectorData";
 import { faClose, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { WindowCloseEvent } from "../../models/WindowCloseEvent";
@@ -50,7 +50,7 @@ export class WindowContentComponent implements OnInit, AfterViewInit {
         private readonly animationService: AnimationService,
         private readonly appRef: ApplicationRef,
         private injector: Injector,
-        @Inject(PopupInjectionToken) public windowData: WindowInjectorData,
+        @Inject(PopupDataInjectionToken) public windowData: WindowInjectorData,
         private readonly elementRef: ElementRef<HTMLElement>,
         private readonly viewContainerRef: ViewContainerRef
     ) {

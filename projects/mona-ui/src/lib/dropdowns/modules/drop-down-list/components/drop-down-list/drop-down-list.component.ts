@@ -25,6 +25,7 @@ import { faChevronDown, faTimes, IconDefinition } from "@fortawesome/free-solid-
 import { PopupRef } from "../../../../../popup/models/PopupRef";
 import { ConnectionPositionPair } from "@angular/cdk/overlay";
 import { fromEvent, Subject, take, takeUntil } from "rxjs";
+import { AnimationService } from "../../../../../animations/animation.service";
 
 @Component({
     selector: "mona-drop-down-list",
@@ -95,6 +96,7 @@ export class DropDownListComponent implements OnInit, OnDestroy, ControlValueAcc
     public valueTemplate?: TemplateRef<any>;
 
     public constructor(
+        private readonly animationService: AnimationService,
         private readonly cdr: ChangeDetectorRef,
         private readonly elementRef: ElementRef<HTMLElement>,
         private readonly popupListService: PopupListService,
@@ -172,6 +174,16 @@ export class DropDownListComponent implements OnInit, OnDestroy, ControlValueAcc
                 )
             ]
         });
+        this.animationService.slideDown(this.popupRef.overlayRef.overlayElement.firstElementChild as HTMLElement);
+        this.animationService.animate({
+            element: this.popupRef.overlayRef.overlayElement as HTMLElement,
+            duration: 200,
+            delay: 150,
+            startStyles: { boxShadow: "none" },
+            endStyles: { boxShadow: "var(--mona-popup-shadow)" }
+        });
+        this.cdr.markForCheck();
+
         this.popupRef.closed.pipe(take(1)).subscribe(() => {
             this.popupRef = null;
             (this.elementRef.nativeElement.firstElementChild as HTMLElement)?.focus();
@@ -212,7 +224,7 @@ export class DropDownListComponent implements OnInit, OnDestroy, ControlValueAcc
             .selectMany(g => g.source)
             .singleOrDefault(d => d.dataEquals(this.value));
         if (this.valuePopupListItem) {
-            this.valuePopupListItem.selected = true;
+            this.valuePopupListItem.selected.set(true);
         }
     }
 

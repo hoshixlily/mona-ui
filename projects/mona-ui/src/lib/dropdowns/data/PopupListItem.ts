@@ -1,3 +1,5 @@
+import { signal, WritableSignal } from "@angular/core";
+
 export interface ListItemOptions {
     data: any;
     text: string;
@@ -10,8 +12,8 @@ export interface ListItemOptions {
 export class PopupListItem {
     public data: any;
     public disabled: boolean;
-    public highlighted: boolean = false;
-    public selected: boolean = false;
+    public highlighted: WritableSignal<boolean> = signal(false);
+    public selected: WritableSignal<boolean> = signal(false);
     public text: string;
     public textField?: string;
     public value: any;

@@ -1,4 +1,5 @@
 import { InjectionToken } from "@angular/core";
 import { PopupSettings } from "./PopupSettings";
 
-export const PopupInjectionToken = new InjectionToken<PopupSettings>("PopupInjectionToken");
+export const PopupDataInjectionToken = new InjectionToken("PopupInjectionToken");
+export const PopupSettingsInjectionToken = new InjectionToken<PopupSettings>("PopupSettingsInjectionToken");

@@ -27,6 +27,7 @@ import { ComboBoxItemTemplateDirective } from "../../directives/combo-box-item-t
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { faChevronDown, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { ConnectionPositionPair } from "@angular/cdk/overlay";
+import { AnimationService } from "../../../../../animations/animation.service";
 
 @Component({
     selector: "mona-combo-box",
@@ -103,6 +104,7 @@ export class ComboBoxComponent implements OnInit, OnDestroy, ControlValueAccesso
         text$.pipe(map(value => value));
 
     public constructor(
+        private readonly animationService: AnimationService,
         private readonly elementRef: ElementRef<HTMLElement>,
         private readonly popupListService: PopupListService,
         private readonly popupService: PopupService
@@ -235,6 +237,14 @@ export class ComboBoxComponent implements OnInit, OnDestroy, ControlValueAccesso
                 )
             ]
         });
+        this.animationService.slideDown(this.popupRef.overlayRef.overlayElement.firstElementChild as HTMLElement, 200);
+        this.animationService.animate({
+            element: this.popupRef.overlayRef.overlayElement as HTMLElement,
+            duration: 200,
+            delay: 150,
+            startStyles: { boxShadow: "none" },
+            endStyles: { boxShadow: "var(--mona-popup-shadow)" }
+        });
         window.setTimeout(() => {
             const input = this.elementRef.nativeElement.querySelector("input");
             if (input) {
@@ -283,7 +293,7 @@ export class ComboBoxComponent implements OnInit, OnDestroy, ControlValueAccesso
             .selectMany(g => g.source)
             .singleOrDefault(d => d.dataEquals(this.value));
         if (this.valuePopupListItem) {
-            this.valuePopupListItem.selected = true;
+            this.valuePopupListItem.selected.set(true);
         }
         this.comboBoxValue.set(this.valuePopupListItem?.text ?? "");
     }
@@ -300,7 +310,7 @@ export class ComboBoxComponent implements OnInit, OnDestroy, ControlValueAccesso
                 ) {
                     return;
                 }
-                this.close();
+                // this.close();
             });
         fromEvent<FocusEvent>(this.elementRef.nativeElement, "focusin")
             .pipe(takeUntil(this.#destroy$))
@@ -333,7 +343,10 @@ export class ComboBoxComponent implements OnInit, OnDestroy, ControlValueAccesso
             }
             this.popupListService.viewListData
                 .selectMany(g => g.source)
-                .forEach(i => (i.selected = i.highlighted = false));
+                .forEach(i => {
+                    i.highlighted.set(false);
+                    i.selected.set(false);
+                });
             const popupListItem = this.popupListService.viewListData
                 .selectMany(g => g.source)
                 .firstOrDefault(item => !item.disabled && item.text.toLowerCase().includes(value.toLowerCase()));
@@ -341,7 +354,7 @@ export class ComboBoxComponent implements OnInit, OnDestroy, ControlValueAccesso
                 this.open();
             }
             if (popupListItem) {
-                popupListItem.highlighted = true;
+                popupListItem.highlighted.set(true);
                 this.popupListService.scrollToListItem$.next(popupListItem);
             }
             this.comboBoxValue.set(value);

@@ -3,7 +3,7 @@ import { PopupSettings } from "../models/PopupSettings";
 import { Overlay, PositionStrategy } from "@angular/cdk/overlay";
 import { ComponentPortal } from "@angular/cdk/portal";
 import { PopupRef } from "../models/PopupRef";
-import { PopupInjectionToken } from "../models/PopupInjectionToken";
+import { PopupDataInjectionToken, PopupSettingsInjectionToken } from "../models/PopupInjectionToken";
 import { DefaultPositions } from "../models/DefaultPositions";
 import { filter, fromEvent, Subject, take, takeUntil } from "rxjs";
 import { PopupCloseEvent, PopupCloseSource } from "../models/PopupCloseEvent";
@@ -59,39 +59,24 @@ export class PopupService implements OnDestroy {
         const preventClose = settings.preventClose;
         const popupReference = new PopupReference(overlayRef);
 
-        const createInjector = (isTemplate: boolean) => {
-            const tokenValue = !isTemplate
-                ? settings.data
-                : ({
-                      popupReference,
-                      closeOnBackdropClick: settings.closeOnBackdropClick ?? true,
-                      closeOnEscape: settings.closeOnEscape ?? true,
-                      closeOnOutsideClick: settings.closeOnOutsideClick ?? true,
-                      preventClose: settings.preventClose,
-                      wrapperClass: settings.popupWrapperClass,
-                      disableAnimation: settings.disableAnimation
-                  } as PopupInjectorData);
-            return Injector.create({
-                parent: this.injector,
-                providers: [
-                    { provide: PopupRef, useFactory: () => popupReference.popupRef },
-                    { provide: PopupInjectionToken, useValue: tokenValue },
-                    ...(settings.providers ?? [])
-                ]
-            });
-        };
+        const injector = Injector.create({
+            parent: this.injector,
+            providers: [
+                { provide: PopupRef, useFactory: () => popupReference.popupRef },
+                { provide: PopupDataInjectionToken, useValue: settings.data },
+                { provide: PopupSettingsInjectionToken, useValue: settings },
+                ...(settings.providers ?? [])
+            ]
+        });
 
         if (settings.content instanceof TemplateRef) {
-            const portal = new ComponentPortal(PopupWrapperComponent, null, createInjector(true));
+            const portal = new ComponentPortal(PopupWrapperComponent, null, injector);
             popupReference.componentRef = overlayRef.attach(portal);
             const component = popupReference.componentRef.instance as PopupWrapperComponent;
-            settings.closeOnBackdropClick = false; // handled by wrapper component
-            settings.closeOnEscape = false; // handled by wrapper component
-            settings.closeOnOutsideClick = false; // handled by wrapper component
             component.templateRef = settings.content;
             popupReference.componentRef.changeDetectorRef.detectChanges();
         } else {
-            const portal = new ComponentPortal(settings.content, null, createInjector(false));
+            const portal = new ComponentPortal(settings.content, null, injector);
             popupReference.componentRef = overlayRef.attach(portal);
         }
 

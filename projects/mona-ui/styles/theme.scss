@@ -304,6 +304,10 @@ mona-popup-list-item {
     @include font-medium;
 }
 
+.mona-dropdown-popup-list-wrapper {
+    max-height: 250px;
+}
+
 ul.mona-list mona-text-box.filter-box {
     & div.mona-text-box {
         border: none !important;
@@ -507,7 +511,6 @@ div.mona-time-picker-popup {
     user-select: none;
     padding: 0 !important;
     overflow: hidden auto;
-    max-height: 250px;
 
     & mona-text-box.filter-box {
         & div.mona-text-box {

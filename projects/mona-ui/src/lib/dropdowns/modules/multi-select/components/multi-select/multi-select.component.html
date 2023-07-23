@@ -25,7 +25,7 @@
 </div>
 
 <ng-template #popupTemplate>
-    <div *ngIf="!!popupRef">
+    <div class="mona-dropdown-popup-list-wrapper">
         <mona-popup-list [textField]="textField" [valueField]="valueField" [groupField]="groupField" [filterable]="filterable"
                          [value]="popupListValues" selectionMode="multiple" (valueChange)="onPopupListValueChange($event)">
             <ng-container *ngIf="itemTemplate">

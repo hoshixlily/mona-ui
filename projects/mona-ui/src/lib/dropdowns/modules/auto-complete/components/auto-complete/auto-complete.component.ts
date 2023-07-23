@@ -27,6 +27,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { ConnectionPositionPair } from "@angular/cdk/overlay";
 import { Action } from "../../../../../utils/Action";
 import { faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { AnimationService } from "../../../../../animations/animation.service";
 
 @Component({
     selector: "mona-auto-complete",
@@ -94,6 +95,7 @@ export class AutoCompleteComponent implements OnInit, OnChanges, OnDestroy, Cont
     public valueField?: string;
 
     public constructor(
+        private readonly animationService: AnimationService,
         private readonly elementRef: ElementRef<HTMLElement>,
         private readonly popupListService: PopupListService,
         private readonly popupService: PopupService
@@ -103,7 +105,10 @@ export class AutoCompleteComponent implements OnInit, OnChanges, OnDestroy, Cont
         event.stopImmediatePropagation();
         this.popupListService.sourceListData
             .selectMany(g => g.source)
-            .forEach(i => (i.selected = i.highlighted = false));
+            .forEach(i => {
+                i.highlighted.set(false);
+                i.selected.set(false);
+            });
         this.autoCompleteValue.set("");
         this.#value = "";
         this.#propagateChange("");
@@ -136,7 +141,7 @@ export class AutoCompleteComponent implements OnInit, OnChanges, OnDestroy, Cont
         if (event.key === "Enter") {
             const item = this.popupListService.viewListData
                 .selectMany(g => g.source)
-                .firstOrDefault(i => i.selected || i.highlighted);
+                .firstOrDefault(i => i.selected() || i.highlighted());
             if (item) {
                 this.valuePopupListItem = item;
                 this.autoCompleteValue.set(item.text);
@@ -209,6 +214,14 @@ export class AutoCompleteComponent implements OnInit, OnChanges, OnDestroy, Cont
                 )
             ]
         });
+        this.animationService.slideDown(this.popupRef.overlayRef.overlayElement.firstElementChild as HTMLElement);
+        this.animationService.animate({
+            element: this.popupRef.overlayRef.overlayElement as HTMLElement,
+            duration: 200,
+            delay: 150,
+            startStyles: { boxShadow: "none" },
+            endStyles: { boxShadow: "var(--mona-popup-shadow)" }
+        });
         window.setTimeout(() => {
             const input = this.elementRef.nativeElement.querySelector("input");
             if (input) {
@@ -253,7 +266,7 @@ export class AutoCompleteComponent implements OnInit, OnChanges, OnDestroy, Cont
             .selectMany(g => g.source)
             .singleOrDefault(d => d.dataEquals(this.value));
         if (this.valuePopupListItem) {
-            this.valuePopupListItem.selected = true;
+            this.valuePopupListItem.selected.set(true);
         }
         this.autoCompleteValue.set(this.valuePopupListItem?.text ?? "");
     }
@@ -306,14 +319,17 @@ export class AutoCompleteComponent implements OnInit, OnChanges, OnDestroy, Cont
                     }
                     this.popupListService.viewListData
                         .selectMany(g => g.source)
-                        .forEach(i => (i.selected = i.highlighted = false));
+                        .forEach(i => {
+                            i.highlighted.set(false);
+                            i.selected.set(false);
+                        });
                     const popupListItem = this.popupListService.viewListData
                         .selectMany(g => g.source)
                         .firstOrDefault(
                             item => !item.disabled && item.text.toLowerCase().startsWith(value.toLowerCase())
                         );
                     if (popupListItem) {
-                        popupListItem.highlighted = true;
+                        popupListItem.highlighted.set(true);
                         this.popupListService.scrollToListItem$.next(popupListItem);
                     }
                     if (!this.popupRef) {

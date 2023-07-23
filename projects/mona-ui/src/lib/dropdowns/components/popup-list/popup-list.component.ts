@@ -4,6 +4,7 @@ import {
     ChangeDetectorRef,
     Component,
     ContentChild,
+    ElementRef,
     EventEmitter,
     Input,
     OnChanges,
@@ -84,13 +85,14 @@ export class PopupListComponent implements OnInit, OnChanges, AfterViewInit, OnD
     public constructor(
         @SkipSelf()
         public readonly popupListService: PopupListService,
-        private readonly cdr: ChangeDetectorRef
+        private readonly cdr: ChangeDetectorRef,
+        private elementRef: ElementRef<HTMLElement>
     ) {}
 
     public ngAfterViewInit(): void {
         const firstSelectedItem = this.popupListService.viewListData
             .selectMany(g => g.source)
-            .firstOrDefault(i => i.selected || i.highlighted);
+            .firstOrDefault(i => i.selected() || i.highlighted());
         if (firstSelectedItem) {
             window.setTimeout(() => this.scrollToItem(firstSelectedItem), 0);
         }
@@ -106,7 +108,7 @@ export class PopupListComponent implements OnInit, OnChanges, AfterViewInit, OnD
                 if (changes["value"].isFirstChange() || this.selectionMode === "single") {
                     const firstSelectedItem = this.popupListService.viewListData
                         .selectMany(g => g.source)
-                        .firstOrDefault(i => i.selected || i.highlighted);
+                        .firstOrDefault(i => i.selected() || i.highlighted());
                     if (firstSelectedItem) {
                         window.setTimeout(() => this.scrollToItem(firstSelectedItem), 0);
                     }
@@ -118,7 +120,7 @@ export class PopupListComponent implements OnInit, OnChanges, AfterViewInit, OnD
     public ngOnDestroy(): void {
         this.componentDestroy$.next();
         this.componentDestroy$.complete();
-        this.popupListService.viewListData.selectMany(g => g.source).forEach(i => (i.selected = false));
+        this.popupListService.viewListData.selectMany(g => g.source).forEach(i => i.selected.set(false));
     }
 
     public ngOnInit(): void {
@@ -126,7 +128,7 @@ export class PopupListComponent implements OnInit, OnChanges, AfterViewInit, OnD
             .selectMany(g => g.source)
             .firstOrDefault(i => i.dataEquals(this.value));
         if (selectedItem) {
-            selectedItem.selected = true;
+            selectedItem.selected.set(true);
         }
         this.setEvents();
         this.setSubscriptions();
@@ -144,10 +146,10 @@ export class PopupListComponent implements OnInit, OnChanges, AfterViewInit, OnD
                 via: "selection"
             });
         } else if (this.selectionMode === "multiple") {
-            item.selected = !item.selected;
+            item.selected.set(!item.selected());
             let values: any[] = [...this.value];
             let items: PopupListItem[] = [];
-            if (item.selected) {
+            if (item.selected()) {
                 values.push(item.data);
                 items = this.popupListService.getListItemsOfValues(values);
             } else {
@@ -197,10 +199,10 @@ export class PopupListComponent implements OnInit, OnChanges, AfterViewInit, OnD
                     if (this.selectionMode === "multiple") {
                         const highlightedItem = this.popupListService.viewListData
                             .selectMany(g => g.source)
-                            .firstOrDefault(i => i.highlighted);
+                            .firstOrDefault(i => i.highlighted());
                         if (highlightedItem) {
-                            if (highlightedItem.selected) {
-                                highlightedItem.selected = false;
+                            if (highlightedItem.selected()) {
+                                highlightedItem.selected.set(false);
                                 const values = this.value.filter(v => !highlightedItem.dataEquals(v));
                                 const items = this.popupListService.getListItemsOfValues(values);
                                 this.valueChange.emit({
@@ -208,7 +210,7 @@ export class PopupListComponent implements OnInit, OnChanges, AfterViewInit, OnD
                                     value: items
                                 });
                             } else {
-                                highlightedItem.selected = true;
+                                highlightedItem.selected.set(true);
                                 const values = [...this.value, highlightedItem.data];
                                 const items = this.popupListService.getListItemsOfValues(values);
                                 this.valueChange.emit({
@@ -221,7 +223,7 @@ export class PopupListComponent implements OnInit, OnChanges, AfterViewInit, OnD
                         if (this.popupListService.filterModeActive) {
                             const selectedItem = this.popupListService.viewListData
                                 .selectMany(g => g.source)
-                                .firstOrDefault(i => i.selected);
+                                .firstOrDefault(i => i.selected());
                             if (selectedItem) {
                                 this.valueChange.emit({
                                     value: [selectedItem],
@@ -246,7 +248,7 @@ export class PopupListComponent implements OnInit, OnChanges, AfterViewInit, OnD
     private updateHighlightedValues(values: any[]): void {
         this.popupListService.viewListData.forEach(g => {
             g.source.forEach(i => {
-                i.highlighted = values.length === 0 ? false : values.some(v => i.dataEquals(v));
+                i.highlighted.set(values.length === 0 ? false : values.some(v => i.dataEquals(v)));
             });
         });
     }
@@ -254,7 +256,7 @@ export class PopupListComponent implements OnInit, OnChanges, AfterViewInit, OnD
     private updateSelectedValues(values: any[]): void {
         this.popupListService.viewListData.forEach(g => {
             g.source.forEach(i => {
-                i.selected = values.length === 0 ? false : values.some(v => i.dataEquals(v));
+                i.selected.set(values.length === 0 ? false : values.some(v => i.dataEquals(v)));
             });
         });
     }
