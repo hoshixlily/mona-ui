@@ -7,6 +7,7 @@ div.mona-tooltip-content {
     height: 100%;
     padding: 8px 10px;
     position: relative;
+    z-index: 1;
 }
 
 div.mona-tooltip-arrow {
@@ -18,7 +19,7 @@ div.mona-tooltip-arrow {
     background: var(--mona-background);
     transform-origin: center;
     transform: rotate(45deg);
-    z-index: -1;
+    z-index: 0;
 
     &.bottom {
         top: -6px;
