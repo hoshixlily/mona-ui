@@ -27,7 +27,8 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { ConnectionPositionPair } from "@angular/cdk/overlay";
 import { Action } from "../../../../../utils/Action";
 import { faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
-import { AnimationService } from "../../../../../animations/animation.service";
+import { PopupAnimationService } from "../../../../../animations/popup-animation.service";
+import { AnimationState } from "../../../../../animations/AnimationState";
 
 @Component({
     selector: "mona-auto-complete",
@@ -95,8 +96,8 @@ export class AutoCompleteComponent implements OnInit, OnChanges, OnDestroy, Cont
     public valueField?: string;
 
     public constructor(
-        private readonly animationService: AnimationService,
         private readonly elementRef: ElementRef<HTMLElement>,
+        private readonly popupAnimationService: PopupAnimationService,
         private readonly popupListService: PopupListService,
         private readonly popupService: PopupService
     ) {}
@@ -193,7 +194,8 @@ export class AutoCompleteComponent implements OnInit, OnChanges, OnDestroy, Cont
         this.popupRef = this.popupService.create({
             anchor: this.dropdownWrapper,
             content: this.popupTemplate,
-            hasBackdrop: true,
+            hasBackdrop: false,
+            closeOnOutsideClick: false,
             withPush: false,
             width: this.elementRef.nativeElement.getBoundingClientRect().width,
             popupClass: ["mona-dropdown-popup-content"],
@@ -214,14 +216,8 @@ export class AutoCompleteComponent implements OnInit, OnChanges, OnDestroy, Cont
                 )
             ]
         });
-        this.animationService.slideDown(this.popupRef.overlayRef.overlayElement.firstElementChild as HTMLElement);
-        this.animationService.animate({
-            element: this.popupRef.overlayRef.overlayElement as HTMLElement,
-            duration: 200,
-            delay: 150,
-            startStyles: { boxShadow: "none" },
-            endStyles: { boxShadow: "var(--mona-popup-shadow)" }
-        });
+        this.popupAnimationService.setupDropdownOutsideClickCloseAnimation(this.popupRef);
+        this.popupAnimationService.animateDropdown(this.popupRef, AnimationState.Show);
         window.setTimeout(() => {
             const input = this.elementRef.nativeElement.querySelector("input");
             if (input) {
