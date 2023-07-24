@@ -4,12 +4,11 @@ import { DateTimePickerModule } from "./modules/date-time-picker/date-time-picke
 import { DatePickerModule } from "./modules/date-picker/date-picker.module";
 import { CalendarModule } from "./modules/calendar/calendar.module";
 import { TimePickerModule } from "./modules/time-picker/time-picker.module";
-import { DateService } from "./services/date.service";
 
 @NgModule({
     declarations: [],
     imports: [CommonModule],
     exports: [CalendarModule, DatePickerModule, DateTimePickerModule, TimePickerModule],
-    providers: [DateService]
+    providers: []
 })
 export class DateInputsModule {}
