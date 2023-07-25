@@ -28,7 +28,8 @@ import {
     SortableOptions,
     CellEditEvent,
     NotificationService,
-    DialogService
+    DialogService,
+    BreadcrumbItem
 } from "mona-ui";
 import { TestComponentComponent } from "./test-component/test-component.component";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
@@ -53,6 +54,13 @@ export class AppComponent implements OnInit {
     public readonly snowflakeIcon: IconDefinition = faSnowflake;
     public readonly sunIcon: IconDefinition = faSun;
     public autoCompleteValue: string = "Yakizakana";
+    public breadcrumbItems: BreadcrumbItem[] = [
+        { label: "Home", title: "Home" },
+        { label: "Products", title: "Products" },
+        { label: "Fruits", title: "Fruits" },
+        { label: "Quince", title: "Quince" }
+    ];
+    public breadcrumbViewItems: BreadcrumbItem[] = this.breadcrumbItems;
     public buttonGroupButtonSelected: boolean = true;
     public calendarMaxValue: Date | null = new Date(2022, 6, 15);
     public calendarMinValue: Date | null = new Date(2022, 6, 10);
@@ -569,6 +577,11 @@ export class AppComponent implements OnInit {
     public onAutoCompleteValueChange(value: string): void {
         this.autoCompleteValue = value;
         console.log("Auto-complete value changed: ", value);
+    }
+
+    public onBreadcrumbItemClick(item: BreadcrumbItem): void {
+        const index = this.breadcrumbViewItems.indexOf(item);
+        this.breadcrumbViewItems = this.breadcrumbViewItems.slice(0, index + 1);
     }
 
     public onButtonSelectedChange(selected: boolean): void {

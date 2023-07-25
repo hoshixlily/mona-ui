@@ -1,0 +1,22 @@
+ol.mona-breadcrumb {
+    display: flex;
+    overflow: hidden;
+    list-style: none;
+    user-select: none;
+
+    & li {
+        display: flex;
+        align-items: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+li.mona-breadcrumb-item {
+    cursor: pointer;
+}
+
+li.mona-breadcrumb-separator {
+    margin: 0 12px;
+}

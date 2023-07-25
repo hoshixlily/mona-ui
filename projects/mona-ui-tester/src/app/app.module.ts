@@ -19,7 +19,8 @@ import {
     PagerModule,
     FilterModule,
     GridModule,
-    NotificationModule
+    NotificationModule,
+    NavigationModule
 } from "mona-ui";
 import { TestComponentComponent } from "./test-component/test-component.component";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
@@ -51,7 +52,8 @@ import { NgOptimizedImage } from "@angular/common";
         FilterModule,
         GridModule,
         NotificationModule,
-        NgOptimizedImage
+        NgOptimizedImage,
+        NavigationModule
     ],
     bootstrap: [AppComponent]
 })

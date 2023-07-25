@@ -1,0 +1,11 @@
+<ol class="mona-breadcrumb" >
+    <ng-container *ngFor="let item of breadcrumbItems(); let ix = index;">
+        <li class="mona-breadcrumb-item" [title]="item.title"
+            [ngClass]="{'mona-disabled': item.disabled}" (click)="onItemClick(item)" >
+            <span class="mona-breadcrumb-item-text">{{item.label}}</span>
+        </li>
+        <li class="mona-breadcrumb-separator" *ngIf="ix < breadcrumbItems().length - 1">
+            <fa-icon [icon]="separator"></fa-icon>
+        </li>
+    </ng-container>
+</ol>

@@ -172,6 +172,14 @@ export * from "./lib/menus/modules/menubar/components/menubar/menubar.component"
 export * from "./lib/menus/modules/menubar/menubar.module";
 export * from "./lib/menus/menus.module";
 
+/** Navigation */
+
+/** Breadcrumb */
+export * from "./lib/navigation/modules/breadcrumb/models/BreadcrumbItem";
+export * from "./lib/navigation/modules/breadcrumb/components/breadcrumb/breadcrumb.component";
+export * from "./lib/navigation/modules/breadcrumb/breadcrumb.module";
+export * from "./lib/navigation/navigation.module";
+
 /** Notification */
 export * from "./lib/notification/services/notification.service";
 export * from "./lib/notification/components/notification/notification.component";

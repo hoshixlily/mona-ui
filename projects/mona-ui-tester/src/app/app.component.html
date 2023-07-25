@@ -157,6 +157,10 @@
                         </div>
                         <div class="component-container" style="padding: 10px;">
                             <div>
+                                <mona-breadcrumb [items]="breadcrumbViewItems"
+                                                 (itemClick)="onBreadcrumbItemClick($event)"></mona-breadcrumb>
+                            </div>
+                            <div>
                                 <button monaButton>Button 1</button>
                                 <button monaButton>Button 2</button>
                                 <button monaButton [flat]="true">Flat Button</button>
