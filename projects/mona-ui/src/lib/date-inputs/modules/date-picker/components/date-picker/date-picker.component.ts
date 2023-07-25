@@ -18,8 +18,9 @@ import { Action } from "../../../../../utils/Action";
 import { PopupRef } from "../../../../../popup/models/PopupRef";
 import { faCalendar, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { ConnectionPositionPair } from "@angular/cdk/overlay";
-import { take, takeUntil } from "rxjs";
-import { DateService } from "../../../../services/date.service";
+import { take } from "rxjs";
+import { PopupAnimationService } from "../../../../../animations/popup-animation.service";
+import { AnimationState } from "../../../../../animations/AnimationState";
 
 @Component({
     selector: "mona-date-picker",
@@ -70,10 +71,10 @@ export class DatePickerComponent implements OnInit, ControlValueAccessor {
     public readonly: boolean = false;
 
     public constructor(
-        private readonly dateService: DateService,
         private readonly cdr: ChangeDetectorRef,
         private readonly elementRef: ElementRef<HTMLElement>,
         private readonly focusMonitor: FocusMonitor,
+        private readonly popupAnimationService: PopupAnimationService,
         private readonly popupService: PopupService
     ) {}
 
@@ -156,25 +157,8 @@ export class DatePickerComponent implements OnInit, ControlValueAccessor {
                 )
             ]
         });
-        this.popupRef.overlayRef
-            .outsidePointerEvents()
-            .pipe(takeUntil(this.popupRef.closed))
-            .subscribe(e => {
-                if (e.type.includes("click") && this.popupRef) {
-                    this.dateService.animate(
-                        this.popupRef.overlayRef.overlayElement.firstElementChild as Element,
-                        this.popupRef.overlayRef.overlayElement,
-                        "hide"
-                    );
-                    this.popupRef.closeWithDelay();
-                }
-            });
-        this.dateService.setupOutsideClickCloseAnimation(this.popupRef);
-        this.dateService.animate(
-            this.popupRef.overlayRef.overlayElement.firstElementChild as Element,
-            this.popupRef.overlayRef.overlayElement,
-            "show"
-        );
+        this.popupAnimationService.setupDropdownOutsideClickCloseAnimation(this.popupRef);
+        this.popupAnimationService.animateDropdown(this.popupRef, AnimationState.Show);
         this.popupRef.closed.pipe(take(1)).subscribe(() => {
             this.popupRef = null;
             this.focusMonitor.focusVia(input, "program");
@@ -209,11 +193,7 @@ export class DatePickerComponent implements OnInit, ControlValueAccessor {
         if (!this.popupRef) {
             return;
         }
-        this.dateService.animate(
-            this.popupRef.overlayRef.overlayElement.firstElementChild as Element,
-            this.popupRef.overlayRef.overlayElement,
-            "hide"
-        );
+        this.popupAnimationService.animateDropdown(this.popupRef, AnimationState.Hide);
     }
 
     private dateStringEquals(date1: Date | null, date2: Date | null): boolean {

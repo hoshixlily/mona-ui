@@ -19,8 +19,8 @@ import { PopupRef } from "../../../../../popup/models/PopupRef";
 import { DateTime } from "luxon";
 import { ConnectionPositionPair } from "@angular/cdk/overlay";
 import { take } from "rxjs";
-import { AnimationService } from "../../../../../animations/animation.service";
-import { DateService } from "../../../../services/date.service";
+import { PopupAnimationService } from "../../../../../animations/popup-animation.service";
+import { AnimationState } from "../../../../../animations/AnimationState";
 
 @Component({
     selector: "mona-date-time-picker",
@@ -82,9 +82,9 @@ export class DateTimePickerComponent implements OnInit, ControlValueAccessor {
 
     public constructor(
         private readonly cdr: ChangeDetectorRef,
-        private readonly dateService: DateService,
         private readonly elementRef: ElementRef<HTMLElement>,
         private readonly focusMonitor: FocusMonitor,
+        private readonly popupAnimationService: PopupAnimationService,
         private readonly popupService: PopupService
     ) {}
 
@@ -98,12 +98,10 @@ export class DateTimePickerComponent implements OnInit, ControlValueAccessor {
             this.setCurrentDate(inRangeDate);
             this.navigatedDate = inRangeDate;
         }
-        this.dateService.animate(
-            this.popupRef?.overlayRef.overlayElement.firstElementChild as HTMLElement,
-            this.popupRef?.overlayRef.overlayElement as HTMLElement,
-            "hide"
-        );
-        this.popupRef?.closeWithDelay();
+        if (this.popupRef) {
+            this.popupAnimationService.animateDropdown(this.popupRef, AnimationState.Hide);
+            this.popupRef.closeWithDelay();
+        }
     }
 
     public onDateInputBlur(): void {
@@ -169,7 +167,7 @@ export class DateTimePickerComponent implements OnInit, ControlValueAccessor {
                 )
             ]
         });
-        this.setAnimations(this.popupRef, "show");
+        this.setAnimations(this.popupRef, AnimationState.Show);
         this.popupRef.closed.pipe(take(1)).subscribe(() => {
             this.focusMonitor.focusVia(input, "program");
         });
@@ -209,7 +207,7 @@ export class DateTimePickerComponent implements OnInit, ControlValueAccessor {
                 )
             ]
         });
-        this.setAnimations(this.popupRef, "show");
+        this.setAnimations(this.popupRef, AnimationState.Show);
         const input = this.elementRef.nativeElement.querySelector("input") as HTMLElement;
         this.popupRef.closed.pipe(take(1)).subscribe(() => {
             this.focusMonitor.focusVia(input, "program");
@@ -253,13 +251,9 @@ export class DateTimePickerComponent implements OnInit, ControlValueAccessor {
         return date1 === date2;
     }
 
-    private setAnimations(popupRef: PopupRef, mode: "show" | "hide"): void {
-        this.dateService.setupOutsideClickCloseAnimation(popupRef);
-        this.dateService.animate(
-            popupRef.overlayRef.overlayElement.firstElementChild as HTMLElement,
-            popupRef.overlayRef.overlayElement,
-            mode
-        );
+    private setAnimations(popupRef: PopupRef, state: AnimationState): void {
+        this.popupAnimationService.setupDropdownOutsideClickCloseAnimation(popupRef);
+        this.popupAnimationService.animateDropdown(popupRef, state);
     }
 
     private setCurrentDate(date: Date | null): void {

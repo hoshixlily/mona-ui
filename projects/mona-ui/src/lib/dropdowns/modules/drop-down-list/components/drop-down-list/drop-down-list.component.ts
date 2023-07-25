@@ -25,7 +25,8 @@ import { faChevronDown, faTimes, IconDefinition } from "@fortawesome/free-solid-
 import { PopupRef } from "../../../../../popup/models/PopupRef";
 import { ConnectionPositionPair } from "@angular/cdk/overlay";
 import { fromEvent, Subject, take, takeUntil } from "rxjs";
-import { AnimationService } from "../../../../../animations/animation.service";
+import { PopupAnimationService } from "../../../../../animations/popup-animation.service";
+import { AnimationState } from "../../../../../animations/AnimationState";
 
 @Component({
     selector: "mona-drop-down-list",
@@ -96,9 +97,9 @@ export class DropDownListComponent implements OnInit, OnDestroy, ControlValueAcc
     public valueTemplate?: TemplateRef<any>;
 
     public constructor(
-        private readonly animationService: AnimationService,
         private readonly cdr: ChangeDetectorRef,
         private readonly elementRef: ElementRef<HTMLElement>,
+        private readonly popupAnimationService: PopupAnimationService,
         private readonly popupListService: PopupListService,
         private readonly popupService: PopupService
     ) {}
@@ -157,6 +158,7 @@ export class DropDownListComponent implements OnInit, OnDestroy, ControlValueAcc
             withPush: false,
             width: this.elementRef.nativeElement.getBoundingClientRect().width,
             popupClass: ["mona-dropdown-popup-content"],
+            closeOnOutsideClick: false,
             positions: [
                 new ConnectionPositionPair(
                     { originX: "start", originY: "bottom" },
@@ -174,16 +176,9 @@ export class DropDownListComponent implements OnInit, OnDestroy, ControlValueAcc
                 )
             ]
         });
-        this.animationService.slideDown(this.popupRef.overlayRef.overlayElement.firstElementChild as HTMLElement);
-        this.animationService.animate({
-            element: this.popupRef.overlayRef.overlayElement as HTMLElement,
-            duration: 200,
-            delay: 150,
-            startStyles: { boxShadow: "none" },
-            endStyles: { boxShadow: "var(--mona-popup-shadow)" }
-        });
+        this.popupAnimationService.setupDropdownOutsideClickCloseAnimation(this.popupRef);
+        this.popupAnimationService.animateDropdown(this.popupRef, AnimationState.Show);
         this.cdr.markForCheck();
-
         this.popupRef.closed.pipe(take(1)).subscribe(() => {
             this.popupRef = null;
             (this.elementRef.nativeElement.firstElementChild as HTMLElement)?.focus();
