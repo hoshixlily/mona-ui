@@ -1,6 +1,8 @@
-import { Component, EventEmitter, Input, Output, signal, WritableSignal } from "@angular/core";
+import { Component, ContentChild, EventEmitter, Input, Output, signal, WritableSignal } from "@angular/core";
 import { BreadcrumbItem } from "../../models/BreadcrumbItem";
 import { faChevronRight, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { BreadcrumbItemTemplateDirective } from "../../directives/breadcrumb-item-template.directive";
+import { BreadcrumbSeparatorTemplateDirective } from "../../directives/breadcrumb-separator-template.directive";
 
 @Component({
     selector: "mona-breadcrumb",
@@ -13,6 +15,12 @@ export class BreadcrumbComponent {
 
     @Output()
     public itemClick: EventEmitter<BreadcrumbItem> = new EventEmitter<BreadcrumbItem>();
+
+    @ContentChild(BreadcrumbItemTemplateDirective)
+    public itemTemplate?: BreadcrumbItemTemplateDirective;
+
+    @ContentChild(BreadcrumbSeparatorTemplateDirective)
+    public separatorTemplate?: BreadcrumbSeparatorTemplateDirective;
 
     @Input()
     public set items(value: Iterable<BreadcrumbItem>) {

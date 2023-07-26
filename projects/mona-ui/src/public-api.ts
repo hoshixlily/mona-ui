@@ -176,6 +176,8 @@ export * from "./lib/menus/menus.module";
 
 /** Breadcrumb */
 export * from "./lib/navigation/modules/breadcrumb/models/BreadcrumbItem";
+export * from "./lib/navigation/modules/breadcrumb/directives/breadcrumb-item-template.directive";
+export * from "./lib/navigation/modules/breadcrumb/directives/breadcrumb-separator-template.directive";
 export * from "./lib/navigation/modules/breadcrumb/components/breadcrumb/breadcrumb.component";
 export * from "./lib/navigation/modules/breadcrumb/breadcrumb.module";
 export * from "./lib/navigation/navigation.module";
