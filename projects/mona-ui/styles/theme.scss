@@ -1210,6 +1210,21 @@ ul.mona-menubar {
     }
 }
 
+/** Navigation */
+
+/** Breadcrumb */
+ol.mona-breadcrumb {
+    color: var(--mona-text);
+    @include font-medium;
+}
+
+.mona-breadcrumb-item {
+    & .mona-disabled {
+        @include disabled;
+    }
+}
+
+
 /** Notification */
 div.mona-notification-container {
     @include font-medium;

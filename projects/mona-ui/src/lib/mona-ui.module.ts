@@ -14,6 +14,7 @@ import { ProgressBarsModule } from "./progress-bars/progress-bars.module";
 import { FilterModule } from "./filter/filter.module";
 import { GridModule } from "./grid/grid.module";
 import { NotificationModule } from "./notification/notification.module";
+import { NavigationModule } from "./navigation/navigation.module";
 
 @NgModule({
     exports: [
@@ -25,6 +26,7 @@ import { NotificationModule } from "./notification/notification.module";
         InputsModule,
         LayoutModule,
         MenusModule,
+        NavigationModule,
         NotificationModule,
         PagerModule,
         PopupModule,
