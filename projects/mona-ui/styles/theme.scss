@@ -1306,7 +1306,72 @@ div.mona-progress-bar-indeterminate {
     }
 }
 
+/** Tooltips */
+div.mona-tooltip-arrow,
+div.mona-popover-arrow {
+    width: 12px;
+    height: 12px;
+    box-sizing: border-box;
+    position: absolute;
+    pointer-events: none;
+    background: var(--mona-background);
+    transform-origin: center;
+    transform: rotate(45deg);
+    z-index: 0;
+
+    &.bottom {
+        top: -6px;
+        left: calc(50% - 6px);
+        border-left: 1px solid var(--mona-border-color);
+        border-top: 1px solid var(--mona-border-color);
+        clip-path: inset(0 1px 1px 0);
+    }
+
+    &.top {
+        bottom: -6px;
+        left: calc(50% - 6px);
+        border-right: 1px solid var(--mona-border-color);
+        border-bottom: 1px solid var(--mona-border-color);
+        clip-path: inset(1px 0 0 1px);
+    }
+
+    &.right {
+        left: -6px;
+        top: calc(50% - 6px);
+        border-left: 1px solid var(--mona-border-color);
+        border-bottom: 1px solid var(--mona-border-color);
+        clip-path: inset(1px 1px 0 0);
+    }
+
+    &.left {
+        right: -6px;
+        top: calc(50% - 6px);
+        border-right: 1px solid var(--mona-border-color);
+        border-top: 1px solid var(--mona-border-color);
+        clip-path: inset(0 0 1px 1px);
+    }
+}
+
+/** Popover */
+.mona-popover-popup-wrapper {
+    overflow: initial !important;
+}
+
+.mona-popover-popup-content {
+    color: var(--mona-text);
+    padding: 0 !important;
+}
+
+div.mona-popover-title {
+    border-bottom: 1px solid var(--mona-border-color-light);
+}
+
+div.mona-popover-footer {
+    border-top: 1px solid var(--mona-border-color-light);
+}
+
 /** Tooltip */
+
 .mona-tooltip-popup-wrapper {
     overflow: initial !important;
 }

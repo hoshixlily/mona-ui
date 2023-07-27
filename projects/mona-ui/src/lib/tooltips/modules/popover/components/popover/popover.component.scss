@@ -1,0 +1,20 @@
+div.mona-popover {
+    position: relative;
+}
+
+div.mona-popover-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+div.mona-popover-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+}

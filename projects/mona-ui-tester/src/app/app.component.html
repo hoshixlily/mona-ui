@@ -359,6 +359,17 @@
                                     <span style="color: #95c5cb; font-weight: bold;">Tempest</span>
                                 </mona-tooltip>
 
+                                <button monaButton #popoverComponentAnchor>Popover Anchor</button>
+                                <mona-popover [target]="popoverComponentAnchor" position="top" title="Popover Title" #popover="monaPopover">
+                                    <div style="padding: 8px 12px;">Are you sure you want to perform this action?</div>
+                                    <ng-template monaPopoverFooterTemplate>
+                                        <div style="display: flex; align-items: center; justify-content: flex-end; padding: 4px 12px;">
+                                            <button monaButton [primary]="true" (click)="popover.close()" style="margin-right: 4px;">OK</button>
+                                            <button monaButton [primary]="false" (click)="popover.close()">Cancel</button>
+                                        </div>
+                                    </ng-template>
+                                </mona-popover>
+
                                 <ng-template #windowTitleTemplate>
                                     <span style="color: crimson; font-weight: bolder;">Templated Window Title</span>
                                 </ng-template>

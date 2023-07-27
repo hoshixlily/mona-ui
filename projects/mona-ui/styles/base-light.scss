@@ -30,6 +30,7 @@
 
     --mona-border-color: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) - 12%));
     --mona-border-color-dark: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) - 14%));
+    --mona-border-color-light: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) - 8%));
     --mona-focus-border-color: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) - 18%));
     --mona-primary-border-color: hsl(var(--mona-primary-base), calc(var(--mona-primary-base-lightness) - 6%));
     --mona-selected-border-color: var(--mona-primary-border-color);
