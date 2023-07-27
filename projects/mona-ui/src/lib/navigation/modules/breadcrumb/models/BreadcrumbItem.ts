@@ -1,7 +1,6 @@
 export interface BreadcrumbItem<T = any> {
     data?: T;
     disabled?: boolean;
-    label?: string;
-    url?: string;
+    text?: string;
     title?: string;
 }

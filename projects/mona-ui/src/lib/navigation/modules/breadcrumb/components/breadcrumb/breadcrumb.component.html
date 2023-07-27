@@ -2,7 +2,7 @@
     <ng-container *ngFor="let item of breadcrumbItems(); let ix = index;">
         <li class="mona-breadcrumb-item" [title]="item.title"
             [ngClass]="{'mona-disabled': item.disabled}" (click)="onItemClick(item)">
-            <span class="mona-breadcrumb-item-text" *ngIf="!itemTemplate">{{item.label}}</span>
+            <span class="mona-breadcrumb-item-text" *ngIf="!itemTemplate">{{item.text}}</span>
             <ng-container [ngTemplateOutlet]="itemTemplate?.template??null"
                           [ngTemplateOutletContext]="{$implicit: item}" *ngIf="itemTemplate"></ng-container>
         </li>
