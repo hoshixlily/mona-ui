@@ -1,8 +1,9 @@
 <ng-template>
     <div class="mona-popover" [attr.data-uid]="uid">
         <div class="mona-popover-content">
-            <div class="mona-popover-title" *ngIf="title">
-                <span>{{title}}</span>
+            <div class="mona-popover-title" *ngIf="title || titleTemplateRef">
+                <span *ngIf="!titleTemplateRef">{{title}}</span>
+                <ng-container [ngTemplateOutlet]="titleTemplateRef" *ngIf="titleTemplateRef"></ng-container>
             </div>
             <div class="mona-popover-body">
                 <ng-content></ng-content>

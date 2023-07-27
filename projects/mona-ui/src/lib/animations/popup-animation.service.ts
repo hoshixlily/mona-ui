@@ -52,25 +52,6 @@ export class PopupAnimationService {
             });
     }
 
-    public setupPopoverOutsideClickCloseAnimation(popupRef: PopupRef, target: Element | ElementRef): void {
-        popupRef.overlayRef
-            .outsidePointerEvents()
-            .pipe(
-                filter(e => {
-                    const targetElement = target instanceof ElementRef ? target.nativeElement : target;
-                    return !targetElement.contains(e.target as Element);
-                }),
-                takeUntil(popupRef.closed)
-            )
-            .subscribe(e => {
-                if (e.type.includes("click")) {
-                    this.animateDropdownBoxShadow(popupRef, AnimationState.Hide);
-                    this.animationService.fadeOut(popupRef.overlayRef.overlayElement.firstElementChild as Element);
-                    popupRef.closeWithDelay();
-                }
-            });
-    }
-
     private animateDropdownBoxShadow(popupRef: PopupRef, state: AnimationState): void {
         switch (state) {
             case AnimationState.Show:

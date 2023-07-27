@@ -1384,9 +1384,7 @@ div.mona-popover-footer {
 }
 
 .mona-invisible-tooltip {
-    position: absolute !important;
-    z-index: -999;
-    top: -9999px;
+    visibility: hidden;
 }
 
 

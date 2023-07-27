@@ -211,7 +211,11 @@ export * from "./lib/progress-bars/progress-bars.module";
 /** Tooltips */
 
 /** Popover */
+export * from "./lib/tooltips/modules/popover/models/PopoverHideEvent";
+export * from "./lib/tooltips/modules/popover/models/PopoverShowEvent";
+export * from "./lib/tooltips/modules/popover/models/PopoverShownEvent";
 export * from "./lib/tooltips/modules/popover/directives/popover-footer-template.directive";
+export * from "./lib/tooltips/modules/popover/directives/popover-title-template.directive";
 export * from "./lib/tooltips/modules/popover/components/popover/popover.component";
 export * from "./lib/tooltips/modules/popover/popover.module";
 

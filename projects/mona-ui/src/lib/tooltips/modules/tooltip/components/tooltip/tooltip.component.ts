@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnInit, TemplateRef, ViewChild } from "@angular/core";
+import { ChangeDetectionStrategy, Component, ElementRef, Input, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { filter, fromEvent, Subject, take, takeUntil, tap } from "rxjs";
 import { PopupService } from "../../../../../popup/services/popup.service";
 import { PopupRef } from "../../../../../popup/models/PopupRef";
@@ -10,7 +10,8 @@ import { AnimationService } from "../../../../../animations/animation.service";
 @Component({
     selector: "mona-tooltip",
     templateUrl: "./tooltip.component.html",
-    styleUrls: ["./tooltip.component.scss"]
+    styleUrls: ["./tooltip.component.scss"],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TooltipComponent implements OnInit {
     readonly #destroy$: Subject<void> = new Subject<void>();

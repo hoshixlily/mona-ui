@@ -29,11 +29,23 @@ import {
     CellEditEvent,
     NotificationService,
     DialogService,
-    BreadcrumbItem
+    BreadcrumbItem,
+    PopoverShowEvent,
+    PopoverShownEvent,
+    PopoverHideEvent
 } from "mona-ui";
 import { TestComponentComponent } from "./test-component/test-component.component";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
-import { faFilter, faHeart, faHome, faMoon, faSearch, faSnowflake, faSun } from "@fortawesome/free-solid-svg-icons";
+import {
+    faFilter,
+    faHeart,
+    faHome,
+    faMoon,
+    faSearch,
+    faSnowflake,
+    faSun,
+    faTimes
+} from "@fortawesome/free-solid-svg-icons";
 import { Enumerable, IndexableList } from "@mirei/ts-collections";
 import { map, Observable, take } from "rxjs";
 import { DateTime } from "luxon";
@@ -47,6 +59,7 @@ import { GridOrderData } from "./GridOrderData";
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent implements OnInit {
+    public readonly closeIcon: IconDefinition = faTimes;
     public readonly filterIcon: IconDefinition = faFilter;
     public readonly heartIcon: IconDefinition = faHeart;
     public readonly homeIcon: IconDefinition = faHome;
@@ -688,6 +701,24 @@ export class AppComponent implements OnInit {
         } else {
             this.pagerPageSize = event.newPageSize;
         }
+    }
+
+    public onPopoverHidden(): void {
+        console.log("Popover hidden");
+    }
+
+    public onPopoverHide(event: PopoverHideEvent): void {
+        // event.preventDefault();
+        console.log(event);
+    }
+
+    public onPopoverShow(event: PopoverShowEvent): void {
+        // event.preventDefault();
+        console.log(event);
+    }
+
+    public onPopoverShownEvent(event: PopoverShownEvent): void {
+        console.log(event);
     }
 
     public onPopupClose(): void {

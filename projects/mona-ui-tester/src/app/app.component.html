@@ -359,13 +359,31 @@
                                     <span style="color: #95c5cb; font-weight: bold;">Tempest</span>
                                 </mona-tooltip>
 
-                                <button monaButton #popoverComponentAnchor>Popover Anchor</button>
-                                <mona-popover [target]="popoverComponentAnchor" position="top" title="Popover Title" #popover="monaPopover">
+                                <button monaButton #popoverComponentAnchor (click)="popover.toggle()">Popover Anchor</button>
+                                <mona-popover [target]="popoverComponentAnchor" position="top" trigger="click"
+                                              (show)="onPopoverShow($event)" (shown)="onPopoverShownEvent($event)"
+                                              (hide)="onPopoverHide($event)" (hidden)="onPopoverHidden()"
+                                              title="Popover Title" #popover="monaPopover">
+                                    <div style="padding: 8px 12px;">Are you sure you want to perform this action?</div>
+                                    <div style="padding: 8px 12px;">Are you sure you want to perform this action?</div>
+                                    <div style="padding: 8px 12px;">Are you sure you want to perform this action?</div>
+                                    <div style="padding: 8px 12px;">Are you sure you want to perform this action?</div>
+                                    <div style="padding: 8px 12px;">Are you sure you want to perform this action?</div>
+<!--                                    <div style="padding: 8px 12px;">Are you sure you want to perform this action?</div>-->
+<!--                                    <div style="padding: 8px 12px;">Are you sure you want to perform this action?</div>-->
                                     <div style="padding: 8px 12px;">Are you sure you want to perform this action?</div>
                                     <ng-template monaPopoverFooterTemplate>
                                         <div style="display: flex; align-items: center; justify-content: flex-end; padding: 4px 12px;">
                                             <button monaButton [primary]="true" (click)="popover.close()" style="margin-right: 4px;">OK</button>
                                             <button monaButton [primary]="false" (click)="popover.close()">Cancel</button>
+                                        </div>
+                                    </ng-template>
+                                    <ng-template monaPopoverTitleTemplate>
+                                        <div style="display: flex; align-items: center; width: 100%;">
+                                            <span style="color: #00a86b; flex: 1;">Perform Action</span>
+                                            <button monaButton [flat]="true" (click)="popover.close()">
+                                                <fa-icon [icon]="closeIcon" style="color: white;"></fa-icon>
+                                            </button>
                                         </div>
                                     </ng-template>
                                 </mona-popover>
