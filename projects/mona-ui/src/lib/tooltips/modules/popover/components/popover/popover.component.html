@@ -1,0 +1,18 @@
+<ng-template>
+    <div class="mona-popover" [attr.data-uid]="uid">
+        <div class="mona-popover-content">
+            <div class="mona-popover-title" *ngIf="title || titleTemplateRef">
+                <span *ngIf="!titleTemplateRef">{{title}}</span>
+                <ng-container [ngTemplateOutlet]="titleTemplateRef" *ngIf="titleTemplateRef"></ng-container>
+            </div>
+            <div class="mona-popover-body">
+                <ng-content></ng-content>
+            </div>
+            <div class="mona-popover-footer" *ngIf="footerTemplateRef">
+                <ng-container [ngTemplateOutlet]="footerTemplateRef"></ng-container>
+            </div>
+        </div>
+        <div class="mona-popover-arrow"
+             [ngClass]="{'top':position==='top', 'bottom': position==='bottom', 'left': position==='left', 'right': position==='right'}"></div>
+    </div>
+</ng-template>

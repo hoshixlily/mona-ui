@@ -208,6 +208,17 @@ export * from "./lib/progress-bars/modules/progress-bar/components/progress-bar/
 export * from "./lib/progress-bars/modules/progress-bar/progress-bar.module";
 export * from "./lib/progress-bars/progress-bars.module";
 
+/** Tooltips */
+
+/** Popover */
+export * from "./lib/tooltips/modules/popover/models/PopoverHideEvent";
+export * from "./lib/tooltips/modules/popover/models/PopoverShowEvent";
+export * from "./lib/tooltips/modules/popover/models/PopoverShownEvent";
+export * from "./lib/tooltips/modules/popover/directives/popover-footer-template.directive";
+export * from "./lib/tooltips/modules/popover/directives/popover-title-template.directive";
+export * from "./lib/tooltips/modules/popover/components/popover/popover.component";
+export * from "./lib/tooltips/modules/popover/popover.module";
+
 /** Tooltip */
 export * from "./lib/tooltips/modules/tooltip/components/tooltip/tooltip.component";
 export * from "./lib/tooltips/modules/tooltip/tooltip.module";

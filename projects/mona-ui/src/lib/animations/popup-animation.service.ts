@@ -1,7 +1,7 @@
-import { Injectable } from "@angular/core";
+import { ElementRef, Injectable } from "@angular/core";
 import { AnimationService } from "./animation.service";
 import { PopupRef } from "../popup/models/PopupRef";
-import { takeUntil } from "rxjs";
+import { filter, takeUntil } from "rxjs";
 import { AnimationState } from "./AnimationState";
 
 /**
@@ -19,11 +19,23 @@ export class PopupAnimationService {
         switch (state) {
             case AnimationState.Show:
                 this.animationService.slideDown(popupRef.overlayRef.overlayElement.firstElementChild as Element);
-                this.animateBoxShadow(popupRef, state);
+                this.animateDropdownBoxShadow(popupRef, state);
                 break;
             case AnimationState.Hide:
-                this.animateBoxShadow(popupRef, state);
+                this.animateDropdownBoxShadow(popupRef, state);
                 this.animationService.slideUp(popupRef.overlayRef.overlayElement.firstElementChild as Element);
+        }
+    }
+
+    public animatePopover(popupRef: PopupRef, state: AnimationState): void {
+        switch (state) {
+            case AnimationState.Show:
+                this.animationService.fadeIn(popupRef.overlayRef.overlayElement.firstElementChild as Element, 200);
+                this.animatePopoverBoxShadow(popupRef, state);
+                break;
+            case AnimationState.Hide:
+                this.animatePopoverBoxShadow(popupRef, state);
+                this.animationService.fadeOut(popupRef.overlayRef.overlayElement.firstElementChild as Element, 300);
         }
     }
 
@@ -33,14 +45,14 @@ export class PopupAnimationService {
             .pipe(takeUntil(popupRef.closed))
             .subscribe(e => {
                 if (e.type.includes("click")) {
-                    this.animateBoxShadow(popupRef, AnimationState.Hide);
+                    this.animateDropdownBoxShadow(popupRef, AnimationState.Hide);
                     this.animationService.slideUp(popupRef.overlayRef.overlayElement.firstElementChild as Element);
                     popupRef.closeWithDelay();
                 }
             });
     }
 
-    private animateBoxShadow(popupRef: PopupRef, state: AnimationState): void {
+    private animateDropdownBoxShadow(popupRef: PopupRef, state: AnimationState): void {
         switch (state) {
             case AnimationState.Show:
                 this.animationService.animate({
@@ -55,6 +67,26 @@ export class PopupAnimationService {
                 this.animationService.animate({
                     element: popupRef.overlayRef.overlayElement,
                     duration: 10,
+                    startStyles: { boxShadow: "var(--mona-popup-shadow)" },
+                    endStyles: { boxShadow: "none" }
+                });
+                break;
+        }
+    }
+
+    private animatePopoverBoxShadow(popupRef: PopupRef, state: AnimationState): void {
+        switch (state) {
+            case AnimationState.Show:
+                this.animationService.animate({
+                    element: popupRef.overlayRef.overlayElement,
+                    duration: 200,
+                    startStyles: { boxShadow: "none" },
+                    endStyles: { boxShadow: "var(--mona-popup-shadow)" }
+                });
+                break;
+            case AnimationState.Hide:
+                this.animationService.animate({
+                    element: popupRef.overlayRef.overlayElement,
                     startStyles: { boxShadow: "var(--mona-popup-shadow)" },
                     endStyles: { boxShadow: "none" }
                 });
