@@ -10,12 +10,14 @@ import { ColorPaletteModule } from "./modules/color-palette/color-palette.module
 import { ColorPickerModule } from "./modules/color-picker/color-picker.module";
 import { SliderModule } from "./modules/slider/slider.module";
 import { RangeSliderModule } from "./modules/range-slider/range-slider.module";
+import { ColorGradientModule } from "./modules/color-gradient/color-gradient.module";
 
 @NgModule({
     declarations: [],
     imports: [CommonModule],
     exports: [
         CheckBoxModule,
+        ColorGradientModule,
         ColorPaletteModule,
         ColorPickerModule,
         NumericTextBoxModule,

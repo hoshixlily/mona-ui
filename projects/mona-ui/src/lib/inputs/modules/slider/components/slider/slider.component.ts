@@ -71,6 +71,9 @@ export class SliderComponent implements OnInit, ControlValueAccessor {
     public orientation: "horizontal" | "vertical" = "horizontal";
 
     @Input()
+    public showLabels: boolean = true;
+
+    @Input()
     public showTicks: boolean = true;
 
     @Input()

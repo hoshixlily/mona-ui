@@ -1,0 +1,16 @@
+<div class="mona-color-gradient">
+    <div class="mona-color-gradient-color-area">
+        <div class="mona-hsv-rectangle" [style.background-color]="hsvRectBackground()" #hsvRectangle>
+            <div class="mona-hsv-rectangle-pointer" [style.left.px]="hsvPointerLeft"
+                 [style.top.px]="hsvPointerTop" #hsvPointer></div>
+        </div>
+        <ul class="mona-color-gradient-recent-colors"></ul>
+
+    </div>
+    <div class="mona-color-gradient-slider-area">
+        <mona-hue-slider [ngModel]="hsv().h()" (ngModelChange)="hueValue$.next($event)"></mona-hue-slider>
+    </div>
+    <div class="mona-color-gradient-data-area">
+        <div [style.background-color]="selectedColor()" style="width: 20px; height: 20px; display: flex;"></div>
+    </div>
+</div>

@@ -1,0 +1,17 @@
+div.mona-hue-slider {
+    position: relative;
+    width: 20px;
+    height: 160px;
+    border: 1px solid var(--mona-border-color);
+    background: linear-gradient(to top, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
+}
+
+div.mona-hue-slider-handle {
+    height: 10px;
+    border: 2px solid white;
+    margin-top: -5px;
+    margin-left: -2px;
+    position: absolute;
+    top: 160px;
+    width: 24px;
+}

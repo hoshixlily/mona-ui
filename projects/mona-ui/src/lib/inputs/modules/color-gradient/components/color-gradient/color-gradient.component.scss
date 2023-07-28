@@ -1,0 +1,29 @@
+div.mona-color-gradient {
+    display: flex;
+}
+
+div.mona-color-gradient-color-area {
+    display: flex;
+    flex-direction: column;
+}
+
+div.mona-color-gradient-slider-area {
+    margin-left: 24px;
+    display: flex;
+}
+
+div.mona-hsv-rectangle {
+    position: relative;
+    width: 270px;
+    height: 160px;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0), black), linear-gradient(to right, white, rgba(255, 255, 255, 0));
+    //background-blend-mode: saturation, normal;
+    border: 1px solid var(--mona-border-color);
+}
+
+div.mona-hsv-rectangle-pointer {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    box-shadow: 0 0 0 2px white inset;
+}

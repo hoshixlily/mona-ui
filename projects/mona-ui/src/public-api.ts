@@ -80,6 +80,9 @@ export * from "./lib/grid/grid.module";
 export * from "./lib/inputs/modules/check-box/directives/check-box.directive";
 export * from "./lib/inputs/modules/check-box/check-box.module";
 
+export * from "./lib/inputs/modules/color-gradient/components/color-gradient/color-gradient.component";
+export * from "./lib/inputs/modules/color-gradient/color-gradient.module";
+
 export * from "./lib/inputs/modules/color-palette/components/color-palette/color-palette.component";
 export * from "./lib/inputs/modules/color-palette/color-palette.module";
 

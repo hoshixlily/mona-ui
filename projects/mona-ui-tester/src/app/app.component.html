@@ -493,6 +493,8 @@
                                         貴方は夜空を覆っている雲の狭間から輝いている一つの星のように私の人生を照らしてくれているよ。
                                     </div>
                                 </mona-fieldset>
+
+
                             </div>
                             <div style="display: flex; align-items: center; justify-content: center;">
                                 <mona-avatar [borderRadius]="sliderValue"
@@ -502,6 +504,8 @@
                                 <mona-avatar backgroundColor="transparent" [borderWidth]="0">
                                     <fa-icon [icon]="snowflakeIcon" style="color: #95c5cb;"></fa-icon>
                                 </mona-avatar>
+                                <mona-color-gradient [ngModel]="colorGradientColor"
+                                                     (ngModelChange)="onColorGradientValueChange($event)"></mona-color-gradient>
                             </div>
                         </div>
                     </ng-template>
