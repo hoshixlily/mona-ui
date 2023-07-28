@@ -242,27 +242,16 @@ export class PopoverComponent implements OnInit {
         const viewportHeight = window.innerHeight;
         switch (position) {
             case "top":
-                if (popoverRect.top < 0) {
-                    return true;
-                }
-                break;
+                return popoverRect.top < 0;
             case "bottom":
-                if (popoverRect.bottom > viewportHeight) {
-                    return true;
-                }
-                break;
+                return popoverRect.bottom > viewportHeight;
             case "right":
-                if (popoverRect.right > viewportWidth) {
-                    return true;
-                }
-                break;
+                return popoverRect.right > viewportWidth;
             case "left":
-                if (popoverRect.left < 0) {
-                    return true;
-                }
-                break;
+                return popoverRect.left < 0;
+            default:
+                return false;
         }
-        return false;
     }
 
     private setSubscriptions(): void {
