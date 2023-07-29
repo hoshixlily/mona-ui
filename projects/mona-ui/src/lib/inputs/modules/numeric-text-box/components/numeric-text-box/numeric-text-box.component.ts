@@ -1,6 +1,8 @@
 import {
     ChangeDetectionStrategy,
     Component,
+    ContentChild,
+    ContentChildren,
     ElementRef,
     EventEmitter,
     forwardRef,
@@ -8,6 +10,8 @@ import {
     OnDestroy,
     OnInit,
     Output,
+    QueryList,
+    TemplateRef,
     ViewChild
 } from "@angular/core";
 import { delay, interval, Subject, takeUntil } from "rxjs";
@@ -15,6 +19,7 @@ import { FocusMonitor, FocusOrigin } from "@angular/cdk/a11y";
 import { Action } from "../../../../../utils/Action";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { faChevronDown, faChevronUp, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { NumericTextBoxPrefixTemplateDirective } from "../../directives/numeric-text-box-prefix-template.directive";
 
 type Sign = "-" | "+";
 
@@ -75,6 +80,9 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
 
     @Input()
     public min?: number;
+
+    @ContentChildren(NumericTextBoxPrefixTemplateDirective, { read: TemplateRef })
+    public prefixTemplateList: QueryList<TemplateRef<any>> = new QueryList<TemplateRef<any>>();
 
     @Input()
     public readonly: boolean = false;

@@ -1,4 +1,7 @@
 <div class="mona-numeric-text-box" [ngClass]="{'mona-disabled': disabled}">
+    <ng-container *ngFor="let prefixTemplate of prefixTemplateList">
+        <ng-container *ngTemplateOutlet="prefixTemplate"></ng-container>
+    </ng-container>
     <input monaTextBox [disabled]="disabled" [readonly]="readonly" [ngModel]="visibleValue" (ngModelChange)="value$.next($event)"
            (keydown)="onKeydown($event)" (paste)="onPaste($event)" (wheel)="onMouseWheel($event)" (focus)="inputFocus.emit($event)"
            (blur)="inputBlur.emit($event)"

@@ -17,8 +17,8 @@ div.mona-color-gradient-slider-area {
 
 div.mona-hsv-rectangle {
     position: relative;
-    width: 223px;
-    height: 223px;
+    width: 214px;
+    height: 214px;
     background: linear-gradient(to bottom, rgba(0, 0, 0, 0), black), linear-gradient(to right, white, rgba(255, 255, 255, 0));
     border: 1px solid var(--mona-border-color);
 }
@@ -27,14 +27,15 @@ div.mona-hsv-rectangle-pointer {
     position: absolute;
     width: 12px;
     height: 12px;
-    box-shadow: 0 0 0 1px white inset, 0 0 0 1px var(--mona-border-color), 0 0 0 3px var(--mona-border-color) inset;
+    box-shadow: 0 0 0 1px white inset, 0 0 0 1px var(--mona-border-color), 0 0 0 2px var(--mona-border-color) inset;
 }
 
 div.mona-color-gradient-preview {
-    width: 152px;
+    min-width: 80px;
     height: 80px;
     display: flex;
     margin-left: 12px;
+    margin-right: 8px;
     border: 1px solid var(--mona-border-color);
 }
 
@@ -62,27 +63,16 @@ div.mona-color-gradient-inputs {
             column-gap: 2px;
         }
     }
-    & span {
-        width: 20px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-family: monospace;
-        color: var(--mona-text);
-        font-size: 14px;
-    }
 }
 
 div.mona-color-gradient-hex-value {
-    margin-top: 8px;
-    margin-left: 12px;
     & mona-text-box {
-        width: 152px;
+        width: 94px;
     }
 }
 
 mona-numeric-text-box {
-    width: 50px;
+    width: 94px;
 }
 
 span.mona-color-gradient-hex-value-error {
@@ -94,4 +84,15 @@ span.mona-color-gradient-hex-value-error {
     background: var(--mona-error);
     box-shadow: 0 0 0 5px var(--mona-border-color) inset;
     clip-path: inset(4px 4px 4px 4px);
+}
+
+span.mona-color-gradient-value-input-prefix {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-right: 1px solid var(--mona-border-color);
+    width: 28px;
+    user-select: none;
+    color: var(--mona-text);
+    font-family: monospace;
 }

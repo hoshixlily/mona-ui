@@ -89,6 +89,7 @@ export * from "./lib/inputs/modules/color-palette/color-palette.module";
 export * from "./lib/inputs/modules/color-picker/components/color-picker/color-picker.component";
 export * from "./lib/inputs/modules/color-picker/color-picker.module";
 
+export * from "./lib/inputs/modules/numeric-text-box/directives/numeric-text-box-prefix-template.directive";
 export * from "./lib/inputs/modules/numeric-text-box/components/numeric-text-box/numeric-text-box.component";
 export * from "./lib/inputs/modules/numeric-text-box/numeric-text-box.module";
 
