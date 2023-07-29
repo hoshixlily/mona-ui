@@ -3,6 +3,7 @@ div.mona-alpha-slider {
     width: 12px;
     height: 100%;
     border: 1px solid var(--mona-border-color);
+    user-select: none;
 }
 
 div.mona-alpha-slider-color {

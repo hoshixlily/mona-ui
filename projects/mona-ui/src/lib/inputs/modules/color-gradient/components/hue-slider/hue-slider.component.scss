@@ -4,6 +4,7 @@ div.mona-hue-slider {
     height: 100%;
     border: 1px solid var(--mona-border-color);
     background: linear-gradient(to top, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
+    user-select: none;
 }
 
 div.mona-hue-slider-handle {
