@@ -15,9 +15,10 @@ import {
     WritableSignal
 } from "@angular/core";
 import { SliderComponent } from "../../../slider/components/slider/slider.component";
-import { distinctUntilChanged, fromEvent, Subject, switchMap, tap } from "rxjs";
+import { asapScheduler, asyncScheduler, distinctUntilChanged, fromEvent, Subject, switchMap, tap } from "rxjs";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
+import { faCopy, faTimes, faTimesSquare, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 
 export interface HSV {
     h: WritableSignal<number>;
@@ -49,7 +50,12 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
     #pointerMouseDown: boolean = false;
     #pointerMouseMove: boolean = false;
     #propagateChange: (value: string) => void = () => {};
+    public readonly copyIcon: IconDefinition = faCopy;
+    public readonly errorIcon: IconDefinition = faTimes;
     public readonly hueValue$: Subject<number> = new Subject<number>();
+    public hex: Signal<string> = signal("#FFFFFF");
+    public hexFocused: WritableSignal<boolean> = signal(false);
+    public hexInputValue: WritableSignal<string> = signal("");
     public hsv: WritableSignal<HSV> = signal<HSV>({ h: signal(255), s: signal(255), v: signal(255) });
     public hsvRectBackground: Signal<string> = signal("");
     public hsvPointerLeft: number = 0;
@@ -70,13 +76,6 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
 
     public ngAfterViewInit() {
         this.setSubscriptions();
-        // const hsv = this.rgb2hsv(255, 0, 0);
-        // this.hsv().h.set(hsv.h);
-        // this.rgb().r.set(255);
-        // this.rgb().g.set(0);
-        // this.rgb().b.set(0);
-        // this.hsvPointerLeft = this.getPositionFromSaturation(hsv.s);
-        // this.hsvPointerTop = this.getPositionFromValue(hsv.v);
     }
 
     public ngOnInit(): void {
@@ -89,6 +88,67 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
             const rgb = this.rgb();
             return `rgb(${rgb.r()}, ${rgb.g()}, ${rgb.b()})`;
         });
+        this.hex = computed(() => {
+            const rgb = this.rgb();
+            const focused = this.hexFocused();
+            if (!focused) {
+                return this.rgb2hex(rgb.r(), rgb.g(), rgb.b());
+            }
+            return this.hexInputValue();
+        });
+    }
+
+    public onRgbChange(value: number, channel: "r" | "g" | "b"): void {
+        const rgb = this.rgb();
+        rgb[channel].set(value);
+        const hsv = this.rgb2hsv(rgb.r(), rgb.g(), rgb.b());
+        this.hsv().h.set(hsv.h);
+        this.hsv().s.set(hsv.s);
+        this.hsv().v.set(hsv.v);
+        this.hexInputValue.set(this.hex());
+        this.hsvPointerLeft = this.getPositionFromSaturation(hsv.s);
+        this.hsvPointerTop = this.getPositionFromValue(hsv.v);
+        this.#propagateChange(this.rgb2hex(rgb.r(), rgb.g(), rgb.b()));
+    }
+
+    public onHsvChange(value: number, channel: "h" | "s" | "v"): void {
+        const hsv = this.hsv();
+        hsv[channel].set(value);
+        const rgb = this.hsv2rgb(hsv.h(), hsv.s(), hsv.v());
+        this.rgb().r.set(rgb.r);
+        this.rgb().g.set(rgb.g);
+        this.rgb().b.set(rgb.b);
+        this.hexInputValue.set(this.hex());
+        this.hsvPointerLeft = this.getPositionFromSaturation(hsv.s());
+        this.hsvPointerTop = this.getPositionFromValue(hsv.v());
+        this.#propagateChange(this.rgb2hex(rgb.r, rgb.g, rgb.b));
+    }
+
+    public onHexChange(value: string): void {
+        this.hexInputValue.set(value);
+        if (!this.isValidHex(value)) {
+            console.warn("Invalid hex value");
+            return;
+        }
+        const rgb = this.hex2rgb(value);
+        const hsv = this.rgb2hsv(rgb.r, rgb.g, rgb.b);
+        this.hsv().h.set(hsv.h);
+        this.hsv().s.set(hsv.s);
+        this.hsv().v.set(hsv.v);
+        this.rgb().r.set(rgb.r);
+        this.rgb().g.set(rgb.g);
+        this.rgb().b.set(rgb.b);
+        this.hsvPointerLeft = this.getPositionFromSaturation(hsv.s);
+        this.hsvPointerTop = this.getPositionFromValue(hsv.v);
+        this.#propagateChange(value);
+    }
+
+    public onHexInputBlur(): void {
+        this.updateHexInputValue();
+    }
+
+    public onHexInputFocus(): void {
+        this.hexFocused.set(true);
     }
 
     public registerOnChange(fn: any) {
@@ -109,15 +169,23 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
         this.rgb().r.set(rgb.r);
         this.rgb().g.set(rgb.g);
         this.rgb().b.set(rgb.b);
+        this.hexInputValue.set(value);
         this.hsvPointerLeft = this.getPositionFromSaturation(hsv.s);
         this.hsvPointerTop = this.getPositionFromValue(hsv.v);
         this.cdr.detectChanges();
     }
 
+    private getLongHex(hex: string): string {
+        if (hex.length === 4) {
+            return `#${hex[1]}${hex[1]}${hex[2]}${hex[2]}${hex[3]}${hex[3]}`;
+        }
+        return hex;
+    }
+
     private getSaturationFromPosition(): number {
         const minVal = this.hsvPointer.nativeElement.offsetLeft + this.hsvPointer.nativeElement.offsetWidth / 2;
         const maxVal = this.hsvRectangle.nativeElement.offsetWidth;
-        return (minVal / maxVal) * 100;
+        return Math.round((minVal / maxVal) * 100);
     }
 
     private getPositionFromSaturation(saturation: number): number {
@@ -135,16 +203,21 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
     private getValueFromPosition(): number {
         const minVal = this.hsvPointer.nativeElement.offsetTop + this.hsvPointer.nativeElement.offsetHeight / 2;
         const maxVal = this.hsvRectangle.nativeElement.offsetHeight;
-        return Math.abs(100 - (minVal / maxVal) * 100);
+        return Math.round(Math.abs(100 - (minVal / maxVal) * 100));
     }
 
     private hex2rgb(hex: string): { r: number; g: number; b: number } {
-        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)!;
-        return {
-            r: parseInt(result[1], 16),
-            g: parseInt(result[2], 16),
-            b: parseInt(result[3], 16)
-        };
+        hex = hex.replace(/^#/, "");
+        if (hex.length !== 3 && hex.length !== 6) {
+            throw new Error("Invalid hex color");
+        }
+        if (hex.length === 3) {
+            hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+        }
+        const r = parseInt(hex.substring(0, 2), 16);
+        const g = parseInt(hex.substring(2, 4), 16);
+        const b = parseInt(hex.substring(4, 6), 16);
+        return { r, g, b };
     }
 
     private hsv2rgb(hue: number, saturation: number, value: number): { r: number; g: number; b: number } {
@@ -204,6 +277,14 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
         };
     }
 
+    private isShorthandHex(hex: string): boolean {
+        return /^#([0-9A-F]{3})$/i.test(hex);
+    }
+
+    private isValidHex(hex: string): boolean {
+        return /^#([0-9A-F]{3}){1,2}$/i.test(hex);
+    }
+
     private rgb2hex(r: number, g: number, b: number): string {
         const rgb = b | (g << 8) | (r << 16);
         return "#" + (0x1000000 + rgb).toString(16).slice(1);
@@ -243,13 +324,6 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
         };
     }
 
-    private setHsvRectBackground(hue: number): void {
-        const { r, g, b } = this.hsv2rgb(hue, 100, 100);
-        this.rgb().r.set(r);
-        this.rgb().g.set(g);
-        this.rgb().b.set(b);
-    }
-
     private setHsvRectPointerEvents(): void {
         fromEvent<MouseEvent>(this.hsvPointer.nativeElement, "mousedown")
             .pipe(
@@ -273,6 +347,7 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
                 if (this.#pointerMouseDown) {
                     this.updateHsvRectPointerPosition(event);
                     this.updateHsvValues();
+                    this.updateHexInputValue();
                 }
             });
         fromEvent<MouseEvent>(this.hsvRectangle.nativeElement, "click")
@@ -281,17 +356,24 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
                 if (!this.#pointerMouseMove) {
                     this.updateHsvRectPointerPosition(event);
                     this.updateHsvValues();
+                    this.updateHexInputValue();
                 }
             });
     }
 
     private setSubscriptions(): void {
         this.hueValue$.pipe(distinctUntilChanged(), takeUntilDestroyed(this.#destroyRef)).subscribe((value: number) => {
-            this.hsv().h.set(value);
-            this.setHsvRectBackground(value);
+            this.hsv().h.set(Math.round(value));
+            this.updateHsvValues();
+            this.updateHexInputValue();
             this.cdr.detectChanges();
         });
         this.setHsvRectPointerEvents();
+    }
+
+    private updateHexInputValue(): void {
+        const hex = this.rgb2hex(this.rgb().r(), this.rgb().g(), this.rgb().b());
+        this.hexInputValue.set(hex);
     }
 
     private updateHsvRectPointerPosition(event: MouseEvent): void {
@@ -299,10 +381,6 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
         const pointerRect = this.hsvPointer.nativeElement.getBoundingClientRect();
         const left = event.clientX - containerRect.left - pointerRect.width / 2;
         const top = event.clientY - containerRect.top - pointerRect.height / 2;
-
-        if (top === this.hsvPointerTop && left === this.hsvPointerLeft) {
-            return;
-        }
 
         let newLeft;
         if (left < -pointerRect.width / 2) {
@@ -322,10 +400,6 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
             newTop = top;
         }
 
-        if (newLeft === this.hsvPointerLeft && newTop === this.hsvPointerTop) {
-            return;
-        }
-
         this.hsvPointerLeft = newLeft;
         this.hsvPointerTop = newTop;
         this.cdr.detectChanges();
@@ -334,15 +408,12 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
     private updateHsvValues(): void {
         const saturation = this.getSaturationFromPosition();
         const value = this.getValueFromPosition();
-        if (this.hsv().s() === saturation && this.hsv().v() === value) {
-            return;
-        }
+        this.hsv().s.set(saturation);
+        this.hsv().v.set(value);
         const rgb = this.hsv2rgb(this.hsv().h(), saturation, value);
         if (this.rgb().r() === rgb.r && this.rgb().g() === rgb.g && this.rgb().b() === rgb.b) {
             return;
         }
-        console.log("updateHsvValues", rgb);
-        console.log("updateHsvValues", [saturation, value]);
         this.rgb().r.set(rgb.r);
         this.rgb().g.set(rgb.g);
         this.rgb().b.set(rgb.b);

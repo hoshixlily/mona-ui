@@ -57,8 +57,6 @@ export class HueSliderComponent implements AfterViewInit, ControlValueAccessor {
     private setHandlePosition(position: number): void {
         const handleElement = this.sliderHandle.nativeElement;
         handleElement.style.top = `${position}px`;
-        const hue = this.getHueFromPosition(position);
-        this.#propagateChange(hue);
     }
 
     private setSubscriptions(): void {
@@ -82,6 +80,8 @@ export class HueSliderComponent implements AfterViewInit, ControlValueAccessor {
                 const handleBottom = event.clientY - containerRect.top + handleRect.height / 2;
                 if (handleTop >= 0 && handleBottom <= containerRect.height + handleRect.height) {
                     this.setHandlePosition(handleTop);
+                    const hue = this.getHueFromPosition(handleTop);
+                    this.#propagateChange(hue);
                 }
             }
         });
@@ -91,6 +91,8 @@ export class HueSliderComponent implements AfterViewInit, ControlValueAccessor {
             }
             const handleElement = this.sliderHandle.nativeElement;
             const top = event.offsetY - handleElement.clientHeight / 2;
+            const hue = this.getHueFromPosition(top);
+            this.#propagateChange(hue);
             this.setHandlePosition(top);
         });
     }

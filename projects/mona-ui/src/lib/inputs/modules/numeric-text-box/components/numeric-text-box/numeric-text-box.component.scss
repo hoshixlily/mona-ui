@@ -1,3 +1,7 @@
+:host {
+    display: flex;
+}
+
 div.mona-numeric-text-box {
     display: flex;
     & > [monaTextBox] {

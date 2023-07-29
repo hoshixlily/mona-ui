@@ -79,7 +79,7 @@ export class AppComponent implements OnInit {
     public calendarMaxValue: Date | null = new Date(2022, 6, 15);
     public calendarMinValue: Date | null = new Date(2022, 6, 10);
     public calendarValue: Date | null = new Date(2022, 6, 12);
-    public colorGradientColor: string = "#ff0000";
+    public colorGradientColor: string = "#4d0f33";
     public colorPalette: string[] = [
         "#263400",
         "#d61dff",
