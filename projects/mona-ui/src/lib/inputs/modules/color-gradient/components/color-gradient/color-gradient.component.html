@@ -9,6 +9,7 @@
     </div>
     <div class="mona-color-gradient-slider-area">
         <mona-hue-slider [ngModel]="hsv().h()" (ngModelChange)="hueValue$.next($event)"></mona-hue-slider>
+        <mona-alpha-slider [color]="alphaInputColor()" [ngModel]="alpha()" (ngModelChange)="onAlphaChange($event)"></mona-alpha-slider>
     </div>
     <div class="mona-color-gradient-data-area">
         <div class="mona-color-gradient-preview" [style.background-color]="selectedColor()"></div>

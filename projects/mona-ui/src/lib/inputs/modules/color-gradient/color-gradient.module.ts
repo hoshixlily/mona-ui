@@ -7,9 +7,10 @@ import { NumericTextBoxModule } from "../numeric-text-box/numeric-text-box.modul
 import { TextBoxModule } from "../text-box/text-box.module";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { ButtonModule } from "../../../buttons/modules/button/button.module";
+import { AlphaSliderComponent } from './components/alpha-slider/alpha-slider.component';
 
 @NgModule({
-    declarations: [ColorGradientComponent, HueSliderComponent],
+    declarations: [ColorGradientComponent, HueSliderComponent, AlphaSliderComponent],
     imports: [CommonModule, FormsModule, NumericTextBoxModule, TextBoxModule, FontAwesomeModule, ButtonModule],
     exports: [ColorGradientComponent]
 })

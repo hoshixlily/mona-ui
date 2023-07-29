@@ -15,10 +15,10 @@ import {
     WritableSignal
 } from "@angular/core";
 import { SliderComponent } from "../../../slider/components/slider/slider.component";
-import { asapScheduler, asyncScheduler, distinctUntilChanged, fromEvent, Subject, switchMap, tap } from "rxjs";
+import { distinctUntilChanged, fromEvent, Subject, switchMap, tap } from "rxjs";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
-import { faCopy, faTimes, faTimesSquare, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { faCopy, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 
 export interface HSV {
     h: WritableSignal<number>;
@@ -53,6 +53,8 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
     public readonly copyIcon: IconDefinition = faCopy;
     public readonly errorIcon: IconDefinition = faTimes;
     public readonly hueValue$: Subject<number> = new Subject<number>();
+    public alpha: WritableSignal<number> = signal(255);
+    public alphaInputColor: Signal<string> = signal("#FFFFFF");
     public hex: Signal<string> = signal("#FFFFFF");
     public hexFocused: WritableSignal<boolean> = signal(false);
     public hexInputValue: WritableSignal<string> = signal("");
@@ -86,16 +88,31 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
         });
         this.selectedColor = computed(() => {
             const rgb = this.rgb();
-            return `rgb(${rgb.r()}, ${rgb.g()}, ${rgb.b()})`;
+            return `rgba(${rgb.r()}, ${rgb.g()}, ${rgb.b()}, ${this.alpha() / 255})`;
         });
         this.hex = computed(() => {
             const rgb = this.rgb();
+            const alpha = this.alpha();
             const focused = this.hexFocused();
             if (!focused) {
-                return this.rgb2hex(rgb.r(), rgb.g(), rgb.b());
+                return this.rgba2hex(rgb.r(), rgb.g(), rgb.b(), alpha);
             }
             return this.hexInputValue();
         });
+
+        /**
+         * We need the color without alpha for the input color
+         */
+        this.alphaInputColor = computed(() => {
+            const rgb = this.rgb();
+            return this.rgba2hex(rgb.r(), rgb.g(), rgb.b(), 255);
+        });
+    }
+
+    public onAlphaChange(value: number): void {
+        this.alpha.set(value);
+        this.updateHexInputValue();
+        this.#propagateChange(this.hex());
     }
 
     public onRgbChange(value: number, channel: "r" | "g" | "b"): void {
@@ -108,7 +125,7 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
         this.hexInputValue.set(this.hex());
         this.hsvPointerLeft = this.getPositionFromSaturation(hsv.s);
         this.hsvPointerTop = this.getPositionFromValue(hsv.v);
-        this.#propagateChange(this.rgb2hex(rgb.r(), rgb.g(), rgb.b()));
+        this.#propagateChange(this.rgba2hex(rgb.r(), rgb.g(), rgb.b(), this.alpha()));
     }
 
     public onHsvChange(value: number, channel: "h" | "s" | "v"): void {
@@ -121,7 +138,7 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
         this.hexInputValue.set(this.hex());
         this.hsvPointerLeft = this.getPositionFromSaturation(hsv.s());
         this.hsvPointerTop = this.getPositionFromValue(hsv.v());
-        this.#propagateChange(this.rgb2hex(rgb.r, rgb.g, rgb.b));
+        this.#propagateChange(this.rgba2hex(rgb.r, rgb.g, rgb.b, this.alpha()));
     }
 
     public onHexChange(value: string): void {
@@ -130,7 +147,7 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
             console.warn("Invalid hex value");
             return;
         }
-        const rgb = this.hex2rgb(value);
+        const rgb = this.hex2rgba(value);
         const hsv = this.rgb2hsv(rgb.r, rgb.g, rgb.b);
         this.hsv().h.set(hsv.h);
         this.hsv().s.set(hsv.s);
@@ -138,6 +155,7 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
         this.rgb().r.set(rgb.r);
         this.rgb().g.set(rgb.g);
         this.rgb().b.set(rgb.b);
+        this.alpha.set(rgb.a);
         this.hsvPointerLeft = this.getPositionFromSaturation(hsv.s);
         this.hsvPointerTop = this.getPositionFromValue(hsv.v);
         this.#propagateChange(value);
@@ -161,7 +179,7 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
         if (value == null || !this.hsvRectangle || !this.hsvPointer) {
             return;
         }
-        const rgb = this.hex2rgb(value);
+        const rgb = this.hex2rgba(value);
         const hsv = this.rgb2hsv(rgb.r, rgb.g, rgb.b);
         this.hsv().h.set(hsv.h);
         this.hsv().s.set(hsv.s);
@@ -206,18 +224,27 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
         return Math.round(Math.abs(100 - (minVal / maxVal) * 100));
     }
 
-    private hex2rgb(hex: string): { r: number; g: number; b: number } {
-        hex = hex.replace(/^#/, "");
-        if (hex.length !== 3 && hex.length !== 6) {
-            throw new Error("Invalid hex color");
+    private hex2rgba(hex: string): { r: number; g: number; b: number; a: number } {
+        let r = 0,
+            g = 0,
+            b = 0,
+            a = 255;
+        if (hex.length == 4 || hex.length == 5) {
+            r = parseInt(hex[1] + hex[1], 16);
+            g = parseInt(hex[2] + hex[2], 16);
+            b = parseInt(hex[3] + hex[3], 16);
+            if (hex.length == 5) {
+                a = parseInt(hex[4] + hex[4], 16);
+            }
+        } else if (hex.length == 7 || hex.length == 9) {
+            r = parseInt(hex.slice(1, 3), 16);
+            g = parseInt(hex.slice(3, 5), 16);
+            b = parseInt(hex.slice(5, 7), 16);
+            if (hex.length == 9) {
+                a = parseInt(hex.slice(7, 9), 16);
+            }
         }
-        if (hex.length === 3) {
-            hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
-        }
-        const r = parseInt(hex.substring(0, 2), 16);
-        const g = parseInt(hex.substring(2, 4), 16);
-        const b = parseInt(hex.substring(4, 6), 16);
-        return { r, g, b };
+        return { r: r, g: g, b: b, a: a };
     }
 
     private hsv2rgb(hue: number, saturation: number, value: number): { r: number; g: number; b: number } {
@@ -277,17 +304,22 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
         };
     }
 
-    private isShorthandHex(hex: string): boolean {
-        return /^#([0-9A-F]{3})$/i.test(hex);
-    }
-
     private isValidHex(hex: string): boolean {
-        return /^#([0-9A-F]{3}){1,2}$/i.test(hex);
+        return /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/.test(hex);
     }
 
-    private rgb2hex(r: number, g: number, b: number): string {
-        const rgb = b | (g << 8) | (r << 16);
-        return "#" + (0x1000000 + rgb).toString(16).slice(1);
+    private rgba2hex(r: number, g: number, b: number, a: number): string {
+        let rHex = r.toString(16);
+        let gHex = g.toString(16);
+        let bHex = b.toString(16);
+        let aHex = a.toString(16);
+
+        if (rHex.length == 1) rHex = "0" + rHex;
+        if (gHex.length == 1) gHex = "0" + gHex;
+        if (bHex.length == 1) bHex = "0" + bHex;
+        if (aHex.length == 1) aHex = "0" + aHex;
+
+        return `#${rHex}${gHex}${bHex}${aHex.toUpperCase() !== "FF" ? aHex : ""}`;
     }
 
     private rgb2hsv(r: number, g: number, b: number): { h: number; s: number; v: number } {
@@ -372,7 +404,7 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
     }
 
     private updateHexInputValue(): void {
-        const hex = this.rgb2hex(this.rgb().r(), this.rgb().g(), this.rgb().b());
+        const hex = this.rgba2hex(this.rgb().r(), this.rgb().g(), this.rgb().b(), this.alpha());
         this.hexInputValue.set(hex);
     }
 
@@ -417,6 +449,6 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
         this.rgb().r.set(rgb.r);
         this.rgb().g.set(rgb.g);
         this.rgb().b.set(rgb.b);
-        this.#propagateChange(this.rgb2hex(rgb.r, rgb.g, rgb.b));
+        this.#propagateChange(this.rgba2hex(rgb.r, rgb.g, rgb.b, this.alpha()));
     }
 }
