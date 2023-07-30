@@ -122,7 +122,7 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
         this.hsv().h.set(hsv.h);
         this.hsv().s.set(hsv.s);
         this.hsv().v.set(hsv.v);
-        this.hexInputValue.set(this.hex());
+        this.updateHexInputValue();
         this.hsvPointerLeft = this.getPositionFromSaturation(hsv.s);
         this.hsvPointerTop = this.getPositionFromValue(hsv.v);
         this.#propagateChange(this.rgba2hex(rgb.r(), rgb.g(), rgb.b(), this.alpha()));
@@ -135,7 +135,7 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
         this.rgb().r.set(rgb.r);
         this.rgb().g.set(rgb.g);
         this.rgb().b.set(rgb.b);
-        this.hexInputValue.set(this.hex());
+        this.updateHexInputValue();
         this.hsvPointerLeft = this.getPositionFromSaturation(hsv.s());
         this.hsvPointerTop = this.getPositionFromValue(hsv.v());
         this.#propagateChange(this.rgba2hex(rgb.r, rgb.g, rgb.b, this.alpha()));
