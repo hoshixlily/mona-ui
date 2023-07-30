@@ -36,8 +36,8 @@ import { AnimationState } from "../../../../../animations/AnimationState";
     ]
 })
 export class DatePickerComponent implements OnInit, ControlValueAccessor {
-    #value: Date | null = null;
     #propagateChange: Action<Date | null> | null = null;
+    #value: Date | null = null;
     public readonly dateIcon: IconDefinition = faCalendar;
     private popupRef: PopupRef | null = null;
     public currentDateString: string = "";

@@ -19,18 +19,7 @@ import { distinctUntilChanged, fromEvent, Subject, switchMap, tap } from "rxjs";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { faCopy, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
-
-export interface HSV {
-    h: WritableSignal<number>;
-    s: WritableSignal<number>;
-    v: WritableSignal<number>;
-}
-
-export interface RGB {
-    r: WritableSignal<number>;
-    g: WritableSignal<number>;
-    b: WritableSignal<number>;
-}
+import { HSV, HSVSignal, RGBA, RGBSignal } from "../../models/ColorSpaces";
 
 @Component({
     selector: "mona-color-gradient",
@@ -58,11 +47,11 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
     public hex: Signal<string> = signal("#FFFFFF");
     public hexFocused: WritableSignal<boolean> = signal(false);
     public hexInputValue: WritableSignal<string> = signal("");
-    public hsv: WritableSignal<HSV> = signal<HSV>({ h: signal(255), s: signal(255), v: signal(255) });
+    public hsv: WritableSignal<HSVSignal> = signal<HSVSignal>({ h: signal(255), s: signal(255), v: signal(255) });
     public hsvRectBackground: Signal<string> = signal("");
     public hsvPointerLeft: number = 0;
     public hsvPointerTop: number = 0;
-    public rgb: WritableSignal<RGB> = signal<RGB>({ r: signal(255), g: signal(255), b: signal(255) });
+    public rgb: WritableSignal<RGBSignal> = signal<RGBSignal>({ r: signal(255), g: signal(255), b: signal(255) });
     public selectedColor: Signal<string> = signal("");
 
     @ViewChild("hueSliderElement")
@@ -116,6 +105,9 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
     }
 
     public onRgbChange(value: number, channel: "r" | "g" | "b"): void {
+        if (value == null) {
+            return;
+        }
         const rgb = this.rgb();
         rgb[channel].set(value);
         const hsv = this.rgb2hsv(rgb.r(), rgb.g(), rgb.b());
@@ -129,6 +121,9 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
     }
 
     public onHsvChange(value: number, channel: "h" | "s" | "v"): void {
+        if (value == null) {
+            return;
+        }
         const hsv = this.hsv();
         hsv[channel].set(value);
         const rgb = this.hsv2rgb(hsv.h(), hsv.s(), hsv.v());
@@ -224,7 +219,7 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
         return Math.round(Math.abs(100 - (minVal / maxVal) * 100));
     }
 
-    private hex2rgba(hex: string): { r: number; g: number; b: number; a: number } {
+    private hex2rgba(hex: string): RGBA {
         let r = 0,
             g = 0,
             b = 0,
@@ -322,7 +317,7 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
         return `#${rHex}${gHex}${bHex}${aHex.toUpperCase() !== "FF" ? aHex : ""}`;
     }
 
-    private rgb2hsv(r: number, g: number, b: number): { h: number; s: number; v: number } {
+    private rgb2hsv(r: number, g: number, b: number): HSV {
         r = r / 255;
         g = g / 255;
         b = b / 255;

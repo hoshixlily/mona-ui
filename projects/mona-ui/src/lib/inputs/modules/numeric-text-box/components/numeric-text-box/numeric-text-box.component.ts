@@ -93,17 +93,6 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
     @Input()
     public step: number = 1;
 
-    @Input()
-    public set value(value: number | null) {
-        this.updateValue(value == null ? null : String(value), false);
-    }
-    public get value(): number | null {
-        return this.componentValue;
-    }
-
-    @Output()
-    public valueChange: EventEmitter<number | null> = new EventEmitter<number | null>();
-
     @ViewChild("valueTextBox")
     public valueTextBoxRef!: ElementRef<HTMLInputElement>;
 
@@ -238,15 +227,13 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
 
     public writeValue(obj: number | string | null | undefined) {
         if (obj == null) {
-            this.componentValue = null;
-            this.visibleValue = this.formatter(this.componentValue) ?? "";
+            this.updateValue(null);
             return;
         }
         if (typeof obj === "string" && !NumericTextBoxComponent.isNumeric(obj)) {
             throw new Error("Value must be a number.");
         }
-        this.componentValue = +obj;
-        this.visibleValue = this.formatter(this.componentValue) ?? "";
+        this.updateValue(String(obj));
     }
 
     private containsExcessiveDecimalPlaces(event: KeyboardEvent): boolean {
@@ -294,6 +281,7 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
     private setSubscriptions(): void {
         this.value$.pipe(takeUntil(this.componentDestroy$)).subscribe((value: string) => {
             this.updateValue(value);
+            this.propagateChange?.(this.componentValue);
         });
         this.spin$.pipe(takeUntil(this.componentDestroy$)).subscribe((sign: Sign) => {
             if (sign === "-") {
@@ -314,16 +302,12 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
         this.inputFocus.pipe(takeUntil(this.componentDestroy$)).subscribe(() => this.elementRef.nativeElement.focus());
     }
 
-    private updateValue(value: string | null, emit: boolean = true): void {
+    private updateValue(value: string | null): void {
         if (this.readonly) {
             return;
         }
         this.componentValue =
             value == null ? null : NumericTextBoxComponent.isNumeric(value) ? parseFloat(value) : null;
         this.visibleValue = this.componentValue == null ? "" : this.componentValue;
-        if (emit) {
-            this.valueChange.emit(this.componentValue);
-            this.propagateChange?.(this.componentValue);
-        }
     }
 }
