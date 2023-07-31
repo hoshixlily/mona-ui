@@ -7,18 +7,35 @@ div.mona-color-gradient-color-area {
     flex-direction: column;
     margin-right: 8px;
     user-select: none;
+    padding: 10px;
+    row-gap: 8px;
+    background: var(--mona-background-dark);
+    border: 1px solid var(--mona-border-color);
 }
 
 div.mona-color-gradient-slider-area {
     display: flex;
-    margin-left: 8px;
-    column-gap: 8px;
+    column-gap: 12px;
+}
+
+div.mona-color-gradient-preview {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    border: 2px solid var(--mona-border-color);
+}
+
+div.mona-color-gradient-sliders {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    row-gap: 8px;
 }
 
 div.mona-hsv-rectangle {
     position: relative;
-    width: 214px;
-    height: 214px;
+    width: 100%;
+    height: 160px;
     background: linear-gradient(to bottom, rgba(0, 0, 0, 0), black), linear-gradient(to right, white, rgba(255, 255, 255, 0));
     border: 1px solid var(--mona-border-color);
 }
@@ -30,13 +47,17 @@ div.mona-hsv-rectangle-pointer {
     box-shadow: 0 0 0 1px white inset, 0 0 0 1px var(--mona-border-color), 0 0 0 2px var(--mona-border-color) inset;
 }
 
-div.mona-color-gradient-preview {
-    min-width: 80px;
-    height: 80px;
+div.mona-color-gradient-numeric-inputs {
     display: flex;
-    margin-left: 12px;
-    margin-right: 8px;
-    border: 1px solid var(--mona-border-color);
+    flex-direction: row;
+    column-gap: 12px;
+}
+
+div.mona-color-gradient-channel-switch {
+    width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 div.mona-color-gradient-values {
@@ -48,31 +69,36 @@ div.mona-color-gradient-values {
 
 div.mona-color-gradient-inputs {
     display: flex;
-    flex-direction: row;
-    margin-right: 8px;
-    column-gap: 8px;
-    margin-top: 8px;
-    & > div {
-        display: flex;
-        flex-direction: column;
-        flex: 1;
-        row-gap: 2px;
-        & > div {
-            display: flex;
-            flex-direction: row;
-            column-gap: 2px;
-        }
+    flex-direction: column;
+    row-gap: 8px;
+}
+
+div.mona-color-gradient-hex-input {
+    & mona-text-box {
+        width: 100%;
     }
 }
 
-div.mona-color-gradient-hex-value {
-    & mona-text-box {
-        width: 94px;
-    }
+div.mona-color-gradient-rgb-inputs,
+div.mona-color-gradient-hsv-inputs {
+    display: flex;
+    flex-direction: row;
+    column-gap: 4px;
+}
+
+span.mona-color-gradient-hex-input-prefix {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    padding: 0 8px;
+    font-family: monospace;
+    border-right: 1px solid var(--mona-border-color);
+    background-color: var(--mona-background-darker);
 }
 
 mona-numeric-text-box {
-    width: 94px;
+    width: 72px;
 }
 
 span.mona-color-gradient-hex-value-error {
@@ -91,6 +117,7 @@ span.mona-color-gradient-value-input-prefix {
     align-items: center;
     justify-content: center;
     border-right: 1px solid var(--mona-border-color);
+    background-color: var(--mona-background-darker);
     width: 28px;
     user-select: none;
     color: var(--mona-text);

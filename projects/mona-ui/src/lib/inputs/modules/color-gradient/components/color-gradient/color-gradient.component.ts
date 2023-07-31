@@ -18,8 +18,10 @@ import { SliderComponent } from "../../../slider/components/slider/slider.compon
 import { distinctUntilChanged, fromEvent, Subject, switchMap, tap } from "rxjs";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
-import { faCopy, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { faCopy, faSort, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { HSV, HSVSignal, RGBA, RGBSignal } from "../../models/ColorSpaces";
+import { ColorMode } from "../../models/ColorMode";
+import { Clipboard } from "@angular/cdk/clipboard";
 
 @Component({
     selector: "mona-color-gradient",
@@ -35,15 +37,18 @@ import { HSV, HSVSignal, RGBA, RGBSignal } from "../../models/ColorSpaces";
     ]
 })
 export class ColorGradientComponent implements OnInit, AfterViewInit, ControlValueAccessor {
+    readonly #clipboard: Clipboard = inject(Clipboard);
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     #pointerMouseDown: boolean = false;
     #pointerMouseMove: boolean = false;
     #propagateChange: (value: string) => void = () => {};
     public readonly copyIcon: IconDefinition = faCopy;
+    public readonly switchIcon: IconDefinition = faSort;
     public readonly errorIcon: IconDefinition = faTimes;
     public readonly hueValue$: Subject<number> = new Subject<number>();
     public alpha: WritableSignal<number> = signal(255);
     public alphaInputColor: Signal<string> = signal("#FFFFFF");
+    public colorMode: WritableSignal<ColorMode> = signal("rgb");
     public hex: Signal<string> = signal("#FFFFFF");
     public hexFocused: WritableSignal<boolean> = signal(false);
     public hexInputValue: WritableSignal<string> = signal("");
@@ -104,6 +109,19 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
         this.#propagateChange(this.hex());
     }
 
+    public onCopyColorSelect(mode: "hex" | "rgb"): void {
+        switch (mode) {
+            case "hex":
+                this.#clipboard.copy(this.hex());
+                break;
+            case "rgb":
+                const rgb = this.rgb();
+                const alpha = Math.round((this.alpha() / 255) * 100) / 100;
+                this.#clipboard.copy(`rgba(${rgb.r()}, ${rgb.g()}, ${rgb.b()}, ${alpha})`);
+                break;
+        }
+    }
+
     public onRgbChange(value: number, channel: "r" | "g" | "b"): void {
         if (value == null) {
             return;
@@ -162,6 +180,10 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
 
     public onHexInputFocus(): void {
         this.hexFocused.set(true);
+    }
+
+    public onSwitchColorModeClick(): void {
+        this.colorMode.set(this.colorMode() === "rgb" ? "hsv" : "rgb");
     }
 
     public registerOnChange(fn: any) {

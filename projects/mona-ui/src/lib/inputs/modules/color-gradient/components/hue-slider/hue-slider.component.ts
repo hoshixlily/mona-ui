@@ -44,19 +44,19 @@ export class HueSliderComponent implements AfterViewInit, ControlValueAccessor {
 
     private getHueFromPosition(position: number): number {
         const containerRect = this.elementRef.nativeElement.getBoundingClientRect();
-        const value = position / containerRect.height;
-        return 360 - value * 360;
+        const value = position / containerRect.width;
+        return value * 360;
     }
 
     private getPositionFromHue(hue: number): number {
         const containerRect = this.elementRef.nativeElement.getBoundingClientRect();
-        const value = (360 - hue) / 360;
-        return value * containerRect.height;
+        const value = hue / 360;
+        return value * containerRect.width;
     }
 
     private setHandlePosition(position: number): void {
         const handleElement = this.sliderHandle.nativeElement;
-        handleElement.style.top = `${position}px`;
+        handleElement.style.left = `${position}px`;
     }
 
     private setSubscriptions(): void {
@@ -76,11 +76,11 @@ export class HueSliderComponent implements AfterViewInit, ControlValueAccessor {
                 const containerRect = this.elementRef.nativeElement.getBoundingClientRect();
                 const handleElement = this.sliderHandle.nativeElement;
                 const handleRect = handleElement.getBoundingClientRect();
-                const handleTop = event.clientY - containerRect.top - handleRect.height / 2;
-                const handleBottom = event.clientY - containerRect.top + handleRect.height / 2;
-                if (handleTop >= 0 && handleBottom <= containerRect.height + handleRect.height) {
-                    this.setHandlePosition(handleTop);
-                    const hue = this.getHueFromPosition(handleTop);
+                const handleLeft = event.clientX - containerRect.left - handleRect.width / 2;
+                const handleRight = event.clientX - containerRect.left + handleRect.width / 2;
+                if (handleLeft >= 0 && handleRight <= containerRect.width + handleRect.width) {
+                    this.setHandlePosition(handleLeft);
+                    const hue = this.getHueFromPosition(handleLeft);
                     this.#propagateChange(hue);
                 }
             }
@@ -90,10 +90,10 @@ export class HueSliderComponent implements AfterViewInit, ControlValueAccessor {
                 return;
             }
             const handleElement = this.sliderHandle.nativeElement;
-            const top = event.offsetY - handleElement.clientHeight / 2;
-            const hue = this.getHueFromPosition(top);
+            const left = event.offsetX - handleElement.clientWidth / 2;
+            const hue = this.getHueFromPosition(left);
             this.#propagateChange(hue);
-            this.setHandlePosition(top);
+            this.setHandlePosition(left);
         });
     }
 }
