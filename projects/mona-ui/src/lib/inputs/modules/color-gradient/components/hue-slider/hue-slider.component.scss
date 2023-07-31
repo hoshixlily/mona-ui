@@ -5,12 +5,14 @@ div.mona-hue-slider {
     border: 1px solid var(--mona-border-color);
     background: linear-gradient(to right, #ff0000, #ffff00, #00ff00, #00ffff, #0000ff, #ff00ff, #ff0000);
     user-select: none;
+    cursor: pointer;
 }
 
 div.mona-hue-slider-handle {
     height: 14px;
     box-shadow: 0 0 0 1px white inset, 0 0 0 1px var(--mona-border-color), 0 0 0 2px var(--mona-border-color) inset;
-    margin-left: -9px;
     position: absolute;
     width: 14px;
+    transform: translateX(-100%);
+    cursor: pointer;
 }

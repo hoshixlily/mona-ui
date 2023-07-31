@@ -45,6 +45,7 @@ div.mona-hsv-rectangle-pointer {
     width: 12px;
     height: 12px;
     box-shadow: 0 0 0 1px white inset, 0 0 0 1px var(--mona-border-color), 0 0 0 2px var(--mona-border-color) inset;
+    cursor: pointer;
 }
 
 div.mona-color-gradient-numeric-inputs {

@@ -4,6 +4,7 @@ div.mona-alpha-slider {
     height: 16px;
     border: 1px solid var(--mona-border-color);
     user-select: none;
+    cursor: pointer;
 }
 
 div.mona-alpha-slider-color {
@@ -28,8 +29,9 @@ div.mona-alpha-slider-transparency {
 div.mona-alpha-slider-handle {
     height: 14px;
     box-shadow: 0 0 0 1px white inset, 0 0 0 1px var(--mona-border-color), 0 0 0 2px var(--mona-border-color) inset;
-    margin-left: -9px;
     position: absolute;
     width: 14px;
+    cursor: pointer;
+    transform: translateX(-100%);
     z-index: 3;
 }
