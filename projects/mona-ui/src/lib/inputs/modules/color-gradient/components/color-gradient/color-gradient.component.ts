@@ -393,8 +393,8 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
         fromEvent<MouseEvent>(document, "mousemove")
             .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe((event: MouseEvent) => {
-                this.#pointerMouseMove = true;
                 if (this.#pointerMouseDown) {
+                    this.#pointerMouseMove = true;
                     this.updateHsvRectPointerPosition(event);
                     this.updateHsvValues();
                     this.updateHexInputValue();
