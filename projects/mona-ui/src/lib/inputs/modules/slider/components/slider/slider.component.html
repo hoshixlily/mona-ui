@@ -17,7 +17,8 @@
         </ng-container>
     </div>
     <div class="mona-slider-tick-label-list"
-         [ngClass]="{'mona-slider-position-before': labelPosition==='before', 'mona-slider-position-after': labelPosition==='after'}">
+         [ngClass]="{'mona-slider-position-before': labelPosition==='before', 'mona-slider-position-after': labelPosition==='after'}"
+         *ngIf="showLabels">
         <ng-container *ngFor="let tick of ticks; let tx = index;">
             <span class="mona-slider-tick-label">
                 <span *ngIf="!tickValueTemplate">{{tick.value}}</span>

@@ -43,7 +43,7 @@
                 </button>
             </li>
             <li *ngIf="pageInputVisible()">
-                <mona-numeric-text-box [spinners]="false" [min]="1" [max]="pageCount" [(value)]="inputValue"
+                <mona-numeric-text-box [spinners]="false" [min]="1" [max]="pageCount" [(ngModel)]="inputValue"
                                        (inputBlur)="onPageInputBlur()" *ngIf="pageInput"></mona-numeric-text-box>
             </li>
             <li *ngIf="pageInputVisible() && pageSizeValueList.length !== 0">
@@ -71,7 +71,7 @@
                 </li>
                <li>
                    <span class="mona-pager-input-text">Page</span>
-                   <mona-numeric-text-box [spinners]="false" [min]="1" [max]="pageCount" [(value)]="inputValue"
+                   <mona-numeric-text-box [spinners]="false" [min]="1" [max]="pageCount" [(ngModel)]="inputValue"
                                           (inputBlur)="onPageInputBlur()"></mona-numeric-text-box>
                    <span class="mona-pager-input-text">of</span>
                    <span class="mona-pager-input-text">{{pageCount}}</span>
