@@ -64,10 +64,13 @@ export class AlphaSliderComponent implements AfterViewInit, ControlValueAccessor
         const containerRect = this.elementRef.nativeElement.getBoundingClientRect();
         const handleRect = this.sliderHandle.nativeElement.getBoundingClientRect();
         const value = alpha / 255;
-        return Math.max(
-            handleRect.width / 2,
-            Math.min(containerRect.width - handleRect.width / 2, Math.round(value * containerRect.width))
-        );
+        if (value === 0) {
+            return handleRect.width / 2;
+        }
+        if (value === 1) {
+            return containerRect.width + handleRect.width / 2;
+        }
+        return Math.round(value * containerRect.width);
     }
 
     private setHandlePosition(position: number): void {
