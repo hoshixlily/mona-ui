@@ -2,43 +2,41 @@ import {
     AfterContentInit,
     Component,
     ContentChildren,
+    DestroyRef,
     ElementRef,
     EventEmitter,
+    inject,
     Input,
-    NgZone,
-    OnDestroy,
     OnInit,
     Output,
-    QueryList,
-    Renderer2
+    QueryList
 } from "@angular/core";
-import { FlexibleConnectedPositionStrategyOrigin } from "@angular/cdk/overlay";
 import { ContextMenuService } from "../../services/context-menu.service";
 import { ContextMenuContentComponent } from "../context-menu-content/context-menu-content.component";
 import { MenuItem } from "../../models/MenuItem";
 import { ContextMenuInjectorData } from "../../models/ContextMenuInjectorData";
 import { PopupRef } from "../../../../../popup/models/PopupRef";
-import { Subject, take, takeUntil } from "rxjs";
+import { fromEvent, mergeWith, Subject, take } from "rxjs";
 import { PopupOffset } from "../../../../../popup/models/PopupOffset";
 import { MenuItemComponent } from "../../../shared-menu/components/menu-item/menu-item.component";
 import { ContextMenuCloseEvent } from "../../models/ContextMenuCloseEvent";
 import { v4 } from "uuid";
 import { ContextMenuOpenEvent } from "../../models/ContextMenuOpenEvent";
 import { ContextMenuNavigationEvent } from "../../models/ContextMenuNavigationEvent";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { Point } from "@angular/cdk/drag-drop";
 
 @Component({
     selector: "mona-contextmenu",
     templateUrl: "./context-menu.component.html",
     styleUrls: ["./context-menu.component.scss"]
 })
-export class ContextMenuComponent implements OnInit, OnDestroy, AfterContentInit {
-    private readonly componentDestroy$: Subject<void> = new Subject<void>();
+export class ContextMenuComponent implements OnInit, AfterContentInit {
+    readonly #destroyRef: DestroyRef = inject(DestroyRef);
     private contextMenuInjectorData: Partial<ContextMenuInjectorData> = { isRoot: true };
     private contextMenuRef: PopupRef | null = null;
     private menuClickNotifier: Subject<MenuItem> = new Subject<MenuItem>();
     private precise: boolean = true;
-    private targetListener: () => void = () => void 0;
-    private windowEventListenerRefs: Array<() => void> = [];
     public readonly uid: string = v4();
 
     @Output()
@@ -66,7 +64,7 @@ export class ContextMenuComponent implements OnInit, OnDestroy, AfterContentInit
     public popupClass: string | string[] = [];
 
     @Input()
-    public target!: FlexibleConnectedPositionStrategyOrigin;
+    public target!: ElementRef | Element;
 
     @Input()
     public trigger: string = "contextmenu";
@@ -74,12 +72,7 @@ export class ContextMenuComponent implements OnInit, OnDestroy, AfterContentInit
     @Input()
     public width?: number | string;
 
-    public constructor(
-        private readonly contextMenuService: ContextMenuService,
-        private readonly elementRef: ElementRef,
-        private readonly renderer: Renderer2,
-        private readonly zone: NgZone
-    ) {}
+    public constructor(private readonly contextMenuService: ContextMenuService) {}
 
     public closeMenu(): void {
         this.contextMenuRef?.close();
@@ -90,13 +83,6 @@ export class ContextMenuComponent implements OnInit, OnDestroy, AfterContentInit
             return;
         }
         this.menuItems = this.menuItemComponents.map(m => m.getMenuItem()) ?? [];
-    }
-
-    public ngOnDestroy(): void {
-        this.targetListener?.();
-        this.windowEventListenerRefs.forEach(ref => ref());
-        this.componentDestroy$.next();
-        this.componentDestroy$.complete();
     }
 
     public ngOnInit(): void {
@@ -116,8 +102,21 @@ export class ContextMenuComponent implements OnInit, OnDestroy, AfterContentInit
         this.contextMenuInjectorData.menuItems = this.menuItems;
         this.contextMenuInjectorData.navigate = this.navigate;
         this.contextMenuInjectorData.popupClass = this.popupClass;
+
+        const anchorElement = this.target instanceof ElementRef ? this.target.nativeElement : this.target;
+        let anchor: Point | Element;
+        if (this.precise) {
+            if (event.detail !== 0) {
+                anchor = { x: event.x, y: event.y };
+            } else {
+                const rect = anchorElement.getBoundingClientRect();
+                anchor = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+            }
+        } else {
+            anchor = anchorElement;
+        }
         this.contextMenuRef = this.contextMenuService.open({
-            anchor: this.precise ? { x: event.x, y: event.y } : this.target,
+            anchor,
             closeOnOutsideClick: true,
             content: ContextMenuContentComponent,
             data: this.contextMenuInjectorData,
@@ -146,23 +145,33 @@ export class ContextMenuComponent implements OnInit, OnDestroy, AfterContentInit
     }
 
     private setEventListeners(): void {
-        this.zone.runOutsideAngular(() => {
-            this.targetListener = this.renderer.listen(this.target, this.trigger, (event: PointerEvent) => {
+        const eventTarget = this.target instanceof ElementRef ? this.target.nativeElement : this.target;
+        fromEvent<PointerEvent>(eventTarget, this.trigger)
+            .pipe(takeUntilDestroyed(this.#destroyRef))
+            .subscribe(event => {
                 event.stopPropagation();
                 event.preventDefault();
-                this.zone.run(() => {
-                    this.create(event);
-                });
+                this.create(event);
             });
-            this.windowEventListenerRefs = [
-                this.renderer.listen(window, "click", this.onOutsideClick.bind(this)),
-                this.renderer.listen(window, "contextmenu", this.onOutsideClick.bind(this)),
-                this.renderer.listen(window, "auxclick", this.onOutsideClick.bind(this)),
-                this.renderer.listen(window, "keydown.esc", () => this.contextMenuRef?.close())
-            ];
-        });
+        fromEvent<PointerEvent>(window, "click")
+            .pipe(
+                mergeWith(
+                    fromEvent<PointerEvent>(window, "contextmenu"),
+                    fromEvent<PointerEvent>(window, "auxclick"),
+                    fromEvent<KeyboardEvent>(window, "keydown")
+                ),
+                takeUntilDestroyed(this.#destroyRef)
+            )
+            .subscribe(event => {
+                if (event instanceof KeyboardEvent && event.key === "Escape") {
+                    this.contextMenuRef?.close();
+                }
+                if (event instanceof PointerEvent) {
+                    this.onOutsideClick(event);
+                }
+            });
 
-        this.menuClickNotifier.pipe(takeUntil(this.componentDestroy$)).subscribe(() => {
+        this.menuClickNotifier.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(() => {
             this.contextMenuRef?.close();
         });
     }
