@@ -19,6 +19,7 @@ import { ButtonService } from "../../../services/button.service";
 })
 export class ButtonDirective implements OnInit, OnDestroy {
     #selected: boolean = false;
+    #tabindex: number = 0;
     readonly #destroy$: Subject<void> = new Subject<void>();
 
     @HostBinding("class.mona-disabled")
@@ -44,6 +45,16 @@ export class ButtonDirective implements OnInit, OnDestroy {
 
     public get selected(): boolean {
         return this.#selected;
+    }
+
+    @HostBinding("attr.tabindex")
+    @Input()
+    public set tabindex(tabindex: number | string) {
+        this.#tabindex = typeof tabindex === "string" ? parseInt(tabindex, 10) : tabindex;
+    }
+
+    public get tabindex(): number {
+        return this.disabled ? -1 : this.#tabindex;
     }
 
     @Output()
