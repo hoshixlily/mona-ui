@@ -54,7 +54,7 @@ export class HueSliderComponent implements AfterViewInit, ControlValueAccessor {
         const handleRect = this.sliderHandle.nativeElement.getBoundingClientRect();
         const value = hue / 360;
         return Math.max(
-            0,
+            handleRect.width / 2,
             Math.min(containerRect.width - handleRect.width / 2, Math.round(value * containerRect.width))
         );
     }

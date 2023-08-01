@@ -204,6 +204,7 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
         this.rgb().r.set(rgb.r);
         this.rgb().g.set(rgb.g);
         this.rgb().b.set(rgb.b);
+        this.alpha.set(rgb.a);
         this.hexInputValue.set(value);
         this.hsvPointerLeft = this.getPositionFromSaturation(hsv.s);
         this.hsvPointerTop = this.getPositionFromValue(hsv.v);
