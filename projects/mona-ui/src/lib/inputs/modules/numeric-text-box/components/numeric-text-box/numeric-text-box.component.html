@@ -2,15 +2,28 @@
     <ng-container *ngFor="let prefixTemplate of prefixTemplateList">
         <ng-container *ngTemplateOutlet="prefixTemplate"></ng-container>
     </ng-container>
-    <input monaTextBox [disabled]="disabled" [readonly]="readonly" [ngModel]="visibleValue" (ngModelChange)="value$.next($event)"
-           (keydown)="onKeydown($event)" (paste)="onPaste($event)" (wheel)="onMouseWheel($event)" (focus)="inputFocus.emit($event)"
+    <input monaTextBox [disabled]="disabled"
+           [required]="required"
+           [type]="'text'"
+           inputmode="numeric"
+           [readonly]="readonly"
+           [tabIndex]="tabindex"
+           [ngModel]="formattedValue()"
+           (ngModelChange)="valueChange$.next($event)"
+           (keydown)="keydown$.next($event)"
+           (focus)="inputFocus.emit($event)"
+           (focusout)="inputFocusOut.emit($event)"
            (blur)="inputBlur.emit($event)"
+           (beforeinput)="beforeInput$.next($event)"
+           (wheel)="wheel$.next($event)"
            autocomplete="off" tabindex="0" class="mona-input-inner" #valueTextBox>
     <div class="mona-numeric-text-box-spinners" *ngIf="spinners">
-        <button monaButton [disabled]="disabled" [tabIndex]="-1" (mousedown)="spin$.next('+')" (mouseup)="spinStop$.next()">
+        <button monaButton [disabled]="disabled" [tabIndex]="-1"
+                (mousedown)="spin$.next('+')" (mouseup)="spinStop$.next()">
             <fa-icon [icon]="increaseIcon"></fa-icon>
         </button>
-        <button monaButton [disabled]="disabled" [tabIndex]="-1" (mousedown)="spin$.next('-')" (mouseup)="spinStop$.next()">
+        <button monaButton [disabled]="disabled" [tabIndex]="-1"
+                (mousedown)="spin$.next('-')" (mouseup)="spinStop$.next()">
             <fa-icon [icon]="decreaseIcon"></fa-icon>
         </button>
     </div>

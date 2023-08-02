@@ -306,7 +306,7 @@ export class AppComponent implements OnInit {
     };
     public menuBarMenuVisible: boolean = false;
     public multiSelectTagCount: number = 2;
-    public numericTextBoxValue: number = 629;
+    public numericTextBoxValue: number | null = 10;
     public pagerTestData: Array<{ index: number; text: string }> = Enumerable.range(1, 1337)
         .select(i => {
             return { index: i, text: `Item ${i}` };
@@ -693,6 +693,11 @@ export class AppComponent implements OnInit {
         this.selectedMultiSelectDataItems = value;
         // this.cdr.detectChanges();
         console.log(`MultiSelect value changed`, value);
+    }
+
+    public onNumericTextBoxValueChange(value: number | null): void {
+        this.numericTextBoxValue = value;
+        console.log(value);
     }
 
     public onPagerPageChange(event: PageChangeEvent): void {
