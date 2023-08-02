@@ -16,24 +16,28 @@
                 <div class="mona-color-gradient-channel-inputs">
                     <div class="mona-color-gradient-rgb-inputs" *ngIf="colorMode()==='rgb'">
                         <mona-numeric-text-box [ngModel]="rgb().r()" [min]="0" [max]="255" [decimals]="0" [spinners]="false"
+                                               [nullable]="false"
                                                (ngModelChange)="onRgbChange($event, 'r')">
                             <ng-template monaNumericTextBoxPrefixTemplate>
                                 <span class="mona-color-gradient-value-input-prefix">R</span>
                             </ng-template>
                         </mona-numeric-text-box>
                         <mona-numeric-text-box [ngModel]="rgb().g()" [min]="0" [max]="255" [decimals]="0" [spinners]="false"
+                                               [nullable]="false"
                                                (ngModelChange)="onRgbChange($event, 'g')">
                             <ng-template monaNumericTextBoxPrefixTemplate>
                                 <span class="mona-color-gradient-value-input-prefix">G</span>
                             </ng-template>
                         </mona-numeric-text-box>
                         <mona-numeric-text-box [ngModel]="rgb().b()" [min]="0" [max]="255" [decimals]="0" [spinners]="false"
+                                               [nullable]="false"
                                                (ngModelChange)="onRgbChange($event, 'b')">
                             <ng-template monaNumericTextBoxPrefixTemplate>
                                 <span class="mona-color-gradient-value-input-prefix">B</span>
                             </ng-template>
                         </mona-numeric-text-box>
                         <mona-numeric-text-box [ngModel]="alpha()" [min]="0" [max]="255" [decimals]="0" [spinners]="false"
+                                               [nullable]="false"
                                                (ngModelChange)="onAlphaChange($event)">
                             <ng-template monaNumericTextBoxPrefixTemplate>
                                 <span class="mona-color-gradient-value-input-prefix">A</span>
@@ -42,24 +46,28 @@
                     </div>
                     <div class="mona-color-gradient-hsv-inputs" *ngIf="colorMode()==='hsv'">
                         <mona-numeric-text-box [ngModel]="hsv().h()" [min]="0" [max]="360" [decimals]="0" [spinners]="false"
+                                               [nullable]="false"
                                                (ngModelChange)="onHsvChange($event, 'h')">
                             <ng-template monaNumericTextBoxPrefixTemplate>
                                 <span class="mona-color-gradient-value-input-prefix">H</span>
                             </ng-template>
                         </mona-numeric-text-box>
                         <mona-numeric-text-box [ngModel]="hsv().s()" [min]="0" [max]="100" [decimals]="0" [spinners]="false"
+                                               [nullable]="false"
                                                (ngModelChange)="onHsvChange($event, 's')">
                             <ng-template monaNumericTextBoxPrefixTemplate>
                                 <span class="mona-color-gradient-value-input-prefix">S</span>
                             </ng-template>
                         </mona-numeric-text-box>
                         <mona-numeric-text-box [ngModel]="hsv().v()" [min]="0" [max]="100" [decimals]="0" [spinners]="false"
+                                               [nullable]="false"
                                                (ngModelChange)="onHsvChange($event, 'v')">
                             <ng-template monaNumericTextBoxPrefixTemplate>
                                 <span class="mona-color-gradient-value-input-prefix">V</span>
                             </ng-template>
                         </mona-numeric-text-box>
                         <mona-numeric-text-box [ngModel]="alpha()" [min]="0" [max]="255" [decimals]="0" [spinners]="false"
+                                               [nullable]="false"
                                                (ngModelChange)="onAlphaChange($event)">
                             <ng-template monaNumericTextBoxPrefixTemplate>
                                 <span class="mona-color-gradient-value-input-prefix">A</span>

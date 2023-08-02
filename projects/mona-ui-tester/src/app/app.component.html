@@ -392,8 +392,10 @@
                                     <span style="color: crimson; font-weight: bolder;">Templated Window Title</span>
                                 </ng-template>
 
-                                <mona-numeric-text-box [readonly]="true" [min]="-4" [step]="0.7"
-                                                       [(ngModel)]="numericTextBoxValue"
+                                <mona-numeric-text-box [readonly]="false" [min]="0" [max]="255"
+                                                       [nullable]="false"
+                                                       [ngModel]="numericTextBoxValue"
+                                                       (ngModelChange)="onNumericTextBoxValueChange($event)"
                                                        [formatter]="numericTextBoxFormatter"
                                                        style="width: 200px;"></mona-numeric-text-box>
 

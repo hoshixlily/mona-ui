@@ -1,25 +1,31 @@
 import {
     ChangeDetectionStrategy,
     Component,
-    ContentChild,
+    computed,
     ContentChildren,
+    DestroyRef,
     ElementRef,
     EventEmitter,
     forwardRef,
+    inject,
     Input,
     OnDestroy,
     OnInit,
     Output,
     QueryList,
+    Signal,
+    signal,
     TemplateRef,
-    ViewChild
+    ViewChild,
+    WritableSignal
 } from "@angular/core";
-import { delay, interval, Subject, takeUntil } from "rxjs";
+import { delay, distinctUntilChanged, filter, interval, map, Subject, takeUntil } from "rxjs";
 import { FocusMonitor, FocusOrigin } from "@angular/cdk/a11y";
 import { Action } from "../../../../../utils/Action";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { faChevronDown, faChevronUp, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { NumericTextBoxPrefixTemplateDirective } from "../../directives/numeric-text-box-prefix-template.directive";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 
 type Sign = "-" | "+";
 
@@ -37,37 +43,29 @@ type Sign = "-" | "+";
     ]
 })
 export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueAccessor {
-    private readonly componentDestroy$: Subject<void> = new Subject<void>();
-    private readonly specialKeys: string[] = [
-        "Backspace",
-        "Tab",
-        "End",
-        "Home",
-        "ArrowLeft",
-        "ArrowRight",
-        "ArrowUp",
-        "ArrowDown",
-        "Delete",
-        "Escaped"
-    ];
-    private propagateChange: Action<number | null> | null = null;
+    readonly #destroyRef: DestroyRef = inject(DestroyRef);
+    #propagateChange: Action<number | null> | null = null;
+
+    public readonly beforeInput$: Subject<InputEvent> = new Subject<InputEvent>();
     public readonly decreaseIcon: IconDefinition = faChevronDown;
     public readonly increaseIcon: IconDefinition = faChevronUp;
-    public componentValue: number | null = null;
+    public readonly valueChange$: Subject<string> = new Subject<string>();
+    public focused: WritableSignal<boolean> = signal(false);
+    public formattedValue: Signal<string> = signal("");
+    public keydown$: Subject<KeyboardEvent> = new Subject<KeyboardEvent>();
+    public value: WritableSignal<number | null> = signal(null);
     public spin$: Subject<Sign> = new Subject<Sign>();
     public spinStop$: Subject<void> = new Subject<void>();
-    public value$: Subject<string> = new Subject<string>();
-    public visibleValue: string | number = "";
+    public wheel$: Subject<WheelEvent> = new Subject<WheelEvent>();
 
     @Input()
-    public decimals?: number = 0;
+    public decimals: number = 0;
 
     @Input()
     public disabled: boolean = false;
 
     @Input()
-    public formatter: Action<number | null, string> = (value: number | null): string =>
-        value?.toFixed(this.decimals ?? 2) ?? "";
+    public formatter: Action<number | null, string> | null = null;
 
     @Output()
     public inputBlur: EventEmitter<Event> = new EventEmitter<Event>();
@@ -75,11 +73,17 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
     @Output()
     public inputFocus: EventEmitter<Event> = new EventEmitter<Event>();
 
+    @Output()
+    public inputFocusOut: EventEmitter<Event> = new EventEmitter<Event>();
+
     @Input()
     public max?: number;
 
     @Input()
     public min?: number;
+
+    @Input()
+    public nullable: boolean = true;
 
     @ContentChildren(NumericTextBoxPrefixTemplateDirective, { read: TemplateRef })
     public prefixTemplateList: QueryList<TemplateRef<any>> = new QueryList<TemplateRef<any>>();
@@ -88,10 +92,16 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
     public readonly: boolean = false;
 
     @Input()
+    public required: boolean = false;
+
+    @Input()
     public spinners: boolean = true;
 
     @Input()
     public step: number = 1;
+
+    @Input()
+    public tabindex: number = 0;
 
     @ViewChild("valueTextBox")
     public valueTextBoxRef!: ElementRef<HTMLInputElement>;
@@ -128,162 +138,131 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
     }
 
     public decrease(): void {
-        if (this.componentValue == null) {
-            this.value$.next("0");
+        const value = this.value();
+        if (value == null) {
+            this.valueChange$.next("0");
         } else {
-            let result = NumericTextBoxComponent.calculate(this.componentValue, this.step, "-");
+            let result = NumericTextBoxComponent.calculate(value, this.step, "-");
             if (this.min != null && result < this.min) {
                 result = this.min;
             }
-            this.value$.next(result.toString());
+            this.valueChange$.next(result.toString());
         }
         this.focus();
     }
 
     public increase(): void {
-        if (this.componentValue == null) {
-            this.value$.next("0");
+        const value = this.value();
+        if (value == null) {
+            this.valueChange$.next("0");
         } else {
-            let result = NumericTextBoxComponent.calculate(this.componentValue, this.step, "+");
+            let result = NumericTextBoxComponent.calculate(value, this.step, "+");
             if (this.max != null && result > this.max) {
                 result = this.max;
             }
-            this.value$.next(result.toString());
+            this.valueChange$.next(result.toString());
         }
         this.focus();
     }
 
     public ngOnDestroy(): void {
-        this.componentDestroy$.next();
-        this.componentDestroy$.complete();
-        this.spinStop$.next();
-        this.spinStop$.complete();
         this.focusMonitor.stopMonitoring(this.elementRef.nativeElement);
     }
 
     public ngOnInit(): void {
+        this.formattedValue = computed(() => {
+            const value = this.value();
+            const focused = this.focused();
+            if (value == null) {
+                return "";
+            }
+            if (focused && !this.readonly) {
+                return value?.toString() ?? "";
+            }
+            if (this.formatter) {
+                return this.formatter(value);
+            }
+            if (this.decimals > 0) {
+                return value?.toFixed(this.decimals) ?? "";
+            }
+            return value?.toString() ?? "";
+        });
+
         this.setSubscriptions();
         this.focusMonitor
             .monitor(this.elementRef, true)
-            .pipe(takeUntil(this.componentDestroy$))
+            .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe((focusOrigin: FocusOrigin) => {
-                if (!focusOrigin) {
-                    this.visibleValue = this.formatter(this.componentValue) ?? "";
-                } else {
-                    this.visibleValue = this.componentValue ?? "";
-                }
+                this.focused.set(focusOrigin !== null);
             });
     }
 
-    public onKeydown(event: KeyboardEvent): void {
-        if (event.ctrlKey) {
-            return;
-        }
-        if (event.key === "ArrowUp") {
-            event.preventDefault();
-            this.increase();
-            return;
-        }
-        if (event.key === "ArrowDown") {
-            event.preventDefault();
-            this.decrease();
-            return;
-        }
-        if (!this.specialKeys.includes(event.key)) {
-            if (this.preventInvalidMinusSign(event)) {
-                return;
-            }
-            if (!event.key.match(/[0-9.,\-]/)) {
-                event.preventDefault();
-                return;
-            }
-            if (this.containsExcessiveDecimalPlaces(event)) {
-                event.preventDefault();
-            }
-        }
-    }
-
-    public onMouseWheel(event: WheelEvent): void {
-        event.preventDefault();
-        if (event.deltaY < 0) {
-            this.increase();
-        } else {
-            this.decrease();
-        }
-    }
-
-    public onPaste(event: ClipboardEvent): void {
-        const pastedData = event.clipboardData?.getData("Text");
-        if (!pastedData || !NumericTextBoxComponent.isNumeric(pastedData)) {
-            event.preventDefault();
-        }
-    }
-
     public registerOnChange(fn: any) {
-        this.propagateChange = fn;
+        this.#propagateChange = fn;
     }
 
     public registerOnTouched(fn: any) {}
 
-    public writeValue(obj: number | string | null | undefined) {
+    public writeValue(obj: number | null | undefined) {
         if (obj == null) {
-            this.updateValue(null);
+            this.value.set(null);
             return;
         }
-        if (typeof obj === "string" && !NumericTextBoxComponent.isNumeric(obj)) {
-            throw new Error("Value must be a number.");
-        }
-        this.updateValue(String(obj));
-    }
-
-    private containsExcessiveDecimalPlaces(event: KeyboardEvent): boolean {
-        const target = event.target as HTMLInputElement;
-        if (this.componentValue != null) {
-            if (event.key === ".") {
-                return this.decimals === 0;
-            }
-            const valueStr = this.componentValue.toString();
-            if (!valueStr.includes(".")) {
-                return false;
-            }
-            const valueParts = valueStr.split(".");
-            if (
-                this.decimals != null &&
-                valueParts[1].length >= this.decimals &&
-                target.selectionStart &&
-                target.selectionStart > valueParts[0].length
-            ) {
-                return true;
-            }
-        }
-        return false;
+        this.value.set(Number(obj));
     }
 
     private focus(): void {
         this.focusMonitor.focusVia(this.valueTextBoxRef, "keyboard");
     }
 
-    private preventInvalidMinusSign(event: KeyboardEvent): boolean {
-        const target = event.target as HTMLInputElement;
-        if (event.key === "-") {
-            if (target.selectionStart !== 0) {
-                event.preventDefault();
-                return true;
-            }
-            if (target.selectionStart === 0 && this.componentValue?.toString().charAt(0) === "-") {
-                event.preventDefault();
-                return true;
-            }
-        }
-        return false;
-    }
-
     private setSubscriptions(): void {
-        this.value$.pipe(takeUntil(this.componentDestroy$)).subscribe((value: string) => {
-            this.updateValue(value);
-            this.propagateChange?.(this.componentValue);
+        this.valueChange$
+            .pipe(
+                takeUntilDestroyed(this.#destroyRef),
+                distinctUntilChanged(),
+                filter(v => v == null || v === "" || NumericTextBoxComponent.isNumeric(v)),
+                map(v => {
+                    if (v == null || v === "") {
+                        if (this.nullable) {
+                            return null;
+                        }
+                        if (this.min != null) {
+                            return this.min;
+                        }
+                        return 0;
+                    }
+                    return parseFloat(v.toString());
+                })
+            )
+            .subscribe((value: number | null) => {
+                const previousValue = this.value();
+                if (value == null) {
+                    this.value.set(null);
+                } else if (this.min != null && value < this.min) {
+                    this.value.set(this.min);
+                } else if (this.max != null && value > this.max) {
+                    this.value.set(this.max);
+                } else {
+                    this.value.set(value);
+                }
+                if (previousValue !== this.value()) {
+                    this.#propagateChange?.(this.value());
+                }
+            });
+        this.keydown$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe((event: KeyboardEvent) => {
+            if (event.key === "ArrowUp") {
+                event.preventDefault();
+                this.increase();
+                return;
+            }
+
+            if (event.key === "ArrowDown") {
+                event.preventDefault();
+                this.decrease();
+                return;
+            }
         });
-        this.spin$.pipe(takeUntil(this.componentDestroy$)).subscribe((sign: Sign) => {
+        this.spin$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe((sign: Sign) => {
             if (sign === "-") {
                 this.decrease();
             } else {
@@ -299,15 +278,93 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
                     }
                 });
         });
-        this.inputFocus.pipe(takeUntil(this.componentDestroy$)).subscribe(() => this.elementRef.nativeElement.focus());
-    }
+        this.wheel$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe((event: WheelEvent) => {
+            if (event.deltaY < 0) {
+                this.increase();
+            } else {
+                this.decrease();
+            }
+        });
+        this.inputFocus
+            .pipe(takeUntilDestroyed(this.#destroyRef))
+            .subscribe(() => this.elementRef.nativeElement.focus());
 
-    private updateValue(value: string | null): void {
-        if (this.readonly) {
-            return;
-        }
-        this.componentValue =
-            value == null ? null : NumericTextBoxComponent.isNumeric(value) ? parseFloat(value) : null;
-        this.visibleValue = this.componentValue == null ? "" : this.componentValue;
+        this.beforeInput$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe((event: InputEvent) => {
+            const inputElement = event.target as HTMLInputElement;
+
+            if (event.inputType.startsWith("delete")) {
+                if (inputElement.value.length === 1 && !this.nullable) {
+                    if (this.min != null) {
+                        event.preventDefault();
+                        this.valueChange$.next(this.min.toString());
+                        return;
+                    } else {
+                        event.preventDefault();
+                        return;
+                    }
+                }
+            }
+
+            const insertedText = event.data;
+            if (insertedText == null || insertedText === "") {
+                return;
+            }
+            if (!insertedText.match(/[0-9.\-]/)) {
+                event.preventDefault();
+                return;
+            }
+
+            const value = inputElement.value;
+            const selectionStart = inputElement.selectionStart;
+            const selectionEnd = inputElement.selectionEnd;
+            if (selectionStart == null || selectionEnd == null) {
+                event.preventDefault();
+                return;
+            }
+
+            if (insertedText === "-") {
+                if ((selectionStart !== 0 || value.includes("-")) && selectionEnd - selectionStart !== value.length) {
+                    event.preventDefault();
+                    return;
+                }
+            }
+
+            if (insertedText === ".") {
+                if (this.decimals === 0 || value.includes(".")) {
+                    event.preventDefault();
+                    return;
+                }
+            }
+
+            const newValue = value.slice(0, selectionStart) + insertedText + value.slice(selectionEnd);
+            if (
+                selectionEnd - selectionStart === value.length &&
+                newValue !== "-" &&
+                !NumericTextBoxComponent.isNumeric(newValue)
+            ) {
+                event.preventDefault();
+                return;
+            }
+
+            if (newValue.includes(".")) {
+                const decimals = newValue.split(".")[1];
+                if (decimals.length > String(this.decimals).length) {
+                    event.preventDefault();
+                    return;
+                }
+            }
+
+            if (this.min != null && parseFloat(newValue) < this.min) {
+                event.preventDefault();
+                this.valueChange$.next(this.min.toString());
+                return;
+            }
+
+            if (this.max != null && parseFloat(newValue) > this.max) {
+                event.preventDefault();
+                this.valueChange$.next(this.max.toString());
+                return;
+            }
+        });
     }
 }
