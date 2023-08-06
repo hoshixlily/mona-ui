@@ -1,6 +1,6 @@
-<div class="mona-color-palette" [style.grid-template-columns]="'repeat('+columns+', minmax('+tileSize+'px, 1fr))'"
+<div class="mona-color-palette" [style.grid-template-columns]="'repeat('+colorScheme().columns+', minmax('+tileSize+'px, 1fr))'"
      [style.grid-auto-rows]="tileSize+'px'">
-    <ng-container *ngFor="let color of colors">
+    <ng-container *ngFor="let color of colorScheme().colors">
         <div class="mona-color-cell" [ngClass]="{'mona-selected': color===selectedColor}"
              [style.background-color]="color" (click)="onColorSelect(color)"></div>
     </ng-container>
