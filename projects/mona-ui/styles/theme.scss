@@ -732,7 +732,7 @@ div.mona-hsv-rectangle {
 }
 
 div.mona-color-gradient-preview {
-    border: 2px solid var(--mona-border-color);
+    border: 1px solid var(--mona-border-color);
 }
 
 span.mona-color-gradient-hex-input-prefix {
@@ -759,16 +759,11 @@ div.mona-alpha-slider {
 /** Color Palette */
 .mona-color-palette {
     & > div.mona-color-cell {
-        border: 2px solid black;
         &.mona-selected {
-            border: 1px solid lightgray;
-            width: calc(100% + 2px);
-            height: calc(100% + 2px);
-            margin-left: -1px;
-            margin-top: -1px;
+            box-shadow: 0 0 0 1px var(--mona-border-color) inset;
         }
         &:hover:not(.mona-selected) {
-            border: 1px solid black;
+            box-shadow: 0 0 0 1px var(--mona-border-color) inset;
         }
     }
 }
@@ -786,8 +781,10 @@ div.mona-alpha-slider {
 }
 
 .mona-color-picker-popup {
-    //padding: 2px !important;
     overflow: hidden;
+    & .mona-color-gradient-color-area {
+        border-color: transparent !important;
+    }
 }
 
 .mona-color-picker-popup-wrapper {

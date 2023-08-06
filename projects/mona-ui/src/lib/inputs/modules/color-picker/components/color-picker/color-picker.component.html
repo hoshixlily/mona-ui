@@ -10,6 +10,10 @@
 </div>
 
 <ng-template #popupTemplate>
-    <mona-color-palette [palette]="palette" [columns]="8" [value]="color"
-                        (valueChange)="onColorPaletteValueChange($event)"></mona-color-palette>
+    <mona-color-palette [palette]="palette" [columns]="columns" [ngModel]="color"
+                        (ngModelChange)="onColorPaletteValueChange($event)"
+                        *ngIf="view==='palette'"></mona-color-palette>
+    <mona-color-gradient [opacity]="opacity"
+                         [ngModel]="color" (ngModelChange)="onColorGradientValueChange($event)"
+        *ngIf="view==='gradient'"></mona-color-gradient>
 </ng-template>

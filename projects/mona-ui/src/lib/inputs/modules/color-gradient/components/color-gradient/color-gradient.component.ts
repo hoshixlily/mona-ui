@@ -8,6 +8,7 @@ import {
     ElementRef,
     forwardRef,
     inject,
+    Input,
     OnInit,
     Signal,
     signal,
@@ -67,6 +68,9 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
 
     @ViewChild("hsvRectangle")
     public hsvRectangle!: ElementRef<HTMLDivElement>;
+
+    @Input()
+    public opacity: boolean = true;
 
     public constructor(private readonly cdr: ChangeDetectorRef) {}
 
