@@ -732,7 +732,7 @@ div.mona-hsv-rectangle {
 }
 
 div.mona-color-gradient-preview {
-    border: 2px solid var(--mona-border-color);
+    border: 1px solid var(--mona-border-color);
 }
 
 span.mona-color-gradient-hex-input-prefix {
@@ -781,8 +781,10 @@ div.mona-alpha-slider {
 }
 
 .mona-color-picker-popup {
-    //padding: 2px !important;
     overflow: hidden;
+    & .mona-color-gradient-color-area {
+        border-color: transparent !important;
+    }
 }
 
 .mona-color-picker-popup-wrapper {

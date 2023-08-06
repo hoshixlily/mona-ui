@@ -1,14 +1,4 @@
-import {
-    Component,
-    ElementRef,
-    EventEmitter,
-    forwardRef,
-    Input,
-    OnInit,
-    Output,
-    TemplateRef,
-    ViewChild
-} from "@angular/core";
+import { Component, ElementRef, forwardRef, Input, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { faChevronDown, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { Action } from "../../../../../utils/Action";
@@ -16,6 +6,8 @@ import { PopupRef } from "../../../../../popup/models/PopupRef";
 import { PopupAnimationService } from "../../../../../animations/popup-animation.service";
 import { PopupService } from "../../../../../popup/services/popup.service";
 import { AnimationState } from "../../../../../animations/AnimationState";
+import { ColorPickerView } from "../../models/ColorPickerView";
+import { PaletteType } from "../../../color-palette/models/PaletteType";
 
 @Component({
     selector: "mona-color-picker",
@@ -39,14 +31,32 @@ export class ColorPickerComponent implements OnInit, ControlValueAccessor {
     @ViewChild("colorPickerAnchor")
     public colorPickerAnchor!: ElementRef<HTMLDivElement>;
 
+    /**
+     * The number of columns to display in the color palette.
+     * Only applies when the view is set to "palette" and the palette is a custom array of colors.
+     * @default 10
+     * @type {number}
+     */
     @Input()
-    public palette: string[] = [];
+    public columns: number = 10;
+
+    /**
+     * Whether to display the opacity slider.
+     * Only applies when the view is set to "gradient".
+     * @default true
+     * @type {boolean}
+     */
+    @Input()
+    public opacity: boolean = true;
+
+    @Input()
+    public palette: string[] | PaletteType = "flat";
 
     @ViewChild("popupTemplate")
     public popupTemplateRef!: TemplateRef<any>;
 
-    @Output()
-    public valueChange: EventEmitter<string | null> = new EventEmitter<string | null>();
+    @Input()
+    public view: ColorPickerView = "gradient";
 
     public constructor(
         private readonly popupAnimationService: PopupAnimationService,
@@ -54,6 +64,11 @@ export class ColorPickerComponent implements OnInit, ControlValueAccessor {
     ) {}
 
     public ngOnInit(): void {}
+
+    public onColorGradientValueChange(value: string | null): void {
+        this.color = value;
+        this.propagateChange?.(value);
+    }
 
     public onColorPaletteValueChange(value: string | null): void {
         this.color = value;

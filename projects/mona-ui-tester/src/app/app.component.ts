@@ -124,7 +124,7 @@ export class AppComponent implements OnInit {
     ];
 
     public colorPaletteValue: string = "#fb9a99";
-    public colorPickerValue: string | null = "#0086fc";
+    public colorPickerValue: string | null = "#7D3C98";
 
     public comboBoxValueNormalizer$ = (text$: Observable<string>): Observable<any> => {
         return text$.pipe(

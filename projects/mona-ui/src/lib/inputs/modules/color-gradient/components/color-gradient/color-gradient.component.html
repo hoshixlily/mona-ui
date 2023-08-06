@@ -7,7 +7,7 @@
         <div class="mona-color-gradient-slider-area">
             <div class="mona-color-gradient-sliders">
                 <mona-hue-slider [ngModel]="hsv().h()" (ngModelChange)="hueValue$.next($event)"></mona-hue-slider>
-                <mona-alpha-slider [color]="alphaInputColor()" [ngModel]="alpha()" (ngModelChange)="onAlphaChange($event)"></mona-alpha-slider>
+                <mona-alpha-slider [color]="alphaInputColor()" [ngModel]="alpha()" (ngModelChange)="onAlphaChange($event)" *ngIf="opacity"></mona-alpha-slider>
             </div>
             <div class="mona-color-gradient-preview" [style.background-color]="selectedColor()"></div>
         </div>
@@ -38,7 +38,7 @@
                         </mona-numeric-text-box>
                         <mona-numeric-text-box [ngModel]="alpha()" [min]="0" [max]="255" [decimals]="0" [spinners]="false"
                                                [nullable]="false"
-                                               (ngModelChange)="onAlphaChange($event)">
+                                               (ngModelChange)="onAlphaChange($event)" *ngIf="opacity">
                             <ng-template monaNumericTextBoxPrefixTemplate>
                                 <span class="mona-color-gradient-value-input-prefix">A</span>
                             </ng-template>
@@ -68,7 +68,7 @@
                         </mona-numeric-text-box>
                         <mona-numeric-text-box [ngModel]="alpha()" [min]="0" [max]="255" [decimals]="0" [spinners]="false"
                                                [nullable]="false"
-                                               (ngModelChange)="onAlphaChange($event)">
+                                               (ngModelChange)="onAlphaChange($event)" *ngIf="opacity">
                             <ng-template monaNumericTextBoxPrefixTemplate>
                                 <span class="mona-color-gradient-value-input-prefix">A</span>
                             </ng-template>
