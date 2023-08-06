@@ -76,13 +76,13 @@ export class MultiSelectComponent implements OnInit, OnDestroy, ControlValueAcce
     public groupField?: string;
 
     @ContentChild(MultiSelectGroupTemplateDirective, { read: TemplateRef })
-    public groupTemplate?: TemplateRef<any>;
+    public groupTemplate: TemplateRef<any> | null = null;
 
     @Input()
     public itemDisabler?: Action<any, boolean> | string;
 
     @ContentChild(MultiSelectItemTemplateDirective, { read: TemplateRef })
-    public itemTemplate?: TemplateRef<any>;
+    public itemTemplate: TemplateRef<any> | null = null;
 
     @Input()
     public placeholder?: string;
