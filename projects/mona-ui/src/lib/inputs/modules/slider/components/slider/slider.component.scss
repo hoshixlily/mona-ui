@@ -9,10 +9,15 @@ div.mona-slider {
 div.mona-slider-track {
     position: relative;
     z-index: 2;
+    cursor: pointer;
 }
 
 div.mona-slider-selection {
     position: absolute;
+    background: var(--mona-primary);
+    &.mona-slider-dragging {
+        transition: none;
+    }
 }
 
 div.mona-slider-tick-list {
@@ -25,7 +30,6 @@ span.mona-slider-tick {
     & > span {
         flex: 1;
         cursor: pointer;
-        z-index: 4;
     }
 }
 
@@ -37,9 +41,11 @@ div.mona-slider-tick-label-list {
     justify-content: space-between;
     -webkit-user-select: none;
     user-select: none;
+
     &.mona-slider-position-after {
         align-items: flex-end;
     }
+
     &.mona-slider-position-before {
         align-items: flex-start;
     }
@@ -55,12 +61,13 @@ span.mona-slider-tick-label {
     line-height: 1.667;
 }
 
-
-div.mona-slider-handler {
-    width: calc($track-thickness * 3);
+div.mona-slider-handle {
+    background: var(--mona-primary);
+    border: 1px solid var(--mona-border-color);
     height: calc($track-thickness * 3);
     position: absolute;
-    z-index: 5;
+    width: calc($track-thickness * 3);
+    z-index: 2;
     cursor: pointer;
     outline: none;
 }
@@ -80,6 +87,14 @@ div.mona-slider-horizontal {
         top: 0;
         bottom: 0;
         transition: width ease-out 0.3s;
+        &.mona-slider-dragging {
+            transition: none;
+        }
+    }
+
+    & div.mona-slider-handle {
+        transform: translateX(-50%);
+        transition: left ease-out 0.3s;
         &.mona-slider-dragging {
             transition: none;
         }
@@ -105,14 +120,6 @@ div.mona-slider-horizontal {
         width: 0;
         height: calc($track-thickness * 3);
     }
-
-    & div.mona-slider-handler {
-        left: calc($track-thickness * 3 / -2);
-        transition: left ease-out 0.3s;
-        &.mona-slider-dragging {
-            transition: none;
-        }
-    }
 }
 
 div.mona-slider-vertical {
@@ -121,8 +128,8 @@ div.mona-slider-vertical {
     justify-content: center;
 
     & div.mona-slider-track {
-        height: 100%;
         width: $track-thickness;
+        height: 100%;
     }
 
     & div.mona-slider-selection {
@@ -130,6 +137,14 @@ div.mona-slider-vertical {
         bottom: 0;
         right: 0;
         transition: height ease-out 0.3s;
+        &.mona-slider-dragging {
+            transition: none;
+        }
+    }
+
+    & div.mona-slider-handle {
+        transform: translateY(50%);
+        transition: bottom ease-out 0.3s;
         &.mona-slider-dragging {
             transition: none;
         }
@@ -156,11 +171,4 @@ div.mona-slider-vertical {
         width: calc($track-thickness * 3);
     }
 
-    & div.mona-slider-handler {
-        bottom: calc($track-thickness * 3 / -2);
-        transition: bottom ease-out 0.3s,  box-shadow 0.15s ease-in;
-        &.mona-slider-dragging {
-            transition: none;
-        }
-    }
 }

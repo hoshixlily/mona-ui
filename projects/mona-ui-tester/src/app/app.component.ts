@@ -380,7 +380,7 @@ export class AppComponent implements OnInit {
         { text: "REPLACED WITH Okonomiyaki", value: 29, group: "FOODIE", active: true }
     ];
     public selectedPrimitiveComboBoxDataItem: string | null = null;
-    public sliderValue: number = 8;
+    public sliderValue: number = 7;
     public switchValue: boolean = false;
     public stepperStep: number = 1;
     public stepperSteps: StepOptions[] = [

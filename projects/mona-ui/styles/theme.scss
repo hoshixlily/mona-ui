@@ -905,6 +905,12 @@ div.mona-range-slider-vertical {
 }
 
 /** Slider */
+div.mona-slider {
+    &.mona-disabled {
+        @include disabled;
+    }
+}
+
 div.mona-slider-track {
     border: 1px solid var(--mona-border-color);
     background-color: var(--mona-background);
@@ -915,7 +921,7 @@ div.mona-slider-selection {
     background-color: var(--mona-primary);
 }
 
-div.mona-slider-handler {
+div.mona-slider-handle {
     background-color: var(--mona-primary);
     border: 1px solid var(--mona-primary-border-color);
     &:focus {
