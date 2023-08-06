@@ -15,8 +15,10 @@
         "sourceMap": true,
         "paths": {
             "mona-ui": [
-                "dist/mona-ui/mona-ui",
-                "dist/mona-ui",
+                "projects/mona-ui/src/lib"
+            ],
+            "mona-ui/*": [
+                "projects/mona-ui/src/lib/*"
             ]
         },
         "declaration": false,
@@ -35,6 +37,11 @@
     },
     "angularCompilerOptions": {
         "enableI18nLegacyMessageIdFormat": false,
+        "extendedDiagnostics": {
+            "checks": {
+                "optionalChainNotNullable": "suppress"
+            }
+        },
         "strictInjectionParameters": true,
         "strictInputAccessModifiers": true,
         "strictTemplates": true
