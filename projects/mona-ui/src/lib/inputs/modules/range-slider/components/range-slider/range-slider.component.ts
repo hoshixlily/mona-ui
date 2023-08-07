@@ -17,7 +17,7 @@ import {
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
-import { delay, filter, from, fromEvent, map, merge, take } from "rxjs";
+import { delay, filter, fromEvent, map, merge, take } from "rxjs";
 import { Orientation } from "../../../../../models/Orientation";
 import { Action } from "../../../../../utils/Action";
 import { SliderHandleData } from "../../../../models/slider/SliderHandleData";
@@ -146,7 +146,6 @@ export class RangeSliderComponent implements AfterViewInit, ControlValueAccessor
             const tick = this.findClosestTickElement(event);
             const valueStr = tick.getAttribute("data-value");
             const value = valueStr ? Number(valueStr) : 0;
-            const handleData = this.getClosestHandlerDataToMouse(event);
             const handlePosition = handleType === "primary" ? this.handlePosition()[0] : this.handlePosition()[1];
             const newPosition = this.getPositionFromValue(value);
             if (handlePosition !== newPosition) {
@@ -357,38 +356,4 @@ export class RangeSliderComponent implements AfterViewInit, ControlValueAccessor
                 this.handleHandleMove(event, this.orientation, handleData.type);
             });
     }
-
-    // public onHandleKeyDown(event: KeyboardEvent, type: SliderHandlerType): void {
-    //     const value = type === "primary" ? this.handlerValue()[0] : this.handlerValue()[1];
-    //     if (event.key === "ArrowLeft" || event.key === "ArrowDown") {
-    //         if (value - this.step < this.min) {
-    //             return;
-    //         }
-    //         this.setHandlerValue(value - this.step, type);
-    //     } else if (event.key === "ArrowRight" || event.key === "ArrowUp") {
-    //         if (value + this.step > this.max) {
-    //             return;
-    //         }
-    //         this.setHandlerValue(value + this.step, type);
-    //     }
-    //     if (!this.dragging()) {
-    //         fromEvent(event.target as HTMLElement, "keyup")
-    //             .pipe(take(1))
-    //             .subscribe(() => {
-    //                 this.dragging.set(false);
-    //             });
-    //         this.dragging.set(true);
-    //     }
-    // }
-    //
-    // public onTickClick(event: MouseEvent, tick: SliderTick): void {
-    //     const handlerData = this.getClosestHandlerDataToMouse(event);
-    //     this.setHandlerValue(tick.value, handlerData.type);
-    //     handlerData.element.focus();
-    // }
-    //
-    //
-
-    //
-    //
 }
