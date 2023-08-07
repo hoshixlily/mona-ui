@@ -479,10 +479,14 @@
                                     </ng-template>
                                 </mona-slider>
                                 <mona-range-slider orientation="vertical"
-                                                   [min]="0"
-                                                    [max]="23"
-                                                    [ngModel]="[8, 17]"
-                                                    (ngModelChange)="print($event)"
+                                                   [min]="11"
+                                                   [max]="22"
+                                                   [ngModel]="rangedSliderValues"
+                                                   (ngModelChange)="onRangedSliderValueChange($event)"
+                                                   [showTicks]="true"
+                                                   [showLabels]="true"
+                                                   [labelStep]="2"
+                                                   [tickStep]="2"
                                                     style="height: 400px;">
                                     <ng-template monaRangeSliderTickValueTemplate let-value>
                                         <fa-icon [icon]="moonIcon" *ngIf="value < 8 || value > 17"
