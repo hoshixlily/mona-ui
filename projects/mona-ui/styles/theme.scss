@@ -856,6 +856,12 @@ input[type="radio"][monaRadioButton] {
 }
 
 /** Range Slider */
+div.mona-range-slider {
+    &.mona-disabled {
+        @include disabled;
+    }
+}
+
 div.mona-range-slider-track {
     border: 1px solid var(--mona-border-color);
     background-color: var(--mona-background);
