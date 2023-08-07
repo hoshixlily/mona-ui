@@ -77,13 +77,13 @@ export class ComboBoxComponent implements OnInit, OnDestroy, ControlValueAccesso
     public groupField?: string;
 
     @ContentChild(ComboBoxGroupTemplateDirective, { read: TemplateRef })
-    public groupTemplate?: TemplateRef<any>;
+    public groupTemplate: TemplateRef<any> | null = null;
 
     @Input()
     public itemDisabler?: Action<any, boolean> | string;
 
     @ContentChild(ComboBoxItemTemplateDirective, { read: TemplateRef })
-    public itemTemplate?: TemplateRef<any>;
+    public itemTemplate: TemplateRef<any> | null = null;
 
     @Input()
     public placeholder?: string;

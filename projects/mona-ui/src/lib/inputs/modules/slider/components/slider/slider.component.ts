@@ -1,14 +1,17 @@
 import {
+    AfterViewInit,
     ChangeDetectionStrategy,
     Component,
-    computed,
     ContentChild,
+    DestroyRef,
     ElementRef,
     forwardRef,
+    inject,
     Input,
+    OnChanges,
     OnInit,
-    Signal,
     signal,
+    SimpleChanges,
     TemplateRef,
     ViewChild,
     WritableSignal
@@ -16,9 +19,10 @@ import {
 import { SliderTick } from "../../../../models/slider/SliderTick";
 import { SliderLabelPosition } from "../../../../models/slider/SliderLabelPosition";
 import { SliderTickValueTemplateDirective } from "../../directives/slider-tick-value-template.directive";
-import { distinctUntilChanged, fromEvent, map, startWith, take, tap } from "rxjs";
+import { delay, filter, fromEvent, take, tap } from "rxjs";
 import { Action } from "../../../../../utils/Action";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 
 @Component({
     selector: "mona-slider",
@@ -33,27 +37,18 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
         }
     ]
 })
-export class SliderComponent implements OnInit, ControlValueAccessor {
+export class SliderComponent implements OnInit, AfterViewInit, ControlValueAccessor, OnChanges {
+    readonly #destroyRef: DestroyRef = inject(DestroyRef);
+    #mouseDown: boolean = false;
+    #mouseMove: boolean = false;
     #propagateChange: Action<number> | null = null;
     public dragging: WritableSignal<boolean> = signal(false);
-    public handlerValue: WritableSignal<number> = signal(0);
-    public handlerPosition: Signal<number> = computed(() => {
-        const value = this.trackSelectionWidth();
-        return value === 0 ? value - 9 : value - 7;
-    });
-    public trackSelectionWidth: Signal<number> = computed(() => {
-        const element = this.elementRef.nativeElement;
-        const rect = element.getBoundingClientRect();
-        const distance = this.orientation === "horizontal" ? rect.right - rect.left : rect.bottom - rect.top;
-        const value = Math.max(this.min, Math.min(this.handlerValue(), this.max));
-        const percentage = (value - this.min) / (this.max - this.min);
-        return Math.max(distance * percentage - 2, 0);
-    });
-
+    public handlePosition: WritableSignal<number> = signal(0);
+    public handleValue: WritableSignal<number> = signal(0);
     public ticks: SliderTick[] = [];
 
-    @ViewChild("handlerElementRef")
-    public handlerElementRef!: ElementRef<HTMLDivElement>;
+    @Input()
+    public disabled: boolean = false;
 
     @Input()
     public labelPosition: SliderLabelPosition = "after";
@@ -71,78 +66,175 @@ export class SliderComponent implements OnInit, ControlValueAccessor {
     public orientation: "horizontal" | "vertical" = "horizontal";
 
     @Input()
-    public showLabels: boolean = true;
+    public showLabels: boolean = false;
 
     @Input()
-    public showTicks: boolean = true;
+    public showTicks: boolean = false;
+
+    @ViewChild("sliderHandle")
+    public sliderHandle!: ElementRef<HTMLDivElement>;
 
     @Input()
     public step: number = 1;
+
+    @Input()
+    public tickStep: number = 1;
 
     @ContentChild(SliderTickValueTemplateDirective, { read: TemplateRef })
     public tickValueTemplate?: TemplateRef<any>;
 
     public constructor(private readonly elementRef: ElementRef<HTMLDivElement>) {}
 
-    public ngOnInit(): void {
-        this.prepareTicks();
+    public ngAfterViewInit(): void {
+        this.setSubscription();
     }
 
-    public onHandlerKeyDown(event: KeyboardEvent): void {
-        if (event.key === "ArrowLeft" || event.key === "ArrowDown") {
-            if (this.handlerValue() - this.step >= this.min) {
-                this.setHandlerValue(this.handlerValue() - this.step);
-            } else {
-                this.setHandlerValue(this.min);
-            }
-        } else if (event.key === "ArrowRight" || event.key === "ArrowUp") {
-            if (this.handlerValue() + this.step <= this.max) {
-                this.setHandlerValue(this.handlerValue() + this.step);
-            } else {
-                this.setHandlerValue(this.max);
-            }
+    public ngOnChanges(changes: SimpleChanges): void {
+        if (changes["min"] || changes["max"] || changes["step"]) {
+            this.prepareTicks(); // TODO: Use setters and signals to update ticks
         }
     }
 
-    public onHandlerMouseDown(event: MouseEvent): void {
-        const moveSubscription = fromEvent(document, "mousemove")
-            .pipe(
-                tap(() => this.dragging.set(true)),
-                map((moveEvent: Event) => {
-                    const tickElement = this.findClosestTickElement(moveEvent as MouseEvent);
-                    return Number(tickElement.getAttribute("data-value"));
-                }),
-                startWith(this.handlerValue()),
-                distinctUntilChanged()
-            )
-            .subscribe((tickValue: number) => {
-                this.setHandlerValue(tickValue);
-            });
-        fromEvent(document, "mouseup")
-            .pipe(take(1))
-            .subscribe(() => {
-                this.dragging.set(false);
-                moveSubscription.unsubscribe();
-            });
-    }
-
-    public onTickClick(event: MouseEvent, tick: SliderTick): void {
-        this.setHandlerValue(tick.value);
-        this.handlerElementRef.nativeElement.focus();
+    public ngOnInit(): void {
+        this.prepareTicks();
     }
 
     public registerOnChange(fn: any): void {
         this.#propagateChange = fn;
     }
 
-    public registerOnTouched(fn: any): void {
-        void 0;
+    public registerOnTouched(fn: any): void {}
+
+    public writeValue(obj: number): void {
+        if (obj != null) {
+            const value = Math.max(this.min, Math.min(obj, this.max));
+            const position = this.getPositionFromValue(value);
+            this.handleValue.set(value);
+            this.handlePosition.set(position);
+        }
     }
 
-    public writeValue(obj: number) {
-        if (obj !== undefined) {
-            this.handlerValue.set(obj);
+    private getPositionFromValue(value: number): number {
+        const containerRect = this.elementRef.nativeElement.getBoundingClientRect();
+        if (this.orientation === "horizontal") {
+            if (value === this.min) {
+                return 0;
+            }
+            if (value === this.max) {
+                return containerRect.width;
+            }
+            return ((value - this.min) / (this.max - this.min)) * containerRect.width;
+        } else {
+            if (value === this.min) {
+                return 0;
+            }
+            if (value === this.max) {
+                return containerRect.height;
+            }
+            return ((value - this.min) / (this.max - this.min)) * containerRect.height;
         }
+    }
+
+    private getValueFromPosition(position: number): number {
+        const containerRect = this.elementRef.nativeElement.getBoundingClientRect();
+        if (this.orientation === "horizontal") {
+            const value = position / containerRect.width;
+            return Math.max(this.min, Math.min(this.max, Math.round(value * this.max)));
+        } else {
+            const value = position / containerRect.height;
+            return Math.max(this.min, Math.min(this.max, Math.round(value * this.max)));
+        }
+    }
+
+    private handleHandleMove(event: MouseEvent, direction: "horizontal" | "vertical"): void {
+        if (this.showTicks) {
+            const tick = this.findClosestTickElement(event);
+            const valueStr = tick.getAttribute("data-value");
+            const value = valueStr ? Number(valueStr) : 0;
+            const position = this.getPositionFromValue(value);
+            if (position !== this.handlePosition()) {
+                this.handlePosition.set(position);
+                this.handleValue.set(value);
+                this.#propagateChange?.(value);
+            }
+            return;
+        }
+
+        const containerRect = this.elementRef.nativeElement.getBoundingClientRect();
+        const handlePos =
+            direction === "horizontal" ? event.clientX - containerRect.left : containerRect.bottom - event.clientY;
+        const maxPos = direction === "horizontal" ? containerRect.width : containerRect.height;
+        if (handlePos >= 0 && handlePos <= maxPos && handlePos !== this.handlePosition()) {
+            const value = this.getValueFromPosition(handlePos);
+            if (!this.showTicks) {
+                this.handlePosition.set(handlePos);
+            }
+            if (value !== this.handleValue()) {
+                if (this.showTicks && this.handlePosition() !== handlePos) {
+                    this.handlePosition.set(handlePos);
+                }
+                this.handleValue.set(value);
+                this.#propagateChange?.(value);
+            }
+        }
+    }
+
+    private setSubscription(): void {
+        fromEvent<MouseEvent>(this.sliderHandle.nativeElement, "mousedown")
+            .pipe(
+                takeUntilDestroyed(this.#destroyRef),
+                filter(() => !this.disabled)
+            )
+            .subscribe(() => {
+                this.#mouseDown = true;
+                this.dragging.set(true);
+                const moveSubscription = fromEvent<MouseEvent>(document, "mousemove").subscribe((event: MouseEvent) => {
+                    if (this.#mouseDown) {
+                        this.#mouseMove = true;
+                        this.handleHandleMove(event, this.orientation);
+                    }
+                });
+                fromEvent<MouseEvent>(document, "mouseup")
+                    .pipe(delay(10), take(1))
+                    .subscribe(() => {
+                        this.#mouseDown = false;
+                        this.#mouseMove = false;
+                        this.dragging.set(false);
+                        moveSubscription.unsubscribe();
+                    });
+            });
+
+        fromEvent<MouseEvent>(this.elementRef.nativeElement, "click")
+            .pipe(
+                takeUntilDestroyed(this.#destroyRef),
+                tap(() => this.dragging.set(false)),
+                filter(() => !this.disabled && !this.#mouseMove)
+            )
+            .subscribe((event: MouseEvent) => {
+                this.handleHandleMove(event, this.orientation);
+            });
+
+        fromEvent<KeyboardEvent>(this.sliderHandle.nativeElement, "keydown")
+            .pipe(
+                filter(
+                    (event: KeyboardEvent) =>
+                        event.key === "ArrowLeft" ||
+                        event.key === "ArrowRight" ||
+                        event.key === "ArrowUp" ||
+                        (event.key === "ArrowDown" && !this.disabled)
+                ),
+                tap((event: KeyboardEvent) => {
+                    this.dragging.set(true);
+                    const value = this.handleValue();
+                    const step = event.key === "ArrowLeft" || event.key === "ArrowDown" ? -this.step : this.step;
+                    const newValue = Math.max(this.min, Math.min(this.max, value + step));
+                    this.handleValue.set(newValue);
+                    this.handlePosition.set(this.getPositionFromValue(newValue));
+                    this.#propagateChange?.(newValue);
+                }),
+                takeUntilDestroyed(this.#destroyRef)
+            )
+            .subscribe();
     }
 
     private findClosestTickElement(event: MouseEvent): HTMLSpanElement {
@@ -165,6 +257,7 @@ export class SliderComponent implements OnInit, ControlValueAccessor {
     private prepareTicks(): void {
         let index = 0;
         let value = this.min;
+        this.ticks = [];
         while (value < this.max) {
             this.ticks.push({ index, value });
             value += this.step;
@@ -174,13 +267,5 @@ export class SliderComponent implements OnInit, ControlValueAccessor {
         if (this.orientation === "vertical") {
             this.ticks.reverse();
         }
-    }
-
-    private setHandlerValue(value: number): void {
-        if (this.handlerValue() === value) {
-            return;
-        }
-        this.handlerValue.set(value);
-        this.#propagateChange?.(value);
     }
 }

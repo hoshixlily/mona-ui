@@ -4,7 +4,7 @@
         <ng-container *ngIf="!column.cellTemplate">
             <span class="mona-grid-cell-text">{{row.data[column.field]}}</span>
         </ng-container>
-        <ng-container [ngTemplateOutlet]="column.cellTemplate.templateRef ?? null"
+        <ng-container [ngTemplateOutlet]="column.cellTemplate.templateRef"
                       *ngIf="column.cellTemplate" [ngTemplateOutletContext]="{$implicit: row, column}"></ng-container>
     </ng-container>
     <ng-container [ngTemplateOutlet]="cellEditTemplate" *ngIf="editing"></ng-container>

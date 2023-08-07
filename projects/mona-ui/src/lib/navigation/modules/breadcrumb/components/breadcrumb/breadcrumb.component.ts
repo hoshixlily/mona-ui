@@ -17,10 +17,10 @@ export class BreadcrumbComponent {
     public itemClick: EventEmitter<BreadcrumbItem> = new EventEmitter<BreadcrumbItem>();
 
     @ContentChild(BreadcrumbItemTemplateDirective)
-    public itemTemplate?: BreadcrumbItemTemplateDirective;
+    public itemTemplate: BreadcrumbItemTemplateDirective | null = null;
 
     @ContentChild(BreadcrumbSeparatorTemplateDirective)
-    public separatorTemplate?: BreadcrumbSeparatorTemplateDirective;
+    public separatorTemplate: BreadcrumbSeparatorTemplateDirective | null = null;
 
     @Input()
     public set items(value: Iterable<BreadcrumbItem>) {

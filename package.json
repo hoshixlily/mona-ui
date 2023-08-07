@@ -42,15 +42,15 @@
         ]
     },
     "dependencies": {
-        "@angular/animations": "^16.1.6",
-        "@angular/cdk": "^16.1.5",
-        "@angular/common": "^16.1.6",
-        "@angular/compiler": "^16.1.6",
-        "@angular/core": "^16.1.6",
-        "@angular/forms": "^16.1.6",
-        "@angular/platform-browser": "^16.1.6",
-        "@angular/platform-browser-dynamic": "^16.1.6",
-        "@angular/router": "^16.1.6",
+        "@angular/animations": "^16.1.8",
+        "@angular/cdk": "^16.1.7",
+        "@angular/common": "^16.1.8",
+        "@angular/compiler": "^16.1.8",
+        "@angular/core": "^16.1.8",
+        "@angular/forms": "^16.1.8",
+        "@angular/platform-browser": "^16.1.8",
+        "@angular/platform-browser-dynamic": "^16.1.8",
+        "@angular/router": "^16.1.8",
         "@fortawesome/angular-fontawesome": "^0.13.0",
         "@fortawesome/fontawesome-svg-core": "^6.4.0",
         "@fortawesome/free-solid-svg-icons": "^6.4.0",
@@ -62,14 +62,14 @@
         "zone.js": "~0.13.0"
     },
     "devDependencies": {
-        "@angular-devkit/build-angular": "^16.1.4",
-        "@angular-eslint/builder": "^16.0.1",
-        "@angular-eslint/eslint-plugin": "^16.0.1",
-        "@angular-eslint/eslint-plugin-template": "^16.0.1",
-        "@angular-eslint/schematics": "^16.0.1",
-        "@angular-eslint/template-parser": "^16.0.1",
-        "@angular/cli": "~16.1.4",
-        "@angular/compiler-cli": "^16.1.6",
+        "@angular-devkit/build-angular": "^16.1.8",
+        "@angular-eslint/builder": "^16.1.0",
+        "@angular-eslint/eslint-plugin": "^16.1.0",
+        "@angular-eslint/eslint-plugin-template": "^16.1.0",
+        "@angular-eslint/schematics": "^16.1.0",
+        "@angular-eslint/template-parser": "^16.1.0",
+        "@angular/cli": "~16.1.8",
+        "@angular/compiler-cli": "^16.1.8",
         "@fortawesome/fontawesome-free": "^6.4.0",
         "@ngneat/spectator": "^15.0.1",
         "@semantic-release/changelog": "^6.0.3",
@@ -87,6 +87,6 @@
         "karma-jasmine-html-reporter": "~2.0.0",
         "ng-packagr": "^16.1.0",
         "prettier": "^2.8.1",
-        "typescript": "~4.9.5"
+        "typescript": "^5.1.6"
     }
 }

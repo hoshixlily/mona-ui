@@ -5,22 +5,22 @@ import { AppComponent } from "./app.component";
 import {
     ButtonsModule,
     ContextMenuModule,
-    DropDownsModule,
-    InputsModule,
-    PopupListComponent,
-    PopupModule,
-    TreeViewModule,
-    LayoutModule,
     DateInputsModule,
-    TooltipsModule,
-    MenubarModule,
-    WindowModule,
-    ProgressBarsModule,
-    PagerModule,
+    DropDownsModule,
     FilterModule,
     GridModule,
+    InputsModule,
+    LayoutModule,
+    MenubarModule,
+    NavigationModule,
     NotificationModule,
-    NavigationModule
+    PagerModule,
+    PopupListComponent,
+    PopupModule,
+    ProgressBarsModule,
+    TooltipsModule,
+    TreeViewModule,
+    WindowModule
 } from "mona-ui";
 import { TestComponentComponent } from "./test-component/test-component.component";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";

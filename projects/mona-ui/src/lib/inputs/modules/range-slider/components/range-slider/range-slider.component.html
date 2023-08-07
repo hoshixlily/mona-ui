@@ -1,31 +1,31 @@
-<div class="mona-range-slider"
-     [ngClass]="{'mona-range-slider-horizontal': orientation==='horizontal',
-                 'mona-range-slider-vertical': orientation==='vertical'}">
+<div class="mona-range-slider" [ngClass]="{'mona-range-slider-horizontal':orientation==='horizontal',
+                 'mona-range-slider-vertical':orientation==='vertical', 'mona-disabled': disabled}">
     <div class="mona-range-slider-track">
         <div class="mona-range-slider-selection"
-             [style.left.px]="orientation==='horizontal' ? trackSelectionPositions().position : undefined"
-             [style.width.px]="orientation==='horizontal' ? trackSelectionPositions().size : undefined"
-             [style.bottom.px]="orientation==='vertical' ? trackSelectionPositions().position : undefined"
-             [style.height.px]="orientation==='vertical' ? trackSelectionPositions().size : undefined"
-             [ngClass]="{'mona-range-slider-dragging': dragging()}">
+             [ngClass]="{'mona-range-slider-dragging': dragging()}"
+             [style.left.px]="orientation==='horizontal'?trackSelectionStyleData().position:undefined"
+             [style.width.px]="orientation==='horizontal'?trackSelectionStyleData().size:undefined"
+             [style.bottom.px]="orientation==='vertical'?trackSelectionStyleData().position:undefined"
+             [style.height.px]="orientation==='vertical'?trackSelectionStyleData().size:undefined">
         </div>
     </div>
-    <div class="mona-range-slider-tick-list">
+    <div class="mona-range-slider-tick-list" *ngIf="showTicks">
         <ng-container *ngFor="let tick of ticks; let tx = index;">
-            <span class="mona-range-slider-tick" [ngClass]="{'mona-range-slider-tick-visible': showTicks}"
+            <span class="mona-range-slider-tick" [ngClass]="{'mona-invisible': tx % tickStep !== 0}"
                   *ngIf="tx !== 0">
-                <span (click)="onTickClick($event, tick)" [attr.data-value]="tick.value"></span>
+                <span [attr.data-value]="tick.value"></span>
             </span>
-            <span class="mona-range-slider-tick" [ngClass]="{'mona-range-slider-tick-visible': showTicks}"
+            <span class="mona-range-slider-tick" [ngClass]="{'mona-invisible': tx % tickStep !== 0}"
                   *ngIf="tx !== ticks.length - 1">
-                <span (click)="onTickClick($event, tick)" [attr.data-value]="tick.value"></span>
+                <span [attr.data-value]="tick.value"></span>
             </span>
         </ng-container>
     </div>
     <div class="mona-range-slider-tick-label-list"
-         [ngClass]="{'mona-slider-position-before': labelPosition==='before', 'mona-slider-position-after': labelPosition==='after'}">
-        <ng-container *ngFor="let tick of ticks;">
-            <span class="mona-range-slider-tick-label">
+         [ngClass]="{'mona-slider-position-before': labelPosition==='before', 'mona-slider-position-after': labelPosition==='after'}"
+         *ngIf="showTicks && showLabels">
+        <ng-container *ngFor="let tick of ticks; let tx = index;">
+            <span class="mona-range-slider-tick-label" [ngClass]="{'mona-invisible': tx % labelStep !== 0}">
                 <span *ngIf="!tickValueTemplate">{{tick.value}}</span>
                 <span *ngIf="tickValueTemplate">
                     <ng-container
@@ -34,20 +34,16 @@
             </span>
         </ng-container>
     </div>
-    <div class="mona-range-slider-handler mona-range-slider-handler-primary"
+    <div class="mona-range-slider-handle mona-range-slider-handle-primary"
          [ngClass]="{'mona-range-slider-dragging': dragging()}"
-         [style.left.px]="orientation==='horizontal' ? handlerPosition()[0] : undefined"
-         [style.bottom.px]="orientation==='vertical' ? handlerPosition()[0] : undefined"
-         [attr.tabindex]="0"
-         (keydown)="onHandleKeyDown($event, 'primary')"
-         (mousedown)="onHandlerMouseDown($event, 'primary')"
-         #primaryHandlerRef></div>
-    <div class="mona-range-slider-handler mona-range-slider-handler-secondary"
+         [style.left.px]="orientation==='horizontal'?handlePosition()[0]:undefined"
+         [style.bottom.px]="orientation==='vertical'?handlePosition()[0]:undefined"
+         [attr.tabindex]="disabled?-1:0"
+         #primaryHandle></div>
+    <div class="mona-range-slider-handle mona-range-slider-handle-secondary"
          [ngClass]="{'mona-range-slider-dragging': dragging()}"
-         [style.left.px]="orientation==='horizontal' ? handlerPosition()[1] : undefined"
-         [style.bottom.px]="orientation==='vertical' ? handlerPosition()[1] : undefined"
-         [attr.tabindex]="0"
-         (keydown)="onHandleKeyDown($event, 'secondary')"
-         (mousedown)="onHandlerMouseDown($event, 'secondary')"
-         #secondaryHandlerRef></div>
+         [style.left.px]="orientation==='horizontal'?handlePosition()[1]:undefined"
+         [style.bottom.px]="orientation==='vertical'?handlePosition()[1]:undefined"
+         [attr.tabindex]="disabled?-1:0"
+         #secondaryHandle></div>
 </div>

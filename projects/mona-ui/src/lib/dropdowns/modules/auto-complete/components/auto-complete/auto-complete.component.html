@@ -11,12 +11,12 @@
                          (valueChange)="onPopupListValueChange($event)">
             <ng-container *ngIf="itemTemplate">
                 <ng-template monaListItemTemplate let-dataItem let-listItem="listItem">
-                    <ng-container [ngTemplateOutlet]="itemTemplate ?? null" [ngTemplateOutletContext]="{$implicit: dataItem, listItem}"></ng-container>
+                    <ng-container [ngTemplateOutlet]="itemTemplate" [ngTemplateOutletContext]="{$implicit: dataItem, listItem}"></ng-container>
                 </ng-template>
             </ng-container>
             <ng-container *ngIf="groupTemplate">
                 <ng-template monaListGroupTemplate let-dataItem let-listItem="listItem">
-                    <ng-container [ngTemplateOutlet]="groupTemplate ?? null" [ngTemplateOutletContext]="{$implicit: dataItem, listItem}"></ng-container>
+                    <ng-container [ngTemplateOutlet]="groupTemplate" [ngTemplateOutletContext]="{$implicit: dataItem, listItem}"></ng-container>
                 </ng-template>
             </ng-container>
         </mona-popup-list>

@@ -70,13 +70,13 @@ export class DropDownListComponent implements OnInit, OnDestroy, ControlValueAcc
     public groupField?: string;
 
     @ContentChild(DropDownListGroupTemplateDirective, { read: TemplateRef })
-    public groupTemplate?: TemplateRef<any>;
+    public groupTemplate: TemplateRef<any> | null = null;
 
     @Input()
     public itemDisabler?: Action<any, boolean> | string;
 
     @ContentChild(DropDownListItemTemplateDirective, { read: TemplateRef })
-    public itemTemplate?: TemplateRef<any>;
+    public itemTemplate: TemplateRef<any> | null = null;
 
     @Input()
     public placeholder?: string;
@@ -94,7 +94,7 @@ export class DropDownListComponent implements OnInit, OnDestroy, ControlValueAcc
     public valueField?: string;
 
     @ContentChild(DropDownListValueTemplateDirective, { read: TemplateRef })
-    public valueTemplate?: TemplateRef<any>;
+    public valueTemplate: TemplateRef<any> | null = null;
 
     public constructor(
         private readonly cdr: ChangeDetectorRef,
