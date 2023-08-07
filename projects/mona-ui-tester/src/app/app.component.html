@@ -448,9 +448,9 @@
 
                             <div style="display: flex; align-items: center; justify-content: center;">
                                 <mona-range-slider orientation="horizontal"
-                                                    [ngModel]="rangedSliderValues"
+                                                   [ngModel]="rangedSliderValues"
+                                                   (ngModelChange)="onRangedSliderValueChange($event)"
                                                    [min]="1" [max]="24"
-                                                    (ngModelChange)="onRangedSliderValueChange($event)"
                                                     style="width: 400px;">
                                     <ng-template monaRangeSliderTickValueTemplate let-value>
                                         <fa-icon [icon]="moonIcon" *ngIf="value % 2 === 0"

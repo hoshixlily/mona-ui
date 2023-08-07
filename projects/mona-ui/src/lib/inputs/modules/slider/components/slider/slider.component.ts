@@ -196,6 +196,7 @@ export class SliderComponent implements OnInit, AfterViewInit, ControlValueAcces
                     .subscribe(() => {
                         this.#mouseDown = false;
                         this.#mouseMove = false;
+                        this.dragging.set(false);
                         moveSubscription.unsubscribe();
                     });
             });
