@@ -1,7 +1,6 @@
 import {
     AfterViewInit,
     ChangeDetectionStrategy,
-    ChangeDetectorRef,
     Component,
     computed,
     ContentChild,
@@ -16,28 +15,16 @@ import {
     ViewChild,
     WritableSignal
 } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
+import { delay, filter, from, fromEvent, map, merge, take } from "rxjs";
 import { Orientation } from "../../../../../models/Orientation";
+import { Action } from "../../../../../utils/Action";
+import { SliderHandleData } from "../../../../models/slider/SliderHandleData";
+import { SliderHandleType } from "../../../../models/slider/SliderHandleType";
 import { SliderLabelPosition } from "../../../../models/slider/SliderLabelPosition";
 import { SliderTick } from "../../../../models/slider/SliderTick";
-import { SliderHandlerData } from "../../../../models/slider/SliderHandlerData";
-import { SliderHandlerType } from "../../../../models/slider/SliderHandlerType";
-import {
-    delay,
-    distinctUntilChanged,
-    filter,
-    fromEvent,
-    map,
-    merge,
-    mergeWith,
-    startWith,
-    take,
-    takeUntil,
-    tap
-} from "rxjs";
 import { RangeSliderTickValueTemplateDirective } from "../../directives/range-slider-tick-value-template.directive";
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
-import { Action } from "../../../../../utils/Action";
-import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 
 @Component({
     selector: "mona-range-slider",
@@ -60,7 +47,7 @@ export class RangeSliderComponent implements AfterViewInit, ControlValueAccessor
     public dragging: WritableSignal<boolean> = signal(false);
     public handlePosition: WritableSignal<[number, number]> = signal([0, 0]);
     public handleValue: WritableSignal<[number, number]> = signal([0, 0]);
-    public trackSelectionPositions: Signal<{ size: number; position: number }> = signal({
+    public trackSelectionStyleData: Signal<{ size: number; position: number }> = signal({
         position: 0,
         size: 0
     });
@@ -92,25 +79,34 @@ export class RangeSliderComponent implements AfterViewInit, ControlValueAccessor
     public secondaryHandle!: ElementRef<HTMLDivElement>;
 
     @Input()
+    public showLabels: boolean = false;
+
+    @Input()
     public showTicks: boolean = false;
 
     @Input()
     public step: number = 1;
 
+    @Input()
+    public tickStep: number = 1;
+
     @ContentChild(RangeSliderTickValueTemplateDirective, { read: TemplateRef })
     public tickValueTemplate?: TemplateRef<any>;
 
-    public constructor(
-        private readonly elementRef: ElementRef<HTMLDivElement>,
-        private readonly cdr: ChangeDetectorRef
-    ) {}
+    public constructor(private readonly elementRef: ElementRef<HTMLDivElement>) {}
 
     public ngAfterViewInit() {
+        this.prepareTicks();
         this.setSubscriptions();
     }
 
     public ngOnInit(): void {
-        // this.prepareTicks();
+        this.trackSelectionStyleData = computed(() => {
+            return {
+                position: Math.min(this.handlePosition()[0], this.handlePosition()[1]),
+                size: Math.abs(this.handlePosition()[1] - this.handlePosition()[0])
+            };
+        });
     }
 
     private getPositionFromValue(value: number): number {
@@ -122,7 +118,7 @@ export class RangeSliderComponent implements AfterViewInit, ControlValueAccessor
             if (value === this.max) {
                 return containerRect.width;
             }
-            return (value / this.max) * containerRect.width;
+            return ((value - this.min) / (this.max - this.min)) * containerRect.width;
         } else {
             if (value === this.min) {
                 return 0;
@@ -130,7 +126,7 @@ export class RangeSliderComponent implements AfterViewInit, ControlValueAccessor
             if (value === this.max) {
                 return containerRect.height;
             }
-            return (value / this.max) * containerRect.height;
+            return ((value - this.min) / (this.max - this.min)) * containerRect.height;
         }
     }
 
@@ -145,9 +141,19 @@ export class RangeSliderComponent implements AfterViewInit, ControlValueAccessor
         }
     }
 
-    private handleHandleMove(event: MouseEvent, orientation: Orientation, handleType: SliderHandlerType): void {
+    private handleHandleMove(event: MouseEvent, orientation: Orientation, handleType: SliderHandleType): void {
         if (this.showTicks) {
-            // TODO: implement
+            const tick = this.findClosestTickElement(event);
+            const valueStr = tick.getAttribute("data-value");
+            const value = valueStr ? Number(valueStr) : 0;
+            const handleData = this.getClosestHandlerDataToMouse(event);
+            const handlePosition = handleType === "primary" ? this.handlePosition()[0] : this.handlePosition()[1];
+            const newPosition = this.getPositionFromValue(value);
+            if (handlePosition !== newPosition) {
+                this.setHandlePosition(newPosition, handleType);
+                this.setHandleValue(value, handleType);
+                this.#propagateChange?.(this.handleValue());
+            }
             return;
         }
         const containerRect = this.elementRef.nativeElement.getBoundingClientRect();
@@ -188,7 +194,7 @@ export class RangeSliderComponent implements AfterViewInit, ControlValueAccessor
         void 0;
     }
 
-    public setHandlePosition(position: number, handleType: SliderHandlerType): void {
+    public setHandlePosition(position: number, handleType: SliderHandleType): void {
         this.handlePosition.set(
             handleType === "primary" ? [position, this.handlePosition()[1]] : [this.handlePosition()[0], position]
         );
@@ -196,17 +202,113 @@ export class RangeSliderComponent implements AfterViewInit, ControlValueAccessor
 
     public writeValue(obj: [number, number]) {
         if (obj != null) {
-            this.handleValue.set(obj);
-            this.handlePosition.set(obj.map(value => this.getPositionFromValue(value)) as [number, number]);
+            this.handleValue.set([
+                this.min >= obj[0] ? this.min : this.max <= obj[0] ? this.max : obj[0],
+                this.min >= obj[1] ? this.min : this.max <= obj[1] ? this.max : obj[1]
+            ]);
+            this.handlePosition.set(
+                this.handleValue().map(value => this.getPositionFromValue(value)) as [number, number]
+            );
         }
     }
 
-    private setHandleValue(value: number, handleType: SliderHandlerType): void {
+    private findClosestTickElement(event: MouseEvent): HTMLSpanElement {
+        const elements = Array.from(
+            this.elementRef.nativeElement.querySelectorAll(".mona-range-slider-tick > span")
+        ) as HTMLSpanElement[];
+        let maxDistance = Number.MAX_VALUE;
+        let index = 0;
+        for (const [ex, element] of elements.entries()) {
+            const rect = element.getBoundingClientRect();
+            const distance = Math.sqrt(Math.pow(rect.left - event.clientX, 2) + Math.pow(rect.top - event.clientY, 2));
+            if (distance < maxDistance) {
+                maxDistance = distance;
+                index = ex;
+            }
+        }
+        return elements[index];
+    }
+
+    private getClosestHandlerDataToMouse(event: MouseEvent): SliderHandleData {
+        const primaryHandlerRect = this.primaryHandle.nativeElement.getBoundingClientRect();
+        const secondaryHandlerRect = this.secondaryHandle.nativeElement.getBoundingClientRect();
+        const primaryDistance = Math.sqrt(
+            Math.pow(primaryHandlerRect.left - event.clientX, 2) + Math.pow(primaryHandlerRect.top - event.clientY, 2)
+        );
+        const secondaryDistance = Math.sqrt(
+            Math.pow(secondaryHandlerRect.left - event.clientX, 2) +
+                Math.pow(secondaryHandlerRect.top - event.clientY, 2)
+        );
+        return primaryDistance < secondaryDistance
+            ? {
+                  element: this.primaryHandle.nativeElement,
+                  type: "primary"
+              }
+            : {
+                  element: this.secondaryHandle.nativeElement,
+                  type: "secondary"
+              };
+    }
+
+    private prepareTicks(): void {
+        let index = 0;
+        let value = this.min;
+        this.ticks = [];
+        while (value < this.max) {
+            this.ticks.push({ index, value });
+            value += this.step;
+            index++;
+        }
+        this.ticks.push({ index, value: Math.min(value + this.step, this.max) });
+        if (this.orientation === "vertical") {
+            this.ticks.reverse();
+        }
+    }
+
+    private setHandleValue(value: number, handleType: SliderHandleType): void {
         if (handleType === "primary") {
             this.handleValue.set([value, this.handleValue()[1]]);
         } else {
             this.handleValue.set([this.handleValue()[0], value]);
         }
+    }
+
+    private setKeyboardSubscriptions(): void {
+        merge(
+            fromEvent<KeyboardEvent>(this.primaryHandle.nativeElement, "keydown").pipe(
+                map(event => ({ event, type: "primary" }))
+            ),
+            fromEvent<KeyboardEvent>(this.secondaryHandle.nativeElement, "keydown").pipe(
+                map(event => ({ event, type: "secondary" }))
+            )
+        )
+            .pipe(
+                takeUntilDestroyed(this.#destroyRef),
+                filter(
+                    ({ event }) =>
+                        event.key === "ArrowLeft" ||
+                        event.key === "ArrowRight" ||
+                        event.key === "ArrowUp" ||
+                        event.key === "ArrowDown"
+                )
+            )
+            .subscribe(({ event, type }) => {
+                const value = this.handleValue()[type === "primary" ? 0 : 1];
+                let newValue: number;
+                if (event.key === "ArrowLeft" || event.key === "ArrowDown") {
+                    newValue = value - this.step;
+                } else {
+                    newValue = value + this.step;
+                }
+                if (newValue < this.min || newValue > this.max) {
+                    return;
+                }
+                this.setHandleValue(newValue, type as SliderHandleType);
+                this.setHandlePosition(this.getPositionFromValue(newValue), type as SliderHandleType);
+                if (this.#propagateChange) {
+                    this.#propagateChange(this.handleValue());
+                }
+            });
     }
 
     private setSubscriptions(): void {
@@ -225,7 +327,7 @@ export class RangeSliderComponent implements AfterViewInit, ControlValueAccessor
                 const moveSubscription = fromEvent<MouseEvent>(document, "mousemove").subscribe(event => {
                     if (this.#mouseDown) {
                         this.#mouseMove = true;
-                        this.handleHandleMove(event, this.orientation, type as SliderHandlerType);
+                        this.handleHandleMove(event, this.orientation, type as SliderHandleType);
                     }
                 });
                 fromEvent<MouseEvent>(document, "mouseup")
@@ -236,6 +338,23 @@ export class RangeSliderComponent implements AfterViewInit, ControlValueAccessor
                         this.dragging.set(false);
                         moveSubscription.unsubscribe();
                     });
+            });
+        this.setKeyboardSubscriptions();
+        this.setTrackClickSubscription();
+    }
+
+    private setTrackClickSubscription(): void {
+        fromEvent<MouseEvent>(this.elementRef.nativeElement, "click")
+            .pipe(
+                takeUntilDestroyed(this.#destroyRef),
+                filter(() => !this.disabled && !this.#mouseMove),
+                map(event => {
+                    const handleData = this.getClosestHandlerDataToMouse(event);
+                    return { event, handleData };
+                })
+            )
+            .subscribe(({ event, handleData }) => {
+                this.handleHandleMove(event, this.orientation, handleData.type);
             });
     }
 
@@ -262,150 +381,14 @@ export class RangeSliderComponent implements AfterViewInit, ControlValueAccessor
     //     }
     // }
     //
-    // public onHandlerMouseDown(event: MouseEvent, type: SliderHandlerType): void {
-    //     const moveSubscription = fromEvent(document, "mousemove")
-    //         .pipe(
-    //             tap(() => this.dragging.set(true)),
-    //             map((moveEvent: Event) => {
-    //                 const tickElement = this.findClosestTickElement(moveEvent as MouseEvent);
-    //                 return Number(tickElement.getAttribute("data-value"));
-    //             }),
-    //             filter((value: number) =>
-    //                 type === "primary" ? value !== this.handlerValue()[0] : value !== this.handlerValue()[1]
-    //             ),
-    //             distinctUntilChanged()
-    //         )
-    //         .subscribe((value: number) => {
-    //             this.setHandlerValue(value, type);
-    //         });
-    //     fromEvent(document, "mouseup")
-    //         .pipe(take(1))
-    //         .subscribe(() => {
-    //             this.dragging.set(false);
-    //             moveSubscription.unsubscribe();
-    //         });
-    // }
-    //
     // public onTickClick(event: MouseEvent, tick: SliderTick): void {
     //     const handlerData = this.getClosestHandlerDataToMouse(event);
     //     this.setHandlerValue(tick.value, handlerData.type);
     //     handlerData.element.focus();
     // }
     //
-    // public registerOnChange(fn: any): void {
-    //     this.#propagateChange = fn;
-    // }
     //
-    // public registerOnTouched(fn: any): void {
-    //     void 0;
-    // }
+
     //
-    // public writeValue(obj: [number, number]) {
-    //     if (obj !== undefined) {
-    //         this.handlerValue.set(obj);
-    //     }
-    // }
     //
-    // private findClosestTickElement(event: MouseEvent): HTMLSpanElement {
-    //     const elements = Array.from(
-    //         this.elementRef.nativeElement.querySelectorAll(".mona-range-slider-tick > span")
-    //     ) as HTMLSpanElement[];
-    //     let maxDistance = Number.MAX_VALUE;
-    //     let index = 0;
-    //     for (const [ex, element] of elements.entries()) {
-    //         const rect = element.getBoundingClientRect();
-    //         const distance = Math.sqrt(Math.pow(rect.left - event.clientX, 2) + Math.pow(rect.top - event.clientY, 2));
-    //         if (distance < maxDistance) {
-    //             maxDistance = distance;
-    //             index = ex;
-    //         }
-    //     }
-    //     return elements[index];
-    // }
-    //
-    // private getClosestHandlerDataToMouse(event: MouseEvent): SliderHandlerData {
-    //     const primaryHandlerRect = this.primaryHandlerRef.nativeElement.getBoundingClientRect();
-    //     const secondaryHandlerRect = this.secondaryHandlerRef.nativeElement.getBoundingClientRect();
-    //     const primaryDistance = Math.sqrt(
-    //         Math.pow(primaryHandlerRect.left - event.clientX, 2) + Math.pow(primaryHandlerRect.top - event.clientY, 2)
-    //     );
-    //     const secondaryDistance = Math.sqrt(
-    //         Math.pow(secondaryHandlerRect.left - event.clientX, 2) +
-    //             Math.pow(secondaryHandlerRect.top - event.clientY, 2)
-    //     );
-    //     return primaryDistance < secondaryDistance
-    //         ? {
-    //               element: this.primaryHandlerRef.nativeElement,
-    //               type: "primary"
-    //           }
-    //         : {
-    //               element: this.secondaryHandlerRef.nativeElement,
-    //               type: "secondary"
-    //           };
-    // }
-    //
-    // private prepareTicks(): void {
-    //     let index = 0;
-    //     let value = this.min;
-    //     while (value < this.max) {
-    //         this.ticks.push({ index, value });
-    //         value += this.step;
-    //         index++;
-    //     }
-    //     this.ticks.push({ index, value: Math.min(value + this.step, this.max) });
-    //     if (this.orientation === "vertical") {
-    //         this.ticks.reverse();
-    //     }
-    // }
-    //
-    // private setHandlerPositionsSignal(): void {
-    //     this.handlerPosition = computed(() => {
-    //         const element = this.elementRef.nativeElement;
-    //         const rect = element.getBoundingClientRect();
-    //         const primaryHandlerRect = this.primaryHandlerRef.nativeElement.getBoundingClientRect();
-    //         const secondaryHandlerRect = this.secondaryHandlerRef.nativeElement.getBoundingClientRect();
-    //         const distance = this.orientation === "horizontal" ? rect.right - rect.left : rect.bottom - rect.top;
-    //
-    //         if (!this.handlerValue()) {
-    //             return [0, 0];
-    //         }
-    //         const primaryValue = Math.max(this.min, Math.min(this.handlerValue()[0], this.max));
-    //         const secondaryValue = Math.max(this.min, Math.min(this.handlerValue()[1], this.max));
-    //         const primaryPercentage = (primaryValue - this.min) / (this.max - this.min);
-    //         const secondaryPercentage = (secondaryValue - this.min) / (this.max - this.min);
-    //         const primaryOffset =
-    //             this.orientation === "horizontal" ? primaryHandlerRect.width / 2 : primaryHandlerRect.height / 2;
-    //         const secondaryOffset =
-    //             this.orientation === "horizontal" ? secondaryHandlerRect.width / 2 : secondaryHandlerRect.height / 2;
-    //         const positions: [number, number] = [
-    //             Math.max(distance * primaryPercentage - primaryOffset, -primaryOffset),
-    //             Math.max(distance * secondaryPercentage - secondaryOffset, -secondaryOffset)
-    //         ];
-    //         return positions;
-    //     });
-    // }
-    //
-    // private setHandlerValue(value: number, type: SliderHandlerType): void {
-    //     if (type === "primary") {
-    //         if (value === this.handlerValue()[0]) {
-    //             return;
-    //         }
-    //         this.handlerValue.update(currentValue => [value, currentValue[1]]);
-    //     } else {
-    //         if (value === this.handlerValue()[1]) {
-    //             return;
-    //         }
-    //         this.handlerValue.update(currentValue => [currentValue[0], value]);
-    //     }
-    //     this.#propagateChange?.(this.handlerValue());
-    // }
-    //
-    // private setTrackSelectionSignal(): void {
-    //     this.trackSelectionPositions = computed(() => {
-    //         return {
-    //             position: Math.min(this.handlerPosition()[0], this.handlerPosition()[1]),
-    //             size: Math.abs(this.handlerPosition()[1] - this.handlerPosition()[0])
-    //         };
-    //     });
-    // }
 }

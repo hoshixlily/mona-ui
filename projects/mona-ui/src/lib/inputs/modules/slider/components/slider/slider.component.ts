@@ -77,6 +77,9 @@ export class SliderComponent implements OnInit, AfterViewInit, ControlValueAcces
     @Input()
     public step: number = 1;
 
+    @Input()
+    public tickStep: number = 1;
+
     @ContentChild(SliderTickValueTemplateDirective, { read: TemplateRef })
     public tickValueTemplate?: TemplateRef<any>;
 
@@ -120,7 +123,7 @@ export class SliderComponent implements OnInit, AfterViewInit, ControlValueAcces
             if (value === this.max) {
                 return containerRect.width;
             }
-            return (value / this.max) * containerRect.width;
+            return ((value - this.min) / (this.max - this.min)) * containerRect.width;
         } else {
             if (value === this.min) {
                 return 0;
@@ -128,7 +131,7 @@ export class SliderComponent implements OnInit, AfterViewInit, ControlValueAcces
             if (value === this.max) {
                 return containerRect.height;
             }
-            return (value / this.max) * containerRect.height;
+            return ((value - this.min) / (this.max - this.min)) * containerRect.height;
         }
     }
 
@@ -148,11 +151,11 @@ export class SliderComponent implements OnInit, AfterViewInit, ControlValueAcces
             const tick = this.findClosestTickElement(event);
             const valueStr = tick.getAttribute("data-value");
             const value = valueStr ? Number(valueStr) : 0;
-            const position = this.getPositionFromValue(Number(value));
+            const position = this.getPositionFromValue(value);
             if (position !== this.handlePosition()) {
                 this.handlePosition.set(position);
-                this.handleValue.set(Number(value));
-                this.#propagateChange?.(Number(value));
+                this.handleValue.set(value);
+                this.#propagateChange?.(value);
             }
             return;
         }
@@ -205,12 +208,9 @@ export class SliderComponent implements OnInit, AfterViewInit, ControlValueAcces
             .pipe(
                 takeUntilDestroyed(this.#destroyRef),
                 tap(() => this.dragging.set(false)),
-                filter(() => !this.disabled)
+                filter(() => !this.disabled && !this.#mouseMove)
             )
             .subscribe((event: MouseEvent) => {
-                if (this.#mouseMove) {
-                    return;
-                }
                 this.handleHandleMove(event, this.orientation);
             });
 

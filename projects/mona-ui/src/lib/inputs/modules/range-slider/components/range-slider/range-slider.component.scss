@@ -9,6 +9,7 @@ div.mona-range-slider {
 div.mona-range-slider-track {
     position: relative;
     z-index: 2;
+    cursor: pointer;
 }
 
 div.mona-range-slider-selection {
@@ -16,14 +17,48 @@ div.mona-range-slider-selection {
 }
 
 div.mona-range-slider-handle {
-    background: var(--mona-primary);
-    border: 1px solid var(--mona-border-color);
     height: calc($track-thickness * 3);
     position: absolute;
     width: calc($track-thickness * 3);
     z-index: 2;
     cursor: pointer;
     outline: none;
+}
+
+div.mona-range-slider-tick-list {
+    display: grid;
+    position: absolute;
+}
+
+span.mona-range-slider-tick {
+    display: flex;
+    & > span {
+        flex: 1;
+        cursor: pointer;
+    }
+}
+
+div.mona-range-slider-tick-label-list {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    -webkit-user-select: none;
+    user-select: none;
+    &.mona-slider-position-after {
+        align-items: flex-end;
+    }
+    &.mona-slider-position-before {
+        align-items: flex-start;
+    }
+}
+
+span.mona-range-slider-tick-label {
+    position: relative;
+    align-items: center;
+    justify-content: center;
+    display: flex;
 }
 
 div.mona-range-slider-horizontal {
@@ -40,7 +75,7 @@ div.mona-range-slider-horizontal {
         left: 0;
         top: 0;
         bottom: 0;
-        transition: width ease-out 0.3s;
+        transition: width ease-out 0.3s, left ease-out 0.3s;
         &.mona-range-slider-dragging {
             transition: none;
         }
@@ -48,10 +83,31 @@ div.mona-range-slider-horizontal {
 
     & div.mona-range-slider-handle {
         transform: translateX(-50%);
-        transition: left ease-out 0.3s;
+        transition: left ease-out 0.3s, box-shadow 0.15s ease-in;
         &.mona-range-slider-dragging {
             transition: none;
         }
+    }
+
+    & div.mona-range-slider-tick-list {
+        width: 100%;
+        height: calc($track-thickness * 3);
+        grid-auto-flow: column;
+        grid-auto-columns: minmax(0, 1fr);
+        align-items: center;
+    }
+
+    & span.mona-range-slider-tick {
+        height: 100%;
+    }
+
+    & div.mona-range-slider-tick-label-list {
+        flex-direction: row;
+    }
+
+    & span.mona-range-slider-tick-label {
+        width: 0;
+        height: calc($track-thickness * 3);
     }
 }
 
@@ -60,42 +116,9 @@ div.mona-range-slider-horizontal {
 
 
 //
-//div.mona-range-slider-tick-list {
-//    display: grid;
-//    position: absolute;
-//}
+
 //
-//span.mona-range-slider-tick {
-//    display: flex;
-//    & > span {
-//        flex: 1;
-//        cursor: pointer;
-//        z-index: 4;
-//    }
-//}
-//
-//div.mona-range-slider-tick-label-list {
-//    position: absolute;
-//    width: 100%;
-//    height: 100%;
-//    display: flex;
-//    justify-content: space-between;
-//    -webkit-user-select: none;
-//    user-select: none;
-//    &.mona-slider-position-after {
-//        align-items: flex-end;
-//    }
-//    &.mona-slider-position-before {
-//        align-items: flex-start;
-//    }
-//}
-//
-//span.mona-range-slider-tick-label {
-//    position: relative;
-//    align-items: center;
-//    justify-content: center;
-//    display: flex;
-//}
+
 //
 //
 //div.mona-range-slider-handler {

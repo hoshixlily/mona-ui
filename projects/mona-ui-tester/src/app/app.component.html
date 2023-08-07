@@ -432,9 +432,9 @@
                             </div>
 
                             <div style="display: flex; align-items: center; justify-content: center; margin-top: 40px;">
-                                <mona-slider orientation="horizontal" labelPosition="before" [max]="32"
-                                             [showTicks]="true" [showLabels]="true"
-                                             [disabled]="true"
+                                <mona-slider orientation="horizontal" labelPosition="before" [min]="6" [max]="32"
+                                             [showTicks]="true" [showLabels]="true" [labelStep]="3"
+                                             [disabled]="false"
                                              [ngModel]="sliderValue" (ngModelChange)="onSliderValueChange($event)" style="width: 560px;">
                                     <ng-template monaSliderTickValueTemplate let-value>
                                         <fa-icon [icon]="moonIcon" *ngIf="value % 2 === 0"
@@ -450,7 +450,11 @@
                                 <mona-range-slider orientation="horizontal"
                                                    [ngModel]="rangedSliderValues"
                                                    (ngModelChange)="onRangedSliderValueChange($event)"
-                                                   [min]="1" [max]="24"
+                                                   [min]="4" [max]="24"
+                                                   [showLabels]="true"
+                                                   [showTicks]="true"
+                                                   [labelStep]="4"
+                                                   labelPosition="after"
                                                     style="width: 400px;">
                                     <ng-template monaRangeSliderTickValueTemplate let-value>
                                         <fa-icon [icon]="moonIcon" *ngIf="value % 2 === 0"

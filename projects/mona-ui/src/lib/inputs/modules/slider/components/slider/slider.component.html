@@ -10,10 +10,10 @@
     </div>
     <div class="mona-slider-tick-list" *ngIf="showTicks">
         <ng-container *ngFor="let tick of ticks; let tx = index;">
-                <span class="mona-slider-tick" [ngClass]="{'mona-slider-tick-visible': showTicks}" *ngIf="tx !== 0">
+                <span class="mona-slider-tick" [ngClass]="{'mona-invisible': tx % tickStep !== 0}" *ngIf="tx !== 0">
                     <span [attr.data-value]="tick.value"></span>
                 </span>
-            <span class="mona-slider-tick" [ngClass]="{'mona-slider-tick-visible': showTicks}"
+            <span class="mona-slider-tick" [ngClass]="{'mona-invisible': tx % tickStep !== 0}"
                   *ngIf="tx !== ticks.length - 1">
                     <span [attr.data-value]="tick.value"></span>
                 </span>
@@ -23,7 +23,7 @@
          [ngClass]="{'mona-slider-position-before': labelPosition==='before', 'mona-slider-position-after': labelPosition==='after'}"
          *ngIf="showTicks && showLabels">
         <ng-container *ngFor="let tick of ticks; let tx = index;">
-                <span class="mona-slider-tick-label" *ngIf="tx%labelStep===0">
+                <span class="mona-slider-tick-label" [ngClass]="{'mona-invisible': tx % labelStep !== 0}">
                     <span *ngIf="!tickValueTemplate">{{tick.value}}</span>
                     <span *ngIf="tickValueTemplate">
                         <ng-container
@@ -36,6 +36,6 @@
          [ngClass]="{'mona-slider-dragging': dragging()}"
          [style.left.px]="orientation==='horizontal' ? handlePosition() : undefined"
          [style.bottom.px]="orientation==='vertical' ? handlePosition() : undefined"
-         [attr.tabindex]="disabled?-1:0"
+         [attr.tabindex]="disabled"
          #sliderHandle></div>
 </div>
