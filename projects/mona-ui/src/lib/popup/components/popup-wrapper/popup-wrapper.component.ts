@@ -1,16 +1,5 @@
-import {
-    ChangeDetectionStrategy,
-    Component,
-    EventEmitter,
-    Inject,
-    OnInit,
-    Output,
-    signal,
-    TemplateRef,
-    WritableSignal
-} from "@angular/core";
+import { ChangeDetectionStrategy, Component, Inject, OnInit, signal, TemplateRef, WritableSignal } from "@angular/core";
 import { PopupSettingsInjectionToken } from "../../models/PopupInjectionToken";
-import { AnimationEvent } from "@angular/animations";
 import { PopupSettings } from "../../models/PopupSettings";
 
 @Component({
@@ -23,9 +12,6 @@ export class PopupWrapperComponent implements OnInit {
     public templateRef: TemplateRef<any> | null = null;
     public visible: WritableSignal<boolean> = signal(false);
     public wrapperClass: WritableSignal<string> = signal("");
-
-    @Output()
-    public animationStateChange: EventEmitter<AnimationEvent> = new EventEmitter<AnimationEvent>();
 
     public constructor(@Inject(PopupSettingsInjectionToken) private readonly popupSettings: PopupSettings) {}
 

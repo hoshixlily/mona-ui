@@ -293,13 +293,26 @@ mona-button-group button[monaButton] {
         background-color: var(--mona-background-active);
     }
 }
-
-/** Split Button */
-.mona-split-button-popup {
-    & ul li {
-        height: 30px !important;
+/** Dropdown Button */
+.mona-dropdown-button-popup {
+    &.mona-dropdown-button-popup-content-bottom {
+        & ul {
+            border-top-color: transparent !important;
+        }
+    }
+    &.mona-dropdown-button-popup-content-top {
+        & ul {
+            border-bottom-color: transparent !important;
+        }
     }
 }
+
+/** Split Button */
+//.mona-split-button-popup {
+//    & ul li {
+//        height: 30px !important;
+//    }
+//}
 
 
 /** Dropdowns */

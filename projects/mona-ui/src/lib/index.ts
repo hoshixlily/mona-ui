@@ -9,6 +9,8 @@ export * from "./buttons/modules/button-group/components/button-group/button-gro
 export * from "./buttons/modules/button-group/button-group.module";
 export * from "./buttons/modules/chip/components/chip/chip.component";
 export * from "./buttons/modules/chip/chip.module";
+export * from "./buttons/modules/drop-down-button/components/drop-down-button/drop-down-button.component";
+export * from "./buttons/modules/drop-down-button/drop-down-button.module";
 export * from "./buttons/modules/split-button/directives/split-button-text-template.directive";
 export * from "./buttons/modules/split-button/components/split-button/split-button.component";
 export * from "./buttons/modules/split-button/split-button.module";
