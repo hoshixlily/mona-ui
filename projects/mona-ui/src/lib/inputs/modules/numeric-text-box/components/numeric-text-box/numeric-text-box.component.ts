@@ -279,6 +279,7 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
                 });
         });
         this.wheel$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe((event: WheelEvent) => {
+            event.preventDefault();
             if (event.deltaY < 0) {
                 this.increase();
             } else {
