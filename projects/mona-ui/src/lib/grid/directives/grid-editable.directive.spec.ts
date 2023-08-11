@@ -1,8 +1,15 @@
-import { GridEditableDirective } from './grid-editable.directive';
+import { createDirectiveFactory, SpectatorDirective } from "@ngneat/spectator";
+import { GridEditableDirective } from "./grid-editable.directive";
 
-describe('GridEditableDirective', () => {
-  it('should create an instance', () => {
-    const directive = new GridEditableDirective();
-    expect(directive).toBeTruthy();
-  });
+describe("GridEditableDirective", () => {
+    let spectator: SpectatorDirective<GridEditableDirective>;
+    const createDirective = createDirectiveFactory(GridEditableDirective);
+
+    beforeEach(() => {
+        spectator = createDirective(`<mona-grid monaGridEditable></mona-grid>`);
+    });
+
+    it("should create", () => {
+        expect(spectator.directive).toBeDefined();
+    });
 });

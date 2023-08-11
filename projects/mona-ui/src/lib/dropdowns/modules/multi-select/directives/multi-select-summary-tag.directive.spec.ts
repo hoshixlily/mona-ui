@@ -1,8 +1,15 @@
-import { MultiSelectSummaryTagDirective } from './multi-select-summary-tag.directive';
+import { createDirectiveFactory, SpectatorDirective } from "@ngneat/spectator";
+import { MultiSelectSummaryTagDirective } from "./multi-select-summary-tag.directive";
 
-describe('MultiSelectSummaryTagDirective', () => {
-  it('should create an instance', () => {
-    const directive = new MultiSelectSummaryTagDirective();
-    expect(directive).toBeTruthy();
-  });
+describe("MultiSelectSummaryTagDirective", () => {
+    let spectator: SpectatorDirective<MultiSelectSummaryTagDirective>;
+    const createDirective = createDirectiveFactory(MultiSelectSummaryTagDirective);
+
+    beforeEach(() => {
+        spectator = createDirective(`<ng-template monaMultiSelectSummaryTag></ng-template>`);
+    });
+
+    it("should create", () => {
+        expect(spectator.directive).toBeDefined();
+    });
 });

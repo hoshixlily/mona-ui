@@ -1,8 +1,15 @@
-import { CircularProgressBarLabelTemplateDirective } from './circular-progress-bar-label-template.directive';
+import { createDirectiveFactory, SpectatorDirective } from "@ngneat/spectator";
+import { CircularProgressBarLabelTemplateDirective } from "./circular-progress-bar-label-template.directive";
 
-describe('CircularProgressBarLabelTemplateDirective', () => {
-  it('should create an instance', () => {
-    const directive = new CircularProgressBarLabelTemplateDirective();
-    expect(directive).toBeTruthy();
-  });
+describe("CircularProgressBarLabelTemplateDirective", () => {
+    let spectator: SpectatorDirective<CircularProgressBarLabelTemplateDirective>;
+    const createDirective = createDirectiveFactory(CircularProgressBarLabelTemplateDirective);
+
+    beforeEach(() => {
+        spectator = createDirective(`<ng-template monaCircularProgressBarLabelTemplate></ng-template>`);
+    });
+
+    it("should create", () => {
+        expect(spectator.directive).toBeDefined();
+    });
 });

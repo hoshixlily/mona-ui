@@ -1,8 +1,15 @@
-import { WindowDragHandlerDirective } from './window-drag-handler.directive';
+import { createDirectiveFactory, SpectatorDirective } from "@ngneat/spectator";
+import { WindowDragHandlerDirective } from "./window-drag-handler.directive";
 
-describe('WindowDragHandlerDirective', () => {
-  it('should create an instance', () => {
-    const directive = new WindowDragHandlerDirective();
-    expect(directive).toBeTruthy();
-  });
+describe("WindowDragHandlerDirective", () => {
+    let spectator: SpectatorDirective<WindowDragHandlerDirective>;
+    const createDirective = createDirectiveFactory(WindowDragHandlerDirective);
+
+    beforeEach(() => {
+        spectator = createDirective(`<div monaWindowDragHandler></div>`);
+    });
+
+    it("should create", () => {
+        expect(spectator.directive).toBeDefined();
+    });
 });
