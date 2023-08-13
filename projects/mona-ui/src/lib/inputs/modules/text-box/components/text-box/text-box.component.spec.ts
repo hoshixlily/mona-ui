@@ -1,23 +1,20 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormsModule } from "@angular/forms";
+import { createComponentFactory, Spectator } from "@ngneat/spectator";
 
-import { TextBoxComponent } from './text-box.component';
+import { TextBoxComponent } from "./text-box.component";
 
-describe('TextBoxComponent', () => {
-  let component: TextBoxComponent;
-  let fixture: ComponentFixture<TextBoxComponent>;
+describe("TextBoxComponent", () => {
+    let spectator: Spectator<TextBoxComponent>;
+    const createComponent = createComponentFactory({
+        component: TextBoxComponent,
+        imports: [FormsModule]
+    });
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [ TextBoxComponent ]
-    })
-    .compileComponents();
+    beforeEach(() => {
+        spectator = createComponent();
+    });
 
-    fixture = TestBed.createComponent(TextBoxComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it("should create", () => {
+        expect(spectator.component).toBeDefined();
+    });
 });

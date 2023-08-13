@@ -1,23 +1,17 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { createComponentFactory, mockProvider, Spectator } from "@ngneat/spectator";
+import { PopupRef, PopupService } from "mona-ui";
+import { TestComponentComponent } from "./test-component.component";
 
-import { TestComponentComponent } from './test-component.component';
+describe("TestComponentComponent", () => {
+    let spectator: Spectator<TestComponentComponent>;
+    const createComponent = createComponentFactory({
+        component: TestComponentComponent,
+        providers: [PopupService, mockProvider(PopupRef)]
+    });
 
-describe('TestComponentComponent', () => {
-  let component: TestComponentComponent;
-  let fixture: ComponentFixture<TestComponentComponent>;
+    beforeEach(() => (spectator = createComponent()));
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [ TestComponentComponent ]
-    })
-    .compileComponents();
-
-    fixture = TestBed.createComponent(TestComponentComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it("should create", () => {
+        expect(spectator.component).toBeTruthy();
+    });
 });

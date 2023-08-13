@@ -3,7 +3,7 @@ import { MultiSelectComponent } from "../components/multi-select/multi-select.co
 import { MultiSelectSummaryTagTemplateDirective } from "./multi-select-summary-tag-template.directive";
 
 @Directive({
-    selector: "[monaMultiSelectSummaryTag]"
+    selector: "mona-multi-select[monaMultiSelectSummaryTag]"
 })
 export class MultiSelectSummaryTagDirective implements OnInit, AfterContentInit {
     @ContentChild(MultiSelectSummaryTagTemplateDirective, { read: TemplateRef })

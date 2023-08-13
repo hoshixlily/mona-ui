@@ -12,10 +12,7 @@ export class TreeViewDisableDirective implements OnChanges {
         this.treeViewService.disabledKeys.addAll(disabledKeys);
     }
 
-    public constructor(
-        private readonly treeView: TreeViewComponent,
-        private readonly treeViewService: TreeViewService
-    ) {}
+    public constructor(private readonly treeViewService: TreeViewService) {}
 
     public ngOnChanges(changes: SimpleChanges): void {
         if (changes && changes["disabledKeys"] && !changes["disabledKeys"].isFirstChange()) {

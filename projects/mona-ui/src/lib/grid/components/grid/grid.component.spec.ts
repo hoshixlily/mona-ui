@@ -1,23 +1,25 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { DragDropModule } from "@angular/cdk/drag-drop";
+import { createComponentFactory, Spectator } from "@ngneat/spectator";
+import { PagerModule } from "../../../pager/pager.module";
+import { GridFilterPipe } from "../../pipes/grid-filter.pipe";
+import { GridPagePipe } from "../../pipes/grid-page.pipe";
+import { GridListComponent } from "../grid-list/grid-list.component";
 
-import { GridComponent } from './grid.component';
+import { GridComponent } from "./grid.component";
 
-describe('GridComponent', () => {
-  let component: GridComponent;
-  let fixture: ComponentFixture<GridComponent>;
+describe("GridComponent", () => {
+    let spectator: Spectator<GridComponent>;
+    const createComponent = createComponentFactory({
+        component: GridComponent,
+        imports: [PagerModule, DragDropModule],
+        declarations: [GridFilterPipe, GridPagePipe, GridListComponent]
+    });
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [ GridComponent ]
-    })
-    .compileComponents();
+    beforeEach(() => {
+        spectator = createComponent();
+    });
 
-    fixture = TestBed.createComponent(GridComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it("should create", () => {
+        expect(spectator.component).toBeTruthy();
+    });
 });

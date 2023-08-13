@@ -1,23 +1,19 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { createComponentFactory, Spectator } from "@ngneat/spectator";
+import { WindowService } from "../../services/window.service";
+import { WindowComponent } from "./window.component";
 
-import { WindowComponent } from './window.component';
+describe("WindowComponent", () => {
+    let spectator: Spectator<WindowComponent>;
+    let createComponent = createComponentFactory({
+        component: WindowComponent,
+        providers: [WindowService]
+    });
 
-describe('WindowComponent', () => {
-  let component: WindowComponent;
-  let fixture: ComponentFixture<WindowComponent>;
+    beforeEach(() => {
+        spectator = createComponent();
+    });
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [ WindowComponent ]
-    })
-    .compileComponents();
-
-    fixture = TestBed.createComponent(WindowComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it("should create", () => {
+        expect(spectator.component).toBeDefined();
+    });
 });

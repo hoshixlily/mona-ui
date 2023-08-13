@@ -1,9 +1,13 @@
 import { createDirectiveFactory, SpectatorDirective } from "@ngneat/spectator";
+import { TreeViewService } from "../services/tree-view.service";
 import { TreeViewDisableDirective } from "./tree-view-disable.directive";
 
 describe("TreeViewDisableDirective", () => {
     let spectator: SpectatorDirective<TreeViewDisableDirective>;
-    const createDirective = createDirectiveFactory(TreeViewDisableDirective);
+    const createDirective = createDirectiveFactory({
+        directive: TreeViewDisableDirective,
+        providers: [TreeViewService]
+    });
 
     beforeEach(() => {
         spectator = createDirective(`<mona-tree-view monaTreeViewDisable></mona-tree-view>`);

@@ -1,21 +1,51 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Component, TemplateRef, ViewChild } from "@angular/core";
+import { createComponentFactory, Spectator } from "@ngneat/spectator";
+import { PopupSettingsInjectionToken } from "../../models/PopupInjectionToken";
+import { PopupSettings } from "../../models/PopupSettings";
 
-import { PopupWrapperComponent } from './popup-wrapper.component';
+import { PopupWrapperComponent } from "./popup-wrapper.component";
 
-describe('PopupWrapperComponent', () => {
-  let component: PopupWrapperComponent;
-  let fixture: ComponentFixture<PopupWrapperComponent>;
+@Component({
+    template: `
+        <ng-template #contentTemplate>
+            <div>Test</div>
+        </ng-template>
+        <div>Test</div>
+    `
+})
+class PopupWrapperComponentTestComponent {
+    @ViewChild("contentTemplate")
+    public contentTemplate!: TemplateRef<any>;
+}
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      declarations: [PopupWrapperComponent]
+const POPUP_TOKEN = [
+    {
+        provide: PopupSettingsInjectionToken,
+        useValue: {} as PopupSettings
+    }
+];
+
+describe("PopupWrapperComponent", () => {
+    let spectator: Spectator<PopupWrapperComponent>;
+    const createComponent = createComponentFactory({
+        component: PopupWrapperComponent,
+        providers: [POPUP_TOKEN]
     });
-    fixture = TestBed.createComponent(PopupWrapperComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+    let testComponentSpectator: Spectator<PopupWrapperComponentTestComponent>;
+    const createTestComponent = createComponentFactory({
+        component: PopupWrapperComponentTestComponent
+    });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    beforeEach(() => {
+        testComponentSpectator = createTestComponent();
+        spectator = createComponent({
+            props: {
+                templateRef: testComponentSpectator.component.contentTemplate
+            }
+        });
+    });
+
+    it("should create", () => {
+        expect(spectator.component).toBeTruthy();
+    });
 });

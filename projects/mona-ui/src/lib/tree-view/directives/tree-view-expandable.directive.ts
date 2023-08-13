@@ -15,10 +15,7 @@ export class TreeViewExpandableDirective implements OnInit, OnChanges {
     @Output()
     public expandedKeysChange: EventEmitter<string[]> = new EventEmitter<string[]>();
 
-    public constructor(
-        private readonly treeView: TreeViewComponent,
-        private readonly treeViewService: TreeViewService
-    ) {}
+    public constructor(private readonly treeViewService: TreeViewService) {}
 
     public ngOnChanges(changes: SimpleChanges): void {
         if (changes && changes["expandedKeys"] && !changes["expandedKeys"].isFirstChange()) {

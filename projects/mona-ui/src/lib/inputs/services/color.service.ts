@@ -1,10 +1,11 @@
 import { Injectable } from "@angular/core";
-import { PaletteType } from "../modules/color-palette/models/PaletteType";
 import { ColorScheme } from "../models/ColorScheme";
+import { PaletteType } from "../modules/color-palette/models/PaletteType";
 
 @Injectable()
 export class ColorService {
     public constructor() {}
+
     public static readonly FlatColorScheme: ColorScheme = {
         name: "flat",
         columns: 20,

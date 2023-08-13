@@ -1,23 +1,24 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { FontAwesomeTestingModule } from "@fortawesome/angular-fontawesome/testing";
+import { createComponentFactory, Spectator } from "@ngneat/spectator";
+import { PopupAnimationService } from "../../../../../animations/popup-animation.service";
+import { PopupListService } from "../../../../services/popup-list.service";
 
-import { MultiSelectComponent } from './multi-select.component';
+import { MultiSelectComponent } from "./multi-select.component";
 
-describe('MultiSelectComponent', () => {
-  let component: MultiSelectComponent;
-  let fixture: ComponentFixture<MultiSelectComponent>;
+describe("MultiSelectComponent", () => {
+    let spectator: Spectator<MultiSelectComponent>;
+    const createComponent = createComponentFactory({
+        component: MultiSelectComponent,
+        imports: [BrowserAnimationsModule, FontAwesomeTestingModule],
+        providers: [PopupAnimationService, PopupListService]
+    });
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [ MultiSelectComponent ]
-    })
-    .compileComponents();
+    beforeEach(() => {
+        spectator = createComponent();
+    });
 
-    fixture = TestBed.createComponent(MultiSelectComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it("should create", () => {
+        expect(spectator.component).toBeDefined();
+    });
 });

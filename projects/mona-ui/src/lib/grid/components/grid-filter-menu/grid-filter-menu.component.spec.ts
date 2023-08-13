@@ -1,23 +1,32 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { FontAwesomeTestingModule } from "@fortawesome/angular-fontawesome/testing";
+import { createComponentFactory, Spectator } from "@ngneat/spectator";
+import { ButtonModule } from "../../../buttons/modules/button/button.module";
+import { Column } from "../../models/Column";
+import { GridService } from "../../services/grid.service";
 
-import { GridFilterMenuComponent } from './grid-filter-menu.component';
+import { GridFilterMenuComponent } from "./grid-filter-menu.component";
 
-describe('GridFilterMenuComponent', () => {
-  let component: GridFilterMenuComponent;
-  let fixture: ComponentFixture<GridFilterMenuComponent>;
+describe("GridFilterMenuComponent", () => {
+    let spectator: Spectator<GridFilterMenuComponent>;
+    const createComponent = createComponentFactory({
+        component: GridFilterMenuComponent,
+        imports: [BrowserAnimationsModule, FontAwesomeTestingModule, ButtonModule],
+        providers: [GridService]
+    });
+    let column: Column;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [ GridFilterMenuComponent ]
-    })
-    .compileComponents();
+    beforeEach(() => {
+        column = new Column();
+        column.field = "test";
+        spectator = createComponent({
+            props: {
+                column
+            }
+        });
+    });
 
-    fixture = TestBed.createComponent(GridFilterMenuComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it("should create", () => {
+        expect(spectator.component).toBeDefined();
+    });
 });

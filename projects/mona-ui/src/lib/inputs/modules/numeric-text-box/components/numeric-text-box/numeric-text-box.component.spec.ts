@@ -1,23 +1,21 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormsModule } from "@angular/forms";
+import { FontAwesomeTestingModule } from "@fortawesome/angular-fontawesome/testing";
+import { createComponentFactory, Spectator } from "@ngneat/spectator";
 
-import { NumericTextBoxComponent } from './numeric-text-box.component';
+import { NumericTextBoxComponent } from "./numeric-text-box.component";
 
-describe('NumericTextBoxComponent', () => {
-  let component: NumericTextBoxComponent;
-  let fixture: ComponentFixture<NumericTextBoxComponent>;
+describe("NumericTextBoxComponent", () => {
+    let spectator: Spectator<NumericTextBoxComponent>;
+    const createComponent = createComponentFactory({
+        component: NumericTextBoxComponent,
+        imports: [FontAwesomeTestingModule, FormsModule]
+    });
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [ NumericTextBoxComponent ]
-    })
-    .compileComponents();
+    beforeEach(() => {
+        spectator = createComponent();
+    });
 
-    fixture = TestBed.createComponent(NumericTextBoxComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it("should create", () => {
+        expect(spectator.component).toBeDefined();
+    });
 });

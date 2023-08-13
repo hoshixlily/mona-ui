@@ -1,21 +1,20 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { createComponentFactory, Spectator } from "@ngneat/spectator";
+import { ContextMenuModule } from "../../../../../menus/modules/context-menu/context-menu.module";
 
-import { DropDownButtonComponent } from './drop-down-button.component';
+import { DropDownButtonComponent } from "./drop-down-button.component";
 
-describe('DropDownButtonComponent', () => {
-  let component: DropDownButtonComponent;
-  let fixture: ComponentFixture<DropDownButtonComponent>;
-
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      declarations: [DropDownButtonComponent]
+describe("DropDownButtonComponent", () => {
+    let spectator: Spectator<DropDownButtonComponent>;
+    const createComponent = createComponentFactory({
+        component: DropDownButtonComponent,
+        imports: [ContextMenuModule]
     });
-    fixture = TestBed.createComponent(DropDownButtonComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    beforeEach(() => {
+        spectator = createComponent();
+    });
+
+    it("should create", () => {
+        expect(spectator.component).toBeDefined();
+    });
 });
