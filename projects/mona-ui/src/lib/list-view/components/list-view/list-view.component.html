@@ -1,0 +1,30 @@
+<div class="mona-list-view" [tabIndex]="-1">
+    <div class="mona-list-view-header" *ngIf="listViewHeaderTemplateRef">
+        <ng-container [ngTemplateOutlet]="listViewHeaderTemplateRef"></ng-container>
+    </div>
+    <div class="mona-list-view-content">
+        <ul class="mona-list-view-list" [attr.tabindex]="-1">
+            <ng-container *ngFor="let item of viewItems(); let ix = index;">
+                <li [class.mona-focused]="item.focused()" [attr.data-item-index]="ix">
+                    <ng-container [ngTemplateOutlet]="listViewItemTemplateRef"
+                                  [ngTemplateOutletContext]="{$implicit: item.data, index: ix, first: ix===0, last: ix===listViewItems().length-1}"></ng-container>
+                </li>
+            </ng-container>
+        </ul>
+    </div>
+    <div class="mona-list-view-footer" *ngIf="listViewFooterTemplateRef">
+        <ng-container [ngTemplateOutlet]="listViewFooterTemplateRef"></ng-container>
+    </div>
+    <div class="mona-list-view-pager" *ngIf="pagerSettings.enabled">
+        <mona-pager [firstLast]="pagerSettings.firstLast??false"
+                    [pageSizeValues]="pagerSettings.pageSizeValues"
+                    [visiblePages]="pagerSettings.visiblePages??5"
+                    [total]="listViewItems().length"
+                    [skip]="pageState.skip()"
+                    [responsive]="false"
+                    [pageSize]="pageState.take()"
+                    [previousNext]="pagerSettings.previousNext??false"
+                    (pageChange)="onPageChange($event)"
+                    (pageSizeChange)="onPageSizeChange($event)"></mona-pager>
+    </div>
+</div>

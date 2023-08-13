@@ -1,7 +1,8 @@
+import { NgOptimizedImage } from "@angular/common";
 import { NgModule } from "@angular/core";
-
-import { AppRoutingModule } from "./app-routing.module";
-import { AppComponent } from "./app.component";
+import { FormsModule } from "@angular/forms";
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import {
     ButtonsModule,
     ContextMenuModule,
@@ -11,6 +12,7 @@ import {
     GridModule,
     InputsModule,
     LayoutModule,
+    ListViewModule,
     MenubarModule,
     NavigationModule,
     NotificationModule,
@@ -22,11 +24,10 @@ import {
     TreeViewModule,
     WindowModule
 } from "mona-ui";
+
+import { AppRoutingModule } from "./app-routing.module";
+import { AppComponent } from "./app.component";
 import { TestComponentComponent } from "./test-component/test-component.component";
-import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { FormsModule } from "@angular/forms";
-import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { NgOptimizedImage } from "@angular/common";
 
 @NgModule({
     declarations: [AppComponent, TestComponentComponent],
@@ -53,7 +54,8 @@ import { NgOptimizedImage } from "@angular/common";
         GridModule,
         NotificationModule,
         NgOptimizedImage,
-        NavigationModule
+        NavigationModule,
+        ListViewModule
     ],
     bootstrap: [AppComponent]
 })

@@ -1,0 +1,32 @@
+:host {
+    display: block;
+}
+
+div.mona-list-view {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+div.mona-list-view-content {
+    flex: 1;
+    overflow: auto;
+}
+
+ul.mona-list-view-list {
+    list-style: none;
+    outline: none;
+}
+
+div.mona-list-view-header {
+    border-bottom: 1px solid var(--mona-border-color);
+}
+
+div.mona-list-view-footer {
+    border-top: 1px solid var(--mona-border-color);
+}
+
+div.mona-list-view-pager {
+    border-top: 1px solid var(--mona-border-color);
+}

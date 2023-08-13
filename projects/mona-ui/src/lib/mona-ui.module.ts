@@ -1,20 +1,21 @@
 import { NgModule } from "@angular/core";
 import { ButtonsModule } from "./buttons/buttons.module";
-import { PopupModule } from "./popup/popup.module";
-import { MenusModule } from "./menus/menus.module";
-import { DropDownsModule } from "./dropdowns/drop-downs.module";
-import { InputsModule } from "./inputs/inputs.module";
-import { TreeViewModule } from "./tree-view/tree-view.module";
-import { LayoutModule } from "./layout/layout.module";
 import { DateInputsModule } from "./date-inputs/date-inputs.module";
-import { TooltipsModule } from "./tooltips/tooltips.module";
-import { WindowModule } from "./window/window.module";
-import { PagerModule } from "./pager/pager.module";
-import { ProgressBarsModule } from "./progress-bars/progress-bars.module";
+import { DropDownsModule } from "./dropdowns/drop-downs.module";
 import { FilterModule } from "./filter/filter.module";
 import { GridModule } from "./grid/grid.module";
-import { NotificationModule } from "./notification/notification.module";
+import { InputsModule } from "./inputs/inputs.module";
+import { LayoutModule } from "./layout/layout.module";
+import { ListViewModule } from "./list-view/list-view.module";
+import { MenusModule } from "./menus/menus.module";
 import { NavigationModule } from "./navigation/navigation.module";
+import { NotificationModule } from "./notification/notification.module";
+import { PagerModule } from "./pager/pager.module";
+import { PopupModule } from "./popup/popup.module";
+import { ProgressBarsModule } from "./progress-bars/progress-bars.module";
+import { TooltipsModule } from "./tooltips/tooltips.module";
+import { TreeViewModule } from "./tree-view/tree-view.module";
+import { WindowModule } from "./window/window.module";
 
 @NgModule({
     exports: [
@@ -25,6 +26,7 @@ import { NavigationModule } from "./navigation/navigation.module";
         GridModule,
         InputsModule,
         LayoutModule,
+        ListViewModule,
         MenusModule,
         NavigationModule,
         NotificationModule,

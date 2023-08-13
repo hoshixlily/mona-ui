@@ -164,6 +164,13 @@ export * from "./layout/modules/tab-strip/tab-strip.module";
 export * from "./layout/layout.module";
 /** Layout End */
 
+/** List View */
+export * from "./list-view/components/list-view/list-view.component";
+export * from "./list-view/directives/list-view-item-template.directive";
+export * from "./list-view/directives/list-view-header-template.directive";
+export * from "./list-view/directives/list-view-footer-template.directive";
+export * from "./list-view/list-view.module";
+
 /** Menus */
 // export * from "./menus/models/MenuItem";
 export * from "./menus/modules/shared-menu/components/menu-item/menu-item.component";

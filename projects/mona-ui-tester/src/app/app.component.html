@@ -532,6 +532,22 @@
                                     </div>
                                 </mona-fieldset>
 
+                                <mona-list-view [items]="dropdownListDataItems" style="height: 350px; width: 350px;">
+                                    <ng-template monaListViewHeaderTemplate>
+                                        <div style="padding: 4px 8px; font-weight: 600;">List of Products</div>
+                                    </ng-template>
+                                    <ng-template monaListViewItemTemplate let-dataItem>
+                                        <div style="padding:4px 8px;">
+                                            {{dataItem.text}}
+                                        </div>
+                                    </ng-template>
+                                    <ng-template monaListViewFooterTemplate>
+                                        <div style="padding: 4px 8px; font-weight: 600;">
+                                            <span style="color: var(--mona-primary-light);">{{dropdownListDataItems.length}}</span> items
+                                        </div>
+                                    </ng-template>
+                                </mona-list-view>
+
 
                             </div>
                             <div style="display: flex; align-items: center; justify-content: center;">

@@ -1202,6 +1202,32 @@ div.mona-tab-strip-scroll {
     }
 }
 
+/** List View */
+.mona-list-view {
+    @include font-medium;
+    color: var(--mona-text);
+    background: var(--mona-background);
+    border: 1px solid var(--mona-border-color);
+}
+
+.mona-list-view-content {
+    @include scrollbars-thin;
+}
+
+.mona-list-view-list {
+    & li {
+        &.mona-focused {
+            box-shadow: 0 0 0 1px var(--mona-focus-border-color) inset;
+        }
+    }
+}
+
+.mona-list-view-pager {
+    & .mona-pager {
+        border: none;
+    }
+}
+
 /** Menu */
 /** Context Menu */
 .mona-contextmenu-content {
