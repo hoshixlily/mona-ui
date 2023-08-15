@@ -11,11 +11,12 @@ import {
     TemplateRef,
     WritableSignal
 } from "@angular/core";
-import { Enumerable, Group, List } from "@mirei/ts-collections";
+import { Enumerable, List } from "@mirei/ts-collections";
 import { filter, fromEvent, map, tap } from "rxjs";
 import { PageChangeEvent } from "../../../pager/models/PageChangeEvent";
 import { PageSizeChangeEvent } from "../../../pager/models/PageSizeChangeEvent";
 import { ListViewFooterTemplateDirective } from "../../directives/list-view-footer-template.directive";
+import { ListViewGroupTemplateDirective } from "../../directives/list-view-group-template.directive";
 import { ListViewHeaderTemplateDirective } from "../../directives/list-view-header-template.directive";
 import { ListViewItemTemplateDirective } from "../../directives/list-view-item-template.directive";
 import { ListViewItem } from "../../models/ListViewItem";
@@ -45,12 +46,13 @@ export class ListViewComponent<T = any> implements OnInit {
         type: "numeric",
         visiblePages: 5
     };
-    public viewItems: Signal<List<Group<string, ListViewItem>>> = signal<List<Group<string, ListViewItem>>>(
-        new List<Group<string, ListViewItem>>([])
-    );
+    public viewItems: Signal<List<ListViewItem>> = signal<List<ListViewItem>>(new List<ListViewItem>([]));
 
     @Input()
     public groupField?: string;
+
+    @ContentChild(ListViewGroupTemplateDirective, { read: TemplateRef })
+    public listViewGroupTemplateRef: TemplateRef<any> | null = null;
 
     @ContentChild(ListViewFooterTemplateDirective, { read: TemplateRef })
     public listViewFooterTemplateRef: TemplateRef<any> | null = null;
@@ -66,6 +68,9 @@ export class ListViewComponent<T = any> implements OnInit {
 
     @ContentChild(ListViewItemTemplateDirective, { read: TemplateRef })
     public listViewItemTemplateRef!: TemplateRef<ListViewItemTemplateContext>;
+
+    @Input()
+    public navigable: boolean = false;
 
     @Input()
     public pageSize: number = 5;
@@ -90,7 +95,12 @@ export class ListViewComponent<T = any> implements OnInit {
 
     public onListItemClick(item: ListViewItem<T>): void {
         this.listViewService.toggleItemSelection(item);
-        this.clearFocusedItem();
+        if (item.selected()) {
+            this.viewItems()
+                .where(i => !i.equals(item))
+                .forEach(i => i.focused.set(false));
+            item.focused.set(true);
+        }
     }
 
     public onPageChange(event: PageChangeEvent): void {
@@ -105,22 +115,27 @@ export class ListViewComponent<T = any> implements OnInit {
     }
 
     private clearFocusedItem(): void {
-        const focusedItem = this.flatViewItems.firstOrDefault(i => i.focused());
+        const focusedItem = this.viewItems().firstOrDefault(i => i.focused());
         if (focusedItem) {
             focusedItem.focused.set(false);
         }
     }
 
     private focusNextItem(): void {
-        const focusedItem = this.flatViewItems.firstOrDefault(i => i.focused());
+        const focusedItem = this.viewItems().firstOrDefault(i => i.focused());
         if (focusedItem) {
-            const nextItem = this.flatViewItems.elementAtOrDefault(this.flatViewItems.indexOf(focusedItem) + 1);
+            const nextItem = this.viewItems()
+                .skipWhile(i => !i.equals(focusedItem))
+                .skip(1)
+                .firstOrDefault(i => !i.groupHeader);
             if (nextItem) {
                 focusedItem.focused.set(false);
                 nextItem.focused.set(true);
             }
         } else {
-            const firstItem = this.flatViewItems.firstOrDefault(i => i.selected()) ?? this.viewItems().firstOrDefault();
+            const firstItem =
+                this.viewItems().firstOrDefault(i => !i.groupHeader && i.selected()) ??
+                this.viewItems().firstOrDefault(i => !i.groupHeader);
             if (firstItem) {
                 firstItem.focused.set(true);
             }
@@ -128,60 +143,70 @@ export class ListViewComponent<T = any> implements OnInit {
     }
 
     private focusPreviousItem(): void {
-        const focusedItem = this.flatViewItems.firstOrDefault(i => i.focused());
+        const focusedItem = this.viewItems().firstOrDefault(i => i.focused());
         if (focusedItem) {
-            const previousItem = this.flatViewItems.elementAtOrDefault(this.flatViewItems.indexOf(focusedItem) - 1);
+            const previousItem = this.viewItems()
+                .reverse()
+                .skipWhile(i => !i.equals(focusedItem))
+                .skip(1)
+                .firstOrDefault(i => !i.groupHeader);
             if (previousItem) {
                 focusedItem.focused.set(false);
                 previousItem.focused.set(true);
             }
         } else {
             const firstItem =
-                this.flatViewItems.firstOrDefault(i => i.selected()) ?? this.flatViewItems.firstOrDefault();
+                this.viewItems().firstOrDefault(i => !i.groupHeader && i.selected()) ??
+                this.viewItems().firstOrDefault(i => !i.groupHeader);
             if (firstItem) {
                 firstItem.focused.set(true);
             }
         }
     }
 
-    private groupDataItems(dataItems: Iterable<any>): List<Group<string, ListViewItem>> {
-        let groupedItems: List<Group<string, ListViewItem>>;
+    private groupDataItems(dataItems: Iterable<any>): List<ListViewItem> {
+        let groupedItems: List<ListViewItem>;
         if (this.groupField) {
             const field = this.groupField as string;
             groupedItems = Enumerable.from(dataItems)
                 .groupBy(item => (item as any)[field])
                 .select(group => {
-                    return new Group<string, ListViewItem>(
-                        group.key,
-                        group.select(d => new ListViewItem<T>(d)).toList()
-                    );
+                    const header = new ListViewItem({
+                        headerText: group.key
+                    });
+                    header.groupHeader = true;
+                    return new List<ListViewItem>([
+                        header,
+                        ...group.source.select(item => new ListViewItem(item)).toList()
+                    ]);
                 })
-                .orderBy(g => g.key)
+                .selectMany(g => g)
                 .toList();
         } else {
-            const items = Enumerable.from(dataItems)
+            groupedItems = Enumerable.from(dataItems)
                 .select(item => new ListViewItem<T>(item))
                 .toList();
-            groupedItems = new List<Group<string, ListViewItem>>([new Group<string, ListViewItem>("", items)]);
         }
         return groupedItems;
     }
 
-    private groupListItems(listItems: Iterable<ListViewItem>): List<Group<string, ListViewItem>> {
-        let groupedItems: List<Group<string, ListViewItem>>;
+    private groupListItems(listItems: Iterable<ListViewItem>): List<ListViewItem> {
+        let groupedItems: List<ListViewItem>;
         if (this.groupField) {
             const field = this.groupField as string;
             groupedItems = Enumerable.from(listItems)
                 .groupBy(item => (item.data as any)[field])
                 .select(group => {
-                    return new Group<string, ListViewItem>(group.key, group.source.toList());
+                    const header = new ListViewItem({
+                        headerText: group.key
+                    });
+                    header.groupHeader = true;
+                    return new List<ListViewItem>([header, ...group.source.toList()]);
                 })
-                .orderBy(g => g.key)
+                .selectMany(g => g)
                 .toList();
         } else {
-            groupedItems = new List<Group<string, ListViewItem>>([
-                new Group<string, ListViewItem>("", Enumerable.from(listItems))
-            ]);
+            groupedItems = new List<ListViewItem>(listItems);
         }
         return groupedItems;
     }
@@ -193,10 +218,10 @@ export class ListViewComponent<T = any> implements OnInit {
     }
 
     private scrollToFocusedItem(): void {
-        const focusedItem = this.flatViewItems.firstOrDefault(i => i.focused());
+        const focusedItem = this.viewItems().firstOrDefault(i => i.focused());
         if (focusedItem) {
             const focusedItemElement = this.elementRef.nativeElement.querySelector(
-                `[data-item-index="${this.flatViewItems.indexOf(focusedItem)}"]`
+                `[data-item-index="${this.viewItems().indexOf(focusedItem)}"]`
             );
             if (focusedItemElement) {
                 focusedItemElement.scrollIntoView({
@@ -207,31 +232,16 @@ export class ListViewComponent<T = any> implements OnInit {
         }
     }
 
-    private setSubscriptions(): void {
-        this.viewItems = computed(() => {
-            const skip = this.pageState.skip();
-            const take = this.pageState.take();
-            if (!this.pagerSettings.enabled) {
-                return this.listViewService.listViewItems();
-            }
-            const items = this.listViewService
-                .listViewItems()
-                .selectMany(g => g.source)
-                .skip(skip)
-                .take(take);
-            return this.groupListItems(items);
-        });
-        this.itemCount = computed(() => {
-            console.log("itemCount signal");
-            return this.listViewService
-                .listViewItems()
-                .selectMany(g => g.source)
-                .count();
-        });
-
+    private setKeyboardNavigation(): void {
         fromEvent<KeyboardEvent>(this.elementRef.nativeElement, "keydown")
             .pipe(
-                filter((event: KeyboardEvent) => event.key === "ArrowDown" || event.key === "ArrowUp"),
+                filter(
+                    (event: KeyboardEvent) =>
+                        event.key === "ArrowDown" ||
+                        event.key === "ArrowUp" ||
+                        event.key === "Enter" ||
+                        event.key === " "
+                ),
                 tap((event: KeyboardEvent) => {
                     event.stopImmediatePropagation();
                     event.preventDefault();
@@ -245,13 +255,47 @@ export class ListViewComponent<T = any> implements OnInit {
                 } else if (key === "ArrowUp") {
                     this.focusPreviousItem();
                     this.scrollToFocusedItem();
+                } else if (key === "Enter" || key === " ") {
+                    const focusedItem = this.viewItems().firstOrDefault(i => i.focused());
+                    if (focusedItem) {
+                        this.listViewService.toggleItemSelection(focusedItem);
+                    }
                 }
             });
     }
 
-    private get flatViewItems(): List<ListViewItem> {
-        return this.viewItems()
-            .selectMany(g => g.source)
-            .toList();
+    private setSubscriptions(): void {
+        this.viewItems = computed(() => {
+            const skip = this.pageState.skip();
+            const take = this.pageState.take();
+            if (!this.pagerSettings.enabled) {
+                return this.listViewService.listViewItems();
+            }
+            const items = this.listViewService
+                .listViewItems()
+                .where(i => !i.groupHeader)
+                .skip(skip)
+                .take(take)
+                .toList();
+            return this.groupListItems(items);
+        });
+        this.itemCount = computed(() => {
+            return this.listViewService.listViewItems().count();
+        });
+
+        if (this.navigable) {
+            this.setKeyboardNavigation();
+        }
+
+        fromEvent<MouseEvent>(document, "click")
+            .pipe(
+                filter((event: MouseEvent) => {
+                    const target = event.target as HTMLElement;
+                    return !this.elementRef.nativeElement.contains(target);
+                })
+            )
+            .subscribe(() => {
+                this.clearFocusedItem();
+            });
     }
 }

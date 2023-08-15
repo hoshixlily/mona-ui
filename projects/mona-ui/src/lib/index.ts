@@ -167,8 +167,9 @@ export * from "./layout/layout.module";
 /** List View */
 export * from "./list-view/components/list-view/list-view.component";
 export * from "./list-view/directives/list-view-item-template.directive";
-export * from "./list-view/directives/list-view-header-template.directive";
 export * from "./list-view/directives/list-view-footer-template.directive";
+export * from "./list-view/directives/list-view-group-template.directive";
+export * from "./list-view/directives/list-view-header-template.directive";
 export * from "./list-view/directives/list-view-selectable.directive";
 export * from "./list-view/directives/list-view-virtual-scroll.directive";
 export * from "./list-view/list-view.module";

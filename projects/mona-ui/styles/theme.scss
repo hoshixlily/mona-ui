@@ -1234,6 +1234,15 @@ div.mona-tab-strip-scroll {
     }
 }
 
+.mona-list-view-group-header {
+    background: var(--mona-background-dark);
+    border-bottom: 1px solid var(--mona-border-color);
+    user-select: none;
+    &:not(:first-child) {
+        border-top: 1px solid var(--mona-border-color);
+    }
+}
+
 /** Menu */
 /** Context Menu */
 .mona-contextmenu-content {

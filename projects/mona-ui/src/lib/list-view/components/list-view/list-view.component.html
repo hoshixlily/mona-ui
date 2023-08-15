@@ -6,27 +6,30 @@
         <cdk-virtual-scroll-viewport [itemSize]="listViewService.virtualScrollOptions.itemHeight"
                                      *ngIf="listViewService.virtualScrollOptions.enabled">
             <ul class="mona-list-view-list" [attr.tabindex]="-1">
-                <ng-container *ngFor="let group of viewItems(); let ix = index;">
-                    <ng-container *ngIf="group.key">
-                        <div class="mona-list-view-group-header">{{group.key}}</div>
+                <ng-container *cdkVirtualFor="let item of listViewService.listViewItems(); let ix = index;">
+                    <ng-container *ngIf="item.groupHeader">
+                        <div class="mona-list-view-group-header" *ngIf="!listViewGroupTemplateRef">{{item.data.headerText}}</div>
+                        <ng-container [ngTemplateOutlet]="listViewGroupTemplateRef" [ngTemplateOutletContext]="{$implicit: item.data.headerText}"
+                                      *ngIf="listViewGroupTemplateRef"></ng-container>
                     </ng-container>
-                    <ng-container *cdkVirtualFor="let item of group.source">
-                        <ng-container [ngTemplateOutlet]="listItemTemplate"
-                                      [ngTemplateOutletContext]="{$implicit: item, index: ix}"></ng-container>
-                    </ng-container>
+                    <ng-container [ngTemplateOutlet]="listItemTemplate"
+                                  [ngTemplateOutletContext]="{$implicit: item, index: ix}"
+                                  *ngIf="!item.header()"></ng-container>
                 </ng-container>
             </ul>
         </cdk-virtual-scroll-viewport>
 
         <ul class="mona-list-view-list" [attr.tabindex]="-1" *ngIf="!listViewService.virtualScrollOptions.enabled">
-            <ng-container *ngFor="let group of viewItems(); let ix = index;">
-                <ng-container *ngIf="group.key">
-                    <div class="mona-list-view-group-header">{{group.key}}</div>
+            <ng-container
+                *ngFor="let item of viewItems(); let ix = index;">
+                <ng-container *ngIf="item.groupHeader">
+                    <div class="mona-list-view-group-header" *ngIf="!listViewGroupTemplateRef">{{item.data.headerText}}</div>
+                    <ng-container [ngTemplateOutlet]="listViewGroupTemplateRef" [ngTemplateOutletContext]="{$implicit: item.data.headerText}"
+                                  *ngIf="listViewGroupTemplateRef"></ng-container>
                 </ng-container>
-                <ng-container *ngFor="let item of group.source">
-                    <ng-container [ngTemplateOutlet]="listItemTemplate"
-                                  [ngTemplateOutletContext]="{$implicit: item, index: ix}"></ng-container>
-                </ng-container>
+                <ng-container [ngTemplateOutlet]="listItemTemplate"
+                              [ngTemplateOutletContext]="{$implicit: item, index: ix}"
+                              *ngIf="!item.groupHeader"></ng-container>
             </ng-container>
         </ul>
         <ng-template #listItemTemplate let-item let-ix="index">

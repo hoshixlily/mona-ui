@@ -8,6 +8,7 @@ import { ListViewHeaderTemplateDirective } from "./directives/list-view-header-t
 import { ListViewItemTemplateDirective } from "./directives/list-view-item-template.directive";
 import { ListViewSelectableDirective } from "./directives/list-view-selectable.directive";
 import { ListViewVirtualScrollDirective } from "./directives/list-view-virtual-scroll.directive";
+import { ListViewGroupTemplateDirective } from "./directives/list-view-group-template.directive";
 
 @NgModule({
     declarations: [
@@ -16,13 +17,15 @@ import { ListViewVirtualScrollDirective } from "./directives/list-view-virtual-s
         ListViewHeaderTemplateDirective,
         ListViewFooterTemplateDirective,
         ListViewSelectableDirective,
-        ListViewVirtualScrollDirective
+        ListViewVirtualScrollDirective,
+        ListViewGroupTemplateDirective
     ],
     imports: [CommonModule, PagerModule, CdkVirtualForOf, CdkVirtualScrollViewport, CdkFixedSizeVirtualScroll],
     exports: [
         ListViewComponent,
         ListViewItemTemplateDirective,
         ListViewFooterTemplateDirective,
+        ListViewGroupTemplateDirective,
         ListViewHeaderTemplateDirective,
         ListViewSelectableDirective,
         ListViewVirtualScrollDirective

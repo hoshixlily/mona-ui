@@ -6,9 +6,7 @@ import { VirtualScrollOptions } from "../models/VirtualScrollOptions";
 
 @Injectable()
 export class ListViewService {
-    public listViewItems: WritableSignal<List<Group<string, ListViewItem>>> = signal<List<Group<string, ListViewItem>>>(
-        new List<Group<string, ListViewItem>>([])
-    );
+    public listViewItems: WritableSignal<List<ListViewItem>> = signal<List<ListViewItem>>(new List<ListViewItem>([]));
     public selectableOptions: SelectableOptions = {
         enabled: false,
         mode: "single"
@@ -22,11 +20,11 @@ export class ListViewService {
 
     public loadSelectedKeys(selectedKeys: Iterable<any>): void {
         const selectedKeySet = new EnumerableSet<any>(selectedKeys);
-        for (const item of this.flatListViewItems) {
+        for (const item of this.listViewItems()) {
             item.selected.set(false);
         }
         for (const key of selectedKeySet) {
-            const item = this.flatListViewItems.firstOrDefault(item => {
+            const item = this.listViewItems().firstOrDefault(item => {
                 if (this.selectionKey) {
                     return item.data[this.selectionKey] === key;
                 }
@@ -52,7 +50,7 @@ export class ListViewService {
         }
         if (this.selectableOptions.mode === "single") {
             this.selectedKeys.clear();
-            for (const item of this.flatListViewItems) {
+            for (const item of this.listViewItems()) {
                 item.selected.set(false);
             }
         }
@@ -65,9 +63,5 @@ export class ListViewService {
             item.selected.set(true);
         }
         this.selectedKeysChange.emit(this.selectedKeys.toArray());
-    }
-
-    private get flatListViewItems(): IEnumerable<ListViewItem> {
-        return this.listViewItems().selectMany(i => i.source);
     }
 }

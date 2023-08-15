@@ -7,6 +7,7 @@ div.mona-list-view {
     height: 100%;
     display: flex;
     flex-direction: column;
+    outline: none;
 }
 
 div.mona-list-view-content {
@@ -34,4 +35,9 @@ div.mona-list-view-footer {
 
 div.mona-list-view-pager {
     border-top: 1px solid var(--mona-border-color);
+}
+
+div.mona-list-view-group-header {
+    font-weight: bold;
+    padding: 4px 8px;
 }
