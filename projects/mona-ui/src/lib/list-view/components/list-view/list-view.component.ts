@@ -232,7 +232,7 @@ export class ListViewComponent<T = any> implements OnInit {
         }
     }
 
-    private setKeyboardNavigation(): void {
+    private setKeyboardEvents(): void {
         fromEvent<KeyboardEvent>(this.elementRef.nativeElement, "keydown")
             .pipe(
                 filter(
@@ -249,13 +249,13 @@ export class ListViewComponent<T = any> implements OnInit {
                 map((event: KeyboardEvent) => event.key)
             )
             .subscribe((key: string) => {
-                if (key === "ArrowDown") {
+                if (key === "ArrowDown" && this.navigable) {
                     this.focusNextItem();
                     this.scrollToFocusedItem();
-                } else if (key === "ArrowUp") {
+                } else if (key === "ArrowUp" && this.navigable) {
                     this.focusPreviousItem();
                     this.scrollToFocusedItem();
-                } else if (key === "Enter" || key === " ") {
+                } else if (this.listViewService.selectableOptions.enabled && (key === "Enter" || key === " ")) {
                     const focusedItem = this.viewItems().firstOrDefault(i => i.focused());
                     if (focusedItem) {
                         this.listViewService.toggleItemSelection(focusedItem);
@@ -283,8 +283,8 @@ export class ListViewComponent<T = any> implements OnInit {
             return this.listViewService.listViewItems().count();
         });
 
-        if (this.navigable) {
-            this.setKeyboardNavigation();
+        if (this.navigable || this.listViewService.selectableOptions.enabled) {
+            this.setKeyboardEvents();
         }
 
         fromEvent<MouseEvent>(document, "click")
