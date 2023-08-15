@@ -14,6 +14,11 @@ div.mona-list-view-content {
     overflow: auto;
 }
 
+.cdk-virtual-scrollable {
+    width: 100%;
+    height: 100%;
+}
+
 ul.mona-list-view-list {
     list-style: none;
     outline: none;

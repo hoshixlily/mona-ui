@@ -8,4 +8,11 @@ export class ListViewItem<T = any> {
     public constructor(data: T) {
         this.data = data;
     }
+
+    public equals(other: ListViewItem<T>, viaField?: string | number | symbol): boolean {
+        if (viaField) {
+            return (this.data as any)[viaField] === (other.data as any)[viaField];
+        }
+        return this.data === other.data;
+    }
 }

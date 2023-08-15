@@ -532,18 +532,23 @@
                                     </div>
                                 </mona-fieldset>
 
-                                <mona-list-view [items]="dropdownListDataItems" style="height: 350px; width: 350px;">
+                                <mona-list-view [items]="listViewDataItems"
+                                                [monaListViewSelectable]="{enabled: true, mode: 'multiple'}"
+                                                [selectedKeys]="listViewSelectedKeys" selectionKey="text"
+                                                (selectedKeysChange)="onListViewSelectionChange($event)"
+                                                [monaListViewVirtualScroll]="{enabled: true, itemHeight: 28}"
+                                                style="height: 350px; width: 350px;">
                                     <ng-template monaListViewHeaderTemplate>
                                         <div style="padding: 4px 8px; font-weight: 600;">List of Products</div>
                                     </ng-template>
                                     <ng-template monaListViewItemTemplate let-dataItem>
-                                        <div style="padding:4px 8px;">
+                                        <div style="padding:4px 8px; color: #32BEA6;">
                                             {{dataItem.text}}
                                         </div>
                                     </ng-template>
                                     <ng-template monaListViewFooterTemplate>
                                         <div style="padding: 4px 8px; font-weight: 600;">
-                                            <span style="color: var(--mona-primary-light);">{{dropdownListDataItems.length}}</span> items
+                                            <span style="color: var(--mona-primary-light);">{{listViewDataItems.length}}</span> items | <span style="color: #FF3055;">{{listViewSelectedKeys.size}}</span> selected
                                         </div>
                                     </ng-template>
                                 </mona-list-view>

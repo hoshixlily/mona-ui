@@ -1211,13 +1211,19 @@ div.mona-tab-strip-scroll {
 }
 
 .mona-list-view-content {
-    @include scrollbars-thin;
+    &, & .cdk-virtual-scrollable {
+        @include scrollbars-thin;
+    }
 }
 
 .mona-list-view-list {
     & li {
         &.mona-focused {
             box-shadow: 0 0 0 1px var(--mona-focus-border-color) inset;
+        }
+        &.mona-selected {
+            background-color: var(--mona-primary);
+            color: var(--mona-text-inverted);
         }
     }
 }

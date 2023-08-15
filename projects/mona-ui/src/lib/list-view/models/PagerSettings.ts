@@ -3,7 +3,7 @@ export interface PagerSettings {
     firstLast?: boolean;
     info?: boolean;
     pageSizeValues: number[] | boolean;
-    previousNext?: boolean;
+    previousNext: boolean;
     type: "numeric" | "input";
-    visiblePages?: number;
+    visiblePages: number;
 }
