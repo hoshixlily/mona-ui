@@ -1,23 +1,25 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { createComponentFactory, Spectator } from "@ngneat/spectator";
+import { ContextMenuService } from "../../services/context-menu.service";
 
-import { ContextMenuComponent } from './context-menu.component';
+import { ContextMenuComponent } from "./context-menu.component";
 
-describe('ContextMenuComponent', () => {
-  let component: ContextMenuComponent;
-  let fixture: ComponentFixture<ContextMenuComponent>;
+describe("ContextMenuComponent", () => {
+    let spectator: Spectator<ContextMenuComponent>;
+    const createComponent = createComponentFactory({
+        component: ContextMenuComponent,
+        providers: [ContextMenuService]
+    });
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [ ContextMenuComponent ]
-    })
-    .compileComponents();
+    beforeEach(() => {
+        const target = document.createElement("div");
+        spectator = createComponent({
+            props: {
+                target
+            }
+        });
+    });
 
-    fixture = TestBed.createComponent(ContextMenuComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it("should create", () => {
+        expect(spectator.component).toBeDefined();
+    });
 });

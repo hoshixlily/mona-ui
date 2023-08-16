@@ -164,6 +164,16 @@ export * from "./layout/modules/tab-strip/tab-strip.module";
 export * from "./layout/layout.module";
 /** Layout End */
 
+/** List View */
+export * from "./list-view/components/list-view/list-view.component";
+export * from "./list-view/directives/list-view-item-template.directive";
+export * from "./list-view/directives/list-view-footer-template.directive";
+export * from "./list-view/directives/list-view-group-template.directive";
+export * from "./list-view/directives/list-view-header-template.directive";
+export * from "./list-view/directives/list-view-selectable.directive";
+export * from "./list-view/directives/list-view-virtual-scroll.directive";
+export * from "./list-view/list-view.module";
+
 /** Menus */
 // export * from "./menus/models/MenuItem";
 export * from "./menus/modules/shared-menu/components/menu-item/menu-item.component";
@@ -261,8 +271,8 @@ export * from "./window/directives/window-title-template.directive";
 export * from "./window/components/window/window.component";
 export * from "./window/window.module";
 
-/** Shared [TEMPORARY EXPORT] */
-// export * from "./shared/components/popup-list-item/popup-list-item.component";
-export * from "./shared/shared.module";
+/** Pipes */
+export * from "./pipes/slice.pipe";
+export * from "./pipes/type-cast.pipe";
 
 export * from "./mona-ui.module";

@@ -1,23 +1,37 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { FontAwesomeTestingModule } from "@fortawesome/angular-fontawesome/testing";
+import { createComponentFactory, Spectator } from "@ngneat/spectator";
+import { SplitterPaneComponent } from "../splitter-pane/splitter-pane.component";
 
-import { SplitterResizerComponent } from './splitter-resizer.component';
+import { SplitterResizerComponent } from "./splitter-resizer.component";
 
-describe('SplitterResizerComponent', () => {
-  let component: SplitterResizerComponent;
-  let fixture: ComponentFixture<SplitterResizerComponent>;
+describe("SplitterResizerComponent", () => {
+    let spectator: Spectator<SplitterResizerComponent>;
+    const createComponent = createComponentFactory({
+        component: SplitterResizerComponent,
+        imports: [FontAwesomeTestingModule]
+    });
+    let previousPaneSpectator: Spectator<SplitterPaneComponent>;
+    const createPreviousPaneComponent = createComponentFactory({
+        component: SplitterPaneComponent
+    });
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [ SplitterResizerComponent ]
-    })
-    .compileComponents();
+    let nextPaneSpectator: Spectator<SplitterPaneComponent>;
+    const createNextPaneComponent = createComponentFactory({
+        component: SplitterPaneComponent
+    });
 
-    fixture = TestBed.createComponent(SplitterResizerComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+    beforeEach(() => {
+        previousPaneSpectator = createPreviousPaneComponent();
+        nextPaneSpectator = createNextPaneComponent();
+        spectator = createComponent({
+            props: {
+                previousPane: previousPaneSpectator.component,
+                nextPane: nextPaneSpectator.component
+            }
+        });
+    });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it("should create", () => {
+        expect(spectator.component).toBeDefined();
+    });
 });

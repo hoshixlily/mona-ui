@@ -1,23 +1,23 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { FontAwesomeTestingModule } from "@fortawesome/angular-fontawesome/testing";
+import { createComponentFactory, Spectator } from "@ngneat/spectator";
+import { DateComparerPipe } from "../../../../../pipes/date-comparer.pipe";
+import { DateIncludePipe } from "../../../../../pipes/date-include.pipe";
+import { SlicePipe } from "../../../../../pipes/slice.pipe";
 
-import { CalendarComponent } from './calendar.component';
+import { CalendarComponent } from "./calendar.component";
 
-describe('CalendarComponent', () => {
-  let component: CalendarComponent;
-  let fixture: ComponentFixture<CalendarComponent>;
+describe("CalendarComponent", () => {
+    let spectator: Spectator<CalendarComponent>;
+    const createComponent = createComponentFactory({
+        component: CalendarComponent,
+        imports: [FontAwesomeTestingModule, SlicePipe, DateComparerPipe, DateIncludePipe]
+    });
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [ CalendarComponent ]
-    })
-    .compileComponents();
+    beforeEach(() => {
+        spectator = createComponent();
+    });
 
-    fixture = TestBed.createComponent(CalendarComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it("should create", () => {
+        expect(spectator.component).toBeDefined();
+    });
 });

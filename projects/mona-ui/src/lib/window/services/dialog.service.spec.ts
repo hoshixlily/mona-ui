@@ -1,16 +1,20 @@
-import { TestBed } from '@angular/core/testing';
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { createServiceFactory, SpectatorService } from "@ngneat/spectator";
+import { AnimationService } from "../../animations/animation.service";
 
-import { DialogService } from './dialog.service';
+import { DialogService } from "./dialog.service";
 
-describe('DialogService', () => {
-  let service: DialogService;
+describe("DialogService", () => {
+    let spectator: SpectatorService<DialogService>;
+    const createService = createServiceFactory({
+        service: DialogService,
+        imports: [BrowserAnimationsModule],
+        providers: [AnimationService]
+    });
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({});
-    service = TestBed.inject(DialogService);
-  });
+    beforeEach(() => (spectator = createService()));
 
-  it('should be created', () => {
-    expect(service).toBeTruthy();
-  });
+    it("should be created", () => {
+        expect(spectator.service).toBeTruthy();
+    });
 });

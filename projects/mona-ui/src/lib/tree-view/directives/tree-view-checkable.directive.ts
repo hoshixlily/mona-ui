@@ -1,5 +1,4 @@
 import { Directive, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from "@angular/core";
-import { TreeViewComponent } from "../components/tree-view/tree-view.component";
 import { CheckableOptions } from "../data/CheckableOptions";
 import { TreeViewService } from "../services/tree-view.service";
 
@@ -19,10 +18,7 @@ export class TreeViewCheckableDirective implements OnInit, OnChanges {
     @Input("monaTreeViewCheckable")
     public options?: CheckableOptions | "";
 
-    public constructor(
-        private readonly treeView: TreeViewComponent,
-        private readonly treeViewService: TreeViewService
-    ) {}
+    public constructor(private readonly treeViewService: TreeViewService) {}
 
     public ngOnChanges(changes: SimpleChanges): void {
         if (changes && changes["checkedKeys"] && !changes["checkedKeys"].isFirstChange()) {

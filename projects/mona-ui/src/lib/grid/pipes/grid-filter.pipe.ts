@@ -1,6 +1,6 @@
 import { Pipe, PipeTransform } from "@angular/core";
-import { IQuery, Query } from "../../query/core/Query";
 import { Dictionary } from "@mirei/ts-collections";
+import { IQuery, Query } from "../../query/core/Query";
 import { ColumnFilterState } from "../models/ColumnFilterState";
 import { ColumnSortState } from "../models/ColumnSortState";
 import { Row } from "../models/Row";

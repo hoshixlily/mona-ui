@@ -1,16 +1,19 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed } from "@angular/core/testing";
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { createServiceFactory, SpectatorService } from "@ngneat/spectator";
 
-import { PopupAnimationService } from './popup-animation.service';
+import { PopupAnimationService } from "./popup-animation.service";
 
-describe('PopupAnimationService', () => {
-  let service: PopupAnimationService;
+describe("PopupAnimationService", () => {
+    let spectator: SpectatorService<PopupAnimationService>;
+    const createService = createServiceFactory({
+        service: PopupAnimationService,
+        imports: [BrowserAnimationsModule]
+    });
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({});
-    service = TestBed.inject(PopupAnimationService);
-  });
+    beforeEach(() => (spectator = createService()));
 
-  it('should be created', () => {
-    expect(service).toBeTruthy();
-  });
+    it("should be created", () => {
+        expect(spectator.service).toBeTruthy();
+    });
 });

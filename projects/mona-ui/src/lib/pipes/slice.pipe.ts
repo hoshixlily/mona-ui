@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from "@angular/core";
-import { Enumerable, IEnumerable } from "@mirei/ts-collections";
+import { Enumerable } from "@mirei/ts-collections";
 
 @Pipe({
     name: "monaSlice",

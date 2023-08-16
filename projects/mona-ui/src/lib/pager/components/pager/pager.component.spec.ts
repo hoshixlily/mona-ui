@@ -1,23 +1,22 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { FontAwesomeTestingModule } from "@fortawesome/angular-fontawesome/testing";
+import { createComponentFactory, Spectator } from "@ngneat/spectator";
+import { ButtonModule } from "../../../buttons/modules/button/button.module";
+import { SlicePipe } from "../../../pipes/slice.pipe";
 
-import { PagerComponent } from './pager.component';
+import { PagerComponent } from "./pager.component";
 
-describe('PagerComponent', () => {
-  let component: PagerComponent;
-  let fixture: ComponentFixture<PagerComponent>;
+describe("PagerComponent", () => {
+    let spectator: Spectator<PagerComponent>;
+    const createComponent = createComponentFactory({
+        component: PagerComponent,
+        imports: [SlicePipe, FontAwesomeTestingModule, ButtonModule]
+    });
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [ PagerComponent ]
-    })
-    .compileComponents();
+    beforeEach(() => {
+        spectator = createComponent();
+    });
 
-    fixture = TestBed.createComponent(PagerComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it("should create", () => {
+        expect(spectator.component).toBeDefined();
+    });
 });

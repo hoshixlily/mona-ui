@@ -1,0 +1,60 @@
+<div class="mona-list-view" [attr.tabindex]="-1">
+    <div class="mona-list-view-header" *ngIf="listViewHeaderTemplateRef">
+        <ng-container [ngTemplateOutlet]="listViewHeaderTemplateRef"></ng-container>
+    </div>
+    <div class="mona-list-view-content" #listViewContent>
+        <cdk-virtual-scroll-viewport [itemSize]="listViewService.virtualScrollOptions.itemHeight"
+                                     *ngIf="listViewService.virtualScrollOptions.enabled" #virtualScrollViewport>
+            <ul class="mona-list-view-list" [attr.tabindex]="-1">
+                <ng-container *cdkVirtualFor="let item of listViewService.listViewItems(); let ix = index;">
+                    <ng-container *ngIf="item.groupHeader">
+                        <div class="mona-list-view-group-header" *ngIf="!listViewGroupTemplateRef">{{item.data.headerText}}</div>
+                        <ng-container [ngTemplateOutlet]="listViewGroupTemplateRef" [ngTemplateOutletContext]="{$implicit: item.data.headerText}"
+                                      *ngIf="listViewGroupTemplateRef"></ng-container>
+                    </ng-container>
+                    <ng-container [ngTemplateOutlet]="listItemTemplate"
+                                  [ngTemplateOutletContext]="{$implicit: item, index: ix}"
+                                  *ngIf="!item.groupHeader"></ng-container>
+                </ng-container>
+            </ul>
+        </cdk-virtual-scroll-viewport>
+
+        <ul class="mona-list-view-list" [attr.tabindex]="-1" *ngIf="!listViewService.virtualScrollOptions.enabled">
+            <ng-container
+                *ngFor="let item of viewItems(); let ix = index;">
+                <ng-container *ngIf="item.groupHeader">
+                    <div class="mona-list-view-group-header" *ngIf="!listViewGroupTemplateRef">{{item.data.headerText}}</div>
+                    <ng-container [ngTemplateOutlet]="listViewGroupTemplateRef" [ngTemplateOutletContext]="{$implicit: item.data.headerText}"
+                                  *ngIf="listViewGroupTemplateRef"></ng-container>
+                </ng-container>
+                <ng-container [ngTemplateOutlet]="listItemTemplate"
+                              [ngTemplateOutletContext]="{$implicit: item, index: ix}"
+                              *ngIf="!item.groupHeader"></ng-container>
+            </ng-container>
+        </ul>
+        <ng-template #listItemTemplate let-item let-ix="index">
+            <li [class.mona-focused]="item.focused()" [attr.data-item-index]="ix"
+                [class.mona-selected]="item.selected()"
+                (click)="onListItemClick(item)">
+                <ng-container [ngTemplateOutlet]="listViewItemTemplateRef"
+                              [ngTemplateOutletContext]="{$implicit: item.data, index: ix, first: ix===0,
+                                                last: ix===listViewService.listViewItems().length-1}"></ng-container>
+            </li>
+        </ng-template>
+    </div>
+    <div class="mona-list-view-footer" *ngIf="listViewFooterTemplateRef">
+        <ng-container [ngTemplateOutlet]="listViewFooterTemplateRef"></ng-container>
+    </div>
+    <div class="mona-list-view-pager" *ngIf="pagerSettings.enabled && !listViewService.virtualScrollOptions.enabled">
+        <mona-pager [firstLast]="pagerSettings.firstLast??false"
+                    [pageSizeValues]="pagerSettings.pageSizeValues"
+                    [visiblePages]="pagerSettings.visiblePages"
+                    [total]="itemCount()"
+                    [skip]="pageState.skip()"
+                    [responsive]="false"
+                    [pageSize]="pageState.take()"
+                    [previousNext]="pagerSettings.previousNext"
+                    (pageChange)="onPageChange($event)"
+                    (pageSizeChange)="onPageSizeChange($event)"></mona-pager>
+    </div>
+</div>

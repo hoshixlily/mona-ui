@@ -1,21 +1,20 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { FontAwesomeTestingModule } from "@fortawesome/angular-fontawesome/testing";
+import { createComponentFactory, Spectator } from "@ngneat/spectator";
 
-import { DialogContentComponent } from './dialog-content.component';
+import { DialogContentComponent } from "./dialog-content.component";
 
-describe('DialogContentComponent', () => {
-  let component: DialogContentComponent;
-  let fixture: ComponentFixture<DialogContentComponent>;
-
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      declarations: [DialogContentComponent]
+describe("DialogContentComponent", () => {
+    let spectator: Spectator<DialogContentComponent>;
+    const createComponent = createComponentFactory({
+        component: DialogContentComponent,
+        imports: [FontAwesomeTestingModule]
     });
-    fixture = TestBed.createComponent(DialogContentComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    beforeEach(() => {
+        spectator = createComponent();
+    });
+
+    it("should create", () => {
+        expect(spectator.component).toBeDefined();
+    });
 });

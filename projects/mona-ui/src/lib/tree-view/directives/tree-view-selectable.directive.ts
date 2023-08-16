@@ -1,6 +1,5 @@
 import { Directive, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from "@angular/core";
 import { SelectableOptions } from "../data/SelectableOptions";
-import { TreeViewComponent } from "../components/tree-view/tree-view.component";
 import { TreeViewService } from "../services/tree-view.service";
 
 @Directive({
@@ -19,10 +18,7 @@ export class TreeViewSelectableDirective implements OnInit, OnChanges {
     @Input("monaTreeViewSelectable")
     public options?: SelectableOptions | "";
 
-    public constructor(
-        private readonly treeView: TreeViewComponent,
-        private readonly treeViewService: TreeViewService
-    ) {}
+    public constructor(private readonly treeViewService: TreeViewService) {}
 
     public ngOnChanges(changes: SimpleChanges): void {
         if (changes && changes["selectedKeys"] && !changes["selectedKeys"].isFirstChange()) {

@@ -1,23 +1,23 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormsModule } from "@angular/forms";
+import { createComponentFactory, Spectator } from "@ngneat/spectator";
+import { DropDownListModule } from "../../../dropdowns/modules/drop-down-list/drop-down-list.module";
+import { TextBoxModule } from "../../../inputs/modules/text-box/text-box.module";
+import { OperatorFilterPipe } from "../../pipes/operator-filter.pipe";
+import { ValuelessOperatorPipe } from "../../pipes/valueless-operator.pipe";
 
-import { FilterMenuComponent } from './filter-menu.component';
+import { FilterMenuComponent } from "./filter-menu.component";
 
-describe('FilterMenuComponent', () => {
-  let component: FilterMenuComponent;
-  let fixture: ComponentFixture<FilterMenuComponent>;
+describe("FilterMenuComponent", () => {
+    let spectator: Spectator<FilterMenuComponent>;
+    const createComponent = createComponentFactory({
+        component: FilterMenuComponent,
+        imports: [FormsModule, TextBoxModule, DropDownListModule],
+        declarations: [OperatorFilterPipe, ValuelessOperatorPipe]
+    });
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [ FilterMenuComponent ]
-    })
-    .compileComponents();
+    beforeEach(() => (spectator = createComponent()));
 
-    fixture = TestBed.createComponent(FilterMenuComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it("should create", () => {
+        expect(spectator.component).toBeTruthy();
+    });
 });

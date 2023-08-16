@@ -1202,6 +1202,47 @@ div.mona-tab-strip-scroll {
     }
 }
 
+/** List View */
+.mona-list-view {
+    @include font-medium;
+    color: var(--mona-text);
+    background: var(--mona-background);
+    border: 1px solid var(--mona-border-color);
+}
+
+.mona-list-view-content {
+    &, & .cdk-virtual-scrollable {
+        @include scrollbars-thin;
+    }
+}
+
+.mona-list-view-list {
+    & li {
+        &.mona-focused {
+            box-shadow: 0 0 0 1px var(--mona-focus-border-color) inset;
+        }
+        &.mona-selected {
+            background-color: var(--mona-primary);
+            color: var(--mona-text-inverted);
+        }
+    }
+}
+
+.mona-list-view-pager {
+    & .mona-pager {
+        border: none;
+    }
+}
+
+.mona-list-view-group-header {
+    background: var(--mona-background-dark);
+    border-bottom: 1px solid var(--mona-border-color);
+    user-select: none;
+    &:not(:first-child) {
+        border-top: 1px solid var(--mona-border-color);
+    }
+}
+
 /** Menu */
 /** Context Menu */
 .mona-contextmenu-content {

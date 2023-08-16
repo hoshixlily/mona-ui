@@ -7,12 +7,10 @@ import {
     createComponent,
     DestroyRef,
     ElementRef,
-    EventEmitter,
     inject,
     Inject,
     Injector,
     OnInit,
-    Output,
     signal,
     TemplateRef,
     Type,
@@ -20,15 +18,14 @@ import {
     ViewContainerRef,
     WritableSignal
 } from "@angular/core";
-import { PopupDataInjectionToken } from "../../../popup/models/PopupInjectionToken";
-import { WindowInjectorData } from "../../models/WindowInjectorData";
-import { faClose, IconDefinition } from "@fortawesome/free-solid-svg-icons";
-import { WindowCloseEvent } from "../../models/WindowCloseEvent";
-import { PopupCloseSource } from "../../../popup/models/PopupCloseEvent";
-import { animate, AnimationEvent, state, style, transition, trigger } from "@angular/animations";
-import { filter, fromEvent } from "rxjs";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { faClose, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { filter, fromEvent } from "rxjs";
 import { AnimationService } from "../../../animations/animation.service";
+import { PopupCloseSource } from "../../../popup/models/PopupCloseEvent";
+import { PopupDataInjectionToken } from "../../../popup/models/PopupInjectionToken";
+import { WindowCloseEvent } from "../../models/WindowCloseEvent";
+import { WindowInjectorData } from "../../models/WindowInjectorData";
 
 @Component({
     selector: "mona-window-content",

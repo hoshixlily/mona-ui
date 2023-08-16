@@ -1,23 +1,31 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { createComponentFactory, Spectator } from "@ngneat/spectator";
+import { Column } from "../../models/Column";
+import { Row } from "../../models/Row";
+import { GridService } from "../../services/grid.service";
 
-import { GridCellComponent } from './grid-cell.component';
+import { GridCellComponent } from "./grid-cell.component";
 
-describe('GridCellComponent', () => {
-  let component: GridCellComponent;
-  let fixture: ComponentFixture<GridCellComponent>;
+describe("GridCellComponent", () => {
+    let spectator: Spectator<GridCellComponent>;
+    const createComponent = createComponentFactory({
+        component: GridCellComponent,
+        providers: [GridService]
+    });
+    const column: Column = new Column();
+    column.field = "test";
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [ GridCellComponent ]
-    })
-    .compileComponents();
+    const row: Row = new Row({ test: "test" });
 
-    fixture = TestBed.createComponent(GridCellComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+    beforeEach(() => {
+        spectator = createComponent({
+            props: {
+                column,
+                row
+            }
+        });
+    });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it("should create", () => {
+        expect(spectator.component).toBeTruthy();
+    });
 });

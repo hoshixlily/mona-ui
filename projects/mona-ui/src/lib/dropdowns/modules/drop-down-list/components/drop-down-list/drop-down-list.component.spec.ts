@@ -1,23 +1,23 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { FontAwesomeTestingModule } from "@fortawesome/angular-fontawesome/testing";
+import { createComponentFactory, Spectator } from "@ngneat/spectator";
+import { PopupAnimationService } from "../../../../../animations/popup-animation.service";
 
-import { DropDownListComponent } from './drop-down-list.component';
+import { DropDownListComponent } from "./drop-down-list.component";
 
-describe('DropDownListComponent', () => {
-  let component: DropDownListComponent;
-  let fixture: ComponentFixture<DropDownListComponent>;
+describe("DropDownListComponent", () => {
+    let spectator: Spectator<DropDownListComponent>;
+    const createComponent = createComponentFactory({
+        component: DropDownListComponent,
+        imports: [BrowserAnimationsModule, FontAwesomeTestingModule],
+        providers: [PopupAnimationService]
+    });
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [ DropDownListComponent ]
-    })
-    .compileComponents();
+    beforeEach(() => {
+        spectator = createComponent();
+    });
 
-    fixture = TestBed.createComponent(DropDownListComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it("should create", () => {
+        expect(spectator.component).toBeDefined();
+    });
 });

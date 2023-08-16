@@ -80,9 +80,6 @@ export class PopupComponent implements OnInit, OnDestroy, AfterViewInit {
     ) {}
 
     public ngAfterViewInit(): void {
-        if (!this.contentTemplate) {
-            throw new Error(`${PopupComponent.name} requires contentTemplate`);
-        }
         window.setTimeout(() => {
             this.setEventListeners();
         });

@@ -1,23 +1,48 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Component, TemplateRef, ViewChild } from "@angular/core";
+import { FontAwesomeTestingModule } from "@fortawesome/angular-fontawesome/testing";
+import { createComponentFactory, Spectator } from "@ngneat/spectator";
 
-import { PopupComponent } from './popup.component';
+import { PopupComponent } from "./popup.component";
 
-describe('PopupComponent', () => {
-  let component: PopupComponent;
-  let fixture: ComponentFixture<PopupComponent>;
+@Component({
+    template: `
+        <ng-template #contentTemplate>
+            <div>Test</div>
+        </ng-template>
+    `
+})
+class PopupComponentTestComponent {
+    @ViewChild("contentTemplate")
+    public contentTemplate!: TemplateRef<any>;
+}
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [ PopupComponent ]
-    })
-    .compileComponents();
+describe("PopupComponent", () => {
+    let spectator: Spectator<PopupComponent>;
+    const createComponent = createComponentFactory({
+        component: PopupComponent
+    });
+    let testComponentSpectator: Spectator<PopupComponentTestComponent>;
+    const createTestComponent = createComponentFactory({
+        component: PopupComponentTestComponent,
+        imports: [FontAwesomeTestingModule]
+    });
 
-    fixture = TestBed.createComponent(PopupComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+    beforeEach(() => {
+        const target = document.createElement("div");
+        testComponentSpectator = createTestComponent();
+        testComponentSpectator.detectChanges();
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+        console.warn(testComponentSpectator.component);
+
+        spectator = createComponent({
+            props: {
+                anchor: target,
+                contentTemplate: testComponentSpectator.component.contentTemplate
+            }
+        });
+    });
+
+    it("should create", () => {
+        expect(spectator.component).toBeTruthy();
+    });
 });

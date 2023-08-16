@@ -1,23 +1,21 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { FontAwesomeTestingModule } from "@fortawesome/angular-fontawesome/testing";
+import { createComponentFactory, Spectator } from "@ngneat/spectator";
+import { ContextMenuModule } from "../../../../../menus/modules/context-menu/context-menu.module";
 
-import { SplitButtonComponent } from './split-button.component';
+import { SplitButtonComponent } from "./split-button.component";
 
-describe('SplitButtonComponent', () => {
-  let component: SplitButtonComponent;
-  let fixture: ComponentFixture<SplitButtonComponent>;
+describe("SplitButtonComponent", () => {
+    let spectator: Spectator<SplitButtonComponent>;
+    const createComponent = createComponentFactory({
+        component: SplitButtonComponent,
+        imports: [ContextMenuModule, FontAwesomeTestingModule]
+    });
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [ SplitButtonComponent ]
-    })
-    .compileComponents();
+    beforeEach(() => {
+        spectator = createComponent();
+    });
 
-    fixture = TestBed.createComponent(SplitButtonComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it("should create", () => {
+        expect(spectator.component).toBeDefined();
+    });
 });

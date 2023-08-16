@@ -1,23 +1,27 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { createComponentFactory, Spectator } from "@ngneat/spectator";
+import { PopupAnimationService } from "../../../../../animations/popup-animation.service";
 
-import { TooltipComponent } from './tooltip.component';
+import { TooltipComponent } from "./tooltip.component";
 
-describe('TooltipComponent', () => {
-  let component: TooltipComponent;
-  let fixture: ComponentFixture<TooltipComponent>;
+describe("TooltipComponent", () => {
+    let spectator: Spectator<TooltipComponent>;
+    const createComponent = createComponentFactory({
+        component: TooltipComponent,
+        imports: [BrowserAnimationsModule],
+        providers: [PopupAnimationService]
+    });
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [ TooltipComponent ]
-    })
-    .compileComponents();
+    beforeEach(() => {
+        const target = document.createElement("div");
+        spectator = createComponent({
+            props: {
+                target
+            }
+        });
+    });
 
-    fixture = TestBed.createComponent(TooltipComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it("should create", () => {
+        expect(spectator.component).toBeDefined();
+    });
 });

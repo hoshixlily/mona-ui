@@ -26,11 +26,12 @@ export class GridSelectableDirective implements OnInit, OnChanges, OnDestroy {
     @Input("monaGridSelectable")
     public options?: SelectableOptions | "";
 
-    public constructor(private readonly grid: GridComponent, private readonly gridService: GridService) {}
+    public constructor(private readonly gridService: GridService) {}
 
     public ngOnChanges(changes: SimpleChanges): void {
         if (changes && changes["selectedKeys"] && !changes["selectedKeys"].isFirstChange()) {
             this.gridService.loadSelectedKeys(this.gridService.selectedKeys);
+            console.log("selectedKeys", this.gridService.selectedKeys);
         }
     }
 

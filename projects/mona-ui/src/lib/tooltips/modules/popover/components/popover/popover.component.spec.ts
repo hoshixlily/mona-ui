@@ -1,21 +1,27 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { createComponentFactory, Spectator } from "@ngneat/spectator";
+import { PopupAnimationService } from "../../../../../animations/popup-animation.service";
 
-import { PopoverComponent } from './popover.component';
+import { PopoverComponent } from "./popover.component";
 
-describe('PopoverComponent', () => {
-  let component: PopoverComponent;
-  let fixture: ComponentFixture<PopoverComponent>;
-
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      declarations: [PopoverComponent]
+describe("PopoverComponent", () => {
+    let spectator: Spectator<PopoverComponent>;
+    const createComponent = createComponentFactory({
+        component: PopoverComponent,
+        imports: [BrowserAnimationsModule],
+        providers: [PopupAnimationService]
     });
-    fixture = TestBed.createComponent(PopoverComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    beforeEach(() => {
+        const target = document.createElement("div");
+        spectator = createComponent({
+            props: {
+                target
+            }
+        });
+    });
+
+    it("should create", () => {
+        expect(spectator.component).toBeDefined();
+    });
 });

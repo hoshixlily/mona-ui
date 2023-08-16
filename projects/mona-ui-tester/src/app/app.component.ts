@@ -304,6 +304,9 @@ export class AppComponent implements OnInit {
         allowUnsort: true,
         showIndices: true
     };
+    public listViewDataItems: IndexableList<any> = new IndexableList();
+    public listViewScrollBottomItemCount: number = 20;
+    public listViewSelectedKeys: Set<string> = new Set([]);
     public menuBarMenuVisible: boolean = false;
     public multiSelectTagCount: number = 2;
     public numericTextBoxValue: number | null = 10;
@@ -581,6 +584,22 @@ export class AppComponent implements OnInit {
         // window.setInterval(() => {
         //     console.log(this.gridOrderData[0]);
         // }, 3000);
+
+        const listViewItems = new Array<{ text: string; value: number }>();
+        for (let vx = 1; vx <= 3000; ++vx) {
+            listViewItems.push({ text: `Item ${vx}`, value: vx });
+        }
+        this.listViewDataItems = new IndexableList(listViewItems);
+        this.listViewSelectedKeys = new Set([
+            "Item 3",
+            "Item 5",
+            "Item 7",
+            "Item 9",
+            "Item 11",
+            "Item 13",
+            "Item 15",
+            "Item 2999"
+        ]);
     }
 
     public numericTextBoxFormatter = (value: number | null): string => (value != null ? `${value} °C` : "");
@@ -687,6 +706,11 @@ export class AppComponent implements OnInit {
     public onGridSortChange(sort: SortDescriptor[]): void {
         this.gridSort = sort;
         console.log(sort);
+    }
+
+    public onListViewSelectionChange(keys: string[]): void {
+        this.listViewSelectedKeys = new Set(keys);
+        console.log(keys);
     }
 
     public onMultiSelectValueChange(value: unknown[]): void {

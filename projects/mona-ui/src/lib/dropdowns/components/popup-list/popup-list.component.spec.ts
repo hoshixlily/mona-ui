@@ -1,22 +1,18 @@
-import { ComponentFixture, TestBed } from "@angular/core/testing";
+import { createComponentFactory, Spectator } from "@ngneat/spectator";
+import { PopupListService } from "../../services/popup-list.service";
 
 import { PopupListComponent } from "./popup-list.component";
 
-describe("ListComponent", () => {
-    let component: PopupListComponent;
-    let fixture: ComponentFixture<PopupListComponent>;
-
-    beforeEach(async () => {
-        await TestBed.configureTestingModule({
-            declarations: [PopupListComponent]
-        }).compileComponents();
-
-        fixture = TestBed.createComponent(PopupListComponent);
-        component = fixture.componentInstance;
-        fixture.detectChanges();
+describe("PopupListComponent", () => {
+    let spectator: Spectator<PopupListComponent>;
+    const createComponent = createComponentFactory({
+        component: PopupListComponent,
+        providers: [PopupListService]
     });
 
+    beforeEach(() => (spectator = createComponent()));
+
     it("should create", () => {
-        expect(component).toBeTruthy();
+        expect(spectator.component).toBeTruthy();
     });
 });
