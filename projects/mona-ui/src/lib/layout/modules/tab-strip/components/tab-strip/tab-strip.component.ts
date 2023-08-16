@@ -2,6 +2,7 @@ import {
     AfterContentInit,
     AfterViewInit,
     ChangeDetectionStrategy,
+    ChangeDetectorRef,
     Component,
     ContentChildren,
     ElementRef,
@@ -61,7 +62,7 @@ export class TabStripComponent implements OnInit, AfterContentInit, OnDestroy, A
     @ViewChild("tabListElement")
     public tabListElement!: ElementRef<HTMLUListElement>;
 
-    public constructor() {}
+    public constructor(private readonly cdr: ChangeDetectorRef) {}
 
     public ngAfterContentInit(): void {
         this.tabComponents.forEach((t, tx) => (t.index = tx));
@@ -87,6 +88,7 @@ export class TabStripComponent implements OnInit, AfterContentInit, OnDestroy, A
         if (selectedTab) {
             this.loadTabContent(selectedTab);
         }
+        this.cdr.detectChanges();
     }
 
     public ngOnDestroy(): void {
