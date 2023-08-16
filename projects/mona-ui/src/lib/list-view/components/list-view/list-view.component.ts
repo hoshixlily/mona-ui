@@ -1,16 +1,24 @@
+import { CdkVirtualScrollViewport } from "@angular/cdk/scrolling";
 import {
+    AfterViewInit,
     ChangeDetectionStrategy,
     Component,
     computed,
     ContentChild,
+    DestroyRef,
     ElementRef,
+    EventEmitter,
+    inject,
     Input,
     OnInit,
+    Output,
     Signal,
     signal,
     TemplateRef,
+    ViewChild,
     WritableSignal
 } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { Enumerable, List } from "@mirei/ts-collections";
 import { filter, fromEvent, map, tap } from "rxjs";
 import { PageChangeEvent } from "../../../pager/models/PageChangeEvent";
@@ -32,7 +40,8 @@ import { ListViewService } from "../../services/list-view.service";
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [ListViewService]
 })
-export class ListViewComponent<T = any> implements OnInit {
+export class ListViewComponent<T = any> implements OnInit, AfterViewInit {
+    readonly #destroyRef: DestroyRef = inject(DestroyRef);
     #items: Iterable<T> = [];
     public itemCount: Signal<number> = signal(0);
     public page: WritableSignal<number> = signal(1);
@@ -66,6 +75,9 @@ export class ListViewComponent<T = any> implements OnInit {
         this.prepareListViewItems();
     }
 
+    @ViewChild("listViewContent")
+    public listViewContent!: ElementRef<HTMLDivElement>;
+
     @ContentChild(ListViewItemTemplateDirective, { read: TemplateRef })
     public listViewItemTemplateRef!: TemplateRef<ListViewItemTemplateContext>;
 
@@ -84,10 +96,20 @@ export class ListViewComponent<T = any> implements OnInit {
         }
     }
 
+    @Output()
+    public scrollBottom: EventEmitter<Event> = new EventEmitter<Event>();
+
+    @ViewChild("virtualScrollViewport")
+    public virtualScrollViewport: CdkVirtualScrollViewport | null = null;
+
     public constructor(
         private readonly elementRef: ElementRef<HTMLDivElement>,
         public readonly listViewService: ListViewService
     ) {}
+
+    public ngAfterViewInit(): void {
+        this.setScrollBottomEvent();
+    }
 
     public ngOnInit(): void {
         this.setSubscriptions();
@@ -213,8 +235,8 @@ export class ListViewComponent<T = any> implements OnInit {
 
     private prepareListViewItems(): void {
         const groupedItems = this.groupDataItems(this.#items);
-        this.listViewService.loadSelectedKeys(this.listViewService.selectedKeys);
         this.listViewService.listViewItems.set(groupedItems);
+        this.listViewService.loadSelectedKeys(this.listViewService.selectedKeys);
     }
 
     private scrollToFocusedItem(): void {
@@ -235,6 +257,7 @@ export class ListViewComponent<T = any> implements OnInit {
     private setKeyboardEvents(): void {
         fromEvent<KeyboardEvent>(this.elementRef.nativeElement, "keydown")
             .pipe(
+                takeUntilDestroyed(this.#destroyRef),
                 filter(
                     (event: KeyboardEvent) =>
                         event.key === "ArrowDown" ||
@@ -264,6 +287,22 @@ export class ListViewComponent<T = any> implements OnInit {
             });
     }
 
+    private setScrollBottomEvent(): void {
+        const element = this.listViewService.virtualScrollOptions.enabled
+            ? (this.virtualScrollViewport?.elementRef.nativeElement as HTMLElement)
+            : this.listViewContent.nativeElement;
+        fromEvent<Event>(element, "scroll")
+            .pipe(
+                takeUntilDestroyed(this.#destroyRef),
+                filter(event => {
+                    const target = event.target as HTMLElement;
+                    return Math.abs(target.scrollHeight - target.scrollTop - target.clientHeight) < 3.0;
+                }),
+                tap((event: Event) => this.scrollBottom.emit(event))
+            )
+            .subscribe();
+    }
+
     private setSubscriptions(): void {
         this.viewItems = computed(() => {
             const skip = this.pageState.skip();
@@ -289,6 +328,7 @@ export class ListViewComponent<T = any> implements OnInit {
 
         fromEvent<MouseEvent>(document, "click")
             .pipe(
+                takeUntilDestroyed(this.#destroyRef),
                 filter((event: MouseEvent) => {
                     const target = event.target as HTMLElement;
                     return !this.elementRef.nativeElement.contains(target);

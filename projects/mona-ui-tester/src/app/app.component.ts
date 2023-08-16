@@ -305,6 +305,7 @@ export class AppComponent implements OnInit {
         showIndices: true
     };
     public listViewDataItems: IndexableList<any> = new IndexableList();
+    public listViewScrollBottomItemCount: number = 20;
     public listViewSelectedKeys: Set<string> = new Set([]);
     public menuBarMenuVisible: boolean = false;
     public multiSelectTagCount: number = 2;

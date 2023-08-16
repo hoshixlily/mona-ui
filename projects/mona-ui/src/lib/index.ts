@@ -271,8 +271,8 @@ export * from "./window/directives/window-title-template.directive";
 export * from "./window/components/window/window.component";
 export * from "./window/window.module";
 
-/** Shared [TEMPORARY EXPORT] */
-// export * from "./shared/components/popup-list-item/popup-list-item.component";
-export * from "./shared/shared.module";
+/** Pipes */
+export * from "./pipes/slice.pipe";
+export * from "./pipes/type-cast.pipe";
 
 export * from "./mona-ui.module";

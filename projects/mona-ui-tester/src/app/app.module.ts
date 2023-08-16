@@ -20,6 +20,7 @@ import {
     PopupListComponent,
     PopupModule,
     ProgressBarsModule,
+    SlicePipe,
     TooltipsModule,
     TreeViewModule,
     WindowModule
@@ -55,7 +56,9 @@ import { TestComponentComponent } from "./test-component/test-component.componen
         NotificationModule,
         NgOptimizedImage,
         NavigationModule,
-        ListViewModule
+        ListViewModule,
+
+        SlicePipe
     ],
     bootstrap: [AppComponent]
 })

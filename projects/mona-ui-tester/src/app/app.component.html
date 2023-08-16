@@ -532,11 +532,12 @@
                                     </div>
                                 </mona-fieldset>
 
-                                <mona-list-view [items]="listViewDataItems"
+                                <mona-list-view [items]="listViewDataItems|monaSlice:0:listViewScrollBottomItemCount"
                                                 [monaListViewSelectable]="{enabled: true, mode: 'multiple'}"
+                                                (scrollBottom)="listViewScrollBottomItemCount=listViewScrollBottomItemCount+10"
                                                 [selectedKeys]="listViewSelectedKeys" selectionKey="text"
-                                                (selectedKeysChange)="onListViewSelectionChange($event)"
                                                 [monaListViewVirtualScroll]="{enabled: true, itemHeight: 28}"
+                                                (selectedKeysChange)="onListViewSelectionChange($event)"
                                                 style="height: 350px; width: 350px;">
                                     <ng-template monaListViewHeaderTemplate>
                                         <div style="padding: 4px 8px; font-weight: 600;">List of Products</div>

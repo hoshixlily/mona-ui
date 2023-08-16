@@ -2,9 +2,9 @@
     <div class="mona-list-view-header" *ngIf="listViewHeaderTemplateRef">
         <ng-container [ngTemplateOutlet]="listViewHeaderTemplateRef"></ng-container>
     </div>
-    <div class="mona-list-view-content">
+    <div class="mona-list-view-content" #listViewContent>
         <cdk-virtual-scroll-viewport [itemSize]="listViewService.virtualScrollOptions.itemHeight"
-                                     *ngIf="listViewService.virtualScrollOptions.enabled">
+                                     *ngIf="listViewService.virtualScrollOptions.enabled" #virtualScrollViewport>
             <ul class="mona-list-view-list" [attr.tabindex]="-1">
                 <ng-container *cdkVirtualFor="let item of listViewService.listViewItems(); let ix = index;">
                     <ng-container *ngIf="item.groupHeader">
@@ -14,7 +14,7 @@
                     </ng-container>
                     <ng-container [ngTemplateOutlet]="listItemTemplate"
                                   [ngTemplateOutletContext]="{$implicit: item, index: ix}"
-                                  *ngIf="!item.header()"></ng-container>
+                                  *ngIf="!item.groupHeader"></ng-container>
                 </ng-container>
             </ul>
         </cdk-virtual-scroll-viewport>
