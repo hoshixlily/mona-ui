@@ -304,6 +304,7 @@ export class AppComponent implements OnInit {
         allowUnsort: true,
         showIndices: true
     };
+    public listBox2Items: IndexableList<any> = new IndexableList([] as any[]);
     public listViewDataItems: IndexableList<any> = new IndexableList();
     public listViewScrollBottomItemCount: number = 20;
     public listViewSelectedKeys: Set<string> = new Set([]);

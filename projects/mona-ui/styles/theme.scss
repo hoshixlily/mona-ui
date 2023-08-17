@@ -1202,6 +1202,13 @@ div.mona-tab-strip-scroll {
     }
 }
 
+/** List Box */
+.mona-list-box-actions {
+    background: var(--mona-background);
+    border: 1px solid var(--mona-border-color);
+    border-left-color: transparent;
+}
+
 /** List View */
 .mona-list-view {
     @include font-medium;

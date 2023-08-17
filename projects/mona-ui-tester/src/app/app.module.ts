@@ -12,6 +12,7 @@ import {
     GridModule,
     InputsModule,
     LayoutModule,
+    ListBoxModule,
     ListViewModule,
     MenubarModule,
     NavigationModule,
@@ -57,7 +58,7 @@ import { TestComponentComponent } from "./test-component/test-component.componen
         NgOptimizedImage,
         NavigationModule,
         ListViewModule,
-
+        ListBoxModule,
         SlicePipe
     ],
     bootstrap: [AppComponent]

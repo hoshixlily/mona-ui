@@ -164,6 +164,10 @@ export * from "./layout/modules/tab-strip/tab-strip.module";
 export * from "./layout/layout.module";
 /** Layout End */
 
+/** List Box */
+export * from "./list-box/components/list-box/list-box.component";
+export * from "./list-box/list-box.module";
+
 /** List View */
 export * from "./list-view/components/list-view/list-view.component";
 export * from "./list-view/directives/list-view-item-template.directive";

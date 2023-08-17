@@ -518,10 +518,8 @@
                                     </ng-template>
                                 </mona-range-slider>
 
-                                <mona-calendar [(ngModel)]="calendarValue"
-                                               [min]="calendarMinValue"
-                                                  [max]="calendarMaxValue"
-                                               style="width: 300px;"></mona-calendar>
+                                <mona-list-box [items]="dropdownListDataItems" textField="text" [connectedList]="listBox2"></mona-list-box>
+                                <mona-list-box [items]="listBox2Items" textField="text" #listBox2></mona-list-box>
 
                                 <mona-fieldset legend="Quote" style="width: 375px;">
                                     <ng-template monaFieldsetLegendTemplate>
@@ -642,7 +640,10 @@
                                     <mona-splitter orientation="horizontal">
                                         <mona-splitter-pane [collapsible]="true">
                                             <div style="width: 100%; height: 100%; padding: 20px;">
-
+                                                <mona-calendar [(ngModel)]="calendarValue"
+                                                               [min]="calendarMinValue"
+                                                               [max]="calendarMaxValue"
+                                                               style="width: 300px;"></mona-calendar>
                                             </div>
                                         </mona-splitter-pane>
                                         <mona-splitter-pane [collapsible]="true">

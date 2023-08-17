@@ -1,0 +1,36 @@
+<div class="mona-list-box">
+    <div class="mona-list-box-view">
+        <mona-list-view [items]="listBoxItems()" monaListViewSelectable
+                        [navigable]="true"
+                        [selectedKeys]="selectedItems" (selectedKeysChange)="onSelectedItemChange($event)">
+            <ng-template monaListViewItemTemplate let-item>
+                <div class="mona-list-box-item" [attr.data-item]="textField?item[textField]:item">
+                    {{textField ? item[textField] : item}}
+                </div>
+            </ng-template>
+        </mona-list-view>
+    </div>
+    <div class="mona-list-box-actions">
+        <button monaButton (click)="onMoveUpClick()">
+            <fa-icon [icon]="moveUpIcon"></fa-icon>
+        </button>
+        <button monaButton (click)="onMoveDownClick()">
+            <fa-icon [icon]="moveDownIcon"></fa-icon>
+        </button>
+        <button monaButton (click)="onTransferRightClick()">
+            <fa-icon [icon]="transferRightIcon"></fa-icon>
+        </button>
+        <button monaButton (click)="onTransferLeftClick()">
+            <fa-icon [icon]="transferLeftIcon"></fa-icon>
+        </button>
+        <button monaButton (click)="onTransferAllRightClick()">
+            <fa-icon [icon]="transferAllRightIcon"></fa-icon>
+        </button>
+        <button monaButton (click)="onTransferAllLeftClick()">
+            <fa-icon [icon]="transferAllLeftIcon"></fa-icon>
+        </button>
+        <button monaButton (click)="onRemoveClick()">
+            <fa-icon [icon]="removeIcon"></fa-icon>
+        </button>
+    </div>
+</div>
