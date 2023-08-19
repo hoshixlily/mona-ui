@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, ElementRef, Input, signal, WritableSignal } from "@angular/core";
+import {
+    ChangeDetectionStrategy,
+    Component,
+    ContentChild,
+    ElementRef,
+    Input,
+    signal,
+    TemplateRef,
+    WritableSignal
+} from "@angular/core";
 import {
     faAngleDown,
     faAngleLeft,
@@ -10,6 +19,8 @@ import {
     IconDefinition
 } from "@fortawesome/free-solid-svg-icons";
 import { Collections, Enumerable, List } from "@mirei/ts-collections";
+import { ListBoxItemTemplateDirective } from "../../directives/list-box-item-template.directive";
+import { ListBoxItemTemplateContext } from "../../models/ListBoxItemTemplateContext";
 import { ToolbarOptions } from "../../models/ToolbarOptions";
 
 type ListBoxDirection = "horizontal" | "horizontal-reverse" | "vertical" | "vertical-reverse";
@@ -36,6 +47,9 @@ export class ListBoxComponent<T> {
 
     @Input()
     public connectedList: ListBoxComponent<T> | null = null;
+
+    @ContentChild(ListBoxItemTemplateDirective, { read: TemplateRef })
+    public itemTemplate: TemplateRef<ListBoxItemTemplateContext> | null = null;
 
     @Input()
     public set items(value: Iterable<T>) {

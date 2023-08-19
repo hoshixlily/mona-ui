@@ -165,6 +165,7 @@ export * from "./layout/layout.module";
 /** Layout End */
 
 /** List Box */
+export * from "./list-box/directives/list-box-item-template.directive";
 export * from "./list-box/components/list-box/list-box.component";
 export * from "./list-box/list-box.module";
 

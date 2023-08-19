@@ -8,10 +8,12 @@
         <mona-list-view [items]="listBoxItems()" monaListViewSelectable
                         [navigable]="true"
                         [selectedKeys]="selectedItems" (selectedKeysChange)="onSelectedItemChange($event)">
-            <ng-template monaListViewItemTemplate let-item>
-                <div class="mona-list-box-item" [attr.data-item]="textField?item[textField]:item">
+            <ng-template monaListViewItemTemplate let-item let-index="index">
+                <div class="mona-list-box-item" [attr.data-item]="textField?item[textField]:item" *ngIf="!itemTemplate">
                     {{textField ? item[textField] : item}}
                 </div>
+                <ng-container [ngTemplateOutlet]="itemTemplate"
+                              [ngTemplateOutletContext]="{$implicit: item, index}"></ng-container>
             </ng-template>
         </mona-list-view>
     </div>

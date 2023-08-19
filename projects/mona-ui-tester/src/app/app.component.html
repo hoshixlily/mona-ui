@@ -520,7 +520,11 @@
 
                                 <mona-list-box [items]="dropdownListDataItems" textField="text"
                                                [toolbar]="{position:'bottom'}"
-                                               [connectedList]="listBox2"></mona-list-box>
+                                               [connectedList]="listBox2">
+                                    <ng-template monaListBoxItemTemplate let-item>
+                                        <div style="color: #00a86b; padding: 4px 8px;">{{item.text}}</div>
+                                    </ng-template>
+                                </mona-list-box>
                                 <mona-list-box [items]="listBox2Items" textField="text" #listBox2></mona-list-box>
 
                                 <mona-fieldset legend="Quote" style="width: 375px;">
