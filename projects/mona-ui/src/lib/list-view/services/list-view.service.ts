@@ -44,7 +44,7 @@ export class ListViewService {
         this.virtualScrollOptions = { ...this.virtualScrollOptions, ...options };
     }
 
-    public toggleItemSelection(item: ListViewItem): void {
+    public toggleItemSelection(item: ListViewItem, emit: boolean = true): void {
         if (!this.selectableOptions.enabled) {
             return;
         }
@@ -62,6 +62,8 @@ export class ListViewService {
             this.selectedKeys.add(key);
             item.selected.set(true);
         }
-        this.selectedKeysChange.emit(this.selectedKeys.toArray());
+        if (emit) {
+            this.selectedKeysChange.emit(this.selectedKeys.toArray());
+        }
     }
 }

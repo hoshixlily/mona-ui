@@ -5,8 +5,8 @@
      [class.mona-list-box-vertical-reverse]="direction()==='vertical-reverse'"
 >
     <div class="mona-list-box-view">
-        <mona-list-view [items]="listBoxItems()" monaListViewSelectable
-                        [navigable]="true"
+        <mona-list-view [items]="listBoxItems()" [monaListViewSelectable]="{enabled: true, mode: 'single'}"
+                        [navigable]="{enabled: true, mode: 'select'}"
                         [selectedKeys]="selectedItems" (selectedKeysChange)="onSelectedItemChange($event)">
             <ng-template monaListViewItemTemplate let-item let-index="index">
                 <div class="mona-list-box-item" [attr.data-item]="textField?item[textField]:item" *ngIf="!itemTemplate">

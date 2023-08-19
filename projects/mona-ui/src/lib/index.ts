@@ -280,4 +280,5 @@ export * from "./window/window.module";
 export * from "./pipes/slice.pipe";
 export * from "./pipes/type-cast.pipe";
 
+/** Main Module */
 export * from "./mona-ui.module";

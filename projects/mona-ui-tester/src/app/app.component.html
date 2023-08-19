@@ -525,7 +525,7 @@
                                         <div style="color: #00a86b; padding: 4px 8px;">{{item.text}}</div>
                                     </ng-template>
                                 </mona-list-box>
-                                <mona-list-box [items]="listBox2Items" textField="text" #listBox2></mona-list-box>
+                                <mona-list-box [items]="listBox2Items" textField="text" [toolbar]="false" #listBox2></mona-list-box>
 
                                 <mona-fieldset legend="Quote" style="width: 375px;">
                                     <ng-template monaFieldsetLegendTemplate>
@@ -537,11 +537,12 @@
                                 </mona-fieldset>
 
                                 <mona-list-view [items]="listViewDataItems|monaSlice:0:listViewScrollBottomItemCount"
-                                                [monaListViewSelectable]="{enabled: true, mode: 'multiple'}"
+                                                [monaListViewSelectable]="{enabled: true, mode: 'single'}"
                                                 (scrollBottom)="listViewScrollBottomItemCount=listViewScrollBottomItemCount+10"
                                                 [selectedKeys]="listViewSelectedKeys" selectionKey="text"
                                                 [monaListViewVirtualScroll]="{enabled: true, itemHeight: 28}"
                                                 (selectedKeysChange)="onListViewSelectionChange($event)"
+                                                [navigable]="true"
                                                 style="height: 350px; width: 350px;">
                                     <ng-template monaListViewHeaderTemplate>
                                         <div style="padding: 4px 8px; font-weight: 600;">List of Products</div>
