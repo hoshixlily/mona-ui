@@ -29,6 +29,7 @@ import { ListViewHeaderTemplateDirective } from "../../directives/list-view-head
 import { ListViewItemTemplateDirective } from "../../directives/list-view-item-template.directive";
 import { ListViewItem } from "../../models/ListViewItem";
 import { ListViewItemTemplateContext } from "../../models/ListViewItemTemplateContext";
+import { NavigableOptions } from "../../models/NavigableOptions";
 import { PagerSettings } from "../../models/PagerSettings";
 import { PageState } from "../../models/PageState";
 import { ListViewService } from "../../services/list-view.service";
@@ -43,7 +44,12 @@ import { ListViewService } from "../../services/list-view.service";
 export class ListViewComponent<T = any> implements OnInit, AfterViewInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     #items: Iterable<T> = [];
+    #lastFocusedItem: ListViewItem<T> | null = null;
     public itemCount: Signal<number> = signal(0);
+    public navigableOptions: NavigableOptions = {
+        enabled: false,
+        mode: "focus"
+    };
     public page: WritableSignal<number> = signal(1);
     public pageState: PageState = { page: signal(1), skip: signal(0), take: signal(10) };
     public pagerSettings: PagerSettings = {
@@ -82,7 +88,14 @@ export class ListViewComponent<T = any> implements OnInit, AfterViewInit {
     public listViewItemTemplateRef!: TemplateRef<ListViewItemTemplateContext>;
 
     @Input()
-    public navigable: boolean = false;
+    public set navigable(value: boolean | Partial<NavigableOptions>) {
+        if (typeof value === "boolean") {
+            this.navigableOptions.enabled = value;
+        } else {
+            this.navigableOptions.enabled = true;
+            Object.assign(this.navigableOptions, value);
+        }
+    }
 
     @Input()
     public pageSize: number = 5;
@@ -117,7 +130,7 @@ export class ListViewComponent<T = any> implements OnInit, AfterViewInit {
 
     public onListItemClick(item: ListViewItem<T>): void {
         this.listViewService.toggleItemSelection(item);
-        if (item.selected()) {
+        if (item.selected() && this.navigableOptions.mode === "focus") {
             this.viewItems()
                 .where(i => !i.equals(item))
                 .forEach(i => i.focused.set(false));
@@ -153,6 +166,7 @@ export class ListViewComponent<T = any> implements OnInit, AfterViewInit {
             if (nextItem) {
                 focusedItem.focused.set(false);
                 nextItem.focused.set(true);
+                this.#lastFocusedItem = nextItem;
             }
         } else {
             const firstItem =
@@ -160,6 +174,7 @@ export class ListViewComponent<T = any> implements OnInit, AfterViewInit {
                 this.viewItems().firstOrDefault(i => !i.groupHeader);
             if (firstItem) {
                 firstItem.focused.set(true);
+                this.#lastFocusedItem = firstItem;
             }
         }
     }
@@ -175,6 +190,7 @@ export class ListViewComponent<T = any> implements OnInit, AfterViewInit {
             if (previousItem) {
                 focusedItem.focused.set(false);
                 previousItem.focused.set(true);
+                this.#lastFocusedItem = previousItem;
             }
         } else {
             const firstItem =
@@ -182,6 +198,7 @@ export class ListViewComponent<T = any> implements OnInit, AfterViewInit {
                 this.viewItems().firstOrDefault(i => !i.groupHeader);
             if (firstItem) {
                 firstItem.focused.set(true);
+                this.#lastFocusedItem = firstItem;
             }
         }
     }
@@ -237,6 +254,12 @@ export class ListViewComponent<T = any> implements OnInit, AfterViewInit {
         const groupedItems = this.groupDataItems(this.#items);
         this.listViewService.listViewItems.set(groupedItems);
         this.listViewService.loadSelectedKeys(this.listViewService.selectedKeys);
+        if (this.#lastFocusedItem != null) {
+            const item = this.viewItems().firstOrDefault(i => i.equals(this.#lastFocusedItem as ListViewItem));
+            if (item) {
+                item.focused.set(true);
+            }
+        }
     }
 
     private scrollToFocusedItem(): void {
@@ -250,6 +273,64 @@ export class ListViewComponent<T = any> implements OnInit, AfterViewInit {
                     behavior: "auto",
                     block: "center"
                 });
+            }
+        }
+    }
+
+    private scrollToSelectedItem(): void {
+        const selectedItem = this.viewItems().firstOrDefault(i => i.selected());
+        if (selectedItem) {
+            const selectedItemElement = this.elementRef.nativeElement.querySelector(
+                `[data-item-index="${this.viewItems().indexOf(selectedItem)}"]`
+            );
+            if (selectedItemElement) {
+                selectedItemElement.scrollIntoView({
+                    behavior: "auto",
+                    block: "center"
+                });
+            }
+        }
+    }
+
+    private selectNextItem(): void {
+        const selectedItem = this.viewItems().firstOrDefault(i => i.selected());
+        if (selectedItem) {
+            const nextItem = this.viewItems()
+                .skipWhile(i => !i.equals(selectedItem))
+                .skip(1)
+                .firstOrDefault(i => !i.groupHeader);
+            if (nextItem) {
+                this.listViewService.toggleItemSelection(selectedItem, false);
+                this.listViewService.toggleItemSelection(nextItem);
+            }
+        } else {
+            const firstItem =
+                this.viewItems().firstOrDefault(i => !i.groupHeader && i.selected()) ??
+                this.viewItems().firstOrDefault(i => !i.groupHeader);
+            if (firstItem) {
+                this.listViewService.toggleItemSelection(firstItem);
+            }
+        }
+    }
+
+    private selectPreviousItem(): void {
+        const selectedItem = this.viewItems().firstOrDefault(i => i.selected());
+        if (selectedItem) {
+            const previousItem = this.viewItems()
+                .reverse()
+                .skipWhile(i => !i.equals(selectedItem))
+                .skip(1)
+                .firstOrDefault(i => !i.groupHeader);
+            if (previousItem) {
+                this.listViewService.toggleItemSelection(selectedItem, false);
+                this.listViewService.toggleItemSelection(previousItem);
+            }
+        } else {
+            const firstItem =
+                this.viewItems().firstOrDefault(i => !i.groupHeader && i.selected()) ??
+                this.viewItems().firstOrDefault(i => !i.groupHeader);
+            if (firstItem) {
+                this.listViewService.toggleItemSelection(firstItem);
             }
         }
     }
@@ -272,12 +353,28 @@ export class ListViewComponent<T = any> implements OnInit, AfterViewInit {
                 map((event: KeyboardEvent) => event.key)
             )
             .subscribe((key: string) => {
-                if (key === "ArrowDown" && this.navigable) {
-                    this.focusNextItem();
-                    this.scrollToFocusedItem();
-                } else if (key === "ArrowUp" && this.navigable) {
-                    this.focusPreviousItem();
-                    this.scrollToFocusedItem();
+                if (key === "ArrowDown" && this.navigableOptions.enabled) {
+                    if (this.navigableOptions.mode === "focus") {
+                        this.focusNextItem();
+                        this.scrollToFocusedItem();
+                    } else if (
+                        this.navigableOptions.mode === "select" &&
+                        this.listViewService.selectableOptions.enabled
+                    ) {
+                        this.selectNextItem();
+                        this.scrollToSelectedItem();
+                    }
+                } else if (key === "ArrowUp" && this.navigableOptions.enabled) {
+                    if (this.navigableOptions.mode === "focus") {
+                        this.focusPreviousItem();
+                        this.scrollToFocusedItem();
+                    } else if (
+                        this.navigableOptions.mode === "select" &&
+                        this.listViewService.selectableOptions.enabled
+                    ) {
+                        this.selectPreviousItem();
+                        this.scrollToSelectedItem();
+                    }
                 } else if (this.listViewService.selectableOptions.enabled && (key === "Enter" || key === " ")) {
                     const focusedItem = this.viewItems().firstOrDefault(i => i.focused());
                     if (focusedItem) {
@@ -322,7 +419,7 @@ export class ListViewComponent<T = any> implements OnInit, AfterViewInit {
             return this.listViewService.listViewItems().count();
         });
 
-        if (this.navigable || this.listViewService.selectableOptions.enabled) {
+        if (this.navigableOptions.enabled || this.listViewService.selectableOptions.enabled) {
             this.setKeyboardEvents();
         }
 

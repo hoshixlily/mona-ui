@@ -1,23 +1,14 @@
 module.exports = {
     root: true,
-    ignorePatterns: [
-        "projects/**/*"
-    ],
+    ignorePatterns: ["projects/**/*"],
     overrides: [
         {
-            files: [
-                "*.ts"
-            ],
+            files: ["*.ts"],
             parserOptions: {
-                project: [
-                    "tsconfig.json",
-                    "e2e/tsconfig.json"
-                ],
+                project: ["tsconfig.json", "e2e/tsconfig.json"],
                 createDefaultProgram: true
             },
-            plugins: [
-                "@typescript-eslint"
-            ],
+            plugins: ["@typescript-eslint"],
             extends: [
                 "eslint:recommended",
                 "plugin:@typescript-eslint/recommended",
@@ -28,17 +19,17 @@ module.exports = {
                 "@angular-eslint/component-selector": [
                     "error",
                     {
-                        "prefix": "mona",
-                        "style": "kebab-case",
-                        "type": "element"
+                        prefix: "mona",
+                        style: "kebab-case",
+                        type: "element"
                     }
                 ],
                 "@angular-eslint/directive-selector": [
                     "error",
                     {
-                        "prefix": "mona",
-                        "style": "camelCase",
-                        "type": "attribute"
+                        prefix: "mona",
+                        style: "camelCase",
+                        type: "attribute"
                     }
                 ],
                 "@typescript-eslint/explicit-function-return-type": "off",
@@ -58,7 +49,6 @@ module.exports = {
                                 "private-decorated-field",
                                 "protected-decorated-field",
                                 "public-decorated-field",
-                                "private-abstract-field",
                                 "protected-abstract-field",
                                 "public-abstract-field",
 
@@ -79,11 +69,10 @@ module.exports = {
                                 "private-instance-method",
                                 "private-decorated-method",
 
-                                "private-abstract-method",
                                 "protected-abstract-method",
-                                "public-abstract-method",
+                                "public-abstract-method"
                             ],
-                            order: "alphabetically",
+                            order: "alphabetically"
                         },
                         interfaces: {
                             order: "alphabetically"
@@ -108,7 +97,7 @@ module.exports = {
                     },
                     {
                         selector: ["classMethod", "function"],
-                        format: ["strictCamelCase"],
+                        format: ["strictCamelCase"]
                     },
                     {
                         selector: "classProperty",
@@ -133,27 +122,23 @@ module.exports = {
                     {
                         selector: "variable",
                         format: ["strictCamelCase"]
-                    },
+                    }
                 ],
                 "@typescript-eslint/no-inferrable-types": "off"
             },
-            "overrides": [
+            overrides: [
                 {
-                    "files": ["*.ts"],
-                    "rules": {
+                    files: ["*.ts"],
+                    rules: {
                         "@typescript-eslint/explicit-function-return-type": ["error"]
                     }
                 }
             ]
         },
         {
-            files: [
-                "*.html"
-            ],
-            extends: [
-                "plugin:@angular-eslint/template/recommended"
-            ],
+            files: ["*.html"],
+            extends: ["plugin:@angular-eslint/template/recommended"],
             rules: {}
         }
     ]
-}
+};

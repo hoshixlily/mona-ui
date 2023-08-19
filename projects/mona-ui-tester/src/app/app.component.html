@@ -518,10 +518,14 @@
                                     </ng-template>
                                 </mona-range-slider>
 
-                                <mona-calendar [(ngModel)]="calendarValue"
-                                               [min]="calendarMinValue"
-                                                  [max]="calendarMaxValue"
-                                               style="width: 300px;"></mona-calendar>
+                                <mona-list-box [items]="dropdownListDataItems" textField="text"
+                                               [toolbar]="{position:'bottom'}"
+                                               [connectedList]="listBox2">
+                                    <ng-template monaListBoxItemTemplate let-item>
+                                        <div style="color: #00a86b; padding: 4px 8px;">{{item.text}}</div>
+                                    </ng-template>
+                                </mona-list-box>
+                                <mona-list-box [items]="listBox2Items" textField="text" [toolbar]="false" #listBox2></mona-list-box>
 
                                 <mona-fieldset legend="Quote" style="width: 375px;">
                                     <ng-template monaFieldsetLegendTemplate>
@@ -533,11 +537,12 @@
                                 </mona-fieldset>
 
                                 <mona-list-view [items]="listViewDataItems|monaSlice:0:listViewScrollBottomItemCount"
-                                                [monaListViewSelectable]="{enabled: true, mode: 'multiple'}"
+                                                [monaListViewSelectable]="{enabled: true, mode: 'single'}"
                                                 (scrollBottom)="listViewScrollBottomItemCount=listViewScrollBottomItemCount+10"
                                                 [selectedKeys]="listViewSelectedKeys" selectionKey="text"
                                                 [monaListViewVirtualScroll]="{enabled: true, itemHeight: 28}"
                                                 (selectedKeysChange)="onListViewSelectionChange($event)"
+                                                [navigable]="true"
                                                 style="height: 350px; width: 350px;">
                                     <ng-template monaListViewHeaderTemplate>
                                         <div style="padding: 4px 8px; font-weight: 600;">List of Products</div>
@@ -642,7 +647,10 @@
                                     <mona-splitter orientation="horizontal">
                                         <mona-splitter-pane [collapsible]="true">
                                             <div style="width: 100%; height: 100%; padding: 20px;">
-
+                                                <mona-calendar [(ngModel)]="calendarValue"
+                                                               [min]="calendarMinValue"
+                                                               [max]="calendarMaxValue"
+                                                               style="width: 300px;"></mona-calendar>
                                             </div>
                                         </mona-splitter-pane>
                                         <mona-splitter-pane [collapsible]="true">

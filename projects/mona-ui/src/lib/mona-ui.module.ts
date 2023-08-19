@@ -6,6 +6,7 @@ import { FilterModule } from "./filter/filter.module";
 import { GridModule } from "./grid/grid.module";
 import { InputsModule } from "./inputs/inputs.module";
 import { LayoutModule } from "./layout/layout.module";
+import { ListBoxModule } from "./list-box/list-box.module";
 import { ListViewModule } from "./list-view/list-view.module";
 import { MenusModule } from "./menus/menus.module";
 import { NavigationModule } from "./navigation/navigation.module";
@@ -26,6 +27,7 @@ import { WindowModule } from "./window/window.module";
         GridModule,
         InputsModule,
         LayoutModule,
+        ListBoxModule,
         ListViewModule,
         MenusModule,
         NavigationModule,
