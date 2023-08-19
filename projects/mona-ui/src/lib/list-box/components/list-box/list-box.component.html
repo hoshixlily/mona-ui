@@ -1,4 +1,9 @@
-<div class="mona-list-box">
+<div class="mona-list-box"
+     [class.mona-list-box-horizontal]="direction()==='horizontal'"
+     [class.mona-list-box-vertical]="direction()==='vertical'"
+     [class.mona-list-box-horizontal-reverse]="direction()==='horizontal-reverse'"
+     [class.mona-list-box-vertical-reverse]="direction()==='vertical-reverse'"
+>
     <div class="mona-list-box-view">
         <mona-list-view [items]="listBoxItems()" monaListViewSelectable
                         [navigable]="true"
@@ -10,26 +15,38 @@
             </ng-template>
         </mona-list-view>
     </div>
-    <div class="mona-list-box-actions">
-        <button monaButton (click)="onMoveUpClick()">
+    <div class="mona-list-box-toolbar"
+         [class.mona-list-box-toolbar-horizontal]="direction()==='horizontal'"
+         [class.mona-list-box-toolbar-vertical]="direction()==='vertical'"
+         [class.mona-list-box-toolbar-horizontal-reverse]="direction()==='horizontal-reverse'"
+         [class.mona-list-box-toolbar-vertical-reverse]="direction()==='vertical-reverse'"
+         *ngIf="toolbarOptions != null">
+        <button monaButton (click)="onMoveUpClick()"
+                *ngIf="toolbarOptions?.actions|contain:'moveUp'">
             <fa-icon [icon]="moveUpIcon"></fa-icon>
         </button>
-        <button monaButton (click)="onMoveDownClick()">
+        <button monaButton (click)="onMoveDownClick()"
+                *ngIf="toolbarOptions?.actions|contain:'moveDown'">
             <fa-icon [icon]="moveDownIcon"></fa-icon>
         </button>
-        <button monaButton (click)="onTransferRightClick()">
-            <fa-icon [icon]="transferRightIcon"></fa-icon>
+        <button monaButton (click)="onTransferToClick()"
+                *ngIf="toolbarOptions?.actions|contain:'transferTo'">
+            <fa-icon [icon]="transferToIcon"></fa-icon>
         </button>
-        <button monaButton (click)="onTransferLeftClick()">
-            <fa-icon [icon]="transferLeftIcon"></fa-icon>
+        <button monaButton (click)="onTransferFromClick()"
+                *ngIf="toolbarOptions?.actions|contain:'transferFrom'">
+            <fa-icon [icon]="transferFromIcon"></fa-icon>
         </button>
-        <button monaButton (click)="onTransferAllRightClick()">
-            <fa-icon [icon]="transferAllRightIcon"></fa-icon>
+        <button monaButton (click)="onTransferAllToClick()"
+                *ngIf="toolbarOptions?.actions|contain:'transferAllTo'">
+            <fa-icon [icon]="transferAllToIcon"></fa-icon>
         </button>
-        <button monaButton (click)="onTransferAllLeftClick()">
-            <fa-icon [icon]="transferAllLeftIcon"></fa-icon>
+        <button monaButton (click)="onTransferAllFromClick()"
+                *ngIf="toolbarOptions?.actions|contain:'transferAllFrom'">
+            <fa-icon [icon]="transferAllFromIcon"></fa-icon>
         </button>
-        <button monaButton (click)="onRemoveClick()">
+        <button monaButton (click)="onRemoveClick()"
+                *ngIf="toolbarOptions?.actions|contain:'remove'">
             <fa-icon [icon]="removeIcon"></fa-icon>
         </button>
     </div>

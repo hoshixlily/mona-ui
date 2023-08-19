@@ -518,7 +518,9 @@
                                     </ng-template>
                                 </mona-range-slider>
 
-                                <mona-list-box [items]="dropdownListDataItems" textField="text" [connectedList]="listBox2"></mona-list-box>
+                                <mona-list-box [items]="dropdownListDataItems" textField="text"
+                                               [toolbar]="{position:'bottom'}"
+                                               [connectedList]="listBox2"></mona-list-box>
                                 <mona-list-box [items]="listBox2Items" textField="text" #listBox2></mona-list-box>
 
                                 <mona-fieldset legend="Quote" style="width: 375px;">

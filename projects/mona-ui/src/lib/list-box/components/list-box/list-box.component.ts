@@ -10,6 +10,9 @@ import {
     IconDefinition
 } from "@fortawesome/free-solid-svg-icons";
 import { Collections, Enumerable, List } from "@mirei/ts-collections";
+import { ToolbarOptions } from "../../models/ToolbarOptions";
+
+type ListBoxDirection = "horizontal" | "horizontal-reverse" | "vertical" | "vertical-reverse";
 
 @Component({
     selector: "mona-list-box",
@@ -21,13 +24,15 @@ export class ListBoxComponent<T> {
     public readonly moveDownIcon: IconDefinition = faAngleDown;
     public readonly moveUpIcon: IconDefinition = faAngleUp;
     public readonly removeIcon: IconDefinition = faTrash;
-    public readonly transferAllLeftIcon: IconDefinition = faAnglesLeft;
-    public readonly transferAllRightIcon: IconDefinition = faAnglesRight;
-    public readonly transferLeftIcon: IconDefinition = faAngleLeft;
-    public readonly transferRightIcon: IconDefinition = faAngleRight;
+    public readonly transferAllFromIcon: IconDefinition = faAnglesLeft;
+    public readonly transferAllToIcon: IconDefinition = faAnglesRight;
+    public readonly transferFromIcon: IconDefinition = faAngleLeft;
+    public readonly transferToIcon: IconDefinition = faAngleRight;
+    public direction: WritableSignal<ListBoxDirection> = signal("horizontal");
     public listBoxItems: WritableSignal<List<T>> = signal(new List<T>());
     public selectedItem: T | null = null;
     public selectedItems: List<T> = new List<T>();
+    public toolbarOptions: ToolbarOptions | null = this.getDefaultToolbarOptions();
 
     @Input()
     public connectedList: ListBoxComponent<T> | null = null;
@@ -39,6 +44,11 @@ export class ListBoxComponent<T> {
 
     @Input()
     public textField: string = "";
+
+    @Input()
+    public set toolbar(value: boolean | Partial<ToolbarOptions>) {
+        this.updateToolbarOptions(value);
+    }
 
     public constructor(private readonly elementRef: ElementRef<HTMLElement>) {}
 
@@ -82,7 +92,7 @@ export class ListBoxComponent<T> {
         this.selectedItem = items[0];
     }
 
-    public onTransferAllLeftClick(): void {
+    public onTransferAllFromClick(): void {
         if (this.connectedList) {
             this.moveInto(this.connectedList.listBoxItems());
             this.connectedList.listBoxItems.set(new List<T>());
@@ -91,7 +101,7 @@ export class ListBoxComponent<T> {
         }
     }
 
-    public onTransferAllRightClick(): void {
+    public onTransferAllToClick(): void {
         if (this.connectedList) {
             this.connectedList.moveInto(this.listBoxItems());
             this.listBoxItems.set(new List<T>());
@@ -100,7 +110,7 @@ export class ListBoxComponent<T> {
         }
     }
 
-    public onTransferLeftClick(): void {
+    public onTransferFromClick(): void {
         if (this.connectedList && this.connectedList.selectedItem) {
             this.moveInto([this.connectedList.selectedItem]);
             this.connectedList.listBoxItems().remove(this.connectedList.selectedItem);
@@ -112,7 +122,7 @@ export class ListBoxComponent<T> {
         }
     }
 
-    public onTransferRightClick(): void {
+    public onTransferToClick(): void {
         if (this.connectedList && this.selectedItem) {
             this.connectedList.moveInto([this.selectedItem]);
             this.listBoxItems().remove(this.selectedItem);
@@ -124,10 +134,62 @@ export class ListBoxComponent<T> {
         }
     }
 
+    private getDefaultToolbarOptions(): ToolbarOptions {
+        return {
+            actions: ["moveDown", "moveUp", "remove", "transferAllFrom", "transferAllTo", "transferFrom", "transferTo"],
+            position: "right"
+        };
+    }
+
     private scrollToSelectedItem(): void {
         const selectedItemElement = this.elementRef.nativeElement.querySelector(".mona-selected");
         if (selectedItemElement) {
             selectedItemElement.scrollIntoView({ behavior: "auto", block: "center" });
         }
+    }
+
+    private updateDirection(): void {
+        if (this.toolbarOptions) {
+            switch (this.toolbarOptions.position) {
+                case "right":
+                    this.direction.set("horizontal");
+                    break;
+                case "left":
+                    this.direction.set("horizontal-reverse");
+                    break;
+                case "top":
+                    this.direction.set("vertical-reverse");
+                    break;
+                case "bottom":
+                    this.direction.set("vertical");
+                    break;
+            }
+        }
+    }
+
+    private updateToolbarOptions(options: boolean | Partial<ToolbarOptions>) {
+        if (typeof options === "boolean") {
+            this.toolbarOptions = options ? this.getDefaultToolbarOptions() : null;
+        } else {
+            if (options.actions && options.actions.length > 0 && options.position) {
+                this.toolbarOptions = options as Required<ToolbarOptions>;
+            } else if (options.actions && options.actions.length > 0 && !options.position) {
+                this.toolbarOptions = { ...options, position: "right" } as Required<ToolbarOptions>;
+            } else if ((!options.actions || options.actions.length === 0) && options.position) {
+                this.toolbarOptions = {
+                    ...options,
+                    actions: [
+                        "moveDown",
+                        "moveUp",
+                        "remove",
+                        "transferAllFrom",
+                        "transferAllTo",
+                        "transferFrom",
+                        "transferTo"
+                    ]
+                } as Required<ToolbarOptions>;
+            }
+        }
+        this.updateDirection();
     }
 }
