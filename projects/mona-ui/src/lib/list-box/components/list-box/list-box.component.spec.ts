@@ -1,21 +1,22 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { createComponentFactory, Spectator } from "@ngneat/spectator";
+import { ListViewModule } from "../../../list-view/list-view.module";
+import { ContainPipe } from "../../../pipes/contain.pipe";
 
-import { ListBoxComponent } from './list-box.component';
+import { ListBoxComponent } from "./list-box.component";
 
-describe('ListBoxComponent', () => {
-  let component: ListBoxComponent;
-  let fixture: ComponentFixture<ListBoxComponent>;
-
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      declarations: [ListBoxComponent]
+describe("ListBoxComponent", () => {
+    let spectator: Spectator<ListBoxComponent>;
+    const createComponent = createComponentFactory({
+        component: ListBoxComponent,
+        imports: [ContainPipe, FontAwesomeModule, ListViewModule]
     });
-    fixture = TestBed.createComponent(ListBoxComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    beforeEach(() => {
+        spectator = createComponent();
+    });
+
+    it("should create", () => {
+        expect(spectator.component).toBeDefined();
+    });
 });

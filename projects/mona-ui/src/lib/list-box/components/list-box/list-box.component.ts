@@ -31,7 +31,7 @@ type ListBoxDirection = "horizontal" | "horizontal-reverse" | "vertical" | "vert
     styleUrls: ["./list-box.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ListBoxComponent<T> {
+export class ListBoxComponent<T = any> {
     public readonly moveDownIcon: IconDefinition = faAngleDown;
     public readonly moveUpIcon: IconDefinition = faAngleUp;
     public readonly removeIcon: IconDefinition = faTrash;

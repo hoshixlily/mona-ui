@@ -1,8 +1,17 @@
-import { AfterContentInit, Component, ContentChildren, Input, OnDestroy, OnInit, QueryList, Self } from "@angular/core";
-import { ButtonDirective } from "../../../button/directives/button.directive";
+import {
+    AfterContentInit,
+    Component,
+    ContentChildren,
+    DestroyRef,
+    inject,
+    Input,
+    OnInit,
+    QueryList
+} from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { SelectionMode } from "../../../../../models/SelectionMode";
 import { ButtonService } from "../../../../services/button.service";
-import { Subject, takeUntil } from "rxjs";
+import { ButtonDirective } from "../../../button/directives/button.directive";
 
 @Component({
     selector: "mona-button-group",
@@ -10,9 +19,9 @@ import { Subject, takeUntil } from "rxjs";
     styleUrls: ["./button-group.component.scss"],
     providers: [ButtonService]
 })
-export class ButtonGroupComponent implements OnInit, AfterContentInit, OnDestroy {
+export class ButtonGroupComponent implements OnInit, AfterContentInit {
+    readonly #destroyRef: DestroyRef = inject(DestroyRef);
     #disabled: boolean = false;
-    private readonly componentDestroy$: Subject<void> = new Subject<void>();
     private selectionMode: SelectionMode = "multiple";
 
     @ContentChildren(ButtonDirective)
@@ -23,6 +32,7 @@ export class ButtonGroupComponent implements OnInit, AfterContentInit, OnDestroy
         this.#disabled = disabled;
         this.notifyDisableStateChanged();
     }
+
     public get disabled(): boolean {
         return this.#disabled;
     }
@@ -36,11 +46,10 @@ export class ButtonGroupComponent implements OnInit, AfterContentInit, OnDestroy
 
     public ngAfterContentInit(): void {
         this.notifyDisableStateChanged();
-    }
-
-    public ngOnDestroy(): void {
-        this.componentDestroy$.next();
-        this.componentDestroy$.complete();
+        this.buttons.forEach(b => (b.toggleable = true));
+        this.buttons.changes.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(() => {
+            this.buttons.forEach(b => (b.toggleable = true));
+        });
     }
 
     public ngOnInit(): void {
@@ -52,7 +61,7 @@ export class ButtonGroupComponent implements OnInit, AfterContentInit, OnDestroy
     }
 
     private notifySelectionStateChange(): void {
-        this.buttonService.buttonClick$.pipe(takeUntil(this.componentDestroy$)).subscribe(button => {
+        this.buttonService.buttonClick$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(button => {
             if (this.selectionMode === "single") {
                 this.buttons.forEach(b => {
                     this.buttonService.buttonSelect$.next([b, b === button ? !b.selected : false]);
@@ -61,7 +70,7 @@ export class ButtonGroupComponent implements OnInit, AfterContentInit, OnDestroy
                 this.buttonService.buttonSelect$.next([button, !button.selected]);
             }
         });
-        this.buttonService.buttonSelected$.pipe(takeUntil(this.componentDestroy$)).subscribe(button => {
+        this.buttonService.buttonSelected$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(button => {
             if (this.selectionMode === "single") {
                 if (button.selected) {
                     this.buttons.forEach(b => {

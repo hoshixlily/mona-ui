@@ -174,7 +174,7 @@
                             </div>
                             <div>
                                 <button monaButton>Button 1</button>
-                                <button monaButton>Button 2</button>
+                                <button monaButton [toggleable]="true">Button 2</button>
                                 <button monaButton [flat]="true">Flat Button</button>
                                 <button monaButton [primary]="true">Primary Button</button>
                                 <button monaButton [disabled]="true">Disabled Button</button>
@@ -220,17 +220,17 @@
                             </div>
                             <div style="display: flex; align-items: center;">
                                 <mona-button-group selection="multiple">
-                                    <button monaButton [toggleable]="true">B</button>
-                                    <button monaButton [toggleable]="true">I</button>
-                                    <button monaButton [toggleable]="true">U</button>
-                                    <button monaButton [toggleable]="true" [(selected)]="buttonGroupButtonSelected">
+                                    <button monaButton>B</button>
+                                    <button monaButton>I</button>
+                                    <button monaButton>U</button>
+                                    <button monaButton [(selected)]="buttonGroupButtonSelected">
                                         <span style="text-decoration: line-through;">S</span>
                                     </button>
                                 </mona-button-group>
                                 <mona-button-group selection="single">
-                                    <button monaButton [toggleable]="true">Left</button>
-                                    <button monaButton [toggleable]="true">Center</button>
-                                    <button monaButton [toggleable]="true" [(selected)]="buttonGroupButtonSelected">Right</button>
+                                    <button monaButton>Left</button>
+                                    <button monaButton>Center</button>
+                                    <button monaButton [(selected)]="buttonGroupButtonSelected">Right</button>
                                 </mona-button-group>
                             </div>
                             <div style="display: flex; align-items: center;">
@@ -542,7 +542,7 @@
                                                 [selectedKeys]="listViewSelectedKeys" selectionKey="text"
                                                 [monaListViewVirtualScroll]="{enabled: true, itemHeight: 28}"
                                                 (selectedKeysChange)="onListViewSelectionChange($event)"
-                                                [navigable]="true"
+                                                [navigable]="{enabled: true, mode: 'focus'}"
                                                 style="height: 350px; width: 350px;">
                                     <ng-template monaListViewHeaderTemplate>
                                         <div style="padding: 4px 8px; font-weight: 600;">List of Products</div>

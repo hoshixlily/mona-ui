@@ -1,26 +1,29 @@
 import {
     ChangeDetectorRef,
+    DestroyRef,
     Directive,
     ElementRef,
     EventEmitter,
     Host,
     HostBinding,
+    inject,
     Input,
-    OnDestroy,
     OnInit,
     Optional,
     Output
 } from "@angular/core";
-import { fromEvent, Subject, takeUntil } from "rxjs";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { fromEvent, takeWhile } from "rxjs";
 import { ButtonService } from "../../../services/button.service";
 
 @Directive({
     selector: "[monaButton]"
 })
-export class ButtonDirective implements OnInit, OnDestroy {
+export class ButtonDirective implements OnInit {
     #selected: boolean = false;
     #tabindex: number = 0;
-    readonly #destroy$: Subject<void> = new Subject<void>();
+    #toggleable: boolean = false;
+    readonly #destroyRef: DestroyRef = inject(DestroyRef);
 
     @HostBinding("class.mona-disabled")
     @Input()
@@ -61,7 +64,16 @@ export class ButtonDirective implements OnInit, OnDestroy {
     public selectedChange: EventEmitter<boolean> = new EventEmitter<boolean>();
 
     @Input()
-    public toggleable: boolean = false;
+    public set toggleable(toggleable: boolean) {
+        this.#toggleable = toggleable;
+        if (toggleable) {
+            this.setToggleableEvent();
+        }
+    }
+
+    public get toggleable(): boolean {
+        return this.#toggleable;
+    }
 
     public constructor(
         @Host() @Optional() private readonly buttonService: ButtonService,
@@ -69,31 +81,31 @@ export class ButtonDirective implements OnInit, OnDestroy {
         private readonly cdr: ChangeDetectorRef
     ) {}
 
-    public ngOnDestroy(): void {
-        this.#destroy$.next();
-        this.#destroy$.complete();
-    }
-
     public ngOnInit(): void {
-        if (this.toggleable) {
-            fromEvent<MouseEvent>(this.elementRef.nativeElement, "click")
-                .pipe(takeUntil(this.#destroy$))
-                .subscribe(() => {
-                    if (this.buttonService) {
-                        this.buttonService.buttonClick$.next(this);
-                    } else {
-                        this.selected = !this.selected;
-                        this.selectedChange.emit(this.selected);
-                    }
-                });
-        }
-        this.buttonService?.buttonSelect$.pipe(takeUntil(this.#destroy$)).subscribe(result => {
+        this.buttonService?.buttonSelect$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(result => {
             const [button, selected] = result;
             if (button === this) {
-                this.cdr.markForCheck();
+                this.cdr.detectChanges();
                 this.#selected = selected;
                 this.selectedChange.emit(selected);
             }
         });
+    }
+
+    private setToggleableEvent(): void {
+        fromEvent<MouseEvent>(this.elementRef.nativeElement, "click")
+            .pipe(
+                takeUntilDestroyed(this.#destroyRef),
+                takeWhile(() => this.toggleable)
+            )
+            .subscribe(() => {
+                if (this.buttonService) {
+                    this.buttonService.buttonClick$.next(this);
+                } else {
+                    this.selected = !this.selected;
+                    this.selectedChange.emit(this.selected);
+                }
+                this.cdr.detectChanges();
+            });
     }
 }
