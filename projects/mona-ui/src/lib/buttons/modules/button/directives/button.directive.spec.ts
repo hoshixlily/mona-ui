@@ -29,9 +29,9 @@ class TestButtonDirectiveComponent {
 @Component({
     template: `
         <mona-button-group selection="single">
-            <button monaButton>A</button>
-            <button monaButton>B</button>
-            <button monaButton>C</button>
+            <button monaButton [toggleable]="true">A</button>
+            <button monaButton [toggleable]="true">B</button>
+            <button monaButton [toggleable]="true">C</button>
         </mona-button-group>
     `
 })
