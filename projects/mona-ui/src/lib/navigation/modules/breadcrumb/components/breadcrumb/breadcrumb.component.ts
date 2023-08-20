@@ -1,4 +1,5 @@
 import { Component, ContentChild, EventEmitter, Input, Output, signal, WritableSignal } from "@angular/core";
+import { List } from "@mirei/ts-collections";
 import { BreadcrumbItem } from "../../models/BreadcrumbItem";
 import { faChevronRight, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { BreadcrumbItemTemplateDirective } from "../../directives/breadcrumb-item-template.directive";
@@ -11,7 +12,9 @@ import { BreadcrumbSeparatorTemplateDirective } from "../../directives/breadcrum
 })
 export class BreadcrumbComponent {
     public readonly separator: IconDefinition = faChevronRight;
-    public breadcrumbItems: WritableSignal<BreadcrumbItem[]> = signal<BreadcrumbItem[]>([]);
+    public breadcrumbItems: WritableSignal<List<BreadcrumbItem>> = signal<List<BreadcrumbItem>>(
+        new List<BreadcrumbItem>()
+    );
 
     @Output()
     public itemClick: EventEmitter<BreadcrumbItem> = new EventEmitter<BreadcrumbItem>();
@@ -24,11 +27,7 @@ export class BreadcrumbComponent {
 
     @Input()
     public set items(value: Iterable<BreadcrumbItem>) {
-        if (Array.isArray(value)) {
-            this.breadcrumbItems.set(value);
-        } else {
-            this.breadcrumbItems.set(Array.from(value));
-        }
+        this.breadcrumbItems.set(new List<BreadcrumbItem>(value));
     }
 
     public onItemClick(item: BreadcrumbItem): void {
