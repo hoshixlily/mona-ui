@@ -1,4 +1,4 @@
-export class PreventableEvent<E = unknown> {
+export class PreventableEvent<E extends Event = Event> {
     readonly #event?: E;
     readonly #type?: string;
     #defaultPrevented: boolean = false;

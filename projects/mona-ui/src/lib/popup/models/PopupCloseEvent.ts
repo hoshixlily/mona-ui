@@ -3,7 +3,7 @@ import { PreventableEvent } from "../../utils/PreventableEvent";
 export class PopupCloseEvent<R = unknown> extends PreventableEvent {
     readonly #options?: Partial<PopupCloseEventOptions<R>>;
     public constructor(options?: Partial<PopupCloseEventOptions<R>>) {
-        super(options?.type ?? "popupClose", options?.event);
+        super(options?.type ?? "popupClose", options?.originalEvent);
         this.#options = options;
     }
 
@@ -16,8 +16,9 @@ export class PopupCloseEvent<R = unknown> extends PreventableEvent {
     }
 }
 
-export interface PopupCloseEventOptions<R = unknown> {
-    event?: unknown;
+export interface PopupCloseEventOptions<R = unknown, E = unknown> {
+    event?: E;
+    originalEvent: Event;
     result?: R;
     type?: string;
     via?: PopupCloseSource;

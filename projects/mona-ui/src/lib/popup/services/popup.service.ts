@@ -86,7 +86,11 @@ export class PopupService implements OnDestroy {
                     .backdropClick()
                     .pipe(takeUntil(backdropSubject))
                     .subscribe(e => {
-                        const event = new PopupCloseEvent({ event: e, via: PopupCloseSource.BackdropClick });
+                        const event = new PopupCloseEvent({
+                            event: e,
+                            originalEvent: e,
+                            via: PopupCloseSource.BackdropClick
+                        });
                         const prevented = preventClose ? preventClose(event) || event.isDefaultPrevented() : false;
                         if (!prevented) {
                             popupReference.close(event);
@@ -104,7 +108,11 @@ export class PopupService implements OnDestroy {
                     .pipe(takeUntil(this.serviceDestroy$))
                     .subscribe(event => {
                         if (this.outsideEventsToClose.includes(event.type)) {
-                            const closeEvent = new PopupCloseEvent({ event, via: PopupCloseSource.OutsideClick });
+                            const closeEvent = new PopupCloseEvent({
+                                event,
+                                originalEvent: event,
+                                via: PopupCloseSource.OutsideClick
+                            });
                             const prevented = preventClose
                                 ? preventClose(closeEvent) || closeEvent.isDefaultPrevented()
                                 : false;
@@ -145,7 +153,11 @@ export class PopupService implements OnDestroy {
                 )
                 .subscribe(event => {
                     if (event.key === "Escape") {
-                        const closeEvent = new PopupCloseEvent({ event, via: PopupCloseSource.Escape });
+                        const closeEvent = new PopupCloseEvent({
+                            event,
+                            originalEvent: event,
+                            via: PopupCloseSource.Escape
+                        });
                         const prevented = state.settings.preventClose
                             ? state.settings.preventClose(closeEvent) || closeEvent.isDefaultPrevented()
                             : false;

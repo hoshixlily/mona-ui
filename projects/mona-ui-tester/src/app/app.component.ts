@@ -32,7 +32,8 @@ import {
     BreadcrumbItem,
     PopoverShowEvent,
     PopoverShownEvent,
-    PopoverHideEvent
+    PopoverHideEvent,
+    ListBoxActionClickEvent
 } from "mona-ui";
 import { TestComponentComponent } from "./test-component/test-component.component";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
@@ -707,6 +708,13 @@ export class AppComponent implements OnInit {
     public onGridSortChange(sort: SortDescriptor[]): void {
         this.gridSort = sort;
         console.log(sort);
+    }
+
+    public onListBoxActionClick(event: ListBoxActionClickEvent): void {
+        if (event.action === "moveDown" && event.selectedItem?.text === "Plum") {
+            event.preventDefault();
+            console.log(event);
+        }
     }
 
     public onListViewSelectionChange(keys: string[]): void {

@@ -519,6 +519,8 @@
                                 </mona-range-slider>
 
                                 <mona-list-box [items]="dropdownListDataItems" textField="text"
+                                               (selectionChange)="print($event)"
+                                               (actionClick)="onListBoxActionClick($event)"
                                                [toolbar]="{position:'bottom'}"
                                                [connectedList]="listBox2">
                                     <ng-template monaListBoxItemTemplate let-item>
