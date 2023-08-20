@@ -1,5 +1,5 @@
 import { EventEmitter, Injectable, signal, WritableSignal } from "@angular/core";
-import { EnumerableSet, Group, IEnumerable, List } from "@mirei/ts-collections";
+import { Enumerable, EnumerableSet, Group, IEnumerable, List } from "@mirei/ts-collections";
 import { ListViewItem } from "../models/ListViewItem";
 import { SelectableOptions } from "../models/SelectableOptions";
 import { VirtualScrollOptions } from "../models/VirtualScrollOptions";
@@ -48,6 +48,7 @@ export class ListViewService {
         if (!this.selectableOptions.enabled) {
             return;
         }
+        const previousSelectedKeys = this.selectedKeys.toArray();
         if (this.selectableOptions.mode === "single") {
             this.selectedKeys.clear();
             for (const item of this.listViewItems()) {
@@ -63,6 +64,13 @@ export class ListViewService {
             item.selected.set(true);
         }
         if (emit) {
+            if (
+                Enumerable.from(previousSelectedKeys)
+                    .orderBy(k => k)
+                    .sequenceEqual(this.selectedKeys.orderBy(k => k))
+            ) {
+                return;
+            }
             this.selectedKeysChange.emit(this.selectedKeys.toArray());
         }
     }

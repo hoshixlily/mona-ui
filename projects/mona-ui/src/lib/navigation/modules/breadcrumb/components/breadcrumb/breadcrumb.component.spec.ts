@@ -1,21 +1,19 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { createComponentFactory, Spectator } from "@ngneat/spectator";
 
-import { BreadcrumbComponent } from './breadcrumb.component';
+import { BreadcrumbComponent } from "./breadcrumb.component";
 
-describe('BreadcrumbComponent', () => {
-  let component: BreadcrumbComponent;
-  let fixture: ComponentFixture<BreadcrumbComponent>;
-
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      declarations: [BreadcrumbComponent]
+describe("BreadcrumbComponent", () => {
+    let spectator: Spectator<BreadcrumbComponent>;
+    const createComponent = createComponentFactory({
+        component: BreadcrumbComponent,
+        imports: []
     });
-    fixture = TestBed.createComponent(BreadcrumbComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    beforeEach(() => {
+        spectator = createComponent();
+    });
+
+    it("should create", () => {
+        expect(spectator.component).toBeTruthy();
+    });
 });
