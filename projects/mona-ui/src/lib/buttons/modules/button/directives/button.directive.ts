@@ -17,17 +17,27 @@ import { fromEvent, takeWhile } from "rxjs";
 import { ButtonService } from "../../../services/button.service";
 
 @Directive({
-    selector: "[monaButton]"
+    selector: "[monaButton]",
+    host: {
+        "[attr.disabled]": "disabled ? '' : undefined"
+    }
 })
 export class ButtonDirective implements OnInit {
+    _disabled: boolean = false;
     #selected: boolean = false;
     #tabindex: number = 0;
     #toggleable: boolean = false;
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
 
-    @HostBinding("class.mona-disabled")
+    public set disabled(disabled: boolean) {
+        this._disabled = disabled;
+    }
+
     @Input()
-    public disabled: boolean = false;
+    @HostBinding("class.mona-disabled")
+    public get disabled(): boolean {
+        return this._disabled;
+    }
 
     @HostBinding("class.mona-flat")
     @Input()

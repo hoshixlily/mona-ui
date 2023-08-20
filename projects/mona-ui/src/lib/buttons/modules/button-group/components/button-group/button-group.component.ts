@@ -1,5 +1,6 @@
 import {
     AfterContentInit,
+    ChangeDetectionStrategy,
     Component,
     ContentChildren,
     DestroyRef,
@@ -18,12 +19,13 @@ import { ButtonDirective } from "../../../button/directives/button.directive";
     selector: "mona-button-group",
     templateUrl: "./button-group.component.html",
     styleUrls: ["./button-group.component.scss"],
-    providers: [ButtonService]
+    providers: [ButtonService],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ButtonGroupComponent implements OnInit, AfterContentInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     #disabled: boolean = false;
-    private selectionMode: SelectionMode = "multiple";
+    #selection: SelectionMode = "multiple";
 
     @ContentChildren(ButtonDirective)
     private buttons: QueryList<ButtonDirective> = new QueryList<ButtonDirective>();
@@ -40,7 +42,11 @@ export class ButtonGroupComponent implements OnInit, AfterContentInit {
 
     @Input()
     public set selection(selection: SelectionMode) {
-        this.selectionMode = selection;
+        this.#selection = selection;
+    }
+
+    public get selection(): SelectionMode {
+        return this.#selection;
     }
 
     public constructor(private readonly buttonService: ButtonService) {}
@@ -54,12 +60,12 @@ export class ButtonGroupComponent implements OnInit, AfterContentInit {
     }
 
     private notifyDisableStateChanged(): void {
-        this.buttons.forEach(b => (b.disabled = this.#disabled));
+        this.buttons.forEach(b => (b.disabled = this.disabled));
     }
 
     private notifySelectionStateChange(): void {
         this.buttonService.buttonClick$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(button => {
-            if (this.selectionMode === "single") {
+            if (this.#selection === "single") {
                 const selectedButton = Enumerable.from(this.buttons).firstOrDefault(b => b.selected);
                 if (selectedButton === button) {
                     return;
@@ -72,7 +78,7 @@ export class ButtonGroupComponent implements OnInit, AfterContentInit {
             }
         });
         this.buttonService.buttonSelected$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(button => {
-            if (this.selectionMode === "single") {
+            if (this.#selection === "single") {
                 if (button.selected) {
                     this.buttons.forEach(b => {
                         if (b !== button) {

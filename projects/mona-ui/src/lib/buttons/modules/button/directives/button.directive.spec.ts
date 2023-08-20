@@ -108,6 +108,8 @@ describe("ButtonDirective", () => {
     });
 
     it("should update selected attribute of buttons of a button group", fakeAsync(() => {
+        testButtonGroupSpectator.tick();
+        testButtonGroupSpectator.detectChanges();
         const buttons = testButtonGroupSpectator.queryAll("button") as HTMLButtonElement[];
         buttons[0].click();
         testComponentSpectator.tick();
@@ -133,4 +135,14 @@ describe("ButtonDirective", () => {
         expect(buttons[1]).not.toHaveClass("mona-selected");
         expect(buttons[2]).toHaveClass("mona-selected");
     }));
+
+    it("should change selected status of a toggleable button when clicked", () => {
+        testComponentSpectator.component.toggleable = true;
+        testComponentSpectator.detectChanges();
+        const button = testComponentSpectator.query("button") as HTMLButtonElement;
+        button.click();
+        expect(button).toHaveClass("mona-selected");
+        button.click();
+        expect(button).not.toHaveClass("mona-selected");
+    });
 });
