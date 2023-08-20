@@ -9,6 +9,7 @@ import {
     QueryList
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { Enumerable } from "@mirei/ts-collections";
 import { SelectionMode } from "../../../../../models/SelectionMode";
 import { ButtonService } from "../../../../services/button.service";
 import { ButtonDirective } from "../../../button/directives/button.directive";
@@ -59,6 +60,10 @@ export class ButtonGroupComponent implements OnInit, AfterContentInit {
     private notifySelectionStateChange(): void {
         this.buttonService.buttonClick$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(button => {
             if (this.selectionMode === "single") {
+                const selectedButton = Enumerable.from(this.buttons).firstOrDefault(b => b.selected);
+                if (selectedButton === button) {
+                    return;
+                }
                 this.buttons.forEach(b => {
                     this.buttonService.buttonSelect$.next([b, b === button ? !b.selected : false]);
                 });
