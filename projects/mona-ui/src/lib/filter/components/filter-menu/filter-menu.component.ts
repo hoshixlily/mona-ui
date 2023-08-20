@@ -196,6 +196,9 @@ export class FilterMenuComponent implements OnInit {
     }
 
     public onFilterApply(): void {
+        if (!this.selectedConnectorItem) {
+            this.clearSecondFilterValues();
+        }
         if (this.type === "string") {
             const value1 = this.stringFilterValues[0];
             const value2 = this.stringFilterValues[1];
@@ -405,6 +408,26 @@ export class FilterMenuComponent implements OnInit {
                     operator2: undefined,
                     value2: null
                 };
+        }
+    }
+
+    private clearSecondFilterValues(): void {
+        this.selectedFilterMenuDataItemList[1] = undefined;
+        switch (this.type) {
+            case "string":
+                this.stringFilterValues[1] = "";
+                break;
+            case "number":
+                this.numberFilterValues[1] = null;
+                break;
+            case "date":
+                this.dateFilterValues[1] = null;
+                break;
+            case "boolean":
+                this.booleanFilterValues[1] = null;
+                break;
+            default:
+                break;
         }
     }
 

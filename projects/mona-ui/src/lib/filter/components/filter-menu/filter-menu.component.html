@@ -44,6 +44,7 @@
     <div class="mona-filter-menu-item" *ngIf="firstFilterValid">
         <mona-button-group selection="single" [disabled]="!firstFilterValid">
             <button monaButton [selected]="item.value === selectedConnectorItem?.value"
+                    [toggleable]="false"
                     (click)="onConnectorChange(item)" *ngFor="let item of connectorDataItems">{{item.text}}</button>
         </mona-button-group>
     </div>

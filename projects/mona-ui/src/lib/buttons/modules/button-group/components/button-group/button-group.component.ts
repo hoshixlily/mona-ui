@@ -46,10 +46,6 @@ export class ButtonGroupComponent implements OnInit, AfterContentInit {
 
     public ngAfterContentInit(): void {
         this.notifyDisableStateChanged();
-        this.buttons.forEach(b => (b.toggleable = true));
-        this.buttons.changes.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(() => {
-            this.buttons.forEach(b => (b.toggleable = true));
-        });
     }
 
     public ngOnInit(): void {
