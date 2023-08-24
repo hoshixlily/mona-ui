@@ -101,7 +101,7 @@ export class GridListComponent implements OnInit, AfterViewInit, OnDestroy {
         if (state == null) {
             this.gridService.gridGroupExpandState.add(
                 groupKey,
-                new Dictionary<number, boolean>(undefined, [
+                new Dictionary<number, boolean>([
                     new KeyValuePair<number, boolean>(this.gridService.pageState.page, group.collapsed)
                 ])
             );

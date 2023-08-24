@@ -49,7 +49,7 @@ export class DropDownListComponent implements OnInit, OnDestroy, ControlValueAcc
     public readonly clearIcon: IconDefinition = faTimes;
     public readonly dropdownIcon: IconDefinition = faChevronDown;
     public popupRef: PopupRef | null = null;
-    public valuePopupListItem?: PopupListItem;
+    public valuePopupListItem?: PopupListItem | null = null;
 
     @HostBinding("class.mona-dropdown")
     public readonly hostClass: boolean = true;

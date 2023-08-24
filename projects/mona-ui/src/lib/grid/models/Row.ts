@@ -11,7 +11,7 @@ export class Row {
         this.data = data;
     }
 
-    public getEditForm(key: string): FormGroup {
+    public getEditForm(key: string): FormGroup | null {
         return this.#editFromDictionary.get(key);
     }
 

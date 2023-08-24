@@ -51,7 +51,7 @@ export class AutoCompleteComponent implements OnInit, OnChanges, OnDestroy, Cont
     public readonly clearIcon: IconDefinition = faTimes;
     public autoCompleteValue: WritableSignal<string> = signal("");
     public popupRef: PopupRef | null = null;
-    public valuePopupListItem?: PopupListItem;
+    public valuePopupListItem?: PopupListItem | null = null;
 
     @HostBinding("class.mona-dropdown")
     public readonly hostClass: boolean = true;

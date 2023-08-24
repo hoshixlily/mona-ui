@@ -53,7 +53,7 @@ export class ComboBoxComponent implements OnInit, OnDestroy, ControlValueAccesso
     public readonly comboBoxValue$: Subject<string> = new Subject<string>();
     public comboBoxValue: WritableSignal<string> = signal("");
     public popupRef: PopupRef | null = null;
-    public valuePopupListItem?: PopupListItem;
+    public valuePopupListItem?: PopupListItem | null = null;
 
     @HostBinding("class.mona-dropdown")
     public readonly hostClass: boolean = true;

@@ -134,7 +134,7 @@ export class PopupService implements OnDestroy {
             popupRef: popupReference.popupRef,
             settings
         });
-        this.setEventListeners(this.popupStateMap.get(uid));
+        this.setEventListeners(this.popupStateMap.get(uid) as PopupState);
         return popupReference.popupRef;
     }
 
