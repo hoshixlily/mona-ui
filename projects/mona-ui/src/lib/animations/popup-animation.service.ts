@@ -1,7 +1,7 @@
-import { ElementRef, Injectable } from "@angular/core";
-import { AnimationService } from "./animation.service";
+import { Injectable } from "@angular/core";
+import { takeUntil } from "rxjs";
 import { PopupRef } from "../popup/models/PopupRef";
-import { filter, takeUntil } from "rxjs";
+import { AnimationService } from "./animation.service";
 import { AnimationState } from "./AnimationState";
 
 /**

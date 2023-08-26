@@ -1,6 +1,5 @@
 import { Pipe, PipeTransform } from "@angular/core";
 import { Enumerable } from "@mirei/ts-collections";
-import { Row } from "../models/Row";
 
 @Pipe({
     name: "gridPage"

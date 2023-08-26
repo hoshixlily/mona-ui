@@ -1,4 +1,3 @@
-import { ConnectionPositionPair } from "@angular/cdk/overlay";
 import {
     AfterContentInit,
     AfterViewInit,

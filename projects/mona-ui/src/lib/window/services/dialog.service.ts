@@ -1,12 +1,12 @@
 import { ApplicationRef, Injectable } from "@angular/core";
-import { DialogType } from "../models/DialogType";
-import { DialogAction } from "../models/DialogAction";
-import { DialogSettings } from "../models/DialogSettings";
-import { DialogRef } from "../models/DialogRef";
-import { WindowService } from "./window.service";
+import { Subject, take } from "rxjs";
 import { DialogContentComponent } from "../components/dialog-content/dialog-content.component";
-import { of, Subject, take } from "rxjs";
+import { DialogAction } from "../models/DialogAction";
 import { DialogHandler } from "../models/DialogHandler";
+import { DialogRef } from "../models/DialogRef";
+import { DialogSettings } from "../models/DialogSettings";
+import { DialogType } from "../models/DialogType";
+import { WindowService } from "./window.service";
 
 @Injectable({
     providedIn: "root"

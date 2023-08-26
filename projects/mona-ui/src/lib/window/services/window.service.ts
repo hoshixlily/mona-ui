@@ -1,15 +1,15 @@
 import { forwardRef, Injectable } from "@angular/core";
+import { asapScheduler } from "rxjs";
+import { AnimationService } from "../../animations/animation.service";
+import { PopupCloseEvent } from "../../popup/models/PopupCloseEvent";
 import { PopupService } from "../../popup/services/popup.service";
 import { WindowContentComponent } from "../components/window-content/window-content.component";
-import { WindowInjectorData } from "../models/WindowInjectorData";
-import { WindowSettings } from "../models/WindowSettings";
-import { asapScheduler, filter, take } from "rxjs";
-import { WindowRef } from "../models/WindowRef";
-import { PopupCloseEvent } from "../../popup/models/PopupCloseEvent";
 import { WindowCloseEvent } from "../models/WindowCloseEvent";
+import { WindowInjectorData } from "../models/WindowInjectorData";
+import { WindowRef } from "../models/WindowRef";
 import { WindowReference } from "../models/WindowReference";
 import { WindowReferenceOptions } from "../models/WindowReferenceOptions";
-import { AnimationService } from "../../animations/animation.service";
+import { WindowSettings } from "../models/WindowSettings";
 
 @Injectable({
     providedIn: "root"

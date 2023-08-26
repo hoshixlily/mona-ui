@@ -1,11 +1,9 @@
 import { EventEmitter, Injectable } from "@angular/core";
-import { CheckableOptions } from "../data/CheckableOptions";
 import { Dictionary, EnumerableSet, SortedSet } from "@mirei/ts-collections";
+import { CheckableOptions } from "../data/CheckableOptions";
 import { Node } from "../data/Node";
-import { SelectableOptions } from "../data/SelectableOptions";
 import { NodeDisabler, NodeDisablerAction } from "../data/NodeDisabler";
-import { Subject } from "rxjs";
-import { CdkDragStart } from "@angular/cdk/drag-drop";
+import { SelectableOptions } from "../data/SelectableOptions";
 
 @Injectable()
 export class TreeViewService {

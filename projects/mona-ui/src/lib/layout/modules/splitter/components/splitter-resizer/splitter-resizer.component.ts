@@ -4,14 +4,11 @@ import {
     Component,
     ElementRef,
     Input,
-    NgZone,
     OnChanges,
     OnInit,
     QueryList,
     SimpleChanges
 } from "@angular/core";
-import { SplitterPaneComponent } from "../splitter-pane/splitter-pane.component";
-import { Orientation } from "../../data/Orientation";
 import {
     faCaretDown,
     faCaretLeft,
@@ -22,6 +19,8 @@ import {
     IconDefinition
 } from "@fortawesome/free-solid-svg-icons";
 import { fromEvent } from "rxjs";
+import { Orientation } from "../../data/Orientation";
+import { SplitterPaneComponent } from "../splitter-pane/splitter-pane.component";
 
 @Component({
     selector: "mona-splitter-resizer",

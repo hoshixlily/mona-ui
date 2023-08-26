@@ -1,5 +1,5 @@
 import { EventEmitter, Injectable, signal, WritableSignal } from "@angular/core";
-import { Enumerable, EnumerableSet, Group, IEnumerable, List } from "@mirei/ts-collections";
+import { Enumerable, EnumerableSet, List } from "@mirei/ts-collections";
 import { ListViewItem } from "../models/ListViewItem";
 import { SelectableOptions } from "../models/SelectableOptions";
 import { VirtualScrollOptions } from "../models/VirtualScrollOptions";

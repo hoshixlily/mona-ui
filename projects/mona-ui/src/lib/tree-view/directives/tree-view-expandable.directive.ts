@@ -1,5 +1,4 @@
 import { Directive, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from "@angular/core";
-import { TreeViewComponent } from "../components/tree-view/tree-view.component";
 import { TreeViewService } from "../services/tree-view.service";
 
 @Directive({

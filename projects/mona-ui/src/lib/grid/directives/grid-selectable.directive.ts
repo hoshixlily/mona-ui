@@ -1,14 +1,14 @@
 import { Directive, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from "@angular/core";
-import { SelectableOptions } from "../models/SelectableOptions";
-import { GridComponent } from "../components/grid/grid.component";
-import { GridService } from "../services/grid.service";
 import { Subject, takeUntil } from "rxjs";
+import { SelectableOptions } from "../models/SelectableOptions";
+import { GridService } from "../services/grid.service";
 
 @Directive({
     selector: "mona-grid[monaGridSelectable]"
 })
 export class GridSelectableDirective implements OnInit, OnChanges, OnDestroy {
     readonly #destroy$: Subject<void> = new Subject<void>();
+
     @Input()
     public set selectedKeys(selectedKeys: Iterable<unknown>) {
         this.gridService.selectedKeys.clear();

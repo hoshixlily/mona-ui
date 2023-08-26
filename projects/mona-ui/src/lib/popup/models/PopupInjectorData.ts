@@ -1,6 +1,5 @@
-import { PopupReference } from "./PopupReference";
 import { PopupCloseEvent } from "./PopupCloseEvent";
-import { AnimationMetadata } from "@angular/animations";
+import { PopupReference } from "./PopupReference";
 
 export interface PopupInjectorData {
     disableAnimation?: boolean;
