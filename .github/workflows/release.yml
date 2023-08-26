@@ -29,7 +29,7 @@ jobs:
         run: npm install --save-dev @semantic-release/changelog @semantic-release/git --legacy-peer-deps
 
       - name: Test
-        run: npm run test -- --browsers=ChromeHeadless --watch=false --code-coverage
+        run: npm run test:lib -- --browsers=ChromeHeadless --watch=false --code-coverage
 
       - name: Build
         run: npm run build:prod
