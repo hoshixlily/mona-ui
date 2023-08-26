@@ -24,7 +24,7 @@
     ],
     "repository": {
         "type": "git",
-        "url": "https://github.com/merophise/mona-ui"
+        "url": "https://github.com/hoshixlily/mona-ui"
     },
     "publishConfig": {
         "access": "public"
