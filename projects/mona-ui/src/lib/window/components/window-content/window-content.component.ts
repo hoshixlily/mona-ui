@@ -80,10 +80,10 @@ export class WindowContentComponent implements OnInit, AfterViewInit {
     }
 
     public onCloseClick(event: MouseEvent): void {
-        this.closeWindow();
+        this.closeWindow(event);
     }
 
-    private closeWindow(): void {
+    private closeWindow(event: Event): void {
         const closeEvent = new WindowCloseEvent({ event, via: PopupCloseSource.CloseButton });
         if (this.windowData.preventClose && this.windowData.preventClose(closeEvent)) {
             return;
@@ -117,8 +117,8 @@ export class WindowContentComponent implements OnInit, AfterViewInit {
                     filter(event => event.key === "Escape"),
                     takeUntilDestroyed(this.destroyRef)
                 )
-                .subscribe(() => {
-                    this.closeWindow();
+                .subscribe(event => {
+                    this.closeWindow(event);
                 });
         }
     }
