@@ -8,8 +8,8 @@ describe("RangeSliderComponent", () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            declarations: [RangeSliderComponent]
-        });
+    imports: [RangeSliderComponent]
+});
         fixture = TestBed.createComponent(RangeSliderComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();

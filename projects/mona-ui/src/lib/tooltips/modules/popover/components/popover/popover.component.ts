@@ -28,13 +28,16 @@ import { PopoverTitleTemplateDirective } from "../../directives/popover-title-te
 import { PopoverShowEvent } from "../../models/PopoverShowEvent";
 import { PopoverShownEvent } from "../../models/PopoverShownEvent";
 import { PopoverHideEvent } from "../../models/PopoverHideEvent";
+import { NgIf, NgTemplateOutlet, NgClass } from "@angular/common";
 
 @Component({
     selector: "mona-popover",
     templateUrl: "./popover.component.html",
     styleUrls: ["./popover.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    exportAs: "monaPopover"
+    exportAs: "monaPopover",
+    standalone: true,
+    imports: [NgIf, NgTemplateOutlet, NgClass]
 })
 export class PopoverComponent implements OnInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);

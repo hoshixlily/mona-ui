@@ -8,8 +8,8 @@ describe('SplitterPaneComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SplitterPaneComponent ]
-    })
+    imports: [SplitterPaneComponent]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(SplitterPaneComponent);

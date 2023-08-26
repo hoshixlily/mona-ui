@@ -22,12 +22,17 @@ import { asapScheduler, interval, Subject, takeUntil, timer } from "rxjs";
 import { ScrollDirection } from "../../../../../models/ScrollDirection";
 import { faChevronLeft, faChevronRight, faXmark, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { TabCloseEvent } from "../../data/TabCloseEvent";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { ButtonDirective } from "../../../../../buttons/modules/button/directives/button.directive";
+import { NgIf, NgFor, NgClass, NgTemplateOutlet } from "@angular/common";
 
 @Component({
     selector: "mona-tab-strip",
     templateUrl: "./tab-strip.component.html",
     styleUrls: ["./tab-strip.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [NgIf, ButtonDirective, FontAwesomeModule, NgFor, NgClass, NgTemplateOutlet]
 })
 export class TabStripComponent implements OnInit, AfterContentInit, OnDestroy, AfterViewInit {
     readonly #destroy$: Subject<void> = new Subject<void>();

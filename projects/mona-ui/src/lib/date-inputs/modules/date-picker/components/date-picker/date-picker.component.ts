@@ -12,7 +12,7 @@ import {
 } from "@angular/core";
 import { PopupService } from "../../../../../popup/services/popup.service";
 import { FocusMonitor } from "@angular/cdk/a11y";
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
+import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from "@angular/forms";
 import { DateTime } from "luxon";
 import { Action } from "../../../../../utils/Action";
 import { PopupRef } from "../../../../../popup/models/PopupRef";
@@ -21,6 +21,11 @@ import { ConnectionPositionPair } from "@angular/cdk/overlay";
 import { take } from "rxjs";
 import { PopupAnimationService } from "../../../../../animations/popup-animation.service";
 import { AnimationState } from "../../../../../animations/AnimationState";
+import { CalendarComponent } from "../../../calendar/components/calendar/calendar.component";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { ButtonDirective } from "../../../../../buttons/modules/button/directives/button.directive";
+import { TextBoxDirective } from "../../../../../inputs/modules/text-box/directives/text-box.directive";
+import { NgClass } from "@angular/common";
 
 @Component({
     selector: "mona-date-picker",
@@ -33,7 +38,9 @@ import { AnimationState } from "../../../../../animations/AnimationState";
             useExisting: forwardRef(() => DatePickerComponent),
             multi: true
         }
-    ]
+    ],
+    standalone: true,
+    imports: [NgClass, TextBoxDirective, FormsModule, ButtonDirective, FontAwesomeModule, CalendarComponent]
 })
 export class DatePickerComponent implements OnInit, ControlValueAccessor {
     #propagateChange: Action<Date | null> | null = null;

@@ -21,7 +21,8 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
             useExisting: forwardRef(() => AlphaSliderComponent),
             multi: true
         }
-    ]
+    ],
+    standalone: true
 })
 export class AlphaSliderComponent implements AfterViewInit, ControlValueAccessor {
     #mouseDown: boolean = false;

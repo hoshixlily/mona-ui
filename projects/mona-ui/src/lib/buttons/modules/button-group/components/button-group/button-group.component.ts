@@ -20,7 +20,8 @@ import { ButtonDirective } from "../../../button/directives/button.directive";
     templateUrl: "./button-group.component.html",
     styleUrls: ["./button-group.component.scss"],
     providers: [ButtonService],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true
 })
 export class ButtonGroupComponent implements OnInit, AfterContentInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);

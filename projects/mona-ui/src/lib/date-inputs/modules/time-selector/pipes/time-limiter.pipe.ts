@@ -2,7 +2,8 @@ import { Pipe, PipeTransform } from "@angular/core";
 import { TimeUnit } from "../models/TimeUnit";
 
 @Pipe({
-    name: "timeLimiter"
+    name: "timeLimiter",
+    standalone: true
 })
 export class TimeLimiterPipe implements PipeTransform {
     public transform(

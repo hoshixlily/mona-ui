@@ -13,8 +13,10 @@ import {
 } from "@angular/core";
 import { TextBoxPrefixTemplateDirective } from "../../directives/text-box-prefix-template.directive";
 import { TextBoxSuffixTemplateDirective } from "../../directives/text-box-suffix-template.directive";
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
+import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from "@angular/forms";
 import { Action } from "../../../../../utils/Action";
+import { TextBoxDirective } from "../../directives/text-box.directive";
+import { NgFor, NgTemplateOutlet } from "@angular/common";
 
 @Component({
     selector: "mona-text-box",
@@ -27,7 +29,9 @@ import { Action } from "../../../../../utils/Action";
             useExisting: forwardRef(() => TextBoxComponent),
             multi: true
         }
-    ]
+    ],
+    standalone: true,
+    imports: [NgFor, NgTemplateOutlet, TextBoxDirective, FormsModule]
 })
 export class TextBoxComponent implements OnInit, ControlValueAccessor {
     private propagateChange: Action<string, any> | null = null;

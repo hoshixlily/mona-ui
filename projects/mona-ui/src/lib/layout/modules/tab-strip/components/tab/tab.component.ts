@@ -15,7 +15,8 @@ import { v4 } from "uuid";
 @Component({
     selector: "mona-tab",
     template: "",
-    styleUrls: []
+    styleUrls: [],
+    standalone: true
 })
 export class TabComponent implements OnInit, AfterViewInit {
     #viewRef?: EmbeddedViewRef<any>;

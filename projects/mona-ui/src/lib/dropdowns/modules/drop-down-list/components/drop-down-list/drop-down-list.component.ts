@@ -27,6 +27,12 @@ import { ConnectionPositionPair } from "@angular/cdk/overlay";
 import { fromEvent, Subject, take, takeUntil } from "rxjs";
 import { PopupAnimationService } from "../../../../../animations/popup-animation.service";
 import { AnimationState } from "../../../../../animations/AnimationState";
+import { ListGroupTemplateDirective } from "../../../../directives/list-group-template.directive";
+import { ListItemTemplateDirective } from "../../../../directives/list-item-template.directive";
+import { PopupListComponent } from "../../../../components/popup-list/popup-list.component";
+import { ButtonDirective } from "../../../../../buttons/modules/button/directives/button.directive";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { NgClass, NgIf, NgTemplateOutlet } from "@angular/common";
 
 @Component({
     selector: "mona-drop-down-list",
@@ -40,7 +46,9 @@ import { AnimationState } from "../../../../../animations/AnimationState";
             useExisting: forwardRef(() => DropDownListComponent),
             multi: true
         }
-    ]
+    ],
+    standalone: true,
+    imports: [NgClass, NgIf, NgTemplateOutlet, FontAwesomeModule, ButtonDirective, PopupListComponent, ListItemTemplateDirective, ListGroupTemplateDirective]
 })
 export class DropDownListComponent implements OnInit, OnDestroy, ControlValueAccessor {
     readonly #destroy$: Subject<void> = new Subject<void>();

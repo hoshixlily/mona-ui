@@ -28,6 +28,13 @@ import { faChevronDown, faTimes, IconDefinition } from "@fortawesome/free-solid-
 import { ConnectionPositionPair } from "@angular/cdk/overlay";
 import { PopupAnimationService } from "../../../../../animations/popup-animation.service";
 import { AnimationState } from "../../../../../animations/AnimationState";
+import { ListGroupTemplateDirective } from "../../../../directives/list-group-template.directive";
+import { ListItemTemplateDirective } from "../../../../directives/list-item-template.directive";
+import { PopupListComponent } from "../../../../components/popup-list/popup-list.component";
+import { ButtonDirective } from "../../../../../buttons/modules/button/directives/button.directive";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { ChipComponent } from "../../../../../buttons/modules/chip/components/chip/chip.component";
+import { NgClass, NgFor, NgIf, NgTemplateOutlet, SlicePipe } from "@angular/common";
 
 @Component({
     selector: "mona-multi-select",
@@ -41,7 +48,9 @@ import { AnimationState } from "../../../../../animations/AnimationState";
             multi: true
         }
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [NgClass, NgFor, ChipComponent, NgIf, NgTemplateOutlet, FontAwesomeModule, ButtonDirective, PopupListComponent, ListItemTemplateDirective, ListGroupTemplateDirective, SlicePipe]
 })
 export class MultiSelectComponent implements OnInit, OnDestroy, ControlValueAccessor {
     readonly #destroy$: Subject<void> = new Subject<void>();

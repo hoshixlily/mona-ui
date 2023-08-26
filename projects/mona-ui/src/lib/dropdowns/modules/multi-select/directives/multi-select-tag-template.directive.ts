@@ -1,7 +1,8 @@
 import { Directive } from "@angular/core";
 
 @Directive({
-    selector: "ng-template[monaMultiSelectTagTemplate]"
+    selector: "ng-template[monaMultiSelectTagTemplate]",
+    standalone: true
 })
 export class MultiSelectTagTemplateDirective {
     public constructor() {}

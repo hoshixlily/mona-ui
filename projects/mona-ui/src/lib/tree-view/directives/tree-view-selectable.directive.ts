@@ -3,7 +3,8 @@ import { SelectableOptions } from "../data/SelectableOptions";
 import { TreeViewService } from "../services/tree-view.service";
 
 @Directive({
-    selector: "mona-tree-view[monaTreeViewSelectable]"
+    selector: "mona-tree-view[monaTreeViewSelectable]",
+    standalone: true
 })
 export class TreeViewSelectableDirective implements OnInit, OnChanges {
     @Input()

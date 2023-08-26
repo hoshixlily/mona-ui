@@ -17,7 +17,8 @@ import { v4 } from "uuid";
     selector: "mona-splitter-pane",
     templateUrl: "./splitter-pane.component.html",
     styleUrls: ["./splitter-pane.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true
 })
 export class SplitterPaneComponent implements OnInit {
     public readonly uid: string = v4();

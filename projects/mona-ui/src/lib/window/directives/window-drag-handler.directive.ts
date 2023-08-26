@@ -3,7 +3,8 @@ import { fromEvent, Subject, takeUntil } from "rxjs";
 import { WindowReference } from "../models/WindowReference";
 
 @Directive({
-    selector: "div[monaWindowDragHandler]"
+    selector: "div[monaWindowDragHandler]",
+    standalone: true
 })
 export class WindowDragHandlerDirective implements AfterViewInit, OnDestroy {
     readonly #destroy$: Subject<void> = new Subject<void>();

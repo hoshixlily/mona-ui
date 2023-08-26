@@ -22,7 +22,8 @@ import { WindowCloseEvent } from "../../models/WindowCloseEvent";
     selector: "mona-window",
     templateUrl: "./window.component.html",
     styleUrls: ["./window.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true
 })
 export class WindowComponent implements OnInit, OnDestroy, AfterViewInit {
     private readonly componentDestroy$: Subject<void> = new Subject<void>();

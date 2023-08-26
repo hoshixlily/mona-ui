@@ -8,8 +8,8 @@ describe('FieldsetComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [FieldsetComponent]
-    });
+    imports: [FieldsetComponent]
+});
     fixture = TestBed.createComponent(FieldsetComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

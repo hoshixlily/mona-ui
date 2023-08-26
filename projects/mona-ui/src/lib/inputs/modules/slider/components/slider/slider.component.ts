@@ -23,6 +23,7 @@ import { delay, filter, fromEvent, take, tap } from "rxjs";
 import { Action } from "../../../../../utils/Action";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { NgClass, NgIf, NgFor, NgTemplateOutlet } from "@angular/common";
 
 @Component({
     selector: "mona-slider",
@@ -35,7 +36,9 @@ import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
             useExisting: forwardRef(() => SliderComponent),
             multi: true
         }
-    ]
+    ],
+    standalone: true,
+    imports: [NgClass, NgIf, NgFor, NgTemplateOutlet]
 })
 export class SliderComponent implements OnInit, AfterViewInit, ControlValueAccessor, OnChanges {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);

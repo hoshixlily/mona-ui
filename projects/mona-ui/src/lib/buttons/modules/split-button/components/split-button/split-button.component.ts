@@ -21,11 +21,16 @@ import { MenuItem } from "../../../../../menus/modules/context-menu/models/MenuI
 import { Subject, takeUntil } from "rxjs";
 import { SplitButtonTextTemplateDirective } from "../../directives/split-button-text-template.directive";
 import { faChevronDown, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { NgIf, NgTemplateOutlet } from "@angular/common";
+import { ButtonDirective } from "../../../button/directives/button.directive";
 
 @Component({
     selector: "mona-split-button",
     templateUrl: "./split-button.component.html",
-    styleUrls: ["./split-button.component.scss"]
+    styleUrls: ["./split-button.component.scss"],
+    standalone: true,
+    imports: [ButtonDirective, NgIf, NgTemplateOutlet, FontAwesomeModule, ContextMenuComponent]
 })
 export class SplitButtonComponent implements AfterViewInit, AfterContentInit, OnDestroy {
     private readonly componentDestroy$: Subject<void> = new Subject<void>();

@@ -13,11 +13,15 @@ import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ContextMenuComponent } from "../../../../../menus/modules/context-menu/components/context-menu/context-menu.component";
 import { MenuItem } from "../../../../../menus/modules/context-menu/models/MenuItem";
 import { MenuItemComponent } from "../../../../../menus/modules/shared-menu/components/menu-item/menu-item.component";
+import { NgIf } from "@angular/common";
+import { ButtonDirective } from "../../../button/directives/button.directive";
 
 @Component({
     selector: "mona-drop-down-button",
     templateUrl: "./drop-down-button.component.html",
-    styleUrls: ["./drop-down-button.component.scss"]
+    styleUrls: ["./drop-down-button.component.scss"],
+    standalone: true,
+    imports: [ButtonDirective, NgIf, ContextMenuComponent]
 })
 export class DropDownButtonComponent implements AfterViewInit, AfterContentInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);

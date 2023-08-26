@@ -6,7 +6,8 @@ import { ColumnSortState } from "../models/ColumnSortState";
 import { Row } from "../models/Row";
 
 @Pipe({
-    name: "gridFilter"
+    name: "gridFilter",
+    standalone: true
 })
 export class GridFilterPipe implements PipeTransform {
     public constructor() {}

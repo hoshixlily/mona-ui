@@ -29,7 +29,8 @@ import { Point } from "@angular/cdk/drag-drop";
 @Component({
     selector: "mona-contextmenu",
     templateUrl: "./context-menu.component.html",
-    styleUrls: ["./context-menu.component.scss"]
+    styleUrls: ["./context-menu.component.scss"],
+    standalone: true
 })
 export class ContextMenuComponent implements OnInit, AfterContentInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);

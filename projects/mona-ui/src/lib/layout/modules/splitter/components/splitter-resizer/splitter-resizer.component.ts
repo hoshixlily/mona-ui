@@ -21,12 +21,16 @@ import {
 import { fromEvent } from "rxjs";
 import { Orientation } from "../../data/Orientation";
 import { SplitterPaneComponent } from "../splitter-pane/splitter-pane.component";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { NgClass, NgIf } from "@angular/common";
 
 @Component({
     selector: "mona-splitter-resizer",
     templateUrl: "./splitter-resizer.component.html",
     styleUrls: ["./splitter-resizer.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [NgClass, NgIf, FontAwesomeModule]
 })
 export class SplitterResizerComponent implements OnInit, OnChanges {
     public readonly horizontalCollapseNextIcon: IconDefinition = faCaretRight;

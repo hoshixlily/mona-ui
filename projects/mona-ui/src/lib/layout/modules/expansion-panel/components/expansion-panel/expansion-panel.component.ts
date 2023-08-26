@@ -3,12 +3,16 @@ import { faMinus, faPlus, IconDefinition } from "@fortawesome/free-solid-svg-ico
 import { ExpansionPanelTitleTemplateDirective } from "../../directives/expansion-panel-title-template.directive";
 import { ExpansionPanelActionsTemplateDirective } from "../../directives/expansion-panel-actions-template.directive";
 import { SlideVertical } from "../../../../../animations/slide.animation";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { NgClass, NgIf, NgTemplateOutlet } from "@angular/common";
 
 @Component({
     selector: "mona-expansion-panel",
     templateUrl: "./expansion-panel.component.html",
     styleUrls: ["./expansion-panel.component.scss"],
-    animations: [SlideVertical]
+    animations: [SlideVertical],
+    standalone: true,
+    imports: [NgClass, NgIf, NgTemplateOutlet, FontAwesomeModule]
 })
 export class ExpansionPanelComponent implements OnInit {
     public readonly collapseIcon: IconDefinition = faMinus;

@@ -18,11 +18,23 @@ import {
 import { SliderComponent } from "../../../slider/components/slider/slider.component";
 import { distinctUntilChanged, fromEvent, Subject, switchMap, tap } from "rxjs";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
+import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from "@angular/forms";
 import { faCopy, faSort, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { HSV, HSVSignal, RGBA, RGBSignal } from "../../models/ColorSpaces";
 import { ColorMode } from "../../models/ColorMode";
 import { Clipboard } from "@angular/cdk/clipboard";
+import { MenuItemComponent } from "../../../../../menus/modules/shared-menu/components/menu-item/menu-item.component";
+import { ContextMenuComponent } from "../../../../../menus/modules/context-menu/components/context-menu/context-menu.component";
+import { TextBoxSuffixTemplateDirective } from "../../../text-box/directives/text-box-suffix-template.directive";
+import { TextBoxPrefixTemplateDirective } from "../../../text-box/directives/text-box-prefix-template.directive";
+import { TextBoxComponent } from "../../../text-box/components/text-box/text-box.component";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { ButtonDirective } from "../../../../../buttons/modules/button/directives/button.directive";
+import { NumericTextBoxPrefixTemplateDirective } from "../../../numeric-text-box/directives/numeric-text-box-prefix-template.directive";
+import { NumericTextBoxComponent } from "../../../numeric-text-box/components/numeric-text-box/numeric-text-box.component";
+import { AlphaSliderComponent } from "../alpha-slider/alpha-slider.component";
+import { NgIf } from "@angular/common";
+import { HueSliderComponent } from "../hue-slider/hue-slider.component";
 
 @Component({
     selector: "mona-color-gradient",
@@ -35,7 +47,9 @@ import { Clipboard } from "@angular/cdk/clipboard";
             useExisting: forwardRef(() => ColorGradientComponent),
             multi: true
         }
-    ]
+    ],
+    standalone: true,
+    imports: [HueSliderComponent, FormsModule, NgIf, AlphaSliderComponent, NumericTextBoxComponent, NumericTextBoxPrefixTemplateDirective, ButtonDirective, FontAwesomeModule, TextBoxComponent, TextBoxPrefixTemplateDirective, TextBoxSuffixTemplateDirective, ContextMenuComponent, MenuItemComponent]
 })
 export class ColorGradientComponent implements OnInit, AfterViewInit, ControlValueAccessor {
     readonly #clipboard: Clipboard = inject(Clipboard);

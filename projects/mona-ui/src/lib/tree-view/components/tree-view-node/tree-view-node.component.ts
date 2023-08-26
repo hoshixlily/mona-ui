@@ -7,11 +7,17 @@ import { DropPositionChangeEvent } from "../../data/DropPositionChangeEvent";
 import { NodeClickEvent } from "../../data/NodeClickEvent";
 import { of, Subject, switchMap, takeUntil } from "rxjs";
 import { Highlightable } from "@angular/cdk/a11y";
+import { FormsModule } from "@angular/forms";
+import { CheckBoxDirective } from "../../../inputs/modules/check-box/directives/check-box.directive";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { NgIf, NgClass, NgTemplateOutlet } from "@angular/common";
 
 @Component({
     selector: "mona-tree-view-node",
     templateUrl: "./tree-view-node.component.html",
-    styleUrls: ["./tree-view-node.component.scss"]
+    styleUrls: ["./tree-view-node.component.scss"],
+    standalone: true,
+    imports: [NgIf, FontAwesomeModule, NgClass, CheckBoxDirective, FormsModule, NgTemplateOutlet]
 })
 export class TreeViewNodeComponent implements OnInit, OnDestroy, Highlightable {
     private readonly componentDestroy$: Subject<void> = new Subject<void>();

@@ -17,12 +17,16 @@ import { FocusMonitor } from "@angular/cdk/a11y";
 import { PopupService } from "../../../../../popup/services/popup.service";
 import { DateTime } from "luxon";
 import { take } from "rxjs";
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
+import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from "@angular/forms";
 import { Action } from "../../../../../utils/Action";
 import { PopupRef } from "../../../../../popup/models/PopupRef";
 import { ConnectionPositionPair } from "@angular/cdk/overlay";
 import { PopupAnimationService } from "../../../../../animations/popup-animation.service";
 import { AnimationState } from "../../../../../animations/AnimationState";
+import { TimeSelectorComponent } from "../../../time-selector/components/time-selector/time-selector.component";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { ButtonDirective } from "../../../../../buttons/modules/button/directives/button.directive";
+import { TextBoxDirective } from "../../../../../inputs/modules/text-box/directives/text-box.directive";
 
 @Component({
     selector: "mona-time-picker",
@@ -35,7 +39,9 @@ import { AnimationState } from "../../../../../animations/AnimationState";
             useExisting: forwardRef(() => TimePickerComponent),
             multi: true
         }
-    ]
+    ],
+    standalone: true,
+    imports: [TextBoxDirective, FormsModule, ButtonDirective, FontAwesomeModule, TimeSelectorComponent]
 })
 export class TimePickerComponent implements OnInit, OnChanges, ControlValueAccessor {
     #value: Date | null = null;

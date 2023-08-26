@@ -2,7 +2,8 @@ import { Directive, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChange
 import { TreeViewService } from "../services/tree-view.service";
 
 @Directive({
-    selector: "mona-tree-view[monaTreeViewExpandable]"
+    selector: "mona-tree-view[monaTreeViewExpandable]",
+    standalone: true
 })
 export class TreeViewExpandableDirective implements OnInit, OnChanges {
     @Input()

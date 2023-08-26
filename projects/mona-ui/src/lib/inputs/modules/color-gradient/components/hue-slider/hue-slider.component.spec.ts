@@ -8,8 +8,8 @@ describe('HueSliderComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [HueSliderComponent]
-    });
+    imports: [HueSliderComponent]
+});
     fixture = TestBed.createComponent(HueSliderComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();

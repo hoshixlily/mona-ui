@@ -25,6 +25,7 @@ import { SliderHandleType } from "../../../../models/slider/SliderHandleType";
 import { SliderLabelPosition } from "../../../../models/slider/SliderLabelPosition";
 import { SliderTick } from "../../../../models/slider/SliderTick";
 import { RangeSliderTickValueTemplateDirective } from "../../directives/range-slider-tick-value-template.directive";
+import { NgClass, NgIf, NgFor, NgTemplateOutlet } from "@angular/common";
 
 @Component({
     selector: "mona-range-slider",
@@ -37,7 +38,9 @@ import { RangeSliderTickValueTemplateDirective } from "../../directives/range-sl
             useExisting: forwardRef(() => RangeSliderComponent),
             multi: true
         }
-    ]
+    ],
+    standalone: true,
+    imports: [NgClass, NgIf, NgFor, NgTemplateOutlet]
 })
 export class RangeSliderComponent implements AfterViewInit, ControlValueAccessor {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);

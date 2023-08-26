@@ -8,12 +8,15 @@ import {
     signal,
     WritableSignal
 } from "@angular/core";
+import { NgStyle, NgIf } from "@angular/common";
 
 @Component({
     selector: "mona-avatar",
     templateUrl: "./avatar.component.html",
     styleUrls: ["./avatar.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [NgStyle, NgIf]
 })
 export class AvatarComponent implements OnInit {
     public avatarHeight: WritableSignal<string> = signal("64px");

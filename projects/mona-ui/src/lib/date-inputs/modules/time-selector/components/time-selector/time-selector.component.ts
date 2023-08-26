@@ -20,6 +20,7 @@ import { Meridiem } from "../../../../models/Meridiem";
 import { TimeUnit } from "../../models/TimeUnit";
 import { TimeLimiterPipe } from "../../pipes/time-limiter.pipe";
 import { HourSelectorPipe } from "../../pipes/hour-selector.pipe";
+import { NgClass, NgFor, NgIf, DecimalPipe } from "@angular/common";
 
 @Component({
     selector: "mona-time-selector",
@@ -32,7 +33,9 @@ import { HourSelectorPipe } from "../../pipes/hour-selector.pipe";
             useExisting: forwardRef(() => TimeSelectorComponent),
             multi: true
         }
-    ]
+    ],
+    standalone: true,
+    imports: [NgClass, NgFor, NgIf, DecimalPipe, HourSelectorPipe, TimeLimiterPipe]
 })
 export class TimeSelectorComponent implements OnInit, AfterViewInit, ControlValueAccessor {
     #propagateChange: Action<Date | null> | null = null;

@@ -20,7 +20,7 @@ import { Enumerable, List } from "@mirei/ts-collections";
 import { TreeViewService } from "../../services/tree-view.service";
 import { TreeViewNodeTextTemplateDirective } from "../../directives/tree-view-node-text-template.directive";
 import { Action } from "../../../utils/Action";
-import { CdkDragDrop, CdkDragEnd, CdkDragMove, CdkDragStart } from "@angular/cdk/drag-drop";
+import { CdkDragDrop, CdkDragEnd, CdkDragMove, CdkDragStart, CdkDropList, CdkDrag, CdkDragPreview } from "@angular/cdk/drag-drop";
 import { DropPosition } from "../../data/DropPosition";
 import { DropPositionChangeEvent } from "../../data/DropPositionChangeEvent";
 import { faArrowDown, faArrowUp, faPlus, IconDefinition } from "@fortawesome/free-solid-svg-icons";
@@ -33,6 +33,8 @@ import { TreeViewNodeComponent } from "../tree-view-node/tree-view-node.componen
 import { ActiveDescendantKeyManager } from "@angular/cdk/a11y";
 import { filter, fromEvent, Subject, takeUntil } from "rxjs";
 import { animate, style, transition, trigger } from "@angular/animations";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { NgFor, NgIf, NgTemplateOutlet } from "@angular/common";
 
 @Component({
     selector: "mona-tree-view",
@@ -47,7 +49,9 @@ import { animate, style, transition, trigger } from "@angular/animations";
             ]),
             transition(":leave", [animate("0.15s ease-out", style({ height: "0px", opacity: 0 }))])
         ])
-    ]
+    ],
+    standalone: true,
+    imports: [CdkDropList, NgFor, CdkDrag, TreeViewNodeComponent, NgIf, NgTemplateOutlet, CdkDragPreview, FontAwesomeModule]
 })
 export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
     private readonly componentDestroy$: Subject<void> = new Subject<void>();

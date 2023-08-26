@@ -26,7 +26,7 @@ import { PopupListItemComponent } from "../popup-list-item/popup-list-item.compo
 import { PopupListValueChangeEvent } from "../../data/PopupListValueChangeEvent";
 import { ListItemTemplateDirective } from "../../directives/list-item-template.directive";
 import { ListGroupTemplateDirective } from "../../directives/list-group-template.directive";
-import { TextBoxModule } from "../../../inputs/modules/text-box/text-box.module";
+
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { faSearch, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { FormsModule } from "@angular/forms";
@@ -36,7 +36,7 @@ import { FormsModule } from "@angular/forms";
     templateUrl: "./popup-list.component.html",
     styleUrls: ["./popup-list.component.scss"],
     standalone: true,
-    imports: [CommonModule, PopupListItemComponent, TextBoxModule, FontAwesomeModule, FormsModule],
+    imports: [CommonModule, PopupListItemComponent, FontAwesomeModule, FormsModule],
     changeDetection: ChangeDetectionStrategy.Default
 })
 export class PopupListComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {

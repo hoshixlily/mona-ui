@@ -1,6 +1,6 @@
 import { Component, ElementRef, forwardRef, Input, OnInit, TemplateRef, ViewChild } from "@angular/core";
 import { faChevronDown, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
+import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from "@angular/forms";
 import { Action } from "../../../../../utils/Action";
 import { PopupRef } from "../../../../../popup/models/PopupRef";
 import { PopupAnimationService } from "../../../../../animations/popup-animation.service";
@@ -8,6 +8,11 @@ import { PopupService } from "../../../../../popup/services/popup.service";
 import { AnimationState } from "../../../../../animations/AnimationState";
 import { ColorPickerView } from "../../models/ColorPickerView";
 import { PaletteType } from "../../../color-palette/models/PaletteType";
+import { ColorGradientComponent } from "../../../color-gradient/components/color-gradient/color-gradient.component";
+import { ColorPaletteComponent } from "../../../color-palette/components/color-palette/color-palette.component";
+import { ButtonDirective } from "../../../../../buttons/modules/button/directives/button.directive";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { NgIf } from "@angular/common";
 
 @Component({
     selector: "mona-color-picker",
@@ -19,7 +24,9 @@ import { PaletteType } from "../../../color-palette/models/PaletteType";
             useExisting: forwardRef(() => ColorPickerComponent),
             multi: true
         }
-    ]
+    ],
+    standalone: true,
+    imports: [NgIf, FontAwesomeModule, ButtonDirective, ColorPaletteComponent, FormsModule, ColorGradientComponent]
 })
 export class ColorPickerComponent implements OnInit, ControlValueAccessor {
     private popupRef: PopupRef | null = null;

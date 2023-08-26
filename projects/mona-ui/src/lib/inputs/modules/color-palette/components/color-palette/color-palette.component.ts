@@ -17,6 +17,7 @@ import { Action } from "../../../../../utils/Action";
 import { PaletteType } from "../../models/PaletteType";
 import { ColorService } from "../../../../services/color.service";
 import { ColorScheme } from "../../../../models/ColorScheme";
+import { NgFor, NgClass } from "@angular/common";
 
 @Component({
     selector: "mona-color-palette",
@@ -29,7 +30,9 @@ import { ColorScheme } from "../../../../models/ColorScheme";
             multi: true
         },
         ColorService
-    ]
+    ],
+    standalone: true,
+    imports: [NgFor, NgClass]
 })
 export class ColorPaletteComponent implements OnInit, OnChanges, ControlValueAccessor {
     private propagateChange: Action<string | null> | null = null;

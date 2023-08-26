@@ -3,7 +3,8 @@ import { VirtualScrollOptions } from "../models/VirtualScrollOptions";
 import { ListViewService } from "../services/list-view.service";
 
 @Directive({
-    selector: "mona-list-view[monaListViewVirtualScroll]"
+    selector: "mona-list-view[monaListViewVirtualScroll]",
+    standalone: true
 })
 export class ListViewVirtualScrollDirective {
     @Input({

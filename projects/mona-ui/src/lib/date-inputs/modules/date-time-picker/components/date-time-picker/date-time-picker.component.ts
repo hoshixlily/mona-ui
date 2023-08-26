@@ -13,7 +13,7 @@ import {
 import { faCalendar, faClock, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { PopupService } from "../../../../../popup/services/popup.service";
 import { FocusMonitor } from "@angular/cdk/a11y";
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
+import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from "@angular/forms";
 import { Action } from "../../../../../utils/Action";
 import { PopupRef } from "../../../../../popup/models/PopupRef";
 import { DateTime } from "luxon";
@@ -21,6 +21,12 @@ import { ConnectionPositionPair } from "@angular/cdk/overlay";
 import { take } from "rxjs";
 import { PopupAnimationService } from "../../../../../animations/popup-animation.service";
 import { AnimationState } from "../../../../../animations/AnimationState";
+import { TimeSelectorComponent } from "../../../time-selector/components/time-selector/time-selector.component";
+import { CalendarComponent } from "../../../calendar/components/calendar/calendar.component";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { ButtonDirective } from "../../../../../buttons/modules/button/directives/button.directive";
+import { TextBoxDirective } from "../../../../../inputs/modules/text-box/directives/text-box.directive";
+import { NgClass } from "@angular/common";
 
 @Component({
     selector: "mona-date-time-picker",
@@ -33,7 +39,9 @@ import { AnimationState } from "../../../../../animations/AnimationState";
             useExisting: forwardRef(() => DateTimePickerComponent),
             multi: true
         }
-    ]
+    ],
+    standalone: true,
+    imports: [NgClass, TextBoxDirective, FormsModule, ButtonDirective, FontAwesomeModule, CalendarComponent, TimeSelectorComponent]
 })
 export class DateTimePickerComponent implements OnInit, ControlValueAccessor {
     #value: Date | null = null;

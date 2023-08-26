@@ -4,7 +4,8 @@ import { Meridiem } from "../../../models/Meridiem";
 import { Enumerable } from "@mirei/ts-collections";
 
 @Pipe({
-    name: "hourSelector"
+    name: "hourSelector",
+    standalone: true
 })
 export class HourSelectorPipe implements PipeTransform {
     public transform(hours: TimeUnit[], format: "12" | "24", meridiem: Meridiem): TimeUnit[] {

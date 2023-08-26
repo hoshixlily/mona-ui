@@ -20,7 +20,8 @@ import { ButtonService } from "../../../services/button.service";
     selector: "[monaButton]",
     host: {
         "[attr.disabled]": "disabled ? '' : undefined"
-    }
+    },
+    standalone: true
 })
 export class ButtonDirective implements OnInit {
     _disabled: boolean = false;

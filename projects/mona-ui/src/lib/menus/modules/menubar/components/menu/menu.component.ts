@@ -8,7 +8,8 @@ import { MenuTextTemplateDirective } from "../../directives/menu-text-template.d
 @Component({
     selector: "mona-menu",
     template: "",
-    styleUrls: []
+    styleUrls: [],
+    standalone: true
 })
 export class MenuComponent implements OnInit, AfterContentInit {
     public readonly uid: string = v4();

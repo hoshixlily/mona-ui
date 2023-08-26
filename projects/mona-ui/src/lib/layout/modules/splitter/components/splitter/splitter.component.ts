@@ -14,12 +14,15 @@ import { SplitterPaneComponent } from "../splitter-pane/splitter-pane.component"
 import { Orientation } from "../../data/Orientation";
 import { SplitterResizerComponent } from "../splitter-resizer/splitter-resizer.component";
 import { IndexableList } from "@mirei/ts-collections";
+import { NgClass, NgFor, NgStyle, NgIf, NgTemplateOutlet } from "@angular/common";
 
 @Component({
     selector: "mona-splitter",
     templateUrl: "./splitter.component.html",
     styleUrls: ["./splitter.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [NgClass, NgFor, NgStyle, NgIf, NgTemplateOutlet, SplitterResizerComponent]
 })
 export class SplitterComponent implements OnInit, AfterViewInit, AfterContentInit {
     public resizers: IndexableList<SplitterResizerComponent> = new IndexableList<SplitterResizerComponent>();

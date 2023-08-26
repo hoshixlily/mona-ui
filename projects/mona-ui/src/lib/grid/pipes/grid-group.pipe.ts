@@ -6,7 +6,8 @@ import { GridGroup } from "../models/GridGroup";
 import { GridService } from "../services/grid.service";
 
 @Pipe({
-    name: "gridGroup"
+    name: "gridGroup",
+    standalone: true
 })
 export class GridGroupPipe implements PipeTransform {
     public constructor(private readonly gridService: GridService) {}

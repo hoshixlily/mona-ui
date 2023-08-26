@@ -22,10 +22,14 @@ import {
 import { delay, distinctUntilChanged, filter, interval, map, Subject, takeUntil } from "rxjs";
 import { FocusMonitor, FocusOrigin } from "@angular/cdk/a11y";
 import { Action } from "../../../../../utils/Action";
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
+import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from "@angular/forms";
 import { faChevronDown, faChevronUp, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { NumericTextBoxPrefixTemplateDirective } from "../../directives/numeric-text-box-prefix-template.directive";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { ButtonDirective } from "../../../../../buttons/modules/button/directives/button.directive";
+import { TextBoxDirective } from "../../../text-box/directives/text-box.directive";
+import { NgClass, NgFor, NgTemplateOutlet, NgIf } from "@angular/common";
 
 type Sign = "-" | "+";
 
@@ -40,7 +44,9 @@ type Sign = "-" | "+";
             useExisting: forwardRef(() => NumericTextBoxComponent),
             multi: true
         }
-    ]
+    ],
+    standalone: true,
+    imports: [NgClass, NgFor, NgTemplateOutlet, TextBoxDirective, FormsModule, NgIf, ButtonDirective, FontAwesomeModule]
 })
 export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueAccessor {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);

@@ -24,6 +24,8 @@ import { asyncScheduler, filter, fromEvent, interval, Subject, takeUntil, timer 
 import { ScrollDirection } from "../../../../../models/ScrollDirection";
 import { animate, style, transition, trigger } from "@angular/animations";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { NgFor, NgIf, NgTemplateOutlet, NgClass, NgStyle } from "@angular/common";
 
 @Component({
     selector: "mona-scroll-view",
@@ -41,7 +43,9 @@ import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
                 animate("0.3s ease-out", style({ transform: "translateX({{end}}100%)" }))
             ])
         ])
-    ]
+    ],
+    standalone: true,
+    imports: [NgFor, NgIf, NgTemplateOutlet, NgClass, FontAwesomeModule, NgStyle]
 })
 export class ScrollViewComponent implements OnInit, OnDestroy, AfterViewInit {
     #destroyRef: DestroyRef = inject(DestroyRef);

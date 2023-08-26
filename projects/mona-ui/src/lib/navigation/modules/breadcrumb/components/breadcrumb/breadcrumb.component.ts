@@ -4,11 +4,15 @@ import { BreadcrumbItem } from "../../models/BreadcrumbItem";
 import { faChevronRight, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { BreadcrumbItemTemplateDirective } from "../../directives/breadcrumb-item-template.directive";
 import { BreadcrumbSeparatorTemplateDirective } from "../../directives/breadcrumb-separator-template.directive";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { NgFor, NgClass, NgIf, NgTemplateOutlet } from "@angular/common";
 
 @Component({
     selector: "mona-breadcrumb",
     templateUrl: "./breadcrumb.component.html",
-    styleUrls: ["./breadcrumb.component.scss"]
+    styleUrls: ["./breadcrumb.component.scss"],
+    standalone: true,
+    imports: [NgFor, NgClass, NgIf, NgTemplateOutlet, FontAwesomeModule]
 })
 export class BreadcrumbComponent {
     public readonly separator: IconDefinition = faChevronRight;

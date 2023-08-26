@@ -18,12 +18,15 @@ import { ContextMenuItemComponent } from "../context-menu-item/context-menu-item
 import { ActiveDescendantKeyManager } from "@angular/cdk/a11y";
 import { filter, fromEvent, Subject } from "rxjs";
 import { AnimationService } from "../../../../../animations/animation.service";
+import { NgFor, NgIf, NgClass } from "@angular/common";
 
 @Component({
     selector: "mona-contextmenu-content",
     templateUrl: "./context-menu-content.component.html",
     styleUrls: ["./context-menu-content.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [NgFor, NgIf, NgClass, ContextMenuItemComponent]
 })
 export class ContextMenuContentComponent implements OnInit, AfterViewInit {
     private contextMenuInjectorData: Partial<ContextMenuInjectorData> = { isRoot: false };

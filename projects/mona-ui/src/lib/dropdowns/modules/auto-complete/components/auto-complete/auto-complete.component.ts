@@ -23,12 +23,18 @@ import { ComboBoxItemTemplateDirective } from "../../../combo-box/directives/com
 import { PopupListValueChangeEvent } from "../../../../data/PopupListValueChangeEvent";
 import { PopupRef } from "../../../../../popup/models/PopupRef";
 import { Group } from "@mirei/ts-collections";
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
+import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from "@angular/forms";
 import { ConnectionPositionPair } from "@angular/cdk/overlay";
 import { Action } from "../../../../../utils/Action";
 import { faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { PopupAnimationService } from "../../../../../animations/popup-animation.service";
 import { AnimationState } from "../../../../../animations/AnimationState";
+import { ListGroupTemplateDirective } from "../../../../directives/list-group-template.directive";
+import { ListItemTemplateDirective } from "../../../../directives/list-item-template.directive";
+import { PopupListComponent } from "../../../../components/popup-list/popup-list.component";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { TextBoxDirective } from "../../../../../inputs/modules/text-box/directives/text-box.directive";
+import { NgClass, NgIf, NgTemplateOutlet } from "@angular/common";
 
 @Component({
     selector: "mona-auto-complete",
@@ -41,7 +47,9 @@ import { AnimationState } from "../../../../../animations/AnimationState";
             useExisting: forwardRef(() => AutoCompleteComponent),
             multi: true
         }
-    ]
+    ],
+    standalone: true,
+    imports: [NgClass, TextBoxDirective, FormsModule, NgIf, FontAwesomeModule, PopupListComponent, ListItemTemplateDirective, NgTemplateOutlet, ListGroupTemplateDirective]
 })
 export class AutoCompleteComponent implements OnInit, OnChanges, OnDestroy, ControlValueAccessor {
     readonly #destroy$: Subject<void> = new Subject<void>();

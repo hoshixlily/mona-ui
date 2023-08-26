@@ -21,7 +21,8 @@ import { PopupService } from "../../services/popup.service";
 @Component({
     selector: "mona-popup",
     templateUrl: "./popup.component.html",
-    styleUrls: ["./popup.component.scss"]
+    styleUrls: ["./popup.component.scss"],
+    standalone: true
 })
 export class PopupComponent implements OnInit, OnDestroy, AfterViewInit {
     private popupOpened: boolean = false;

@@ -10,12 +10,15 @@ import {
 import { asapScheduler } from "rxjs";
 import { LabelPosition } from "../../models/LabelPosition";
 import { Action } from "../../../../../utils/Action";
+import { NgClass, NgStyle, NgIf, DecimalPipe } from "@angular/common";
 
 @Component({
     selector: "mona-progress-bar",
     templateUrl: "./progress-bar.component.html",
     styleUrls: ["./progress-bar.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [NgClass, NgStyle, NgIf, DecimalPipe]
 })
 export class ProgressBarComponent implements OnInit, AfterViewInit {
     public progress: number = 0;

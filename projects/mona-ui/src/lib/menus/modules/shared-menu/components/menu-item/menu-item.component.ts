@@ -18,7 +18,8 @@ import { MenuItemIconTemplateDirective } from "../../directives/menu-item-icon-t
 @Component({
     selector: "mona-menu-item",
     template: "",
-    styleUrls: []
+    styleUrls: [],
+    standalone: true
 })
 export class MenuItemComponent implements OnInit, AfterContentInit, OnDestroy {
     private readonly componentDestroy$: Subject<void> = new Subject<void>();

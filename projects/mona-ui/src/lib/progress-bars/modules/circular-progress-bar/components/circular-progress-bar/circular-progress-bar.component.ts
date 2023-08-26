@@ -1,11 +1,14 @@
 import { AfterViewInit, Component, ContentChild, Input, OnInit } from "@angular/core";
 import { Action } from "../../../../../utils/Action";
 import { CircularProgressBarLabelTemplateDirective } from "../../directives/circular-progress-bar-label-template.directive";
+import { NgStyle, NgClass, NgIf, NgTemplateOutlet } from "@angular/common";
 
 @Component({
     selector: "mona-circular-progress-bar",
     templateUrl: "./circular-progress-bar.component.html",
-    styleUrls: ["./circular-progress-bar.component.scss"]
+    styleUrls: ["./circular-progress-bar.component.scss"],
+    standalone: true,
+    imports: [NgStyle, NgClass, NgIf, NgTemplateOutlet]
 })
 export class CircularProgressBarComponent implements OnInit, AfterViewInit {
     public circumference: number = 0;

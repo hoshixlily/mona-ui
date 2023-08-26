@@ -24,11 +24,18 @@ import { PopupRef } from "../../../../../popup/models/PopupRef";
 import { Action } from "../../../../../utils/Action";
 import { ComboBoxGroupTemplateDirective } from "../../directives/combo-box-group-template.directive";
 import { ComboBoxItemTemplateDirective } from "../../directives/combo-box-item-template.directive";
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
+import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from "@angular/forms";
 import { faChevronDown, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { ConnectionPositionPair } from "@angular/cdk/overlay";
 import { PopupAnimationService } from "../../../../../animations/popup-animation.service";
 import { AnimationState } from "../../../../../animations/AnimationState";
+import { ListGroupTemplateDirective } from "../../../../directives/list-group-template.directive";
+import { ListItemTemplateDirective } from "../../../../directives/list-item-template.directive";
+import { PopupListComponent } from "../../../../components/popup-list/popup-list.component";
+import { ButtonDirective } from "../../../../../buttons/modules/button/directives/button.directive";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { TextBoxDirective } from "../../../../../inputs/modules/text-box/directives/text-box.directive";
+import { NgClass, NgIf, NgTemplateOutlet } from "@angular/common";
 
 @Component({
     selector: "mona-combo-box",
@@ -42,7 +49,9 @@ import { AnimationState } from "../../../../../animations/AnimationState";
             multi: true
         }
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [NgClass, TextBoxDirective, FormsModule, NgIf, FontAwesomeModule, ButtonDirective, PopupListComponent, ListItemTemplateDirective, NgTemplateOutlet, ListGroupTemplateDirective]
 })
 export class ComboBoxComponent implements OnInit, OnDestroy, ControlValueAccessor {
     readonly #destroy$: Subject<void> = new Subject<void>();

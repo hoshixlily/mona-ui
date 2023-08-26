@@ -6,12 +6,15 @@ import { Position } from "../../../../../models/Position";
 import { DefaultTooltipPositionMap } from "../../../../models/DefaultTooltipPositionMap";
 import { v4 } from "uuid";
 import { AnimationService } from "../../../../../animations/animation.service";
+import { NgClass } from "@angular/common";
 
 @Component({
     selector: "mona-tooltip",
     templateUrl: "./tooltip.component.html",
     styleUrls: ["./tooltip.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [NgClass]
 })
 export class TooltipComponent implements OnInit {
     readonly #destroy$: Subject<void> = new Subject<void>();

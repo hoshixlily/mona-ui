@@ -26,12 +26,19 @@ import { PopupCloseSource } from "../../../popup/models/PopupCloseEvent";
 import { PopupDataInjectionToken } from "../../../popup/models/PopupInjectionToken";
 import { WindowCloseEvent } from "../../models/WindowCloseEvent";
 import { WindowInjectorData } from "../../models/WindowInjectorData";
+import { WindowResizeHandlerDirective } from "../../directives/window-resize-handler.directive";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { ButtonDirective } from "../../../buttons/modules/button/directives/button.directive";
+import { NgIf, NgTemplateOutlet } from "@angular/common";
+import { WindowDragHandlerDirective } from "../../directives/window-drag-handler.directive";
 
 @Component({
     selector: "mona-window-content",
     templateUrl: "./window-content.component.html",
     styleUrls: ["./window-content.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [WindowDragHandlerDirective, NgIf, NgTemplateOutlet, ButtonDirective, FontAwesomeModule, WindowResizeHandlerDirective]
 })
 export class WindowContentComponent implements OnInit, AfterViewInit {
     private readonly destroyRef = inject(DestroyRef);

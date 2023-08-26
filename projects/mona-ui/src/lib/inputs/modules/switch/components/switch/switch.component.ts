@@ -4,6 +4,7 @@ import { Action } from "../../../../../utils/Action";
 import { FadeAnimation } from "../../../../../animations/fade.animation";
 import { SwitchOffLabelTemplateDirective } from "../../directives/switch-off-label-template.directive";
 import { SwitchOnLabelTemplateDirective } from "../../directives/switch-on-label-template.directive";
+import { NgClass, NgIf, NgTemplateOutlet } from "@angular/common";
 
 @Component({
     selector: "mona-switch",
@@ -16,7 +17,9 @@ import { SwitchOnLabelTemplateDirective } from "../../directives/switch-on-label
             useExisting: forwardRef(() => SwitchComponent),
             multi: true
         }
-    ]
+    ],
+    standalone: true,
+    imports: [NgClass, NgIf, NgTemplateOutlet]
 })
 export class SwitchComponent implements OnInit, ControlValueAccessor {
     private propagateChange: Action<boolean> | null = null;

@@ -1,4 +1,4 @@
-import { CdkVirtualScrollViewport } from "@angular/cdk/scrolling";
+import { CdkVirtualScrollViewport, CdkFixedSizeVirtualScroll, CdkVirtualForOf } from "@angular/cdk/scrolling";
 import {
     AfterViewInit,
     ChangeDetectionStrategy,
@@ -33,13 +33,17 @@ import { NavigableOptions } from "../../models/NavigableOptions";
 import { PagerSettings } from "../../models/PagerSettings";
 import { PageState } from "../../models/PageState";
 import { ListViewService } from "../../services/list-view.service";
+import { PagerComponent } from "../../../pager/components/pager/pager.component";
+import { NgIf, NgTemplateOutlet, NgFor } from "@angular/common";
 
 @Component({
     selector: "mona-list-view",
     templateUrl: "./list-view.component.html",
     styleUrls: ["./list-view.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    providers: [ListViewService]
+    providers: [ListViewService],
+    standalone: true,
+    imports: [NgIf, NgTemplateOutlet, CdkVirtualScrollViewport, CdkFixedSizeVirtualScroll, CdkVirtualForOf, NgFor, PagerComponent]
 })
 export class ListViewComponent<T = any> implements OnInit, AfterViewInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);

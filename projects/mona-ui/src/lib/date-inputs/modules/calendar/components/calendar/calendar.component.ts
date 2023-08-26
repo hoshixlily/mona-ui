@@ -5,6 +5,12 @@ import { Dictionary } from "@mirei/ts-collections";
 import { faChevronLeft, faChevronRight, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { Action } from "../../../../../utils/Action";
+import { DateIncludePipe } from "../../../../../pipes/date-include.pipe";
+import { DateComparerPipe } from "../../../../../pipes/date-comparer.pipe";
+import { SlicePipe } from "../../../../../pipes/slice.pipe";
+import { NgIf, NgFor, NgClass, DatePipe } from "@angular/common";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { ButtonDirective } from "../../../../../buttons/modules/button/directives/button.directive";
 
 @Component({
     selector: "mona-calendar",
@@ -17,7 +23,9 @@ import { Action } from "../../../../../utils/Action";
             useExisting: forwardRef(() => CalendarComponent),
             multi: true
         }
-    ]
+    ],
+    standalone: true,
+    imports: [ButtonDirective, FontAwesomeModule, NgIf, NgFor, NgClass, DatePipe, SlicePipe, DateComparerPipe, DateIncludePipe]
 })
 export class CalendarComponent implements OnInit, ControlValueAccessor {
     #propagateChange: Action<Date | null> | null = null;

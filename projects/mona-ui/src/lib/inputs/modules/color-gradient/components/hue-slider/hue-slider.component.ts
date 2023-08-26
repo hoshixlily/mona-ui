@@ -13,7 +13,8 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
             useExisting: forwardRef(() => HueSliderComponent),
             multi: true
         }
-    ]
+    ],
+    standalone: true
 })
 export class HueSliderComponent implements AfterViewInit, ControlValueAccessor {
     #mouseDown: boolean = false;

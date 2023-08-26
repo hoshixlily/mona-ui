@@ -17,12 +17,15 @@ import { ContextMenuOpenEvent } from "../../../context-menu/models/ContextMenuOp
 import { ContextMenuNavigationEvent } from "../../../context-menu/models/ContextMenuNavigationEvent";
 import { Collections, Enumerable, List } from "@mirei/ts-collections";
 import { Subject, takeUntil } from "rxjs";
+import { NgFor, NgClass, NgIf, NgTemplateOutlet } from "@angular/common";
 
 @Component({
     selector: "mona-menubar",
     templateUrl: "./menubar.component.html",
     styleUrls: ["./menubar.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [NgFor, NgClass, NgIf, NgTemplateOutlet, ContextMenuComponent]
 })
 export class MenubarComponent implements OnInit, AfterViewInit, OnDestroy, AfterContentInit {
     private readonly componentDestroy$: Subject<void> = new Subject<void>();

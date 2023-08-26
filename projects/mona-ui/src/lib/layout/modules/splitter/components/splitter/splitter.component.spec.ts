@@ -8,8 +8,8 @@ describe('SplitterComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ SplitterComponent ]
-    })
+    imports: [SplitterComponent]
+})
     .compileComponents();
 
     fixture = TestBed.createComponent(SplitterComponent);
