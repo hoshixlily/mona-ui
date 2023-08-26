@@ -35,7 +35,7 @@ import { GridListComponent } from "../grid-list/grid-list.component";
 import { GridColumnResizeHandlerDirective } from "../../directives/grid-column-resize-handler.directive";
 import { GridFilterMenuComponent } from "../grid-filter-menu/grid-filter-menu.component";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { ChipComponent } from "../../../buttons/modules/chip/components/chip/chip.component";
+import { ChipComponent } from "../../../buttons/chip/chip.component";
 import { NgIf, NgFor, NgStyle, NgTemplateOutlet } from "@angular/common";
 
 @Component({
@@ -45,7 +45,23 @@ import { NgIf, NgFor, NgStyle, NgTemplateOutlet } from "@angular/common";
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [GridService],
     standalone: true,
-    imports: [NgIf, CdkDropList, NgFor, ChipComponent, NgStyle, CdkDrag, NgTemplateOutlet, FontAwesomeModule, GridFilterMenuComponent, GridColumnResizeHandlerDirective, CdkDragPreview, GridListComponent, PagerComponent, GridFilterPipe, GridPagePipe]
+    imports: [
+        NgIf,
+        CdkDropList,
+        NgFor,
+        ChipComponent,
+        NgStyle,
+        CdkDrag,
+        NgTemplateOutlet,
+        FontAwesomeModule,
+        GridFilterMenuComponent,
+        GridColumnResizeHandlerDirective,
+        CdkDragPreview,
+        GridListComponent,
+        PagerComponent,
+        GridFilterPipe,
+        GridPagePipe
+    ]
 })
 export class GridComponent implements OnInit, AfterViewInit, OnDestroy, AfterContentInit {
     #destroy$: Subject<void> = new Subject<void>();

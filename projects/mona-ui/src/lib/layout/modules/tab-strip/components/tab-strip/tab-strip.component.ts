@@ -23,7 +23,7 @@ import { ScrollDirection } from "../../../../../models/ScrollDirection";
 import { faChevronLeft, faChevronRight, faXmark, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { TabCloseEvent } from "../../data/TabCloseEvent";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { ButtonDirective } from "../../../../../buttons/modules/button/directives/button.directive";
+import { ButtonDirective } from "../../../../../buttons/button/button.directive";
 import { NgIf, NgFor, NgClass, NgTemplateOutlet } from "@angular/common";
 
 @Component({

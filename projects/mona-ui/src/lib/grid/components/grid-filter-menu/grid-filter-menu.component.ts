@@ -22,7 +22,7 @@ import { Subject, take, takeUntil } from "rxjs";
 import { animate, AnimationBuilder, style } from "@angular/animations";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { NgClass } from "@angular/common";
-import { ButtonDirective } from "../../../buttons/modules/button/directives/button.directive";
+import { ButtonDirective } from "../../../buttons/button/button.directive";
 
 @Component({
     selector: "mona-grid-filter-menu",

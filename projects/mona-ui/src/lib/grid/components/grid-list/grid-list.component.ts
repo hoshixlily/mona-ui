@@ -9,7 +9,7 @@ import { Dictionary, KeyValuePair } from "@mirei/ts-collections";
 import { GridGroupPipe } from "../../pipes/grid-group.pipe";
 import { SlicePipe } from "../../../pipes/slice.pipe";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { ButtonDirective } from "../../../buttons/modules/button/directives/button.directive";
+import { ButtonDirective } from "../../../buttons/button/button.directive";
 import { GridCellComponent } from "../grid-cell/grid-cell.component";
 import { NgFor, NgIf, NgClass, NgTemplateOutlet } from "@angular/common";
 
@@ -19,7 +19,17 @@ import { NgFor, NgIf, NgClass, NgTemplateOutlet } from "@angular/common";
     styleUrls: ["./grid-list.component.scss"],
     changeDetection: ChangeDetectionStrategy.Default,
     standalone: true,
-    imports: [NgFor, NgIf, NgClass, GridCellComponent, ButtonDirective, FontAwesomeModule, NgTemplateOutlet, SlicePipe, GridGroupPipe]
+    imports: [
+        NgFor,
+        NgIf,
+        NgClass,
+        GridCellComponent,
+        ButtonDirective,
+        FontAwesomeModule,
+        NgTemplateOutlet,
+        SlicePipe,
+        GridGroupPipe
+    ]
 })
 export class GridListComponent implements OnInit, AfterViewInit, OnDestroy {
     readonly #destroy: Subject<void> = new Subject<void>();

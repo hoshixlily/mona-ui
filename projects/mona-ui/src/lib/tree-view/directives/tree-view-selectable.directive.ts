@@ -1,5 +1,5 @@
 import { Directive, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from "@angular/core";
-import { SelectableOptions } from "../data/SelectableOptions";
+import { SelectableOptions } from "../models/SelectableOptions";
 import { TreeViewService } from "../services/tree-view.service";
 
 @Directive({

@@ -25,13 +25,13 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { PageChangeEvent } from "../../models/PageChangeEvent";
 import { PageSizeChangeEvent } from "../../models/PageSizeChangeEvent";
-import { DropDownListComponent } from "../../../dropdowns/modules/drop-down-list/components/drop-down-list/drop-down-list.component";
+import { DropDownListComponent } from "../../../dropdowns/drop-down-list/drop-down-list.component";
 import { Enumerable } from "@mirei/ts-collections";
 import { SlicePipe } from "../../../pipes/slice.pipe";
 import { FormsModule } from "@angular/forms";
-import { NumericTextBoxComponent } from "../../../inputs/modules/numeric-text-box/components/numeric-text-box/numeric-text-box.component";
+import { NumericTextBoxComponent } from "../../../inputs/numeric-text-box/numeric-text-box.component";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { ButtonDirective } from "../../../buttons/modules/button/directives/button.directive";
+import { ButtonDirective } from "../../../buttons/button/button.directive";
 import { NgIf, NgClass, NgFor } from "@angular/common";
 
 @Component({
@@ -40,7 +40,17 @@ import { NgIf, NgClass, NgFor } from "@angular/common";
     styleUrls: ["./pager.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone: true,
-    imports: [NgIf, ButtonDirective, FontAwesomeModule, NgClass, NgFor, NumericTextBoxComponent, FormsModule, DropDownListComponent, SlicePipe]
+    imports: [
+        NgIf,
+        ButtonDirective,
+        FontAwesomeModule,
+        NgClass,
+        NgFor,
+        NumericTextBoxComponent,
+        FormsModule,
+        DropDownListComponent,
+        SlicePipe
+    ]
 })
 export class PagerComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
     #widthObserver: ResizeObserver | null = null;

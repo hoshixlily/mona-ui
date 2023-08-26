@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
-import { Node } from "../../data/Node";
+import { Node } from "../../models/Node";
 import { TreeViewService } from "../../services/tree-view.service";
 
 import { TreeViewNodeComponent } from "./tree-view-node.component";

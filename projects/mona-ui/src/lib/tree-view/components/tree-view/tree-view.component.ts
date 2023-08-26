@@ -15,20 +15,28 @@ import {
     TemplateRef,
     ViewChildren
 } from "@angular/core";
-import { Node } from "../../data/Node";
+import { Node } from "../../models/Node";
 import { Enumerable, List } from "@mirei/ts-collections";
 import { TreeViewService } from "../../services/tree-view.service";
 import { TreeViewNodeTextTemplateDirective } from "../../directives/tree-view-node-text-template.directive";
 import { Action } from "../../../utils/Action";
-import { CdkDragDrop, CdkDragEnd, CdkDragMove, CdkDragStart, CdkDropList, CdkDrag, CdkDragPreview } from "@angular/cdk/drag-drop";
-import { DropPosition } from "../../data/DropPosition";
-import { DropPositionChangeEvent } from "../../data/DropPositionChangeEvent";
+import {
+    CdkDragDrop,
+    CdkDragEnd,
+    CdkDragMove,
+    CdkDragStart,
+    CdkDropList,
+    CdkDrag,
+    CdkDragPreview
+} from "@angular/cdk/drag-drop";
+import { DropPosition } from "../../models/DropPosition";
+import { DropPositionChangeEvent } from "../../models/DropPositionChangeEvent";
 import { faArrowDown, faArrowUp, faPlus, IconDefinition } from "@fortawesome/free-solid-svg-icons";
-import { NodeDragStartEvent } from "../../data/NodeDragStartEvent";
-import { NodeDragEvent } from "../../data/NodeDragEvent";
-import { NodeDropEvent } from "../../data/NodeDropEvent";
-import { NodeDragEndEvent } from "../../data/NodeDragEndEvent";
-import { NodeClickEvent } from "../../data/NodeClickEvent";
+import { NodeDragStartEvent } from "../../models/NodeDragStartEvent";
+import { NodeDragEvent } from "../../models/NodeDragEvent";
+import { NodeDropEvent } from "../../models/NodeDropEvent";
+import { NodeDragEndEvent } from "../../models/NodeDragEndEvent";
+import { NodeClickEvent } from "../../models/NodeClickEvent";
 import { TreeViewNodeComponent } from "../tree-view-node/tree-view-node.component";
 import { ActiveDescendantKeyManager } from "@angular/cdk/a11y";
 import { filter, fromEvent, Subject, takeUntil } from "rxjs";
@@ -51,7 +59,16 @@ import { NgFor, NgIf, NgTemplateOutlet } from "@angular/common";
         ])
     ],
     standalone: true,
-    imports: [CdkDropList, NgFor, CdkDrag, TreeViewNodeComponent, NgIf, NgTemplateOutlet, CdkDragPreview, FontAwesomeModule]
+    imports: [
+        CdkDropList,
+        NgFor,
+        CdkDrag,
+        TreeViewNodeComponent,
+        NgIf,
+        NgTemplateOutlet,
+        CdkDragPreview,
+        FontAwesomeModule
+    ]
 })
 export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
     private readonly componentDestroy$: Subject<void> = new Subject<void>();

@@ -1,9 +1,9 @@
 import { EventEmitter, Injectable } from "@angular/core";
 import { Dictionary, EnumerableSet, SortedSet } from "@mirei/ts-collections";
-import { CheckableOptions } from "../data/CheckableOptions";
-import { Node } from "../data/Node";
-import { NodeDisabler, NodeDisablerAction } from "../data/NodeDisabler";
-import { SelectableOptions } from "../data/SelectableOptions";
+import { CheckableOptions } from "../models/CheckableOptions";
+import { Node } from "../models/Node";
+import { NodeDisabler, NodeDisablerAction } from "../models/NodeDisabler";
+import { SelectableOptions } from "../models/SelectableOptions";
 
 @Injectable()
 export class TreeViewService {

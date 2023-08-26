@@ -1,7 +1,7 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { Subject } from "rxjs";
-import { ProgressBarComponent } from "../../../progress-bars/modules/progress-bar/components/progress-bar/progress-bar.component";
+import { ProgressBarComponent } from "../../../progress-bars/progress-bar/progress-bar.component";
 import { NotificationData } from "../../models/NotificationData";
 import { NotificationComponent } from "./notification.component";
 

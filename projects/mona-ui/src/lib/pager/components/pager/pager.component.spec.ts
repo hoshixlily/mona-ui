@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
-import { ButtonDirective } from "../../../buttons/modules/button/directives/button.directive";
+import { ButtonDirective } from "../../../buttons/button/button.directive";
 import { PagerComponent } from "./pager.component";
 
 describe("PagerComponent", () => {
