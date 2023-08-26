@@ -5,8 +5,10 @@ import {
     ChangeDetectorRef,
     Component,
     ContentChildren,
+    DestroyRef,
     ElementRef,
     EventEmitter,
+    inject,
     Input,
     OnDestroy,
     OnInit,
@@ -14,6 +16,7 @@ import {
     QueryList,
     ViewChild
 } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { GridService } from "../../services/grid.service";
 import { faArrowDownLong, faArrowUpLong, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { Column } from "../../models/Column";
@@ -63,8 +66,8 @@ import { NgIf, NgFor, NgStyle, NgTemplateOutlet } from "@angular/common";
         GridPagePipe
     ]
 })
-export class GridComponent implements OnInit, AfterViewInit, OnDestroy, AfterContentInit {
-    #destroy$: Subject<void> = new Subject<void>();
+export class GridComponent implements OnInit, AfterViewInit, AfterContentInit {
+    readonly #destroyRef: DestroyRef = inject(DestroyRef);
     #filter: CompositeFilterDescriptor[] = [];
     #sort: SortDescriptor[] = [];
     public readonly ascendingSortIcon: IconDefinition = faArrowUpLong;
@@ -178,7 +181,7 @@ export class GridComponent implements OnInit, AfterViewInit, OnDestroy, AfterCon
             }
         };
         processColumns();
-        this.columns.changes.pipe(takeUntil(this.#destroy$)).subscribe(() => {
+        this.columns.changes.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(() => {
             processColumns();
         });
     }
@@ -186,11 +189,6 @@ export class GridComponent implements OnInit, AfterViewInit, OnDestroy, AfterCon
     public ngAfterViewInit(): void {
         this.setInitialCalculatedWidthOfColumns();
         this.cdr.detectChanges();
-    }
-
-    public ngOnDestroy(): void {
-        this.#destroy$.next();
-        this.#destroy$.complete();
     }
 
     public ngOnInit(): void {
@@ -386,7 +384,7 @@ export class GridComponent implements OnInit, AfterViewInit, OnDestroy, AfterCon
 
     private setSubscriptions(): void {
         this.gridService.cellEdit$
-            .pipe(takeUntil(this.#destroy$))
+            .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe((event: CellEditEvent) => this.cellEdit.emit(event));
     }
 }

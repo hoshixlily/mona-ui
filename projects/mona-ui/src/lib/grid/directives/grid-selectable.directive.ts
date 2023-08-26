@@ -1,5 +1,15 @@
-import { Directive, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges } from "@angular/core";
-import { Subject, takeUntil } from "rxjs";
+import {
+    DestroyRef,
+    Directive,
+    EventEmitter,
+    inject,
+    Input,
+    OnChanges,
+    OnInit,
+    Output,
+    SimpleChanges
+} from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { SelectableOptions } from "../models/SelectableOptions";
 import { GridService } from "../services/grid.service";
 
@@ -7,8 +17,8 @@ import { GridService } from "../services/grid.service";
     selector: "mona-grid[monaGridSelectable]",
     standalone: true
 })
-export class GridSelectableDirective implements OnInit, OnChanges, OnDestroy {
-    readonly #destroy$: Subject<void> = new Subject<void>();
+export class GridSelectableDirective implements OnInit, OnChanges {
+    readonly #destroyRef: DestroyRef = inject(DestroyRef);
 
     @Input()
     public set selectedKeys(selectedKeys: Iterable<unknown>) {
@@ -36,11 +46,6 @@ export class GridSelectableDirective implements OnInit, OnChanges, OnDestroy {
         }
     }
 
-    public ngOnDestroy(): void {
-        this.#destroy$.next();
-        this.#destroy$.complete();
-    }
-
     public ngOnInit(): void {
         this.gridService.selectedKeysChange = this.selectedKeysChange;
         if (this.options) {
@@ -53,7 +58,7 @@ export class GridSelectableDirective implements OnInit, OnChanges, OnDestroy {
     }
 
     private setSubscriptions(): void {
-        this.gridService.selectedRowsChange$.pipe(takeUntil(this.#destroy$)).subscribe(selectedRows => {
+        this.gridService.selectedRowsChange$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(selectedRows => {
             const selectedKeys = selectedRows.map(r =>
                 this.gridService.selectionKeyField ? r.data[this.gridService.selectionKeyField] : r.data
             );

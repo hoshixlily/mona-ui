@@ -1,11 +1,15 @@
+import { ConnectionPositionPair } from "@angular/cdk/overlay";
+import { NgClass, NgFor, NgIf, NgTemplateOutlet, SlicePipe } from "@angular/common";
 import {
     ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
     ContentChild,
+    DestroyRef,
     ElementRef,
     forwardRef,
     HostBinding,
+    inject,
     Input,
     OnDestroy,
     OnInit,
@@ -13,28 +17,27 @@ import {
     TemplateRef,
     ViewChild
 } from "@angular/core";
-import { PopupListService } from "../services/popup-list.service";
-import { PopupService } from "../../popup/services/popup.service";
-import { PopupListItem } from "../models/PopupListItem";
-import { PopupListValueChangeEvent } from "../models/PopupListValueChangeEvent";
-import { MultiSelectTagTemplateDirective } from "../directives/multi-select-tag-template.directive";
-import { MultiSelectItemTemplateDirective } from "../directives/multi-select-item-template.directive";
-import { MultiSelectGroupTemplateDirective } from "../directives/multi-select-group-template.directive";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
-import { fromEvent, Subject, take, takeUntil } from "rxjs";
-import { PopupRef } from "../../popup/models/PopupRef";
-import { Action } from "../../utils/Action";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { faChevronDown, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
-import { ConnectionPositionPair } from "@angular/cdk/overlay";
-import { PopupAnimationService } from "../../animations/services/popup-animation.service";
+import { fromEvent, take } from "rxjs";
 import { AnimationState } from "../../animations/models/AnimationState";
+import { PopupAnimationService } from "../../animations/services/popup-animation.service";
+import { ButtonDirective } from "../../buttons/button/button.directive";
+import { ChipComponent } from "../../buttons/chip/chip.component";
+import { PopupRef } from "../../popup/models/PopupRef";
+import { PopupService } from "../../popup/services/popup.service";
+import { Action } from "../../utils/Action";
 import { ListGroupTemplateDirective } from "../directives/list-group-template.directive";
 import { ListItemTemplateDirective } from "../directives/list-item-template.directive";
+import { MultiSelectGroupTemplateDirective } from "../directives/multi-select-group-template.directive";
+import { MultiSelectItemTemplateDirective } from "../directives/multi-select-item-template.directive";
+import { MultiSelectTagTemplateDirective } from "../directives/multi-select-tag-template.directive";
+import { PopupListItem } from "../models/PopupListItem";
+import { PopupListValueChangeEvent } from "../models/PopupListValueChangeEvent";
 import { PopupListComponent } from "../popup-list/popup-list.component";
-import { ButtonDirective } from "../../buttons/button/button.directive";
-import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { ChipComponent } from "../../buttons/chip/chip.component";
-import { NgClass, NgFor, NgIf, NgTemplateOutlet, SlicePipe } from "@angular/common";
+import { PopupListService } from "../services/popup-list.service";
 
 @Component({
     selector: "mona-multi-select",
@@ -65,7 +68,7 @@ import { NgClass, NgFor, NgIf, NgTemplateOutlet, SlicePipe } from "@angular/comm
     ]
 })
 export class MultiSelectComponent implements OnInit, OnDestroy, ControlValueAccessor {
-    readonly #destroy$: Subject<void> = new Subject<void>();
+    readonly #destroyRef: DestroyRef = inject(DestroyRef);
     #propagateChange: any = () => {};
     #value: any[] = [];
 
@@ -156,8 +159,6 @@ export class MultiSelectComponent implements OnInit, OnDestroy, ControlValueAcce
     }
 
     public ngOnDestroy(): void {
-        this.#destroy$.next();
-        this.#destroy$.complete();
         this.resizeObserver?.disconnect();
     }
 
@@ -273,7 +274,7 @@ export class MultiSelectComponent implements OnInit, OnDestroy, ControlValueAcce
         this.resizeObserver.observe(this.elementRef.nativeElement);
 
         fromEvent<KeyboardEvent>(this.elementRef.nativeElement, "keydown")
-            .pipe(takeUntil(this.#destroy$))
+            .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe((event: KeyboardEvent) => {
                 if (event.key === "Enter") {
                     if (this.popupRef) {

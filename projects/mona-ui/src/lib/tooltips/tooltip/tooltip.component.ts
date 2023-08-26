@@ -1,12 +1,23 @@
-import { ChangeDetectionStrategy, Component, ElementRef, Input, OnInit, TemplateRef, ViewChild } from "@angular/core";
-import { filter, fromEvent, Subject, take, takeUntil, tap } from "rxjs";
-import { PopupService } from "../../popup/services/popup.service";
-import { PopupRef } from "../../popup/models/PopupRef";
-import { Position } from "../../models/Position";
-import { DefaultTooltipPositionMap } from "../models/DefaultTooltipPositionMap";
+import { NgClass } from "@angular/common";
+import {
+    ChangeDetectionStrategy,
+    Component,
+    DestroyRef,
+    ElementRef,
+    inject,
+    Input,
+    OnInit,
+    TemplateRef,
+    ViewChild
+} from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { filter, fromEvent, take, tap } from "rxjs";
 import { v4 } from "uuid";
 import { AnimationService } from "../../animations/services/animation.service";
-import { NgClass } from "@angular/common";
+import { Position } from "../../models/Position";
+import { PopupRef } from "../../popup/models/PopupRef";
+import { PopupService } from "../../popup/services/popup.service";
+import { DefaultTooltipPositionMap } from "../models/DefaultTooltipPositionMap";
 
 @Component({
     selector: "mona-tooltip",
@@ -17,7 +28,7 @@ import { NgClass } from "@angular/common";
     imports: [NgClass]
 })
 export class TooltipComponent implements OnInit {
-    readonly #destroy$: Subject<void> = new Subject<void>();
+    readonly #destroyRef: DestroyRef = inject(DestroyRef);
     #popupRef?: PopupRef;
     public readonly uid: string = v4();
 
@@ -32,7 +43,6 @@ export class TooltipComponent implements OnInit {
 
     public constructor(
         private readonly animationService: AnimationService,
-        private readonly elementRef: ElementRef<HTMLElement>,
         private readonly popupService: PopupService
     ) {}
 
@@ -96,7 +106,7 @@ export class TooltipComponent implements OnInit {
         fromEvent<MouseEvent>(target, "mouseenter")
             .pipe(
                 filter(() => !this.#popupRef),
-                takeUntil(this.#destroy$),
+                takeUntilDestroyed(this.#destroyRef),
                 tap(() => {
                     fromEvent(target, "mouseleave")
                         .pipe(take(1))

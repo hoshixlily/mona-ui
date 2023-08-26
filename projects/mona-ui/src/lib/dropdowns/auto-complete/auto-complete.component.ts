@@ -1,12 +1,15 @@
+import { ConnectionPositionPair } from "@angular/cdk/overlay";
+import { NgClass, NgIf, NgTemplateOutlet } from "@angular/common";
 import {
     Component,
     ContentChild,
+    DestroyRef,
     ElementRef,
     forwardRef,
     HostBinding,
+    inject,
     Input,
     OnChanges,
-    OnDestroy,
     OnInit,
     signal,
     SimpleChanges,
@@ -14,27 +17,26 @@ import {
     ViewChild,
     WritableSignal
 } from "@angular/core";
-import { PopupListService } from "../services/popup-list.service";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from "@angular/forms";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { Group } from "@mirei/ts-collections";
+import { debounceTime, distinctUntilChanged, fromEvent, Subject, take } from "rxjs";
+import { AnimationState } from "../../animations/models/AnimationState";
+import { PopupAnimationService } from "../../animations/services/popup-animation.service";
+import { TextBoxDirective } from "../../inputs/directives/text-box.directive";
+import { PopupRef } from "../../popup/models/PopupRef";
 import { PopupService } from "../../popup/services/popup.service";
-import { debounceTime, distinctUntilChanged, fromEvent, Subject, take, takeUntil } from "rxjs";
-import { PopupListItem } from "../models/PopupListItem";
+import { Action } from "../../utils/Action";
 import { ComboBoxGroupTemplateDirective } from "../directives/combo-box-group-template.directive";
 import { ComboBoxItemTemplateDirective } from "../directives/combo-box-item-template.directive";
-import { PopupListValueChangeEvent } from "../models/PopupListValueChangeEvent";
-import { PopupRef } from "../../popup/models/PopupRef";
-import { Group } from "@mirei/ts-collections";
-import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from "@angular/forms";
-import { ConnectionPositionPair } from "@angular/cdk/overlay";
-import { Action } from "../../utils/Action";
-import { faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
-import { PopupAnimationService } from "../../animations/services/popup-animation.service";
-import { AnimationState } from "../../animations/models/AnimationState";
 import { ListGroupTemplateDirective } from "../directives/list-group-template.directive";
 import { ListItemTemplateDirective } from "../directives/list-item-template.directive";
+import { PopupListItem } from "../models/PopupListItem";
+import { PopupListValueChangeEvent } from "../models/PopupListValueChangeEvent";
 import { PopupListComponent } from "../popup-list/popup-list.component";
-import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { TextBoxDirective } from "../../inputs/directives/text-box.directive";
-import { NgClass, NgIf, NgTemplateOutlet } from "@angular/common";
+import { PopupListService } from "../services/popup-list.service";
 
 @Component({
     selector: "mona-auto-complete",
@@ -61,8 +63,8 @@ import { NgClass, NgIf, NgTemplateOutlet } from "@angular/common";
         ListGroupTemplateDirective
     ]
 })
-export class AutoCompleteComponent implements OnInit, OnChanges, OnDestroy, ControlValueAccessor {
-    readonly #destroy$: Subject<void> = new Subject<void>();
+export class AutoCompleteComponent implements OnInit, OnChanges, ControlValueAccessor {
+    readonly #destroyRef: DestroyRef = inject(DestroyRef);
     #propagateChange: any = () => {};
     #value: any;
     public readonly autoCompleteValue$: Subject<string> = new Subject<string>();
@@ -142,11 +144,6 @@ export class AutoCompleteComponent implements OnInit, OnChanges, OnDestroy, Cont
         if (changes["data"] && !changes["data"].isFirstChange()) {
             this.initialize();
         }
-    }
-
-    public ngOnDestroy(): void {
-        this.#destroy$.next();
-        this.#destroy$.complete();
     }
 
     public ngOnInit(): void {
@@ -287,7 +284,7 @@ export class AutoCompleteComponent implements OnInit, OnChanges, OnDestroy, Cont
 
     private setEventListeners(): void {
         fromEvent<FocusEvent>(this.elementRef.nativeElement, "focusin")
-            .pipe(takeUntil(this.#destroy$))
+            .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe(() => {
                 const input = this.elementRef.nativeElement.querySelector("input");
                 if (input) {
@@ -296,7 +293,7 @@ export class AutoCompleteComponent implements OnInit, OnChanges, OnDestroy, Cont
                 }
             });
         fromEvent<FocusEvent>(this.elementRef.nativeElement, "focusout")
-            .pipe(takeUntil(this.#destroy$))
+            .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe(event => {
                 const target = event.relatedTarget as HTMLElement;
                 if (
@@ -317,7 +314,7 @@ export class AutoCompleteComponent implements OnInit, OnChanges, OnDestroy, Cont
 
     private setSubscriptions(): void {
         this.autoCompleteValue$
-            .pipe(takeUntil(this.#destroy$), debounceTime(50), distinctUntilChanged())
+            .pipe(takeUntilDestroyed(this.#destroyRef), debounceTime(50), distinctUntilChanged())
             .subscribe((value: string) => {
                 if (value) {
                     if (this.filterable) {

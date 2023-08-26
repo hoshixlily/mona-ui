@@ -1,16 +1,27 @@
-import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, TemplateRef } from "@angular/core";
-import { Node } from "../../models/Node";
+import { Highlightable } from "@angular/cdk/a11y";
+import { NgClass, NgIf, NgTemplateOutlet } from "@angular/common";
+import {
+    Component,
+    DestroyRef,
+    ElementRef,
+    EventEmitter,
+    inject,
+    Input,
+    OnInit,
+    Output,
+    TemplateRef
+} from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { FormsModule } from "@angular/forms";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { faCaretRight, faChevronDown, faChevronRight, IconDefinition } from "@fortawesome/free-solid-svg-icons";
-import { TreeViewService } from "../../services/tree-view.service";
+import { of, Subject, switchMap } from "rxjs";
+import { CheckBoxDirective } from "../../../inputs/check-box/check-box.directive";
 import { DropPosition } from "../../models/DropPosition";
 import { DropPositionChangeEvent } from "../../models/DropPositionChangeEvent";
+import { Node } from "../../models/Node";
 import { NodeClickEvent } from "../../models/NodeClickEvent";
-import { of, Subject, switchMap, takeUntil } from "rxjs";
-import { Highlightable } from "@angular/cdk/a11y";
-import { FormsModule } from "@angular/forms";
-import { CheckBoxDirective } from "../../../inputs/check-box/check-box.directive";
-import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { NgIf, NgClass, NgTemplateOutlet } from "@angular/common";
+import { TreeViewService } from "../../services/tree-view.service";
 
 @Component({
     selector: "mona-tree-view-node",
@@ -19,8 +30,8 @@ import { NgIf, NgClass, NgTemplateOutlet } from "@angular/common";
     standalone: true,
     imports: [NgIf, FontAwesomeModule, NgClass, CheckBoxDirective, FormsModule, NgTemplateOutlet]
 })
-export class TreeViewNodeComponent implements OnInit, OnDestroy, Highlightable {
-    private readonly componentDestroy$: Subject<void> = new Subject<void>();
+export class TreeViewNodeComponent implements OnInit, Highlightable {
+    readonly #destroyRef: DestroyRef = inject(DestroyRef);
     public readonly click$: Subject<MouseEvent> = new Subject<MouseEvent>();
     public readonly collapseIcon: IconDefinition = faChevronDown;
     public readonly dropMagnetIcon: IconDefinition = faCaretRight;
@@ -53,11 +64,6 @@ export class TreeViewNodeComponent implements OnInit, OnDestroy, Highlightable {
         private readonly elementRef: ElementRef<HTMLElement>,
         public readonly treeViewService: TreeViewService
     ) {}
-
-    public ngOnDestroy(): void {
-        this.componentDestroy$.next();
-        this.componentDestroy$.complete();
-    }
 
     public ngOnInit(): void {
         this.setSubscriptions();
@@ -147,8 +153,7 @@ export class TreeViewNodeComponent implements OnInit, OnDestroy, Highlightable {
     private setSubscriptions(): void {
         this.click$
             .pipe(
-                takeUntil(this.componentDestroy$),
-                // debounceTime(350),
+                takeUntilDestroyed(this.#destroyRef),
                 switchMap(event => of({ event, type: event.type }))
             )
             .subscribe(result => {

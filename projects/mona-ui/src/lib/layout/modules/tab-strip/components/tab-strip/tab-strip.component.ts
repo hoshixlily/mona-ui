@@ -1,3 +1,4 @@
+import { NgClass, NgFor, NgIf, NgTemplateOutlet } from "@angular/common";
 import {
     AfterContentInit,
     AfterViewInit,
@@ -5,8 +6,10 @@ import {
     ChangeDetectorRef,
     Component,
     ContentChildren,
+    DestroyRef,
     ElementRef,
     EventEmitter,
+    inject,
     Input,
     OnDestroy,
     OnInit,
@@ -17,14 +20,14 @@ import {
     ViewContainerRef,
     WritableSignal
 } from "@angular/core";
-import { TabComponent } from "../tab/tab.component";
-import { asapScheduler, interval, Subject, takeUntil, timer } from "rxjs";
-import { ScrollDirection } from "../../../../../models/ScrollDirection";
-import { faChevronLeft, faChevronRight, faXmark, IconDefinition } from "@fortawesome/free-solid-svg-icons";
-import { TabCloseEvent } from "../../data/TabCloseEvent";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { faChevronLeft, faChevronRight, faXmark, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { asapScheduler, interval, Subject, takeUntil, timer } from "rxjs";
 import { ButtonDirective } from "../../../../../buttons/button/button.directive";
-import { NgIf, NgFor, NgClass, NgTemplateOutlet } from "@angular/common";
+import { ScrollDirection } from "../../../../../models/ScrollDirection";
+import { TabCloseEvent } from "../../data/TabCloseEvent";
+import { TabComponent } from "../tab/tab.component";
 
 @Component({
     selector: "mona-tab-strip",
@@ -35,7 +38,7 @@ import { NgIf, NgFor, NgClass, NgTemplateOutlet } from "@angular/common";
     imports: [NgIf, ButtonDirective, FontAwesomeModule, NgFor, NgClass, NgTemplateOutlet]
 })
 export class TabStripComponent implements OnInit, AfterContentInit, OnDestroy, AfterViewInit {
-    readonly #destroy$: Subject<void> = new Subject<void>();
+    readonly #destroyRef: DestroyRef = inject(DestroyRef);
     #resizeObserver: ResizeObserver | null = null;
     #scroll$: Subject<void> = new Subject<void>();
     public readonly scrollLeftIcon: IconDefinition = faChevronLeft;
@@ -71,10 +74,12 @@ export class TabStripComponent implements OnInit, AfterContentInit, OnDestroy, A
 
     public ngAfterContentInit(): void {
         this.tabComponents.forEach((t, tx) => (t.index = tx));
-        this.tabComponents.changes.pipe(takeUntil(this.#destroy$)).subscribe((tabs: QueryList<TabComponent>) => {
-            tabs.forEach((t, tx) => (t.index = tx));
-            this.updateScrollVisibility();
-        });
+        this.tabComponents.changes
+            .pipe(takeUntilDestroyed(this.#destroyRef))
+            .subscribe((tabs: QueryList<TabComponent>) => {
+                tabs.forEach((t, tx) => (t.index = tx));
+                this.updateScrollVisibility();
+            });
     }
 
     public ngAfterViewInit(): void {
@@ -97,8 +102,6 @@ export class TabStripComponent implements OnInit, AfterContentInit, OnDestroy, A
     }
 
     public ngOnDestroy(): void {
-        this.#destroy$.next();
-        this.#destroy$.complete();
         this.#resizeObserver?.disconnect();
     }
 

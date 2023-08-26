@@ -1,3 +1,4 @@
+import { NgIf, NgTemplateOutlet } from "@angular/common";
 import {
     AfterContentInit,
     AfterViewInit,
@@ -5,25 +6,25 @@ import {
     Component,
     ContentChild,
     ContentChildren,
+    DestroyRef,
     ElementRef,
     EventEmitter,
+    inject,
     Input,
-    OnDestroy,
     Output,
     QueryList,
     TemplateRef,
     ViewChild
 } from "@angular/core";
-import { PopupOffset } from "../../../../popup/models/PopupOffset";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { faChevronDown, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { ContextMenuComponent } from "../../../../menus/context-menu/context-menu.component";
 import { MenuItemComponent } from "../../../../menus/menu-item/menu-item.component";
 import { MenuItem } from "../../../../menus/models/MenuItem";
-import { Subject, takeUntil } from "rxjs";
-import { SplitButtonTextTemplateDirective } from "../../directives/split-button-text-template.directive";
-import { faChevronDown, IconDefinition } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { NgIf, NgTemplateOutlet } from "@angular/common";
+import { PopupOffset } from "../../../../popup/models/PopupOffset";
 import { ButtonDirective } from "../../../button/button.directive";
+import { SplitButtonTextTemplateDirective } from "../../directives/split-button-text-template.directive";
 
 @Component({
     selector: "mona-split-button",
@@ -32,8 +33,8 @@ import { ButtonDirective } from "../../../button/button.directive";
     standalone: true,
     imports: [ButtonDirective, NgIf, NgTemplateOutlet, FontAwesomeModule, ContextMenuComponent]
 })
-export class SplitButtonComponent implements AfterViewInit, AfterContentInit, OnDestroy {
-    private readonly componentDestroy$: Subject<void> = new Subject<void>();
+export class SplitButtonComponent implements AfterViewInit, AfterContentInit {
+    readonly #destroyRef: DestroyRef = inject(DestroyRef);
     public readonly menuIcon: IconDefinition = faChevronDown;
     public menuItems: MenuItem[] = [];
     public popupOffset: PopupOffset = {
@@ -70,7 +71,7 @@ export class SplitButtonComponent implements AfterViewInit, AfterContentInit, On
 
     public ngAfterContentInit(): void {
         this.menuItems = this.menuItemComponents.map(m => m.getMenuItem());
-        this.menuItemComponents.changes.pipe(takeUntil(this.componentDestroy$)).subscribe(() => {
+        this.menuItemComponents.changes.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(() => {
             this.menuItems = this.menuItemComponents.map(m => m.getMenuItem());
         });
     }
@@ -82,10 +83,5 @@ export class SplitButtonComponent implements AfterViewInit, AfterContentInit, On
             this.contextMenuComponent.setPrecise(false);
             this.cdr.detectChanges();
         });
-    }
-
-    public ngOnDestroy(): void {
-        this.componentDestroy$.next();
-        this.componentDestroy$.complete();
     }
 }

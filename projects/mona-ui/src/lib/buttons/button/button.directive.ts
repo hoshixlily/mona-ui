@@ -24,20 +24,20 @@ import { ButtonService } from "../services/button.service";
     standalone: true
 })
 export class ButtonDirective implements OnInit {
-    _disabled: boolean = false;
+    #disabled: boolean = false;
     #selected: boolean = false;
     #tabindex: number = 0;
     #toggleable: boolean = false;
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
 
     public set disabled(disabled: boolean) {
-        this._disabled = disabled;
+        this.#disabled = disabled;
     }
 
     @Input()
     @HostBinding("class.mona-disabled")
     public get disabled(): boolean {
-        return this._disabled;
+        return this.#disabled;
     }
 
     @HostBinding("class.mona-flat")

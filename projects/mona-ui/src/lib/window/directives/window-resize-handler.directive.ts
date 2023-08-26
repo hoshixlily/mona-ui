@@ -1,14 +1,15 @@
-import { AfterViewInit, Directive, ElementRef, Input, NgZone, OnDestroy } from "@angular/core";
-import { WindowResizeHandlerDirection } from "../models/WindowResizeHandlerDirection";
-import { fromEvent, Subject, takeUntil } from "rxjs";
+import { AfterViewInit, DestroyRef, Directive, ElementRef, inject, Input, NgZone } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { fromEvent } from "rxjs";
 import { WindowReference } from "../models/WindowReference";
+import { WindowResizeHandlerDirection } from "../models/WindowResizeHandlerDirection";
 
 @Directive({
     selector: "div[monaWindowResizeHandler]",
     standalone: true
 })
-export class WindowResizeHandlerDirective implements AfterViewInit, OnDestroy {
-    private readonly destroy$: Subject<void> = new Subject<void>();
+export class WindowResizeHandlerDirective implements AfterViewInit {
+    readonly #destroyRef: DestroyRef = inject(DestroyRef);
 
     @Input()
     public direction!: WindowResizeHandlerDirection;
@@ -32,11 +33,6 @@ export class WindowResizeHandlerDirective implements AfterViewInit, OnDestroy {
 
     public ngAfterViewInit(): void {
         this.setEvents();
-    }
-
-    public ngOnDestroy(): void {
-        this.destroy$.next();
-        this.destroy$.complete();
     }
 
     public onMouseDown(event: MouseEvent) {
@@ -225,7 +221,7 @@ export class WindowResizeHandlerDirective implements AfterViewInit, OnDestroy {
     private setEvents(): void {
         this.zone.runOutsideAngular(() => {
             fromEvent<MouseEvent>(this.elementRef.nativeElement, "mousedown")
-                .pipe(takeUntil(this.destroy$))
+                .pipe(takeUntilDestroyed(this.#destroyRef))
                 .subscribe(event => this.onMouseDown(event));
         });
     }

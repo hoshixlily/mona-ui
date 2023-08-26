@@ -2,18 +2,18 @@ import {
     AfterContentInit,
     Component,
     ContentChildren,
+    DestroyRef,
     EventEmitter,
+    inject,
     Input,
-    OnDestroy,
-    OnInit,
     Output,
     QueryList,
     TemplateRef
 } from "@angular/core";
-import { MenuItem } from "../models/MenuItem";
-import { Subject, takeUntil } from "rxjs";
-import { MenuItemTextTemplateDirective } from "../directives/menu-item-text-template.directive";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { MenuItemIconTemplateDirective } from "../directives/menu-item-icon-template.directive";
+import { MenuItemTextTemplateDirective } from "../directives/menu-item-text-template.directive";
+import { MenuItem } from "../models/MenuItem";
 
 @Component({
     selector: "mona-menu-item",
@@ -21,8 +21,8 @@ import { MenuItemIconTemplateDirective } from "../directives/menu-item-icon-temp
     styleUrls: [],
     standalone: true
 })
-export class MenuItemComponent implements OnInit, AfterContentInit, OnDestroy {
-    private readonly componentDestroy$: Subject<void> = new Subject<void>();
+export class MenuItemComponent implements AfterContentInit {
+    readonly #destroyRef: DestroyRef = inject(DestroyRef);
     private menuItem: MenuItem = {
         disabled: false,
         divider: false,
@@ -80,17 +80,10 @@ export class MenuItemComponent implements OnInit, AfterContentInit, OnDestroy {
     }
 
     public ngAfterContentInit(): void {
-        this.submenuItems.changes.pipe(takeUntil(this.componentDestroy$)).subscribe(() => {
+        this.submenuItems.changes.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(() => {
             this.menuItem.subMenuItems = this.submenuItems.map(si => si.getMenuItem());
         });
     }
-
-    public ngOnDestroy(): void {
-        this.componentDestroy$.next();
-        this.componentDestroy$.unsubscribe();
-    }
-
-    public ngOnInit(): void {}
 
     private getMenuItemWithDepth(depth: number = 0): MenuItem {
         this.menuItem.iconTemplate = this.iconTemplate.get(0);

@@ -15,7 +15,8 @@
         "build:prod": "ng build mona-ui --configuration production",
         "build:watch": "ng build mona-ui --watch --configuration development",
         "watch": "ng build mona-ui --watch --configuration development",
-        "test:lib": "ng test mona-ui",
+        "test:lib": "ng test mona-ui --code-coverage --watch=false",
+        "test:lib:watch": "ng test mona-ui --code-coverage --watch",
         "test:app": "ng test mona-ui-tester"
     },
     "author": "Lumine",

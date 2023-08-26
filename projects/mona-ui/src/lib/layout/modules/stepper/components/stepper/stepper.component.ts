@@ -1,22 +1,24 @@
+import { NgClass, NgFor, NgIf, NgStyle, NgTemplateOutlet } from "@angular/common";
 import {
     ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
     ContentChild,
+    DestroyRef,
     ElementRef,
     EventEmitter,
+    inject,
     Input,
-    OnDestroy,
     OnInit,
     Output
 } from "@angular/core";
-import { Step, StepOptions } from "../../models/Step";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { Enumerable } from "@mirei/ts-collections";
-import { StepperLabelTemplateDirective } from "../../directives/stepper-label-template.directive";
+import { fromEvent } from "rxjs";
 import { StepperIndicatorTemplateDirective } from "../../directives/stepper-indicator-template.directive";
+import { StepperLabelTemplateDirective } from "../../directives/stepper-label-template.directive";
 import { StepperStepTemplateDirective } from "../../directives/stepper-step-template.directive";
-import { fromEvent, Subject, takeUntil } from "rxjs";
-import { NgStyle, NgClass, NgFor, NgIf, NgTemplateOutlet } from "@angular/common";
+import { Step, StepOptions } from "../../models/Step";
 
 @Component({
     selector: "mona-stepper",
@@ -26,8 +28,8 @@ import { NgStyle, NgClass, NgFor, NgIf, NgTemplateOutlet } from "@angular/common
     standalone: true,
     imports: [NgStyle, NgClass, NgFor, NgIf, NgTemplateOutlet]
 })
-export class StepperComponent implements OnInit, OnDestroy {
-    private readonly componentDestroy$: Subject<void> = new Subject<void>();
+export class StepperComponent implements OnInit {
+    readonly #destroyRef: DestroyRef = inject(DestroyRef);
     public activeStep: Step | null = null;
     public stepList: Step[] = [];
 
@@ -71,11 +73,6 @@ export class StepperComponent implements OnInit, OnDestroy {
 
     public constructor(private readonly elementRef: ElementRef<HTMLElement>, private readonly cdr: ChangeDetectorRef) {}
 
-    public ngOnDestroy(): void {
-        this.componentDestroy$.next();
-        this.componentDestroy$.complete();
-    }
-
     public ngOnInit(): void {
         if (!this.activeStep) {
             this.setActiveStep(this.stepList[0], true);
@@ -116,7 +113,7 @@ export class StepperComponent implements OnInit, OnDestroy {
 
     private setSubscriptions(): void {
         fromEvent<KeyboardEvent>(this.elementRef.nativeElement, "keydown")
-            .pipe(takeUntil(this.componentDestroy$))
+            .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe((event: KeyboardEvent) => {
                 if (!this.activeStep) {
                     this.activeStep = this.stepList[0];

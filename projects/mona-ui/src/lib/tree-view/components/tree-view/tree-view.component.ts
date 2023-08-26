@@ -1,13 +1,26 @@
+import { animate, style, transition, trigger } from "@angular/animations";
+import { ActiveDescendantKeyManager } from "@angular/cdk/a11y";
+import {
+    CdkDrag,
+    CdkDragDrop,
+    CdkDragEnd,
+    CdkDragMove,
+    CdkDragPreview,
+    CdkDragStart,
+    CdkDropList
+} from "@angular/cdk/drag-drop";
+import { NgFor, NgIf, NgTemplateOutlet } from "@angular/common";
 import {
     AfterViewInit,
     ChangeDetectorRef,
     Component,
     ContentChild,
+    DestroyRef,
     ElementRef,
     EventEmitter,
+    inject,
     Input,
     OnChanges,
-    OnDestroy,
     OnInit,
     Output,
     QueryList,
@@ -15,34 +28,23 @@ import {
     TemplateRef,
     ViewChildren
 } from "@angular/core";
-import { Node } from "../../models/Node";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { faArrowDown, faArrowUp, faPlus, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { Enumerable, List } from "@mirei/ts-collections";
-import { TreeViewService } from "../../services/tree-view.service";
-import { TreeViewNodeTextTemplateDirective } from "../../directives/tree-view-node-text-template.directive";
+import { filter, fromEvent } from "rxjs";
 import { Action } from "../../../utils/Action";
-import {
-    CdkDragDrop,
-    CdkDragEnd,
-    CdkDragMove,
-    CdkDragStart,
-    CdkDropList,
-    CdkDrag,
-    CdkDragPreview
-} from "@angular/cdk/drag-drop";
+import { TreeViewNodeTextTemplateDirective } from "../../directives/tree-view-node-text-template.directive";
 import { DropPosition } from "../../models/DropPosition";
 import { DropPositionChangeEvent } from "../../models/DropPositionChangeEvent";
-import { faArrowDown, faArrowUp, faPlus, IconDefinition } from "@fortawesome/free-solid-svg-icons";
-import { NodeDragStartEvent } from "../../models/NodeDragStartEvent";
-import { NodeDragEvent } from "../../models/NodeDragEvent";
-import { NodeDropEvent } from "../../models/NodeDropEvent";
-import { NodeDragEndEvent } from "../../models/NodeDragEndEvent";
+import { Node } from "../../models/Node";
 import { NodeClickEvent } from "../../models/NodeClickEvent";
+import { NodeDragEndEvent } from "../../models/NodeDragEndEvent";
+import { NodeDragEvent } from "../../models/NodeDragEvent";
+import { NodeDragStartEvent } from "../../models/NodeDragStartEvent";
+import { NodeDropEvent } from "../../models/NodeDropEvent";
+import { TreeViewService } from "../../services/tree-view.service";
 import { TreeViewNodeComponent } from "../tree-view-node/tree-view-node.component";
-import { ActiveDescendantKeyManager } from "@angular/cdk/a11y";
-import { filter, fromEvent, Subject, takeUntil } from "rxjs";
-import { animate, style, transition, trigger } from "@angular/animations";
-import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { NgFor, NgIf, NgTemplateOutlet } from "@angular/common";
 
 @Component({
     selector: "mona-tree-view",
@@ -70,8 +72,8 @@ import { NgFor, NgIf, NgTemplateOutlet } from "@angular/common";
         FontAwesomeModule
     ]
 })
-export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
-    private readonly componentDestroy$: Subject<void> = new Subject<void>();
+export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit {
+    readonly #destroyRef: DestroyRef = inject(DestroyRef);
     private disabler?: Action<any, boolean> | string;
     private dragNode?: Node;
     private dropTargetNode?: Node;
@@ -174,11 +176,6 @@ export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit, OnDe
         if (changes && changes["data"] && !changes["data"].isFirstChange()) {
             this.prepareNodeList();
         }
-    }
-
-    public ngOnDestroy(): void {
-        this.componentDestroy$.next();
-        this.componentDestroy$.complete();
     }
 
     public ngOnInit(): void {
@@ -402,7 +399,7 @@ export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit, OnDe
                         event.key === "Enter" ||
                         event.key === " "
                 ),
-                takeUntil(this.componentDestroy$)
+                takeUntilDestroyed(this.#destroyRef)
             )
             .subscribe(event => {
                 event.preventDefault();
@@ -436,7 +433,7 @@ export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit, OnDe
                 }
             });
         fromEvent<FocusEvent>(this.elementRef.nativeElement, "focusout")
-            .pipe(takeUntil(this.componentDestroy$))
+            .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe(() => {
                 this.treeViewService.nodeDictionary.values().forEach(n => n.focused.set(false));
             });

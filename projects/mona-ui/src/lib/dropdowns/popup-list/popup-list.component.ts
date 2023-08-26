@@ -4,8 +4,10 @@ import {
     ChangeDetectorRef,
     Component,
     ContentChild,
+    DestroyRef,
     ElementRef,
     EventEmitter,
+    inject,
     Input,
     OnChanges,
     OnDestroy,
@@ -17,6 +19,7 @@ import {
     TemplateRef,
     ViewChildren
 } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { TextBoxPrefixTemplateDirective } from "../../inputs/directives/text-box-prefix-template.directive";
 import { TextBoxComponent } from "../../inputs/text-box/text-box.component";
 import { PopupListItem } from "../models/PopupListItem";
@@ -49,7 +52,7 @@ import { FormsModule } from "@angular/forms";
     changeDetection: ChangeDetectionStrategy.Default
 })
 export class PopupListComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
-    private readonly componentDestroy$: Subject<void> = new Subject<void>();
+    readonly #destroyRef: DestroyRef = inject(DestroyRef);
     public readonly filterIcon: IconDefinition = faSearch;
     public readonly filter$: Subject<string> = new Subject<string>();
 
@@ -127,8 +130,6 @@ export class PopupListComponent implements OnInit, OnChanges, AfterViewInit, OnD
     }
 
     public ngOnDestroy(): void {
-        this.componentDestroy$.next();
-        this.componentDestroy$.complete();
         this.popupListService.viewListData.selectMany(g => g.source).forEach(i => i.selected.set(false));
     }
 
@@ -186,7 +187,7 @@ export class PopupListComponent implements OnInit, OnChanges, AfterViewInit, OnD
 
     private setEvents(): void {
         fromEvent<KeyboardEvent>(document, "keydown")
-            .pipe(takeUntil(this.componentDestroy$))
+            .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe((event: KeyboardEvent) => {
                 if (event.key === "ArrowDown" || event.key === "ArrowUp") {
                     if (!this.navigable) {
@@ -247,10 +248,10 @@ export class PopupListComponent implements OnInit, OnChanges, AfterViewInit, OnD
 
     private setSubscriptions(): void {
         this.filter$
-            .pipe(takeUntil(this.componentDestroy$), debounceTime(200))
+            .pipe(takeUntilDestroyed(this.#destroyRef), debounceTime(200))
             .subscribe(filter => this.popupListService.filterItems(filter, this.selectionMode));
         this.popupListService.scrollToListItem$
-            .pipe(takeUntil(this.componentDestroy$))
+            .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe(item => this.scrollToItem(item));
     }
 

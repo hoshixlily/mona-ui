@@ -1,23 +1,25 @@
 import {
     AfterViewInit,
     ChangeDetectorRef,
+    DestroyRef,
     Directive,
     ElementRef,
     EventEmitter,
+    inject,
     Input,
     NgZone,
-    OnDestroy,
     Output
 } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { fromEvent } from "rxjs";
 import { Column } from "../models/Column";
-import { fromEvent, Subject, takeUntil } from "rxjs";
 
 @Directive({
     selector: "[monaGridColumnResizeHandler]",
     standalone: true
 })
-export class GridColumnResizeHandlerDirective implements AfterViewInit, OnDestroy {
-    readonly #destroy$: Subject<void> = new Subject<void>();
+export class GridColumnResizeHandlerDirective implements AfterViewInit {
+    readonly #destroyRef: DestroyRef = inject(DestroyRef);
 
     @Input()
     public column!: Column;
@@ -36,11 +38,6 @@ export class GridColumnResizeHandlerDirective implements AfterViewInit, OnDestro
 
     public ngAfterViewInit(): void {
         this.setEvents();
-    }
-
-    public ngOnDestroy(): void {
-        this.#destroy$.next();
-        this.#destroy$.complete();
     }
 
     private onMouseDown(event: MouseEvent) {
@@ -101,7 +98,7 @@ export class GridColumnResizeHandlerDirective implements AfterViewInit, OnDestro
     private setEvents(): void {
         this.zone.runOutsideAngular(() => {
             fromEvent<MouseEvent>(this.elementRef.nativeElement, "mousedown")
-                .pipe(takeUntil(this.#destroy$))
+                .pipe(takeUntilDestroyed(this.#destroyRef))
                 .subscribe(event => {
                     event.stopImmediatePropagation();
                     this.onMouseDown(event);

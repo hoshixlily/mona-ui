@@ -1,3 +1,4 @@
+import { NgClass, NgFor, NgIf, NgTemplateOutlet } from "@angular/common";
 import {
     AfterContentInit,
     AfterViewInit,
@@ -5,19 +6,18 @@ import {
     ChangeDetectorRef,
     Component,
     ContentChildren,
-    OnDestroy,
-    OnInit,
+    DestroyRef,
+    inject,
     QueryList,
     ViewChildren
 } from "@angular/core";
-import { MenuComponent } from "../menu/menu.component";
-import { ContextMenuComponent } from "../context-menu/context-menu.component";
-import { ContextMenuCloseEvent } from "../models/ContextMenuCloseEvent";
-import { ContextMenuOpenEvent } from "../models/ContextMenuOpenEvent";
-import { ContextMenuNavigationEvent } from "../models/ContextMenuNavigationEvent";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { Collections, Enumerable, List } from "@mirei/ts-collections";
-import { Subject, takeUntil } from "rxjs";
-import { NgFor, NgClass, NgIf, NgTemplateOutlet } from "@angular/common";
+import { ContextMenuComponent } from "../context-menu/context-menu.component";
+import { MenuComponent } from "../menu/menu.component";
+import { ContextMenuCloseEvent } from "../models/ContextMenuCloseEvent";
+import { ContextMenuNavigationEvent } from "../models/ContextMenuNavigationEvent";
+import { ContextMenuOpenEvent } from "../models/ContextMenuOpenEvent";
 
 @Component({
     selector: "mona-menubar",
@@ -27,8 +27,8 @@ import { NgFor, NgClass, NgIf, NgTemplateOutlet } from "@angular/common";
     standalone: true,
     imports: [NgFor, NgClass, NgIf, NgTemplateOutlet, ContextMenuComponent]
 })
-export class MenubarComponent implements OnInit, AfterViewInit, OnDestroy, AfterContentInit {
-    private readonly componentDestroy$: Subject<void> = new Subject<void>();
+export class MenubarComponent implements AfterViewInit, AfterContentInit {
+    readonly #destroyRef: DestroyRef = inject(DestroyRef);
 
     @ViewChildren(ContextMenuComponent)
     public readonly contextMenuComponents: QueryList<ContextMenuComponent> = new QueryList<ContextMenuComponent>();
@@ -40,7 +40,7 @@ export class MenubarComponent implements OnInit, AfterViewInit, OnDestroy, After
     public constructor(private readonly cdr: ChangeDetectorRef) {}
 
     public ngAfterContentInit(): void {
-        this.menuList.changes.pipe(takeUntil(this.componentDestroy$)).subscribe(event => {
+        this.menuList.changes.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(event => {
             this.cdr.detectChanges();
             this.currentContextMenu?.closeMenu();
             this.currentContextMenu = null;
@@ -60,19 +60,12 @@ export class MenubarComponent implements OnInit, AfterViewInit, OnDestroy, After
                 });
         };
         pairContext();
-        this.contextMenuComponents.changes.pipe(takeUntil(this.componentDestroy$)).subscribe(() => {
+        this.contextMenuComponents.changes.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(() => {
             this.contextMenuComponents.forEach(c => c.setPrecise(false));
             this.cdr.detectChanges();
             pairContext();
         });
     }
-
-    public ngOnDestroy(): void {
-        this.componentDestroy$.next();
-        this.componentDestroy$.complete();
-    }
-
-    public ngOnInit(): void {}
 
     public onContextMenuClose(event: ContextMenuCloseEvent): void {
         if (event.uid === this.currentContextMenu?.uid) {

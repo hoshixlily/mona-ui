@@ -1,25 +1,26 @@
-import { Injectable, Injector, OnDestroy, TemplateRef } from "@angular/core";
-import { PopupSettings } from "../models/PopupSettings";
 import { Overlay, PositionStrategy } from "@angular/cdk/overlay";
 import { ComponentPortal } from "@angular/cdk/portal";
-import { PopupRef } from "../models/PopupRef";
-import { PopupDataInjectionToken, PopupSettingsInjectionToken } from "../models/PopupInjectionToken";
-import { DefaultPositions } from "../models/DefaultPositions";
-import { filter, fromEvent, Subject, take, takeUntil } from "rxjs";
-import { PopupCloseEvent, PopupCloseSource } from "../models/PopupCloseEvent";
+import { DestroyRef, inject, Injectable, Injector, TemplateRef } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { Dictionary } from "@mirei/ts-collections";
-import { PopupState } from "../models/PopupState";
+import { filter, fromEvent, Subject, take, takeUntil } from "rxjs";
 import { v4 } from "uuid";
-import { PopupReference } from "../models/PopupReference";
 import { PopupWrapperComponent } from "../components/popup-wrapper/popup-wrapper.component";
+import { DefaultPositions } from "../models/DefaultPositions";
+import { PopupCloseEvent, PopupCloseSource } from "../models/PopupCloseEvent";
+import { PopupDataInjectionToken, PopupSettingsInjectionToken } from "../models/PopupInjectionToken";
+import { PopupRef } from "../models/PopupRef";
+import { PopupReference } from "../models/PopupReference";
+import { PopupSettings } from "../models/PopupSettings";
+import { PopupState } from "../models/PopupState";
 
 @Injectable({
     providedIn: "root"
 })
-export class PopupService implements OnDestroy {
+export class PopupService {
+    readonly #destroyRef: DestroyRef = inject(DestroyRef);
     private readonly outsideEventsToClose = ["click", "mousedown", "dblclick", "contextmenu", "auxclick"];
     private readonly popupStateMap: Dictionary<string, PopupState> = new Dictionary<string, PopupState>();
-    private readonly serviceDestroy$: Subject<void> = new Subject<void>();
 
     public constructor(private readonly injector: Injector, private readonly overlay: Overlay) {}
 
@@ -105,7 +106,7 @@ export class PopupService implements OnDestroy {
             if (settings.closeOnOutsideClick ?? true) {
                 const subscription = overlayRef
                     .outsidePointerEvents()
-                    .pipe(takeUntil(this.serviceDestroy$))
+                    .pipe(takeUntilDestroyed(this.#destroyRef))
                     .subscribe(event => {
                         if (this.outsideEventsToClose.includes(event.type)) {
                             const closeEvent = new PopupCloseEvent({
@@ -136,11 +137,6 @@ export class PopupService implements OnDestroy {
         });
         this.setEventListeners(this.popupStateMap.get(uid) as PopupState);
         return popupReference.popupRef;
-    }
-
-    public ngOnDestroy(): void {
-        this.serviceDestroy$.next();
-        this.serviceDestroy$.complete();
     }
 
     private setEventListeners(state: PopupState): void {

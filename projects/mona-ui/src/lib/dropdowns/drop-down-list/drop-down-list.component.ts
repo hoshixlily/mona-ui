@@ -1,38 +1,40 @@
+import { ConnectionPositionPair } from "@angular/cdk/overlay";
+import { NgClass, NgIf, NgTemplateOutlet } from "@angular/common";
 import {
     ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
     ContentChild,
+    DestroyRef,
     ElementRef,
     forwardRef,
     HostBinding,
+    inject,
     Input,
-    OnDestroy,
     OnInit,
     TemplateRef,
     ViewChild
 } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from "@angular/forms";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { faChevronDown, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { fromEvent, take } from "rxjs";
+import { AnimationState } from "../../animations/models/AnimationState";
+import { PopupAnimationService } from "../../animations/services/popup-animation.service";
+import { ButtonDirective } from "../../buttons/button/button.directive";
+import { PopupRef } from "../../popup/models/PopupRef";
 import { PopupService } from "../../popup/services/popup.service";
-import { PopupListService } from "../services/popup-list.service";
-import { PopupListValueChangeEvent } from "../models/PopupListValueChangeEvent";
+import { Action } from "../../utils/Action";
+import { DropDownListGroupTemplateDirective } from "../directives/drop-down-list-group-template.directive";
 import { DropDownListItemTemplateDirective } from "../directives/drop-down-list-item-template.directive";
 import { DropDownListValueTemplateDirective } from "../directives/drop-down-list-value-template.directive";
-import { PopupListItem } from "../models/PopupListItem";
-import { DropDownListGroupTemplateDirective } from "../directives/drop-down-list-group-template.directive";
-import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from "@angular/forms";
-import { Action } from "../../utils/Action";
-import { faChevronDown, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
-import { PopupRef } from "../../popup/models/PopupRef";
-import { ConnectionPositionPair } from "@angular/cdk/overlay";
-import { fromEvent, Subject, take, takeUntil } from "rxjs";
-import { PopupAnimationService } from "../../animations/services/popup-animation.service";
-import { AnimationState } from "../../animations/models/AnimationState";
 import { ListGroupTemplateDirective } from "../directives/list-group-template.directive";
 import { ListItemTemplateDirective } from "../directives/list-item-template.directive";
+import { PopupListItem } from "../models/PopupListItem";
+import { PopupListValueChangeEvent } from "../models/PopupListValueChangeEvent";
 import { PopupListComponent } from "../popup-list/popup-list.component";
-import { ButtonDirective } from "../../buttons/button/button.directive";
-import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { NgClass, NgIf, NgTemplateOutlet } from "@angular/common";
+import { PopupListService } from "../services/popup-list.service";
 
 @Component({
     selector: "mona-drop-down-list",
@@ -60,8 +62,8 @@ import { NgClass, NgIf, NgTemplateOutlet } from "@angular/common";
         ListGroupTemplateDirective
     ]
 })
-export class DropDownListComponent implements OnInit, OnDestroy, ControlValueAccessor {
-    readonly #destroy$: Subject<void> = new Subject<void>();
+export class DropDownListComponent implements OnInit, ControlValueAccessor {
+    readonly #destroyRef: DestroyRef = inject(DestroyRef);
     #propagateChange: any = () => {};
     #value: any;
     public readonly clearIcon: IconDefinition = faTimes;
@@ -131,11 +133,6 @@ export class DropDownListComponent implements OnInit, OnDestroy, ControlValueAcc
     public close(): void {
         this.popupRef?.close();
         this.popupRef = null;
-    }
-
-    public ngOnDestroy(): void {
-        this.#destroy$.next();
-        this.#destroy$.complete();
     }
 
     public ngOnInit(): void {
@@ -243,7 +240,7 @@ export class DropDownListComponent implements OnInit, OnDestroy, ControlValueAcc
 
     private setEventListeners(): void {
         fromEvent<KeyboardEvent>(this.elementRef.nativeElement, "keydown")
-            .pipe(takeUntil(this.#destroy$))
+            .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe(event => {
                 if (event.key === "Enter") {
                     if (this.popupRef) {

@@ -3,20 +3,22 @@ import {
     ChangeDetectionStrategy,
     Component,
     ContentChild,
+    DestroyRef,
     ElementRef,
     EventEmitter,
+    inject,
     Input,
     OnDestroy,
-    OnInit,
     Output,
     TemplateRef,
     ViewChild
 } from "@angular/core";
-import { asapScheduler, Subject, takeUntil } from "rxjs";
-import { WindowService } from "../../services/window.service";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { asapScheduler } from "rxjs";
 import { WindowTitleTemplateDirective } from "../../directives/window-title-template.directive";
-import { WindowRef } from "../../models/WindowRef";
 import { WindowCloseEvent } from "../../models/WindowCloseEvent";
+import { WindowRef } from "../../models/WindowRef";
+import { WindowService } from "../../services/window.service";
 
 @Component({
     selector: "mona-window",
@@ -25,8 +27,8 @@ import { WindowCloseEvent } from "../../models/WindowCloseEvent";
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone: true
 })
-export class WindowComponent implements OnInit, OnDestroy, AfterViewInit {
-    private readonly componentDestroy$: Subject<void> = new Subject<void>();
+export class WindowComponent implements OnDestroy, AfterViewInit {
+    readonly #destroyRef: DestroyRef = inject(DestroyRef);
     private windowRef?: WindowRef;
 
     @Output()
@@ -115,7 +117,7 @@ export class WindowComponent implements OnInit, OnDestroy, AfterViewInit {
                 top: this.top,
                 width: this.width
             });
-            this.windowRef.resize$.pipe(takeUntil(this.componentDestroy$)).subscribe(event => {
+            this.windowRef.resize$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(event => {
                 if (event.width != null) {
                     this.widthChange.emit(event.width);
                 }
@@ -129,10 +131,10 @@ export class WindowComponent implements OnInit, OnDestroy, AfterViewInit {
                     this.topChange.emit(event.top);
                 }
             });
-            this.windowRef.close$.pipe(takeUntil(this.componentDestroy$)).subscribe(event => {
+            this.windowRef.close$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(event => {
                 this.close.emit(event);
             });
-            this.windowRef.drag$.pipe(takeUntil(this.componentDestroy$)).subscribe(event => {
+            this.windowRef.drag$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(event => {
                 if (event.left != null) {
                     this.leftChange.emit(event.left);
                 }
@@ -140,20 +142,16 @@ export class WindowComponent implements OnInit, OnDestroy, AfterViewInit {
                     this.topChange.emit(event.top);
                 }
             });
-            this.windowRef.dragEnd$.pipe(takeUntil(this.componentDestroy$)).subscribe(() => {
+            this.windowRef.dragEnd$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(() => {
                 this.dragEnd.emit();
             });
-            this.windowRef.dragStart$.pipe(takeUntil(this.componentDestroy$)).subscribe(() => {
+            this.windowRef.dragStart$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(() => {
                 this.dragStart.emit();
             });
         });
     }
 
     public ngOnDestroy(): void {
-        this.componentDestroy$.next();
-        this.componentDestroy$.complete();
         this.windowRef?.close();
     }
-
-    public ngOnInit(): void {}
 }

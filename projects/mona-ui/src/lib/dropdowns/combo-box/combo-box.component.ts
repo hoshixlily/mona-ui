@@ -1,12 +1,15 @@
+import { ConnectionPositionPair } from "@angular/cdk/overlay";
+import { NgClass, NgIf, NgTemplateOutlet } from "@angular/common";
 import {
     ChangeDetectionStrategy,
     Component,
     ContentChild,
+    DestroyRef,
     ElementRef,
     forwardRef,
     HostBinding,
+    inject,
     Input,
-    OnDestroy,
     OnInit,
     signal,
     SimpleChanges,
@@ -14,28 +17,27 @@ import {
     ViewChild,
     WritableSignal
 } from "@angular/core";
-import { PopupListService } from "../services/popup-list.service";
-import { PopupService } from "../../popup/services/popup.service";
-import { PopupListItem } from "../models/PopupListItem";
-import { PopupListValueChangeEvent } from "../models/PopupListValueChangeEvent";
-import { distinctUntilChanged, fromEvent, map, Observable, of, Subject, take, takeUntil } from "rxjs";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from "@angular/forms";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { faChevronDown, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { Group } from "@mirei/ts-collections";
+import { distinctUntilChanged, fromEvent, map, Observable, of, Subject, take } from "rxjs";
+import { AnimationState } from "../../animations/models/AnimationState";
+import { PopupAnimationService } from "../../animations/services/popup-animation.service";
+import { ButtonDirective } from "../../buttons/button/button.directive";
+import { TextBoxDirective } from "../../inputs/directives/text-box.directive";
 import { PopupRef } from "../../popup/models/PopupRef";
+import { PopupService } from "../../popup/services/popup.service";
 import { Action } from "../../utils/Action";
 import { ComboBoxGroupTemplateDirective } from "../directives/combo-box-group-template.directive";
 import { ComboBoxItemTemplateDirective } from "../directives/combo-box-item-template.directive";
-import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from "@angular/forms";
-import { faChevronDown, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
-import { ConnectionPositionPair } from "@angular/cdk/overlay";
-import { PopupAnimationService } from "../../animations/services/popup-animation.service";
-import { AnimationState } from "../../animations/models/AnimationState";
 import { ListGroupTemplateDirective } from "../directives/list-group-template.directive";
 import { ListItemTemplateDirective } from "../directives/list-item-template.directive";
+import { PopupListItem } from "../models/PopupListItem";
+import { PopupListValueChangeEvent } from "../models/PopupListValueChangeEvent";
 import { PopupListComponent } from "../popup-list/popup-list.component";
-import { ButtonDirective } from "../../buttons/button/button.directive";
-import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { TextBoxDirective } from "../../inputs/directives/text-box.directive";
-import { NgClass, NgIf, NgTemplateOutlet } from "@angular/common";
+import { PopupListService } from "../services/popup-list.service";
 
 @Component({
     selector: "mona-combo-box",
@@ -64,8 +66,8 @@ import { NgClass, NgIf, NgTemplateOutlet } from "@angular/common";
         ListGroupTemplateDirective
     ]
 })
-export class ComboBoxComponent implements OnInit, OnDestroy, ControlValueAccessor {
-    readonly #destroy$: Subject<void> = new Subject<void>();
+export class ComboBoxComponent implements OnInit, ControlValueAccessor {
+    readonly #destroyRef: DestroyRef = inject(DestroyRef);
     #propagateChange: any = () => {};
     #value: any;
     public readonly clearIcon: IconDefinition = faTimes;
@@ -147,11 +149,6 @@ export class ComboBoxComponent implements OnInit, OnDestroy, ControlValueAccesso
         if (changes["data"] && !changes["data"].isFirstChange()) {
             this.initialize();
         }
-    }
-
-    public ngOnDestroy(): void {
-        this.#destroy$.next();
-        this.#destroy$.complete();
     }
 
     public ngOnInit(): void {
@@ -316,7 +313,7 @@ export class ComboBoxComponent implements OnInit, OnDestroy, ControlValueAccesso
 
     private setEventListeners(): void {
         fromEvent<FocusEvent>(this.elementRef.nativeElement, "focusout")
-            .pipe(takeUntil(this.#destroy$))
+            .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe(event => {
                 const target = event.relatedTarget as HTMLElement;
                 if (
@@ -329,7 +326,7 @@ export class ComboBoxComponent implements OnInit, OnDestroy, ControlValueAccesso
                 // this.close();
             });
         fromEvent<FocusEvent>(this.elementRef.nativeElement, "focusin")
-            .pipe(takeUntil(this.#destroy$))
+            .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe(() => {
                 const input = this.elementRef.nativeElement.querySelector("input");
                 if (input) {
@@ -340,7 +337,7 @@ export class ComboBoxComponent implements OnInit, OnDestroy, ControlValueAccesso
     }
 
     private setSubscriptions(): void {
-        this.comboBoxValue$.pipe(takeUntil(this.#destroy$), distinctUntilChanged()).subscribe(value => {
+        this.comboBoxValue$.pipe(takeUntilDestroyed(this.#destroyRef), distinctUntilChanged()).subscribe(value => {
             if (this.filterable) {
                 if (!value) {
                     this.popupListService.viewListData = this.popupListService.sourceListData.toList();
