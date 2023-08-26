@@ -1,21 +1,21 @@
-import { createComponentFactory, Spectator } from "@ngneat/spectator";
-import { HourSelectorPipe } from "../../pipes/hour-selector.pipe";
-import { TimeLimiterPipe } from "../../pipes/time-limiter.pipe";
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 
 import { TimeSelectorComponent } from "./time-selector.component";
 
 describe("TimeSelectorComponent", () => {
-    let spectator: Spectator<TimeSelectorComponent>;
-    const createComponent = createComponentFactory({
-        component: TimeSelectorComponent,
-        declarations: [TimeLimiterPipe, HourSelectorPipe]
-    });
+    let component: TimeSelectorComponent;
+    let fixture: ComponentFixture<TimeSelectorComponent>;
 
     beforeEach(() => {
-        spectator = createComponent();
+        TestBed.configureTestingModule({
+            imports: [TimeSelectorComponent]
+        });
+        fixture = TestBed.createComponent(TimeSelectorComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
     });
 
     it("should create", () => {
-        expect(spectator.component).toBeDefined();
+        expect(component).toBeTruthy();
     });
 });

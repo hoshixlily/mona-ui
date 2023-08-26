@@ -1,21 +1,21 @@
-import { FormsModule } from "@angular/forms";
-import { FontAwesomeTestingModule } from "@fortawesome/angular-fontawesome/testing";
-import { createComponentFactory, Spectator } from "@ngneat/spectator";
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 
 import { NumericTextBoxComponent } from "./numeric-text-box.component";
 
 describe("NumericTextBoxComponent", () => {
-    let spectator: Spectator<NumericTextBoxComponent>;
-    const createComponent = createComponentFactory({
-        component: NumericTextBoxComponent,
-        imports: [FontAwesomeTestingModule, FormsModule]
-    });
+    let component: NumericTextBoxComponent;
+    let fixture: ComponentFixture<NumericTextBoxComponent>;
 
     beforeEach(() => {
-        spectator = createComponent();
+        TestBed.configureTestingModule({
+            imports: [NumericTextBoxComponent]
+        });
+        fixture = TestBed.createComponent(NumericTextBoxComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
     });
 
     it("should create", () => {
-        expect(spectator.component).toBeDefined();
+        expect(component).toBeTruthy();
     });
 });

@@ -1,25 +1,26 @@
-import { FormsModule } from "@angular/forms";
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { FontAwesomeTestingModule } from "@fortawesome/angular-fontawesome/testing";
-import { createComponentFactory, Spectator } from "@ngneat/spectator";
 import { PopupAnimationService } from "../../../../../animations/popup-animation.service";
-import { TextBoxModule } from "../../../../../inputs/modules/text-box/text-box.module";
+import { ButtonDirective } from "../../../../../buttons/modules/button/directives/button.directive";
+import { TextBoxDirective } from "../../../../../inputs/modules/text-box/directives/text-box.directive";
 
 import { ComboBoxComponent } from "./combo-box.component";
 
 describe("ComboBoxComponent", () => {
-    let spectator: Spectator<ComboBoxComponent>;
-    let createComponent = createComponentFactory({
-        component: ComboBoxComponent,
-        imports: [BrowserAnimationsModule, TextBoxModule, FontAwesomeTestingModule, FormsModule],
-        providers: [PopupAnimationService]
-    });
+    let component: ComboBoxComponent;
+    let fixture: ComponentFixture<ComboBoxComponent>;
 
     beforeEach(() => {
-        spectator = createComponent();
+        TestBed.configureTestingModule({
+            imports: [ComboBoxComponent, ButtonDirective, TextBoxDirective, BrowserAnimationsModule],
+            providers: [PopupAnimationService]
+        });
+        fixture = TestBed.createComponent(ComboBoxComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
     });
 
     it("should create", () => {
-        expect(spectator.component).toBeDefined();
+        expect(component).toBeTruthy();
     });
 });

@@ -1,19 +1,23 @@
-import { createComponentFactory, Spectator } from "@ngneat/spectator";
+import { ComponentFixture, TestBed } from "@angular/core/testing";
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { WindowService } from "../../services/window.service";
 import { WindowComponent } from "./window.component";
 
 describe("WindowComponent", () => {
-    let spectator: Spectator<WindowComponent>;
-    let createComponent = createComponentFactory({
-        component: WindowComponent,
-        providers: [WindowService]
-    });
+    let component: WindowComponent;
+    let fixture: ComponentFixture<WindowComponent>;
 
     beforeEach(() => {
-        spectator = createComponent();
+        TestBed.configureTestingModule({
+            imports: [WindowComponent, BrowserAnimationsModule],
+            providers: [WindowService]
+        });
+        fixture = TestBed.createComponent(WindowComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
     });
 
     it("should create", () => {
-        expect(spectator.component).toBeDefined();
+        expect(component).toBeTruthy();
     });
 });

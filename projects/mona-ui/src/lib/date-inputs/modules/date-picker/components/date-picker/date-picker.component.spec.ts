@@ -1,25 +1,26 @@
-import { FormsModule } from "@angular/forms";
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { FontAwesomeTestingModule } from "@fortawesome/angular-fontawesome/testing";
-import { createComponentFactory, Spectator } from "@ngneat/spectator";
 import { PopupAnimationService } from "../../../../../animations/popup-animation.service";
-import { TextBoxModule } from "../../../../../inputs/modules/text-box/text-box.module";
+import { TextBoxComponent } from "../../../../../inputs/modules/text-box/components/text-box/text-box.component";
+import { ContextMenuComponent } from "../../../../../menus/modules/context-menu/components/context-menu/context-menu.component";
 
 import { DatePickerComponent } from "./date-picker.component";
 
 describe("DatePickerComponent", () => {
-    let spectator: Spectator<DatePickerComponent>;
-    const createComponent = createComponentFactory({
-        component: DatePickerComponent,
-        imports: [FormsModule, BrowserAnimationsModule, TextBoxModule, FontAwesomeTestingModule],
-        providers: [PopupAnimationService]
-    });
+    let component: DatePickerComponent;
+    let fixture: ComponentFixture<DatePickerComponent>;
 
     beforeEach(() => {
-        spectator = createComponent();
+        TestBed.configureTestingModule({
+            imports: [DatePickerComponent, TextBoxComponent, ContextMenuComponent, BrowserAnimationsModule],
+            providers: [PopupAnimationService]
+        });
+        fixture = TestBed.createComponent(DatePickerComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
     });
 
     it("should create", () => {
-        expect(spectator.component).toBeDefined();
+        expect(component).toBeTruthy();
     });
 });

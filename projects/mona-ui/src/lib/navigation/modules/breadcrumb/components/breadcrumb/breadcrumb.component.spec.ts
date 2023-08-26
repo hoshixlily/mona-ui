@@ -1,13 +1,14 @@
 import { Component } from "@angular/core";
-import { FontAwesomeTestingModule } from "@fortawesome/angular-fontawesome/testing";
-import { createComponentFactory, Spectator } from "@ngneat/spectator";
-import { BreadcrumbModule } from "../../breadcrumb.module";
+import { ComponentFixture, TestBed } from "@angular/core/testing";
+import { By } from "@angular/platform-browser";
 import { BreadcrumbItem } from "../../models/BreadcrumbItem";
 
 import { BreadcrumbComponent } from "./breadcrumb.component";
 
 @Component({
-    template: ` <mona-breadcrumb [items]="items" (itemClick)="onItemClick($event)"></mona-breadcrumb> `
+    template: ` <mona-breadcrumb [items]="items" (itemClick)="onItemClick($event)"></mona-breadcrumb> `,
+    standalone: true,
+    imports: [BreadcrumbComponent]
 })
 class TestHostComponent {
     public items: BreadcrumbItem[] = [
@@ -31,36 +32,43 @@ class TestHostComponent {
 }
 
 describe("BreadcrumbComponent", () => {
-    let spectator: Spectator<BreadcrumbComponent>;
-    const createComponent = createComponentFactory({
-        component: BreadcrumbComponent,
-        imports: []
-    });
-    let hostSpectator: Spectator<TestHostComponent>;
-    const createHostComponent = createComponentFactory({
-        component: TestHostComponent,
-        imports: [BreadcrumbModule, FontAwesomeTestingModule]
-    });
+    let component: BreadcrumbComponent;
+    let hostComponent: TestHostComponent;
+    let fixture: ComponentFixture<BreadcrumbComponent>;
+    let hostFixture: ComponentFixture<TestHostComponent>;
 
     beforeEach(() => {
-        spectator = createComponent();
-        hostSpectator = createHostComponent();
+        TestBed.configureTestingModule({
+            imports: [BreadcrumbComponent, TestHostComponent]
+        });
+        fixture = TestBed.createComponent(BreadcrumbComponent);
+        hostFixture = TestBed.createComponent(TestHostComponent);
+        component = fixture.componentInstance;
+        hostComponent = hostFixture.componentInstance;
+        fixture.detectChanges();
+        hostFixture.detectChanges();
     });
 
     it("should create", () => {
-        expect(spectator.component).toBeTruthy();
+        expect(component).toBeTruthy();
     });
 
     it("should render the correct number of items", () => {
-        expect(hostSpectator.queryAll(".mona-breadcrumb-item").length).toBe(3);
+        const items = hostFixture.debugElement
+            .queryAll(By.css(".mona-breadcrumb-item"))
+            .map(li => li.nativeElement) as HTMLLIElement[];
+        expect(items.length).toBe(3);
     });
 
     it("should render the correct number of separators", () => {
-        expect(hostSpectator.queryAll(".mona-breadcrumb-separator").length).toBe(2);
+        const separators = hostFixture.debugElement
+            .queryAll(By.css(".mona-breadcrumb-separator"))
+            .map(li => li.nativeElement) as HTMLLIElement[];
+        expect(separators.length).toBe(2);
     });
 
     it("should render the correct number of items when the items are changed", () => {
-        hostSpectator.component.items = [
+        hostComponent.items = [
             {
                 text: "Home",
                 title: "Home"
@@ -78,22 +86,29 @@ describe("BreadcrumbComponent", () => {
                 title: "Second product"
             }
         ];
-        hostSpectator.detectChanges();
-        expect(hostSpectator.queryAll(".mona-breadcrumb-item").length).toBe(4);
+        hostFixture.detectChanges();
+        const items = hostFixture.debugElement
+            .queryAll(By.css(".mona-breadcrumb-item"))
+            .map(li => li.nativeElement) as HTMLLIElement[];
+        expect(items.length).toBe(4);
     });
 
     it("should show the title of the item when the mouse is over the item", () => {
-        const breadcrumbItems = hostSpectator.queryAll(".mona-breadcrumb-item");
+        const breadcrumbItems = hostFixture.debugElement
+            .queryAll(By.css(".mona-breadcrumb-item"))
+            .map(li => li.nativeElement) as HTMLLIElement[];
         breadcrumbItems[0].dispatchEvent(new MouseEvent("mouseover"));
-        hostSpectator.detectChanges();
+        hostFixture.detectChanges();
         expect(breadcrumbItems[0].getAttribute("title")).toBe("Home");
     });
 
     it("should emit the correct item when an item is clicked", () => {
-        const spy = spyOn(hostSpectator.component, "onItemClick");
-        const breadcrumbItems = hostSpectator.queryAll(".mona-breadcrumb-item");
+        const spy = spyOn(hostComponent, "onItemClick");
+        const breadcrumbItems = hostFixture.debugElement
+            .queryAll(By.css(".mona-breadcrumb-item"))
+            .map(li => li.nativeElement) as HTMLLIElement[];
         breadcrumbItems[0].dispatchEvent(new MouseEvent("click"));
-        hostSpectator.detectChanges();
-        expect(spy).toHaveBeenCalledWith(hostSpectator.component.items[0]);
+        hostFixture.detectChanges();
+        expect(spy).toHaveBeenCalledWith(hostComponent.items[0]);
     });
 });

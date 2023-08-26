@@ -1,3 +1,4 @@
+import { NgIf, NgTemplateOutlet } from "@angular/common";
 import {
     AfterViewInit,
     ApplicationRef,
@@ -19,18 +20,17 @@ import {
     WritableSignal
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { faClose, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { filter, fromEvent } from "rxjs";
 import { AnimationService } from "../../../animations/animation.service";
+import { ButtonDirective } from "../../../buttons/modules/button/directives/button.directive";
 import { PopupCloseSource } from "../../../popup/models/PopupCloseEvent";
 import { PopupDataInjectionToken } from "../../../popup/models/PopupInjectionToken";
+import { WindowDragHandlerDirective } from "../../directives/window-drag-handler.directive";
+import { WindowResizeHandlerDirective } from "../../directives/window-resize-handler.directive";
 import { WindowCloseEvent } from "../../models/WindowCloseEvent";
 import { WindowInjectorData } from "../../models/WindowInjectorData";
-import { WindowResizeHandlerDirective } from "../../directives/window-resize-handler.directive";
-import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { ButtonDirective } from "../../../buttons/modules/button/directives/button.directive";
-import { NgIf, NgTemplateOutlet } from "@angular/common";
-import { WindowDragHandlerDirective } from "../../directives/window-drag-handler.directive";
 
 @Component({
     selector: "mona-window-content",
@@ -38,7 +38,14 @@ import { WindowDragHandlerDirective } from "../../directives/window-drag-handler
     styleUrls: ["./window-content.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone: true,
-    imports: [WindowDragHandlerDirective, NgIf, NgTemplateOutlet, ButtonDirective, FontAwesomeModule, WindowResizeHandlerDirective]
+    imports: [
+        WindowDragHandlerDirective,
+        NgIf,
+        NgTemplateOutlet,
+        ButtonDirective,
+        FontAwesomeModule,
+        WindowResizeHandlerDirective
+    ]
 })
 export class WindowContentComponent implements OnInit, AfterViewInit {
     private readonly destroyRef = inject(DestroyRef);

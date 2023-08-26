@@ -1,20 +1,21 @@
-import { FontAwesomeTestingModule } from "@fortawesome/angular-fontawesome/testing";
-import { createComponentFactory, Spectator } from "@ngneat/spectator";
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 
 import { ExpansionPanelComponent } from "./expansion-panel.component";
 
 describe("ExpansionPanelComponent", () => {
-    let spectator: Spectator<ExpansionPanelComponent>;
-    const createComponent = createComponentFactory({
-        component: ExpansionPanelComponent,
-        imports: [FontAwesomeTestingModule]
-    });
+    let component: ExpansionPanelComponent;
+    let fixture: ComponentFixture<ExpansionPanelComponent>;
 
     beforeEach(() => {
-        spectator = createComponent();
+        TestBed.configureTestingModule({
+            imports: [ExpansionPanelComponent]
+        });
+        fixture = TestBed.createComponent(ExpansionPanelComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
     });
 
     it("should create", () => {
-        expect(spectator.component).toBeDefined();
+        expect(component).toBeTruthy();
     });
 });

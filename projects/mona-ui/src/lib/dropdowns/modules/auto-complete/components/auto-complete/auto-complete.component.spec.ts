@@ -1,23 +1,24 @@
-import { FormsModule } from "@angular/forms";
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { createComponentFactory, Spectator } from "@ngneat/spectator";
 import { PopupAnimationService } from "../../../../../animations/popup-animation.service";
 
 import { AutoCompleteComponent } from "./auto-complete.component";
 
 describe("AutoCompleteComponent", () => {
-    let spectator: Spectator<AutoCompleteComponent>;
-    const createComponent = createComponentFactory({
-        component: AutoCompleteComponent,
-        imports: [FormsModule, BrowserAnimationsModule],
-        providers: [PopupAnimationService]
-    });
+    let component: AutoCompleteComponent;
+    let fixture: ComponentFixture<AutoCompleteComponent>;
 
     beforeEach(() => {
-        spectator = createComponent();
+        TestBed.configureTestingModule({
+            imports: [AutoCompleteComponent, BrowserAnimationsModule],
+            providers: [PopupAnimationService]
+        });
+        fixture = TestBed.createComponent(AutoCompleteComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
     });
 
     it("should create", () => {
-        expect(spectator.component).toBeDefined();
+        expect(component).toBeTruthy();
     });
 });

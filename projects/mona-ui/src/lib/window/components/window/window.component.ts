@@ -27,7 +27,7 @@ import { WindowCloseEvent } from "../../models/WindowCloseEvent";
 })
 export class WindowComponent implements OnInit, OnDestroy, AfterViewInit {
     private readonly componentDestroy$: Subject<void> = new Subject<void>();
-    private windowRef!: WindowRef;
+    private windowRef?: WindowRef;
 
     @Output()
     public close: EventEmitter<WindowCloseEvent> = new EventEmitter<WindowCloseEvent>();
@@ -152,7 +152,7 @@ export class WindowComponent implements OnInit, OnDestroy, AfterViewInit {
     public ngOnDestroy(): void {
         this.componentDestroy$.next();
         this.componentDestroy$.complete();
-        this.windowRef.close();
+        this.windowRef?.close();
     }
 
     public ngOnInit(): void {}

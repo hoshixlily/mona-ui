@@ -1,6 +1,6 @@
 import { EventEmitter } from "@angular/core";
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { createComponentFactory, Spectator } from "@ngneat/spectator";
 import { AnimationService } from "../../../../../animations/animation.service";
 import { PopupDataInjectionToken } from "../../../../../popup/models/PopupInjectionToken";
 import { ContextMenuInjectorData } from "../../models/ContextMenuInjectorData";
@@ -19,18 +19,20 @@ const POPUP_TOKEN = [
 ];
 
 describe("ContextMenuContentComponent", () => {
-    let spectator: Spectator<ContextMenuContentComponent>;
-    const createComponent = createComponentFactory({
-        component: ContextMenuContentComponent,
-        imports: [BrowserAnimationsModule],
-        providers: [AnimationService, POPUP_TOKEN]
-    });
+    let component: ContextMenuContentComponent;
+    let fixture: ComponentFixture<ContextMenuContentComponent>;
 
     beforeEach(() => {
-        spectator = createComponent();
+        TestBed.configureTestingModule({
+            imports: [ContextMenuContentComponent, BrowserAnimationsModule],
+            providers: [AnimationService, POPUP_TOKEN]
+        });
+        fixture = TestBed.createComponent(ContextMenuContentComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
     });
 
     it("should create", () => {
-        expect(spectator.component).toBeDefined();
+        expect(component).toBeTruthy();
     });
 });

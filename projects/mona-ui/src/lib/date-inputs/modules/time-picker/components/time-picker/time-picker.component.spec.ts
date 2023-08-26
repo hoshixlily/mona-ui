@@ -1,28 +1,26 @@
-import { FormsModule } from "@angular/forms";
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { FontAwesomeTestingModule } from "@fortawesome/angular-fontawesome/testing";
-import { createComponentFactory, Spectator } from "@ngneat/spectator";
 import { PopupAnimationService } from "../../../../../animations/popup-animation.service";
-import { TextBoxDirective } from "../../../../../inputs/modules/text-box/directives/text-box.directive";
-import { TextBoxModule } from "../../../../../inputs/modules/text-box/text-box.module";
-import { TimeSelectorModule } from "../../../time-selector/time-selector.module";
+import { TextBoxComponent } from "../../../../../inputs/modules/text-box/components/text-box/text-box.component";
+import { TimeSelectorComponent } from "../../../time-selector/components/time-selector/time-selector.component";
 
 import { TimePickerComponent } from "./time-picker.component";
 
 describe("TimePickerComponent", () => {
-    let spectator: Spectator<TimePickerComponent>;
-    const createComponent = createComponentFactory({
-        component: TimePickerComponent,
-        imports: [FormsModule, BrowserAnimationsModule, FontAwesomeTestingModule, TextBoxModule, TimeSelectorModule],
-        providers: [PopupAnimationService],
-        declarations: [TextBoxDirective]
-    });
+    let component: TimePickerComponent;
+    let fixture: ComponentFixture<TimePickerComponent>;
 
     beforeEach(() => {
-        spectator = createComponent();
+        TestBed.configureTestingModule({
+            imports: [TimePickerComponent, TimeSelectorComponent, TextBoxComponent, BrowserAnimationsModule],
+            providers: [PopupAnimationService]
+        });
+        fixture = TestBed.createComponent(TimePickerComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
     });
 
     it("should create", () => {
-        expect(spectator.component).toBeDefined();
+        expect(component).toBeTruthy();
     });
 });

@@ -1,16 +1,10 @@
-import { DragDropModule } from "@angular/cdk/drag-drop";
-import { createComponentFactory, Spectator } from "@ngneat/spectator";
-import { TreeViewNodeComponent } from "../tree-view-node/tree-view-node.component";
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 
 import { TreeViewComponent } from "./tree-view.component";
 
 describe("TreeViewComponent", () => {
-    let spectator: Spectator<TreeViewComponent>;
-    const createComponent = createComponentFactory({
-        component: TreeViewComponent,
-        imports: [DragDropModule],
-        declarations: [TreeViewNodeComponent]
-    });
+    let component: TreeViewComponent;
+    let fixture: ComponentFixture<TreeViewComponent>;
     const data = [
         {
             id: 1,
@@ -42,17 +36,18 @@ describe("TreeViewComponent", () => {
         }
     ];
 
-    beforeEach(
-        () =>
-            (spectator = createComponent({
-                props: {
-                    data,
-                    keyField: "id"
-                }
-            }))
-    );
+    beforeEach(() => {
+        TestBed.configureTestingModule({
+            imports: [TreeViewComponent]
+        });
+        fixture = TestBed.createComponent(TreeViewComponent);
+        component = fixture.componentInstance;
+        component.data = data;
+        component.keyField = "id";
+        fixture.detectChanges();
+    });
 
     it("should create", () => {
-        expect(spectator.component).toBeTruthy();
+        expect(component).toBeTruthy();
     });
 });

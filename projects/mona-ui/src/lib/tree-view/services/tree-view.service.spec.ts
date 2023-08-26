@@ -1,14 +1,18 @@
-import { createServiceFactory, SpectatorService } from "@ngneat/spectator";
+import { TestBed } from "@angular/core/testing";
 
 import { TreeViewService } from "./tree-view.service";
 
 describe("TreeViewService", () => {
-    let spectator: SpectatorService<TreeViewService>;
-    const createService = createServiceFactory(TreeViewService);
+    let service: TreeViewService;
 
-    beforeEach(() => (spectator = createService()));
+    beforeEach(() => {
+        TestBed.configureTestingModule({
+            providers: [TreeViewService]
+        });
+        service = TestBed.inject(TreeViewService);
+    });
 
     it("should be created", () => {
-        expect(spectator.service).toBeTruthy();
+        expect(service).toBeTruthy();
     });
 });

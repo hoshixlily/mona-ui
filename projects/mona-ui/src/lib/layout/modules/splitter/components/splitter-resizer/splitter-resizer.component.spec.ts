@@ -1,37 +1,40 @@
-import { FontAwesomeTestingModule } from "@fortawesome/angular-fontawesome/testing";
-import { createComponentFactory, Spectator } from "@ngneat/spectator";
+import { Component } from "@angular/core";
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { SplitterPaneComponent } from "../splitter-pane/splitter-pane.component";
+import { SplitterComponent } from "../splitter/splitter.component";
 
 import { SplitterResizerComponent } from "./splitter-resizer.component";
 
-describe("SplitterResizerComponent", () => {
-    let spectator: Spectator<SplitterResizerComponent>;
-    const createComponent = createComponentFactory({
-        component: SplitterResizerComponent,
-        imports: [FontAwesomeTestingModule]
-    });
-    let previousPaneSpectator: Spectator<SplitterPaneComponent>;
-    const createPreviousPaneComponent = createComponentFactory({
-        component: SplitterPaneComponent
-    });
+@Component({
+    template: `
+        <mona-splitter orientation="horizontal">
+            <mona-splitter-pane [size]="300">
+                <div>Pane 1</div>
+            </mona-splitter-pane>
+            <mona-splitter-pane>
+                <div>Pane 2</div>
+            </mona-splitter-pane>
+        </mona-splitter>
+    `,
+    standalone: true,
+    imports: [SplitterResizerComponent, SplitterPaneComponent, SplitterComponent]
+})
+class SplitterResizerComponentTestComponent {}
 
-    let nextPaneSpectator: Spectator<SplitterPaneComponent>;
-    const createNextPaneComponent = createComponentFactory({
-        component: SplitterPaneComponent
-    });
+describe("SplitterResizerComponent", () => {
+    let hostComponent: SplitterResizerComponentTestComponent;
+    let hostFixture: ComponentFixture<SplitterResizerComponentTestComponent>;
 
     beforeEach(() => {
-        previousPaneSpectator = createPreviousPaneComponent();
-        nextPaneSpectator = createNextPaneComponent();
-        spectator = createComponent({
-            props: {
-                previousPane: previousPaneSpectator.component,
-                nextPane: nextPaneSpectator.component
-            }
+        TestBed.configureTestingModule({
+            imports: [SplitterResizerComponent, SplitterResizerComponentTestComponent, SplitterPaneComponent]
         });
+        hostFixture = TestBed.createComponent(SplitterResizerComponentTestComponent);
+        hostComponent = hostFixture.componentInstance;
+        hostFixture.detectChanges();
     });
 
     it("should create", () => {
-        expect(spectator.component).toBeDefined();
+        expect(hostComponent).toBeTruthy();
     });
 });

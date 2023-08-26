@@ -1,8 +1,8 @@
-import { TextBoxPrefixTemplateDirective } from './text-box-prefix-template.directive';
+import { TextBoxPrefixTemplateDirective } from "./text-box-prefix-template.directive";
 
-describe('TextBoxPrefixTemplateDirective', () => {
-  it('should create an instance', () => {
-    const directive = new TextBoxPrefixTemplateDirective();
-    expect(directive).toBeTruthy();
-  });
+describe("TextBoxPrefixTemplateDirective", () => {
+    it("should create an instance", () => {
+        const directive = new TextBoxPrefixTemplateDirective();
+        expect(directive).toBeTruthy();
+    });
 });

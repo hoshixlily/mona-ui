@@ -1,21 +1,21 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { AlphaSliderComponent } from './alpha-slider.component';
+import { AlphaSliderComponent } from "./alpha-slider.component";
 
-describe('AlphaSliderComponent', () => {
-  let component: AlphaSliderComponent;
-  let fixture: ComponentFixture<AlphaSliderComponent>;
+describe("AlphaSliderComponent", () => {
+    let component: AlphaSliderComponent;
+    let fixture: ComponentFixture<AlphaSliderComponent>;
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-    imports: [AlphaSliderComponent]
-});
-    fixture = TestBed.createComponent(AlphaSliderComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+    beforeEach(() => {
+        TestBed.configureTestingModule({
+            imports: [AlphaSliderComponent]
+        });
+        fixture = TestBed.createComponent(AlphaSliderComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it("should create", () => {
+        expect(component).toBeTruthy();
+    });
 });

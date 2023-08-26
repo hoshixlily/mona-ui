@@ -1,8 +1,9 @@
+import { CommonModule, NgIf } from "@angular/common";
 import { ApplicationRef, Component } from "@angular/core";
-import { fakeAsync } from "@angular/core/testing";
-import { FontAwesomeTestingModule } from "@fortawesome/angular-fontawesome/testing";
-import { createComponentFactory, Spectator } from "@ngneat/spectator";
-import { ContextMenuModule } from "../../../../../menus/modules/context-menu/context-menu.module";
+import { ComponentFixture, fakeAsync, TestBed, tick } from "@angular/core/testing";
+import { BrowserModule, By } from "@angular/platform-browser";
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { MenuItemComponent } from "../../../../../menus/modules/shared-menu/components/menu-item/menu-item.component";
 
 import { SplitButtonComponent } from "./split-button.component";
 
@@ -18,54 +19,66 @@ import { SplitButtonComponent } from "./split-button.component";
             </mona-menu-item>
             <mona-menu-item text="Item 4" *ngIf="menuVisible"></mona-menu-item>
         </mona-split-button>
-    `
+    `,
+    standalone: true,
+    imports: [SplitButtonComponent, MenuItemComponent, CommonModule]
 })
 class TestHostComponent {
     public menuVisible: boolean = false;
+
     public constructor(public readonly appRef: ApplicationRef) {}
+
     public onItemClick(event: any): void {
         console.log(event);
     }
 }
 
 describe("SplitButtonComponent", () => {
-    let spectator: Spectator<SplitButtonComponent>;
-    const createComponent = createComponentFactory({
-        component: SplitButtonComponent,
-        imports: [ContextMenuModule, FontAwesomeTestingModule]
-    });
-    let hostSpectator: Spectator<TestHostComponent>;
-    const createHostComponent = createComponentFactory({
-        component: TestHostComponent,
-        imports: [ContextMenuModule, FontAwesomeTestingModule]
-    });
+    let component: SplitButtonComponent;
+    let hostComponent: TestHostComponent;
+    let fixture: ComponentFixture<SplitButtonComponent>;
+    let hostFixture: ComponentFixture<TestHostComponent>;
 
     beforeEach(() => {
-        spectator = createComponent();
-        hostSpectator = createHostComponent();
+        TestBed.configureTestingModule({
+            imports: [SplitButtonComponent, TestHostComponent, BrowserAnimationsModule, CommonModule, BrowserModule],
+            providers: []
+        });
+        fixture = TestBed.createComponent(SplitButtonComponent);
+        hostFixture = TestBed.createComponent(TestHostComponent);
+        component = fixture.componentInstance;
+        hostComponent = hostFixture.componentInstance;
+        fixture.detectChanges();
+        hostFixture.detectChanges();
     });
 
     it("should create", () => {
-        expect(spectator.component).toBeDefined();
+        expect(component).toBeTruthy();
     });
 
     it("should have a menu icon", () => {
-        const buttons = spectator.queryAll("button");
+        const buttons = fixture.debugElement
+            .queryAll(By.css("button"))
+            .map(button => button.nativeElement) as HTMLButtonElement[];
         expect(buttons.length).toBe(2);
         expect(buttons[1].querySelector("fa-icon")).not.toBeNull();
     });
 
     it("should have the text 'Split Button'", () => {
-        const buttons = hostSpectator.queryAll("button");
+        const buttons = hostFixture.debugElement
+            .queryAll(By.css("button"))
+            .map(button => button.nativeElement) as HTMLButtonElement[];
         expect(buttons.length).toBe(2);
         expect(buttons[0].textContent).toBe("Split Button");
     });
 
     it("should show the menu when the menu icon is clicked", () => {
-        const buttons = hostSpectator.queryAll("button") as HTMLButtonElement[];
+        const buttons = hostFixture.debugElement
+            .queryAll(By.css("button"))
+            .map(button => button.nativeElement) as HTMLButtonElement[];
         expect(buttons.length).toBe(2);
         buttons[1].click();
-        hostSpectator.detectChanges();
+        hostFixture.detectChanges();
         const menu = document.querySelector("ul.mona-contextmenu-list");
         expect(menu).not.toBeNull();
         const menuItems = menu?.querySelectorAll("li.mona-contextmenu-list-item");
@@ -76,17 +89,19 @@ describe("SplitButtonComponent", () => {
     });
 
     it("should show the sub menu when the third menu item is hovered", fakeAsync(() => {
-        const buttons = hostSpectator.queryAll("button") as HTMLButtonElement[];
+        const buttons = hostFixture.debugElement
+            .queryAll(By.css("button"))
+            .map(button => button.nativeElement) as HTMLButtonElement[];
         expect(buttons.length).toBe(2);
         buttons[1].click();
-        hostSpectator.detectChanges();
+        hostFixture.detectChanges();
         const menu = document.querySelector("ul.mona-contextmenu-list");
         expect(menu).not.toBeNull();
         const thirdMenuItem = menu?.querySelectorAll("li.mona-contextmenu-list-item")[2] as HTMLLIElement;
         thirdMenuItem.dispatchEvent(new MouseEvent("mouseenter"));
-        hostSpectator.tick();
-        hostSpectator.detectChanges();
-        hostSpectator.tick();
+        tick();
+        hostFixture.detectChanges();
+        tick();
         const subMenu = document.querySelectorAll("ul.mona-contextmenu-list")[1];
         expect(subMenu).not.toBeNull();
 
@@ -98,10 +113,14 @@ describe("SplitButtonComponent", () => {
     }));
 
     it("should show the hidden menu item when condition is true", fakeAsync(() => {
-        const buttons = hostSpectator.queryAll("button") as HTMLButtonElement[];
+        const buttons = hostFixture.debugElement
+            .queryAll(By.css("button"))
+            .map(button => button.nativeElement) as HTMLButtonElement[];
         expect(buttons.length).toBe(2);
         buttons[1].click();
-        hostSpectator.detectChanges();
+        tick();
+        hostFixture.detectChanges();
+        tick();
         const menu = document.querySelector("ul.mona-contextmenu-list");
         expect(menu).not.toBeNull();
         const menuItems = menu?.querySelectorAll("li.mona-contextmenu-list-item");
@@ -109,13 +128,14 @@ describe("SplitButtonComponent", () => {
         expect(menuItems?.item(0)?.textContent).toBe("Item 1");
         expect(menuItems?.item(1)?.textContent).toBe("Item 2");
         expect(menuItems?.item(2)?.textContent).toBe("Item 3");
-        hostSpectator.component.menuVisible = true;
+        hostComponent.menuVisible = true;
         document.body.click();
-        hostSpectator.detectChanges();
+        tick();
+        hostFixture.detectChanges();
         buttons[1].click();
-        hostSpectator.tick();
-        hostSpectator.detectChanges();
-        hostSpectator.tick();
+        tick();
+        hostFixture.detectChanges();
+        tick();
         const menu2 = document.querySelector("ul.mona-contextmenu-list") as HTMLUListElement;
         expect(menu2).not.toBeNull();
         const menuItems2 = menu2.querySelectorAll("li.mona-contextmenu-list-item") as NodeListOf<HTMLLIElement>;

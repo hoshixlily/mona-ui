@@ -1,24 +1,25 @@
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { FontAwesomeTestingModule } from "@fortawesome/angular-fontawesome/testing";
-import { createComponentFactory, Spectator } from "@ngneat/spectator";
 import { PopupAnimationService } from "../../../../../animations/popup-animation.service";
-import { ButtonModule } from "../../../../../buttons/modules/button/button.module";
+import { ButtonDirective } from "../../../../../buttons/modules/button/directives/button.directive";
 
 import { ColorPickerComponent } from "./color-picker.component";
 
 describe("ColorPickerComponent", () => {
-    let spectator: Spectator<ColorPickerComponent>;
-    const createComponent = createComponentFactory({
-        component: ColorPickerComponent,
-        imports: [BrowserAnimationsModule, ButtonModule, FontAwesomeTestingModule],
-        providers: [PopupAnimationService]
-    });
+    let component: ColorPickerComponent;
+    let fixture: ComponentFixture<ColorPickerComponent>;
 
     beforeEach(() => {
-        spectator = createComponent();
+        TestBed.configureTestingModule({
+            imports: [ColorPickerComponent, ButtonDirective, BrowserAnimationsModule],
+            providers: [PopupAnimationService]
+        });
+        fixture = TestBed.createComponent(ColorPickerComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
     });
 
     it("should create", () => {
-        expect(spectator.component).toBeDefined();
+        expect(component).toBeTruthy();
     });
 });

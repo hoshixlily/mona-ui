@@ -1,30 +1,31 @@
-import { FontAwesomeTestingModule } from "@fortawesome/angular-fontawesome/testing";
-import { createComponentFactory, Spectator } from "@ngneat/spectator";
+import { ComponentFixture, TestBed } from "@angular/core/testing";
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { Subject } from "rxjs";
-import { ProgressBarModule } from "../../../progress-bars/modules/progress-bar/progress-bar.module";
-
+import { ProgressBarComponent } from "../../../progress-bars/modules/progress-bar/components/progress-bar/progress-bar.component";
+import { NotificationData } from "../../models/NotificationData";
 import { NotificationComponent } from "./notification.component";
 
 describe("NotificationComponent", () => {
-    let spectator: Spectator<NotificationComponent>;
-    const createComponent = createComponentFactory({
-        component: NotificationComponent,
-        imports: [ProgressBarModule, FontAwesomeTestingModule]
-    });
+    let component: NotificationComponent;
+    let fixture: ComponentFixture<NotificationComponent>;
+    let notificationData: NotificationData;
 
     beforeEach(() => {
-        spectator = createComponent({
-            props: {
-                data: {
-                    componentDestroy$: new Subject<string>(),
-                    visible: true,
-                    options: {}
-                }
-            }
+        TestBed.configureTestingModule({
+            imports: [NotificationComponent, ProgressBarComponent, BrowserAnimationsModule]
         });
+        fixture = TestBed.createComponent(NotificationComponent);
+        component = fixture.componentInstance;
+        notificationData = {
+            componentDestroy$: new Subject<string>(),
+            options: {},
+            visible: true
+        };
+        component.data = notificationData;
+        fixture.detectChanges();
     });
 
     it("should create", () => {
-        expect(spectator.component).toBeDefined();
+        expect(component).toBeTruthy();
     });
 });

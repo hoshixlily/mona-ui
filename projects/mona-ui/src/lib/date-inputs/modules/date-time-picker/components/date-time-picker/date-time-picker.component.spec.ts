@@ -1,25 +1,25 @@
-import { FormsModule } from "@angular/forms";
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { FontAwesomeTestingModule } from "@fortawesome/angular-fontawesome/testing";
-import { createComponentFactory, Spectator } from "@ngneat/spectator";
 import { PopupAnimationService } from "../../../../../animations/popup-animation.service";
-import { TextBoxModule } from "../../../../../inputs/modules/text-box/text-box.module";
+import { TextBoxComponent } from "../../../../../inputs/modules/text-box/components/text-box/text-box.component";
 
 import { DateTimePickerComponent } from "./date-time-picker.component";
 
 describe("DateTimePickerComponent", () => {
-    let spectator: Spectator<DateTimePickerComponent>;
-    const createComponent = createComponentFactory({
-        component: DateTimePickerComponent,
-        imports: [FormsModule, BrowserAnimationsModule, FontAwesomeTestingModule, TextBoxModule],
-        providers: [PopupAnimationService]
-    });
+    let component: DateTimePickerComponent;
+    let fixture: ComponentFixture<DateTimePickerComponent>;
 
     beforeEach(() => {
-        spectator = createComponent();
+        TestBed.configureTestingModule({
+            imports: [DateTimePickerComponent, TextBoxComponent, BrowserAnimationsModule],
+            providers: [PopupAnimationService]
+        });
+        fixture = TestBed.createComponent(DateTimePickerComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
     });
 
     it("should create", () => {
-        expect(spectator.component).toBeDefined();
+        expect(component).toBeTruthy();
     });
 });

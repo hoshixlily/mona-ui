@@ -1,23 +1,22 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { SplitterComponent } from './splitter.component';
+import { SplitterComponent } from "./splitter.component";
 
-describe('SplitterComponent', () => {
-  let component: SplitterComponent;
-  let fixture: ComponentFixture<SplitterComponent>;
+describe("SplitterComponent", () => {
+    let component: SplitterComponent;
+    let fixture: ComponentFixture<SplitterComponent>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-    imports: [SplitterComponent]
-})
-    .compileComponents();
+    beforeEach(async () => {
+        await TestBed.configureTestingModule({
+            imports: [SplitterComponent]
+        }).compileComponents();
 
-    fixture = TestBed.createComponent(SplitterComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+        fixture = TestBed.createComponent(SplitterComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it("should create", () => {
+        expect(component).toBeTruthy();
+    });
 });

@@ -1,7 +1,15 @@
+import { NgFor, NgIf } from "@angular/common";
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { FormsModule } from "@angular/forms";
+import { ButtonGroupComponent } from "../../../buttons/modules/button-group/components/button-group/button-group.component";
+import { ButtonDirective } from "../../../buttons/modules/button/directives/button.directive";
+import { DatePickerComponent } from "../../../date-inputs/modules/date-picker/components/date-picker/date-picker.component";
+import { DateTimePickerComponent } from "../../../date-inputs/modules/date-time-picker/components/date-time-picker/date-time-picker.component";
+import { TimePickerComponent } from "../../../date-inputs/modules/time-picker/components/time-picker/time-picker.component";
+import { DropDownListComponent } from "../../../dropdowns/modules/drop-down-list/components/drop-down-list/drop-down-list.component";
+import { NumericTextBoxComponent } from "../../../inputs/modules/numeric-text-box/components/numeric-text-box/numeric-text-box.component";
+import { TextBoxComponent } from "../../../inputs/modules/text-box/components/text-box/text-box.component";
 import { DataType } from "../../../models/DataType";
-import { FilterMenuDataItem } from "../../models/FilterMenuDataItem";
-import { FilterMenuConnectorItem } from "../../models/FilterMenuConnectorItem";
 import {
     BooleanFilterDescriptor,
     BooleanFilterOperators,
@@ -14,19 +22,11 @@ import {
     StringFilterDescriptor,
     StringFilterOperators
 } from "../../../query/filter/FilterDescriptor";
+import { FilterMenuConnectorItem } from "../../models/FilterMenuConnectorItem";
+import { FilterMenuDataItem } from "../../models/FilterMenuDataItem";
 import { FilterMenuValue } from "../../models/FilterMenuValue";
 import { OperatorFilterPipe } from "../../pipes/operator-filter.pipe";
 import { ValuelessOperatorPipe } from "../../pipes/valueless-operator.pipe";
-import { ButtonDirective } from "../../../buttons/modules/button/directives/button.directive";
-import { ButtonGroupComponent } from "../../../buttons/modules/button-group/components/button-group/button-group.component";
-import { TimePickerComponent } from "../../../date-inputs/modules/time-picker/components/time-picker/time-picker.component";
-import { DateTimePickerComponent } from "../../../date-inputs/modules/date-time-picker/components/date-time-picker/date-time-picker.component";
-import { DatePickerComponent } from "../../../date-inputs/modules/date-picker/components/date-picker/date-picker.component";
-import { NumericTextBoxComponent } from "../../../inputs/modules/numeric-text-box/components/numeric-text-box/numeric-text-box.component";
-import { TextBoxComponent } from "../../../inputs/modules/text-box/components/text-box/text-box.component";
-import { FormsModule } from "@angular/forms";
-import { DropDownListComponent } from "../../../dropdowns/modules/drop-down-list/components/drop-down-list/drop-down-list.component";
-import { NgIf, NgFor } from "@angular/common";
 
 @Component({
     selector: "mona-filter-menu",
@@ -34,7 +34,21 @@ import { NgIf, NgFor } from "@angular/common";
     styleUrls: ["./filter-menu.component.scss"],
     changeDetection: ChangeDetectionStrategy.Default,
     standalone: true,
-    imports: [NgIf, DropDownListComponent, FormsModule, TextBoxComponent, NumericTextBoxComponent, DatePickerComponent, DateTimePickerComponent, TimePickerComponent, ButtonGroupComponent, NgFor, ButtonDirective, ValuelessOperatorPipe, OperatorFilterPipe]
+    imports: [
+        NgIf,
+        DropDownListComponent,
+        FormsModule,
+        TextBoxComponent,
+        NumericTextBoxComponent,
+        DatePickerComponent,
+        DateTimePickerComponent,
+        TimePickerComponent,
+        ButtonGroupComponent,
+        NgFor,
+        ButtonDirective,
+        ValuelessOperatorPipe,
+        OperatorFilterPipe
+    ]
 })
 export class FilterMenuComponent implements OnInit {
     private booleanFilterValues: [boolean | null, boolean | null] = [null, null];

@@ -1,23 +1,26 @@
-import { FormsModule } from "@angular/forms";
-import { createComponentFactory, Spectator } from "@ngneat/spectator";
-import { DropDownListModule } from "../../../dropdowns/modules/drop-down-list/drop-down-list.module";
-import { TextBoxModule } from "../../../inputs/modules/text-box/text-box.module";
-import { OperatorFilterPipe } from "../../pipes/operator-filter.pipe";
-import { ValuelessOperatorPipe } from "../../pipes/valueless-operator.pipe";
+import { ComponentFixture, TestBed } from "@angular/core/testing";
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { PopupAnimationService } from "../../../animations/popup-animation.service";
+import { DropDownListComponent } from "../../../dropdowns/modules/drop-down-list/components/drop-down-list/drop-down-list.component";
+import { TextBoxComponent } from "../../../inputs/modules/text-box/components/text-box/text-box.component";
 
 import { FilterMenuComponent } from "./filter-menu.component";
 
 describe("FilterMenuComponent", () => {
-    let spectator: Spectator<FilterMenuComponent>;
-    const createComponent = createComponentFactory({
-        component: FilterMenuComponent,
-        imports: [FormsModule, TextBoxModule, DropDownListModule],
-        declarations: [OperatorFilterPipe, ValuelessOperatorPipe]
+    let component: FilterMenuComponent;
+    let fixture: ComponentFixture<FilterMenuComponent>;
+
+    beforeEach(() => {
+        TestBed.configureTestingModule({
+            imports: [FilterMenuComponent, TextBoxComponent, DropDownListComponent, BrowserAnimationsModule],
+            providers: [PopupAnimationService]
+        });
+        fixture = TestBed.createComponent(FilterMenuComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
     });
 
-    beforeEach(() => (spectator = createComponent()));
-
     it("should create", () => {
-        expect(spectator.component).toBeTruthy();
+        expect(component).toBeTruthy();
     });
 });

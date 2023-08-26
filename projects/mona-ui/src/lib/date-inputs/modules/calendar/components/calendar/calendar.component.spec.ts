@@ -1,23 +1,21 @@
-import { FontAwesomeTestingModule } from "@fortawesome/angular-fontawesome/testing";
-import { createComponentFactory, Spectator } from "@ngneat/spectator";
-import { DateComparerPipe } from "../../../../../pipes/date-comparer.pipe";
-import { DateIncludePipe } from "../../../../../pipes/date-include.pipe";
-import { SlicePipe } from "../../../../../pipes/slice.pipe";
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 
 import { CalendarComponent } from "./calendar.component";
 
 describe("CalendarComponent", () => {
-    let spectator: Spectator<CalendarComponent>;
-    const createComponent = createComponentFactory({
-        component: CalendarComponent,
-        imports: [FontAwesomeTestingModule, SlicePipe, DateComparerPipe, DateIncludePipe]
-    });
+    let component: CalendarComponent;
+    let fixture: ComponentFixture<CalendarComponent>;
 
     beforeEach(() => {
-        spectator = createComponent();
+        TestBed.configureTestingModule({
+            imports: [CalendarComponent]
+        });
+        fixture = TestBed.createComponent(CalendarComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
     });
 
     it("should create", () => {
-        expect(spectator.component).toBeDefined();
+        expect(component).toBeTruthy();
     });
 });

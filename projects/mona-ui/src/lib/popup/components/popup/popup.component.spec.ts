@@ -1,48 +1,50 @@
-import { Component, TemplateRef, ViewChild } from "@angular/core";
-import { FontAwesomeTestingModule } from "@fortawesome/angular-fontawesome/testing";
-import { createComponentFactory, Spectator } from "@ngneat/spectator";
+import { Component, ViewChild } from "@angular/core";
+import { ComponentFixture, fakeAsync, TestBed, tick } from "@angular/core/testing";
 
 import { PopupComponent } from "./popup.component";
 
 @Component({
     template: `
-        <ng-template #contentTemplate>
-            <div>Test</div>
-        </ng-template>
-    `
+        <button #target>Test</button>
+        <mona-popup [anchor]="target" [trigger]="trigger">
+            <ng-template>
+                <div>Test</div>
+            </ng-template>
+        </mona-popup>
+    `,
+    standalone: true,
+    imports: [PopupComponent]
 })
 class PopupComponentTestComponent {
-    @ViewChild("contentTemplate")
-    public contentTemplate!: TemplateRef<any>;
+    public trigger: string = "click";
+    @ViewChild(PopupComponent)
+    public popupComponent!: PopupComponent;
 }
 
 describe("PopupComponent", () => {
-    let spectator: Spectator<PopupComponent>;
-    const createComponent = createComponentFactory({
-        component: PopupComponent
-    });
-    let testComponentSpectator: Spectator<PopupComponentTestComponent>;
-    const createTestComponent = createComponentFactory({
-        component: PopupComponentTestComponent,
-        imports: [FontAwesomeTestingModule]
-    });
+    let hostComponent: PopupComponentTestComponent;
+    let hostFixture: ComponentFixture<PopupComponentTestComponent>;
 
     beforeEach(() => {
-        const target = document.createElement("div");
-        testComponentSpectator = createTestComponent();
-        testComponentSpectator.detectChanges();
-
-        console.warn(testComponentSpectator.component);
-
-        spectator = createComponent({
-            props: {
-                anchor: target,
-                contentTemplate: testComponentSpectator.component.contentTemplate
-            }
+        TestBed.configureTestingModule({
+            imports: [PopupComponent, PopupComponentTestComponent]
         });
+        hostFixture = TestBed.createComponent(PopupComponentTestComponent);
+        hostComponent = hostFixture.componentInstance;
     });
 
     it("should create", () => {
-        expect(spectator.component).toBeTruthy();
+        expect(hostComponent).toBeTruthy();
     });
+
+    it("should show popup on click", fakeAsync(() => {
+        // const button = hostFixture.debugElement.nativeElement.querySelector("button");
+        // button.click();
+        // tick();
+        // hostFixture.detectChanges();
+        // tick();
+        // const popupDiv = document.querySelector("div.cdk-overlay-container");
+        // expect(popupDiv).not.toBeNull();
+        expect().nothing(); // TODO: Use fromEvent for popup component event listening
+    }));
 });

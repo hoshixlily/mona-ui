@@ -1,20 +1,21 @@
-import { FontAwesomeTestingModule } from "@fortawesome/angular-fontawesome/testing";
-import { createComponentFactory, Spectator } from "@ngneat/spectator";
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 
 import { ScrollViewComponent } from "./scroll-view.component";
 
 describe("ScrollViewComponent", () => {
-    let spectator: Spectator<ScrollViewComponent>;
-    const createComponent = createComponentFactory({
-        component: ScrollViewComponent,
-        imports: [FontAwesomeTestingModule]
-    });
+    let component: ScrollViewComponent;
+    let fixture: ComponentFixture<ScrollViewComponent>;
 
     beforeEach(() => {
-        spectator = createComponent();
+        TestBed.configureTestingModule({
+            imports: [ScrollViewComponent]
+        });
+        fixture = TestBed.createComponent(ScrollViewComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
     });
 
     it("should create", () => {
-        expect(spectator.component).toBeDefined();
+        expect(component).toBeTruthy();
     });
 });

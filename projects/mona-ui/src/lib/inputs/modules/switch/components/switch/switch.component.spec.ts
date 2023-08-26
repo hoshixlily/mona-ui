@@ -1,20 +1,22 @@
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { createComponentFactory, Spectator } from "@ngneat/spectator";
 
 import { SwitchComponent } from "./switch.component";
 
 describe("SwitchComponent", () => {
-    let spectator: Spectator<SwitchComponent>;
-    const createComponent = createComponentFactory({
-        component: SwitchComponent,
-        imports: [BrowserAnimationsModule]
-    });
+    let component: SwitchComponent;
+    let fixture: ComponentFixture<SwitchComponent>;
 
     beforeEach(() => {
-        spectator = createComponent();
+        TestBed.configureTestingModule({
+            imports: [SwitchComponent, BrowserAnimationsModule]
+        });
+        fixture = TestBed.createComponent(SwitchComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
     });
 
     it("should create", () => {
-        expect(spectator.component).toBeDefined();
+        expect(component).toBeTruthy();
     });
 });

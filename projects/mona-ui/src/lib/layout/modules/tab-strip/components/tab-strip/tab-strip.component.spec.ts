@@ -1,23 +1,22 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { TabStripComponent } from './tab-strip.component';
+import { TabStripComponent } from "./tab-strip.component";
 
-describe('TabStripComponent', () => {
-  let component: TabStripComponent;
-  let fixture: ComponentFixture<TabStripComponent>;
+describe("TabStripComponent", () => {
+    let component: TabStripComponent;
+    let fixture: ComponentFixture<TabStripComponent>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-    imports: [TabStripComponent]
-})
-    .compileComponents();
+    beforeEach(async () => {
+        await TestBed.configureTestingModule({
+            imports: [TabStripComponent]
+        }).compileComponents();
 
-    fixture = TestBed.createComponent(TabStripComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+        fixture = TestBed.createComponent(TabStripComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it("should create", () => {
+        expect(component).toBeTruthy();
+    });
 });

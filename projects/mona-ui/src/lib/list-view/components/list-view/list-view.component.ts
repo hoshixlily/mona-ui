@@ -1,4 +1,5 @@
-import { CdkVirtualScrollViewport, CdkFixedSizeVirtualScroll, CdkVirtualForOf } from "@angular/cdk/scrolling";
+import { CdkFixedSizeVirtualScroll, CdkVirtualForOf, CdkVirtualScrollViewport } from "@angular/cdk/scrolling";
+import { NgFor, NgIf, NgTemplateOutlet } from "@angular/common";
 import {
     AfterViewInit,
     ChangeDetectionStrategy,
@@ -21,6 +22,7 @@ import {
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { Enumerable, List } from "@mirei/ts-collections";
 import { filter, fromEvent, map, tap } from "rxjs";
+import { PagerComponent } from "../../../pager/components/pager/pager.component";
 import { PageChangeEvent } from "../../../pager/models/PageChangeEvent";
 import { PageSizeChangeEvent } from "../../../pager/models/PageSizeChangeEvent";
 import { ListViewFooterTemplateDirective } from "../../directives/list-view-footer-template.directive";
@@ -33,8 +35,6 @@ import { NavigableOptions } from "../../models/NavigableOptions";
 import { PagerSettings } from "../../models/PagerSettings";
 import { PageState } from "../../models/PageState";
 import { ListViewService } from "../../services/list-view.service";
-import { PagerComponent } from "../../../pager/components/pager/pager.component";
-import { NgIf, NgTemplateOutlet, NgFor } from "@angular/common";
 
 @Component({
     selector: "mona-list-view",
@@ -43,7 +43,15 @@ import { NgIf, NgTemplateOutlet, NgFor } from "@angular/common";
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [ListViewService],
     standalone: true,
-    imports: [NgIf, NgTemplateOutlet, CdkVirtualScrollViewport, CdkFixedSizeVirtualScroll, CdkVirtualForOf, NgFor, PagerComponent]
+    imports: [
+        NgIf,
+        NgTemplateOutlet,
+        CdkVirtualScrollViewport,
+        CdkFixedSizeVirtualScroll,
+        CdkVirtualForOf,
+        NgFor,
+        PagerComponent
+    ]
 })
 export class ListViewComponent<T = any> implements OnInit, AfterViewInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);

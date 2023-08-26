@@ -1,18 +1,19 @@
 import { Component, ViewChild } from "@angular/core";
-import { fakeAsync } from "@angular/core/testing";
-import { createComponentFactory, createDirectiveFactory, Spectator, SpectatorDirective } from "@ngneat/spectator";
-import { ButtonGroupModule } from "../../button-group/button-group.module";
+import { ComponentFixture, fakeAsync, TestBed, tick } from "@angular/core/testing";
+import { By } from "@angular/platform-browser";
+import { ButtonGroupComponent } from "../../button-group/components/button-group/button-group.component";
 import { ButtonDirective } from "./button.directive";
 
 @Component({
-    template: `<button
+    template: ` <button
         monaButton
         [selected]="selected"
         [toggleable]="toggleable"
         (selectedChange)="selectedChange($event)">
         TEST BUTTON
     </button>`,
-    styles: []
+    standalone: true,
+    imports: [ButtonDirective]
 })
 class TestButtonDirectiveComponent {
     public selected: boolean = false;
@@ -33,113 +34,132 @@ class TestButtonDirectiveComponent {
             <button monaButton [toggleable]="true">B</button>
             <button monaButton [toggleable]="true">C</button>
         </mona-button-group>
-    `
+    `,
+    standalone: true,
+    imports: [ButtonDirective, ButtonGroupComponent]
 })
 class TestButtonGroupButtonComponent {}
 
 describe("ButtonDirective", () => {
-    let spectator: SpectatorDirective<ButtonDirective>;
-    const createDirective = createDirectiveFactory(ButtonDirective);
-    let testComponentSpectator: Spectator<TestButtonDirectiveComponent>;
-    const createTestComponent = createComponentFactory({
-        component: TestButtonDirectiveComponent
-    });
-    let testButtonGroupSpectator: Spectator<TestButtonGroupButtonComponent>;
-    const createTestButtonGroupComponent = createComponentFactory({
-        component: TestButtonGroupButtonComponent,
-        imports: [ButtonGroupModule]
-    });
+    let buttonHostComponent: TestButtonDirectiveComponent;
+    let buttonGroupHostComponent: TestButtonGroupButtonComponent;
+    let buttonHostFixture: ComponentFixture<TestButtonDirectiveComponent>;
+    let buttonGroupHostFixture: ComponentFixture<TestButtonGroupButtonComponent>;
 
     beforeEach(() => {
-        spectator = createDirective(`<button monaButton>TEST BUTTON</button>`);
-        testComponentSpectator = createTestComponent();
-        testButtonGroupSpectator = createTestButtonGroupComponent();
+        TestBed.configureTestingModule({
+            imports: [TestButtonDirectiveComponent]
+        });
+        buttonHostFixture = TestBed.createComponent(TestButtonDirectiveComponent);
+        buttonGroupHostFixture = TestBed.createComponent(TestButtonGroupButtonComponent);
+        buttonHostComponent = buttonHostFixture.componentInstance;
+        buttonGroupHostComponent = buttonGroupHostFixture.componentInstance;
+        buttonHostFixture.detectChanges();
+        buttonGroupHostFixture.detectChanges();
     });
 
     it("should create", () => {
-        expect(spectator.directive).toBeDefined();
+        expect(buttonHostComponent).toBeTruthy();
     });
 
     it("should have class disabled", () => {
-        spectator.setInput("disabled", true);
-        expect(spectator.element).toHaveClass("mona-disabled");
+        buttonHostComponent.buttonDirective.disabled = true;
+        buttonHostFixture.detectChanges();
+        const button = buttonHostFixture.debugElement.nativeElement.querySelector("button");
+        expect(button).toHaveClass("mona-disabled");
     });
 
     it("should have class primary", () => {
-        spectator.setInput("primary", true);
-        expect(spectator.element).toHaveClass("mona-primary");
+        buttonHostComponent.buttonDirective.primary = true;
+        buttonHostFixture.detectChanges();
+        const button = buttonHostFixture.debugElement.nativeElement.querySelector("button");
+        expect(button).toHaveClass("mona-primary");
     });
 
     it("should contain text TEST BUTTON", () => {
-        expect(spectator.element).toHaveText("TEST BUTTON");
+        const button = buttonHostFixture.debugElement.nativeElement.querySelector("button");
+        expect(button.textContent).toContain("TEST BUTTON");
     });
 
     it("should emit selectedChange", fakeAsync(() => {
-        const spy = spyOn(testComponentSpectator.component, "selectedChange").and.callThrough();
-        expect(testComponentSpectator.component.selected).toBeFalse();
-        expect(testComponentSpectator.component.toggleable).toBeFalse();
-        testComponentSpectator.component.toggleable = true;
-        testComponentSpectator.detectChanges();
-        const button = testComponentSpectator.query("button") as HTMLButtonElement;
+        const spy = spyOn(buttonHostComponent, "selectedChange").and.callThrough();
+        expect(buttonHostComponent.selected).toBeFalse();
+        expect(buttonHostComponent.toggleable).toBeFalse();
+        buttonHostComponent.toggleable = true;
+        tick();
+        buttonHostFixture.detectChanges();
+        tick();
+        const button = buttonHostFixture.debugElement.query(By.css("button")).nativeElement as HTMLButtonElement;
         button.click();
-        testComponentSpectator.tick();
-        testComponentSpectator.detectChanges();
-        testComponentSpectator.tick();
+        tick();
+        buttonHostFixture.detectChanges();
+        tick();
         expect(spy).toHaveBeenCalledWith(true);
-        testComponentSpectator.tick();
-        testComponentSpectator.detectChanges();
-        testComponentSpectator.tick();
-        expect(testComponentSpectator.component.selected).toBeTrue();
+        tick();
+        buttonHostFixture.detectChanges();
+        tick();
+        expect(buttonHostComponent.selected).toBeTrue();
     }));
 
     it("should have tabindex -1", () => {
-        spectator.setInput("disabled", true);
-        expect(spectator.element).toHaveAttribute("tabindex", "-1");
+        buttonHostComponent.buttonDirective.tabindex = -1;
+        buttonHostFixture.detectChanges();
+        const button = buttonHostFixture.debugElement.nativeElement.querySelector("button");
+        const tabindex = button.getAttribute("tabindex");
+        expect(tabindex).toBe("-1");
     });
 
     it("should have tabindex 0", () => {
-        spectator.setInput("tabindex", 0);
-        expect(spectator.element).toHaveAttribute("tabindex", "0");
+        buttonHostComponent.buttonDirective.tabindex = 0;
+        buttonHostFixture.detectChanges();
+        const button = buttonHostFixture.debugElement.nativeElement.querySelector("button");
+        const tabindex = button.getAttribute("tabindex");
+        expect(tabindex).toBe("0");
     });
 
     it("should have tabindex 1", () => {
-        spectator.setInput("tabindex", 1);
-        expect(spectator.element).toHaveAttribute("tabindex", "1");
+        buttonHostComponent.buttonDirective.tabindex = 1;
+        buttonHostFixture.detectChanges();
+        const button = buttonHostFixture.debugElement.nativeElement.querySelector("button");
+        const tabindex = button.getAttribute("tabindex");
+        expect(tabindex).toBe("1");
     });
 
     it("should update selected attribute of buttons of a button group", fakeAsync(() => {
-        testButtonGroupSpectator.tick();
-        testButtonGroupSpectator.detectChanges();
-        const buttons = testButtonGroupSpectator.queryAll("button") as HTMLButtonElement[];
+        tick();
+        buttonGroupHostFixture.detectChanges();
+        const buttons = buttonGroupHostFixture.debugElement
+            .queryAll(By.css("button"))
+            .map(button => button.nativeElement) as HTMLButtonElement[];
         buttons[0].click();
-        testComponentSpectator.tick();
-        testButtonGroupSpectator.detectChanges();
-        testButtonGroupSpectator.tick();
+        tick();
+        buttonGroupHostFixture.detectChanges();
+        tick();
         expect(buttons[0]).toHaveClass("mona-selected");
         expect(buttons[1]).not.toHaveClass("mona-selected");
         expect(buttons[2]).not.toHaveClass("mona-selected");
 
         buttons[1].click();
-        testComponentSpectator.tick();
-        testButtonGroupSpectator.detectChanges();
-        testButtonGroupSpectator.tick();
+        tick();
+        buttonGroupHostFixture.detectChanges();
+        tick();
         expect(buttons[0]).not.toHaveClass("mona-selected");
         expect(buttons[1]).toHaveClass("mona-selected");
         expect(buttons[2]).not.toHaveClass("mona-selected");
 
         buttons[2].click();
-        testComponentSpectator.tick();
-        testButtonGroupSpectator.detectChanges();
-        testButtonGroupSpectator.tick();
+        tick();
+        buttonGroupHostFixture.detectChanges();
+        tick();
         expect(buttons[0]).not.toHaveClass("mona-selected");
         expect(buttons[1]).not.toHaveClass("mona-selected");
         expect(buttons[2]).toHaveClass("mona-selected");
     }));
 
     it("should change selected status of a toggleable button when clicked", () => {
-        testComponentSpectator.component.toggleable = true;
-        testComponentSpectator.detectChanges();
-        const button = testComponentSpectator.query("button") as HTMLButtonElement;
+        buttonHostComponent.toggleable = true;
+        buttonHostFixture.detectChanges();
+        const button = buttonHostFixture.debugElement.query(By.css("button")).nativeElement as HTMLButtonElement;
         button.click();
         expect(button).toHaveClass("mona-selected");
         button.click();

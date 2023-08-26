@@ -1,5 +1,5 @@
 import { Component, TemplateRef, ViewChild } from "@angular/core";
-import { createComponentFactory, Spectator } from "@ngneat/spectator";
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { PopupSettingsInjectionToken } from "../../models/PopupInjectionToken";
 import { PopupSettings } from "../../models/PopupSettings";
 
@@ -26,26 +26,20 @@ const POPUP_TOKEN = [
 ];
 
 describe("PopupWrapperComponent", () => {
-    let spectator: Spectator<PopupWrapperComponent>;
-    const createComponent = createComponentFactory({
-        component: PopupWrapperComponent,
-        providers: [POPUP_TOKEN]
-    });
-    let testComponentSpectator: Spectator<PopupWrapperComponentTestComponent>;
-    const createTestComponent = createComponentFactory({
-        component: PopupWrapperComponentTestComponent
-    });
+    let component: PopupWrapperComponent;
+    let fixture: ComponentFixture<PopupWrapperComponent>;
 
     beforeEach(() => {
-        testComponentSpectator = createTestComponent();
-        spectator = createComponent({
-            props: {
-                templateRef: testComponentSpectator.component.contentTemplate
-            }
+        TestBed.configureTestingModule({
+            imports: [PopupWrapperComponent],
+            providers: [POPUP_TOKEN]
         });
+        fixture = TestBed.createComponent(PopupWrapperComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
     });
 
     it("should create", () => {
-        expect(spectator.component).toBeTruthy();
+        expect(component).toBeTruthy();
     });
 });

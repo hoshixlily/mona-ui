@@ -1,18 +1,16 @@
-import { createServiceFactory, SpectatorService } from "@ngneat/spectator";
+import { TestBed } from "@angular/core/testing";
 
 import { TooltipService } from "./tooltip.service";
 
 describe("TooltipService", () => {
-    let spectator: SpectatorService<TooltipService>;
-    const createService = createServiceFactory({
-        service: TooltipService
-    });
+    let service: TooltipService;
 
     beforeEach(() => {
-        spectator = createService();
+        TestBed.configureTestingModule({});
+        service = TestBed.inject(TooltipService);
     });
 
     it("should be created", () => {
-        expect(spectator.service).toBeTruthy();
+        expect(service).toBeTruthy();
     });
 });
