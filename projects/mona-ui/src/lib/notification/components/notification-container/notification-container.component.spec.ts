@@ -1,21 +1,21 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { NotificationContainerComponent } from './notification-container.component';
+import { NotificationContainerComponent } from "./notification-container.component";
 
-describe('NotificationContainerComponent', () => {
-  let component: NotificationContainerComponent;
-  let fixture: ComponentFixture<NotificationContainerComponent>;
+describe("NotificationContainerComponent", () => {
+    let component: NotificationContainerComponent;
+    let fixture: ComponentFixture<NotificationContainerComponent>;
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({
-      declarations: [NotificationContainerComponent]
+    beforeEach(() => {
+        TestBed.configureTestingModule({
+            imports: [NotificationContainerComponent]
+        });
+        fixture = TestBed.createComponent(NotificationContainerComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
     });
-    fixture = TestBed.createComponent(NotificationContainerComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+    it("should create", () => {
+        expect(component).toBeTruthy();
+    });
 });

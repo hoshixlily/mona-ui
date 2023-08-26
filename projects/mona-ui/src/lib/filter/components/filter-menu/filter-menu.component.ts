@@ -1,7 +1,15 @@
+import { NgFor, NgIf } from "@angular/common";
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { FormsModule } from "@angular/forms";
+import { ButtonGroupComponent } from "../../../buttons/button-group/button-group.component";
+import { ButtonDirective } from "../../../buttons/button/button.directive";
+import { DatePickerComponent } from "../../../date-inputs/date-picker/date-picker.component";
+import { DateTimePickerComponent } from "../../../date-inputs/date-time-picker/date-time-picker.component";
+import { TimePickerComponent } from "../../../date-inputs/time-picker/time-picker.component";
+import { DropDownListComponent } from "../../../dropdowns/drop-down-list/drop-down-list.component";
+import { NumericTextBoxComponent } from "../../../inputs/numeric-text-box/numeric-text-box.component";
+import { TextBoxComponent } from "../../../inputs/text-box/text-box.component";
 import { DataType } from "../../../models/DataType";
-import { FilterMenuDataItem } from "../../models/FilterMenuDataItem";
-import { FilterMenuConnectorItem } from "../../models/FilterMenuConnectorItem";
 import {
     BooleanFilterDescriptor,
     BooleanFilterOperators,
@@ -14,13 +22,33 @@ import {
     StringFilterDescriptor,
     StringFilterOperators
 } from "../../../query/filter/FilterDescriptor";
+import { FilterMenuConnectorItem } from "../../models/FilterMenuConnectorItem";
+import { FilterMenuDataItem } from "../../models/FilterMenuDataItem";
 import { FilterMenuValue } from "../../models/FilterMenuValue";
+import { OperatorFilterPipe } from "../../pipes/operator-filter.pipe";
+import { ValuelessOperatorPipe } from "../../pipes/valueless-operator.pipe";
 
 @Component({
     selector: "mona-filter-menu",
     templateUrl: "./filter-menu.component.html",
     styleUrls: ["./filter-menu.component.scss"],
-    changeDetection: ChangeDetectionStrategy.Default
+    changeDetection: ChangeDetectionStrategy.Default,
+    standalone: true,
+    imports: [
+        NgIf,
+        DropDownListComponent,
+        FormsModule,
+        TextBoxComponent,
+        NumericTextBoxComponent,
+        DatePickerComponent,
+        DateTimePickerComponent,
+        TimePickerComponent,
+        ButtonGroupComponent,
+        NgFor,
+        ButtonDirective,
+        ValuelessOperatorPipe,
+        OperatorFilterPipe
+    ]
 })
 export class FilterMenuComponent implements OnInit {
     private booleanFilterValues: [boolean | null, boolean | null] = [null, null];

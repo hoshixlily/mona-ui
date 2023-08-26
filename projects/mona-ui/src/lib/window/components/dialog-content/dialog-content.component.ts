@@ -6,10 +6,27 @@ import { Subject, take } from "rxjs";
 import { DialogResult } from "../../models/DialogResult";
 import { DialogRef } from "../../models/DialogRef";
 import { DialogHandler } from "../../models/DialogHandler";
+import { ButtonDirective } from "../../../buttons/button/button.directive";
+import { NumericTextBoxComponent } from "../../../inputs/numeric-text-box/numeric-text-box.component";
+import { FormsModule } from "@angular/forms";
+import { TextBoxComponent } from "../../../inputs/text-box/text-box.component";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { NgIf, NgFor, NgClass } from "@angular/common";
 
 @Component({
     templateUrl: "./dialog-content.component.html",
-    styleUrls: ["./dialog-content.component.scss"]
+    styleUrls: ["./dialog-content.component.scss"],
+    standalone: true,
+    imports: [
+        NgIf,
+        FontAwesomeModule,
+        TextBoxComponent,
+        FormsModule,
+        NumericTextBoxComponent,
+        NgFor,
+        ButtonDirective,
+        NgClass
+    ]
 })
 export class DialogContentComponent implements AfterContentInit {
     readonly #dialogResult$: Subject<DialogResult> = new Subject<DialogResult>();

@@ -11,12 +11,17 @@ import { NotificationType } from "../../models/NotificationType";
 import { NotificationData } from "../../models/NotificationData";
 import { NotificationFade, NotificationSlide } from "../../animations/animation";
 import { asyncScheduler, interval, takeWhile } from "rxjs";
+import { ProgressBarComponent } from "../../../progress-bars/progress-bar/progress-bar.component";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { NgIf, NgTemplateOutlet, NgStyle } from "@angular/common";
 
 @Component({
     selector: "mona-notification",
     templateUrl: "./notification.component.html",
     styleUrls: ["./notification.component.scss"],
-    animations: [NotificationSlide, NotificationFade]
+    animations: [NotificationSlide, NotificationFade],
+    standalone: true,
+    imports: [NgIf, FontAwesomeModule, NgTemplateOutlet, NgStyle, ProgressBarComponent]
 })
 export class NotificationComponent implements OnInit, OnDestroy {
     public readonly closeIcon: IconDefinition = faTimes;

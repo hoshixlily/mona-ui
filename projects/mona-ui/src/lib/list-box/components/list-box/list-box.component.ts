@@ -26,6 +26,13 @@ import { ListBoxActionClickEvent } from "../../models/ListBoxActionClickEvent";
 import { ListBoxItemTemplateContext } from "../../models/ListBoxItemTemplateContext";
 import { ListBoxSelectionEvent } from "../../models/ListBoxSelectionEvent";
 import { ToolbarAction, ToolbarOptions } from "../../models/ToolbarOptions";
+import { ContainPipe } from "../../../pipes/contain.pipe";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { ButtonDirective } from "../../../buttons/button/button.directive";
+import { NgIf, NgTemplateOutlet } from "@angular/common";
+import { ListViewItemTemplateDirective } from "../../../list-view/directives/list-view-item-template.directive";
+import { ListViewSelectableDirective } from "../../../list-view/directives/list-view-selectable.directive";
+import { ListViewComponent } from "../../../list-view/components/list-view/list-view.component";
 
 type ListBoxDirection = "horizontal" | "horizontal-reverse" | "vertical" | "vertical-reverse";
 
@@ -33,7 +40,18 @@ type ListBoxDirection = "horizontal" | "horizontal-reverse" | "vertical" | "vert
     selector: "mona-list-box",
     templateUrl: "./list-box.component.html",
     styleUrls: ["./list-box.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        ListViewComponent,
+        ListViewSelectableDirective,
+        ListViewItemTemplateDirective,
+        NgIf,
+        NgTemplateOutlet,
+        ButtonDirective,
+        FontAwesomeModule,
+        ContainPipe
+    ]
 })
 export class ListBoxComponent<T = any> {
     public readonly moveDownIcon: IconDefinition = faAngleDown;

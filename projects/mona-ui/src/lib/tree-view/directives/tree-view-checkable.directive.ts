@@ -1,9 +1,10 @@
 import { Directive, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from "@angular/core";
-import { CheckableOptions } from "../data/CheckableOptions";
+import { CheckableOptions } from "../models/CheckableOptions";
 import { TreeViewService } from "../services/tree-view.service";
 
 @Directive({
-    selector: "mona-tree-view[monaTreeViewCheckable]"
+    selector: "mona-tree-view[monaTreeViewCheckable]",
+    standalone: true
 })
 export class TreeViewCheckableDirective implements OnInit, OnChanges {
     @Input()

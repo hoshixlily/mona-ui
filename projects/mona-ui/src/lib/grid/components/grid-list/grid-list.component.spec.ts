@@ -1,18 +1,23 @@
-import { createComponentFactory, Spectator } from "@ngneat/spectator";
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { GridService } from "../../services/grid.service";
 
 import { GridListComponent } from "./grid-list.component";
 
 describe("GridListComponent", () => {
-    let spectator: Spectator<GridListComponent>;
-    const createComponent = createComponentFactory({
-        component: GridListComponent,
-        providers: [GridService]
+    let component: GridListComponent;
+    let fixture: ComponentFixture<GridListComponent>;
+
+    beforeEach(() => {
+        TestBed.configureTestingModule({
+            imports: [GridListComponent],
+            providers: [GridService]
+        });
+        fixture = TestBed.createComponent(GridListComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
     });
 
-    beforeEach(() => (spectator = createComponent()));
-
     it("should create", () => {
-        expect(spectator.component).toBeTruthy();
+        expect(component).toBeTruthy();
     });
 });

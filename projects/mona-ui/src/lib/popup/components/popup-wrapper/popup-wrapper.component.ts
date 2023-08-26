@@ -1,12 +1,15 @@
 import { ChangeDetectionStrategy, Component, Inject, OnInit, signal, TemplateRef, WritableSignal } from "@angular/core";
 import { PopupSettingsInjectionToken } from "../../models/PopupInjectionToken";
 import { PopupSettings } from "../../models/PopupSettings";
+import { NgClass, NgTemplateOutlet } from "@angular/common";
 
 @Component({
     selector: "mona-popup-wrapper",
     templateUrl: "./popup-wrapper.component.html",
     styleUrls: ["./popup-wrapper.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [NgClass, NgTemplateOutlet]
 })
 export class PopupWrapperComponent implements OnInit {
     public templateRef: TemplateRef<any> | null = null;

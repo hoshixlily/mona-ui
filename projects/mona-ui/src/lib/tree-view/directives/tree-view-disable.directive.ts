@@ -2,7 +2,8 @@ import { Directive, Input, OnChanges, SimpleChanges } from "@angular/core";
 import { TreeViewService } from "../services/tree-view.service";
 
 @Directive({
-    selector: "mona-tree-view[monaTreeViewDisable]"
+    selector: "mona-tree-view[monaTreeViewDisable]",
+    standalone: true
 })
 export class TreeViewDisableDirective implements OnChanges {
     @Input()

@@ -1,6 +1,6 @@
 import { forwardRef, Injectable } from "@angular/core";
 import { asapScheduler } from "rxjs";
-import { AnimationService } from "../../animations/animation.service";
+import { AnimationService } from "../../animations/services/animation.service";
 import { PopupCloseEvent } from "../../popup/models/PopupCloseEvent";
 import { PopupService } from "../../popup/services/popup.service";
 import { WindowContentComponent } from "../components/window-content/window-content.component";

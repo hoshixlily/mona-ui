@@ -7,7 +7,8 @@ import { GridColumnTitleTemplateDirective } from "../../directives/grid-column-t
 @Component({
     selector: "mona-grid-column",
     template: "",
-    styleUrls: []
+    styleUrls: [],
+    standalone: true
 })
 export class GridColumnComponent implements OnInit {
     public column: Column = new Column();

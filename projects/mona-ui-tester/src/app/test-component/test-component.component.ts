@@ -4,7 +4,8 @@ import { PopupRef } from "mona-ui";
 @Component({
     selector: "app-test-component",
     templateUrl: "./test-component.component.html",
-    styleUrls: ["./test-component.component.scss"]
+    styleUrls: ["./test-component.component.scss"],
+    standalone: true
 })
 export class TestComponentComponent implements OnInit {
     public constructor(private readonly popupRef: PopupRef) {}

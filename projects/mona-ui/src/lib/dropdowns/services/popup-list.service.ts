@@ -1,8 +1,8 @@
 import { Injectable } from "@angular/core";
 import { Enumerable, Group, List } from "@mirei/ts-collections";
-import { PopupListItem } from "../data/PopupListItem";
+import { PopupListItem } from "../models/PopupListItem";
 import { SelectionMode } from "../../models/SelectionMode";
-import { ItemDisabler, ItemDisablerAction } from "../data/ItemDisabler";
+import { ItemDisabler, ItemDisablerAction } from "../models/ItemDisabler";
 import { Subject } from "rxjs";
 
 @Injectable()

@@ -1,6 +1,6 @@
 import { Injectable } from "@angular/core";
 import { ColorScheme } from "../models/ColorScheme";
-import { PaletteType } from "../modules/color-palette/models/PaletteType";
+import { PaletteType } from "../models/PaletteType";
 
 @Injectable()
 export class ColorService {

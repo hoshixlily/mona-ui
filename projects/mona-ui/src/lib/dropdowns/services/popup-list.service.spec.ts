@@ -1,17 +1,18 @@
 import { TestBed } from "@angular/core/testing";
-import { createServiceFactory, SpectatorService } from "@ngneat/spectator";
 
 import { PopupListService } from "./popup-list.service";
 
 describe("PopupListService", () => {
-    let spectator: SpectatorService<PopupListService>;
-    const createService = createServiceFactory(PopupListService);
+    let service: PopupListService;
 
     beforeEach(() => {
-        spectator = createService();
+        TestBed.configureTestingModule({
+            providers: [PopupListService]
+        });
+        service = TestBed.inject(PopupListService);
     });
 
-    it("should create", () => {
-        expect(spectator.service).toBeDefined();
+    it("should be created", () => {
+        expect(service).toBeTruthy();
     });
 });

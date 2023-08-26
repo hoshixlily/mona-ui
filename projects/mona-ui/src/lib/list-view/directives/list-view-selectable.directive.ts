@@ -3,7 +3,8 @@ import { SelectableOptions } from "../models/SelectableOptions";
 import { ListViewService } from "../services/list-view.service";
 
 @Directive({
-    selector: "mona-list-view[monaListViewSelectable]"
+    selector: "mona-list-view[monaListViewSelectable]",
+    standalone: true
 })
 export class ListViewSelectableDirective implements OnInit, OnChanges {
     @Input()

@@ -16,12 +16,15 @@ import { StepperLabelTemplateDirective } from "../../directives/stepper-label-te
 import { StepperIndicatorTemplateDirective } from "../../directives/stepper-indicator-template.directive";
 import { StepperStepTemplateDirective } from "../../directives/stepper-step-template.directive";
 import { fromEvent, Subject, takeUntil } from "rxjs";
+import { NgStyle, NgClass, NgFor, NgIf, NgTemplateOutlet } from "@angular/common";
 
 @Component({
     selector: "mona-stepper",
     templateUrl: "./stepper.component.html",
     styleUrls: ["./stepper.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [NgStyle, NgClass, NgFor, NgIf, NgTemplateOutlet]
 })
 export class StepperComponent implements OnInit, OnDestroy {
     private readonly componentDestroy$: Subject<void> = new Subject<void>();

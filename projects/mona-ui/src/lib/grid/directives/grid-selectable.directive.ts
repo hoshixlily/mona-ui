@@ -4,7 +4,8 @@ import { SelectableOptions } from "../models/SelectableOptions";
 import { GridService } from "../services/grid.service";
 
 @Directive({
-    selector: "mona-grid[monaGridSelectable]"
+    selector: "mona-grid[monaGridSelectable]",
+    standalone: true
 })
 export class GridSelectableDirective implements OnInit, OnChanges, OnDestroy {
     readonly #destroy$: Subject<void> = new Subject<void>();

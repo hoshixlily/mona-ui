@@ -261,19 +261,19 @@
                                                      [itemDisabler]="dropdownItemDisabler"
                                                      (ngModelChange)="onDropDownValueChange($event)"
                                                      style="width: 200px; ">
-                                    <ng-template monaDropDownListItemTemplate let-dataItem let-listItem="listItem">
-                                        <span style="color: deeppink;"
-                                              *ngIf="dataItem.value % 3 === 0 && !listItem.disabled">{{dataItem.text}}</span>
-                                        <span style="color: dodgerblue;"
-                                              *ngIf="dataItem.value % 3 !== 0 && !listItem.disabled">{{dataItem.text}}</span>
-                                        <span *ngIf="listItem.disabled">{{dataItem.text}}</span>
-                                    </ng-template>
-                                    <ng-template monaDropDownListValueTemplate let-dataItem>
-                                        <span style="color: darkorange; font-weight: 600;">{{dataItem?.text}}</span>
-                                    </ng-template>
-                                    <ng-template monaDropDownListGroupTemplate let-group>
-                                        <span style="color: crimson; font-weight: bold;">{{group}}</span>
-                                    </ng-template>
+<!--                                    <ng-template monaDropDownListItemTemplate let-dataItem let-listItem="listItem">-->
+<!--                                        <span style="color: deeppink;"-->
+<!--                                              *ngIf="dataItem.value % 3 === 0 && !listItem.disabled">{{dataItem.text}}</span>-->
+<!--                                        <span style="color: dodgerblue;"-->
+<!--                                              *ngIf="dataItem.value % 3 !== 0 && !listItem.disabled">{{dataItem.text}}</span>-->
+<!--                                        <span *ngIf="listItem.disabled">{{dataItem.text}}</span>-->
+<!--                                    </ng-template>-->
+<!--                                    <ng-template monaDropDownListValueTemplate let-dataItem>-->
+<!--                                        <span style="color: darkorange; font-weight: 600;">{{dataItem?.text}}</span>-->
+<!--                                    </ng-template>-->
+<!--                                    <ng-template monaDropDownListGroupTemplate let-group>-->
+<!--                                        <span style="color: crimson; font-weight: bold;">{{group}}</span>-->
+<!--                                    </ng-template>-->
                                 </mona-drop-down-list>
                                 <mona-multi-select [data]="dropdownListDataItems" textField="text" valueField="value"
                                                    groupField="group"

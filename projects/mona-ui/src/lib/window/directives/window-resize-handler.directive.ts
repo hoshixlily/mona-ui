@@ -4,7 +4,8 @@ import { fromEvent, Subject, takeUntil } from "rxjs";
 import { WindowReference } from "../models/WindowReference";
 
 @Directive({
-    selector: "div[monaWindowResizeHandler]"
+    selector: "div[monaWindowResizeHandler]",
+    standalone: true
 })
 export class WindowResizeHandlerDirective implements AfterViewInit, OnDestroy {
     private readonly destroy$: Subject<void> = new Subject<void>();

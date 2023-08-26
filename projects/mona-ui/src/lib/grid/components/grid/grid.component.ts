@@ -22,19 +22,46 @@ import { ColumnFilterState } from "../../models/ColumnFilterState";
 import { PageSizeChangeEvent } from "../../../pager/models/PageSizeChangeEvent";
 import { PageChangeEvent } from "../../../pager/models/PageChangeEvent";
 import { GridColumnComponent } from "../grid-column/grid-column.component";
-import { CdkDragDrop, CdkDragEnter, CdkDragStart, CdkDropList } from "@angular/cdk/drag-drop";
+import { CdkDragDrop, CdkDragEnter, CdkDragStart, CdkDropList, CdkDrag, CdkDragPreview } from "@angular/cdk/drag-drop";
 import { CompositeFilterDescriptor } from "../../../query/filter/FilterDescriptor";
 import { Subject, takeUntil } from "rxjs";
 import { SortableOptions } from "../../models/SortableOptions";
 import { Enumerable } from "@mirei/ts-collections";
 import { CellEditEvent } from "../../models/CellEditEvent";
+import { GridPagePipe } from "../../pipes/grid-page.pipe";
+import { GridFilterPipe } from "../../pipes/grid-filter.pipe";
+import { PagerComponent } from "../../../pager/components/pager/pager.component";
+import { GridListComponent } from "../grid-list/grid-list.component";
+import { GridColumnResizeHandlerDirective } from "../../directives/grid-column-resize-handler.directive";
+import { GridFilterMenuComponent } from "../grid-filter-menu/grid-filter-menu.component";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { ChipComponent } from "../../../buttons/chip/chip.component";
+import { NgIf, NgFor, NgStyle, NgTemplateOutlet } from "@angular/common";
 
 @Component({
     selector: "mona-grid",
     templateUrl: "./grid.component.html",
     styleUrls: ["./grid.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    providers: [GridService]
+    providers: [GridService],
+    standalone: true,
+    imports: [
+        NgIf,
+        CdkDropList,
+        NgFor,
+        ChipComponent,
+        NgStyle,
+        CdkDrag,
+        NgTemplateOutlet,
+        FontAwesomeModule,
+        GridFilterMenuComponent,
+        GridColumnResizeHandlerDirective,
+        CdkDragPreview,
+        GridListComponent,
+        PagerComponent,
+        GridFilterPipe,
+        GridPagePipe
+    ]
 })
 export class GridComponent implements OnInit, AfterViewInit, OnDestroy, AfterContentInit {
     #destroy$: Subject<void> = new Subject<void>();

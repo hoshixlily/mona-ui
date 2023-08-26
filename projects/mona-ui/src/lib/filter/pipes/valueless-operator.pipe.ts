@@ -2,7 +2,8 @@ import { Pipe, PipeTransform } from "@angular/core";
 import { FilterOperators } from "../../query/filter/FilterDescriptor";
 
 @Pipe({
-    name: "valuelessOperator"
+    name: "valuelessOperator",
+    standalone: true
 })
 export class ValuelessOperatorPipe implements PipeTransform {
     public transform(value: FilterOperators | undefined): boolean {

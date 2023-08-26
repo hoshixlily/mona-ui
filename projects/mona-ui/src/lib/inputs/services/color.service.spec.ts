@@ -1,16 +1,18 @@
-import { createServiceFactory, SpectatorService } from "@ngneat/spectator";
+import { TestBed } from "@angular/core/testing";
 
 import { ColorService } from "./color.service";
 
 describe("ColorService", () => {
-    let spectator: SpectatorService<ColorService>;
-    const createService = createServiceFactory({
-        service: ColorService
+    let service: ColorService;
+
+    beforeEach(() => {
+        TestBed.configureTestingModule({
+            providers: [ColorService]
+        });
+        service = TestBed.inject(ColorService);
     });
 
-    beforeEach(() => (spectator = createService()));
-
     it("should be created", () => {
-        expect(spectator.service).toBeTruthy();
+        expect(service).toBeTruthy();
     });
 });

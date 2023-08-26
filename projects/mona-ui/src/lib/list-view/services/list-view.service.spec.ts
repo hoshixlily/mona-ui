@@ -1,16 +1,18 @@
-import { createServiceFactory, SpectatorService } from "@ngneat/spectator";
+import { TestBed } from "@angular/core/testing";
 
 import { ListViewService } from "./list-view.service";
 
 describe("ListViewService", () => {
-    let spectator: SpectatorService<ListViewService>;
-    const createService = createServiceFactory({
-        service: ListViewService
+    let service: ListViewService;
+
+    beforeEach(() => {
+        TestBed.configureTestingModule({
+            providers: [ListViewService]
+        });
+        service = TestBed.inject(ListViewService);
     });
 
-    beforeEach(() => (spectator = createService()));
-
     it("should be created", () => {
-        expect(spectator.service).toBeTruthy();
+        expect(service).toBeTruthy();
     });
 });

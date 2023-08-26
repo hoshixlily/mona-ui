@@ -1,17 +1,23 @@
 import { Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, TemplateRef } from "@angular/core";
-import { Node } from "../../data/Node";
+import { Node } from "../../models/Node";
 import { faCaretRight, faChevronDown, faChevronRight, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { TreeViewService } from "../../services/tree-view.service";
-import { DropPosition } from "../../data/DropPosition";
-import { DropPositionChangeEvent } from "../../data/DropPositionChangeEvent";
-import { NodeClickEvent } from "../../data/NodeClickEvent";
+import { DropPosition } from "../../models/DropPosition";
+import { DropPositionChangeEvent } from "../../models/DropPositionChangeEvent";
+import { NodeClickEvent } from "../../models/NodeClickEvent";
 import { of, Subject, switchMap, takeUntil } from "rxjs";
 import { Highlightable } from "@angular/cdk/a11y";
+import { FormsModule } from "@angular/forms";
+import { CheckBoxDirective } from "../../../inputs/check-box/check-box.directive";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { NgIf, NgClass, NgTemplateOutlet } from "@angular/common";
 
 @Component({
     selector: "mona-tree-view-node",
     templateUrl: "./tree-view-node.component.html",
-    styleUrls: ["./tree-view-node.component.scss"]
+    styleUrls: ["./tree-view-node.component.scss"],
+    standalone: true,
+    imports: [NgIf, FontAwesomeModule, NgClass, CheckBoxDirective, FormsModule, NgTemplateOutlet]
 })
 export class TreeViewNodeComponent implements OnInit, OnDestroy, Highlightable {
     private readonly componentDestroy$: Subject<void> = new Subject<void>();

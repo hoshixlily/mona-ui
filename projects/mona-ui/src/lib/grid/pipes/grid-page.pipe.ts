@@ -2,7 +2,8 @@ import { Pipe, PipeTransform } from "@angular/core";
 import { Enumerable } from "@mirei/ts-collections";
 
 @Pipe({
-    name: "gridPage"
+    name: "gridPage",
+    standalone: true
 })
 export class GridPagePipe implements PipeTransform {
     public transform<T>(value: T[], skip: number, take: number): T[] {

@@ -13,7 +13,8 @@ import { Column } from "../models/Column";
 import { fromEvent, Subject, takeUntil } from "rxjs";
 
 @Directive({
-    selector: "[monaGridColumnResizeHandler]"
+    selector: "[monaGridColumnResizeHandler]",
+    standalone: true
 })
 export class GridColumnResizeHandlerDirective implements AfterViewInit, OnDestroy {
     readonly #destroy$: Subject<void> = new Subject<void>();

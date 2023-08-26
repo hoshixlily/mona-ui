@@ -20,12 +20,17 @@ import { ColumnFilterState } from "../../models/ColumnFilterState";
 import { Column } from "../../models/Column";
 import { Subject, take, takeUntil } from "rxjs";
 import { animate, AnimationBuilder, style } from "@angular/animations";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { NgClass } from "@angular/common";
+import { ButtonDirective } from "../../../buttons/button/button.directive";
 
 @Component({
     selector: "mona-grid-filter-menu",
     templateUrl: "./grid-filter-menu.component.html",
     styleUrls: ["./grid-filter-menu.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [ButtonDirective, NgClass, FontAwesomeModule]
 })
 export class GridFilterMenuComponent implements OnInit, OnDestroy {
     readonly #destroy: Subject<void> = new Subject<void>();

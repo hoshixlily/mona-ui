@@ -9,17 +9,35 @@ import {
 } from "@angular/core";
 import { Column } from "../../models/Column";
 import { Row } from "../../models/Row";
-import { FormControl, FormGroup } from "@angular/forms";
-import { FocusMonitor, FocusOrigin } from "@angular/cdk/a11y";
+import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { FocusMonitor, FocusOrigin, A11yModule } from "@angular/cdk/a11y";
 import { GridService } from "../../services/grid.service";
 import { asyncScheduler, filter, fromEvent, map, Subject, take, takeUntil, tap, timer } from "rxjs";
 import { CellEditEvent } from "../../models/CellEditEvent";
+import { CheckBoxDirective } from "../../../inputs/check-box/check-box.directive";
+import { DatePickerComponent } from "../../../date-inputs/date-picker/date-picker.component";
+import { NumericTextBoxComponent } from "../../../inputs/numeric-text-box/numeric-text-box.component";
+import { TextBoxComponent } from "../../../inputs/text-box/text-box.component";
+import { NgClass, NgIf, NgTemplateOutlet } from "@angular/common";
 
 @Component({
     selector: "mona-grid-cell",
     templateUrl: "./grid-cell.component.html",
     styleUrls: ["./grid-cell.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    standalone: true,
+    imports: [
+        A11yModule,
+        NgClass,
+        NgIf,
+        NgTemplateOutlet,
+        FormsModule,
+        ReactiveFormsModule,
+        TextBoxComponent,
+        NumericTextBoxComponent,
+        DatePickerComponent,
+        CheckBoxDirective
+    ]
 })
 export class GridCellComponent implements OnInit, OnDestroy {
     readonly #destroy: Subject<void> = new Subject<void>();
