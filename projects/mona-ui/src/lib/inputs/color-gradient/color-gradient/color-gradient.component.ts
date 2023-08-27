@@ -9,6 +9,7 @@ import {
     forwardRef,
     inject,
     Input,
+    NgZone,
     OnInit,
     Signal,
     signal,
@@ -100,7 +101,7 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
     @Input()
     public opacity: boolean = true;
 
-    public constructor(private readonly cdr: ChangeDetectorRef) {}
+    public constructor(private readonly cdr: ChangeDetectorRef, private readonly zone: NgZone) {}
 
     public ngAfterViewInit() {
         this.setSubscriptions();
@@ -407,6 +408,20 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
     }
 
     private setHsvRectPointerEvents(): void {
+        this.zone.runOutsideAngular(() => {
+            fromEvent<MouseEvent>(document, "mousemove")
+                .pipe(takeUntilDestroyed(this.#destroyRef))
+                .subscribe((event: MouseEvent) => {
+                    if (this.#pointerMouseDown) {
+                        this.zone.run(() => {
+                            this.#pointerMouseMove = true;
+                            this.updateHsvRectPointerPosition(event);
+                            this.updateHsvValues();
+                            this.updateHexInputValue();
+                        });
+                    }
+                });
+        });
         fromEvent<MouseEvent>(this.hsvPointer.nativeElement, "mousedown")
             .pipe(
                 takeUntilDestroyed(this.#destroyRef),
@@ -422,16 +437,6 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
                 )
             )
             .subscribe();
-        fromEvent<MouseEvent>(document, "mousemove")
-            .pipe(takeUntilDestroyed(this.#destroyRef))
-            .subscribe((event: MouseEvent) => {
-                if (this.#pointerMouseDown) {
-                    this.#pointerMouseMove = true;
-                    this.updateHsvRectPointerPosition(event);
-                    this.updateHsvValues();
-                    this.updateHexInputValue();
-                }
-            });
         fromEvent<MouseEvent>(this.hsvRectangle.nativeElement, "click")
             .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe((event: MouseEvent) => {

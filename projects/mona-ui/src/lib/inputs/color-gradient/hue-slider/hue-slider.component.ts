@@ -1,4 +1,12 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, forwardRef, ViewChild } from "@angular/core";
+import {
+    AfterViewInit,
+    ChangeDetectionStrategy,
+    Component,
+    ElementRef,
+    forwardRef,
+    NgZone,
+    ViewChild
+} from "@angular/core";
 import { delay, fromEvent } from "rxjs";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 
@@ -24,7 +32,7 @@ export class HueSliderComponent implements AfterViewInit, ControlValueAccessor {
     @ViewChild("sliderHandle")
     public sliderHandle!: ElementRef<HTMLDivElement>;
 
-    public constructor(private readonly elementRef: ElementRef<HTMLDivElement>) {}
+    public constructor(private readonly elementRef: ElementRef<HTMLDivElement>, private readonly zone: NgZone) {}
 
     public ngAfterViewInit(): void {
         this.setSubscriptions();
@@ -69,39 +77,44 @@ export class HueSliderComponent implements AfterViewInit, ControlValueAccessor {
     }
 
     private setSubscriptions(): void {
-        fromEvent<MouseEvent>(this.sliderHandle.nativeElement, "mousedown").subscribe(() => {
-            this.#mouseDown = true;
-            fromEvent<MouseEvent>(document, "mouseup")
-                .pipe(delay(10))
-                .subscribe(() => {
-                    this.#mouseDown = false;
-                    this.#mouseMove = false;
-                });
-        });
-
-        fromEvent<MouseEvent>(document, "mousemove").subscribe((event: MouseEvent) => {
-            if (this.#mouseDown) {
-                this.#mouseMove = true;
-                const containerRect = this.elementRef.nativeElement.getBoundingClientRect();
-                const handleElement = this.sliderHandle.nativeElement;
-                const handleRect = handleElement.getBoundingClientRect();
-                const handlePos = event.clientX - containerRect.left + handleRect.width / 2;
-                if (handlePos >= handleRect.width / 2 && handlePos <= containerRect.width + handleRect.width / 2) {
-                    this.setHandlePosition(handlePos);
-                    const hue = this.getHueFromPosition(handlePos);
-                    this.#propagateChange(hue);
+        this.zone.runOutsideAngular(() => {
+            fromEvent<MouseEvent>(this.sliderHandle.nativeElement, "mousedown").subscribe(() => {
+                this.#mouseDown = true;
+                fromEvent<MouseEvent>(document, "mouseup")
+                    .pipe(delay(10))
+                    .subscribe(() => {
+                        this.#mouseDown = false;
+                        this.#mouseMove = false;
+                    });
+            });
+            fromEvent<MouseEvent>(document, "mousemove").subscribe((event: MouseEvent) => {
+                if (this.#mouseDown) {
+                    this.#mouseMove = true;
+                    const containerRect = this.elementRef.nativeElement.getBoundingClientRect();
+                    const handleElement = this.sliderHandle.nativeElement;
+                    const handleRect = handleElement.getBoundingClientRect();
+                    const handlePos = event.clientX - containerRect.left + handleRect.width / 2;
+                    if (handlePos >= handleRect.width / 2 && handlePos <= containerRect.width + handleRect.width / 2) {
+                        this.zone.run(() => {
+                            this.setHandlePosition(handlePos);
+                            const hue = this.getHueFromPosition(handlePos);
+                            this.#propagateChange(hue);
+                        });
+                    }
                 }
-            }
-        });
-        fromEvent<MouseEvent>(this.elementRef.nativeElement, "click").subscribe((event: MouseEvent) => {
-            if (this.#mouseMove) {
-                return;
-            }
-            const handleElement = this.sliderHandle.nativeElement;
-            const left = event.offsetX + handleElement.clientWidth / 2;
-            const hue = this.getHueFromPosition(left);
-            this.#propagateChange(hue);
-            this.setHandlePosition(left);
+            });
+            fromEvent<MouseEvent>(this.elementRef.nativeElement, "click").subscribe((event: MouseEvent) => {
+                if (this.#mouseMove) {
+                    return;
+                }
+                const handleElement = this.sliderHandle.nativeElement;
+                const left = event.offsetX + handleElement.clientWidth / 2;
+                const hue = this.getHueFromPosition(left);
+                this.zone.run(() => {
+                    this.#propagateChange(hue);
+                    this.setHandlePosition(left);
+                });
+            });
         });
     }
 }
