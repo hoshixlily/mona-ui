@@ -1,21 +1,23 @@
 import { Highlightable } from "@angular/cdk/a11y";
 import { NgClass, NgIf, NgTemplateOutlet } from "@angular/common";
 import {
+    AfterViewInit,
     Component,
     DestroyRef,
     ElementRef,
     EventEmitter,
     inject,
     Input,
-    OnInit,
+    NgZone,
     Output,
-    TemplateRef
+    TemplateRef,
+    ViewChild
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FormsModule } from "@angular/forms";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { faCaretRight, faChevronDown, faChevronRight, IconDefinition } from "@fortawesome/free-solid-svg-icons";
-import { of, Subject, switchMap } from "rxjs";
+import { fromEvent, of, Subject, switchMap } from "rxjs";
 import { CheckBoxDirective } from "../../../inputs/check-box/check-box.directive";
 import { DropPosition } from "../../models/DropPosition";
 import { DropPositionChangeEvent } from "../../models/DropPositionChangeEvent";
@@ -30,7 +32,7 @@ import { TreeViewService } from "../../services/tree-view.service";
     standalone: true,
     imports: [NgIf, FontAwesomeModule, NgClass, CheckBoxDirective, FormsModule, NgTemplateOutlet]
 })
-export class TreeViewNodeComponent implements OnInit, Highlightable {
+export class TreeViewNodeComponent implements Highlightable, AfterViewInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     public readonly click$: Subject<MouseEvent> = new Subject<MouseEvent>();
     public readonly collapseIcon: IconDefinition = faChevronDown;
@@ -54,6 +56,9 @@ export class TreeViewNodeComponent implements OnInit, Highlightable {
     @Output()
     public nodeDoubleClick: EventEmitter<NodeClickEvent> = new EventEmitter<NodeClickEvent>();
 
+    @ViewChild("nodeElement")
+    public nodeElement!: ElementRef<HTMLElement>;
+
     @Output()
     public nodeSelect: EventEmitter<Node> = new EventEmitter<Node>();
 
@@ -62,10 +67,11 @@ export class TreeViewNodeComponent implements OnInit, Highlightable {
 
     public constructor(
         private readonly elementRef: ElementRef<HTMLElement>,
-        public readonly treeViewService: TreeViewService
+        public readonly treeViewService: TreeViewService,
+        private readonly zone: NgZone
     ) {}
 
-    public ngOnInit(): void {
+    public ngAfterViewInit() {
         this.setSubscriptions();
     }
 
@@ -75,48 +81,6 @@ export class TreeViewNodeComponent implements OnInit, Highlightable {
 
     public onExpandToggle(event: MouseEvent): void {
         this.treeViewService.toggleNodeExpand(this.node);
-    }
-
-    public onMouseEnter(event: MouseEvent): void {
-        if (!this.dragging) {
-            return;
-        }
-        this.dropMagnetVisible = true;
-    }
-
-    public onMouseLeave(event: MouseEvent): void {
-        this.dropMagnetVisible = false;
-        this.dropPosition = undefined;
-        if (!this.dragging) {
-            return;
-        }
-    }
-
-    public onMouseMove(event: MouseEvent): void {
-        if (!this.dragging) {
-            return;
-        }
-        const rect = this.elementRef.nativeElement.getBoundingClientRect();
-        let node: Node | undefined;
-        if (event.clientY > rect.top && event.clientY - rect.top <= 5) {
-            this.dropPosition = "before";
-            node = this.node;
-        } else if (event.clientY < rect.bottom && rect.bottom - event.clientY <= 5) {
-            this.dropPosition = "after";
-            node = this.node;
-        } else if (event.clientY <= rect.top || event.clientY >= rect.bottom) {
-            this.dropPosition = undefined;
-            node = undefined;
-        } else {
-            this.dropPosition = "inside";
-            node = this.node;
-        }
-        if (this.dropPosition) {
-            this.dropPositionChange.emit({
-                position: this.dropPosition,
-                node
-            });
-        }
     }
 
     public onNodeDoubleClick(event: MouseEvent): void {
@@ -163,5 +127,68 @@ export class TreeViewNodeComponent implements OnInit, Highlightable {
                     this.onNodeClick(result.event, "click");
                 }
             });
+        this.zone.runOutsideAngular(() => {
+            fromEvent<MouseEvent>(this.nodeElement.nativeElement, "mouseenter")
+                .pipe(takeUntilDestroyed(this.#destroyRef))
+                .subscribe(() => {
+                    if (!this.dragging) {
+                        return;
+                    }
+                    this.zone.run(() => (this.dropMagnetVisible = true));
+                });
+            fromEvent<MouseEvent>(this.nodeElement.nativeElement, "mouseleave")
+                .pipe(takeUntilDestroyed(this.#destroyRef))
+                .subscribe(() => {
+                    if (this.dropPosition !== undefined) {
+                        this.zone.run(() => {
+                            this.dropPosition = undefined;
+                        });
+                    }
+                    if (this.dropMagnetVisible) {
+                        this.zone.run(() => (this.dropMagnetVisible = false));
+                    }
+                });
+            fromEvent<MouseEvent>(this.nodeElement.nativeElement, "mousemove")
+                .pipe(takeUntilDestroyed(this.#destroyRef))
+                .subscribe(event => {
+                    if (!this.dragging) {
+                        return;
+                    }
+                    const rect = this.elementRef.nativeElement.getBoundingClientRect();
+                    let node: Node | undefined;
+                    let previousDropPosition: DropPosition | undefined = this.dropPosition;
+                    let newDropPosition: DropPosition | undefined;
+                    if (event.clientY > rect.top && event.clientY - rect.top <= 5) {
+                        newDropPosition = "before";
+                        node = this.node;
+                    } else if (event.clientY < rect.bottom && rect.bottom - event.clientY <= 5) {
+                        newDropPosition = "after";
+                        node = this.node;
+                    } else if (event.clientY <= rect.top || event.clientY >= rect.bottom) {
+                        newDropPosition = undefined;
+                        node = undefined;
+                    } else {
+                        newDropPosition = "inside";
+                        node = this.node;
+                    }
+                    if (this.dropPosition !== newDropPosition) {
+                        this.zone.run(() => {
+                            this.dropPosition = newDropPosition;
+                        });
+                    }
+                    if (
+                        this.dropPosition &&
+                        this.dropPositionChange.observed &&
+                        this.dropPosition !== previousDropPosition
+                    ) {
+                        this.zone.run(() => {
+                            this.dropPositionChange.emit({
+                                position: this.dropPosition as DropPosition,
+                                node
+                            });
+                        });
+                    }
+                });
+        });
     }
 }

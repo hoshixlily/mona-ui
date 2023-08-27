@@ -28,7 +28,7 @@
                                     <ng-container [ngTemplateOutlet]="column.titleTemplate.templateRef"></ng-container>
                                 </ng-container>
                                 <ng-template #defaultTitle>
-                                    <span class="mona-grid-column-title" (click)="onColumnSort(column)">{{column.title}}</span>
+                                    <span class="mona-grid-column-title" (click)="onColumnSort(column)" [title]="column.title">{{column.title}}</span>
                                 </ng-template>
                                 <div class="mona-grid-column-actions">
                                     <span *ngIf="gridService.sortableOptions.showIndices && column.sortIndex != null">{{column.sortIndex}}</span>

@@ -1,5 +1,4 @@
-<div class="mona-tree-view-node"
-     (mouseenter)="onMouseEnter($event)" (mouseleave)="onMouseLeave($event)" (mousemove)="onMouseMove($event)">
+<div class="mona-tree-view-node" #nodeElement>
     <div class="mona-tree-view-drop-magnet" *ngIf="dragging && dropMagnetVisible && dropPosition==='before'" [attr.data-nid]="node.uid" [attr.data-pos]="'before'">
         <fa-icon [icon]="dropMagnetIcon"></fa-icon>
         <div></div>
@@ -20,7 +19,7 @@
             <ng-container [ngTemplateOutlet]="nodeTextTemplate" [ngTemplateOutletContext]="{$implicit: node.data, node: node}" *ngIf="!!nodeTextTemplate"></ng-container>
         </div>
     </div>
-    <div class="mona-tree-view-drop-magnet" *ngIf="dragging && dropMagnetVisible && dropPosition==='after'" [attr.data-nid]="node.uid"[attr.data-pos]="'after'">
+    <div class="mona-tree-view-drop-magnet" *ngIf="dragging && dropMagnetVisible && dropPosition==='after'" [attr.data-nid]="node.uid" [attr.data-pos]="'after'">
         <fa-icon [icon]="dropMagnetIcon"></fa-icon>
         <div></div>
     </div>

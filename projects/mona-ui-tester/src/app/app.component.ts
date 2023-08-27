@@ -129,7 +129,8 @@ import {
     TabTitleTemplateDirective,
     TextBoxPrefixTemplateDirective,
     TextBoxSuffixTemplateDirective,
-    TreeViewNodeTextTemplateDirective
+    TreeViewNodeTextTemplateDirective,
+    GridEditableDirective
 } from "mona-ui";
 import { TestComponentComponent } from "./test-component/test-component.component";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
@@ -192,6 +193,7 @@ import { GridOrderData } from "./GridOrderData";
         GridCellTemplateDirective,
         GridColumnComponent,
         GridColumnTitleTemplateDirective,
+        GridEditableDirective,
         GridSelectableDirective,
         ListBoxComponent,
         ListBoxItemTemplateDirective,
