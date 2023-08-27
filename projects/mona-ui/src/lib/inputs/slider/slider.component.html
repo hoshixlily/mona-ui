@@ -36,6 +36,6 @@
          [ngClass]="{'mona-slider-dragging': dragging()}"
          [style.left.px]="orientation==='horizontal' ? handlePosition() : undefined"
          [style.bottom.px]="orientation==='vertical' ? handlePosition() : undefined"
-         [attr.tabindex]="disabled"
+         [attr.tabindex]="disabled?-1:0"
          #sliderHandle></div>
 </div>
