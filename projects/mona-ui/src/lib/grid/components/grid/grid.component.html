@@ -21,7 +21,7 @@
                     <tr cdkDropList [cdkDropListConnectedTo]="groupable ? [groupColumnList!] : []" (cdkDropListDropped)="onColumnDrop($event)">
                         <td *ngFor="let _ of gridService.groupColumns"></td>
                         <th *ngFor="let column of gridService.columns" cdkDrag [cdkDragData]="column" [cdkDragDisabled]="!reorderable && !groupable"
-                            (mousemove)="onColumnMouseEnter($event, column)" (cdkDragEntered)="onColumnDragEnter($event, column)"
+                            (mouseenter)="onColumnMouseEnter($event, column)" (cdkDragEntered)="onColumnDragEnter($event, column)"
                             (cdkDragStarted)="onColumnDragStart($event)">
                             <div class="mona-grid-column-wrap">
                                 <ng-container *ngIf="column.titleTemplate; else defaultTitle;">

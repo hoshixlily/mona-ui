@@ -9,6 +9,7 @@ import {
     forwardRef,
     inject,
     Input,
+    NgZone,
     Signal,
     signal,
     TemplateRef,
@@ -96,7 +97,7 @@ export class RangeSliderComponent implements AfterViewInit, ControlValueAccessor
     @ContentChild(RangeSliderTickValueTemplateDirective, { read: TemplateRef })
     public tickValueTemplate?: TemplateRef<any>;
 
-    public constructor(private readonly elementRef: ElementRef<HTMLDivElement>) {}
+    public constructor(private readonly elementRef: ElementRef<HTMLDivElement>, private readonly zone: NgZone) {}
 
     public ngAfterViewInit() {
         this.prepareTicks();
@@ -152,9 +153,11 @@ export class RangeSliderComponent implements AfterViewInit, ControlValueAccessor
             const handlePosition = handleType === "primary" ? this.handlePosition()[0] : this.handlePosition()[1];
             const newPosition = this.getPositionFromValue(value);
             if (handlePosition !== newPosition) {
-                this.setHandlePosition(newPosition, handleType);
-                this.setHandleValue(value, handleType);
-                this.#propagateChange?.(this.handleValue());
+                this.zone.run(() => {
+                    this.setHandlePosition(newPosition, handleType);
+                    this.setHandleValue(value, handleType);
+                    this.#propagateChange?.(this.handleValue());
+                });
             }
             return;
         }
@@ -174,17 +177,21 @@ export class RangeSliderComponent implements AfterViewInit, ControlValueAccessor
         }
 
         if (!this.showTicks) {
-            this.setHandlePosition(handlePos, handleType);
+            this.zone.run(() => {
+                this.setHandlePosition(handlePos, handleType);
+            });
         }
         const position = handleType === "primary" ? this.handlePosition()[0] : this.handlePosition()[1];
         if (currentValue !== value) {
-            if (this.showTicks && handlePos !== position) {
-                this.setHandlePosition(handlePos, handleType);
-            }
-            this.setHandleValue(value, handleType);
-            if (this.#propagateChange) {
-                this.#propagateChange(this.handleValue());
-            }
+            this.zone.run(() => {
+                if (this.showTicks && handlePos !== position) {
+                    this.setHandlePosition(handlePos, handleType);
+                }
+                this.setHandleValue(value, handleType);
+                if (this.#propagateChange) {
+                    this.#propagateChange(this.handleValue());
+                }
+            });
         }
     }
 
@@ -276,87 +283,97 @@ export class RangeSliderComponent implements AfterViewInit, ControlValueAccessor
     }
 
     private setKeyboardSubscriptions(): void {
-        merge(
-            fromEvent<KeyboardEvent>(this.primaryHandle.nativeElement, "keydown").pipe(
-                map(event => ({ event, type: "primary" }))
-            ),
-            fromEvent<KeyboardEvent>(this.secondaryHandle.nativeElement, "keydown").pipe(
-                map(event => ({ event, type: "secondary" }))
-            )
-        )
-            .pipe(
-                takeUntilDestroyed(this.#destroyRef),
-                filter(
-                    ({ event }) =>
-                        event.key === "ArrowLeft" ||
-                        event.key === "ArrowRight" ||
-                        event.key === "ArrowUp" ||
-                        event.key === "ArrowDown"
+        this.zone.runOutsideAngular(() => {
+            merge(
+                fromEvent<KeyboardEvent>(this.primaryHandle.nativeElement, "keydown").pipe(
+                    map(event => ({ event, type: "primary" }))
+                ),
+                fromEvent<KeyboardEvent>(this.secondaryHandle.nativeElement, "keydown").pipe(
+                    map(event => ({ event, type: "secondary" }))
                 )
             )
-            .subscribe(({ event, type }) => {
-                const value = this.handleValue()[type === "primary" ? 0 : 1];
-                let newValue: number;
-                if (event.key === "ArrowLeft" || event.key === "ArrowDown") {
-                    newValue = value - this.step;
-                } else {
-                    newValue = value + this.step;
-                }
-                if (newValue < this.min || newValue > this.max) {
-                    return;
-                }
-                this.setHandleValue(newValue, type as SliderHandleType);
-                this.setHandlePosition(this.getPositionFromValue(newValue), type as SliderHandleType);
-                if (this.#propagateChange) {
-                    this.#propagateChange(this.handleValue());
-                }
-            });
+                .pipe(
+                    takeUntilDestroyed(this.#destroyRef),
+                    filter(
+                        ({ event }) =>
+                            event.key === "ArrowLeft" ||
+                            event.key === "ArrowRight" ||
+                            event.key === "ArrowUp" ||
+                            event.key === "ArrowDown"
+                    )
+                )
+                .subscribe(({ event, type }) => {
+                    const value = this.handleValue()[type === "primary" ? 0 : 1];
+                    let newValue: number;
+                    if (event.key === "ArrowLeft" || event.key === "ArrowDown") {
+                        newValue = value - this.step;
+                    } else {
+                        newValue = value + this.step;
+                    }
+                    if (newValue < this.min || newValue > this.max) {
+                        return;
+                    }
+                    this.zone.run(() => {
+                        this.setHandleValue(newValue, type as SliderHandleType);
+                        this.setHandlePosition(this.getPositionFromValue(newValue), type as SliderHandleType);
+                        if (this.#propagateChange) {
+                            this.#propagateChange(this.handleValue());
+                        }
+                    });
+                });
+        });
     }
 
     private setSubscriptions(): void {
-        merge(
-            fromEvent<MouseEvent>(this.primaryHandle.nativeElement, "mousedown").pipe(
-                map(event => ({ event, type: "primary" }))
-            ),
-            fromEvent<MouseEvent>(this.secondaryHandle.nativeElement, "mousedown").pipe(
-                map(event => ({ event, type: "secondary" }))
+        this.zone.runOutsideAngular(() => {
+            merge(
+                fromEvent<MouseEvent>(this.primaryHandle.nativeElement, "mousedown").pipe(
+                    map(event => ({ event, type: "primary" }))
+                ),
+                fromEvent<MouseEvent>(this.secondaryHandle.nativeElement, "mousedown").pipe(
+                    map(event => ({ event, type: "secondary" }))
+                )
             )
-        )
-            .pipe(takeUntilDestroyed(this.#destroyRef))
-            .subscribe(({ event, type }) => {
-                this.dragging.set(true);
-                this.#mouseDown = true;
-                const moveSubscription = fromEvent<MouseEvent>(document, "mousemove").subscribe(event => {
-                    if (this.#mouseDown) {
-                        this.#mouseMove = true;
-                        this.handleHandleMove(event, this.orientation, type as SliderHandleType);
-                    }
-                });
-                fromEvent<MouseEvent>(document, "mouseup")
-                    .pipe(delay(1), take(1))
-                    .subscribe(() => {
-                        this.#mouseDown = false;
-                        this.#mouseMove = false;
-                        this.dragging.set(false);
-                        moveSubscription.unsubscribe();
+                .pipe(takeUntilDestroyed(this.#destroyRef))
+                .subscribe(({ event, type }) => {
+                    this.dragging.set(true);
+                    this.#mouseDown = true;
+                    const moveSubscription = fromEvent<MouseEvent>(document, "mousemove").subscribe(event => {
+                        if (this.#mouseDown) {
+                            this.#mouseMove = true;
+                            this.handleHandleMove(event, this.orientation, type as SliderHandleType);
+                        }
                     });
-            });
+                    fromEvent<MouseEvent>(document, "mouseup")
+                        .pipe(delay(1), take(1))
+                        .subscribe(() => {
+                            this.#mouseDown = false;
+                            this.#mouseMove = false;
+                            moveSubscription.unsubscribe();
+                            this.zone.run(() => {
+                                this.dragging.set(false);
+                            });
+                        });
+                });
+        });
         this.setKeyboardSubscriptions();
         this.setTrackClickSubscription();
     }
 
     private setTrackClickSubscription(): void {
-        fromEvent<MouseEvent>(this.elementRef.nativeElement, "click")
-            .pipe(
-                takeUntilDestroyed(this.#destroyRef),
-                filter(() => !this.disabled && !this.#mouseMove),
-                map(event => {
-                    const handleData = this.getClosestHandlerDataToMouse(event);
-                    return { event, handleData };
-                })
-            )
-            .subscribe(({ event, handleData }) => {
-                this.handleHandleMove(event, this.orientation, handleData.type);
-            });
+        this.zone.runOutsideAngular(() => {
+            fromEvent<MouseEvent>(this.elementRef.nativeElement, "click")
+                .pipe(
+                    takeUntilDestroyed(this.#destroyRef),
+                    filter(() => !this.disabled && !this.#mouseMove),
+                    map(event => {
+                        const handleData = this.getClosestHandlerDataToMouse(event);
+                        return { event, handleData };
+                    })
+                )
+                .subscribe(({ event, handleData }) => {
+                    this.handleHandleMove(event, this.orientation, handleData.type);
+                });
+        });
     }
 }

@@ -8,6 +8,7 @@ import {
     forwardRef,
     inject,
     Input,
+    NgZone,
     OnChanges,
     OnInit,
     signal,
@@ -86,7 +87,7 @@ export class SliderComponent implements OnInit, AfterViewInit, ControlValueAcces
     @ContentChild(SliderTickValueTemplateDirective, { read: TemplateRef })
     public tickValueTemplate?: TemplateRef<any>;
 
-    public constructor(private readonly elementRef: ElementRef<HTMLDivElement>) {}
+    public constructor(private readonly elementRef: ElementRef<HTMLDivElement>, private readonly zone: NgZone) {}
 
     public ngAfterViewInit(): void {
         this.setSubscription();
@@ -156,9 +157,11 @@ export class SliderComponent implements OnInit, AfterViewInit, ControlValueAcces
             const value = valueStr ? Number(valueStr) : 0;
             const position = this.getPositionFromValue(value);
             if (position !== this.handlePosition()) {
-                this.handlePosition.set(position);
-                this.handleValue.set(value);
-                this.#propagateChange?.(value);
+                this.zone.run(() => {
+                    this.handlePosition.set(position);
+                    this.handleValue.set(value);
+                    this.#propagateChange?.(value);
+                });
             }
             return;
         }
@@ -170,74 +173,88 @@ export class SliderComponent implements OnInit, AfterViewInit, ControlValueAcces
         if (handlePos >= 0 && handlePos <= maxPos && handlePos !== this.handlePosition()) {
             const value = this.getValueFromPosition(handlePos);
             if (!this.showTicks) {
-                this.handlePosition.set(handlePos);
+                this.zone.run(() => {
+                    this.handlePosition.set(handlePos);
+                });
             }
             if (value !== this.handleValue()) {
-                if (this.showTicks && this.handlePosition() !== handlePos) {
-                    this.handlePosition.set(handlePos);
-                }
-                this.handleValue.set(value);
-                this.#propagateChange?.(value);
+                this.zone.run(() => {
+                    if (this.showTicks && this.handlePosition() !== handlePos) {
+                        this.handlePosition.set(handlePos);
+                    }
+                    this.handleValue.set(value);
+                    this.#propagateChange?.(value);
+                });
             }
         }
     }
 
     private setSubscription(): void {
-        fromEvent<MouseEvent>(this.sliderHandle.nativeElement, "mousedown")
-            .pipe(
-                takeUntilDestroyed(this.#destroyRef),
-                filter(() => !this.disabled)
-            )
-            .subscribe(() => {
-                this.#mouseDown = true;
-                this.dragging.set(true);
-                const moveSubscription = fromEvent<MouseEvent>(document, "mousemove").subscribe((event: MouseEvent) => {
-                    if (this.#mouseDown) {
-                        this.#mouseMove = true;
-                        this.handleHandleMove(event, this.orientation);
-                    }
-                });
-                fromEvent<MouseEvent>(document, "mouseup")
-                    .pipe(delay(10), take(1))
-                    .subscribe(() => {
-                        this.#mouseDown = false;
-                        this.#mouseMove = false;
-                        this.dragging.set(false);
-                        moveSubscription.unsubscribe();
-                    });
-            });
-
-        fromEvent<MouseEvent>(this.elementRef.nativeElement, "click")
-            .pipe(
-                takeUntilDestroyed(this.#destroyRef),
-                tap(() => this.dragging.set(false)),
-                filter(() => !this.disabled && !this.#mouseMove)
-            )
-            .subscribe((event: MouseEvent) => {
-                this.handleHandleMove(event, this.orientation);
-            });
-
-        fromEvent<KeyboardEvent>(this.sliderHandle.nativeElement, "keydown")
-            .pipe(
-                filter(
-                    (event: KeyboardEvent) =>
-                        event.key === "ArrowLeft" ||
-                        event.key === "ArrowRight" ||
-                        event.key === "ArrowUp" ||
-                        (event.key === "ArrowDown" && !this.disabled)
-                ),
-                tap((event: KeyboardEvent) => {
+        this.zone.runOutsideAngular(() => {
+            fromEvent<MouseEvent>(this.sliderHandle.nativeElement, "mousedown")
+                .pipe(
+                    takeUntilDestroyed(this.#destroyRef),
+                    filter(() => !this.disabled)
+                )
+                .subscribe(() => {
+                    this.#mouseDown = true;
                     this.dragging.set(true);
-                    const value = this.handleValue();
-                    const step = event.key === "ArrowLeft" || event.key === "ArrowDown" ? -this.step : this.step;
-                    const newValue = Math.max(this.min, Math.min(this.max, value + step));
-                    this.handleValue.set(newValue);
-                    this.handlePosition.set(this.getPositionFromValue(newValue));
-                    this.#propagateChange?.(newValue);
-                }),
-                takeUntilDestroyed(this.#destroyRef)
-            )
-            .subscribe();
+                    const moveSubscription = fromEvent<MouseEvent>(document, "mousemove").subscribe(
+                        (event: MouseEvent) => {
+                            if (this.#mouseDown) {
+                                this.#mouseMove = true;
+                                this.handleHandleMove(event, this.orientation);
+                            }
+                        }
+                    );
+                    fromEvent<MouseEvent>(document, "mouseup")
+                        .pipe(delay(10), take(1))
+                        .subscribe(() => {
+                            this.#mouseDown = false;
+                            this.#mouseMove = false;
+                            moveSubscription.unsubscribe();
+                            this.zone.run(() => {
+                                this.dragging.set(false);
+                            });
+                        });
+                });
+
+            fromEvent<MouseEvent>(this.elementRef.nativeElement, "click")
+                .pipe(
+                    takeUntilDestroyed(this.#destroyRef),
+                    tap(() => this.dragging.set(false)),
+                    filter(() => !this.disabled && !this.#mouseMove)
+                )
+                .subscribe((event: MouseEvent) => {
+                    this.handleHandleMove(event, this.orientation);
+                });
+
+            fromEvent<KeyboardEvent>(this.sliderHandle.nativeElement, "keydown")
+                .pipe(
+                    filter(
+                        (event: KeyboardEvent) =>
+                            event.key === "ArrowLeft" ||
+                            event.key === "ArrowRight" ||
+                            event.key === "ArrowUp" ||
+                            (event.key === "ArrowDown" && !this.disabled)
+                    ),
+                    tap((event: KeyboardEvent) => {
+                        this.zone.run(() => {
+                            this.dragging.set(true);
+                        });
+                        const value = this.handleValue();
+                        const step = event.key === "ArrowLeft" || event.key === "ArrowDown" ? -this.step : this.step;
+                        const newValue = Math.max(this.min, Math.min(this.max, value + step));
+                        this.zone.run(() => {
+                            this.handleValue.set(newValue);
+                            this.handlePosition.set(this.getPositionFromValue(newValue));
+                            this.#propagateChange?.(newValue);
+                        });
+                    }),
+                    takeUntilDestroyed(this.#destroyRef)
+                )
+                .subscribe();
+        });
     }
 
     private findClosestTickElement(event: MouseEvent): HTMLSpanElement {
