@@ -16,8 +16,8 @@ import { asyncScheduler, filter, fromEvent, map, Subject, take, takeUntil, tap, 
 import { CellEditEvent } from "../../models/CellEditEvent";
 import { CheckBoxDirective } from "../../../inputs/check-box/check-box.directive";
 import { DatePickerComponent } from "../../../date-inputs/date-picker/date-picker.component";
-import { NumericTextBoxComponent } from "../../../inputs/numeric-text-box/numeric-text-box.component";
-import { TextBoxComponent } from "../../../inputs/text-box/text-box.component";
+import { NumericTextBoxComponent } from "../../../inputs/numeric-text-box/components/numeric-text-box/numeric-text-box.component";
+import { TextBoxComponent } from "../../../inputs/text-box/components/text-box/text-box.component";
 import { NgClass, NgIf, NgTemplateOutlet } from "@angular/common";
 
 @Component({

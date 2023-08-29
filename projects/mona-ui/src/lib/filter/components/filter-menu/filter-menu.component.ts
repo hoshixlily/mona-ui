@@ -6,9 +6,9 @@ import { ButtonDirective } from "../../../buttons/button/button.directive";
 import { DatePickerComponent } from "../../../date-inputs/date-picker/date-picker.component";
 import { DateTimePickerComponent } from "../../../date-inputs/date-time-picker/date-time-picker.component";
 import { TimePickerComponent } from "../../../date-inputs/time-picker/time-picker.component";
-import { DropDownListComponent } from "../../../dropdowns/drop-down-list/drop-down-list.component";
-import { NumericTextBoxComponent } from "../../../inputs/numeric-text-box/numeric-text-box.component";
-import { TextBoxComponent } from "../../../inputs/text-box/text-box.component";
+import { DropDownListComponent } from "../../../dropdowns/drop-down-list/components/drop-down-list/drop-down-list.component";
+import { NumericTextBoxComponent } from "../../../inputs/numeric-text-box/components/numeric-text-box/numeric-text-box.component";
+import { TextBoxComponent } from "../../../inputs/text-box/components/text-box/text-box.component";
 import { DataType } from "../../../models/DataType";
 import {
     BooleanFilterDescriptor,

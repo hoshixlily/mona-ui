@@ -26,7 +26,7 @@ import { AnimationState } from "../../animations/models/AnimationState";
 import { TimeSelectorComponent } from "../time-selector/time-selector.component";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { ButtonDirective } from "../../buttons/button/button.directive";
-import { TextBoxDirective } from "../../inputs/directives/text-box.directive";
+import { TextBoxDirective } from "../../inputs/text-box/directives/text-box.directive";
 
 @Component({
     selector: "mona-time-picker",

@@ -11,7 +11,7 @@ import { NotificationType } from "../../models/NotificationType";
 import { NotificationData } from "../../models/NotificationData";
 import { NotificationFade, NotificationSlide } from "../../animations/animation";
 import { asyncScheduler, interval, takeWhile } from "rxjs";
-import { ProgressBarComponent } from "../../../progress-bars/progress-bar/progress-bar.component";
+import { ProgressBarComponent } from "../../../progress-bars/progress-bar/components/progress-bar/progress-bar.component";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { NgIf, NgTemplateOutlet, NgStyle } from "@angular/common";
 

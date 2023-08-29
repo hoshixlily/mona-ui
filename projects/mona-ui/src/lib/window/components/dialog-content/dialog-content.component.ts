@@ -7,9 +7,9 @@ import { DialogResult } from "../../models/DialogResult";
 import { DialogRef } from "../../models/DialogRef";
 import { DialogHandler } from "../../models/DialogHandler";
 import { ButtonDirective } from "../../../buttons/button/button.directive";
-import { NumericTextBoxComponent } from "../../../inputs/numeric-text-box/numeric-text-box.component";
+import { NumericTextBoxComponent } from "../../../inputs/numeric-text-box/components/numeric-text-box/numeric-text-box.component";
 import { FormsModule } from "@angular/forms";
-import { TextBoxComponent } from "../../../inputs/text-box/text-box.component";
+import { TextBoxComponent } from "../../../inputs/text-box/components/text-box/text-box.component";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { NgIf, NgFor, NgClass } from "@angular/common";
 

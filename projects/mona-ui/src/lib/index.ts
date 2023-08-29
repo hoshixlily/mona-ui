@@ -18,27 +18,27 @@ export * from "./date-inputs/time-picker/time-picker.component";
 
 /** Dropdowns */
 
-export * from "./dropdowns/popup-list/popup-list.component";
-export * from "./dropdowns/directives/list-group-template.directive";
-export * from "./dropdowns/directives/list-item-template.directive";
+export * from "./dropdowns/popup-list/components/popup-list/popup-list.component";
+export * from "./dropdowns/popup-list/directives/list-group-template.directive";
+export * from "./dropdowns/popup-list/directives/list-item-template.directive";
 export * from "./dropdowns/auto-complete/auto-complete.component";
-export * from "./dropdowns/directives/combo-box-group-template.directive";
-export * from "./dropdowns/directives/combo-box-item-template.directive";
-export * from "./dropdowns/combo-box/combo-box.component";
+export * from "./dropdowns/combo-box/directives/combo-box-group-template.directive";
+export * from "./dropdowns/combo-box/directives/combo-box-item-template.directive";
+export * from "./dropdowns/combo-box/components/combo-box/combo-box.component";
 
 //
-export * from "./dropdowns/directives/drop-down-list-group-template.directive";
-export * from "./dropdowns/directives/drop-down-list-item-template.directive";
-export * from "./dropdowns/directives/drop-down-list-value-template.directive";
-export * from "./dropdowns/drop-down-list/drop-down-list.component";
+export * from "./dropdowns/drop-down-list/directives/drop-down-list-group-template.directive";
+export * from "./dropdowns/drop-down-list/directives/drop-down-list-item-template.directive";
+export * from "./dropdowns/drop-down-list/directives/drop-down-list-value-template.directive";
+export * from "./dropdowns/drop-down-list/components/drop-down-list/drop-down-list.component";
 
 //
-export * from "./dropdowns/directives/multi-select-group-template.directive";
-export * from "./dropdowns/directives/multi-select-item-template.directive";
-export * from "./dropdowns/directives/multi-select-summary-tag.directive";
-export * from "./dropdowns/directives/multi-select-summary-tag-template.directive";
-export * from "./dropdowns/directives/multi-select-tag-template.directive";
-export * from "./dropdowns/multi-select/multi-select.component";
+export * from "./dropdowns/multi-select/directives/multi-select-group-template.directive";
+export * from "./dropdowns/multi-select/directives/multi-select-item-template.directive";
+export * from "./dropdowns/multi-select/directives/multi-select-summary-tag.directive";
+export * from "./dropdowns/multi-select/directives/multi-select-summary-tag-template.directive";
+export * from "./dropdowns/multi-select/directives/multi-select-tag-template.directive";
+export * from "./dropdowns/multi-select/components/multi-select/multi-select.component";
 
 /** Filters */
 export * from "./query/filter/FilterDescriptor";
@@ -61,24 +61,24 @@ export * from "./grid/components/grid/grid.component";
 
 /** Inputs */
 export * from "./inputs/check-box/check-box.directive";
-export * from "./inputs/color-gradient/color-gradient/color-gradient.component";
+export * from "./inputs/color-gradient/components/color-gradient/color-gradient.component";
 export * from "./inputs/color-palette/color-palette.component";
 export * from "./inputs/color-picker/color-picker.component";
-export * from "./inputs/directives/numeric-text-box-prefix-template.directive";
-export * from "./inputs/numeric-text-box/numeric-text-box.component";
+export * from "./inputs/numeric-text-box/directives/numeric-text-box-prefix-template.directive";
+export * from "./inputs/numeric-text-box/components/numeric-text-box/numeric-text-box.component";
 export * from "./inputs/radio-button/radio-button.directive";
-export * from "./inputs/directives/range-slider-tick-value-template.directive";
-export * from "./inputs/range-slider/range-slider.component";
-export * from "./inputs/directives/slider-tick-value-template.directive";
-export * from "./inputs/slider/slider.component";
-export * from "./inputs/directives/switch-off-label-template.directive";
-export * from "./inputs/directives/switch-on-label-template.directive";
-export * from "./inputs/switch/switch.component";
+export * from "./inputs/range-slider/directives/range-slider-tick-value-template.directive";
+export * from "./inputs/range-slider/components/range-slider/range-slider.component";
+export * from "./inputs/slider/directives/slider-tick-value-template.directive";
+export * from "./inputs/slider/components/slider/slider.component";
+export * from "./inputs/switch/directives/switch-off-label-template.directive";
+export * from "./inputs/switch/directives/switch-on-label-template.directive";
+export * from "./inputs/switch/components/switch/switch.component";
 export * from "./inputs/text-area/text-area.directive";
-export * from "./inputs/directives/text-box.directive";
-export * from "./inputs/directives/text-box-prefix-template.directive";
-export * from "./inputs/directives/text-box-suffix-template.directive";
-export * from "./inputs/text-box/text-box.component";
+export * from "./inputs/text-box/directives/text-box.directive";
+export * from "./inputs/text-box/directives/text-box-prefix-template.directive";
+export * from "./inputs/text-box/directives/text-box-suffix-template.directive";
+export * from "./inputs/text-box/components/text-box/text-box.component";
 
 /** Layout */
 
@@ -86,34 +86,34 @@ export * from "./inputs/text-box/text-box.component";
 export * from "./layout/avatar/avatar.component";
 
 /* Expansion Panel */
-export * from "./layout/expansion-panel/expansion-panel.component";
-export * from "./layout/directives/expansion-panel-actions-template.directive";
-export * from "./layout/directives/expansion-panel-title-template.directive";
+export * from "./layout/expansion-panel/components/expansion-panel/expansion-panel.component";
+export * from "./layout/expansion-panel/directives/expansion-panel-actions-template.directive";
+export * from "./layout/expansion-panel/directives/expansion-panel-title-template.directive";
 
 /* Fieldset */
-export * from "./layout/directives/fieldset-legend-template.directive";
-export * from "./layout/fieldset/fieldset.component";
+export * from "./layout/fieldset/directives/fieldset-legend-template.directive";
+export * from "./layout/fieldset/components/fieldset/fieldset.component";
 
 /** Scroll View */
-export * from "./layout/scroll-view/scroll-view.component";
+export * from "./layout/scroll-view/components/scroll-view/scroll-view.component";
 
 /** Stepper */
-export { StepOptions } from "./layout/modules/stepper/models/Step";
-export * from "./layout/modules/stepper/directives/stepper-indicator-template.directive";
-export * from "./layout/modules/stepper/directives/stepper-label-template.directive";
-export * from "./layout/modules/stepper/directives/stepper-step-template.directive";
-export * from "./layout/modules/stepper/components/stepper/stepper.component";
+export { StepOptions } from "./layout/stepper/models/Step";
+export * from "./layout/stepper/directives/stepper-indicator-template.directive";
+export * from "./layout/stepper/directives/stepper-label-template.directive";
+export * from "./layout/stepper/directives/stepper-step-template.directive";
+export * from "./layout/stepper/components/stepper/stepper.component";
 
 /** Splitter */
-export * from "./layout/splitter/splitter/splitter.component";
-export * from "./layout/splitter/splitter-pane/splitter-pane.component";
+export * from "./layout/splitter/components/splitter/splitter.component";
+export * from "./layout/splitter/components/splitter-pane/splitter-pane.component";
 
 /* Tab Strip */
-export * from "./layout/modules/tab-strip/data/TabCloseEvent";
-export * from "./layout/modules/tab-strip/directives/tab-content-template.directive";
-export * from "./layout/modules/tab-strip/directives/tab-title-template.directive";
-export * from "./layout/modules/tab-strip/components/tab-strip/tab-strip.component";
-export * from "./layout/modules/tab-strip/components/tab/tab.component";
+export * from "./layout/tab-strip/models/TabCloseEvent";
+export * from "./layout/tab-strip/directives/tab-content-template.directive";
+export * from "./layout/tab-strip/directives/tab-title-template.directive";
+export * from "./layout/tab-strip/components/tab-strip/tab-strip.component";
+export * from "./layout/tab-strip/components/tab/tab.component";
 
 /** Layout End */
 
@@ -150,10 +150,10 @@ export * from "./menus/menubar/menubar.component";
 /** Navigation */
 
 /** Breadcrumb */
-export * from "./navigation/models/BreadcrumbItem";
-export * from "./navigation/directives/breadcrumb-item-template.directive";
-export * from "./navigation/directives/breadcrumb-separator-template.directive";
-export * from "./navigation/breadcrumb/breadcrumb.component";
+export * from "./navigation/breadcrumb/models/BreadcrumbItem";
+export * from "./navigation/breadcrumb/directives/breadcrumb-item-template.directive";
+export * from "./navigation/breadcrumb/directives/breadcrumb-separator-template.directive";
+export * from "./navigation/breadcrumb/components/breadcrumb/breadcrumb.component";
 
 /** Notification */
 export * from "./notification/services/notification.service";
@@ -171,19 +171,19 @@ export * from "./popup/services/popup.service";
 export * from "./popup/components/popup/popup.component";
 
 /** Progress */
-export * from "./progress-bars/directives/circular-progress-bar-label-template.directive";
-export * from "./progress-bars/circular-progress-bar/circular-progress-bar.component";
-export * from "./progress-bars/progress-bar/progress-bar.component";
+export * from "./progress-bars/circular-progress-bar/directives/circular-progress-bar-label-template.directive";
+export * from "./progress-bars/circular-progress-bar/components/circular-progress-bar/circular-progress-bar.component";
+export * from "./progress-bars/progress-bar/components/progress-bar/progress-bar.component";
 
 /** Tooltips */
 
 /** Popover */
-export * from "./tooltips/models/PopoverHideEvent";
-export * from "./tooltips/models/PopoverShowEvent";
-export * from "./tooltips/models/PopoverShownEvent";
-export * from "./tooltips/directives/popover-footer-template.directive";
-export * from "./tooltips/directives/popover-title-template.directive";
-export * from "./tooltips/popover/popover.component";
+export * from "./tooltips/popover/models/PopoverHideEvent";
+export * from "./tooltips/popover/models/PopoverShowEvent";
+export * from "./tooltips/popover/models/PopoverShownEvent";
+export * from "./tooltips/popover/directives/popover-footer-template.directive";
+export * from "./tooltips/popover/directives/popover-title-template.directive";
+export * from "./tooltips/popover/components/popover/popover.component";
 
 /** Tooltip */
 export * from "./tooltips/tooltip/tooltip.component";

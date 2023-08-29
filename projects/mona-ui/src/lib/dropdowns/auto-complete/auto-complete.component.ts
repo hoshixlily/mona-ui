@@ -25,18 +25,18 @@ import { Group } from "@mirei/ts-collections";
 import { debounceTime, distinctUntilChanged, fromEvent, Subject, take } from "rxjs";
 import { AnimationState } from "../../animations/models/AnimationState";
 import { PopupAnimationService } from "../../animations/services/popup-animation.service";
-import { TextBoxDirective } from "../../inputs/directives/text-box.directive";
+import { TextBoxDirective } from "../../inputs/text-box/directives/text-box.directive";
 import { PopupRef } from "../../popup/models/PopupRef";
 import { PopupService } from "../../popup/services/popup.service";
 import { Action } from "../../utils/Action";
-import { ComboBoxGroupTemplateDirective } from "../directives/combo-box-group-template.directive";
-import { ComboBoxItemTemplateDirective } from "../directives/combo-box-item-template.directive";
-import { ListGroupTemplateDirective } from "../directives/list-group-template.directive";
-import { ListItemTemplateDirective } from "../directives/list-item-template.directive";
+import { ComboBoxGroupTemplateDirective } from "../combo-box/directives/combo-box-group-template.directive";
+import { ComboBoxItemTemplateDirective } from "../combo-box/directives/combo-box-item-template.directive";
+import { ListGroupTemplateDirective } from "../popup-list/directives/list-group-template.directive";
+import { ListItemTemplateDirective } from "../popup-list/directives/list-item-template.directive";
 import { PopupListItem } from "../models/PopupListItem";
 import { PopupListValueChangeEvent } from "../models/PopupListValueChangeEvent";
-import { PopupListComponent } from "../popup-list/popup-list.component";
-import { PopupListService } from "../services/popup-list.service";
+import { PopupListComponent } from "../popup-list/components/popup-list/popup-list.component";
+import { PopupListService } from "../popup-list/services/popup-list.service";
 
 @Component({
     selector: "mona-auto-complete",

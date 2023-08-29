@@ -8,7 +8,7 @@ import { PopupService } from "../../popup/services/popup.service";
 import { AnimationState } from "../../animations/models/AnimationState";
 import { ColorPickerView } from "../models/ColorPickerView";
 import { PaletteType } from "../models/PaletteType";
-import { ColorGradientComponent } from "../color-gradient/color-gradient/color-gradient.component";
+import { ColorGradientComponent } from "../color-gradient/components/color-gradient/color-gradient.component";
 import { ColorPaletteComponent } from "../color-palette/color-palette.component";
 import { ButtonDirective } from "../../buttons/button/button.directive";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";

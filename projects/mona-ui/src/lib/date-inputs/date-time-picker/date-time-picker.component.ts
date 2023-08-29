@@ -25,7 +25,7 @@ import { TimeSelectorComponent } from "../time-selector/time-selector.component"
 import { CalendarComponent } from "../calendar/calendar.component";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { ButtonDirective } from "../../buttons/button/button.directive";
-import { TextBoxDirective } from "../../inputs/directives/text-box.directive";
+import { TextBoxDirective } from "../../inputs/text-box/directives/text-box.directive";
 import { NgClass } from "@angular/common";
 
 @Component({
