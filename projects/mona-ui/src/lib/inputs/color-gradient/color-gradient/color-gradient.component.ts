@@ -21,7 +21,7 @@ import { distinctUntilChanged, fromEvent, Subject, switchMap, tap } from "rxjs";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from "@angular/forms";
 import { faCopy, faSort, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
-import { HSV, HSVSignal, RGBA, RGBSignal } from "../../models/ColorSpaces";
+import { HSV, HSVSignal, RGB, RGBA, RGBSignal } from "../../models/ColorSpaces";
 import { ColorMode } from "../../models/ColorMode";
 import { Clipboard } from "@angular/cdk/clipboard";
 import { MenuItemComponent } from "../../../menus/menu-item/menu-item.component";
@@ -298,7 +298,7 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
         return { r: r, g: g, b: b, a: a };
     }
 
-    private hsv2rgb(hue: number, saturation: number, value: number): { r: number; g: number; b: number } {
+    private hsv2rgb(hue: number, saturation: number, value: number): RGB {
         hue = hue / 360;
         saturation = saturation / 100;
         value = value / 100;

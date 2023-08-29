@@ -18,12 +18,12 @@ export class GridFilterPipe implements PipeTransform {
         sortStateDict: Dictionary<string, ColumnSortState>
     ): Row[] {
         let queryEnumerable = Query.from(value);
-        queryEnumerable = this.applyFilterStatesIfExists(filterStateDict, queryEnumerable);
-        queryEnumerable = this.applySortStatesIfExists(sortStateDict, queryEnumerable);
+        queryEnumerable = this.applyFilterStates(filterStateDict, queryEnumerable);
+        queryEnumerable = this.applySortStates(sortStateDict, queryEnumerable);
         return queryEnumerable.run();
     }
 
-    private applyFilterStatesIfExists(
+    private applyFilterStates(
         filterStateDict: Dictionary<string, ColumnFilterState>,
         queryEnumerable: IQuery<Row>
     ): IQuery<Row> {
@@ -37,7 +37,7 @@ export class GridFilterPipe implements PipeTransform {
         return queryEnumerable;
     }
 
-    private applySortStatesIfExists(
+    private applySortStates(
         sortStateDict: Dictionary<string, ColumnSortState>,
         queryEnumerable: IQuery<Row>
     ): IQuery<Row> {
