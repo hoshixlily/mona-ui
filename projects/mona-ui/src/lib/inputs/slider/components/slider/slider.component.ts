@@ -239,6 +239,7 @@ export class SliderComponent implements OnInit, AfterViewInit, ControlValueAcces
                             (event.key === "ArrowDown" && !this.disabled)
                     ),
                     tap((event: KeyboardEvent) => {
+                        event.stopPropagation();
                         this.zone.run(() => {
                             this.dragging.set(true);
                         });
