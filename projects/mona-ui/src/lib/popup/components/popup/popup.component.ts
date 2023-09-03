@@ -2,16 +2,19 @@ import {
     AfterViewInit,
     Component,
     ContentChild,
+    DestroyRef,
     ElementRef,
     EventEmitter,
+    inject,
     Input,
     NgZone,
     OnDestroy,
     OnInit,
     Output,
-    Renderer2,
     TemplateRef
 } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { fromEvent } from "rxjs";
 import { PopupRef } from "../../models/PopupRef";
 import { FlexibleConnectedPositionStrategyOrigin } from "@angular/cdk/overlay";
 import { PopupSettings } from "../../models/PopupSettings";
@@ -25,9 +28,9 @@ import { PopupService } from "../../services/popup.service";
     standalone: true
 })
 export class PopupComponent implements OnInit, OnDestroy, AfterViewInit {
+    readonly #destroyRef: DestroyRef = inject(DestroyRef);
     private popupOpened: boolean = false;
     private popupRef: PopupRef | null = null;
-    private popupTriggerListener: (event: Event) => void = () => void 0;
 
     @Input()
     public anchor!: FlexibleConnectedPositionStrategyOrigin;
@@ -74,11 +77,7 @@ export class PopupComponent implements OnInit, OnDestroy, AfterViewInit {
     @Input()
     public width?: number | string;
 
-    public constructor(
-        private readonly popupService: PopupService,
-        private readonly renderer: Renderer2,
-        private readonly zone: NgZone
-    ) {}
+    public constructor(private readonly popupService: PopupService, private readonly zone: NgZone) {}
 
     public ngAfterViewInit(): void {
         window.setTimeout(() => {
@@ -97,64 +96,62 @@ export class PopupComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     private setEventListeners(): void {
-        this.zone.runOutsideAngular(() => {
-            let pointAnchor = false;
-            let target: FlexibleConnectedPositionStrategyOrigin;
-            if (this.anchor instanceof ElementRef) {
-                target = this.anchor.nativeElement;
-            } else if (this.anchor instanceof HTMLElement) {
-                target = this.anchor;
-            } else {
-                target = document.body;
-                pointAnchor = true;
-            }
-            const width =
-                this.width ??
-                (this.anchor instanceof HTMLElement
-                    ? this.anchor.getBoundingClientRect().width
-                    : this.anchor instanceof ElementRef
-                    ? this.anchor.nativeElement.getBoundingClientRect().width
-                    : undefined);
-            this.popupTriggerListener = this.renderer.listen(target, this.trigger, (event: Event) => {
+        let pointAnchor = false;
+        let target: HTMLElement;
+        if (this.anchor instanceof ElementRef) {
+            target = this.anchor.nativeElement;
+        } else if (this.anchor instanceof HTMLElement) {
+            target = this.anchor;
+        } else {
+            target = document.body;
+            pointAnchor = true;
+        }
+        const width =
+            this.width ??
+            (this.anchor instanceof HTMLElement
+                ? this.anchor.getBoundingClientRect().width
+                : this.anchor instanceof ElementRef
+                ? this.anchor.nativeElement.getBoundingClientRect().width
+                : undefined);
+        fromEvent<MouseEvent>(target, this.trigger)
+            .pipe(takeUntilDestroyed(this.#destroyRef))
+            .subscribe(event => {
                 event.preventDefault();
                 if (this.popupOpened) {
                     this.popupOpened = false;
                     return;
                 }
-                this.zone.run(() => {
-                    const popupSettings: PopupSettings = {
-                        anchor: this.anchor,
-                        closeOnEscape: this.closeOnEscape,
-                        content: this.contentTemplate,
-                        hasBackdrop: false,
-                        height: this.height,
-                        maxHeight: this.maxHeight,
-                        maxWidth: this.maxWidth,
-                        minHeight: this.minHeight,
-                        minWidth: this.minWidth,
-                        offset: this.offset,
-                        popupClass: this.popupClass,
-                        popupWrapperClass: this.popupWrapperClass,
-                        width
-                    };
-                    this.popupRef = this.popupService.create(popupSettings);
-                    const subscription = this.popupRef.closed.subscribe(result => {
-                        this.popupRef = null;
-                        this.close.emit();
-                        subscription.unsubscribe();
-                        if (result instanceof PointerEvent && result.type === this.trigger) {
-                            this.popupOpened =
-                                target instanceof HTMLElement && target.contains(result.target as HTMLElement);
-                        } else if (result instanceof PointerEvent && pointAnchor && result.type !== this.trigger) {
-                            this.popupOpened = false;
-                        }
-                    });
-                    if (pointAnchor) {
-                        this.popupOpened = true;
+                const popupSettings: PopupSettings = {
+                    anchor: this.anchor,
+                    closeOnEscape: this.closeOnEscape,
+                    content: this.contentTemplate,
+                    hasBackdrop: false,
+                    height: this.height,
+                    maxHeight: this.maxHeight,
+                    maxWidth: this.maxWidth,
+                    minHeight: this.minHeight,
+                    minWidth: this.minWidth,
+                    offset: this.offset,
+                    popupClass: this.popupClass,
+                    popupWrapperClass: this.popupWrapperClass,
+                    width
+                };
+                this.popupRef = this.popupService.create(popupSettings);
+                const subscription = this.popupRef.closed.subscribe(result => {
+                    this.popupRef = null;
+                    this.close.emit();
+                    subscription.unsubscribe();
+                    if (result instanceof PointerEvent && result.type === this.trigger) {
+                        this.popupOpened =
+                            target instanceof HTMLElement && target.contains(result.target as HTMLElement);
+                    } else if (result instanceof PointerEvent && pointAnchor && result.type !== this.trigger) {
+                        this.popupOpened = false;
                     }
-                    this.open.emit(this.popupRef);
                 });
+                if (pointAnchor) {
+                    this.popupOpened = true;
+                }
+                this.open.emit(this.popupRef);
             });
-        });
     }
 }

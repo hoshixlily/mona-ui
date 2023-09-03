@@ -96,7 +96,7 @@ export class GridFilterMenuComponent implements OnInit, OnDestroy {
             componentRef.instance.value = filterState.filterMenuValue;
         }
         componentRef.changeDetectorRef.detectChanges();
-        componentRef.instance.apply.pipe().subscribe(filter => {
+        componentRef.instance.apply.pipe(take(1)).subscribe(filter => {
             const filterState: ColumnFilterState = {
                 filter,
                 filterMenuValue: componentRef.instance.value

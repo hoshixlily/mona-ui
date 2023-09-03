@@ -47,7 +47,8 @@ export class MenuItemComponent implements AfterContentInit {
         this.menuItem.divider = divider;
     }
 
-    @Input() set iconClass(iconClass: string) {
+    @Input()
+    public set iconClass(iconClass: string) {
         this.menuItem.iconClass = iconClass;
     }
 
