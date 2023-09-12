@@ -10,7 +10,7 @@ export interface MenuItem<T = unknown> {
     iconClass?: string;
     iconTemplate?: TemplateRef<ContextMenuItemIconTemplateContext>;
     menuClick?: () => void;
-    parent: MenuItem | null;
+    parent?: MenuItem | null;
     subMenuItems?: MenuItem[];
     text?: string;
     textTemplate?: TemplateRef<ContextMenuItemTextTemplateContext>;

@@ -181,6 +181,9 @@
                                 <button monaButton [disabled]="false"#contextMenuAnchor>
                                     <span style="color: lightcoral;">Context Menu Target</span>
                                 </button>
+                                <button monaButton #dynamicContextMenuAnchor>
+                                    Dynamic Context Menu Target
+                                </button>
                                 <mona-contextmenu [target]="contextMenuAnchor" (navigate)="print($event)">
                                     <mona-menu-item text="File">
                                         <ng-template monaMenuItemTextTemplate let-menuItem>
@@ -216,6 +219,8 @@
                                         <mona-menu-item text="Replace"></mona-menu-item>
                                     </mona-menu-item>
                                 </mona-contextmenu>
+                                <mona-contextmenu [target]="dynamicContextMenuAnchor"
+                                                  [menuItems]="[{text: 'Dynamic Menu 1', parent: null}]"></mona-contextmenu>
 
                             </div>
                             <div style="display: flex; align-items: center;">
@@ -442,13 +447,13 @@
                                 <mona-stepper orientation="horizontal" [steps]="stepperSteps" [step]="stepperStep" (stepChange)="onStepperStepChange($event)" [linear]="true" style="width: 600px;">
                                     <ng-template monaStepperLabelTemplate let-step let-index="index" let-active="active">
                                         <span *ngIf="!active" style="color: snow; font-weight: bolder;">{{index+1}}. {{step.label}}</span>
-                                        <span *ngIf="active" style="color: teal; font-weight: bolder;">{{index+1}}. {{step.label}}</span>
+                                        <span *ngIf="active" style="color: darkorange; font-weight: bolder;">{{index+1}}. {{step.label}}</span>
                                     </ng-template>
                                     <ng-template monaStepperIndicatorTemplate let-step let-index="index">
                                         <span style="color: snow; font-weight: bold;">{{step.label.substring(0,2).toUpperCase()}}</span>
                                     </ng-template>
                                     <ng-template monaStepperStepTemplate let-step let-index="index" let-active="active">
-                                        <fa-icon [icon]="sunIcon" style="font-size: 24px; margin-top: 0px;" [ngStyle]="{'color': active?'#f00':'#313234'}"></fa-icon>
+                                        <fa-icon [icon]="starIcon" style="font-size: 24px; margin-top: 0px;" [ngStyle]="{'color': active?'darkorange':'#fafafa'}"></fa-icon>
                                     </ng-template>
                                 </mona-stepper>
                             </div>

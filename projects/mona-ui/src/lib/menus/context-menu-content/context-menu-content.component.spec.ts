@@ -5,7 +5,6 @@ import { AnimationService } from "../../animations/services/animation.service";
 import { PopupDataInjectionToken } from "../../popup/models/PopupInjectionToken";
 import { ContextMenuInjectorData } from "../models/ContextMenuInjectorData";
 import { ContextMenuNavigationEvent } from "../models/ContextMenuNavigationEvent";
-
 import { ContextMenuContentComponent } from "./context-menu-content.component";
 
 const POPUP_TOKEN = [

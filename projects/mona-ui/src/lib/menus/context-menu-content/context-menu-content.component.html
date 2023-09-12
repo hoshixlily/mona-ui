@@ -3,9 +3,9 @@
         <li class="mona-contextmenu-list-item"
             [ngClass]="{'mona-disabled': menuItem.disabled, 'divider': menuItem.divider, 'mona-focused': keyManager?.activeItem?.menuItem === menuItem}"
             (mouseenter)="onListItemMouseEnter($event, menuItem)"
-            (click)="onListItemClick($event, menuItem)" *ngIf="menuItem.visible">
+            (click)="onListItemClick($event, menuItem)" *ngIf="menuItem.visible??true">
             <mona-contextmenu-item [menuItem]="menuItem" [iconSpaceVisible]="iconSpaceVisible" [linkSpaceVisible]="linkSpaceVisible"
-                                   [submenuPopupRef]="menuPopupRef" [attr.tabindex]="0" *ngIf="menuItem.visible"></mona-contextmenu-item>
+                                   [submenuPopupRef]="menuPopupRef" [attr.tabindex]="0" *ngIf="menuItem.visible??true"></mona-contextmenu-item>
         </li>
     </ng-container>
 </ul>

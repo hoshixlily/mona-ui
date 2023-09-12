@@ -141,6 +141,7 @@ import {
     faMoon,
     faSearch,
     faSnowflake,
+    faStar,
     faSun,
     faTimes
 } from "@fortawesome/free-solid-svg-icons";
@@ -265,6 +266,7 @@ export class AppComponent implements OnInit {
     public readonly moonIcon: IconDefinition = faMoon;
     public readonly searchIcon: IconDefinition = faSearch;
     public readonly snowflakeIcon: IconDefinition = faSnowflake;
+    public readonly starIcon: IconDefinition = faStar;
     public readonly sunIcon: IconDefinition = faSun;
     public autoCompleteValue: string = "Yakizakana";
     public breadcrumbItems: BreadcrumbItem[] = [
