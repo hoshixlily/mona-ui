@@ -1,8 +1,8 @@
 import { Component } from "@angular/core";
 import { ComponentFixture, fakeAsync, TestBed, tick } from "@angular/core/testing";
-import {BrowserAnimationsModule, NoopAnimationsModule} from "@angular/platform-browser/animations";
-import {MenuItemComponent} from "../menu-item/menu-item.component";
-import {MenuItem} from "../models/MenuItem";
+import { NoopAnimationsModule } from "@angular/platform-browser/animations";
+import { MenuItemComponent } from "../menu-item/menu-item.component";
+import { MenuItem } from "../models/MenuItem";
 import { ContextMenuService } from "../services/context-menu.service";
 
 import { ContextMenuComponent } from "./context-menu.component";
@@ -40,11 +40,11 @@ class ContextMenuComponentTestComponentWithMenuItems {
     public menuItems: MenuItem[] = [
         {
             text: "First dynamic item",
-            parent: null,
+            parent: null
         },
         {
             text: "Second dynamic item",
-            parent: null,
+            parent: null
         }
     ];
 }
@@ -58,7 +58,12 @@ describe("ContextMenuComponent", () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [ContextMenuComponent, ContextMenuComponentTestComponent, NoopAnimationsModule, ContextMenuComponentTestComponentWithMenuItems],
+            imports: [
+                ContextMenuComponent,
+                ContextMenuComponentTestComponent,
+                NoopAnimationsModule,
+                ContextMenuComponentTestComponentWithMenuItems
+            ],
             providers: [ContextMenuService]
         });
         hostFixture = TestBed.createComponent(ContextMenuComponentTestComponent);
@@ -129,6 +134,21 @@ describe("ContextMenuComponent", () => {
         const contextMenuListAfterClick = document.querySelector("ul.mona-contextmenu-list");
         expect(contextMenuListAfterClick).toBeNull();
     }));
+    it("should not close the context menu on click inside", fakeAsync(() => {
+        const target = hostFixture.nativeElement.querySelector("button");
+        target.dispatchEvent(new MouseEvent("contextmenu", { bubbles: true }));
+        tick();
+        hostFixture.detectChanges();
+        tick();
+        const contextMenuList = document.querySelector("ul.mona-contextmenu-list");
+        expect(contextMenuList).not.toBeNull();
+        contextMenuList!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+        tick();
+        hostFixture.detectChanges();
+        tick();
+        const contextMenuListAfterClick = document.querySelector("ul.mona-contextmenu-list");
+        expect(contextMenuListAfterClick).not.toBeNull();
+    }));
     it("should hide context menu on escape key", fakeAsync(() => {
         const target = hostFixture.nativeElement.querySelector("button");
         target.dispatchEvent(new MouseEvent("contextmenu", { bubbles: true }));
@@ -144,13 +164,24 @@ describe("ContextMenuComponent", () => {
         const contextMenuListAfterClick = document.querySelector("ul.mona-contextmenu-list");
         expect(contextMenuListAfterClick).toBeNull();
     }));
+    it("should close the context menu on click on a menu item", fakeAsync(() => {
+        const target = hostFixture.nativeElement.querySelector("button");
+        target.dispatchEvent(new MouseEvent("contextmenu", { bubbles: true }));
+        tick();
+        hostFixture.detectChanges();
+        tick();
+        const contextMenuList = document.querySelector("ul.mona-contextmenu-list") as HTMLUListElement;
+        const firstItem = contextMenuList.children[0] as HTMLLIElement;
+        firstItem.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+        tick();
+        hostFixture.detectChanges();
+        tick();
+        const contextMenuListAfterClick = document.querySelector("ul.mona-contextmenu-list");
+        expect(contextMenuListAfterClick).toBeNull();
+    }));
     it("should ignore the menu-item components if menuItems are provided", fakeAsync(() => {
         const target = hostFixtureWithMenuItems.nativeElement.querySelector("button");
         target.dispatchEvent(new MouseEvent("contextmenu", { bubbles: true }));
-        tick();
-        hostFixtureWithMenuItems.detectChanges();
-        tick();
-        hostFixtureWithMenuItems.detectChanges();
         tick();
         hostFixtureWithMenuItems.detectChanges();
         tick();

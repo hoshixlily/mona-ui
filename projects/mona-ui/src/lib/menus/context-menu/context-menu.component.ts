@@ -98,7 +98,7 @@ export class ContextMenuComponent implements OnInit, AfterContentInit {
         this.precise = precise;
     }
 
-    private create(event: PointerEvent): void {
+    private create(event: MouseEvent): void {
         this.contextMenuInjectorData.menuClick = this.menuClickNotifier;
         this.contextMenuInjectorData.menuItems = this.menuItems;
         this.contextMenuInjectorData.navigate = this.navigate;
@@ -147,19 +147,19 @@ export class ContextMenuComponent implements OnInit, AfterContentInit {
 
     private setEventListeners(): void {
         const eventTarget = this.target instanceof ElementRef ? this.target.nativeElement : this.target;
-        fromEvent<PointerEvent>(eventTarget, this.trigger)
+        fromEvent<MouseEvent>(eventTarget, this.trigger)
             .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe(event => {
                 event.stopPropagation();
                 event.preventDefault();
                 this.create(event);
             });
-        fromEvent<PointerEvent>(window, "click")
+        fromEvent<MouseEvent>(window, "click")
             .pipe(
                 mergeWith(
-                    fromEvent<PointerEvent>(window, "contextmenu"),
-                    fromEvent<PointerEvent>(window, "auxclick"),
-                    fromEvent<KeyboardEvent>(window, "keydown")
+                    fromEvent<MouseEvent>(window, "contextmenu"),
+                    fromEvent<MouseEvent>(window, "auxclick"),
+                    fromEvent<MouseEvent>(window, "keydown")
                 ),
                 takeUntilDestroyed(this.#destroyRef)
             )
@@ -167,7 +167,7 @@ export class ContextMenuComponent implements OnInit, AfterContentInit {
                 if (event instanceof KeyboardEvent && event.key === "Escape") {
                     this.contextMenuRef?.close();
                 }
-                if (event instanceof PointerEvent) {
+                if (event instanceof MouseEvent) {
                     this.onOutsideClick(event);
                 }
             });
