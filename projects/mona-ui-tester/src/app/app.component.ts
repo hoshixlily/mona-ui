@@ -277,9 +277,9 @@ export class AppComponent implements OnInit {
     ];
     public breadcrumbViewItems: BreadcrumbItem[] = this.breadcrumbItems;
     public buttonGroupButtonSelected: boolean = true;
-    public calendarMaxValue: Date | null = new Date(2022, 6, 15);
-    public calendarMinValue: Date | null = new Date(2022, 6, 10);
-    public calendarValue: Date | null = new Date(2022, 6, 12);
+    public calendarMaxValue: Date | null = null; // new Date(2022, 6, 15);
+    public calendarMinValue: Date | null = null; //new Date(2022, 6, 10);
+    public calendarValue: Date | null = new Date(2023, 8, 16);
     public colorGradientColor: string = "#4d0f33";
     public colorPalette: string[] = [
         "#263400",

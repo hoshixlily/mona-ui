@@ -91,7 +91,7 @@ export class ContextMenuComponent implements OnInit, AfterContentInit {
     }
 
     public openMenu(): void {
-        this.create(new MouseEvent("click") as PointerEvent);
+        this.create(new MouseEvent("click"));
     }
 
     public setPrecise(precise: boolean): void {
