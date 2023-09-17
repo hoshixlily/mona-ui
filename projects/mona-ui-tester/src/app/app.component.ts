@@ -5,8 +5,10 @@ import {
     Component,
     ElementRef,
     OnInit,
+    signal,
     TemplateRef,
-    ViewChild
+    ViewChild,
+    WritableSignal
 } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
@@ -155,7 +157,7 @@ import { GridOrderData } from "./GridOrderData";
     selector: "app-root",
     templateUrl: "./app.component.html",
     styleUrls: ["./app.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush,
+    changeDetection: ChangeDetectionStrategy.Default,
     standalone: true,
     imports: [
         AutoCompleteComponent,
@@ -277,8 +279,9 @@ export class AppComponent implements OnInit {
     ];
     public breadcrumbViewItems: BreadcrumbItem[] = this.breadcrumbItems;
     public buttonGroupButtonSelected: boolean = true;
-    public calendarMaxValue: Date | null = null; // new Date(2022, 6, 15);
-    public calendarMinValue: Date | null = null; //new Date(2022, 6, 10);
+    public calendarDisabledDates: WritableSignal<Date[]> = signal([]);
+    public calendarMaxValue: WritableSignal<Date | null> = signal(null); // new Date(2022, 6, 15);
+    public calendarMinValue: WritableSignal<Date | null> = signal(null); //new Date(2022, 6, 10);
     public calendarValue: Date | null = new Date(2023, 8, 16);
     public colorGradientColor: string = "#4d0f33";
     public colorPalette: string[] = [
@@ -758,9 +761,20 @@ export class AppComponent implements OnInit {
         // }, 2000);
 
         // window.setInterval(() => {
-        //     this.dateMax = DateTime.fromJSDate(this.dateMax).plus({ days: 1 }).toJSDate();
-        //     this.dateMin = DateTime.fromJSDate(this.dateMin).plus({ days: 1 }).toJSDate();
-        // }, 5000);
+        //     this.calendarMinValue.set(this.calendarMinValue() != null ? null : new Date(2023, 8, 11));
+        //     this.calendarMaxValue.set(this.calendarMaxValue() != null ? null : new Date(2023, 8, 27));
+        //     // this.calendarDisabledDates.set(
+        //     //     this.calendarDisabledDates().length > 0
+        //     //         ? []
+        //     //         : [
+        //     //               new Date(2023, 8, 1),
+        //     //               new Date(2023, 8, 2),
+        //     //               new Date(2023, 8, 3),
+        //     //               new Date(2023, 8, 13),
+        //     //               new Date(2023, 8, 23)
+        //     //           ]
+        //     // );
+        // }, 3000);
 
         // window.setInterval(() => {
         //     this.menuBarMenuVisible = !this.menuBarMenuVisible;

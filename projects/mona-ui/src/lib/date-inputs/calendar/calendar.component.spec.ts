@@ -2,6 +2,7 @@ import { Component } from "@angular/core";
 import { ComponentFixture, fakeAsync, TestBed, tick } from "@angular/core/testing";
 import { FormsModule } from "@angular/forms";
 import { By } from "@angular/platform-browser";
+import { Enumerable } from "@mirei/ts-collections";
 import { DateTime } from "luxon";
 
 import { CalendarComponent } from "./calendar.component";
@@ -52,7 +53,7 @@ describe("CalendarComponent", () => {
     });
 
     it("should set the current date to the date passed in", () => {
-        const date = DateTime.fromJSDate(setCalendarDate(hostFixture));
+        const date = DateTime.fromJSDate(setCalendarDateOfHost(hostFixture));
 
         const calendarDate = DateTime.fromJSDate(hostComponent.date);
         expect(date.hasSame(calendarDate, "day")).toBeTrue();
@@ -61,7 +62,7 @@ describe("CalendarComponent", () => {
     });
 
     it("should start the calendar on 28th of the previous month", () => {
-        setCalendarDate(hostFixture);
+        setCalendarDateOfHost(hostFixture);
 
         const table = hostFixture.nativeElement.querySelector("table");
         const firstDay = table.querySelector("tbody tr td:first-child");
@@ -69,7 +70,7 @@ describe("CalendarComponent", () => {
     });
 
     it("should have 35 days in the calendar", () => {
-        setCalendarDate(hostFixture);
+        setCalendarDateOfHost(hostFixture);
 
         const table = hostFixture.nativeElement.querySelector("table");
         const days = table.querySelectorAll("tbody tr td");
@@ -77,7 +78,7 @@ describe("CalendarComponent", () => {
     });
 
     it("should have 16th of the month selected", fakeAsync(() => {
-        setCalendarDate(hostFixture);
+        setCalendarDateOfHost(hostFixture);
 
         tick();
         hostFixture.detectChanges();
@@ -90,7 +91,7 @@ describe("CalendarComponent", () => {
     }));
 
     it("should select the day when clicked", fakeAsync(() => {
-        setCalendarDate(hostFixture);
+        setCalendarDateOfHost(hostFixture);
 
         tick();
         hostFixture.detectChanges();
@@ -110,7 +111,7 @@ describe("CalendarComponent", () => {
     }));
 
     it("should switch to year view", fakeAsync(() => {
-        setCalendarDate(hostFixture);
+        setCalendarDateOfHost(hostFixture);
         switchToYearView(hostFixture);
         const table = hostFixture.debugElement.query(By.css("table"));
         const month = table.query(By.css("tr td:first-child"));
@@ -118,7 +119,7 @@ describe("CalendarComponent", () => {
     }));
 
     it("should switch to decade view", fakeAsync(() => {
-        setCalendarDate(hostFixture);
+        setCalendarDateOfHost(hostFixture);
         switchToDecadeView(hostFixture);
         const table = hostFixture.debugElement.query(By.css("table"));
         const year = table.query(By.css("tr td:first-child"));
@@ -126,7 +127,7 @@ describe("CalendarComponent", () => {
     }));
 
     it("should navigate to next decade", fakeAsync(() => {
-        setCalendarDate(hostFixture);
+        setCalendarDateOfHost(hostFixture);
         switchToDecadeView(hostFixture);
         navigateCalendar(hostFixture, "next");
         const table = hostFixture.debugElement.query(By.css("table"));
@@ -135,7 +136,7 @@ describe("CalendarComponent", () => {
     }));
 
     it("should navigate to previous decade", fakeAsync(() => {
-        setCalendarDate(hostFixture);
+        setCalendarDateOfHost(hostFixture);
         switchToDecadeView(hostFixture);
         navigateCalendar(hostFixture, "prev");
         const table = hostFixture.debugElement.query(By.css("table"));
@@ -144,7 +145,7 @@ describe("CalendarComponent", () => {
     }));
 
     it("should navigate to next year", fakeAsync(() => {
-        setCalendarDate(hostFixture);
+        setCalendarDateOfHost(hostFixture);
         switchToYearView(hostFixture);
         navigateCalendar(hostFixture, "next");
         const table = hostFixture.debugElement.query(By.css("table"));
@@ -153,7 +154,7 @@ describe("CalendarComponent", () => {
     }));
 
     it("should navigate to previous year", fakeAsync(() => {
-        setCalendarDate(hostFixture);
+        setCalendarDateOfHost(hostFixture);
         switchToYearView(hostFixture);
         navigateCalendar(hostFixture, "prev");
         const table = hostFixture.debugElement.query(By.css("table"));
@@ -162,7 +163,7 @@ describe("CalendarComponent", () => {
     }));
 
     it("should navigate to next month", fakeAsync(() => {
-        setCalendarDate(hostFixture);
+        setCalendarDateOfHost(hostFixture);
         navigateCalendar(hostFixture, "next");
         const table = hostFixture.debugElement.query(By.css("table"));
         const day = table.query(By.css("tbody tr td:first-child"));
@@ -170,7 +171,7 @@ describe("CalendarComponent", () => {
     }));
 
     it("should navigate to previous month", fakeAsync(() => {
-        setCalendarDate(hostFixture);
+        setCalendarDateOfHost(hostFixture);
         navigateCalendar(hostFixture, "prev");
         const table = hostFixture.debugElement.query(By.css("table"));
         const day = table.query(By.css("tbody tr td:first-child"));
@@ -178,7 +179,7 @@ describe("CalendarComponent", () => {
     }));
 
     it("should switch to year view when year is clicked", fakeAsync(() => {
-        setCalendarDate(hostFixture);
+        setCalendarDateOfHost(hostFixture);
         switchToDecadeView(hostFixture);
         const table = hostFixture.debugElement.query(By.css("table"));
         const year = table.query(By.css("tr td:first-child"));
@@ -193,7 +194,7 @@ describe("CalendarComponent", () => {
     }));
 
     it("should switch to month view when month is clicked", fakeAsync(() => {
-        setCalendarDate(hostFixture);
+        setCalendarDateOfHost(hostFixture);
         switchToYearView(hostFixture);
         const table = hostFixture.debugElement.query(By.css("table"));
         const month = table.query(By.css("tr td:first-child"));
@@ -208,7 +209,7 @@ describe("CalendarComponent", () => {
     }));
 
     it("should add a full row of next month's days if the last day of the month is Sunday", fakeAsync(() => {
-        setCalendarDate(hostFixture, DateTime.fromISO("2021-10-31").toJSDate());
+        setCalendarDateOfHost(hostFixture, DateTime.fromISO("2021-10-31").toJSDate());
         tick();
         hostFixture.detectChanges();
         tick();
@@ -216,6 +217,56 @@ describe("CalendarComponent", () => {
         const table = hostFixture.debugElement.query(By.css("table"));
         const days = table.queryAll(By.css("tbody tr td"));
         expect(days.length).toBe(42);
+    }));
+
+    it("should disable days before minDate", fakeAsync(() => {
+        setCalendarDate(fixture, DateTime.fromISO("2023-09-17").toJSDate());
+        fixture.componentRef.setInput("min", DateTime.fromISO("2023-09-16").toJSDate());
+        tick();
+        fixture.detectChanges();
+        tick();
+        fixture.detectChanges();
+
+        const table = fixture.debugElement.query(By.css("table"));
+        const days = table.queryAll(By.css("tbody tr td"));
+        // first 15 days should be disabled
+        expect(days.slice(0, 15).every(day => day.nativeElement.classList.contains("mona-disabled"))).toBeTrue();
+    }));
+
+    it("should disable days after maxDate", fakeAsync(() => {
+        setCalendarDate(fixture, DateTime.fromISO("2023-09-17").toJSDate());
+        fixture.componentRef.setInput("max", DateTime.fromISO("2023-09-18").toJSDate());
+        tick();
+        fixture.detectChanges();
+        tick();
+        fixture.detectChanges();
+
+        const table = fixture.debugElement.query(By.css("table"));
+        const days = table.queryAll(By.css("tbody tr td"));
+        // last 13 visible days should be disabled. (The very last day is the first day of the next month)
+        expect(
+            Enumerable.from(days)
+                .takeLast(13)
+                .all(day => day.nativeElement.classList.contains("mona-disabled"))
+        ).toBeTrue();
+    }));
+
+    it("should disable days in disabledDates", fakeAsync(() => {
+        setCalendarDate(fixture, DateTime.fromISO("2023-09-17").toJSDate());
+        fixture.componentRef.setInput("disabledDates", [
+            DateTime.fromISO("2023-09-22").toJSDate(),
+            DateTime.fromISO("2023-09-23").toJSDate()
+        ]);
+        tick();
+        fixture.detectChanges();
+        tick();
+        fixture.detectChanges();
+
+        const table = fixture.debugElement.query(By.css("table"));
+        const days = table.queryAll(By.css("tbody tr td"));
+        // given two disabled dates, 22nd and 23rd, they should be disabled. (+4 because of the four days from the previous month)
+        expect(days[21 + 4].nativeElement.classList.contains("mona-disabled")).toBeTrue();
+        expect(days[22 + 4].nativeElement.classList.contains("mona-disabled")).toBeTrue();
     }));
 });
 
@@ -255,7 +306,7 @@ function navigateCalendar(fixture: ComponentFixture<CalendarComponentTestCompone
     fixture.detectChanges();
 }
 
-function setCalendarDate(
+function setCalendarDateOfHost(
     fixture: ComponentFixture<CalendarComponentTestComponent>,
     date: Date = DateTime.fromISO("2023-09-16").toJSDate()
 ): Date {
@@ -263,4 +314,9 @@ function setCalendarDate(
     fixture.detectChanges();
 
     return date;
+}
+
+function setCalendarDate(fixture: ComponentFixture<CalendarComponent>, date: Date): void {
+    fixture.componentInstance.navigatedDate = date;
+    fixture.detectChanges();
 }

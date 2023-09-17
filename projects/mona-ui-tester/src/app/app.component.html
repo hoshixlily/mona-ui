@@ -655,8 +655,9 @@
                                         <mona-splitter-pane [collapsible]="true">
                                             <div style="width: 100%; height: 100%; padding: 20px;">
                                                 <mona-calendar [(ngModel)]="calendarValue"
-                                                               [min]="calendarMinValue"
-                                                               [max]="calendarMaxValue"
+                                                               [min]="calendarMinValue()"
+                                                               [max]="calendarMaxValue()"
+                                                               [disabledDates]="calendarDisabledDates()"
                                                                style="width: 300px;"></mona-calendar>
                                             </div>
                                         </mona-splitter-pane>

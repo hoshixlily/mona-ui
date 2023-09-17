@@ -34,28 +34,28 @@
                 <td *ngFor="let entry of monthlyViewDict | monaSlice:0:7" (click)="onDayClick(entry.key)"
                     [ngClass]="{'mona-calendar-other-month': entry.key|monaDateComparer:monthBounds.start:'<',
                         'mona-selected':entry.key|monaDateComparer:value:'==',
-                        'mona-disabled': (entry.key|monaDateInclude:disabledDates)||(min !== null && (entry.key|monaDateComparer:min:'<'))||(max !== null && (entry.key|monaDateComparer:max:'>'))}">
+                        'mona-disabled': (entry.key|monaDateInclude:disabledDateList())||(minDate() !== null && (entry.key|monaDateComparer:minDate():'<'))||(maxDate() !== null && (entry.key|monaDateComparer:maxDate():'>'))}">
                     <span>{{entry.value}}</span>
                 </td>
             </tr>
             <tr>
                 <td *ngFor="let entry of monthlyViewDict | monaSlice:7:14" (click)="onDayClick(entry.key)"
                     [ngClass]="{'mona-selected':entry.key|monaDateComparer:value:'==',
-                        'mona-disabled': (entry.key|monaDateInclude:disabledDates)||(min !== null && (entry.key|monaDateComparer:min:'<'))||(max !== null && (entry.key|monaDateComparer:max:'>'))}">
+                        'mona-disabled': (entry.key|monaDateInclude:disabledDateList())||(minDate() !== null && (entry.key|monaDateComparer:minDate():'<'))||(maxDate() !== null && (entry.key|monaDateComparer:maxDate():'>'))}">
                     <span>{{entry.value}}</span>
                 </td>
             </tr>
             <tr>
                 <td *ngFor="let entry of monthlyViewDict | monaSlice:14:21" (click)="onDayClick(entry.key)"
                     [ngClass]="{'mona-selected':entry.key|monaDateComparer:value:'==',
-                        'mona-disabled': (entry.key|monaDateInclude:disabledDates)||(min !== null && (entry.key|monaDateComparer:min:'<'))||(max !== null && (entry.key|monaDateComparer:max:'>'))}">
+                        'mona-disabled': (entry.key|monaDateInclude:disabledDateList())||(minDate() !== null && (entry.key|monaDateComparer:minDate():'<'))||(maxDate() !== null && (entry.key|monaDateComparer:maxDate():'>'))}">
                     <span>{{entry.value}}</span>
                 </td>
             </tr>
             <tr>
                 <td *ngFor="let entry of monthlyViewDict | monaSlice:21:28" (click)="onDayClick(entry.key)"
                     [ngClass]="{'mona-selected':entry.key|monaDateComparer:value:'==',
-                        'mona-disabled': (entry.key|monaDateInclude:disabledDates)||(min !== null && (entry.key|monaDateComparer:min:'<'))||(max !== null && (entry.key|monaDateComparer:max:'>'))}">
+                        'mona-disabled': (entry.key|monaDateInclude:disabledDateList())||(minDate() !== null && (entry.key|monaDateComparer:minDate():'<'))||(maxDate() !== null && (entry.key|monaDateComparer:maxDate():'>'))}">
                     <span>{{entry.value}}</span>
                 </td>
             </tr>
@@ -63,7 +63,7 @@
                 <td *ngFor="let entry of monthlyViewDict | monaSlice:28:35" (click)="onDayClick(entry.key)"
                     [ngClass]="{'mona-calendar-other-month':entry.key|monaDateComparer:monthBounds.end:'>',
                         'mona-selected':entry.key|monaDateComparer:value:'==',
-                        'mona-disabled': (entry.key|monaDateInclude:disabledDates)||(min !== null && (entry.key|monaDateComparer:min:'<'))||(max !== null && (entry.key|monaDateComparer:max:'>'))}">
+                        'mona-disabled': (entry.key|monaDateInclude:disabledDateList())||(minDate() !== null && (entry.key|monaDateComparer:minDate():'<'))||(maxDate() !== null && (entry.key|monaDateComparer:maxDate():'>'))}">
                     <span>{{entry.value}}</span>
                 </td>
             </tr>
@@ -71,7 +71,7 @@
                 <td *ngFor="let entry of monthlyViewDict | monaSlice:35:monthlyViewDict.length" (click)="onDayClick(entry.key)"
                     [ngClass]="{'mona-calendar-other-month': entry.key|monaDateComparer:monthBounds.end:'>',
                         'mona-selected':entry.key|monaDateComparer:value:'==',
-                        'mona-disabled': (entry.key|monaDateInclude:disabledDates)||(min !== null && (entry.key|monaDateComparer:min:'<'))||(max !== null && (entry.key|monaDateComparer:max:'>'))}">
+                        'mona-disabled': (entry.key|monaDateInclude:disabledDateList())||(minDate() !== null && (entry.key|monaDateComparer:minDate():'<'))||(maxDate() !== null && (entry.key|monaDateComparer:maxDate():'>'))}">
                     <span>{{entry.value}}</span>
                 </td>
             </tr>

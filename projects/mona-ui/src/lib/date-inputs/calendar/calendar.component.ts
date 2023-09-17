@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, forwardRef, Input, OnInit } from "@angular/core";
+import { ChangeDetectionStrategy, Component, forwardRef, Input, OnInit, signal, WritableSignal } from "@angular/core";
 import { DateTime, DurationObjectUnits } from "luxon";
 import { CalendarView } from "../models/CalendarView";
 import { Dictionary } from "@mirei/ts-collections";
@@ -44,6 +44,9 @@ export class CalendarComponent implements OnInit, ControlValueAccessor {
     public readonly prevMonthIcon: IconDefinition = faChevronLeft;
     public calendarView: CalendarView = "month";
     public decadeYears: number[] = [];
+    public disabledDateList: WritableSignal<Date[]> = signal([]);
+    public maxDate: WritableSignal<Date | null> = signal(null);
+    public minDate: WritableSignal<Date | null> = signal(null);
     public monthBounds: { start: Date; end: Date } = { start: new Date(), end: new Date() };
     public monthlyViewDict: Dictionary<Date, number> = new Dictionary<Date, number>();
     public navigatedDate: Date = new Date();
@@ -52,16 +55,19 @@ export class CalendarComponent implements OnInit, ControlValueAccessor {
     public disabled: boolean = false;
 
     @Input()
-    public disabledDates: Iterable<Date> = [];
+    public set disabledDates(value: Iterable<Date>) {
+        this.disabledDateList.set(Array.from(value));
+    }
 
     @Input()
-    public format: string = "HH:mm";
+    public set max(value: Date | null) {
+        this.maxDate.set(value);
+    }
 
     @Input()
-    public max: Date | null = null;
-
-    @Input()
-    public min: Date | null = null;
+    public set min(value: Date | null) {
+        this.minDate.set(value);
+    }
 
     public constructor() {}
 
