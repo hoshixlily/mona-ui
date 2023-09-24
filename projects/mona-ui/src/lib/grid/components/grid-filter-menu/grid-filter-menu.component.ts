@@ -1,28 +1,30 @@
+import { animate, AnimationBuilder, style } from "@angular/animations";
+import { NgClass } from "@angular/common";
 import {
     ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
     ComponentRef,
+    DestroyRef,
     ElementRef,
     EventEmitter,
+    inject,
     Input,
-    OnDestroy,
     OnInit,
     Output
 } from "@angular/core";
-import { PopupService } from "../../../popup/services/popup.service";
-import { PopupRef } from "../../../popup/models/PopupRef";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { faFilter, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { take } from "rxjs";
+import { ButtonDirective } from "../../../buttons/button/button.directive";
 import { FilterMenuComponent } from "../../../filter/components/filter-menu/filter-menu.component";
 import { DataType } from "../../../models/DataType";
-import { faFilter, IconDefinition } from "@fortawesome/free-solid-svg-icons";
-import { GridService } from "../../services/grid.service";
-import { ColumnFilterState } from "../../models/ColumnFilterState";
+import { PopupRef } from "../../../popup/models/PopupRef";
+import { PopupService } from "../../../popup/services/popup.service";
 import { Column } from "../../models/Column";
-import { Subject, take, takeUntil } from "rxjs";
-import { animate, AnimationBuilder, style } from "@angular/animations";
-import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { NgClass } from "@angular/common";
-import { ButtonDirective } from "../../../buttons/button/button.directive";
+import { ColumnFilterState } from "../../models/ColumnFilterState";
+import { GridService } from "../../services/grid.service";
 
 @Component({
     selector: "mona-grid-filter-menu",
@@ -32,8 +34,8 @@ import { ButtonDirective } from "../../../buttons/button/button.directive";
     standalone: true,
     imports: [ButtonDirective, NgClass, FontAwesomeModule]
 })
-export class GridFilterMenuComponent implements OnInit, OnDestroy {
-    readonly #destroy: Subject<void> = new Subject<void>();
+export class GridFilterMenuComponent implements OnInit {
+    readonly #destroyRef: DestroyRef = inject(DestroyRef);
     private popupRef?: PopupRef;
     public readonly filterIcon: IconDefinition = faFilter;
 
@@ -45,6 +47,7 @@ export class GridFilterMenuComponent implements OnInit, OnDestroy {
 
     @Input()
     public type: DataType = "string";
+
     public constructor(
         private readonly animationBuilder: AnimationBuilder,
         private readonly cdr: ChangeDetectorRef,
@@ -52,11 +55,6 @@ export class GridFilterMenuComponent implements OnInit, OnDestroy {
         private readonly elementRef: ElementRef,
         private readonly gridService: GridService
     ) {}
-
-    public ngOnDestroy(): void {
-        this.#destroy.next();
-        this.#destroy.complete();
-    }
 
     public ngOnInit(): void {
         this.setSubscriptions();
@@ -134,7 +132,7 @@ export class GridFilterMenuComponent implements OnInit, OnDestroy {
     }
 
     private setSubscriptions(): void {
-        this.gridService.filterLoad$.pipe(takeUntil(this.#destroy)).subscribe(() => {
+        this.gridService.filterLoad$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(() => {
             this.cdr.detectChanges();
         });
     }

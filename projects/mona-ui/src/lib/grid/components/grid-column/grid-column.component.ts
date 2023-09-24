@@ -1,8 +1,8 @@
 import { Component, ContentChild, Input, OnInit } from "@angular/core";
-import { Column } from "../../models/Column";
-import { GridCellTemplateDirective } from "../../directives/grid-cell-template.directive";
 import { DataType } from "../../../models/DataType";
+import { GridCellTemplateDirective } from "../../directives/grid-cell-template.directive";
 import { GridColumnTitleTemplateDirective } from "../../directives/grid-column-title-template.directive";
+import { Column } from "../../models/Column";
 
 @Component({
     selector: "mona-grid-column",

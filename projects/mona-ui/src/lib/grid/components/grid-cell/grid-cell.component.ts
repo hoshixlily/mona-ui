@@ -1,24 +1,26 @@
+import { A11yModule, FocusMonitor, FocusOrigin } from "@angular/cdk/a11y";
+import { NgClass, NgIf, NgTemplateOutlet } from "@angular/common";
 import {
     ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
+    DestroyRef,
     ElementRef,
+    inject,
     Input,
-    OnDestroy,
     OnInit
 } from "@angular/core";
-import { Column } from "../../models/Column";
-import { Row } from "../../models/Row";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from "@angular/forms";
-import { FocusMonitor, FocusOrigin, A11yModule } from "@angular/cdk/a11y";
-import { GridService } from "../../services/grid.service";
 import { asyncScheduler, filter, fromEvent, map, Subject, take, takeUntil, tap, timer } from "rxjs";
-import { CellEditEvent } from "../../models/CellEditEvent";
-import { CheckBoxDirective } from "../../../inputs/check-box/check-box.directive";
 import { DatePickerComponent } from "../../../date-inputs/date-picker/date-picker.component";
+import { CheckBoxDirective } from "../../../inputs/check-box/check-box.directive";
 import { NumericTextBoxComponent } from "../../../inputs/numeric-text-box/components/numeric-text-box/numeric-text-box.component";
 import { TextBoxComponent } from "../../../inputs/text-box/components/text-box/text-box.component";
-import { NgClass, NgIf, NgTemplateOutlet } from "@angular/common";
+import { CellEditEvent } from "../../models/CellEditEvent";
+import { Column } from "../../models/Column";
+import { Row } from "../../models/Row";
+import { GridService } from "../../services/grid.service";
 
 @Component({
     selector: "mona-grid-cell",
@@ -39,8 +41,8 @@ import { NgClass, NgIf, NgTemplateOutlet } from "@angular/common";
         CheckBoxDirective
     ]
 })
-export class GridCellComponent implements OnInit, OnDestroy {
-    readonly #destroy: Subject<void> = new Subject<void>();
+export class GridCellComponent implements OnInit {
+    readonly #destroyRef: DestroyRef = inject(DestroyRef);
     private focused: boolean = false;
     public editForm!: FormGroup;
     public editing: boolean = false;
@@ -57,11 +59,6 @@ export class GridCellComponent implements OnInit, OnDestroy {
         private readonly focusMonitor: FocusMonitor,
         private readonly gridService: GridService
     ) {}
-
-    public ngOnDestroy(): void {
-        this.#destroy.next();
-        this.#destroy.complete();
-    }
 
     public ngOnInit(): void {
         this.initializeForm();
@@ -162,10 +159,120 @@ export class GridCellComponent implements OnInit, OnDestroy {
         }
     }
 
+    private handleArrowDownKey(): void {
+        if (this.editing) {
+            return;
+        }
+        const nextRowElement = document.querySelector(`tr[data-ruid='${this.row.uid}']`)?.nextElementSibling;
+        if (nextRowElement) {
+            const cell = nextRowElement.querySelector(
+                `td .mona-grid-cell[data-field='${this.column.field}']`
+            ) as HTMLElement;
+            if (cell) {
+                cell.focus();
+            }
+        }
+    }
+
+    private handleArrowLeftKey(): void {
+        if (this.editing) {
+            return;
+        }
+        const row = document.querySelector(`tr[data-ruid='${this.row.uid}']`);
+        if (!row) {
+            return;
+        }
+        if (this.column.index > 0) {
+            const cell = row.querySelector(
+                `td .mona-grid-cell[data-col-index='${this.column.index - 1}']`
+            ) as HTMLElement;
+            if (cell) {
+                cell.focus();
+            }
+        } else {
+            const previousRowElement = row.previousElementSibling;
+            if (previousRowElement) {
+                const cell = previousRowElement.querySelector("td:last-child .mona-grid-cell") as HTMLElement;
+                if (cell) {
+                    cell.focus();
+                }
+            }
+        }
+    }
+
+    private handleArrowRightKey(): void {
+        if (this.editing) {
+            return;
+        }
+        const row = document.querySelector(`tr[data-ruid='${this.row.uid}']`);
+        if (!row) {
+            return;
+        }
+        if (this.column.index < this.gridService.columns.length - 1) {
+            const cell = row.querySelector(
+                `td .mona-grid-cell[data-col-index='${this.column.index + 1}']`
+            ) as HTMLElement;
+            if (cell) {
+                cell.focus();
+            }
+        } else {
+            const nextRowElement = row.nextElementSibling;
+            if (nextRowElement) {
+                const cell = nextRowElement.querySelector("td:first-child .mona-grid-cell") as HTMLElement;
+                if (cell) {
+                    cell.focus();
+                }
+            }
+        }
+    }
+
+    private handleArrowUpKey(): void {
+        if (this.editing) {
+            return;
+        }
+        const previousRowElement = document.querySelector(`tr[data-ruid='${this.row.uid}']`)?.previousElementSibling;
+        if (previousRowElement) {
+            const cell = previousRowElement.querySelector(
+                `td .mona-grid-cell[data-field='${this.column.field}']`
+            ) as HTMLElement;
+            if (cell) {
+                cell.focus();
+            }
+        }
+    }
+
+    private handleEnterKey(): void {
+        if (this.editing) {
+            this.updateCellValue();
+        }
+        this.gridService.isInEditMode = false;
+        this.editing = false;
+        this.focus();
+    }
+
+    private handleEscapeKey(): void {
+        this.editing = false;
+        this.gridService.isInEditMode = false;
+        this.focus();
+    }
+
+    private handleF2Key(): void {
+        if (!this.gridEditable) {
+            return;
+        }
+        if (this.focused) {
+            this.editing = true;
+            this.gridService.isInEditMode = true;
+            asyncScheduler.schedule(() => {
+                this.focusCellInput();
+            });
+        }
+    }
+
     private setSubscriptions(): void {
         fromEvent<MouseEvent>(this.elementRef.nativeElement, "dblclick")
             .pipe(
-                takeUntil(this.#destroy),
+                takeUntilDestroyed(this.#destroyRef),
                 tap(event => event.stopPropagation())
             )
             .subscribe(() => {
@@ -181,7 +288,7 @@ export class GridCellComponent implements OnInit, OnDestroy {
             });
         fromEvent<MouseEvent>(this.elementRef.nativeElement, "click")
             .pipe(
-                takeUntil(this.#destroy)
+                takeUntilDestroyed(this.#destroyRef)
                 // tap(event => event.stopPropagation())
             )
             .subscribe(() => {
@@ -191,7 +298,7 @@ export class GridCellComponent implements OnInit, OnDestroy {
             });
         fromEvent<KeyboardEvent>(this.elementRef.nativeElement, "keydown")
             .pipe(
-                takeUntil(this.#destroy),
+                takeUntilDestroyed(this.#destroyRef),
                 tap(event => event.stopPropagation()),
                 filter(
                     event =>
@@ -205,113 +312,35 @@ export class GridCellComponent implements OnInit, OnDestroy {
                 )
             )
             .subscribe(event => {
-                if (event.key === "Enter") {
-                    if (this.editing) {
-                        this.updateCellValue();
-                    }
-                    this.gridService.isInEditMode = false;
-                    this.editing = false;
-                    this.focus();
-                } else if (event.key === "Escape") {
-                    this.editing = false;
-                    this.gridService.isInEditMode = false;
-                    this.focus();
-                } else if (event.key === "ArrowUp") {
-                    if (!this.editing) {
-                        const previousRowElement = document.querySelector(
-                            `tr[data-ruid='${this.row.uid}']`
-                        )?.previousElementSibling;
-                        if (previousRowElement) {
-                            const cell = previousRowElement.querySelector(
-                                `td .mona-grid-cell[data-field='${this.column.field}']`
-                            ) as HTMLElement;
-                            if (cell) {
-                                cell.focus();
-                            }
-                        }
-                    }
-                } else if (event.key === "ArrowDown") {
-                    if (!this.editing) {
-                        const nextRowElement = document.querySelector(
-                            `tr[data-ruid='${this.row.uid}']`
-                        )?.nextElementSibling;
-                        if (nextRowElement) {
-                            const cell = nextRowElement.querySelector(
-                                `td .mona-grid-cell[data-field='${this.column.field}']`
-                            ) as HTMLElement;
-                            if (cell) {
-                                cell.focus();
-                            }
-                        }
-                    }
-                } else if (event.key === "ArrowLeft") {
-                    if (!this.editing) {
-                        const row = document.querySelector(`tr[data-ruid='${this.row.uid}']`);
-                        if (!row) {
-                            return;
-                        }
-                        if (this.column.index > 0) {
-                            const cell = row.querySelector(
-                                `td .mona-grid-cell[data-col-index='${this.column.index - 1}']`
-                            ) as HTMLElement;
-                            if (cell) {
-                                cell.focus();
-                            }
-                        } else {
-                            const previousRowElement = row.previousElementSibling;
-                            if (previousRowElement) {
-                                const cell = previousRowElement.querySelector(
-                                    "td:last-child .mona-grid-cell"
-                                ) as HTMLElement;
-                                if (cell) {
-                                    cell.focus();
-                                }
-                            }
-                        }
-                    }
-                } else if (event.key === "ArrowRight") {
-                    if (!this.editing) {
-                        const row = document.querySelector(`tr[data-ruid='${this.row.uid}']`);
-                        if (!row) {
-                            return;
-                        }
-                        if (this.column.index < this.gridService.columns.length - 1) {
-                            const cell = row.querySelector(
-                                `td .mona-grid-cell[data-col-index='${this.column.index + 1}']`
-                            ) as HTMLElement;
-                            if (cell) {
-                                cell.focus();
-                            }
-                        } else {
-                            const nextRowElement = row.nextElementSibling;
-                            if (nextRowElement) {
-                                const cell = nextRowElement.querySelector(
-                                    "td:first-child .mona-grid-cell"
-                                ) as HTMLElement;
-                                if (cell) {
-                                    cell.focus();
-                                }
-                            }
-                        }
-                    }
-                } else if (event.key === "F2") {
-                    if (!this.gridEditable) {
-                        return;
-                    }
-                    if (this.focused) {
-                        this.editing = true;
-                        this.gridService.isInEditMode = true;
-                        asyncScheduler.schedule(() => {
-                            this.focusCellInput();
-                        });
-                    }
+                switch (event.key) {
+                    case "Enter":
+                        this.handleEnterKey();
+                        break;
+                    case "Escape":
+                        this.handleEscapeKey();
+                        break;
+                    case "ArrowUp":
+                        this.handleArrowUpKey();
+                        break;
+                    case "ArrowDown":
+                        this.handleArrowDownKey();
+                        break;
+                    case "ArrowLeft":
+                        this.handleArrowLeftKey();
+                        break;
+                    case "ArrowRight":
+                        this.handleArrowRightKey();
+                        break;
+                    case "F2":
+                        this.handleF2Key();
+                        break;
                 }
                 this.cdr.markForCheck();
             });
         if (this.column.dataType === "date") {
             this.editForm.controls[this.column.field].valueChanges
                 .pipe(
-                    takeUntil(this.#destroy),
+                    takeUntilDestroyed(this.#destroyRef),
                     map(value => {
                         return value as Date;
                     })

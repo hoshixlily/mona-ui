@@ -1,17 +1,27 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, OnDestroy, OnInit } from "@angular/core";
-import { GridService } from "../../services/grid.service";
-import { fromEvent, mergeWith, Subject, takeUntil } from "rxjs";
-import { Column } from "../../models/Column";
-import { Row } from "../../models/Row";
-import { faChevronDown, faChevronRight, IconDefinition } from "@fortawesome/free-solid-svg-icons";
-import { GridGroup } from "../../models/GridGroup";
-import { Dictionary, KeyValuePair } from "@mirei/ts-collections";
-import { GridGroupPipe } from "../../pipes/grid-group.pipe";
-import { SlicePipe } from "../../../pipes/slice.pipe";
+import { NgClass, NgFor, NgIf, NgTemplateOutlet } from "@angular/common";
+import {
+    AfterViewInit,
+    ChangeDetectionStrategy,
+    Component,
+    DestroyRef,
+    ElementRef,
+    inject,
+    Input,
+    OnInit
+} from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { faChevronDown, faChevronRight, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { Dictionary, KeyValuePair } from "@mirei/ts-collections";
+import { fromEvent, mergeWith } from "rxjs";
 import { ButtonDirective } from "../../../buttons/button/button.directive";
+import { SlicePipe } from "../../../pipes/slice.pipe";
+import { Column } from "../../models/Column";
+import { GridGroup } from "../../models/GridGroup";
+import { Row } from "../../models/Row";
+import { GridGroupPipe } from "../../pipes/grid-group.pipe";
+import { GridService } from "../../services/grid.service";
 import { GridCellComponent } from "../grid-cell/grid-cell.component";
-import { NgFor, NgIf, NgClass, NgTemplateOutlet } from "@angular/common";
 
 @Component({
     selector: "mona-grid-list",
@@ -31,8 +41,8 @@ import { NgFor, NgIf, NgClass, NgTemplateOutlet } from "@angular/common";
         GridGroupPipe
     ]
 })
-export class GridListComponent implements OnInit, AfterViewInit, OnDestroy {
-    readonly #destroy: Subject<void> = new Subject<void>();
+export class GridListComponent implements OnInit, AfterViewInit {
+    readonly #destroyRef: DestroyRef = inject(DestroyRef);
     public readonly collapseIcon: IconDefinition = faChevronDown;
     public readonly expandIcon: IconDefinition = faChevronRight;
 
@@ -51,11 +61,6 @@ export class GridListComponent implements OnInit, AfterViewInit, OnDestroy {
         window.setTimeout(() => {
             this.synchronizeHorizontalScroll();
         }, 0);
-    }
-
-    public ngOnDestroy(): void {
-        this.#destroy.next();
-        this.#destroy.complete();
     }
 
     public ngOnInit(): void {
@@ -138,7 +143,7 @@ export class GridListComponent implements OnInit, AfterViewInit, OnDestroy {
 
     private setSubscriptions(): void {
         fromEvent<MouseEvent>(document, "click")
-            .pipe(mergeWith(fromEvent<KeyboardEvent>(document, "keyup")), takeUntil(this.#destroy))
+            .pipe(mergeWith(fromEvent<KeyboardEvent>(document, "keyup")), takeUntilDestroyed(this.#destroyRef))
             .subscribe(e => {
                 if (e.type === "click") {
                     const event = e as MouseEvent;
@@ -163,7 +168,7 @@ export class GridListComponent implements OnInit, AfterViewInit, OnDestroy {
             return;
         }
         fromEvent(gridElement, "scroll")
-            .pipe(takeUntil(this.#destroy))
+            .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe(() => {
                 headerElement.scrollLeft = gridElement.scrollLeft;
             });

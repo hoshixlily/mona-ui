@@ -1,3 +1,5 @@
+import { CdkDrag, CdkDragDrop, CdkDragEnter, CdkDragPreview, CdkDragStart, CdkDropList } from "@angular/cdk/drag-drop";
+import { NgFor, NgIf, NgStyle, NgTemplateOutlet } from "@angular/common";
 import {
     AfterContentInit,
     AfterViewInit,
@@ -10,36 +12,32 @@ import {
     EventEmitter,
     inject,
     Input,
-    OnDestroy,
     OnInit,
     Output,
     QueryList,
     ViewChild
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { GridService } from "../../services/grid.service";
-import { faArrowDownLong, faArrowUpLong, IconDefinition } from "@fortawesome/free-solid-svg-icons";
-import { Column } from "../../models/Column";
-import { SortDescriptor } from "../../../query/sort/SortDescriptor";
-import { ColumnFilterState } from "../../models/ColumnFilterState";
-import { PageSizeChangeEvent } from "../../../pager/models/PageSizeChangeEvent";
-import { PageChangeEvent } from "../../../pager/models/PageChangeEvent";
-import { GridColumnComponent } from "../grid-column/grid-column.component";
-import { CdkDragDrop, CdkDragEnter, CdkDragStart, CdkDropList, CdkDrag, CdkDragPreview } from "@angular/cdk/drag-drop";
-import { CompositeFilterDescriptor } from "../../../query/filter/FilterDescriptor";
-import { Subject, takeUntil } from "rxjs";
-import { SortableOptions } from "../../models/SortableOptions";
-import { Enumerable } from "@mirei/ts-collections";
-import { CellEditEvent } from "../../models/CellEditEvent";
-import { GridPagePipe } from "../../pipes/grid-page.pipe";
-import { GridFilterPipe } from "../../pipes/grid-filter.pipe";
-import { PagerComponent } from "../../../pager/components/pager/pager.component";
-import { GridListComponent } from "../grid-list/grid-list.component";
-import { GridColumnResizeHandlerDirective } from "../../directives/grid-column-resize-handler.directive";
-import { GridFilterMenuComponent } from "../grid-filter-menu/grid-filter-menu.component";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { faArrowDownLong, faArrowUpLong, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { Enumerable } from "@mirei/ts-collections";
 import { ChipComponent } from "../../../buttons/chip/chip.component";
-import { NgIf, NgFor, NgStyle, NgTemplateOutlet } from "@angular/common";
+import { PagerComponent } from "../../../pager/components/pager/pager.component";
+import { PageChangeEvent } from "../../../pager/models/PageChangeEvent";
+import { PageSizeChangeEvent } from "../../../pager/models/PageSizeChangeEvent";
+import { CompositeFilterDescriptor } from "../../../query/filter/FilterDescriptor";
+import { SortDescriptor } from "../../../query/sort/SortDescriptor";
+import { GridColumnResizeHandlerDirective } from "../../directives/grid-column-resize-handler.directive";
+import { CellEditEvent } from "../../models/CellEditEvent";
+import { Column } from "../../models/Column";
+import { ColumnFilterState } from "../../models/ColumnFilterState";
+import { SortableOptions } from "../../models/SortableOptions";
+import { GridFilterPipe } from "../../pipes/grid-filter.pipe";
+import { GridPagePipe } from "../../pipes/grid-page.pipe";
+import { GridService } from "../../services/grid.service";
+import { GridColumnComponent } from "../grid-column/grid-column.component";
+import { GridFilterMenuComponent } from "../grid-filter-menu/grid-filter-menu.component";
+import { GridListComponent } from "../grid-list/grid-list.component";
 
 @Component({
     selector: "mona-grid",
