@@ -90,7 +90,7 @@ export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit {
     @Input()
     public data: Iterable<any> = [];
 
-    @Input()
+    @Input({ required: true })
     public keyField: string = "";
 
     @Output()

@@ -1,3 +1,5 @@
+import { Clipboard } from "@angular/cdk/clipboard";
+import { NgIf } from "@angular/common";
 import {
     AfterViewInit,
     ChangeDetectionStrategy,
@@ -16,25 +18,23 @@ import {
     ViewChild,
     WritableSignal
 } from "@angular/core";
-import { SliderComponent } from "../../../slider/components/slider/slider.component";
-import { distinctUntilChanged, fromEvent, Subject, switchMap, tap } from "rxjs";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from "@angular/forms";
-import { faCopy, faSort, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
-import { HSV, HSVSignal, RGB, RGBA, RGBSignal } from "../../../models/ColorSpaces";
-import { ColorMode } from "../../../models/ColorMode";
-import { Clipboard } from "@angular/cdk/clipboard";
-import { MenuItemComponent } from "../../../../menus/menu-item/menu-item.component";
-import { ContextMenuComponent } from "../../../../menus/context-menu/context-menu.component";
-import { TextBoxSuffixTemplateDirective } from "../../../text-box/directives/text-box-suffix-template.directive";
-import { TextBoxPrefixTemplateDirective } from "../../../text-box/directives/text-box-prefix-template.directive";
-import { TextBoxComponent } from "../../../text-box/components/text-box/text-box.component";
+import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { faCopy, faSort, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { distinctUntilChanged, fromEvent, Subject, switchMap, tap } from "rxjs";
 import { ButtonDirective } from "../../../../buttons/button/button.directive";
-import { NumericTextBoxPrefixTemplateDirective } from "../../../numeric-text-box/directives/numeric-text-box-prefix-template.directive";
+import { ContextMenuComponent } from "../../../../menus/context-menu/context-menu.component";
+import { MenuItemComponent } from "../../../../menus/menu-item/menu-item.component";
+import { ColorMode } from "../../../models/ColorMode";
+import { HSV, HSVSignal, RGB, RGBA, RGBSignal } from "../../../models/ColorSpaces";
 import { NumericTextBoxComponent } from "../../../numeric-text-box/components/numeric-text-box/numeric-text-box.component";
+import { NumericTextBoxPrefixTemplateDirective } from "../../../numeric-text-box/directives/numeric-text-box-prefix-template.directive";
+import { SliderComponent } from "../../../slider/components/slider/slider.component";
+import { TextBoxComponent } from "../../../text-box/components/text-box/text-box.component";
+import { TextBoxPrefixTemplateDirective } from "../../../text-box/directives/text-box-prefix-template.directive";
+import { TextBoxSuffixTemplateDirective } from "../../../text-box/directives/text-box-suffix-template.directive";
 import { AlphaSliderComponent } from "../alpha-slider/alpha-slider.component";
-import { NgIf } from "@angular/common";
 import { HueSliderComponent } from "../hue-slider/hue-slider.component";
 
 @Component({
@@ -74,7 +74,6 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
     #propagateChange: (value: string) => void = () => {};
     public readonly copyIcon: IconDefinition = faCopy;
     public readonly switchIcon: IconDefinition = faSort;
-    public readonly errorIcon: IconDefinition = faTimes;
     public readonly hueValue$: Subject<number> = new Subject<number>();
     public alpha: WritableSignal<number> = signal(255);
     public alphaInputColor: Signal<string> = signal("#FFFFFF");
@@ -244,13 +243,6 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
         this.cdr.detectChanges();
     }
 
-    private getLongHex(hex: string): string {
-        if (hex.length === 4) {
-            return `#${hex[1]}${hex[1]}${hex[2]}${hex[2]}${hex[3]}${hex[3]}`;
-        }
-        return hex;
-    }
-
     private getSaturationFromPosition(): number {
         const minVal = this.hsvPointer.nativeElement.offsetLeft + this.hsvPointer.nativeElement.offsetWidth / 2;
         const maxVal = this.hsvRectangle.nativeElement.offsetWidth;
@@ -380,7 +372,7 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
         const max = Math.max(r, g, b);
         const min = Math.min(r, g, b);
         let h = 0;
-        let s = 0;
+        let s: number;
         const v = max;
         const d = max - min;
         s = max === 0 ? 0 : d / max;

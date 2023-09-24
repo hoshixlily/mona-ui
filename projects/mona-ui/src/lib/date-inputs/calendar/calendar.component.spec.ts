@@ -8,12 +8,16 @@ import { DateTime } from "luxon";
 import { CalendarComponent } from "./calendar.component";
 
 @Component({
-    template: `<mona-calendar [ngModel]="date" (ngModelChange)="onDateChange($event)"></mona-calendar>`,
+    template: ` <mona-calendar
+        [disabled]="disabled"
+        [ngModel]="date"
+        (ngModelChange)="onDateChange($event)"></mona-calendar>`,
     standalone: true,
     imports: [CalendarComponent, FormsModule]
 })
 class CalendarComponentTestComponent {
-    public date: Date = new Date();
+    public date: Date | null = new Date();
+    public disabled: boolean = false;
 
     public onDateChange(date: Date): void {
         this.date = date;
@@ -53,9 +57,9 @@ describe("CalendarComponent", () => {
     });
 
     it("should set the current date to the date passed in", () => {
-        const date = DateTime.fromJSDate(setCalendarDateOfHost(hostFixture));
+        const date = DateTime.fromJSDate(setCalendarDateOfHost(hostFixture) as Date);
 
-        const calendarDate = DateTime.fromJSDate(hostComponent.date);
+        const calendarDate = DateTime.fromJSDate(hostComponent.date as Date);
         expect(date.hasSame(calendarDate, "day")).toBeTrue();
         expect(date.hasSame(calendarDate, "month")).toBeTrue();
         expect(date.hasSame(calendarDate, "year")).toBeTrue();
@@ -268,6 +272,35 @@ describe("CalendarComponent", () => {
         expect(days[21 + 4].nativeElement.classList.contains("mona-disabled")).toBeTrue();
         expect(days[22 + 4].nativeElement.classList.contains("mona-disabled")).toBeTrue();
     }));
+
+    it("should disable the calendar if disabled is true", fakeAsync(() => {
+        setCalendarDateOfHost(hostFixture);
+        hostFixture.componentInstance.disabled = true;
+        tick();
+        hostFixture.detectChanges();
+        tick();
+        hostFixture.detectChanges();
+        const table = hostFixture.debugElement.query(By.css("table"));
+        const days = table.queryAll(By.css("tbody tr td"));
+        expect(days.every(day => day.nativeElement.classList.contains("mona-disabled"))).toBeTrue();
+    }));
+
+    it("should set the date to clicked date", fakeAsync(() => {
+        setCalendarDateOfHost(hostFixture, null);
+        tick();
+        hostFixture.detectChanges();
+        tick();
+
+        const table = hostFixture.debugElement.query(By.css("table"));
+        const dayList = table.queryAll(By.css("tbody tr td"));
+        const day = dayList.find(d => d.nativeElement.textContent === "1");
+        day?.nativeElement.click();
+        tick();
+        hostFixture.detectChanges();
+        tick();
+        hostFixture.detectChanges();
+        expect(day?.nativeElement.textContent).toEqual("1");
+    }));
 });
 
 function switchToYearView(fixture: ComponentFixture<CalendarComponentTestComponent>): void {
@@ -308,8 +341,8 @@ function navigateCalendar(fixture: ComponentFixture<CalendarComponentTestCompone
 
 function setCalendarDateOfHost(
     fixture: ComponentFixture<CalendarComponentTestComponent>,
-    date: Date = DateTime.fromISO("2023-09-16").toJSDate()
-): Date {
+    date: Date | null = DateTime.fromISO("2023-09-16").toJSDate()
+): Date | null {
     fixture.componentInstance.date = date;
     fixture.detectChanges();
 
