@@ -1,8 +1,8 @@
+import { ConnectedPosition } from "@angular/cdk/overlay";
 import { Injectable } from "@angular/core";
+import { PopupRef } from "../../popup/models/PopupRef";
 import { PopupService } from "../../popup/services/popup.service";
 import { ContextMenuSettings } from "../models/ContextMenuSettings";
-import { PopupRef } from "../../popup/models/PopupRef";
-import { ConnectedPosition } from "@angular/cdk/overlay";
 
 @Injectable({
     providedIn: "root"

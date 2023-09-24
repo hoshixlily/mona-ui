@@ -1,9 +1,9 @@
 import { AfterContentInit, Component, ContentChild, ContentChildren, Input, OnInit, QueryList } from "@angular/core";
-import { MenuItem } from "../models/MenuItem";
-import { MenuItemComponent } from "../menu-item/menu-item.component";
 import { v4 } from "uuid";
 import { ContextMenuComponent } from "../context-menu/context-menu.component";
 import { MenuTextTemplateDirective } from "../directives/menu-text-template.directive";
+import { MenuItemComponent } from "../menu-item/menu-item.component";
+import { MenuItem } from "../models/MenuItem";
 
 @Component({
     selector: "mona-menu",

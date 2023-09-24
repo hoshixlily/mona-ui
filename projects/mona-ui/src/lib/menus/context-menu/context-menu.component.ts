@@ -1,3 +1,4 @@
+import { Point } from "@angular/cdk/drag-drop";
 import {
     AfterContentInit,
     Component,
@@ -11,20 +12,19 @@ import {
     Output,
     QueryList
 } from "@angular/core";
-import { ContextMenuService } from "../services/context-menu.service";
-import { ContextMenuContentComponent } from "../context-menu-content/context-menu-content.component";
-import { MenuItem } from "../models/MenuItem";
-import { ContextMenuInjectorData } from "../models/ContextMenuInjectorData";
-import { PopupRef } from "../../popup/models/PopupRef";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { fromEvent, mergeWith, Subject, take } from "rxjs";
+import { v4 } from "uuid";
 import { PopupOffset } from "../../popup/models/PopupOffset";
+import { PopupRef } from "../../popup/models/PopupRef";
+import { ContextMenuContentComponent } from "../context-menu-content/context-menu-content.component";
 import { MenuItemComponent } from "../menu-item/menu-item.component";
 import { ContextMenuCloseEvent } from "../models/ContextMenuCloseEvent";
-import { v4 } from "uuid";
-import { ContextMenuOpenEvent } from "../models/ContextMenuOpenEvent";
+import { ContextMenuInjectorData } from "../models/ContextMenuInjectorData";
 import { ContextMenuNavigationEvent } from "../models/ContextMenuNavigationEvent";
-import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { Point } from "@angular/cdk/drag-drop";
+import { ContextMenuOpenEvent } from "../models/ContextMenuOpenEvent";
+import { MenuItem } from "../models/MenuItem";
+import { ContextMenuService } from "../services/context-menu.service";
 
 @Component({
     selector: "mona-contextmenu",

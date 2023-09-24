@@ -1,3 +1,5 @@
+import { ActiveDescendantKeyManager } from "@angular/cdk/a11y";
+import { NgClass, NgFor, NgIf } from "@angular/common";
 import {
     AfterViewInit,
     ChangeDetectionStrategy,
@@ -9,16 +11,14 @@ import {
     QueryList,
     ViewChildren
 } from "@angular/core";
-import { ContextMenuInjectorData } from "../models/ContextMenuInjectorData";
-import { PopupDataInjectionToken } from "../../popup/models/PopupInjectionToken";
-import { ContextMenuService } from "../services/context-menu.service";
-import { MenuItem } from "../models/MenuItem";
-import { PopupRef } from "../../popup/models/PopupRef";
-import { ContextMenuItemComponent } from "../context-menu-item/context-menu-item.component";
-import { ActiveDescendantKeyManager } from "@angular/cdk/a11y";
 import { filter, fromEvent, Subject } from "rxjs";
 import { AnimationService } from "../../animations/services/animation.service";
-import { NgFor, NgIf, NgClass } from "@angular/common";
+import { PopupDataInjectionToken } from "../../popup/models/PopupInjectionToken";
+import { PopupRef } from "../../popup/models/PopupRef";
+import { ContextMenuItemComponent } from "../context-menu-item/context-menu-item.component";
+import { ContextMenuInjectorData } from "../models/ContextMenuInjectorData";
+import { MenuItem } from "../models/MenuItem";
+import { ContextMenuService } from "../services/context-menu.service";
 
 @Component({
     selector: "mona-contextmenu-content",
@@ -139,6 +139,81 @@ export class ContextMenuContentComponent implements OnInit, AfterViewInit {
         listElement?.focus();
     }
 
+    private handleArrowLeftKey(): void {
+        if (!this.contextMenuData.isRoot) {
+            this.contextMenuData.parentMenuRef?.close();
+            this.contextMenuData.subMenuClose?.next();
+            this.contextMenuData.navigate.emit({
+                previousItem: this.keyManager.activeItem?.menuItem ?? null,
+                currentItem: this.keyManager.activeItem?.menuItem.parent ?? null,
+                direction: "left"
+            });
+        } else {
+            this.contextMenuData.navigate.emit({
+                previousItem: this.keyManager.activeItem?.menuItem ?? null,
+                currentItem: null,
+                direction: "left"
+            });
+        }
+    }
+
+    private handleArrowRightKey(): void {
+        if (
+            this.keyManager.activeItem?.menuItem &&
+            this.keyManager.activeItem.menuItem.subMenuItems &&
+            this.keyManager.activeItem.menuItem.subMenuItems.length > 0
+        ) {
+            this.menuPopupRef?.close();
+            const previousItem = this.keyManager.activeItem;
+            if (this.keyManager.activeItem) {
+                this.create(
+                    this.keyManager.activeItem.elementRef.nativeElement,
+                    this.keyManager.activeItem.menuItem,
+                    true
+                );
+            }
+            this.contextMenuData.navigate.emit({
+                previousItem: previousItem?.menuItem ?? null,
+                currentItem:
+                    this.keyManager.activeItem?.menuItem.subMenuItems?.find(mi => !mi.disabled && !mi.divider) ?? null,
+                direction: "right"
+            });
+        } else {
+            this.contextMenuData.navigate.emit({
+                previousItem: this.keyManager.activeItem?.menuItem ?? null,
+                currentItem: null,
+                direction: "right"
+            });
+        }
+    }
+
+    private handleInputKeys(): void {
+        if (this.keyManager.activeItem?.menuItem) {
+            if (
+                this.keyManager.activeItem.menuItem.subMenuItems &&
+                this.keyManager.activeItem.menuItem.subMenuItems.length > 0
+            ) {
+                return;
+            }
+            if (this.keyManager.activeItem) {
+                this.keyManager.activeItem.menuItem.menuClick?.();
+                this.contextMenuData.menuClick?.next(this.keyManager.activeItem.menuItem);
+            }
+        }
+    }
+
+    private handleVerticalArrowKeys(event: KeyboardEvent): void {
+        const previousItem = this.keyManager.activeItem;
+        this.keyManager.onKeydown(event);
+        if (this.keyManager.activeItem !== previousItem) {
+            this.contextMenuData.navigate.emit({
+                previousItem: previousItem?.menuItem ?? null,
+                currentItem: this.keyManager.activeItem?.menuItem ?? null,
+                direction: event.key === "ArrowDown" ? "down" : "up"
+            });
+        }
+    }
+
     private setEventListeners(): void {
         fromEvent<KeyboardEvent>(this.elementRef.nativeElement, "keydown")
             .pipe(
@@ -157,78 +232,17 @@ export class ContextMenuContentComponent implements OnInit, AfterViewInit {
                 switch (event.key) {
                     case "ArrowDown":
                     case "ArrowUp":
-                        const previousItem = this.keyManager.activeItem;
-                        this.keyManager.onKeydown(event);
-                        if (this.keyManager.activeItem !== previousItem) {
-                            this.contextMenuData.navigate.emit({
-                                previousItem: previousItem?.menuItem ?? null,
-                                currentItem: this.keyManager.activeItem?.menuItem ?? null,
-                                direction: event.key === "ArrowDown" ? "down" : "up"
-                            });
-                        }
+                        this.handleVerticalArrowKeys(event);
                         break;
                     case "Enter":
                     case " ":
-                        if (this.keyManager.activeItem?.menuItem) {
-                            if (
-                                this.keyManager.activeItem.menuItem.subMenuItems &&
-                                this.keyManager.activeItem.menuItem.subMenuItems.length > 0
-                            ) {
-                                return;
-                            }
-                            if (this.keyManager.activeItem) {
-                                this.keyManager.activeItem.menuItem.menuClick?.();
-                                this.contextMenuData.menuClick?.next(this.keyManager.activeItem.menuItem);
-                            }
-                        }
+                        this.handleInputKeys();
                         break;
                     case "ArrowRight":
-                        if (
-                            this.keyManager.activeItem?.menuItem &&
-                            this.keyManager.activeItem.menuItem.subMenuItems &&
-                            this.keyManager.activeItem.menuItem.subMenuItems.length > 0
-                        ) {
-                            this.menuPopupRef?.close();
-                            const previousItem = this.keyManager.activeItem;
-                            if (this.keyManager.activeItem) {
-                                this.create(
-                                    this.keyManager.activeItem.elementRef.nativeElement,
-                                    this.keyManager.activeItem.menuItem,
-                                    true
-                                );
-                            }
-                            this.contextMenuData.navigate.emit({
-                                previousItem: previousItem?.menuItem ?? null,
-                                currentItem:
-                                    this.keyManager.activeItem?.menuItem.subMenuItems?.find(
-                                        mi => !mi.disabled && !mi.divider
-                                    ) ?? null,
-                                direction: "right"
-                            });
-                        } else {
-                            this.contextMenuData.navigate.emit({
-                                previousItem: this.keyManager.activeItem?.menuItem ?? null,
-                                currentItem: null,
-                                direction: "right"
-                            });
-                        }
+                        this.handleArrowRightKey();
                         break;
                     case "ArrowLeft":
-                        if (!this.contextMenuData.isRoot) {
-                            this.contextMenuData.parentMenuRef?.close();
-                            this.contextMenuData.subMenuClose?.next();
-                            this.contextMenuData.navigate.emit({
-                                previousItem: this.keyManager.activeItem?.menuItem ?? null,
-                                currentItem: this.keyManager.activeItem?.menuItem.parent ?? null,
-                                direction: "left"
-                            });
-                        } else {
-                            this.contextMenuData.navigate.emit({
-                                previousItem: this.keyManager.activeItem?.menuItem ?? null,
-                                currentItem: null,
-                                direction: "left"
-                            });
-                        }
+                        this.handleArrowLeftKey();
                         break;
                 }
                 this.cdr.markForCheck();

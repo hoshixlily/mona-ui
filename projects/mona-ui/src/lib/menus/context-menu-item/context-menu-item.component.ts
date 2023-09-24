@@ -1,10 +1,10 @@
+import { Highlightable } from "@angular/cdk/a11y";
+import { NgClass, NgIf, NgTemplateOutlet } from "@angular/common";
 import { Component, ElementRef, Input, OnDestroy, OnInit } from "@angular/core";
-import { MenuItem } from "../models/MenuItem";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { faChevronRight, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { PopupRef } from "../../popup/models/PopupRef";
-import { Highlightable } from "@angular/cdk/a11y";
-import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { NgIf, NgClass, NgTemplateOutlet } from "@angular/common";
+import { MenuItem } from "../models/MenuItem";
 
 @Component({
     selector: "mona-contextmenu-item",
