@@ -1,11 +1,12 @@
 import { ApplicationRef, ComponentRef, createComponent, Injectable } from "@angular/core";
-import { NotificationContainerData } from "../models/NotificationContainerData";
-import { NotificationPosition } from "../models/NotificationPosition";
 import { Subject, Subscription, take } from "rxjs";
-import { NotificationType } from "../models/NotificationType";
+import { v4 } from "uuid";
+import { NotificationContainerComponent } from "../components/notification-container/notification-container.component";
+import { NotificationContainerData } from "../models/NotificationContainerData";
 import { NotificationData } from "../models/NotificationData";
 import { NotificationOptions } from "../models/NotificationOptions";
-import { NotificationContainerComponent } from "../components/notification-container/notification-container.component";
+import { NotificationPosition } from "../models/NotificationPosition";
+import { NotificationType } from "../models/NotificationType";
 
 @Injectable({
     providedIn: "root"
@@ -21,18 +22,9 @@ export class NotificationService {
         topleft: null,
         topright: null
     };
+
     public constructor(private readonly appRef: ApplicationRef) {
         this.initialize();
-    }
-
-    private static generateRandomString(length: number): string {
-        let result = "";
-        const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        const charactersLength = characters.length;
-        for (let i = 0; i < length; i++) {
-            result += characters.charAt(Math.floor(Math.random() * charactersLength));
-        }
-        return result;
     }
 
     private static getDefaultTitle(type: NotificationType): string {
@@ -65,7 +57,7 @@ export class NotificationService {
 
     public show(options: NotificationOptions): void {
         if (!options.id) {
-            options.id = `Notification_${NotificationService.generateRandomString(16)}`;
+            options.id = `Notification_${v4()}`;
         }
         if (!options.text && !options.textTemplate) {
             throw new Error(`Either notification text or textTemplate is required.`);

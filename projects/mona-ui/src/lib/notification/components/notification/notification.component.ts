@@ -1,4 +1,6 @@
+import { NgIf, NgStyle, NgTemplateOutlet } from "@angular/common";
 import { Component, Input, OnDestroy, OnInit, signal, WritableSignal } from "@angular/core";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import {
     faCheckCircle,
     faExclamationCircle,
@@ -7,13 +9,11 @@ import {
     faTimesCircle,
     IconDefinition
 } from "@fortawesome/free-solid-svg-icons";
-import { NotificationType } from "../../models/NotificationType";
-import { NotificationData } from "../../models/NotificationData";
-import { NotificationFade, NotificationSlide } from "../../animations/animation";
 import { asyncScheduler, interval, takeWhile } from "rxjs";
 import { ProgressBarComponent } from "../../../progress-bars/progress-bar/components/progress-bar/progress-bar.component";
-import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { NgIf, NgTemplateOutlet, NgStyle } from "@angular/common";
+import { NotificationFade, NotificationSlide } from "../../animations/animation";
+import { NotificationData } from "../../models/NotificationData";
+import { NotificationType } from "../../models/NotificationType";
 
 @Component({
     selector: "mona-notification",

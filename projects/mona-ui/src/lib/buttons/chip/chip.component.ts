@@ -1,8 +1,8 @@
-import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
-import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { ButtonDirective } from "../button/button.directive";
 import { NgClass, NgIf } from "@angular/common";
+import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { ButtonDirective } from "../button/button.directive";
 
 @Component({
     selector: "mona-chip",
@@ -30,5 +30,6 @@ export class ChipComponent implements OnInit {
     public tabindex: number = 0;
 
     public constructor() {}
+
     public ngOnInit(): void {}
 }

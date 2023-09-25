@@ -12,8 +12,8 @@ import {
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { Enumerable } from "@mirei/ts-collections";
 import { SelectionMode } from "../../models/SelectionMode";
-import { ButtonService } from "../services/button.service";
 import { ButtonDirective } from "../button/button.directive";
+import { ButtonService } from "../services/button.service";
 
 @Component({
     selector: "mona-button-group",

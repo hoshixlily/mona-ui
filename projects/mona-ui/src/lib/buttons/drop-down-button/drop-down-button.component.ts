@@ -1,3 +1,4 @@
+import { NgIf } from "@angular/common";
 import {
     AfterContentInit,
     AfterViewInit,
@@ -14,9 +15,8 @@ import {
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ContextMenuComponent } from "../../menus/context-menu/context-menu.component";
-import { MenuItem } from "../../menus/models/MenuItem";
 import { MenuItemComponent } from "../../menus/menu-item/menu-item.component";
-import { NgIf } from "@angular/common";
+import { MenuItem } from "../../menus/models/MenuItem";
 import { ButtonDirective } from "../button/button.directive";
 
 @Component({
