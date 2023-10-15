@@ -4,13 +4,14 @@ import { FormsModule } from "@angular/forms";
 import { By } from "@angular/platform-browser";
 import { Enumerable } from "@mirei/ts-collections";
 import { DateTime } from "luxon";
-
 import { CalendarComponent } from "./calendar.component";
 
 @Component({
     template: ` <mona-calendar
         [disabled]="disabled"
         [ngModel]="date"
+        [min]="min"
+        [disabledDates]="disabledDates"
         (ngModelChange)="onDateChange($event)"></mona-calendar>`,
     standalone: true,
     imports: [CalendarComponent, FormsModule]
@@ -18,6 +19,8 @@ import { CalendarComponent } from "./calendar.component";
 class CalendarComponentTestComponent {
     public date: Date | null = new Date();
     public disabled: boolean = false;
+    public disabledDates: Date[] = [];
+    public min: Date | null = null;
 
     public onDateChange(date: Date): void {
         this.date = date;
@@ -65,21 +68,35 @@ describe("CalendarComponent", () => {
         expect(date.hasSame(calendarDate, "year")).toBeTrue();
     });
 
-    it("should start the calendar on 28th of the previous month", () => {
+    it("should start the calendar on 28th of the previous month", fakeAsync(() => {
         setCalendarDateOfHost(hostFixture);
+        hostFixture.detectChanges();
+        tick();
+        hostFixture.detectChanges();
 
         const table = hostFixture.nativeElement.querySelector("table");
         const firstDay = table.querySelector("tbody tr td:first-child");
-        expect(firstDay.textContent).toBe("28");
-    });
 
-    it("should have 35 days in the calendar", () => {
+        const days = Array.from(table.querySelectorAll("tbody tr td"));
+        for (const [dx, day] of days.entries()) {
+            console.log((day as any).textContent)
+            if (dx > 0 && dx % 7 === 0) {
+                console.log("\n")
+            }
+        }
+
+        expect(firstDay.textContent).toBe("28");
+    }));
+
+    it("should have 35 days in the calendar", fakeAsync(() => {
         setCalendarDateOfHost(hostFixture);
+        tick();
+        hostFixture.detectChanges();
 
         const table = hostFixture.nativeElement.querySelector("table");
         const days = table.querySelectorAll("tbody tr td");
         expect(days.length).toBe(35);
-    });
+    }));
 
     it("should have 16th of the month selected", fakeAsync(() => {
         setCalendarDateOfHost(hostFixture);
@@ -224,14 +241,15 @@ describe("CalendarComponent", () => {
     }));
 
     it("should disable days before minDate", fakeAsync(() => {
-        setCalendarDate(fixture, DateTime.fromISO("2023-09-17").toJSDate());
-        fixture.componentRef.setInput("min", DateTime.fromISO("2023-09-16").toJSDate());
+        setCalendarDateOfHost(hostFixture, DateTime.fromISO("2023-09-17").toJSDate());
+        hostFixture.detectChanges();
         tick();
-        fixture.detectChanges();
+        hostFixture.componentInstance.min = DateTime.fromISO("2023-09-16").toJSDate();
+        hostFixture.detectChanges();
         tick();
-        fixture.detectChanges();
+        hostFixture.detectChanges();
 
-        const table = fixture.debugElement.query(By.css("table"));
+        const table = hostFixture.debugElement.query(By.css("table"));
         const days = table.queryAll(By.css("tbody tr td"));
         // first 15 days should be disabled
         expect(days.slice(0, 15).every(day => day.nativeElement.classList.contains("mona-disabled"))).toBeTrue();
@@ -256,17 +274,16 @@ describe("CalendarComponent", () => {
     }));
 
     it("should disable days in disabledDates", fakeAsync(() => {
-        setCalendarDate(fixture, DateTime.fromISO("2023-09-17").toJSDate());
-        fixture.componentRef.setInput("disabledDates", [
+        setCalendarDateOfHost(hostFixture, DateTime.fromISO("2023-09-17").toJSDate());
+        hostFixture.componentInstance.disabledDates =  [
             DateTime.fromISO("2023-09-22").toJSDate(),
             DateTime.fromISO("2023-09-23").toJSDate()
-        ]);
+        ];
+        hostFixture.detectChanges();
         tick();
-        fixture.detectChanges();
-        tick();
-        fixture.detectChanges();
+        hostFixture.detectChanges();
 
-        const table = fixture.debugElement.query(By.css("table"));
+        const table = hostFixture.debugElement.query(By.css("table"));
         const days = table.queryAll(By.css("tbody tr td"));
         // given two disabled dates, 22nd and 23rd, they should be disabled. (+4 because of the four days from the previous month)
         expect(days[21 + 4].nativeElement.classList.contains("mona-disabled")).toBeTrue();
@@ -351,5 +368,6 @@ function setCalendarDateOfHost(
 
 function setCalendarDate(fixture: ComponentFixture<CalendarComponent>, date: Date): void {
     fixture.componentInstance.navigatedDate = date;
+    fixture.componentRef.setInput("ngModel", date);
     fixture.detectChanges();
 }

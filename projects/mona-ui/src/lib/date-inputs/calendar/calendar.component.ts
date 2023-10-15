@@ -1,16 +1,16 @@
+import { DatePipe, NgClass, NgFor, NgIf } from "@angular/common";
 import { ChangeDetectionStrategy, Component, forwardRef, Input, OnInit, signal, WritableSignal } from "@angular/core";
-import { DateTime, DurationObjectUnits } from "luxon";
-import { CalendarView } from "../models/CalendarView";
-import { Dictionary } from "@mirei/ts-collections";
-import { faChevronLeft, faChevronRight, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
-import { Action } from "../../utils/Action";
-import { DateIncludePipe } from "../../pipes/date-include.pipe";
-import { DateComparerPipe } from "../../pipes/date-comparer.pipe";
-import { SlicePipe } from "../../pipes/slice.pipe";
-import { NgIf, NgFor, NgClass, DatePipe } from "@angular/common";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { faChevronLeft, faChevronRight, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { Dictionary } from "@mirei/ts-collections";
+import { DateTime, DurationObjectUnits } from "luxon";
 import { ButtonDirective } from "../../buttons/button/button.directive";
+import { DateComparerPipe } from "../../pipes/date-comparer.pipe";
+import { DateIncludePipe } from "../../pipes/date-include.pipe";
+import { SlicePipe } from "../../pipes/slice.pipe";
+import { Action } from "../../utils/Action";
+import { CalendarView } from "../models/CalendarView";
 
 @Component({
     selector: "mona-calendar",
