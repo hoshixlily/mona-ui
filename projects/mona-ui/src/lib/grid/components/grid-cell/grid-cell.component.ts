@@ -78,53 +78,9 @@ export class GridCellComponent implements OnInit {
 
     public onFocusChange(origin: FocusOrigin): void {
         if (!origin) {
-            const duration = this.column.dataType === "date" ? 50 : 25;
-            timer(duration)
-                .pipe(take(1))
-                .subscribe(() => {
-                    if (!this.gridEditable) {
-                        return;
-                    }
-                    if (this.column.dataType !== "date") {
-                        if (this.editing) {
-                            this.editing = false;
-                            this.updateCellValue();
-                        }
-                    } else {
-                        const popupElement = document.querySelector(".mona-date-input-popup");
-                        if (!popupElement) {
-                            this.editing = false;
-                        } else {
-                            const popupClick$ = new Subject<void>();
-                            fromEvent(popupElement, "click")
-                                .pipe(
-                                    takeUntil(popupClick$),
-                                    filter((event: Event) => {
-                                        const target = event.target as HTMLElement;
-                                        return !target.closest(".mona-date-input-popup");
-                                    })
-                                )
-                                .subscribe(() => {
-                                    this.editing = false;
-                                    this.updateCellValue();
-                                    popupClick$.next();
-                                    popupClick$.complete();
-                                });
-                        }
-                    }
-                    this.cdr.markForCheck();
-                });
-            this.focused = false;
+            this.handleFocusLoss();
         } else {
-            this.focused = true;
-            if (this.gridService.isInEditMode) {
-                if (origin !== "mouse") {
-                    this.editing = true;
-                    asyncScheduler.schedule(() => {
-                        this.focusCellInput();
-                    });
-                }
-            }
+            this.handleFocusGain();
         }
     }
 
@@ -241,6 +197,29 @@ export class GridCellComponent implements OnInit {
         }
     }
 
+    private handleDateInputFocusLoss(): void {
+        const popupElement = document.querySelector(".mona-date-input-popup");
+        if (!popupElement) {
+            this.editing = false;
+            return;
+        }
+        const popupClick$ = new Subject<void>();
+        fromEvent(popupElement, "click")
+            .pipe(
+                takeUntil(popupClick$),
+                filter((event: Event) => {
+                    const target = event.target as HTMLElement;
+                    return !target.closest(".mona-date-input-popup");
+                })
+            )
+            .subscribe(() => {
+                this.editing = false;
+                this.updateCellValue();
+                popupClick$.next();
+                popupClick$.complete();
+            });
+    }
+
     private handleEnterKey(): void {
         if (this.editing) {
             this.updateCellValue();
@@ -269,7 +248,67 @@ export class GridCellComponent implements OnInit {
         }
     }
 
-    private setSubscriptions(): void {
+    private handleFocusGain(): void {
+        this.focused = true;
+        if (this.gridService.isInEditMode) {
+            if (origin !== "mouse") {
+                this.editing = true;
+                asyncScheduler.schedule(() => {
+                    this.focusCellInput();
+                });
+            }
+        }
+    }
+
+    private handleFocusLoss(): void {
+        const duration = this.column.dataType === "date" ? 50 : 25;
+        timer(duration)
+            .pipe(take(1))
+            .subscribe(() => {
+                if (!this.gridEditable) {
+                    return;
+                }
+                if (this.column.dataType !== "date") {
+                    if (this.editing) {
+                        this.editing = false;
+                        this.updateCellValue();
+                    }
+                } else {
+                    this.handleDateInputFocusLoss();
+                }
+                this.cdr.markForCheck();
+            });
+        this.focused = false;
+    }
+
+    private setClickSubscription(): void {
+        fromEvent<MouseEvent>(this.elementRef.nativeElement, "click")
+            .pipe(
+                takeUntilDestroyed(this.#destroyRef)
+                // tap(event => event.stopPropagation())
+            )
+            .subscribe(() => {
+                if (!this.editing && this.gridService.isInEditMode) {
+                    this.gridService.isInEditMode = false;
+                }
+            });
+    }
+
+    private setDateValueChangeSubscription(): void {
+        this.editForm.controls[this.column.field].valueChanges
+            .pipe(
+                takeUntilDestroyed(this.#destroyRef),
+                map(value => {
+                    return value as Date;
+                })
+            )
+            .subscribe(() => {
+                this.editing = false;
+                this.gridService.isInEditMode = false;
+            });
+    }
+
+    private setDoubleClickSubscription(): void {
         fromEvent<MouseEvent>(this.elementRef.nativeElement, "dblclick")
             .pipe(
                 takeUntilDestroyed(this.#destroyRef),
@@ -286,16 +325,9 @@ export class GridCellComponent implements OnInit {
                     this.focusCellInput();
                 });
             });
-        fromEvent<MouseEvent>(this.elementRef.nativeElement, "click")
-            .pipe(
-                takeUntilDestroyed(this.#destroyRef)
-                // tap(event => event.stopPropagation())
-            )
-            .subscribe(() => {
-                if (!this.editing && this.gridService.isInEditMode) {
-                    this.gridService.isInEditMode = false;
-                }
-            });
+    }
+
+    private setKeydownSubscription(): void {
         fromEvent<KeyboardEvent>(this.elementRef.nativeElement, "keydown")
             .pipe(
                 takeUntilDestroyed(this.#destroyRef),
@@ -337,18 +369,14 @@ export class GridCellComponent implements OnInit {
                 }
                 this.cdr.markForCheck();
             });
+    }
+
+    private setSubscriptions(): void {
+        this.setDoubleClickSubscription();
+        this.setClickSubscription();
+        this.setKeydownSubscription();
         if (this.column.dataType === "date") {
-            this.editForm.controls[this.column.field].valueChanges
-                .pipe(
-                    takeUntilDestroyed(this.#destroyRef),
-                    map(value => {
-                        return value as Date;
-                    })
-                )
-                .subscribe(value => {
-                    this.editing = false;
-                    this.gridService.isInEditMode = false;
-                });
+            this.setDateValueChangeSubscription();
         }
     }
 

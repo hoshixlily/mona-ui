@@ -11,6 +11,7 @@ import { CalendarComponent } from "./calendar.component";
         [disabled]="disabled"
         [ngModel]="date"
         [min]="min"
+        [max]="max"
         [disabledDates]="disabledDates"
         (ngModelChange)="onDateChange($event)"></mona-calendar>`,
     standalone: true,
@@ -20,6 +21,7 @@ class CalendarComponentTestComponent {
     public date: Date | null = new Date();
     public disabled: boolean = false;
     public disabledDates: Date[] = [];
+    public max: Date | null = null;
     public min: Date | null = null;
 
     public onDateChange(date: Date): void {
@@ -76,15 +78,6 @@ describe("CalendarComponent", () => {
 
         const table = hostFixture.nativeElement.querySelector("table");
         const firstDay = table.querySelector("tbody tr td:first-child");
-
-        const days = Array.from(table.querySelectorAll("tbody tr td"));
-        for (const [dx, day] of days.entries()) {
-            console.log((day as any).textContent)
-            if (dx > 0 && dx % 7 === 0) {
-                console.log("\n")
-            }
-        }
-
         expect(firstDay.textContent).toBe("28");
     }));
 
@@ -256,14 +249,16 @@ describe("CalendarComponent", () => {
     }));
 
     it("should disable days after maxDate", fakeAsync(() => {
-        setCalendarDate(fixture, DateTime.fromISO("2023-09-17").toJSDate());
-        fixture.componentRef.setInput("max", DateTime.fromISO("2023-09-18").toJSDate());
+        setCalendarDateOfHost(hostFixture, DateTime.fromISO("2023-09-17").toJSDate());
+        hostFixture.detectChanges();
         tick();
-        fixture.detectChanges();
+        hostFixture.componentInstance.max = DateTime.fromISO("2023-09-18").toJSDate();
         tick();
-        fixture.detectChanges();
+        hostFixture.detectChanges();
+        tick();
+        hostFixture.detectChanges();
 
-        const table = fixture.debugElement.query(By.css("table"));
+        const table = hostFixture.debugElement.query(By.css("table"));
         const days = table.queryAll(By.css("tbody tr td"));
         // last 13 visible days should be disabled. (The very last day is the first day of the next month)
         expect(
@@ -275,7 +270,7 @@ describe("CalendarComponent", () => {
 
     it("should disable days in disabledDates", fakeAsync(() => {
         setCalendarDateOfHost(hostFixture, DateTime.fromISO("2023-09-17").toJSDate());
-        hostFixture.componentInstance.disabledDates =  [
+        hostFixture.componentInstance.disabledDates = [
             DateTime.fromISO("2023-09-22").toJSDate(),
             DateTime.fromISO("2023-09-23").toJSDate()
         ];
@@ -364,10 +359,4 @@ function setCalendarDateOfHost(
     fixture.detectChanges();
 
     return date;
-}
-
-function setCalendarDate(fixture: ComponentFixture<CalendarComponent>, date: Date): void {
-    fixture.componentInstance.navigatedDate = date;
-    fixture.componentRef.setInput("ngModel", date);
-    fixture.detectChanges();
 }
