@@ -3,9 +3,13 @@ import {
     ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
+    computed,
     ElementRef,
     Input,
-    OnInit
+    OnInit,
+    Signal,
+    signal,
+    WritableSignal
 } from "@angular/core";
 import { asapScheduler } from "rxjs";
 import { LabelPosition } from "../../models/LabelPosition";
@@ -21,11 +25,22 @@ import { NgClass, NgStyle, NgIf, DecimalPipe } from "@angular/common";
     imports: [NgClass, NgStyle, NgIf, DecimalPipe]
 })
 export class ProgressBarComponent implements OnInit, AfterViewInit {
-    public progress: number = 0;
+    readonly #color: WritableSignal<string> = signal("var(--mona-primary)");
+    readonly #labelFormat: WritableSignal<Action<number, string>> = signal((progress: number) => `${progress}%`);
+    public readonly formatted: WritableSignal<boolean> = signal(false);
+    public label: Signal<string> = signal("");
+    public progress: WritableSignal<number> = signal(0);
+    public progressStyles: Signal<Partial<CSSStyleDeclaration>> = signal({});
     public rightClip: number = -1;
 
     @Input()
-    public color: string | Action<number, string> = "var(--mona-primary)";
+    public set color(color: string | Action<number, string>) {
+        if (typeof color === "string") {
+            this.#color.set(color);
+        } else {
+            this.#color.set(color(this.progress()));
+        }
+    }
 
     @Input()
     public disabled: boolean = false;
@@ -34,7 +49,14 @@ export class ProgressBarComponent implements OnInit, AfterViewInit {
     public indeterminate: boolean = false;
 
     @Input()
-    public labelFormat?: Action<number, string>;
+    public set labelFormat(labelFormat: string | Action<number, string>) {
+        if (typeof labelFormat === "string") {
+            this.#labelFormat.set(() => labelFormat);
+        } else {
+            this.#labelFormat.set(labelFormat);
+        }
+        this.formatted.set(true);
+    }
 
     @Input()
     public labelPosition: LabelPosition = "center";
@@ -59,16 +81,38 @@ export class ProgressBarComponent implements OnInit, AfterViewInit {
 
     public ngAfterViewInit(): void {
         window.setTimeout(() => {
-            this.updateProgress(this.progress);
+            this.updateProgress(this.progress());
         });
     }
 
-    public ngOnInit(): void {}
+    public ngOnInit(): void {
+        this.setComputedSignals();
+    }
+
+    private setComputedSignals(): void {
+        this.label = computed(() => {
+            const progress = this.progress();
+            const labelFormat = this.#labelFormat();
+            return labelFormat(progress);
+        });
+        this.progressStyles = computed(() => {
+            const progress = this.progress();
+            const color = this.#color();
+            const progressColor = progress === 0 ? "transparent" : color;
+            return {
+                borderTopRightRadius:
+                    progress === 100 ? "var(--mona-border-radius)" : "calc(var(--mona-border-radius) * 2)",
+                borderBottomRightRadius:
+                    progress === 100 ? "var(--mona-border-radius)" : "calc(var(--mona-border-radius) * 2)",
+                backgroundColor: progressColor
+            } as Partial<CSSStyleDeclaration>;
+        });
+    }
 
     private updateProgress(value: number): void {
-        const oldProgress = this.progress;
-        this.progress = ((value - this.min) / (this.max - this.min)) * 100;
-        this.updateProgressStyle(oldProgress, this.progress);
+        const oldProgress = this.progress();
+        this.progress.set(((value - this.min) / (this.max - this.min)) * 100);
+        this.updateProgressStyle(oldProgress, this.progress());
     }
 
     private updateProgressStyle(oldProgress: number, newProgress: number): void {
@@ -84,13 +128,5 @@ export class ProgressBarComponent implements OnInit, AfterViewInit {
                 this.cdr.detectChanges();
             });
         }
-    }
-
-    public get label(): string {
-        return this.labelFormat?.(this.progress) ?? `${this.progress}%`;
-    }
-
-    public get progressColor(): string {
-        return typeof this.color === "function" ? this.color(this.progress) : this.color;
     }
 }

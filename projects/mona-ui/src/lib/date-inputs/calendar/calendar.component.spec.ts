@@ -7,7 +7,7 @@ import { DateTime } from "luxon";
 import { CalendarComponent } from "./calendar.component";
 
 @Component({
-    template: ` <mona-calendar
+    template: `<mona-calendar
         [disabled]="disabled"
         [ngModel]="date"
         [min]="min"

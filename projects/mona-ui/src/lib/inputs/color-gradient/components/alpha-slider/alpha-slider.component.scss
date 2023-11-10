@@ -34,4 +34,5 @@ div.mona-alpha-slider-handle {
     cursor: pointer;
     transform: translateX(-100%);
     z-index: 3;
+    border-radius: var(--mona-border-radius);
 }

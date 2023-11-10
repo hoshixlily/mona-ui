@@ -53,6 +53,7 @@ input, textarea, button {
         &:hover {
             background-color: var(--mona-scrollbar-thumb-hover);
         }
+        border-radius: calc(var(--mona-border-radius) / 2);
     }
     &::-webkit-scrollbar-corner {
         background: var(--mona-background-dark);
@@ -99,6 +100,7 @@ input, textarea, button {
 .mona-input-selector {
     width: auto;
     border: 1px solid var(--mona-border-color);
+    border-radius: var(--mona-border-radius);
     background: var(--mona-background);
     color: var(--mona-text);
     cursor: pointer;
@@ -193,6 +195,7 @@ button[monaButton] {
     background-color: var(--mona-background);
     color: var(--mona-text);
     border: 1px solid var(--mona-border-color);
+    border-radius: var(--mona-border-radius);
     outline: none;
     user-select: none;
     cursor: pointer;
@@ -255,8 +258,17 @@ button[monaButton] {
 
 /** Button Group */
 mona-button-group button[monaButton] {
+    border-radius: 0;
     &:not(:last-child) {
         border-right: none;
+    }
+    &:first-child {
+        border-top-left-radius: var(--mona-border-radius);
+        border-bottom-left-radius: var(--mona-border-radius);
+    }
+    &:last-child {
+        border-top-right-radius: var(--mona-border-radius);
+        border-bottom-right-radius: var(--mona-border-radius);
     }
 }
 
@@ -265,6 +277,7 @@ mona-button-group button[monaButton] {
     background-color: var(--mona-background);
     color: var(--mona-text);
     border: 1px solid var(--mona-border-color);
+    border-radius: var(--mona-border-radius);
     transition: box-shadow 0.15s ease-in;
 
     & .mona-chip-content {
@@ -307,14 +320,6 @@ mona-button-group button[monaButton] {
     }
 }
 
-/** Split Button */
-//.mona-split-button-popup {
-//    & ul li {
-//        height: 30px !important;
-//    }
-//}
-
-
 /** Dropdowns */
 
 mona-popup-list-item {
@@ -339,6 +344,7 @@ ul.mona-list mona-text-box.filter-box {
     @include font-medium;
     display: inline-flex;
     border: 1px solid var(--mona-border-color);
+    border-radius: var(--mona-border-radius);
     background: var(--mona-background);
     transition: box-shadow 0.15s ease-in;
     &.mona-disabled {
@@ -411,6 +417,7 @@ ul.mona-list mona-text-box.filter-box {
 .mona-calendar {
     background: var(--mona-background);
     color: var(--mona-text);
+    border-radius: var(--mona-border-radius);
     @include font-medium;
     & table {
         & td {
@@ -591,10 +598,13 @@ div.mona-filter-menu-item {
 .mona-grid {
     color: var(--mona-text);
     @include font-medium;
+    border-radius: var(--mona-border-radius);
     & mona-pager {
         & .mona-pager {
             border: none;
             border-top: 1px solid var(--mona-border-color);
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
         }
     }
 }
@@ -638,12 +648,14 @@ button.mona-grid-filtered {
     padding: 0 !important;
     background: var(--mona-background-dark);
     border: 1px solid var(--mona-border-color);
+    border-radius: var(--mona-border-radius);
     box-shadow: var(--mona-popup-shadow);
 }
 
 .mona-grid-column-drag-preview {
     background-color: var(--mona-background);
     border: 1px solid var(--mona-border-color);
+    border-radius: var(--mona-border-radius);
     box-shadow: var(--mona-popup-shadow);
     display: flex;
     align-items: center;
@@ -692,7 +704,8 @@ input[type="checkbox"][monaCheckBox] {
             content: " ";
             background-color: var(--mona-background);
             border: 1px solid var(--mona-border-color);
-            border-radius: 0;
+            border-radius: var(--mona-border-radius);
+            //border-radius: 0;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -742,14 +755,17 @@ input[type="checkbox"][monaCheckBox] {
 div.mona-color-gradient-color-area {
     background: var(--mona-background-dark);
     border: 1px solid var(--mona-border-color);
+    border-radius: var(--mona-border-radius);
 }
 
 div.mona-hsv-rectangle {
     border: 1px solid var(--mona-border-color);
+    border-radius: var(--mona-border-radius);
 }
 
 div.mona-color-gradient-preview {
     border: 1px solid var(--mona-border-color);
+    border-radius: var(--mona-border-radius);
 }
 
 span.mona-color-gradient-hex-input-prefix {
@@ -767,10 +783,18 @@ span.mona-color-gradient-value-input-prefix {
 
 div.mona-hue-slider {
     border: 1px solid var(--mona-border-color);
+    border-radius: var(--mona-border-radius);
 }
 
 div.mona-alpha-slider {
     border: 1px solid var(--mona-border-color);
+    border-radius: var(--mona-border-radius);
+    & .mona-alpha-slider-color {
+        border-radius: var(--mona-border-radius);
+    }
+    & .mona-alpha-slider-transparency {
+        border-radius: var(--mona-border-radius) calc(var(--mona-border-radius) * 2) calc(var(--mona-border-radius) * 2) var(--mona-border-radius);
+    }
 }
 
 /** Color Palette */
@@ -788,6 +812,7 @@ div.mona-alpha-slider {
 /** Color Picker */
 .mona-color-picker {
     border: 1px solid var(--mona-border-color);
+    border-radius: var(--mona-border-radius);
     background: var(--mona-background);
     & > div:first-child {
         border: 1px solid black;
@@ -813,12 +838,25 @@ div.mona-alpha-slider {
 .mona-numeric-text-box {
     background-color: var(--mona-background);
     border: 1px solid var(--mona-border-color);
+    border-radius: var(--mona-border-radius);
     transition: box-shadow 0.15s ease-in;
     &.mona-disabled {
         @include disabled;
     }
     &:focus, &:focus-within {
         box-shadow: var(--mona-focus-shadow);
+    }
+    & button[monaButton] {
+        &:first-child {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        &:last-child {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            border-top-right-radius: 0;
+        }
     }
 }
 
@@ -877,6 +915,7 @@ div.mona-range-slider {
 
 div.mona-range-slider-track {
     border: 1px solid var(--mona-border-color);
+    border-radius: var(--mona-border-radius);
     background-color: var(--mona-background);
 }
 
@@ -893,6 +932,7 @@ span.mona-range-slider-tick-label {
 div.mona-range-slider-handle {
     background-color: var(--mona-primary);
     border: 1px solid var(--mona-primary-border-color);
+    border-radius: var(--mona-border-radius);
     transition: box-shadow 0.15s ease-in;
     &:focus {
         box-shadow: var(--mona-focus-shadow);
@@ -932,6 +972,7 @@ div.mona-slider {
 
 div.mona-slider-track {
     border: 1px solid var(--mona-border-color);
+    border-radius: var(--mona-border-radius);
     background-color: var(--mona-background);
 }
 
@@ -943,6 +984,7 @@ div.mona-slider-selection {
 div.mona-slider-handle {
     background-color: var(--mona-primary);
     border: 1px solid var(--mona-primary-border-color);
+    border-radius: var(--mona-border-radius);
     &:focus {
         box-shadow: var(--mona-focus-shadow);
     }
@@ -973,6 +1015,10 @@ div.mona-slider-vertical {
 }
 
 /** Stepper */
+div.mona-stepper-track {
+    border-radius: var(--mona-border-radius);
+}
+
 ol.mona-stepper-step-list {
     @include font-medium;
 }
@@ -981,6 +1027,7 @@ ol.mona-stepper-step-list {
 .mona-switch {
     background-color: var(--mona-background);
     border: 1px solid var(--mona-border-color);
+    border-radius: var(--mona-border-radius);
     @include font-medium;
 
     &.mona-disabled {
@@ -1002,6 +1049,7 @@ ol.mona-stepper-step-list {
 .mona-switch-handle {
     background-color: var(--mona-background-light);
     border: 1px solid var(--mona-border-color);
+    border-radius: var(--mona-border-radius);
     transition: box-shadow 0.15s ease-in;
     &:active:not(:disabled),
     &:focus-within:not(:disabled),
@@ -1016,6 +1064,7 @@ textarea[monaTextArea] {
     background-color: var(--mona-background);
     color: var(--mona-text);
     border: 1px solid var(--mona-border-color);
+    border-radius: var(--mona-border-radius);
     outline: none;
     overflow: auto;
     resize: both;
@@ -1035,6 +1084,7 @@ textarea[monaTextArea] {
 
 input[monaTextBox] {
     border: 1px solid var(--mona-border-color);
+    border-radius: var(--mona-border-radius);
     outline: none;
     background-color: var(--mona-background);
     color: var(--mona-text);
@@ -1064,6 +1114,7 @@ input[monaTextBox].mona-input-inner {
 .mona-text-box {
     background-color: var(--mona-background);
     border: 1px solid var(--mona-border-color);
+    border-radius: var(--mona-border-radius);
     transition: box-shadow 0.15s ease-in-out;
     height: 100%;
     width: 100%;
@@ -1099,6 +1150,7 @@ button[monaButton].mona-input-button {
 mona-expansion-panel + mona-expansion-panel {
     & .mona-expansion-panel {
         border-top: none !important;
+        border-radius: 0 !important;
     }
 }
 
@@ -1110,12 +1162,14 @@ mona-expansion-panel + mona-expansion-panel {
 fieldset.mona-fieldset {
     background-color: var(--mona-background);
     border: 1px solid var(--mona-border-color);
+    border-radius: var(--mona-border-radius);
     color: var(--mona-text);
 }
 
 legend.mona-fieldset-legend {
     background-color: var(--mona-background-dark);
     border: 1px solid var(--mona-border-color);
+    border-radius: var(--mona-border-radius);
     color: var(--mona-text);
     font-weight: bold;
     @include font-medium;
@@ -1203,20 +1257,56 @@ div.mona-tab-strip-scroll {
 }
 
 /** List Box */
+.mona-list-box {
+    &.mona-list-box-horizontal {
+        & .mona-list-view {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+    }
+    &.mona-list-box-vertical {
+        & .mona-list-view {
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+    }
+    &.mona-list-box-horizontal-reverse {
+        & .mona-list-view {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+    }
+    &.mona-list-box-vertical-reverse {
+        & .mona-list-view {
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+        }
+    }
+}
+
 .mona-list-box-toolbar {
     background: var(--mona-background);
     border: 1px solid var(--mona-border-color);
     &-horizontal {
         border-left-color: transparent;
+        border-top-right-radius: var(--mona-border-radius);
+        border-bottom-right-radius: var(--mona-border-radius);
     }
     &-vertical {
         border-top-color: transparent;
+        border-bottom-left-radius: var(--mona-border-radius);
+        border-bottom-right-radius: var(--mona-border-radius);
     }
     &-horizontal-reverse {
         border-right-color: transparent;
+        border-top-left-radius: var(--mona-border-radius);
+        border-bottom-left-radius: var(--mona-border-radius);
     }
     &-vertical-reverse {
         border-bottom-color: transparent;
+
+        border-top-left-radius: var(--mona-border-radius);
+        border-top-right-radius: var(--mona-border-radius);
     }
 }
 
@@ -1226,6 +1316,7 @@ div.mona-tab-strip-scroll {
     color: var(--mona-text);
     background: var(--mona-background);
     border: 1px solid var(--mona-border-color);
+    border-radius: var(--mona-border-radius);
 }
 
 .mona-list-view-content {
@@ -1285,6 +1376,7 @@ div.mona-tab-strip-scroll {
 ul.mona-contextmenu-list {
     background-color: var(--mona-background);
     border: 1px solid var(--mona-border-color);
+    border-radius: var(--mona-border-radius);
     padding: 4px 0;
 }
 
@@ -1358,6 +1450,7 @@ div.mona-notification-progress {
 .mona-pager {
     background: var(--mona-background);
     border: 1px solid var(--mona-border-color);
+    border-radius: var(--mona-border-radius);
     color: var(--mona-text);
     & mona-numeric-text-box input {
         text-align: center;
@@ -1383,6 +1476,7 @@ div.mona-notification-progress {
     transform-origin: 50% 0%;
     background-color: var(--mona-background);
     border: 1px solid var(--mona-border-color);
+    border-radius: var(--mona-border-radius);
     @include scrollbars;
 }
 
@@ -1390,6 +1484,7 @@ div.mona-notification-progress {
 .mona-progress-bar {
     background-color: var(--mona-background);
     border: 1px solid var(--mona-border-color);
+    border-radius: var(--mona-border-radius);
     height: 22px;
     &.mona-disabled {
         @include disabled;
@@ -1401,6 +1496,13 @@ div.mona-progress-bar-track {
     &-next {
         background-color: var(--mona-background);
         color: var(--mona-text);
+        border-radius: var(--mona-border-radius);
+    }
+    &-prev {
+        border-radius: var(--mona-border-radius);
+        &-empty {
+            border-radius: calc(var(--mona-border-radius) * 2);
+        }
     }
 }
 
@@ -1533,6 +1635,7 @@ div.mona-tree-view-node-dropping {
 .mona-tree-view-node-dragging {
     background-color: var(--mona-background);
     border: 1px solid var(--mona-border-color);
+    border-radius: var(--mona-border-radius);
     box-shadow: var(--mona-popup-shadow);
     padding: 4px 8px;
     display: flex;
