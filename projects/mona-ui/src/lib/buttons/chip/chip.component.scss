@@ -22,6 +22,8 @@ span.mona-chip-label {
 button[monaButton] {
     padding: 0 7px;
     background: var(--mona-background-dark) !important;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
 }
 
 span.mona-chip-close-icon {

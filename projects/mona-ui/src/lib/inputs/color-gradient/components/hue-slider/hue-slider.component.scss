@@ -14,4 +14,5 @@ div.mona-hue-slider-handle {
     width: 14px;
     transform: translateX(-100%);
     cursor: pointer;
+    border-radius: var(--mona-border-radius);
 }

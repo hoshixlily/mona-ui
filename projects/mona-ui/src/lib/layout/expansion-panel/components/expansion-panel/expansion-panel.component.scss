@@ -1,6 +1,7 @@
 div.mona-expansion-panel {
     background: var(--mona-background);
     border: 1px solid var(--mona-border-color);
+    border-radius: var(--mona-border-radius);
     &.collapsed {
         border-bottom: none;
     }

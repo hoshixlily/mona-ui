@@ -84,6 +84,7 @@ div.mona-stepper-track {
     & > div {
         position: absolute;
         background-color: var(--mona-primary);
+        border-radius: var(--mona-border-radius);
     }
     &-horizontal {
         width: 100%;

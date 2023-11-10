@@ -67,11 +67,26 @@ div.mona-calendar-header {
         justify-content: center;
         cursor: pointer;
     }
+    & > div:first-child {
+        & button {
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+    }
+    & > div:last-child {
+        & button {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+    }
     & > div:nth-child(2) {
         & button {
             border-left: none;
             border-right: none;
             width: 100%;
+            border-radius: 0;
         }
         flex: 1;
     }
@@ -83,4 +98,6 @@ div.mona-calendar-decade-view {
     border-left: 1px solid var(--mona-border-color);
     border-right: 1px solid var(--mona-border-color);
     border-bottom: 1px solid var(--mona-border-color);
+    border-bottom-left-radius: var(--mona-border-radius);
+    border-bottom-right-radius: var(--mona-border-radius);
 }

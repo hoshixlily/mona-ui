@@ -20,7 +20,7 @@ div.mona-progress-bar-track {
     width: 100%;
     height: 100%;
     &-prev {
-        transition: background-color 0.35s linear;
+        transition: background-color 0.35s linear, border-radius 0.35s linear;
     }
     &-next {
         position: absolute;
