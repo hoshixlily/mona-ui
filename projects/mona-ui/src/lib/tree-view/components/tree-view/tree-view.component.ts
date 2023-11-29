@@ -279,6 +279,10 @@ export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit {
                     this.dropTargetNode.parent.nodes.splice(index, 0, draggedNode);
                     if (draggedNode.parent) {
                         this.treeViewService.updateNodeCheckStatus(draggedNode.parent);
+                    } else {
+                        this.treeViewService.nodeList = this.treeViewService.nodeList.filter(
+                            node => node.uid !== draggedNode.uid
+                        );
                     }
                     draggedNode.parent = this.dropTargetNode.parent;
                 }
@@ -292,6 +296,10 @@ export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit {
                     this.treeViewService.nodeList.splice(index, 0, draggedNode);
                     if (draggedNode.parent) {
                         this.treeViewService.updateNodeCheckStatus(draggedNode.parent);
+                    } else {
+                        this.treeViewService.nodeList = this.treeViewService.nodeList.filter(
+                            node => node.uid !== draggedNode.uid
+                        );
                     }
                     draggedNode.parent = undefined;
                 }
@@ -306,6 +314,10 @@ export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit {
                     this.dropTargetNode.parent.nodes.splice(index + 1, 0, draggedNode);
                     if (draggedNode.parent) {
                         this.treeViewService.updateNodeCheckStatus(draggedNode.parent);
+                    } else {
+                        this.treeViewService.nodeList = this.treeViewService.nodeList.filter(
+                            node => node.uid !== draggedNode.uid
+                        );
                     }
                     draggedNode.parent = this.dropTargetNode.parent;
                 }
@@ -319,6 +331,10 @@ export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit {
                     this.treeViewService.nodeList.splice(index + 1, 0, draggedNode);
                     if (draggedNode.parent) {
                         this.treeViewService.updateNodeCheckStatus(draggedNode.parent);
+                    } else {
+                        this.treeViewService.nodeList = this.treeViewService.nodeList.filter(
+                            node => node.uid !== draggedNode.uid
+                        );
                     }
                     draggedNode.parent = undefined;
                 }
