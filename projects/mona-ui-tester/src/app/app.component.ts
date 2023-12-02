@@ -132,7 +132,8 @@ import {
     TextBoxPrefixTemplateDirective,
     TextBoxSuffixTemplateDirective,
     TreeViewNodeTextTemplateDirective,
-    GridEditableDirective
+    GridEditableDirective,
+    ChipComponent
 } from "mona-ui";
 import { TestComponentComponent } from "./test-component/test-component.component";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
@@ -257,7 +258,8 @@ import { GridOrderData } from "./GridOrderData";
         TreeViewDisableDirective,
         TreeViewExpandableDirective,
         TreeViewSelectableDirective,
-        TreeViewNodeTextTemplateDirective
+        TreeViewNodeTextTemplateDirective,
+        ChipComponent
     ]
 })
 export class AppComponent implements OnInit {
