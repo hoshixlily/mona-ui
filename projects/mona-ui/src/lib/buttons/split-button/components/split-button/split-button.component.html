@@ -1,7 +1,10 @@
 <div class="mona-split-button" #wrapperElementRef>
     <button monaButton (click)="buttonClick.emit()" [disabled]="disabled" tabindex="0" #mainButton>
-        <span class="mona-slit-button-text" *ngIf="!textTemplate">{{text}}</span>
-        <ng-container [ngTemplateOutlet]="textTemplate" *ngIf="textTemplate"></ng-container>
+        @if (textTemplate) {
+            <ng-container [ngTemplateOutlet]="textTemplate" *ngIf="textTemplate"></ng-container>
+        } @else {
+            <span class="mona-split-button-text">{{text}}</span>
+        }
     </button>
     <button monaButton [disabled]="disabled" tabindex="0" #menuButton>
         <fa-icon [icon]="menuIcon"></fa-icon>

@@ -155,24 +155,7 @@ export class AutoCompleteComponent implements OnInit, OnChanges, ControlValueAcc
 
     public onKeydown(event: KeyboardEvent): void {
         if (event.key === "Enter") {
-            const item = this.popupListService.viewListData
-                .selectMany(g => g.source)
-                .firstOrDefault(i => i.selected() || i.highlighted());
-            if (item) {
-                this.valuePopupListItem = item;
-                this.autoCompleteValue.set(item.text);
-                if (this.value !== item.text) {
-                    this.#value = item.text;
-                    this.#propagateChange(item.text);
-                }
-            } else {
-                if (this.value !== this.autoCompleteValue()) {
-                    this.#value = this.autoCompleteValue();
-                    this.valuePopupListItem = undefined;
-                    this.#propagateChange(this.autoCompleteValue());
-                }
-            }
-            this.close();
+            this.handleEnterKey();
         } else if (event.key === "Escape") {
             this.close();
         }
@@ -265,6 +248,27 @@ export class AutoCompleteComponent implements OnInit, OnChanges, ControlValueAcc
         this.updateValue(data);
     }
 
+    private handleEnterKey(): void {
+        const item = this.popupListService.viewListData
+            .selectMany(g => g.source)
+            .firstOrDefault(i => i.selected() || i.highlighted());
+        if (item) {
+            this.valuePopupListItem = item;
+            this.autoCompleteValue.set(item.text);
+            if (this.value !== item.text) {
+                this.#value = item.text;
+                this.#propagateChange(item.text);
+            }
+        } else {
+            if (this.value !== this.autoCompleteValue()) {
+                this.#value = this.autoCompleteValue();
+                this.valuePopupListItem = undefined;
+                this.#propagateChange(this.autoCompleteValue());
+            }
+        }
+        this.close();
+    }
+
     private initialize(): void {
         this.popupListService.initializeListData({
             data: this.data,
@@ -316,41 +320,39 @@ export class AutoCompleteComponent implements OnInit, OnChanges, ControlValueAcc
         this.autoCompleteValue$
             .pipe(takeUntilDestroyed(this.#destroyRef), debounceTime(50), distinctUntilChanged())
             .subscribe((value: string) => {
-                if (value) {
-                    if (this.filterable) {
-                        this.popupListService.viewListData = this.popupListService.sourceListData
-                            .select(g => {
-                                const filteredItems = g.source.where(i =>
-                                    i.text.toLowerCase().startsWith(value.toLowerCase())
-                                );
-                                return new Group<string, PopupListItem>(g.key, filteredItems.toList());
-                            })
-                            .toList();
-                        this.popupListService.filterModeActive = true;
-                    }
-                    this.popupListService.viewListData
-                        .selectMany(g => g.source)
-                        .forEach(i => {
-                            i.highlighted.set(false);
-                            i.selected.set(false);
-                        });
-                    const popupListItem = this.popupListService.viewListData
-                        .selectMany(g => g.source)
-                        .firstOrDefault(
-                            item => !item.disabled && item.text.toLowerCase().startsWith(value.toLowerCase())
-                        );
-                    if (popupListItem) {
-                        popupListItem.highlighted.set(true);
-                        this.popupListService.scrollToListItem$.next(popupListItem);
-                    }
-                    if (!this.popupRef) {
-                        this.open();
-                    }
-                    this.autoCompleteValue.set(value);
-                } else {
+                if (!value) {
                     this.close();
                     this.autoCompleteValue.set(value);
+                    return;
                 }
+                if (this.filterable) {
+                    this.popupListService.viewListData = this.popupListService.sourceListData
+                        .select(g => {
+                            const filteredItems = g.source.where(i =>
+                                i.text.toLowerCase().startsWith(value.toLowerCase())
+                            );
+                            return new Group<string, PopupListItem>(g.key, filteredItems.toList());
+                        })
+                        .toList();
+                    this.popupListService.filterModeActive = true;
+                }
+                this.popupListService.viewListData
+                    .selectMany(g => g.source)
+                    .forEach(i => {
+                        i.highlighted.set(false);
+                        i.selected.set(false);
+                    });
+                const popupListItem = this.popupListService.viewListData
+                    .selectMany(g => g.source)
+                    .firstOrDefault(item => !item.disabled && item.text.toLowerCase().startsWith(value.toLowerCase()));
+                if (popupListItem) {
+                    popupListItem.highlighted.set(true);
+                    this.popupListService.scrollToListItem$.next(popupListItem);
+                }
+                if (!this.popupRef) {
+                    this.open();
+                }
+                this.autoCompleteValue.set(value);
             });
     }
 

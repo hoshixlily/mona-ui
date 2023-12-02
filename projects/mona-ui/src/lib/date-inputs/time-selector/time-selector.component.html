@@ -1,24 +1,33 @@
 <div class="mona-time-selector" [ngClass]="{'mona-disabled': disabled}" #popupAnchor>
     <ol #hoursListElement>
-        <li *ngFor="let h of hours|hourSelector:hourFormat:meridiem|timeLimiter:'h':navigatedDate():min:max"
-            [ngClass]="{'mona-selected':h.viewValue===hour()}"
-            (click)="onHourChange(h.value)"
-            [attr.data-value]="h.value">{{h.viewValue | number:'2.0'}}</li>
+        @for (h of hours|hourSelector:hourFormat:meridiem|timeLimiter:'h':navigatedDate():min:max; track h) {
+            <li [ngClass]="{'mona-selected':h.viewValue===hour()}"
+                (click)="onHourChange(h.value)"
+                [attr.data-value]="h.value">{{h.viewValue | number:'2.0'}}
+            </li>
+        }
     </ol>
     <ol #minutesListElement>
-        <li *ngFor="let m of minutes|timeLimiter:'m':navigatedDate():min:max"
-            [ngClass]="{'mona-selected':m.value===minute()}"
-            (click)="onMinuteChange(m.value)" [attr.data-value]="m.value">{{m.viewValue | number:'2.0'}}</li>
+        @for (m of minutes|timeLimiter:'m':navigatedDate():min:max; track m) {
+            <li [ngClass]="{'mona-selected':m.value===minute()}"
+                (click)="onMinuteChange(m.value)" [attr.data-value]="m.value">{{m.viewValue | number:'2.0'}}
+            </li>
+        }
     </ol>
     <ol #secondsListElement *ngIf="showSeconds">
-        <li *ngFor="let s of seconds|timeLimiter:'s':navigatedDate():min:max"
-            [ngClass]="{'mona-selected':s.value===second()}"
-            (click)="onSecondChange(s.value)" [attr.data-value]="s.value">{{s.value | number:'2.0'}}</li>
+        @for (s of seconds|timeLimiter:'s':navigatedDate():min:max; track s) {
+            <li [ngClass]="{'mona-selected':s.value===second()}"
+                (click)="onSecondChange(s.value)" [attr.data-value]="s.value">{{s.value | number:'2.0'}}
+            </li>
+        }
     </ol>
     <ol *ngIf="hourFormat==='12'">
-        <li [ngClass]="{'mona-selected': meridiem==='AM'}"
-            (click)="onMeridiemClick('AM')" *ngIf="amMeridiemVisible">AM</li>
-        <li [ngClass]="{'mona-selected': meridiem==='PM'}"
-            (click)="onMeridiemClick('PM')" *ngIf="pmMeridiemVisible">PM</li>
+        @if (amMeridiemVisible) {
+            <li [ngClass]="{'mona-selected': meridiem==='AM'}"
+                (click)="onMeridiemClick('AM')">AM</li>
+        } @else if (pmMeridiemVisible) {
+            <li [ngClass]="{'mona-selected': meridiem==='PM'}"
+                (click)="onMeridiemClick('PM')">PM</li>
+        }
     </ol>
 </div>

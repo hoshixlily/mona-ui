@@ -26,7 +26,7 @@ import { ListBoxActionClickEvent } from "../../models/ListBoxActionClickEvent";
 import { ListBoxItemTemplateContext } from "../../models/ListBoxItemTemplateContext";
 import { ListBoxSelectionEvent } from "../../models/ListBoxSelectionEvent";
 import { ToolbarAction, ToolbarOptions } from "../../models/ToolbarOptions";
-import { ContainPipe } from "../../../pipes/contain.pipe";
+import { ContainsPipe } from "../../../pipes/contains.pipe";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { ButtonDirective } from "../../../buttons/button/button.directive";
 import { NgIf, NgTemplateOutlet } from "@angular/common";
@@ -50,7 +50,7 @@ type ListBoxDirection = "horizontal" | "horizontal-reverse" | "vertical" | "vert
         NgTemplateOutlet,
         ButtonDirective,
         FontAwesomeModule,
-        ContainPipe
+        ContainsPipe
     ]
 })
 export class ListBoxComponent<T = any> {

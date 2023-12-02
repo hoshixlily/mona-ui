@@ -1,13 +1,16 @@
 <div class="mona-chip" [ngClass]="{'mona-disabled': disabled}" [attr.tabindex]="disabled ? -1 : tabindex">
     <div class="mona-chip-content" [ngClass]="{'mona-closable-chip': removable}">
-        <span class="mona-chip-label" *ngIf="!!label">{{label}}</span>
-        <ng-container *ngIf="!label">
+        @if (label) {
+            <span class="mona-chip-label">{{label}}</span>
+        } @else {
             <ng-content></ng-content>
-        </ng-container>
+        }
     </div>
-    <button monaButton [flat]="true" (click)="remove.emit($event)" *ngIf="removable">
-        <span class="mona-chip-close-icon">
-            <fa-icon [icon]="closeIcon"></fa-icon>
-        </span>
-    </button>
+    @if (removable) {
+        <button monaButton [flat]="true" (click)="remove.emit($event)">
+            <span class="mona-chip-close-icon">
+                <fa-icon [icon]="closeIcon"></fa-icon>
+            </span>
+        </button>
+    }
 </div>

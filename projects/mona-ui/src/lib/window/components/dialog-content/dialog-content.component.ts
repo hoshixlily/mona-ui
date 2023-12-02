@@ -51,15 +51,16 @@ export class DialogContentComponent implements AfterContentInit {
 
     public ngAfterContentInit(): void {
         this.#dialogRef.close = () => this.dialogHandler?.close();
-        if (this.dialogHandler) {
-            this.dialogHandler.closed$.pipe(take(1)).subscribe(event => {
-                if (event?.viaClose) {
-                    this.#dialogResult$.next({
-                        viaClose: event?.viaClose
-                    });
-                }
-            });
+        if (!this.dialogHandler) {
+            return;
         }
+        this.dialogHandler.closed$.pipe(take(1)).subscribe(event => {
+            if (event?.viaClose) {
+                this.#dialogResult$.next({
+                    viaClose: event?.viaClose
+                });
+            }
+        });
     }
 
     public onActionClick(event: MouseEvent, action: DialogAction, value?: string | number | null): void {

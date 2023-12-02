@@ -1,8 +1,10 @@
 <div class="mona-combo-box" [ngClass]="{'mona-disabled': disabled}" [attr.tabindex]="disabled ? -1 : 0" #dropdownWrapper>
     <input monaTextBox class="mona-input-inner" [ngModel]="comboBoxValue()" (ngModelChange)="comboBoxValue$.next($event)" (keydown)="onKeydown($event)">
-    <span class="mona-input-clear-icon" *ngIf="showClearButton && valuePopupListItem" (click)="clearValue($event)">
-        <fa-icon [icon]="clearIcon"></fa-icon>
-    </span>
+    @if (showClearButton && valuePopupListItem) {
+        <span class="mona-input-clear-icon" (click)="clearValue($event)">
+            <fa-icon [icon]="clearIcon"></fa-icon>
+        </span>
+    }
     <button monaButton class="mona-input-button" (click)="open()">
         <fa-icon [icon]="dropdownIcon"></fa-icon>
     </button>
@@ -12,16 +14,16 @@
     <div class="mona-dropdown-popup-list-wrapper">
         <mona-popup-list [textField]="textField" [valueField]="valueField" [groupField]="groupField" [value]="value ? [value] : []"
                          (valueChange)="onPopupListValueChange($event)">
-            <ng-container *ngIf="itemTemplate">
+            @if (itemTemplate) {
                 <ng-template monaListItemTemplate let-dataItem let-listItem="listItem">
                     <ng-container [ngTemplateOutlet]="itemTemplate" [ngTemplateOutletContext]="{$implicit: dataItem, listItem}"></ng-container>
                 </ng-template>
-            </ng-container>
-            <ng-container *ngIf="groupTemplate">
+            }
+            @if (groupTemplate) {
                 <ng-template monaListGroupTemplate let-dataItem let-listItem="listItem">
                     <ng-container [ngTemplateOutlet]="groupTemplate" [ngTemplateOutletContext]="{$implicit: dataItem, listItem}"></ng-container>
                 </ng-template>
-            </ng-container>
+            }
         </mona-popup-list>
     </div>
 </ng-template>

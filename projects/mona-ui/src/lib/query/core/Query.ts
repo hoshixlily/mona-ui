@@ -4,11 +4,11 @@ import { FilterUtils } from "../filter/FilterUtils";
 import { SortDescriptor } from "../sort/SortDescriptor";
 
 export interface IQuery<T> extends Iterable<T> {
-    filter(filter: FilterDescriptor | CompositeFilterDescriptor, fieldSelector?: Selector<T, any>): IQuery<T>;
+    filter<R>(filter: FilterDescriptor | CompositeFilterDescriptor, fieldSelector?: Selector<T, R>): IQuery<T>;
 
     run(): T[];
 
-    sort(descriptor: SortDescriptor[], fieldSelector?: Selector<T, any>): IQuery<T>;
+    sort<R>(descriptor: SortDescriptor[], fieldSelector?: Selector<T, R>): IQuery<T>;
 }
 
 export class Query<T> implements IQuery<T> {
@@ -26,7 +26,7 @@ export class Query<T> implements IQuery<T> {
         return new Query(iterable);
     }
 
-    public filter(filter: FilterDescriptor | CompositeFilterDescriptor, fieldSelector?: Selector<T, any>): IQuery<T> {
+    public filter<R>(filter: FilterDescriptor | CompositeFilterDescriptor, fieldSelector?: Selector<T, R>): IQuery<T> {
         return this.enumerator.filter(filter, fieldSelector);
     }
 
@@ -34,7 +34,7 @@ export class Query<T> implements IQuery<T> {
         return this.enumerator.toArray();
     }
 
-    public sort(descriptor: SortDescriptor[], fieldSelector?: Selector<T, any>): IQuery<T> {
+    public sort<R>(descriptor: SortDescriptor[], fieldSelector?: Selector<T, R>): IQuery<T> {
         return this.enumerator.sort(descriptor, fieldSelector);
     }
 }
@@ -44,7 +44,7 @@ export class QueryEnumerator<T> extends Enumerator<T> implements IQuery<T> {
         super(iterable);
     }
 
-    public filter(filter: FilterDescriptor | CompositeFilterDescriptor, fieldSelector?: Selector<T, any>): IQuery<T> {
+    public filter<R>(filter: FilterDescriptor | CompositeFilterDescriptor, fieldSelector?: Selector<T, R>): IQuery<T> {
         return new QueryEnumerator(() => this.filterGenerator(filter, fieldSelector));
     }
 
@@ -52,13 +52,13 @@ export class QueryEnumerator<T> extends Enumerator<T> implements IQuery<T> {
         return Array.from(this);
     }
 
-    public sort(descriptor: SortDescriptor[], fieldSelector?: Selector<T, any>): IQuery<T> {
+    public sort<R>(descriptor: SortDescriptor[], fieldSelector?: Selector<T, R>): IQuery<T> {
         return new QueryEnumerator(() => this.sortGenerator(descriptor, fieldSelector));
     }
 
-    private *filterGenerator(
+    private *filterGenerator<R>(
         filter: FilterDescriptor | CompositeFilterDescriptor,
-        fieldSelector?: Selector<T, any>
+        fieldSelector?: Selector<T, R>
     ): Iterable<T> {
         const predicate = filter.hasOwnProperty("field")
             ? FilterUtils.descriptorToPredicate(filter as FilterDescriptor, fieldSelector)
@@ -66,7 +66,7 @@ export class QueryEnumerator<T> extends Enumerator<T> implements IQuery<T> {
         yield* this.where(predicate);
     }
 
-    private *sortGenerator(descriptor: SortDescriptor[], fieldSelector?: Selector<T, any>): Iterable<T> {
+    private *sortGenerator<R>(descriptor: SortDescriptor[], fieldSelector?: Selector<T, R>): Iterable<T> {
         let result =
             descriptor[0].dir === "asc"
                 ? this.orderBy(

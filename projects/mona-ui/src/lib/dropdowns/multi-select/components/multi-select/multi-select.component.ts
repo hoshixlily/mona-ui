@@ -1,5 +1,5 @@
 import { ConnectionPositionPair } from "@angular/cdk/overlay";
-import { NgClass, NgFor, NgIf, NgTemplateOutlet, SlicePipe } from "@angular/common";
+import { NgClass, NgFor, NgIf, NgTemplateOutlet } from "@angular/common";
 import {
     ChangeDetectionStrategy,
     ChangeDetectorRef,
@@ -26,18 +26,19 @@ import { AnimationState } from "../../../../animations/models/AnimationState";
 import { PopupAnimationService } from "../../../../animations/services/popup-animation.service";
 import { ButtonDirective } from "../../../../buttons/button/button.directive";
 import { ChipComponent } from "../../../../buttons/chip/chip.component";
+import { SlicePipe } from "../../../../pipes/slice.pipe";
 import { PopupRef } from "../../../../popup/models/PopupRef";
 import { PopupService } from "../../../../popup/services/popup.service";
 import { Action } from "../../../../utils/Action";
-import { ListGroupTemplateDirective } from "../../../popup-list/directives/list-group-template.directive";
-import { ListItemTemplateDirective } from "../../../popup-list/directives/list-item-template.directive";
-import { MultiSelectGroupTemplateDirective } from "../../directives/multi-select-group-template.directive";
-import { MultiSelectItemTemplateDirective } from "../../directives/multi-select-item-template.directive";
-import { MultiSelectTagTemplateDirective } from "../../directives/multi-select-tag-template.directive";
 import { PopupListItem } from "../../../models/PopupListItem";
 import { PopupListValueChangeEvent } from "../../../models/PopupListValueChangeEvent";
 import { PopupListComponent } from "../../../popup-list/components/popup-list/popup-list.component";
+import { ListGroupTemplateDirective } from "../../../popup-list/directives/list-group-template.directive";
+import { ListItemTemplateDirective } from "../../../popup-list/directives/list-item-template.directive";
 import { PopupListService } from "../../../popup-list/services/popup-list.service";
+import { MultiSelectGroupTemplateDirective } from "../../directives/multi-select-group-template.directive";
+import { MultiSelectItemTemplateDirective } from "../../directives/multi-select-item-template.directive";
+import { MultiSelectTagTemplateDirective } from "../../directives/multi-select-tag-template.directive";
 
 @Component({
     selector: "mona-multi-select",
@@ -297,13 +298,15 @@ export class MultiSelectComponent implements OnInit, OnDestroy, ControlValueAcce
     }
 
     public get summaryTagText(): string {
-        return this.tagCount < 0
-            ? ""
-            : this.tagCount === 0
-            ? `${this.valuePopupListItem.length} item${this.valuePopupListItem.length === 1 ? "" : "s"}`
-            : `+${this.valuePopupListItem.length - this.tagCount} item${
-                  this.valuePopupListItem.length - this.tagCount > 1 ? "s" : ""
-              }`;
+        if (this.tagCount < 0) {
+            return "";
+        } else if (this.tagCount === 0) {
+            return `${this.valuePopupListItem.length} item${this.valuePopupListItem.length === 1 ? "" : "s"}`;
+        } else {
+            return `+${this.valuePopupListItem.length - this.tagCount} item${
+                this.valuePopupListItem.length - this.tagCount > 1 ? "s" : ""
+            }`;
+        }
     }
 
     public get value(): any[] {

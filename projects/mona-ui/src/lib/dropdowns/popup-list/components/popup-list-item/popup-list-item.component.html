@@ -1,2 +1,5 @@
-<ng-container *ngIf="!itemTemplate">{{item?.text}}</ng-container>
-<ng-container *ngIf="itemTemplate" [ngTemplateOutlet]="itemTemplate" [ngTemplateOutletContext]="{$implicit: item?.data, listItem: item}"></ng-container>
+@if (itemTemplate) {
+    <ng-container [ngTemplateOutlet]="itemTemplate" [ngTemplateOutletContext]="{$implicit: item?.data, listItem: item}"></ng-container>
+} @else {
+    {{item?.text}}
+}

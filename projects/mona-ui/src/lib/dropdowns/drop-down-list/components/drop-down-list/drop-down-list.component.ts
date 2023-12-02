@@ -222,6 +222,43 @@ export class DropDownListComponent implements OnInit, ControlValueAccessor {
         this.updateValue(obj);
     }
 
+    private handleArrowKeys(event: KeyboardEvent): void {
+        if (this.popupRef) {
+            return;
+        }
+        const listItem = this.popupListService.navigate(event, "single");
+        if (listItem) {
+            if (!listItem.dataEquals(this.value)) {
+                this.updateValue(listItem.data);
+                this.#propagateChange?.(this.value);
+            }
+        }
+    }
+
+    private handleEnterKey(): void {
+        if (this.popupRef) {
+            this.close();
+            return;
+        }
+        this.open();
+    }
+
+    private handleEscapeKey(): void {
+        if (this.popupRef) {
+            this.close();
+        }
+    }
+
+    private handleKeyDown(event: KeyboardEvent): void {
+        if (event.key === "Enter") {
+            this.handleEnterKey();
+        } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+            this.handleArrowKeys(event);
+        } else if (event.key === "Escape") {
+            this.handleEscapeKey();
+        }
+    }
+
     private initialize(): void {
         this.popupListService.initializeListData({
             data: this.data,
@@ -242,26 +279,7 @@ export class DropDownListComponent implements OnInit, ControlValueAccessor {
         fromEvent<KeyboardEvent>(this.elementRef.nativeElement, "keydown")
             .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe(event => {
-                if (event.key === "Enter") {
-                    if (this.popupRef) {
-                        this.close();
-                        return;
-                    }
-                    this.open();
-                } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-                    if (this.popupRef) {
-                        return;
-                    }
-                    const listItem = this.popupListService.navigate(event, "single");
-                    if (listItem) {
-                        if (!listItem.dataEquals(this.value)) {
-                            this.updateValue(listItem.data);
-                            this.#propagateChange?.(this.value);
-                        }
-                    }
-                } else if (event.key === "Escape") {
-                    this.close();
-                }
+                this.handleKeyDown(event);
             });
     }
 

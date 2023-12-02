@@ -172,38 +172,14 @@ export class ComboBoxComponent implements OnInit, ControlValueAccessor {
                 this.#propagateChange?.(item.data);
             } else {
                 if (this.allowCustomValue) {
-                    this.valueNormalizer(of(this.comboBoxValue())).subscribe(normalizedValue => {
-                        this.data = [...this.data, normalizedValue];
-                        this.popupListService.initializeListData({
-                            data: [...this.data],
-                            valueField: this.valueField,
-                            disabler: this.itemDisabler,
-                            textField: this.textField,
-                            groupField: this.groupField
-                        });
-                        const item = this.popupListService.viewListData
-                            .selectMany(g => g.source)
-                            .firstOrDefault(i => i.text.toLowerCase() === this.comboBoxValue().toLowerCase());
-                        if (item) {
-                            this.popupListService.selectItem(item, "single");
-                            this.updateValue(item.data);
-                            this.#propagateChange?.(item.data);
-                        }
-                    });
+                    this.handleCustomValue();
                 } else {
                     this.comboBoxValue.set("");
                 }
             }
             this.close();
         } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-            if (this.popupRef) {
-                return;
-            }
-            const listItem = this.popupListService.navigate(event, "single");
-            if (listItem && !listItem.dataEquals(this.value)) {
-                this.updateValue(listItem.data);
-                this.#propagateChange?.(this.value);
-            }
+            this.handleArrowKeys(event);
         } else if (event.key === "Escape") {
             this.close();
         }
@@ -292,6 +268,40 @@ export class ComboBoxComponent implements OnInit, ControlValueAccessor {
 
     public writeValue(obj: any): void {
         this.updateValue(obj);
+    }
+
+    private handleArrowKeys(event: KeyboardEvent): void {
+        if (this.popupRef) {
+            return;
+        }
+        const listItem = this.popupListService.navigate(event, "single");
+        if (listItem && !listItem.dataEquals(this.value)) {
+            this.updateValue(listItem.data);
+            this.#propagateChange?.(this.value);
+        }
+    }
+
+    private handleCustomValue(): void {
+        this.valueNormalizer(of(this.comboBoxValue()))
+            .pipe(take(1))
+            .subscribe(normalizedValue => {
+                this.data = [...this.data, normalizedValue];
+                this.popupListService.initializeListData({
+                    data: [...this.data],
+                    valueField: this.valueField,
+                    disabler: this.itemDisabler,
+                    textField: this.textField,
+                    groupField: this.groupField
+                });
+                const item = this.popupListService.viewListData
+                    .selectMany(g => g.source)
+                    .firstOrDefault(i => i.text.toLowerCase() === this.comboBoxValue().toLowerCase());
+                if (item) {
+                    this.popupListService.selectItem(item, "single");
+                    this.updateValue(item.data);
+                    this.#propagateChange?.(item.data);
+                }
+            });
     }
 
     private initialize(): void {

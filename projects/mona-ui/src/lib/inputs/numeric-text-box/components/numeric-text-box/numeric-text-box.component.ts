@@ -203,11 +203,11 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
             });
     }
 
-    public registerOnChange(fn: any) {
+    public registerOnChange(fn: any): void {
         this.#propagateChange = fn;
     }
 
-    public registerOnTouched(fn: any) {}
+    public registerOnTouched(fn: any): void {}
 
     public writeValue(obj: number | null | undefined) {
         if (obj == null) {

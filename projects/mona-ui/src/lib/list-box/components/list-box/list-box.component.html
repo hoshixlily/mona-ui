@@ -25,37 +25,37 @@
          *ngIf="toolbarOptions != null">
         <button monaButton (click)="onMoveUpClick()"
                 [disabled]="selectedItem == null"
-                *ngIf="toolbarOptions?.actions|contain:'moveUp'">
+                *ngIf="toolbarOptions?.actions|monaContains:'moveUp'">
             <fa-icon [icon]="moveUpIcon"></fa-icon>
         </button>
         <button monaButton (click)="onMoveDownClick()"
                 [disabled]="selectedItem == null"
-                *ngIf="toolbarOptions?.actions|contain:'moveDown'">
+                *ngIf="toolbarOptions?.actions|monaContains:'moveDown'">
             <fa-icon [icon]="moveDownIcon"></fa-icon>
         </button>
         <button monaButton (click)="onTransferFromClick()"
                 [disabled]="connectedList?.selectedItem == null"
-                *ngIf="toolbarOptions?.actions|contain:'transferFrom'">
+                *ngIf="toolbarOptions?.actions|monaContains:'transferFrom'">
             <fa-icon [icon]="transferFromIcon"></fa-icon>
         </button>
         <button monaButton (click)="onTransferToClick()"
                 [disabled]="selectedItem == null"
-                *ngIf="toolbarOptions?.actions|contain:'transferTo'">
+                *ngIf="toolbarOptions?.actions|monaContains:'transferTo'">
             <fa-icon [icon]="transferToIcon"></fa-icon>
         </button>
         <button monaButton (click)="onTransferAllFromClick()"
                 [disabled]="!connectedList || connectedList.listBoxItems().length === 0"
-                *ngIf="toolbarOptions?.actions|contain:'transferAllFrom'">
+                *ngIf="toolbarOptions?.actions|monaContains:'transferAllFrom'">
             <fa-icon [icon]="transferAllFromIcon"></fa-icon>
         </button>
         <button monaButton (click)="onTransferAllToClick()"
                 [disabled]="listBoxItems().length === 0"
-                *ngIf="toolbarOptions?.actions|contain:'transferAllTo'">
+                *ngIf="toolbarOptions?.actions|monaContains:'transferAllTo'">
             <fa-icon [icon]="transferAllToIcon"></fa-icon>
         </button>
         <button monaButton (click)="onRemoveClick()"
                 [disabled]="selectedItem == null"
-                *ngIf="toolbarOptions?.actions|contain:'remove'">
+                *ngIf="toolbarOptions?.actions|monaContains:'remove'">
             <fa-icon [icon]="removeIcon"></fa-icon>
         </button>
     </div>

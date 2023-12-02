@@ -101,6 +101,26 @@ export class TooltipComponent implements OnInit {
         }
     }
 
+    private createTooltipPopup(target: Element): void {
+        this.#popupRef = this.popupService.create({
+            content: this.templateRef,
+            anchor: target,
+            disableAnimation: true,
+            popupClass: "mona-tooltip-popup-content",
+            popupWrapperClass: "mona-tooltip-popup-wrapper",
+            hasBackdrop: false,
+            positions: DefaultTooltipPositionMap[this.position],
+            closeOnOutsideClick: true,
+            withPush: false
+        });
+        this.#popupRef.overlayRef.addPanelClass("mona-invisible-tooltip");
+        window.setTimeout(() => {
+            this.calculateTopAndLeft();
+            this.#popupRef?.overlayRef.removePanelClass("mona-invisible-tooltip");
+            this.animateEnter();
+        }, 100);
+    }
+
     private setSubscriptions(): void {
         const target = this.target instanceof ElementRef ? this.target.nativeElement : this.target;
         fromEvent<MouseEvent>(target, "mouseenter")
@@ -118,23 +138,7 @@ export class TooltipComponent implements OnInit {
                 })
             )
             .subscribe(() => {
-                this.#popupRef = this.popupService.create({
-                    content: this.templateRef,
-                    anchor: target,
-                    disableAnimation: true,
-                    popupClass: "mona-tooltip-popup-content",
-                    popupWrapperClass: "mona-tooltip-popup-wrapper",
-                    hasBackdrop: false,
-                    positions: DefaultTooltipPositionMap[this.position],
-                    closeOnOutsideClick: true,
-                    withPush: false
-                });
-                this.#popupRef.overlayRef.addPanelClass("mona-invisible-tooltip");
-                window.setTimeout(() => {
-                    this.calculateTopAndLeft();
-                    this.#popupRef?.overlayRef.removePanelClass("mona-invisible-tooltip");
-                    this.animateEnter();
-                }, 100);
+                this.createTooltipPopup(target);
             });
     }
 
