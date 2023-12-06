@@ -1,4 +1,4 @@
-import { NgClass, NgIf } from "@angular/common";
+import { NgClass } from "@angular/common";
 import { Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
@@ -9,7 +9,7 @@ import { ButtonDirective } from "../button/button.directive";
     templateUrl: "./chip.component.html",
     styleUrls: ["./chip.component.scss"],
     standalone: true,
-    imports: [NgClass, NgIf, ButtonDirective, FontAwesomeModule]
+    imports: [NgClass, ButtonDirective, FontAwesomeModule]
 })
 export class ChipComponent implements OnInit {
     public readonly closeIcon: IconDefinition = faTimes;
