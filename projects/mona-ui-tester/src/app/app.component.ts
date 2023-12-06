@@ -135,6 +135,7 @@ import {
     GridEditableDirective,
     ChipComponent
 } from "mona-ui";
+import { v4 } from "uuid";
 import { TestComponentComponent } from "./test-component/test-component.component";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import {
@@ -481,6 +482,7 @@ export class AppComponent implements OnInit {
             ShippedDate: d.ShippedDate != null ? new Date(d.ShippedDate) : null
         };
     });
+    public gridOrderDataRandom = this.generateRandomGridData(100000);
 
     public gridProductColumns: any[] = [
         { field: "ProductID", title: "Product ID", filterType: "number" },
@@ -1226,5 +1228,102 @@ export class AppComponent implements OnInit {
                 items: [{ text: "New 2", id: Math.random().toString(), disabled: Math.random() * 100 < 50 }]
             }
         ];
+    }
+
+    private generateRandomGridData(count: number) {
+        const generatedData = [];
+        const cities = [
+            "Paris",
+            "Berlin",
+            "London",
+            "Madrid",
+            "Munich",
+            "Rome",
+            "Prague",
+            "Vienna",
+            "Amsterdam",
+            "Barcelona",
+            "Brussels",
+            "Athens",
+            "Copenhagen",
+            "Dublin",
+            "Helsinki",
+            "Lisbon",
+            "Oslo",
+            "Warsaw",
+            "Stockholm",
+            "Budapest"
+        ];
+        const countries = [
+            "France",
+            "Germany",
+            "UK",
+            "Spain",
+            "Italy",
+            "Austria",
+            "Netherlands",
+            "Belgium",
+            "Greece",
+            "Denmark",
+            "Ireland",
+            "Finland",
+            "Portugal",
+            "Norway",
+            "Poland",
+            "Sweden",
+            "Hungary",
+            "Czech Republic",
+            "Switzerland",
+            "Slovakia"
+        ];
+        const shipNames = [
+            "Sea Explorer",
+            "Ocean Vision",
+            "Wave Jumper",
+            "Marine Dream",
+            "Nautical Disrupter",
+            "Water Bookmark",
+            "Aquatic Friend",
+            "Windy Ship",
+            "Breezy Transport",
+            "Salty Companion",
+            "Maritime Galore",
+            "Sunny Voyage",
+            "Ripple Marvel",
+            "Watery Trail",
+            "Jolly Sailor",
+            "Brave Navigator",
+            "Vibrant Lifeline",
+            "Seafarer's Delight",
+            "Uncharted Journey",
+            "Thunderous Whirlpool"
+        ];
+        let orderNumber = 10000;
+
+        for (let i = 0; i < count; i++) {
+            const now = new Date();
+            const randomCityIndex = Math.floor(Math.random() * cities.length);
+            const randomCountryIndex = Math.floor(Math.random() * countries.length);
+            const randomShipNameIndex = Math.floor(Math.random() * shipNames.length);
+
+            generatedData.push({
+                OrderID: orderNumber++,
+                CustomerID: v4(),
+                EmployeeID: Math.floor(Math.random() * 10),
+                OrderDate: new Date(),
+                RequiredDate: new Date(now.setDate(now.getDate() + Math.random() * 30)),
+                ShippedDate: new Date(now.setDate(now.getDate() + Math.random() * 30)),
+                ShipVia: Math.floor(Math.random() * 4),
+                Freight: Math.floor(Math.random() * 100),
+                ShipName: shipNames[randomShipNameIndex],
+                ShipAddress: "Random Street, " + Math.floor(Math.random() * 100),
+                ShipCity: cities[randomCityIndex],
+                ShipRegion: "",
+                ShipPostalCode: "0000" + Math.floor(Math.random() * 100),
+                ShipCountry: countries[randomCountryIndex]
+            });
+        }
+
+        return generatedData;
     }
 }

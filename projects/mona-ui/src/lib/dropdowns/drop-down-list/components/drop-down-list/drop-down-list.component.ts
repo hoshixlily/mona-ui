@@ -166,6 +166,9 @@ export class DropDownListComponent implements OnInit, ControlValueAccessor {
 
     public open(): void {
         this.dropdownWrapper.nativeElement.focus();
+        if (this.popupRef) {
+            return;
+        }
         this.popupRef = this.popupService.create({
             anchor: this.dropdownWrapper,
             content: this.popupTemplate,
