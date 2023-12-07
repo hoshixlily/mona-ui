@@ -1,122 +1,179 @@
 <div class="mona-pager">
-    <ng-container *ngIf="type==='numeric'">
-        <ol class="mona-pager-list" *ngIf="pageListVisible()">
-            <li *ngIf="firstLast">
-                <button monaButton [flat]="true" (click)="onPageClick(1)" [disabled]="page===1">
-                    <fa-icon [icon]="firstPageIcon"></fa-icon>
-                </button>
-            </li>
-            <li *ngIf="previousNext">
-                <button monaButton [flat]="true" [disabled]="page<=1" (click)="onPreviousPageClick()">
-                    <fa-icon [icon]="previousIcon"></fa-icon>
-                </button>
-            </li>
-            <li *ngIf="pages.length !== 0" [ngClass]="{'mona-pager-active': page===1}">
-                <button monaButton [flat]="true" [selected]="page===1" (click)="onPageClick(1)">1</button>
-            </li>
-            <li *ngIf="pages.length > visiblePages && pages[1].page - 1 > 1">
-                <button monaButton [flat]="true" (click)="onJumpPreviousClick()">
-                    <fa-icon [icon]="ellipsisIcon"></fa-icon>
-                </button>
-            </li>
-            <ng-container *ngFor="let pageItem of pages|monaSlice:1:pages.length-1; let px = index;">
-                <li [attr.data-page]="pageItem.page" [ngClass]="{'mona-pager-active': page===pageItem.page}">
-                    <button monaButton [flat]="true" [selected]="page===pageItem.page" (click)="onPageClick(pageItem.page)">{{pageItem.text}}</button>
-                </li>
-            </ng-container>
-            <li *ngIf="pages.length > visiblePages && pages[pages.length-1].page - pages[pages.length-2].page > 1">
-                <button monaButton [flat]="true" (click)="onJumpNextClick()">
-                    <fa-icon [icon]="ellipsisIcon"></fa-icon>
-                </button>
-            </li>
-            <li *ngIf="pages.length > 1" [ngClass]="{'mona-pager-active': page===pageCount}">
-                <button monaButton [flat]="true" [selected]="page===pageCount" (click)="onPageClick(pageCount)">{{pageCount}}</button>
-            </li>
-            <li *ngIf="previousNext">
-                <button monaButton [flat]="true" [disabled]="page < 1 || page === pageCount" (click)="onNextPageClick()">
-                    <fa-icon [icon]="nextIcon"></fa-icon>
-                </button>
-            </li>
-            <li *ngIf="firstLast">
-                <button monaButton [flat]="true" (click)="onPageClick(pageCount)" [disabled]="page===pageCount">
-                    <fa-icon [icon]="lastPageIcon"></fa-icon>
-                </button>
-            </li>
-            <li *ngIf="pageInputVisible()">
-                <mona-numeric-text-box [spinners]="false" [min]="1" [max]="pageCount" [(ngModel)]="inputValue"
-                                       (inputBlur)="onPageInputBlur()" *ngIf="pageInput"></mona-numeric-text-box>
-            </li>
-            <li *ngIf="pageInputVisible() && pageSizeValueList.length !== 0">
-                <mona-drop-down-list [data]="pageSizeValueList" [ngModel]="pageSize"
-                                     (ngModelChange)="onPageSizeValueChange($event)" #pageSizeDropdownList></mona-drop-down-list>
-                <span>items per page</span>
-            </li>
-        </ol>
-        <div class="mona-pager-info" *ngIf="infoVisible()">
-            <span>{{currentPageDataCountStart}} - {{currentPageDataCountEnd}} of {{total}} items</span>
-        </div>
-    </ng-container>
-    <ng-container *ngIf="type==='input'">
+    @if (type==='numeric') {
+        @if (pageListVisible()) {
+            <ol class="mona-pager-list">
+                @if (firstLast) {
+                    <li class="mona-pager-first-page">
+                        <button monaButton [flat]="true" (click)="onPageClick(1)" [disabled]="page()===1">
+                            <fa-icon [icon]="firstPageIcon"></fa-icon>
+                        </button>
+                    </li>
+                }
+                @if (previousNext) {
+                    <li class="mona-pager-previous-page">
+                        <button monaButton [flat]="true" [disabled]="page()<=1" (click)="onPreviousPageClick()">
+                            <fa-icon [icon]="previousIcon"></fa-icon>
+                        </button>
+                    </li>
+                }
+                @if (pages().length !== 0) {
+                    <li [ngClass]="{'mona-pager-active': page()===1}">
+                        <button monaButton [flat]="true" [selected]="page()===1" (click)="onPageClick(1)">1</button>
+                    </li>
+                }
+                @if (pages().length > visiblePageCount() && pages()[1].page - 1 > 1) {
+                    <li>
+                        <button monaButton [flat]="true" (click)="onJumpPreviousClick()">
+                            <fa-icon [icon]="ellipsisIcon"></fa-icon>
+                        </button>
+                    </li>
+                }
+
+                <!-- @for causes a slight delay in rendering the page list, so we use ngFor instead -->
+                <ng-container *ngFor="let pageItem of pages()|monaSlice:1:pages().length-1; let px = index;">
+                    <li [attr.data-page]="pageItem.page" [ngClass]="{'mona-pager-active': page()===pageItem.page}">
+                        <button monaButton [flat]="true" [selected]="page()===pageItem.page" (click)="onPageClick(pageItem.page)">{{pageItem.text}}</button>
+                    </li>
+                </ng-container>
+
+                @if (pages().length > visiblePageCount() && pages()[pages().length-1].page - pages()[pages().length-2].page > 1) {
+                    <li>
+                        <button monaButton [flat]="true" (click)="onJumpNextClick()">
+                            <fa-icon [icon]="ellipsisIcon"></fa-icon>
+                        </button>
+                    </li>
+                }
+
+                @if (pages().length > 1) {
+                    <li [ngClass]="{'mona-pager-active': page()===pageCount()}">
+                        <button monaButton [flat]="true" [selected]="page()===pageCount()" (click)="onPageClick(pageCount())">{{pageCount()}}</button>
+                    </li>
+                }
+
+                @if (previousNext) {
+                    <li class="mona-pager-next-page">
+                        <button monaButton [flat]="true" [disabled]="page() < 1 || page() === pageCount()" (click)="onNextPageClick()">
+                            <fa-icon [icon]="nextIcon"></fa-icon>
+                        </button>
+                    </li>
+                }
+
+                @if (firstLast) {
+                    <li class="mona-pager-last-page">
+                        <button monaButton [flat]="true" (click)="onPageClick(pageCount())" [disabled]="page()===pageCount()">
+                            <fa-icon [icon]="lastPageIcon"></fa-icon>
+                        </button>
+                    </li>
+                }
+
+                @if (pageInputVisible() && pageInput) {
+                    <li>
+                        <mona-numeric-text-box [spinners]="false" [min]="1" [max]="pageCount()"
+                                               [ngModel]="inputValue()" (ngModelChange)="inputValue.set($event)"
+                                               (inputBlur)="onPageInputBlur()"></mona-numeric-text-box>
+                    </li>
+                }
+
+                @if(pageInputVisible() && pageSizeValueList().length > 0) {
+                    <li>
+                        <mona-drop-down-list [data]="pageSizeValueList()" [ngModel]="pagerPageSize()"
+                                             (ngModelChange)="onPageSizeValueChange($event)" #pageSizeDropdownList></mona-drop-down-list>
+                        <span>items per page</span>
+                    </li>
+                }
+            </ol>
+        }
+        @if (infoVisible()) {
+            <div class="mona-pager-info">
+                <span>{{currentPageDataCountStart()}} - {{currentPageDataCountEnd()}} of {{totalPages()}} items</span>
+            </div>
+        }
+    }
+    @if (type==='input') {
         <div class="mona-pager-input">
-            <ol class="mona-pager-list" *ngIf="pageListVisible()">
-                <li *ngIf="firstLast">
-                    <button monaButton [flat]="true" (click)="onPageClick(1)" [disabled]="page===1">
+            @if (pageListVisible()) {
+                <ol class="mona-pager-list">
+                    @if (firstLast) {
+                        <li class="mona-pager-first-page">
+                            <button monaButton [flat]="true" (click)="onPageClick(1)" [disabled]="page()===1">
+                                <fa-icon [icon]="firstPageIcon"></fa-icon>
+                            </button>
+                        </li>
+                    }
+                    @if (previousNext) {
+                        <li class="mona-pager-previous-page">
+                            <button monaButton [flat]="true" [disabled]="page()<=1" (click)="onPreviousPageClick()">
+                                <fa-icon [icon]="previousIcon"></fa-icon>
+                            </button>
+                        </li>
+                    }
+                    <li>
+                        <span class="mona-pager-input-text">Page</span>
+                        <mona-numeric-text-box [spinners]="false" [min]="1" [max]="pageCount()"
+                                               [ngModel]="inputValue()" (ngModelChange)="inputValue.set($event)"
+                                               (inputBlur)="onPageInputBlur()"></mona-numeric-text-box>
+                        <span class="mona-pager-input-text">of</span>
+                        <span class="mona-pager-input-text">{{pageCount()}}</span>
+                    </li>
+                    @if (previousNext) {
+                        <li class="mona-pager-next-page">
+                            <button monaButton [flat]="true" [disabled]="page() < 1 || page() === pageCount()" (click)="onNextPageClick()">
+                                <fa-icon [icon]="nextIcon"></fa-icon>
+                            </button>
+                        </li>
+                    }
+                    @if (firstLast) {
+                        <li class="mona-pager-last-page">
+                            <button monaButton [flat]="true" (click)="onPageClick(pageCount())" [disabled]="page()===pageCount()">
+                                <fa-icon [icon]="lastPageIcon"></fa-icon>
+                            </button>
+                        </li>
+                    }
+                </ol>
+            }
+        </div>
+        @if (infoVisible()) {
+            <div class="mona-pager-info">
+                <span>{{(page()-1)*pagerPageSize()+1}} - {{page()*pagerPageSize() > totalPages() ? totalPages() : page()*pagerPageSize()}} of {{totalPages()}} items</span>
+            </div>
+        }
+    }
+    @if (!pageListVisible()) {
+        <ol class="mona-pager-list">
+            @if (firstLast) {
+                <li class="mona-pager-first-page">
+                    <button monaButton [flat]="true" (click)="onPageClick(1)" [disabled]="page()===1">
                         <fa-icon [icon]="firstPageIcon"></fa-icon>
                     </button>
                 </li>
-                <li *ngIf="previousNext">
-                    <button monaButton [flat]="true" [disabled]="page<=1" (click)="onPreviousPageClick()">
+            }
+            @if (previousNext) {
+                <li class="mona-pager-previous-page">
+                    <button monaButton [flat]="true" [disabled]="page()<=1" (click)="onPreviousPageClick()">
                         <fa-icon [icon]="previousIcon"></fa-icon>
                     </button>
                 </li>
-               <li>
-                   <span class="mona-pager-input-text">Page</span>
-                   <mona-numeric-text-box [spinners]="false" [min]="1" [max]="pageCount" [(ngModel)]="inputValue"
-                                          (inputBlur)="onPageInputBlur()"></mona-numeric-text-box>
-                   <span class="mona-pager-input-text">of</span>
-                   <span class="mona-pager-input-text">{{pageCount}}</span>
-               </li>
-                <li *ngIf="previousNext">
-                    <button monaButton [flat]="true" [disabled]="page < 1 || page === pageCount" (click)="onNextPageClick()">
+            }
+            @if (pageCount() !== 0) {
+                <li>
+                    <mona-drop-down-list [data]="pageList()" [ngModel]="page()"
+                                         (ngModelChange)="onPageClick($event)" style="width: 75px;"></mona-drop-down-list>
+                </li>
+            }
+            @if (previousNext) {
+                <li class="mona-pager-next-page">
+                    <button monaButton [flat]="true" [disabled]="page() < 1 || page() === pageCount()" (click)="onNextPageClick()">
                         <fa-icon [icon]="nextIcon"></fa-icon>
                     </button>
                 </li>
-                <li *ngIf="firstLast">
-                    <button monaButton [flat]="true" (click)="onPageClick(pageCount)" [disabled]="page===pageCount">
+            }
+            @if (firstLast) {
+                <li class="mona-pager-last-page">
+                    <button monaButton [flat]="true" (click)="onPageClick(pageCount())" [disabled]="page()===pageCount()">
                         <fa-icon [icon]="lastPageIcon"></fa-icon>
                     </button>
                 </li>
-            </ol>
-        </div>
-        <div class="mona-pager-info" *ngIf="infoVisible()">
-            <span>{{(page-1)*pageSize+1}} - {{page*pageSize > total ? total : page*pageSize}} of {{total}} items</span>
-        </div>
-    </ng-container>
-    <ng-container *ngIf="!pageListVisible()">
-        <ol class="mona-pager-list">
-            <li *ngIf="firstLast">
-                <button monaButton [flat]="true" (click)="onPageClick(1)" [disabled]="page===1">
-                    <fa-icon [icon]="firstPageIcon"></fa-icon>
-                </button>
-            </li>
-            <li *ngIf="previousNext">
-                <button monaButton [flat]="true" [disabled]="page<=1" (click)="onPreviousPageClick()">
-                    <fa-icon [icon]="previousIcon"></fa-icon>
-                </button>
-            </li>
-            <li *ngIf="pageCount !== 0">
-                <mona-drop-down-list [data]="pageList()" [ngModel]="page" (ngModelChange)="onPageClick($event)" style="width: 75px;"></mona-drop-down-list>
-            </li>
-            <li *ngIf="previousNext">
-                <button monaButton [flat]="true" [disabled]="page < 1 || page === pageCount" (click)="onNextPageClick()">
-                    <fa-icon [icon]="nextIcon"></fa-icon>
-                </button>
-            </li>
-            <li *ngIf="firstLast">
-                <button monaButton [flat]="true" (click)="onPageClick(pageCount)" [disabled]="page===pageCount">
-                    <fa-icon [icon]="lastPageIcon"></fa-icon>
-                </button>
-            </li>
+            }
         </ol>
-    </ng-container>
+    }
 </div>

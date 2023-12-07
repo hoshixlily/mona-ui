@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
+import { provideAnimations } from "@angular/platform-browser/animations";
 import { PagerComponent } from "../../../pager/components/pager/pager.component";
 
 import { GridComponent } from "./grid.component";
@@ -9,7 +10,8 @@ describe("GridComponent", () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [GridComponent, PagerComponent]
+            imports: [GridComponent, PagerComponent],
+            providers: [provideAnimations()]
         });
         fixture = TestBed.createComponent(GridComponent);
         component = fixture.componentInstance;
