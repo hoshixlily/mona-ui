@@ -11,6 +11,7 @@ import {
     HostBinding,
     inject,
     Input,
+    OnChanges,
     OnDestroy,
     OnInit,
     SimpleChanges,
@@ -68,7 +69,7 @@ import { MultiSelectTagTemplateDirective } from "../../directives/multi-select-t
         SlicePipe
     ]
 })
-export class MultiSelectComponent implements OnInit, OnDestroy, ControlValueAccessor {
+export class MultiSelectComponent implements OnInit, OnChanges, OnDestroy, ControlValueAccessor {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     #propagateChange: any = () => {};
     #value: any[] = [];

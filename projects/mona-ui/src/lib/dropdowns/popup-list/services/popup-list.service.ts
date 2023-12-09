@@ -14,14 +14,6 @@ export class PopupListService {
 
     public constructor() {}
 
-    public static findFirstSelectedItem(items: List<Group<string, PopupListItem>>): PopupListItem | null {
-        return items.selectMany(g => g.source).firstOrDefault(i => i.selected());
-    }
-
-    public static findLastSelectedItem(items: List<Group<string, PopupListItem>>): PopupListItem | null {
-        return items.selectMany(g => g.source).lastOrDefault(i => i.selected());
-    }
-
     public static findNextSelectableItem(
         items: List<Group<string, PopupListItem>>,
         item: PopupListItem
@@ -178,96 +170,14 @@ export class PopupListService {
         const highlightedItem = this.viewListData.selectMany(g => g.source).firstOrDefault(i => i.highlighted());
         const firstItem = this.viewListData.selectMany(g => g.source).firstOrDefault(i => !i.disabled);
         const focusedItem = highlightedItem ?? selectedItem ?? null;
-        let newItem: PopupListItem | null = null;
         if (event.key === "ArrowDown") {
             event.preventDefault();
-            if (focusedItem && PopupListService.isLastSelectableItem(this.viewListData, focusedItem)) {
-                if (this.filterModeActive && focusedItem.highlighted() && !focusedItem.selected()) {
-                    focusedItem.highlighted.set(false);
-                    focusedItem.selected.set(true);
-                }
-                return focusedItem;
-            }
-            const nextItem = !focusedItem
-                ? firstItem
-                : PopupListService.findNextSelectableItem(this.viewListData, focusedItem);
-            if (nextItem) {
-                if (selectionMode === "single") {
-                    if (this.filterModeActive) {
-                        if (focusedItem && focusedItem.highlighted() && !focusedItem.selected()) {
-                            focusedItem.highlighted.set(false);
-                            focusedItem.selected.set(true);
-                            newItem = focusedItem;
-                            return newItem;
-                        } else {
-                            if (focusedItem) {
-                                focusedItem.selected.set(false);
-                                focusedItem.highlighted.set(false);
-                                nextItem.selected.set(true);
-                            }
-                        }
-                    } else {
-                        if (focusedItem) {
-                            if (focusedItem.highlighted() && !focusedItem.selected()) {
-                                focusedItem.highlighted.set(false);
-                                focusedItem.selected.set(true);
-                                newItem = focusedItem;
-                                return newItem;
-                            } else {
-                                focusedItem.selected.set(false);
-                                focusedItem.highlighted.set(false);
-                            }
-                        }
-                        nextItem.selected.set(true);
-                    }
-                } else {
-                    nextItem.highlighted.set(true);
-                    if (focusedItem) {
-                        focusedItem.highlighted.set(false);
-                    }
-                }
-                newItem = nextItem;
-            }
+            return this.handleArrowDownKey(focusedItem, firstItem, selectionMode);
         } else if (event.key === "ArrowUp") {
             event.preventDefault();
-            if (focusedItem) {
-                if (PopupListService.isFirstSelectableItem(this.viewListData, focusedItem)) {
-                    return focusedItem;
-                }
-                const previousItem = PopupListService.findPreviousSelectableItem(this.viewListData, focusedItem);
-                if (previousItem) {
-                    if (selectionMode === "single") {
-                        if (this.filterModeActive) {
-                            if (focusedItem.highlighted() && !focusedItem.selected()) {
-                                focusedItem.highlighted.set(false);
-                                focusedItem.selected.set(true);
-                                newItem = focusedItem;
-                                return newItem;
-                            } else {
-                                focusedItem.selected.set(false);
-                                focusedItem.highlighted.set(false);
-                                previousItem.selected.set(true);
-                            }
-                        } else {
-                            if (focusedItem.highlighted() && !focusedItem.selected()) {
-                                focusedItem.highlighted.set(false);
-                                focusedItem.selected.set(true);
-                                newItem = focusedItem;
-                                return newItem;
-                            } else {
-                                focusedItem.selected.set(false);
-                                previousItem.selected.set(true);
-                            }
-                        }
-                    } else {
-                        focusedItem.highlighted.set(false);
-                        previousItem.highlighted.set(true);
-                    }
-                    newItem = previousItem;
-                }
-            }
+            return this.handleArrowUpKey(focusedItem, selectionMode);
         }
-        return newItem;
+        return null;
     }
 
     public selectItem(item: PopupListItem, selectionMode: SelectionMode): void {
@@ -277,6 +187,107 @@ export class PopupListService {
         } else {
             item.selected.set(!item.selected());
         }
+    }
+
+    private handleArrowDownKey(
+        focusedItem: PopupListItem | null,
+        firstItem: PopupListItem | null,
+        selectionMode: SelectionMode
+    ): PopupListItem | null {
+        let newItem: PopupListItem | null = null;
+        if (focusedItem && PopupListService.isLastSelectableItem(this.viewListData, focusedItem)) {
+            if (this.filterModeActive && focusedItem.highlighted() && !focusedItem.selected()) {
+                focusedItem.highlighted.set(false);
+                focusedItem.selected.set(true);
+            }
+            return focusedItem;
+        }
+        const nextItem = !focusedItem
+            ? firstItem
+            : PopupListService.findNextSelectableItem(this.viewListData, focusedItem);
+        if (!nextItem) {
+            return null;
+        }
+        if (selectionMode === "single") {
+            if (this.filterModeActive) {
+                if (focusedItem && focusedItem.highlighted() && !focusedItem.selected()) {
+                    focusedItem.highlighted.set(false);
+                    focusedItem.selected.set(true);
+                    newItem = focusedItem;
+                    return newItem;
+                } else {
+                    if (focusedItem) {
+                        focusedItem.selected.set(false);
+                        focusedItem.highlighted.set(false);
+                        nextItem.selected.set(true);
+                    }
+                }
+            } else {
+                if (focusedItem) {
+                    if (focusedItem.highlighted() && !focusedItem.selected()) {
+                        focusedItem.highlighted.set(false);
+                        focusedItem.selected.set(true);
+                        newItem = focusedItem;
+                        return newItem;
+                    } else {
+                        focusedItem.selected.set(false);
+                        focusedItem.highlighted.set(false);
+                    }
+                }
+                nextItem.selected.set(true);
+            }
+        } else {
+            nextItem.highlighted.set(true);
+            if (focusedItem) {
+                focusedItem.highlighted.set(false);
+            }
+        }
+        newItem = nextItem;
+        return newItem;
+    }
+
+    private handleArrowUpKey(focusedItem: PopupListItem | null, selectionMode: SelectionMode): PopupListItem | null {
+        if (!focusedItem) {
+            return null;
+        }
+        if (PopupListService.isFirstSelectableItem(this.viewListData, focusedItem)) {
+            return focusedItem;
+        }
+        const previousItem = PopupListService.findPreviousSelectableItem(this.viewListData, focusedItem);
+        if (!previousItem) {
+            return null;
+        }
+
+        let newItem: PopupListItem | null = null;
+        if (selectionMode === "single") {
+            if (this.filterModeActive) {
+                if (focusedItem.highlighted() && !focusedItem.selected()) {
+                    focusedItem.highlighted.set(false);
+                    focusedItem.selected.set(true);
+                    newItem = focusedItem;
+                    return newItem;
+                } else {
+                    focusedItem.selected.set(false);
+                    focusedItem.highlighted.set(false);
+                    previousItem.selected.set(true);
+                }
+            } else {
+                if (focusedItem.highlighted() && !focusedItem.selected()) {
+                    focusedItem.highlighted.set(false);
+                    focusedItem.selected.set(true);
+                    newItem = focusedItem;
+                    return newItem;
+                } else {
+                    focusedItem.selected.set(false);
+                    previousItem.selected.set(true);
+                }
+            }
+        } else {
+            focusedItem.highlighted.set(false);
+            previousItem.highlighted.set(true);
+        }
+        newItem = previousItem;
+        return newItem;
     }
 
     private updateDisabledItems(disablerAction: ItemDisablerAction): void {
