@@ -1,12 +1,17 @@
-<div class="mona-circular-progress-bar" [ngStyle]="{'width': sizePx, 'height': sizePx}" [ngClass]="{'mona-disabled': disabled}">
+<div class="mona-circular-progress-bar" [ngStyle]="{'width': pixelSize(), 'height': pixelSize()}" [ngClass]="{'mona-disabled': disabled}">
     <svg>
-        <circle [attr.cx]="size/2" [attr.cy]="size/2" [attr.r]="size/2 - thickness" [attr.stroke]="strokeColor"
-                [attr.stroke-dasharray]="circumference" [attr.stroke-dashoffset]="strokeDashOffset"
-                [attr.stroke-width]="thickness" fill="transparent" [ngClass]="{'mona-circular-progress-bar-indeterminate': indeterminate}" />
+        <circle [attr.cx]="center().x()" [attr.cy]="center().y()" [attr.r]="radius()" [attr.stroke]="strokeColor()"
+                [attr.stroke-dasharray]="circumference()" [attr.stroke-dashoffset]="strokeDashOffset()"
+                [attr.stroke-width]="circleThickness()" fill="transparent" [ngClass]="{'mona-circular-progress-bar-indeterminate': indeterminateProgress()}" />
     </svg>
-    <div class="mona-circular-progress-bar-label" *ngIf="!indeterminate">
-        <ng-container *ngIf="!labelTemplateDirective">{{progress}}%</ng-container>
-        <ng-container [ngTemplateOutlet]="labelTemplateDirective.templateRef" [ngTemplateOutletContext]="{$implicit: progress}"
-                      *ngIf="!!labelTemplateDirective"></ng-container>
-    </div>
+    @if (!indeterminateProgress()) {
+        <div class="mona-circular-progress-bar-label">
+            @if (labelTemplateDirective) {
+                <ng-container [ngTemplateOutlet]="labelTemplateDirective.templateRef"
+                              [ngTemplateOutletContext]="{$implicit: progressValue()}"></ng-container>
+            } @else {
+                {{progressValue()}}%
+            }
+        </div>
+    }
 </div>
