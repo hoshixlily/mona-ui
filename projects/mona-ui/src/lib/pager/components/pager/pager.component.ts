@@ -68,16 +68,29 @@ export class PagerComponent implements OnInit, AfterViewInit, OnDestroy {
     });
     public infoVisible: WritableSignal<boolean> = signal(true);
     public inputValue: WritableSignal<number> = signal(1);
+    public nextJumperVisible: Signal<boolean> = computed(
+        () =>
+            this.pages().length > this.visiblePageCount() &&
+            this.pages()[this.pages().length - 1].page - this.pages()[this.pages().length - 2].page > 1
+    );
     public page: Signal<number> = computed(() => Math.floor(this.#skip() / this.pagerPageSize()) + 1);
     public pageCount: Signal<number> = computed(() => Math.ceil(this.totalPages() / this.pagerPageSize()));
     public pageInputVisible: WritableSignal<boolean> = signal(true);
     public pageList: WritableSignal<number[]> = signal([]);
     public pageListVisible: WritableSignal<boolean> = signal(true);
     public pageSizeValueList: WritableSignal<number[]> = signal([]);
+    public pagerInfo: Signal<string> = computed(() => {
+        const start = (this.page() - 1) * this.pagerPageSize() + 1;
+        const end = Math.min(this.page() * this.pagerPageSize(), this.totalPages());
+        return `${start} - ${end} of ${this.totalPages()} items`;
+    });
     public pagerPageSize: WritableSignal<number> = signal(10);
     public pages: Signal<Page[]> = computed(() => {
         return this.preparePages(this.page(), this.visiblePageCount(), this.pageCount());
     });
+    public previousJumperVisible: Signal<boolean> = computed(
+        () => this.pages().length > this.visiblePageCount() && this.pages()[1].page - 1 > 1
+    );
     public totalPages: WritableSignal<number> = signal(0);
     public visiblePageCount: WritableSignal<number> = signal(5);
 

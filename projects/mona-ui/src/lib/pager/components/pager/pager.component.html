@@ -21,7 +21,7 @@
                         <button monaButton [flat]="true" [selected]="page()===1" (click)="onPageClick(1)">1</button>
                     </li>
                 }
-                @if (pages().length > visiblePageCount() && pages()[1].page - 1 > 1) {
+                @if (previousJumperVisible()) {
                     <li>
                         <button monaButton [flat]="true" (click)="onJumpPreviousClick()">
                             <fa-icon [icon]="ellipsisIcon"></fa-icon>
@@ -36,7 +36,7 @@
                     </li>
                 </ng-container>
 
-                @if (pages().length > visiblePageCount() && pages()[pages().length-1].page - pages()[pages().length-2].page > 1) {
+                @if (nextJumperVisible()) {
                     <li>
                         <button monaButton [flat]="true" (click)="onJumpNextClick()">
                             <fa-icon [icon]="ellipsisIcon"></fa-icon>
@@ -134,7 +134,7 @@
         </div>
         @if (infoVisible()) {
             <div class="mona-pager-info">
-                <span>{{(page()-1)*pagerPageSize()+1}} - {{page()*pagerPageSize() > totalPages() ? totalPages() : page()*pagerPageSize()}} of {{totalPages()}} items</span>
+                <span>{{pagerInfo()}}</span>
             </div>
         }
     }
