@@ -1,4 +1,5 @@
-<div class="mona-dropdown-list" [ngClass]="{'mona-disabled': disabled}" [attr.tabindex]="disabled ? -1 : 0" (click)="open()" #dropdownWrapper>
+<div class="mona-dropdown-list" [ngClass]="{'mona-disabled': disabled}"
+     [attr.tabindex]="disabled ? -1 : 0" (click)="open()" #dropdownWrapper>
     <div class="mona-dropdown-value">
         @if (!valueTemplate) {
             @if (valuePopupListItem) {

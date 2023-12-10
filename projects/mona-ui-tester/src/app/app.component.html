@@ -444,6 +444,13 @@
                                 <mona-chip [removable]="false">
                                     Chip I
                                 </mona-chip>
+                                <mona-drop-down-tree [data]="treeData"
+                                                     keyField="id"
+                                                     childrenField="items"
+                                                     textField="text"
+                                                     [ngModel]="dropdownTreeSelectedValue"
+                                                     (ngModelChange)="onDropdownTreeValueChange($event)"
+                                                     style="width: 140px;"></mona-drop-down-tree>
                             </div>
 
                             <div style="display: flex; align-items: center; margin-top: 40px;">

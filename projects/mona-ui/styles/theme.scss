@@ -557,6 +557,20 @@ div.mona-time-picker-popup {
     box-shadow: 0 -3px 10px -3px var(--mona-popup-shadow-color) !important;
 }
 
+/** Dropdown Tree */
+.mona-dropdown-tree {
+    & .mona-dropdown-value {
+        color: var(--mona-text);
+    }
+}
+
+.mona-dropdown-tree-popup-wrapper {
+    max-height: 250px;
+    padding: 4px 2px;
+    overflow: auto;
+    @include scrollbars;
+}
+
 /** Multi Select */
 .mona-multi-select {
     & .mona-input-selector {

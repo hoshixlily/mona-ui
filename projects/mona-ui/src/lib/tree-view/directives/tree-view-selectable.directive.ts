@@ -7,6 +7,9 @@ import { TreeViewService } from "../services/tree-view.service";
     standalone: true
 })
 export class TreeViewSelectableDirective implements OnInit, OnChanges {
+    @Input("monaTreeViewSelectable")
+    public options?: SelectableOptions | "";
+
     @Input()
     public set selectedKeys(selectedKeys: Iterable<string>) {
         this.treeViewService.selectedKeys.clear();
@@ -15,9 +18,6 @@ export class TreeViewSelectableDirective implements OnInit, OnChanges {
 
     @Output()
     public selectedKeysChange: EventEmitter<string[]> = new EventEmitter<string[]>();
-
-    @Input("monaTreeViewSelectable")
-    public options?: SelectableOptions | "";
 
     public constructor(private readonly treeViewService: TreeViewService) {}
 

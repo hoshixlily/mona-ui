@@ -43,6 +43,7 @@ import { NodeDragEndEvent } from "../../models/NodeDragEndEvent";
 import { NodeDragEvent } from "../../models/NodeDragEvent";
 import { NodeDragStartEvent } from "../../models/NodeDragStartEvent";
 import { NodeDropEvent } from "../../models/NodeDropEvent";
+import { NodeLookupItem } from "../../models/NodeLookupItem";
 import { TreeViewService } from "../../services/tree-view.service";
 import { TreeViewNodeComponent } from "../tree-view-node/tree-view-node.component";
 
@@ -123,6 +124,9 @@ export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit {
     @ContentChild(TreeViewNodeTextTemplateDirective, { read: TemplateRef })
     public nodeTextTemplate?: TemplateRef<never> | null = null;
 
+    @Output()
+    public selectionChange: EventEmitter<NodeLookupItem> = new EventEmitter<NodeLookupItem>();
+
     @Input()
     public textField: string = "";
 
@@ -151,7 +155,7 @@ export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit {
         this.keyManager = new ActiveDescendantKeyManager(flatComponents).skipPredicate(
             n => n.node.disabled || n.node.anyParentCollapsed()
         );
-        this.nodeComponents.changes.subscribe(result => {
+        this.nodeComponents.changes.subscribe(() => {
             flatComponents = this.flattenComponents();
             const lastActiveItem = this.keyManager?.activeItem;
             this.keyManager = new ActiveDescendantKeyManager(flatComponents).skipPredicate(
@@ -356,6 +360,7 @@ export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit {
         if (component) {
             this.keyManager?.setActiveItem(component);
         }
+        this.selectionChange.emit(node.getLookupItem());
     }
 
     private prepareNodeList(): void {

@@ -33,6 +33,9 @@ export * from "./dropdowns/drop-down-list/directives/drop-down-list-value-templa
 export * from "./dropdowns/drop-down-list/components/drop-down-list/drop-down-list.component";
 
 //
+export * from "./dropdowns/drop-down-tree/components/drop-down-tree/drop-down-tree.component";
+
+//
 export * from "./dropdowns/multi-select/directives/multi-select-group-template.directive";
 export * from "./dropdowns/multi-select/directives/multi-select-item-template.directive";
 export * from "./dropdowns/multi-select/directives/multi-select-summary-tag.directive";

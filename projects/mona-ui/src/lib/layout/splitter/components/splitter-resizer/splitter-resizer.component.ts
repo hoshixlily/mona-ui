@@ -1,6 +1,6 @@
+import { NgClass, NgIf } from "@angular/common";
 import {
     ChangeDetectionStrategy,
-    ChangeDetectorRef,
     Component,
     ElementRef,
     Input,
@@ -9,6 +9,7 @@ import {
     QueryList,
     SimpleChanges
 } from "@angular/core";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import {
     faCaretDown,
     faCaretLeft,
@@ -21,8 +22,6 @@ import {
 import { fromEvent } from "rxjs";
 import { Orientation } from "../../../../models/Orientation";
 import { SplitterPaneComponent } from "../splitter-pane/splitter-pane.component";
-import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { NgClass, NgIf } from "@angular/common";
 
 @Component({
     selector: "mona-splitter-resizer",
@@ -58,7 +57,7 @@ export class SplitterResizerComponent implements OnInit, OnChanges {
     @Input()
     public previousResizer: SplitterResizerComponent | null = null;
 
-    public constructor(private readonly elementRef: ElementRef<HTMLElement>, private readonly cdr: ChangeDetectorRef) {}
+    public constructor(private readonly elementRef: ElementRef<HTMLElement>) {}
 
     public ngOnChanges(changes: SimpleChanges): void {
         if (changes && (changes["panes"] || changes["pane"])) {

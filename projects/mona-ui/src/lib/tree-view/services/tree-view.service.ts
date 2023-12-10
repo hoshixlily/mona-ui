@@ -101,6 +101,7 @@ export class TreeViewService {
             const node = this.nodeDictionary.firstOrDefault(n => n.value.key === key)?.value;
             if (node) {
                 node.setSelected(true);
+                this.lastSelectedNode = node;
             }
         }
     }

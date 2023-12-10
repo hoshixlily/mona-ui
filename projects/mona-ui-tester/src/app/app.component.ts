@@ -133,7 +133,8 @@ import {
     TextBoxSuffixTemplateDirective,
     TreeViewNodeTextTemplateDirective,
     GridEditableDirective,
-    ChipComponent
+    ChipComponent,
+    DropDownTreeComponent
 } from "mona-ui";
 import { v4 } from "uuid";
 import { TestComponentComponent } from "./test-component/test-component.component";
@@ -149,7 +150,7 @@ import {
     faSun,
     faTimes
 } from "@fortawesome/free-solid-svg-icons";
-import { Enumerable, IndexableList } from "@mirei/ts-collections";
+import { Enumerable, IndexableList, List } from "@mirei/ts-collections";
 import { map, Observable, take } from "rxjs";
 import { DateTime } from "luxon";
 import { GridProductData } from "./GridProductData";
@@ -260,7 +261,8 @@ import { GridOrderData } from "./GridOrderData";
         TreeViewExpandableDirective,
         TreeViewSelectableDirective,
         TreeViewNodeTextTemplateDirective,
-        ChipComponent
+        ChipComponent,
+        DropDownTreeComponent
     ]
 })
 export class AppComponent implements OnInit {
@@ -424,6 +426,7 @@ export class AppComponent implements OnInit {
         "Linden",
         "Maidenhair Tree"
     ];
+
     public filterMenuValue: FilterMenuValue = {
         value1: "Item 2",
         value2: "Item 63",
@@ -676,6 +679,7 @@ export class AppComponent implements OnInit {
             ]
         }
     ];
+    public dropdownTreeSelectedValue = this.treeData[0].items[1].items[0];
 
     public treeDisabledKeys: string[] = ["1-1-1", "1-1-4", "1-4"];
     public treeExpandedKeys: string[] = ["1", "1-1", "1-2", "1-3", "1-4"];
@@ -876,6 +880,11 @@ export class AppComponent implements OnInit {
         this.selectedDropdownListDataItem = value;
         console.log(`Dropdown value changed`, value);
         // console.log(value);
+    }
+
+    public onDropdownTreeValueChange(value: unknown): void {
+        this.dropdownTreeSelectedValue = value;
+        console.log(`Dropdown tree value changed`, value);
     }
 
     public onFilterMenuFilterApply(filter: CompositeFilterDescriptor): void {
