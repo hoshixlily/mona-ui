@@ -3,7 +3,9 @@
         <fa-icon [icon]="dropMagnetIcon"></fa-icon>
         <div></div>
     </div>
-    <div class="mona-tree-node-expander" (click)="onExpandToggle($event)" [ngClass]="{'mona-interactive': node.nodes.length !== 0, 'mona-disabled': node.disabled}">
+    <div class="mona-tree-node-expander" (click)="onExpandToggle($event)"
+         [ngClass]="{'mona-interactive': node.nodes.length !== 0, 'mona-disabled': node.disabled}"
+         *ngIf="treeViewService.expandableOptions.enabled">
         <fa-icon [icon]="expandIcon" *ngIf="node.nodes.length !== 0 && !node.expanded"></fa-icon>
         <fa-icon [icon]="collapseIcon" *ngIf="node.nodes.length !== 0 && node.expanded"></fa-icon>
     </div>

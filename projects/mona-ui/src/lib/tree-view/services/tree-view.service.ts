@@ -1,6 +1,7 @@
 import { EventEmitter, Injectable } from "@angular/core";
 import { Dictionary, EnumerableSet, SortedSet } from "@mirei/ts-collections";
 import { CheckableOptions } from "../models/CheckableOptions";
+import { ExpandableOptions } from "../models/ExpandableOptions";
 import { Node } from "../models/Node";
 import { NodeDisabler, NodeDisablerAction } from "../models/NodeDisabler";
 import { SelectableOptions } from "../models/SelectableOptions";
@@ -16,6 +17,9 @@ export class TreeViewService {
     public checkedKeys: EnumerableSet<string> = new EnumerableSet<string>();
     public checkedKeysChange: EventEmitter<string[]> = new EventEmitter<string[]>();
     public disabledKeys: EnumerableSet<string> = new EnumerableSet<string>();
+    public expandableOptions: ExpandableOptions = {
+        enabled: false
+    };
     public expandedKeys: EnumerableSet<string> = new EnumerableSet<string>();
     public expandedKeysChange: EventEmitter<string[]> = new EventEmitter<string[]>();
     public lastSelectedNode?: Node;
@@ -108,6 +112,10 @@ export class TreeViewService {
 
     public setCheckableOptions(options: CheckableOptions): void {
         this.checkableOptions = { ...this.checkableOptions, ...options };
+    }
+
+    public setExpandableOptions(options: ExpandableOptions): void {
+        this.expandableOptions = { ...this.expandableOptions, ...options };
     }
 
     public setSelectableOptions(options: SelectableOptions): void {
