@@ -16,6 +16,9 @@
                         [textField]="textField"
                         [monaTreeViewSelectable]="selectableOptions"
                         [selectedKeys]="selectedTreeKeys()"
+                        [monaTreeViewExpandable]="{enabled: dropdownTreeService.expandableOptions.enabled}"
+                        [expandedKeys]="dropdownTreeService.expandedKeys()"
+                        (expandedKeysChange)="onExpandedKeysChange($event)"
                         (selectedKeysChange)="onSelectedKeysChange($event)"
                         (selectionChange)="onSelectionChange($event)"></mona-tree-view>
     </div>

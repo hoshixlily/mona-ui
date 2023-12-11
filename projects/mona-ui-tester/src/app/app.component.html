@@ -448,8 +448,11 @@
                                                      keyField="id"
                                                      childrenField="items"
                                                      textField="text"
+                                                     monaDropDownTreeExpandable
                                                      [ngModel]="dropdownTreeSelectedValue"
                                                      (ngModelChange)="onDropdownTreeValueChange($event)"
+                                                     [expandedKeys]="dropdownTreeExpandedKeys"
+                                                     (expandedKeysChange)="onDropdownTreeExpandedKeysChange($event)"
                                                      style="width: 140px;"></mona-drop-down-tree>
                             </div>
 

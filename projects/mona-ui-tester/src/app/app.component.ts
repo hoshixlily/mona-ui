@@ -134,7 +134,8 @@ import {
     TreeViewNodeTextTemplateDirective,
     GridEditableDirective,
     ChipComponent,
-    DropDownTreeComponent
+    DropDownTreeComponent,
+    DropDownTreeExpandableDirective
 } from "mona-ui";
 import { v4 } from "uuid";
 import { TestComponentComponent } from "./test-component/test-component.component";
@@ -262,7 +263,8 @@ import { GridOrderData } from "./GridOrderData";
         TreeViewSelectableDirective,
         TreeViewNodeTextTemplateDirective,
         ChipComponent,
-        DropDownTreeComponent
+        DropDownTreeComponent,
+        DropDownTreeExpandableDirective
     ]
 })
 export class AppComponent implements OnInit {
@@ -679,6 +681,7 @@ export class AppComponent implements OnInit {
             ]
         }
     ];
+    public dropdownTreeExpandedKeys: string[] = ["1", "1-4"];
     public dropdownTreeSelectedValue = this.treeData[0].items[1].items[0];
 
     public treeDisabledKeys: string[] = ["1-1-1", "1-1-4", "1-4"];
@@ -880,6 +883,11 @@ export class AppComponent implements OnInit {
         this.selectedDropdownListDataItem = value;
         console.log(`Dropdown value changed`, value);
         // console.log(value);
+    }
+
+    public onDropdownTreeExpandedKeysChange(expandedKeys: string[]): void {
+        this.dropdownTreeExpandedKeys = expandedKeys;
+        console.log(expandedKeys);
     }
 
     public onDropdownTreeValueChange(value: unknown): void {

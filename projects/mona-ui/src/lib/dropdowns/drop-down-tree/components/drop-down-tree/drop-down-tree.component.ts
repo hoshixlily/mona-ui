@@ -5,12 +5,10 @@ import {
     computed,
     DestroyRef,
     ElementRef,
-    EventEmitter,
     forwardRef,
     HostBinding,
     inject,
     Input,
-    Output,
     Signal,
     signal,
     TemplateRef,
@@ -27,18 +25,28 @@ import { ButtonDirective } from "../../../../buttons/button/button.directive";
 import { PopupRef } from "../../../../popup/models/PopupRef";
 import { PopupService } from "../../../../popup/services/popup.service";
 import { TreeViewComponent } from "../../../../tree-view/components/tree-view/tree-view.component";
+import { TreeViewExpandableDirective } from "../../../../tree-view/directives/tree-view-expandable.directive";
 import { TreeViewSelectableDirective } from "../../../../tree-view/directives/tree-view-selectable.directive";
 import { Node } from "../../../../tree-view/models/Node";
 import { NodeLookupItem } from "../../../../tree-view/models/NodeLookupItem";
 import { SelectableOptions } from "../../../../tree-view/models/SelectableOptions";
+import { DropDownTreeService } from "../../services/drop-down-tree.service";
 
 @Component({
     selector: "mona-drop-down-tree",
     standalone: true,
-    imports: [CommonModule, ButtonDirective, TreeViewComponent, FaIconComponent, TreeViewSelectableDirective],
+    imports: [
+        CommonModule,
+        ButtonDirective,
+        TreeViewComponent,
+        FaIconComponent,
+        TreeViewSelectableDirective,
+        TreeViewExpandableDirective
+    ],
     templateUrl: "./drop-down-tree.component.html",
     styleUrl: "./drop-down-tree.component.scss",
     providers: [
+        DropDownTreeService,
         {
             provide: NG_VALUE_ACCESSOR,
             useExisting: forwardRef(() => DropDownTreeComponent),
@@ -90,6 +98,7 @@ export class DropDownTreeComponent implements ControlValueAccessor {
     public textField: string = "";
 
     public constructor(
+        protected readonly dropdownTreeService: DropDownTreeService,
         private readonly elementRef: ElementRef<HTMLElement>,
         private readonly popupAnimationService: PopupAnimationService,
         private readonly popupService: PopupService
@@ -97,6 +106,11 @@ export class DropDownTreeComponent implements ControlValueAccessor {
 
     public close(): void {
         this.#popupRef?.close();
+    }
+
+    public onExpandedKeysChange(expandedKeys: string[]): void {
+        this.dropdownTreeService.expandedKeys.update(set => set.clear().addAll(expandedKeys));
+        this.dropdownTreeService.expandedKeysChange.emit(expandedKeys);
     }
 
     public onSelectedKeysChange(selectedKeys: string[]): void {

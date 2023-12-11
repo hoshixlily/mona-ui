@@ -33,6 +33,7 @@ export * from "./dropdowns/drop-down-list/directives/drop-down-list-value-templa
 export * from "./dropdowns/drop-down-list/components/drop-down-list/drop-down-list.component";
 
 //
+export * from "./dropdowns/drop-down-tree/directives/drop-down-tree-expandable.directive";
 export * from "./dropdowns/drop-down-tree/components/drop-down-tree/drop-down-tree.component";
 
 //
