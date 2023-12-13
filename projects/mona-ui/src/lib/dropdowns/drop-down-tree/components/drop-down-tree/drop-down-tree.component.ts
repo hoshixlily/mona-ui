@@ -3,11 +3,9 @@ import { CommonModule } from "@angular/common";
 import {
     Component,
     computed,
-    DestroyRef,
     ElementRef,
     forwardRef,
     HostBinding,
-    inject,
     Input,
     Signal,
     signal,
@@ -25,11 +23,12 @@ import { ButtonDirective } from "../../../../buttons/button/button.directive";
 import { PopupRef } from "../../../../popup/models/PopupRef";
 import { PopupService } from "../../../../popup/services/popup.service";
 import { TreeViewComponent } from "../../../../tree-view/components/tree-view/tree-view.component";
+import { TreeViewDisableDirective } from "../../../../tree-view/directives/tree-view-disable.directive";
 import { TreeViewExpandableDirective } from "../../../../tree-view/directives/tree-view-expandable.directive";
 import { TreeViewSelectableDirective } from "../../../../tree-view/directives/tree-view-selectable.directive";
-import { Node } from "../../../../tree-view/models/Node";
 import { NodeLookupItem } from "../../../../tree-view/models/NodeLookupItem";
 import { SelectableOptions } from "../../../../tree-view/models/SelectableOptions";
+import { Action } from "../../../../utils/Action";
 import { DropDownTreeService } from "../../services/drop-down-tree.service";
 
 @Component({
@@ -41,7 +40,8 @@ import { DropDownTreeService } from "../../services/drop-down-tree.service";
         TreeViewComponent,
         FaIconComponent,
         TreeViewSelectableDirective,
-        TreeViewExpandableDirective
+        TreeViewExpandableDirective,
+        TreeViewDisableDirective
     ],
     templateUrl: "./drop-down-tree.component.html",
     styleUrl: "./drop-down-tree.component.scss",
@@ -55,7 +55,6 @@ import { DropDownTreeService } from "../../services/drop-down-tree.service";
     ]
 })
 export class DropDownTreeComponent implements ControlValueAccessor {
-    readonly #destroyRef: DestroyRef = inject(DestroyRef);
     #popupRef: PopupRef | null = null;
     #selectedNode: WritableSignal<NodeLookupItem | null> = signal(null);
     #propagateChange: any = () => {};
@@ -71,7 +70,7 @@ export class DropDownTreeComponent implements ControlValueAccessor {
     });
     public readonly clearIcon: IconDefinition = faTimes;
     public readonly dropdownIcon: IconDefinition = faChevronDown;
-    public treeNode?: Node | null = null;
+    public disabler: WritableSignal<Action<unknown, boolean> | string | undefined> = signal(undefined);
 
     @Input()
     public childrenField: string = "";
@@ -87,6 +86,11 @@ export class DropDownTreeComponent implements ControlValueAccessor {
 
     @HostBinding("class.mona-dropdown")
     public readonly hostClass: boolean = true;
+
+    @Input()
+    public set itemDisabler(nodeDisabler: Action<unknown, boolean> | string) {
+        this.disabler.set(nodeDisabler);
+    }
 
     @Input({ required: true })
     public keyField: string = "";
@@ -108,7 +112,7 @@ export class DropDownTreeComponent implements ControlValueAccessor {
         this.#popupRef?.close();
     }
 
-    public onExpandedKeysChange(expandedKeys: string[]): void {
+    public onExpandedKeysChange(expandedKeys: unknown[]): void {
         this.dropdownTreeService.expandedKeys.update(set => set.clear().addAll(expandedKeys));
         this.dropdownTreeService.expandedKeysChange.emit(expandedKeys);
     }

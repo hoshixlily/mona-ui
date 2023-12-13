@@ -14,9 +14,11 @@
                         [keyField]="keyField"
                         [childrenField]="childrenField"
                         [textField]="textField"
+                        monaTreeViewDisable
+                        [nodeDisabler]="disabler()"
                         [monaTreeViewSelectable]="selectableOptions"
                         [selectedKeys]="selectedTreeKeys()"
-                        [monaTreeViewExpandable]="{enabled: dropdownTreeService.expandableOptions.enabled}"
+                        [monaTreeViewExpandable]="dropdownTreeService.expandableOptions"
                         [expandedKeys]="dropdownTreeService.expandedKeys()"
                         (expandedKeysChange)="onExpandedKeysChange($event)"
                         (selectedKeysChange)="onSelectedKeysChange($event)"

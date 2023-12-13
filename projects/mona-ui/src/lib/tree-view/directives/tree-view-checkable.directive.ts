@@ -8,13 +8,13 @@ import { TreeViewService } from "../services/tree-view.service";
 })
 export class TreeViewCheckableDirective implements OnInit, OnChanges {
     @Input()
-    public set checkedKeys(checkedKeys: Iterable<string>) {
+    public set checkedKeys(checkedKeys: Iterable<unknown>) {
         this.treeViewService.checkedKeys.clear();
         this.treeViewService.checkedKeys.addAll(checkedKeys);
     }
 
     @Output()
-    public checkedKeysChange: EventEmitter<string[]> = new EventEmitter<string[]>();
+    public checkedKeysChange: EventEmitter<unknown[]> = new EventEmitter<unknown[]>();
 
     @Input("monaTreeViewCheckable")
     public options?: CheckableOptions | "";

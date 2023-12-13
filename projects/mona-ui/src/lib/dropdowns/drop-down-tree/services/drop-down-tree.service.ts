@@ -7,12 +7,12 @@ export class DropDownTreeService {
     public expandableOptions: ExpandableOptions = {
         enabled: false
     };
-    public expandedKeys: WritableSignal<ImmutableSet<string>> = signal(ImmutableSet.create());
-    public expandedKeysChange: EventEmitter<string[]> = new EventEmitter<string[]>();
+    public expandedKeys: WritableSignal<ImmutableSet<unknown>> = signal(ImmutableSet.create());
+    public expandedKeysChange: EventEmitter<unknown[]> = new EventEmitter<unknown[]>();
 
     public constructor() {}
 
-    public loadExpandedKeys(expandedKeys: Iterable<string>): void {
+    public loadExpandedKeys(expandedKeys: Iterable<unknown>): void {
         this.expandedKeys.update(set => set.clear().addAll(expandedKeys));
     }
 

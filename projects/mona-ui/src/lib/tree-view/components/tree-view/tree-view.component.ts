@@ -76,7 +76,6 @@ import { TreeViewNodeComponent } from "../tree-view-node/tree-view-node.componen
 export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     private disabler?: Action<any, boolean> | string;
-    private dragNode?: Node;
     private dropTargetNode?: Node;
     private keyManager?: ActiveDescendantKeyManager<TreeViewNodeComponent>;
     public readonly dropAfterIcon: IconDefinition = faArrowDown;
@@ -89,7 +88,8 @@ export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit {
     public childrenField: string = "";
 
     @Input()
-    public data: Iterable<any> = [];
+    public data: Iterable<unknown> = [];
+
 
     @Input({ required: true })
     public keyField: string = "";
@@ -101,7 +101,7 @@ export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit {
     public nodeComponents: QueryList<TreeViewNodeComponent> = new QueryList<TreeViewNodeComponent>();
 
     @Input()
-    public set nodeDisabler(nodeDisabler: Action<any, boolean> | string) {
+    public set nodeDisabler(nodeDisabler: Action<unknown, boolean> | string | undefined) {
         this.disabler = nodeDisabler;
         this.updateDisabledState();
     }
@@ -200,7 +200,6 @@ export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit {
         const dragEvent = new NodeDragEndEvent(event.source.data.getLookupItem(), event.event);
         this.nodeDragEnd.emit(dragEvent);
         this.dragging = false;
-        this.dragNode = undefined;
     }
 
     public onNodeDragMove(event: CdkDragMove, node: Node): void {
@@ -225,7 +224,6 @@ export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit {
             return;
         }
         this.dragging = true;
-        this.dragNode = event.source.data;
     }
 
     public onNodeDrop(event: CdkDragDrop<Node, Node, Node>): void {
@@ -263,15 +261,6 @@ export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit {
             }
             draggedNode.parent = this.dropTargetNode;
             this.dropTargetNode.expanded = true;
-            // if (this.dropTargetNode.nodes.length === 1 && this.dropTargetNode.nodes[0].uid === draggedNode.uid) {
-            //     if (this.dropTargetNode.checked && !draggedNode.checked) {
-            //         this.treeViewService.toggleNodeCheck(draggedNode, true);
-            //     } else if (!this.dropTargetNode.checked && draggedNode.checked) {
-            //         this.treeViewService.toggleNodeCheck(draggedNode, false);
-            //     }
-            // } else {
-            //     this.treeViewService.updateNodeCheckStatus(draggedNode.parent);
-            // }
             this.treeViewService.updateNodeCheckStatus(draggedNode.parent);
         } else if (this.dropPosition === "before") {
             if (draggedNode.parent) {

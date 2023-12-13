@@ -448,6 +448,7 @@
                                                      keyField="id"
                                                      childrenField="items"
                                                      textField="text"
+                                                     [itemDisabler]="dropdownTreeDisabler"
                                                      monaDropDownTreeExpandable
                                                      [ngModel]="dropdownTreeSelectedValue"
                                                      (ngModelChange)="onDropdownTreeValueChange($event)"

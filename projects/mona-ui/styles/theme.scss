@@ -1621,7 +1621,7 @@ div.mona-popover-footer {
     @include font-medium;
 }
 .mona-tree-view-node {
-    &.mona-disabled {
+    & .mona-disabled {
         @include disabled;
     }
 }

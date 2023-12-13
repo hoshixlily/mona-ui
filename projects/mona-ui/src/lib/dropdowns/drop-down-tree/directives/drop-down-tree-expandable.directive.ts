@@ -8,12 +8,12 @@ import { DropDownTreeService } from "../services/drop-down-tree.service";
 })
 export class DropDownTreeExpandableDirective implements OnInit, OnChanges {
     @Input()
-    public set expandedKeys(expandedKeys: Iterable<string>) {
+    public set expandedKeys(expandedKeys: Iterable<unknown>) {
         this.dropdownTreeService.expandedKeys.update(set => set.clear().addAll(expandedKeys));
     }
 
     @Output()
-    public expandedKeysChange: EventEmitter<string[]> = new EventEmitter<string[]>();
+    public expandedKeysChange: EventEmitter<unknown[]> = new EventEmitter<unknown[]>();
 
     @Input("monaDropDownTreeExpandable")
     public options?: ExpandableOptions | "";

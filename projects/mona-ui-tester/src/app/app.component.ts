@@ -681,6 +681,7 @@ export class AppComponent implements OnInit {
             ]
         }
     ];
+    public dropdownTreeDisabler: (item: any) => boolean = (item: any) => item.text.toLowerCase().startsWith("c");
     public dropdownTreeExpandedKeys: string[] = ["1", "1-4"];
     public dropdownTreeSelectedValue = this.treeData[0].items[1].items[0];
 
@@ -885,8 +886,8 @@ export class AppComponent implements OnInit {
         // console.log(value);
     }
 
-    public onDropdownTreeExpandedKeysChange(expandedKeys: string[]): void {
-        this.dropdownTreeExpandedKeys = expandedKeys;
+    public onDropdownTreeExpandedKeysChange(expandedKeys: unknown[]): void {
+        this.dropdownTreeExpandedKeys = expandedKeys as string[];
         console.log(expandedKeys);
     }
 
@@ -1039,9 +1040,9 @@ export class AppComponent implements OnInit {
         this.textBoxValue = value;
     }
 
-    public onTreeCheckedKeysChange(checkedKeys: string[]): void {
+    public onTreeCheckedKeysChange(checkedKeys: unknown[]): void {
         console.log(checkedKeys);
-        this.treeCheckedKeys = checkedKeys;
+        this.treeCheckedKeys = checkedKeys as string[];
     }
 
     public onTreeDisabledKeysChange(disabledKeys: string[]): void {
@@ -1049,9 +1050,9 @@ export class AppComponent implements OnInit {
         this.treeDisabledKeys = disabledKeys;
     }
 
-    public onTreeExpandedKeysChange(expandedKeys: string[]): void {
+    public onTreeExpandedKeysChange(expandedKeys: unknown[]): void {
         console.log(expandedKeys);
-        this.treeExpandedKeys = expandedKeys;
+        this.treeExpandedKeys = expandedKeys as string[];
     }
 
     public onTreeNodeClick(event: NodeClickEvent): void {

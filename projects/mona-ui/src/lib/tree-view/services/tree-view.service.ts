@@ -14,14 +14,14 @@ export class TreeViewService {
         checkParents: true,
         enabled: false
     };
-    public checkedKeys: EnumerableSet<string> = new EnumerableSet<string>();
-    public checkedKeysChange: EventEmitter<string[]> = new EventEmitter<string[]>();
-    public disabledKeys: EnumerableSet<string> = new EnumerableSet<string>();
+    public checkedKeys: EnumerableSet<unknown> = new EnumerableSet<unknown>();
+    public checkedKeysChange: EventEmitter<unknown[]> = new EventEmitter<unknown[]>();
+    public disabledKeys: EnumerableSet<unknown> = new EnumerableSet<unknown>();
     public expandableOptions: ExpandableOptions = {
         enabled: false
     };
-    public expandedKeys: EnumerableSet<string> = new EnumerableSet<string>();
-    public expandedKeysChange: EventEmitter<string[]> = new EventEmitter<string[]>();
+    public expandedKeys: EnumerableSet<unknown> = new EnumerableSet<unknown>();
+    public expandedKeysChange: EventEmitter<unknown[]> = new EventEmitter<unknown[]>();
     public lastSelectedNode?: Node;
     public nodeDictionary: Dictionary<string, Node> = new Dictionary<string, Node>();
     public nodeList: Node[] = [];
@@ -54,7 +54,7 @@ export class TreeViewService {
         return disabler;
     }
 
-    public loadCheckedKeys(checkedKeys: Iterable<string>): void {
+    public loadCheckedKeys(checkedKeys: Iterable<unknown>): void {
         const checkedKeySet = new SortedSet(checkedKeys);
         for (const [uid, node] of this.nodeDictionary.entries()) {
             node.checked = checkedKeySet.contains(node.key);
@@ -72,7 +72,7 @@ export class TreeViewService {
         }
     }
 
-    public loadDisabledKeys(disabledKeys: Iterable<string>): void {
+    public loadDisabledKeys(disabledKeys: Iterable<unknown>): void {
         const disabledKeySet = new SortedSet(disabledKeys);
         const disable = (node: Node, disabled?: boolean): void => {
             node.disabled = disabled ?? disabledKeySet.contains(node.key);
@@ -89,7 +89,7 @@ export class TreeViewService {
         }
     }
 
-    public loadExpandedKeys(expandedKeys: Iterable<string>): void {
+    public loadExpandedKeys(expandedKeys: Iterable<unknown>): void {
         const expandedKeySet = new SortedSet(expandedKeys);
         for (const key of expandedKeySet) {
             const node = this.nodeDictionary.firstOrDefault(n => n.value.key === key)?.value;
