@@ -3,6 +3,7 @@ import { Dictionary, EnumerableSet, SortedSet } from "@mirei/ts-collections";
 import { CheckableOptions } from "../models/CheckableOptions";
 import { ExpandableOptions } from "../models/ExpandableOptions";
 import { Node } from "../models/Node";
+import { NodeCheckOptions } from "../models/NodeCheckOptions";
 import { NodeDisabler, NodeDisablerAction } from "../models/NodeDisabler";
 import { SelectableOptions } from "../models/SelectableOptions";
 
@@ -38,6 +39,31 @@ export class TreeViewService {
 
     public constructor() {}
 
+    private static checkNode(node: Node, options: NodeCheckOptions): void {
+        node.checked = options.checked;
+        if (options.checkChildren) {
+            node.nodes.forEach(childNode => this.checkNode(childNode, options));
+        }
+        if (options.checkParent && node.parent) {
+            const parent = node.parent;
+            const siblings = parent.nodes;
+            const checkedSiblings = siblings.filter(sibling => sibling.checked);
+            const indeterminateSiblings = siblings.filter(sibling => sibling.indeterminate);
+            const allSiblingsChecked = checkedSiblings.length === siblings.length;
+            const someSiblingsChecked = checkedSiblings.length > 0;
+            const someSiblingsIndeterminate = indeterminateSiblings.length > 0;
+            parent.indeterminate = !allSiblingsChecked && (someSiblingsChecked || someSiblingsIndeterminate);
+            TreeViewService.checkNode(parent, { checked: allSiblingsChecked, checkChildren: false, checkParent: true });
+        }
+    }
+
+    private static expandNode(node: Node, expand: boolean, expandChildren: boolean): void {
+        node.expanded = expand;
+        if (expandChildren) {
+            node.nodes.forEach(childNode => TreeViewService.expandNode(childNode, expand, expandChildren));
+        }
+    }
+
     public static flattenNodes(nodes: Node[]): Node[] {
         const flattenedNodeList: Node[] = [];
         nodes.forEach(node => {
@@ -64,7 +90,7 @@ export class TreeViewService {
         for (const node of this.nodeDictionary.values()) {
             if (node.nodes.length > 0) {
                 if (this.checkableOptions.checkChildren && checkedKeySet.contains(node.key)) {
-                    node.check({ checked: true, checkChildren: true, checkParent: false });
+                    TreeViewService.checkNode(node, { checked: true, checkChildren: true, checkParent: false });
                 }
                 if (this.checkableOptions.checkParents) {
                     node.indeterminate =
@@ -96,7 +122,7 @@ export class TreeViewService {
         for (const key of expandedKeySet) {
             const node = this.nodeDictionary.firstOrDefault(n => n.value.key === key)?.value;
             if (node) {
-                node.expand(true);
+                TreeViewService.expandNode(node, true, false);
             }
         }
     }
@@ -131,7 +157,7 @@ export class TreeViewService {
         if (this.checkableOptions?.mode === "single") {
             this.uncheckAllNodes();
         }
-        node.check({
+        TreeViewService.checkNode(node, {
             checked: checked ?? !node.checked,
             checkChildren: this.checkableOptions?.checkChildren,
             checkParent: this.checkableOptions?.checkParents
@@ -143,11 +169,11 @@ export class TreeViewService {
         this.checkedKeysChange.emit(checkedKeys);
     }
 
-    public toggleNodeExpand(node: Node, expand?: boolean): void {
+    public toggleNodeExpand(node: Node, expand: boolean): void {
         if (node.nodes.length === 0) {
             return;
         }
-        node.expand(expand ?? !node.expanded, false);
+        TreeViewService.expandNode(node, expand, false);
         const expandedKeys = this.nodeDictionary
             .where(n => n.value.expanded)
             .select(n => n.value.key)
@@ -186,7 +212,9 @@ export class TreeViewService {
     }
 
     public uncheckAllNodes(): void {
-        this.nodeList().forEach(node => node.check({ checked: false, checkChildren: true, checkParent: true }));
+        this.nodeList().forEach(node =>
+            TreeViewService.checkNode(node, { checked: false, checkChildren: true, checkParent: true })
+        );
     }
 
     public updateNodeCheckStatus(node: Node): void {

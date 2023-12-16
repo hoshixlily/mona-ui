@@ -52,33 +52,6 @@ export class Node<T = any> {
         return false;
     }
 
-    public check(options: NodeCheckOptions): void {
-        this.checked = options.checked;
-        if (options.checkChildren) {
-            this.nodes.forEach(node => node.check(options));
-        }
-        if (options.checkParent) {
-            const siblings = this.parent?.nodes ?? [];
-            const checkedSiblings = siblings.filter(sibling => sibling.checked);
-            const indeterminateSiblings = siblings.filter(sibling => sibling.indeterminate);
-            const allSiblingsChecked = checkedSiblings.length === siblings.length;
-            const someSiblingsChecked = checkedSiblings.length > 0;
-            const someSiblingsIndeterminate = indeterminateSiblings.length > 0;
-            const parent = this.parent;
-            if (parent) {
-                parent.indeterminate = !allSiblingsChecked && (someSiblingsChecked || someSiblingsIndeterminate);
-                parent.check({ checked: allSiblingsChecked, checkChildren: false, checkParent: true });
-            }
-        }
-    }
-
-    public expand(expanded: boolean, expandChildren: boolean = false): void {
-        this.expanded = expanded;
-        if (expandChildren) {
-            this.nodes.forEach(node => node.expand(expanded, expandChildren));
-        }
-    }
-
     public isDescendantOf(node: Node): boolean {
         if (this.parent) {
             return this.parent === node || this.parent.isDescendantOf(node);

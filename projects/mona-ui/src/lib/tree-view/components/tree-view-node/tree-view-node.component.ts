@@ -80,7 +80,7 @@ export class TreeViewNodeComponent implements Highlightable, AfterViewInit {
     }
 
     public onExpandToggle(event: MouseEvent): void {
-        this.treeViewService.toggleNodeExpand(this.node);
+        this.treeViewService.toggleNodeExpand(this.node, !this.node.expanded);
     }
 
     public onNodeDoubleClick(event: MouseEvent): void {
