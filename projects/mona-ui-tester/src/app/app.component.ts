@@ -681,11 +681,15 @@ export class AppComponent implements OnInit {
             ]
         }
     ];
+    public treeDataRandom: any[] = this.generateRandomTreeData(10);
+
     public dropdownTreeDisabler: (item: any) => boolean = (item: any) => item.text.toLowerCase().startsWith("c");
     public dropdownTreeExpandedKeys: string[] = ["1", "1-4"];
     public dropdownTreeSelectedValue = this.treeData[0].items[1].items[0];
 
-    public treeDisabledKeys: string[] = ["1-1-1", "1-1-4", "1-4"];
+    public treeDisabledKeys: string[] = [
+        /*"1-1-1", "1-1-4", "1-4"*/
+    ];
     public treeExpandedKeys: string[] = ["1", "1-1", "1-2", "1-3", "1-4"];
     public treeSelectedKeys: string[] = [
         /*"1-2-1", "1-2-2", "1-2-3", "1-2-4"*/
@@ -1051,7 +1055,7 @@ export class AppComponent implements OnInit {
     }
 
     public onTreeExpandedKeysChange(expandedKeys: unknown[]): void {
-        console.log(expandedKeys);
+        // console.log(expandedKeys);
         this.treeExpandedKeys = expandedKeys as string[];
     }
 
@@ -1343,5 +1347,38 @@ export class AppComponent implements OnInit {
         }
 
         return generatedData;
+    }
+
+    private generateRandomTreeData(nodeCount: number): any[] {
+        function generateNode(idPrefix: string, remainingNodes: number): [any, number] {
+            const node: any = {
+                text: Math.random().toString(36).substring(7),
+                id: idPrefix,
+                items: []
+            };
+
+            if (remainingNodes > 0) {
+                const childCount = Math.min(Math.floor(Math.random() * remainingNodes), remainingNodes);
+                for (let i = 0; i < childCount; i++) {
+                    const [childNode, newRemainingNodes] = generateNode(`${idPrefix}-${i + 1}`, remainingNodes - 1);
+                    node.items.push(childNode);
+                    remainingNodes = newRemainingNodes;
+                }
+            }
+
+            return [node, remainingNodes];
+        }
+
+        const trees: any[] = [];
+        let remainingNodes = nodeCount;
+        let rootId = 1;
+        while (remainingNodes > 0) {
+            const [tree, newRemainingNodes] = generateNode(rootId.toString(), remainingNodes - 1);
+            trees.push(tree);
+            remainingNodes = newRemainingNodes;
+            rootId++;
+        }
+
+        return trees;
     }
 }

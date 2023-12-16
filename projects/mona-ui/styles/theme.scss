@@ -1621,6 +1621,7 @@ div.mona-popover-footer {
     @include font-medium;
 }
 .mona-tree-view-node {
+
     & .mona-disabled {
         @include disabled;
     }
@@ -1632,6 +1633,14 @@ div.mona-popover-footer {
 
 div.mona-tree-view-node-text {
     color: var(--mona-text);
+    &:hover:not(.mona-tree-view-node-selected) {
+        background-color: var(--mona-background-hover-darker);
+        box-shadow: 0 0 0 1px var(--mona-border-color-dark);
+    }
+    &:active:not(.mona-tree-view-node-selected) {
+        background-color: var(--mona-background-active-darker);
+        box-shadow: 0 0 0 1px var(--mona-border-color-dark);
+    }
 }
 
 div.mona-tree-view-node-selected {

@@ -1,4 +1,4 @@
-import { EventEmitter, Injectable } from "@angular/core";
+import { computed, EventEmitter, Injectable, Signal, signal, WritableSignal } from "@angular/core";
 import { Dictionary, EnumerableSet, SortedSet } from "@mirei/ts-collections";
 import { CheckableOptions } from "../models/CheckableOptions";
 import { ExpandableOptions } from "../models/ExpandableOptions";
@@ -24,7 +24,7 @@ export class TreeViewService {
     public expandedKeysChange: EventEmitter<unknown[]> = new EventEmitter<unknown[]>();
     public lastSelectedNode?: Node;
     public nodeDictionary: Dictionary<string, Node> = new Dictionary<string, Node>();
-    public nodeList: Node[] = [];
+    public nodeList: WritableSignal<Node[]> = signal([]);
     public selectableOptions: SelectableOptions = {
         childrenOnly: false,
         enabled: false,
@@ -32,7 +32,9 @@ export class TreeViewService {
     };
     public selectedKeys: EnumerableSet<string> = new EnumerableSet<string>();
     public selectedKeysChange: EventEmitter<string[]> = new EventEmitter<string[]>();
-    public viewNodeList: Node[] = [];
+    public viewNodeList: Signal<Node[]> = computed(() => {
+        return this.nodeList();
+    });
 
     public constructor() {}
 
@@ -84,7 +86,7 @@ export class TreeViewService {
                 node.nodes.forEach(childNode => disable(childNode, true));
             }
         };
-        for (const node of this.nodeList) {
+        for (const node of this.nodeList()) {
             disable(node);
         }
     }
@@ -184,7 +186,7 @@ export class TreeViewService {
     }
 
     public uncheckAllNodes(): void {
-        this.nodeList.forEach(node => node.check({ checked: false, checkChildren: true, checkParent: true }));
+        this.nodeList().forEach(node => node.check({ checked: false, checkChildren: true, checkParent: true }));
     }
 
     public updateNodeCheckStatus(node: Node): void {
@@ -214,7 +216,7 @@ export class TreeViewService {
     }
 
     public updateNodeIndices(): void {
-        const flattenedNodes = TreeViewService.flattenNodes(this.nodeList);
+        const flattenedNodes = TreeViewService.flattenNodes(this.nodeList());
         flattenedNodes.forEach((node, index) => (node.index = index));
     }
 }

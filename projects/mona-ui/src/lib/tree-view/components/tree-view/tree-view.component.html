@@ -36,6 +36,6 @@
             </ng-container>
         </ng-template>
         <ng-container [ngTemplateOutlet]="treeTemplate"
-                      [ngTemplateOutletContext]="{$implicit: treeViewService.viewNodeList}"></ng-container>
+                      [ngTemplateOutletContext]="{$implicit: treeViewService.viewNodeList()}"></ng-container>
     </ul>
 </div>
