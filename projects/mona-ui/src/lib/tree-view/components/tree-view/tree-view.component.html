@@ -10,24 +10,22 @@
                                          (nodeSelect)="onNodeSelect($event)"
                                          (nodeClick)="nodeClick.emit($event)"
                                          (nodeDoubleClick)="nodeDoubleClick.emit($event)"></mona-tree-view-node>
-                    <ul class="mona-subtree-list" [@nodeExpand]="node.expanded"
-                        *ngIf="!treeViewService.expandableOptions.enabled
-                        || (treeViewService.expandableOptions.enabled && (node.nodes.length !== 0 && node.expanded))">
-                        <ng-container [ngTemplateOutlet]="treeTemplate"
-                                      [ngTemplateOutletContext]="{$implicit: node.nodes}"></ng-container>
-                    </ul>
+                    @if (!treeViewService.expandableOptions.enabled || (treeViewService.expandableOptions.enabled && (node.nodes.length !== 0 && node.state.expanded()))) {
+                        <ul class="mona-subtree-list" [@nodeExpand]="node.state.expanded()">
+                            <ng-container [ngTemplateOutlet]="treeTemplate"
+                                          [ngTemplateOutletContext]="{$implicit: node.nodes}"></ng-container>
+                        </ul>
+                    }
                     <ng-template cdkDragPreview [data]="node">
                         <div class="mona-tree-view-node-dragging">
                             <span>
-                                <ng-container *ngIf="dropPosition==='inside'">
+                                @if (dropPosition === 'inside') {
                                     <fa-icon [icon]="dropInsideIcon"></fa-icon>
-                                </ng-container>
-                                <ng-container *ngIf="dropPosition==='after'">
+                                } @else if (dropPosition === 'after') {
                                     <fa-icon [icon]="dropAfterIcon"></fa-icon>
-                                </ng-container>
-                                <ng-container *ngIf="dropPosition==='before'">
+                                } @else if (dropPosition === 'before') {
                                     <fa-icon [icon]="dropBeforeIcon"></fa-icon>
-                                </ng-container>
+                                }
                             </span>
                             <span>{{node.text}}</span>
                         </div>

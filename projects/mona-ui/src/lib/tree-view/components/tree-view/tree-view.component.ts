@@ -164,7 +164,7 @@ export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit {
                 this.keyManager?.setActiveItem(lastActiveItem);
             } else {
                 const selectedItem = Enumerable.from(flatComponents)
-                    .where(n => n.node.selected)
+                    .where(n => n.node.state.selected())
                     .lastOrDefault();
                 const focusedItem = Enumerable.from(flatComponents)
                     .where(n => n.node.focused())
@@ -257,7 +257,7 @@ export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit {
                 this.treeViewService.updateNodeCheckStatus(draggedNode.parent);
             }
             draggedNode.parent = this.dropTargetNode;
-            this.dropTargetNode.expanded = true;
+            this.dropTargetNode.state.expanded.set(true);
             this.treeViewService.updateNodeCheckStatus(draggedNode.parent);
         } else if (this.dropPosition === "before") {
             if (draggedNode.parent) {
@@ -344,8 +344,9 @@ export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit {
 
     private prepareNodeList(): void {
         this.treeViewService.nodeList.set([]);
-        this.treeViewService.nodeDictionary.clear();
-        this.prepareNodeListRecursively(this.data, 0, undefined, this.treeViewService.nodeList());
+        const nodes: Node[] = [];
+        this.prepareNodeListRecursively(this.data, 0, nodes);
+        this.treeViewService.nodeList.set(nodes);
         this.treeViewService.loadCheckedKeys(this.treeViewService.checkedKeys);
         this.treeViewService.loadExpandedKeys(this.treeViewService.expandedKeys);
         this.treeViewService.loadSelectedKeys(this.treeViewService.selectedKeys);
@@ -354,12 +355,7 @@ export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit {
         this.updateDisabledState();
     }
 
-    private prepareNodeListRecursively(
-        root: Iterable<any>,
-        index: number,
-        parentNode?: Node,
-        childNodes?: any[]
-    ): void {
+    private prepareNodeListRecursively(root: Iterable<any>, index: number, childNodes: any[], parentNode?: Node): void {
         const rootList = new List(root ?? []);
         if (rootList.length === 0) {
             return;
@@ -378,10 +374,9 @@ export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit {
                 index: index++
             });
             if (this.childrenField) {
-                this.prepareNodeListRecursively(dataItem[this.childrenField], index, node, node.nodes);
+                this.prepareNodeListRecursively(dataItem[this.childrenField], index, node.nodes, node);
             }
-            childNodes?.push(node);
-            this.treeViewService.nodeDictionary.add(node.uid, node);
+            childNodes.push(node);
         }
     }
 
@@ -410,12 +405,12 @@ export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit {
                         break;
                     case "ArrowLeft":
                         if (this.keyManager?.activeItem?.node) {
-                            this.treeViewService.toggleNodeExpand(this.keyManager.activeItem.node, false);
+                            this.treeViewService.setNodeExpand(this.keyManager.activeItem.node, false);
                         }
                         break;
                     case "ArrowRight":
                         if (this.keyManager?.activeItem?.node) {
-                            this.treeViewService.toggleNodeExpand(this.keyManager.activeItem.node, true);
+                            this.treeViewService.setNodeExpand(this.keyManager.activeItem.node, true);
                         }
                         break;
                     case "Enter":
@@ -425,7 +420,8 @@ export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit {
                         break;
                     case " ":
                         if (this.keyManager?.activeItem?.node) {
-                            this.treeViewService.toggleNodeCheck(this.keyManager.activeItem.node);
+                            const node = this.keyManager.activeItem.node;
+                            this.treeViewService.setNodeCheck(node, !node.state.checked());
                         }
                         break;
                 }
@@ -433,14 +429,17 @@ export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit {
         fromEvent<FocusEvent>(this.elementRef.nativeElement, "focusout")
             .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe(() => {
-                this.treeViewService.nodeDictionary.values().forEach(n => n.focused.set(false));
+                this.treeViewService
+                    .nodeDictionary()
+                    .values()
+                    .forEach(n => n.focused.set(false));
             });
     }
 
     private updateDisabledState(): void {
         if (this.disabler) {
             const disabler = TreeViewService.getNodeDisablerAction(this.disabler);
-            for (const node of this.treeViewService.nodeDictionary.values()) {
+            for (const node of this.treeViewService.nodeDictionary().values()) {
                 node.disabled = disabler(node.data);
             }
         }

@@ -1,5 +1,5 @@
 import { Highlightable } from "@angular/cdk/a11y";
-import { NgClass, NgIf, NgTemplateOutlet } from "@angular/common";
+import { NgClass, NgTemplateOutlet } from "@angular/common";
 import {
     AfterViewInit,
     Component,
@@ -30,7 +30,7 @@ import { TreeViewService } from "../../services/tree-view.service";
     templateUrl: "./tree-view-node.component.html",
     styleUrls: ["./tree-view-node.component.scss"],
     standalone: true,
-    imports: [NgIf, FontAwesomeModule, NgClass, CheckBoxDirective, FormsModule, NgTemplateOutlet]
+    imports: [FontAwesomeModule, NgClass, CheckBoxDirective, FormsModule, NgTemplateOutlet]
 })
 export class TreeViewNodeComponent implements Highlightable, AfterViewInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
@@ -76,11 +76,11 @@ export class TreeViewNodeComponent implements Highlightable, AfterViewInit {
     }
 
     public onCheckToggle(checked: boolean): void {
-        this.treeViewService.toggleNodeCheck(this.node, checked);
+        this.treeViewService.setNodeCheck(this.node, checked);
     }
 
     public onExpandToggle(event: MouseEvent): void {
-        this.treeViewService.toggleNodeExpand(this.node, !this.node.expanded);
+        this.treeViewService.setNodeExpand(this.node, !this.node.state.expanded());
     }
 
     public onNodeDoubleClick(event: MouseEvent): void {

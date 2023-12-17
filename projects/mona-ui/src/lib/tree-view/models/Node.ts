@@ -17,37 +17,46 @@ export interface NodeOptions<T = any> {
     text?: string;
 }
 
+export interface NodeState {
+    checked: WritableSignal<boolean>;
+    expanded: WritableSignal<boolean>;
+    indeterminate: WritableSignal<boolean>;
+    selected: WritableSignal<boolean>;
+}
+
 export class Node<T = any> {
     public readonly uid: string = v4();
-    public checked: boolean = false;
     public data?: T;
     public disabled: boolean = false;
-    public expanded: boolean = false;
     public focused: WritableSignal<boolean> = signal(false);
-    public indeterminate: boolean = false;
     public index: number = 0;
     public key: string;
     public nodes: Node<T>[] = [];
     public parent?: Node<T>;
-    public selected: boolean = false;
+    public state: NodeState = {
+        checked: signal(false),
+        expanded: signal(false),
+        indeterminate: signal(false),
+        selected: signal(false)
+    };
     public text: string = "";
     public constructor(options: NodeOptions<T>) {
-        this.checked = options.checked ?? false;
         this.data = options.data;
         this.disabled = options.disabled ?? false;
-        this.expanded = options.expanded ?? false;
-        this.indeterminate = options.indeterminate ?? false;
         this.index = options.index;
         this.key = options.key;
         this.nodes = options.nodes?.map(node => new Node(node)) ?? [];
         this.parent = options.parent;
-        this.selected = options.selected ?? false;
         this.text = options.text ?? "";
+        this.state.checked.set(options.checked ?? false);
+        this.state.expanded.set(options.expanded ?? false);
+        this.state.indeterminate.set(options.indeterminate ?? false);
+        this.state.selected.set(options.selected ?? false);
     }
 
     public anyParentCollapsed(): boolean {
         if (this.parent) {
-            return !this.parent.expanded || this.parent.anyParentCollapsed();
+            return !this.parent.state.expanded() || this.parent.anyParentCollapsed();
         }
         return false;
     }
@@ -61,9 +70,5 @@ export class Node<T = any> {
 
     public getLookupItem(): NodeLookupItem<T> {
         return new NodeLookupItem(this);
-    }
-
-    public setSelected(selected: boolean): void {
-        this.selected = selected;
     }
 }
