@@ -1,5 +1,5 @@
 import { computed, EventEmitter, Injectable, Signal, signal, WritableSignal } from "@angular/core";
-import { Dictionary, EnumerableSet, sequenceEqual, SortedSet } from "@mirei/ts-collections";
+import { aggregate, Dictionary, EnumerableSet, sequenceEqual, SortedSet } from "@mirei/ts-collections";
 import { CheckableOptions } from "../models/CheckableOptions";
 import { ExpandableOptions } from "../models/ExpandableOptions";
 import { Node } from "../models/Node";
@@ -23,6 +23,7 @@ export class TreeViewService {
     };
     public expandedKeys: EnumerableSet<unknown> = new EnumerableSet<unknown>();
     public expandedKeysChange: EventEmitter<unknown[]> = new EventEmitter<unknown[]>();
+    public filterText: WritableSignal<string> = signal("");
     public lastSelectedNode?: Node;
     public nodeDictionary: Signal<Dictionary<string, Node>> = computed(() => {
         const nodeDict = new Dictionary<string, Node>();
@@ -38,6 +39,9 @@ export class TreeViewService {
     public selectedKeys: EnumerableSet<string> = new EnumerableSet<string>();
     public selectedKeysChange: EventEmitter<string[]> = new EventEmitter<string[]>();
     public viewNodeList: Signal<Node[]> = computed(() => {
+        if (this.filterText()) {
+            return this.filterTree(this.nodeList(), this.filterText());
+        }
         return this.nodeList();
     });
 
@@ -64,7 +68,7 @@ export class TreeViewService {
     public loadCheckedKeys(checkedKeys: Iterable<unknown>): void {
         const checkedKeySet = new SortedSet(checkedKeys);
         for (const [uid, node] of this.nodeDictionary().entries()) {
-            node.state.checked.set(checkedKeySet.contains(node.key));
+            node.state.checked = checkedKeySet.contains(node.key);
         }
         for (const node of this.nodeDictionary().values()) {
             if (node.nodes.length > 0) {
@@ -72,10 +76,9 @@ export class TreeViewService {
                     this.checkNode(node, { checked: true, checkChildren: true, checkParent: false });
                 }
                 if (this.checkableOptions.checkParents) {
-                    const indeterminate =
-                        !node.state.checked() &&
-                        node.nodes.some(childNode => childNode.state.checked() || childNode.state.indeterminate());
-                    node.state.indeterminate.set(indeterminate);
+                    node.state.indeterminate =
+                        !node.state.checked &&
+                        node.nodes.some(childNode => childNode.state.checked || childNode.state.indeterminate);
                 }
             }
         }
@@ -113,7 +116,7 @@ export class TreeViewService {
         for (const key of selectedKeySet) {
             const node = this.nodeDictionary().firstOrDefault(n => n.value.key === key)?.value;
             if (node) {
-                node.state.selected.set(true);
+                node.state.selected = true;
                 this.lastSelectedNode = node;
             }
         }
@@ -164,21 +167,21 @@ export class TreeViewService {
         if (node.disabled) {
             return;
         }
-        if (node.state.selected()) {
-            node.state.selected.set(false);
+        if (node.state.selected) {
+            node.state.selected = false;
             this.lastSelectedNode = undefined;
         } else {
             if (this.selectableOptions.mode === "single") {
                 if (this.lastSelectedNode) {
-                    this.lastSelectedNode.state.selected.set(false);
+                    this.lastSelectedNode.state.selected = false;
                 }
             }
-            node.state.selected.set(true);
+            node.state.selected = true;
             node.focused.set(true);
             this.lastSelectedNode = node;
         }
         const selectedKeys = this.nodeDictionary()
-            .where(n => n.value.state.selected())
+            .where(n => n.value.state.selected)
             .select(n => n.value.key)
             .toArray();
         this.selectedKeysChange.emit(selectedKeys);
@@ -192,21 +195,21 @@ export class TreeViewService {
 
     public updateNodeCheckStatus(node: Node): void {
         if (node.nodes.length > 0) {
-            const allChecked = node.nodes.every(childNode => childNode.state.checked());
-            const someChecked = node.nodes.some(childNode => childNode.state.checked());
-            const someIndeterminate = node.nodes.some(childNode => childNode.state.indeterminate());
-            node.state.checked.set(allChecked);
-            node.state.indeterminate.set(someIndeterminate || (!allChecked && someChecked));
+            const allChecked = node.nodes.every(childNode => childNode.state.checked);
+            const someChecked = node.nodes.some(childNode => childNode.state.checked);
+            const someIndeterminate = node.nodes.some(childNode => childNode.state.indeterminate);
+            node.state.checked = allChecked;
+            node.state.indeterminate = someIndeterminate || (!allChecked && someChecked);
         } else {
-            node.state.indeterminate.set(false);
+            node.state.indeterminate = false;
         }
         let parent = node.parent;
         while (parent) {
-            const allChecked = parent.nodes.every(childNode => childNode.state.checked());
-            const someChecked = parent.nodes.some(childNode => childNode.state.checked());
-            const someIndeterminate = parent.nodes.some(childNode => childNode.state.indeterminate());
-            parent.state.checked.set(allChecked);
-            parent.state.indeterminate.set(someIndeterminate || (!allChecked && someChecked));
+            const allChecked = parent.nodes.every(childNode => childNode.state.checked);
+            const someChecked = parent.nodes.some(childNode => childNode.state.checked);
+            const someIndeterminate = parent.nodes.some(childNode => childNode.state.indeterminate);
+            parent.state.checked = allChecked;
+            parent.state.indeterminate = someIndeterminate || (!allChecked && someChecked);
             parent = parent.parent;
         }
         this.emitCheckedKeys();
@@ -219,7 +222,7 @@ export class TreeViewService {
 
     private checkNode(node: Node, options: NodeCheckOptions): void {
         // node.checked = options.checked;
-        node.state.checked.set(options.checked);
+        node.state.checked = options.checked;
         if (options.checkChildren) {
             // if (node.checked && node.expanded) {
             //     node.nodes.forEach(childNode => this.checkNode(childNode, options));
@@ -233,20 +236,19 @@ export class TreeViewService {
         if (options.checkParent && node.parent) {
             const parent = node.parent;
             const siblings = parent.nodes;
-            const checkedSiblings = siblings.filter(sibling => sibling.state.checked());
-            const indeterminateSiblings = siblings.filter(sibling => sibling.state.indeterminate());
+            const checkedSiblings = siblings.filter(sibling => sibling.state.checked);
+            const indeterminateSiblings = siblings.filter(sibling => sibling.state.indeterminate);
             const allSiblingsChecked = checkedSiblings.length === siblings.length;
             const someSiblingsChecked = checkedSiblings.length > 0;
             const someSiblingsIndeterminate = indeterminateSiblings.length > 0;
-            const parentIndeterminate = !allSiblingsChecked && (someSiblingsChecked || someSiblingsIndeterminate);
-            parent.state.indeterminate.set(parentIndeterminate);
+            parent.state.indeterminate = !allSiblingsChecked && (someSiblingsChecked || someSiblingsIndeterminate);
             this.checkNode(parent, { checked: allSiblingsChecked, checkChildren: false, checkParent: true });
         }
     }
 
     private emitCheckedKeys(): void {
         const checkedKeys = this.nodeDictionary()
-            .where(n => n.value.state.checked())
+            .where(n => n.value.state.checked)
             .select(n => n.value.key)
             .orderBy(key => key);
         const previousCheckedKeys = this.checkedKeys.orderBy(key => key);
@@ -258,7 +260,7 @@ export class TreeViewService {
 
     private emitExpandedKeys(): void {
         const expandedKeys = this.nodeDictionary()
-            .where(n => n.value.state.expanded())
+            .where(n => n.value.state.expanded)
             .select(n => n.value.key)
             .orderBy(key => key);
         const previousExpandedKeys = this.expandedKeys.orderBy(key => key);
@@ -268,14 +270,42 @@ export class TreeViewService {
         }
     }
 
+    private expandAllParents(node: Node): void {
+        if (node.parent) {
+            node.parent.state.expanded = true;
+            this.expandAllParents(node.parent);
+        }
+    }
+
     private expandNode(node: Node, expand: boolean, expandChildren: boolean, checkChildren: boolean): void {
-        node.state.expanded.set(expand);
+        node.state.expanded = expand;
         // if (node.checked && checkChildren) {
         //     this.toggleNodeCheck(node, true);
         // }
         if (expandChildren) {
             node.nodes.forEach(childNode => this.expandNode(childNode, expand, expandChildren, checkChildren));
         }
+    }
+
+    private filterTree(nodes: Node[], filterText: string): Node[] {
+        return aggregate(
+            nodes,
+            (result, node) => {
+                if (node.text.toLowerCase().indexOf((filterText || "").toLowerCase()) >= 0) {
+                    result.push(node);
+                    this.expandAllParents(node);
+                } else if (node.nodes && node.nodes.length > 0) {
+                    const newNodes = this.filterTree(node.nodes, filterText);
+                    if (newNodes.length > 0) {
+                        const clone = node.cloneForFilter();
+                        clone.nodes = newNodes;
+                        result.push(clone);
+                    }
+                }
+                return result;
+            },
+            [] as Node[]
+        );
     }
 
     private prepareNodeDictionary(nodes: Node[], nodeDict: Dictionary<string, Node>): void {

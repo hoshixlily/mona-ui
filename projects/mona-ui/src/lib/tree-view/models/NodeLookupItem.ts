@@ -11,14 +11,14 @@ export class NodeLookupItem<T = any> {
     public readonly selected: boolean;
     public readonly text: string;
     public constructor(node: Node) {
-        this.checked = node.state.checked();
+        this.checked = node.state.checked;
         this.data = node.data;
         this.disabled = node.disabled;
-        this.expanded = node.state.expanded();
-        this.indeterminate = node.state.indeterminate();
+        this.expanded = node.state.expanded;
+        this.indeterminate = node.state.indeterminate;
         this.key = node.key;
         this.nodes = node.nodes.map(node => new NodeLookupItem(node));
-        this.selected = node.state.selected();
+        this.selected = node.state.selected;
         this.text = node.text;
     }
 }

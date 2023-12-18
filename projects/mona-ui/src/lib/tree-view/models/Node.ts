@@ -1,27 +1,22 @@
-import { NodeCheckOptions } from "./NodeCheckOptions";
-import { NodeLookupItem } from "./NodeLookupItem";
-import { v4 } from "uuid";
 import { signal, WritableSignal } from "@angular/core";
+import { v4 } from "uuid";
+import { NodeLookupItem } from "./NodeLookupItem";
 
 export interface NodeOptions<T = any> {
-    checked?: boolean;
     data?: T;
     disabled?: boolean;
-    expanded?: boolean;
-    indeterminate?: boolean;
     index: number;
     key: string;
     nodes?: NodeOptions<T>[];
     parent?: Node<T>;
-    selected?: boolean;
     text?: string;
 }
 
 export interface NodeState {
-    checked: WritableSignal<boolean>;
-    expanded: WritableSignal<boolean>;
-    indeterminate: WritableSignal<boolean>;
-    selected: WritableSignal<boolean>;
+    checked: boolean;
+    expanded: boolean;
+    indeterminate: boolean;
+    selected: boolean;
 }
 
 export class Node<T = any> {
@@ -34,12 +29,13 @@ export class Node<T = any> {
     public nodes: Node<T>[] = [];
     public parent?: Node<T>;
     public state: NodeState = {
-        checked: signal(false),
-        expanded: signal(false),
-        indeterminate: signal(false),
-        selected: signal(false)
+        checked: false,
+        expanded: false,
+        indeterminate: false,
+        selected: false
     };
     public text: string = "";
+
     public constructor(options: NodeOptions<T>) {
         this.data = options.data;
         this.disabled = options.disabled ?? false;
@@ -48,17 +44,27 @@ export class Node<T = any> {
         this.nodes = options.nodes?.map(node => new Node(node)) ?? [];
         this.parent = options.parent;
         this.text = options.text ?? "";
-        this.state.checked.set(options.checked ?? false);
-        this.state.expanded.set(options.expanded ?? false);
-        this.state.indeterminate.set(options.indeterminate ?? false);
-        this.state.selected.set(options.selected ?? false);
     }
 
     public anyParentCollapsed(): boolean {
         if (this.parent) {
-            return !this.parent.state.expanded() || this.parent.anyParentCollapsed();
+            return !this.parent.state.expanded || this.parent.anyParentCollapsed();
         }
         return false;
+    }
+
+    public cloneForFilter(): Node<T> {
+        const node = new Node<T>({
+            data: this.data,
+            disabled: this.disabled,
+            index: this.index,
+            key: this.key,
+            nodes: this.nodes.map(node => node.cloneForFilter()),
+            parent: this.parent,
+            text: this.text
+        });
+        node.state = this.state;
+        return node;
     }
 
     public isDescendantOf(node: Node): boolean {

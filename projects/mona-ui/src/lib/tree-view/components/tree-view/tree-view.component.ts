@@ -29,10 +29,13 @@ import {
     ViewChildren
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { FormsModule } from "@angular/forms";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { faArrowDown, faArrowUp, faPlus, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { faArrowDown, faArrowUp, faPlus, faSearch, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { Enumerable, List } from "@mirei/ts-collections";
 import { filter, fromEvent } from "rxjs";
+import { TextBoxComponent } from "../../../inputs/text-box/components/text-box/text-box.component";
+import { TextBoxPrefixTemplateDirective } from "../../../inputs/text-box/directives/text-box-prefix-template.directive";
 import { Action } from "../../../utils/Action";
 import { TreeViewNodeTextTemplateDirective } from "../../directives/tree-view-node-text-template.directive";
 import { DropPosition } from "../../models/DropPosition";
@@ -70,7 +73,10 @@ import { TreeViewNodeComponent } from "../tree-view-node/tree-view-node.componen
         NgIf,
         NgTemplateOutlet,
         CdkDragPreview,
-        FontAwesomeModule
+        FontAwesomeModule,
+        TextBoxComponent,
+        FormsModule,
+        TextBoxPrefixTemplateDirective
     ]
 })
 export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit {
@@ -78,9 +84,10 @@ export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit {
     private disabler?: Action<any, boolean> | string;
     private dropTargetNode?: Node;
     private keyManager?: ActiveDescendantKeyManager<TreeViewNodeComponent>;
-    public readonly dropAfterIcon: IconDefinition = faArrowDown;
-    public readonly dropBeforeIcon: IconDefinition = faArrowUp;
-    public readonly dropInsideIcon: IconDefinition = faPlus;
+    protected readonly dropAfterIcon: IconDefinition = faArrowDown;
+    protected readonly dropBeforeIcon: IconDefinition = faArrowUp;
+    protected readonly dropInsideIcon: IconDefinition = faPlus;
+    protected readonly filterIcon: IconDefinition = faSearch;
     public dragging: boolean = false;
     public dropPosition?: DropPosition;
 
@@ -164,7 +171,7 @@ export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit {
                 this.keyManager?.setActiveItem(lastActiveItem);
             } else {
                 const selectedItem = Enumerable.from(flatComponents)
-                    .where(n => n.node.state.selected())
+                    .where(n => n.node.state.selected)
                     .lastOrDefault();
                 const focusedItem = Enumerable.from(flatComponents)
                     .where(n => n.node.focused())
@@ -257,7 +264,7 @@ export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit {
                 this.treeViewService.updateNodeCheckStatus(draggedNode.parent);
             }
             draggedNode.parent = this.dropTargetNode;
-            this.dropTargetNode.state.expanded.set(true);
+            this.dropTargetNode.state.expanded = true;
             this.treeViewService.updateNodeCheckStatus(draggedNode.parent);
         } else if (this.dropPosition === "before") {
             if (draggedNode.parent) {
@@ -365,9 +372,6 @@ export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit {
             const node: Node = new Node<any>({
                 key: nodeId,
                 data: dataItem,
-                checked: false,
-                expanded: false,
-                selected: false,
                 text: dataItem[this.textField],
                 nodes: [],
                 parent: parentNode,
@@ -421,7 +425,7 @@ export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit {
                     case " ":
                         if (this.keyManager?.activeItem?.node) {
                             const node = this.keyManager.activeItem.node;
-                            this.treeViewService.setNodeCheck(node, !node.state.checked());
+                            this.treeViewService.setNodeCheck(node, !node.state.checked);
                         }
                         break;
                 }

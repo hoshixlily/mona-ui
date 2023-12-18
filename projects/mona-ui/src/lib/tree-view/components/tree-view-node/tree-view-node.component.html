@@ -10,9 +10,9 @@
     @if (treeViewService.expandableOptions.enabled) {
         <div class="mona-tree-node-expander" (click)="onExpandToggle($event)"
              [ngClass]="{'mona-interactive': node.nodes.length !== 0, 'mona-disabled': node.disabled}">
-            @if (node.nodes.length !== 0 && !node.state.expanded()) {
+            @if (node.nodes.length !== 0 && !node.state.expanded) {
                 <fa-icon [icon]="expandIcon"></fa-icon>
-            } @else if (node.nodes.length !== 0 && node.state.expanded()) {
+            } @else if (node.nodes.length !== 0 && node.state.expanded) {
                 <fa-icon [icon]="collapseIcon"></fa-icon>
             }
         </div>
@@ -21,13 +21,13 @@
     <div class="mona-tree-node-content" [ngClass]="{'mona-disabled': node.disabled}">
         @if (treeViewService.checkableOptions.enabled) {
             <input type="checkbox" id="mona-tree-node-checkbox-{{node.uid}}"
-                   [indeterminate]="node.state.indeterminate()"
+                   [indeterminate]="node.state.indeterminate"
                    [disabled]="node.disabled"
-                   [ngModel]="node.state.checked()" (ngModelChange)="onCheckToggle($event)" monaCheckBox>
+                   [ngModel]="node.state.checked" (ngModelChange)="onCheckToggle($event)" monaCheckBox>
         }
         <label for="mona-tree-node-checkbox-{{node.uid}}"></label>
         <div class="mona-tree-view-node-text"
-             [ngClass]="{'mona-tree-view-node-selected': node.state.selected(),
+             [ngClass]="{'mona-tree-view-node-selected': node.state.selected,
                          'mona-tree-view-node-dropping': dragging && dropPosition==='inside',
                          'mona-tree-view-node-focused': node.focused()}"
              (click)="click$.next($event)"

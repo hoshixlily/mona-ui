@@ -1,6 +1,14 @@
 <div class="mona-tree-view" tabindex="0">
     <ul class="mona-tree-list" cdkDropList [cdkDropListSortingDisabled]="true"
         (cdkDropListDropped)="onNodeDrop($event)">
+        <mona-text-box [ngModel]="treeViewService.filterText()"
+                       (ngModelChange)="treeViewService.filterText.set($event)">
+            <ng-template monaTextBoxPrefixTemplate>
+                <div class="mona-tree-view-filter-icon">
+                    <fa-icon [icon]="filterIcon"></fa-icon>
+                </div>
+            </ng-template>
+        </mona-text-box>
         <ng-template #treeTemplate let-nodes>
             <ng-container *ngFor="let node of nodes; let nx = index; trackBy:nodeTrackBy;">
                 <li class="mona-tree-list-item" cdkDrag [cdkDragData]="node" (cdkDragStarted)="onNodeDragStart($event)"
@@ -10,8 +18,8 @@
                                          (nodeSelect)="onNodeSelect($event)"
                                          (nodeClick)="nodeClick.emit($event)"
                                          (nodeDoubleClick)="nodeDoubleClick.emit($event)"></mona-tree-view-node>
-                    @if (!treeViewService.expandableOptions.enabled || (treeViewService.expandableOptions.enabled && (node.nodes.length !== 0 && node.state.expanded()))) {
-                        <ul class="mona-subtree-list" [@nodeExpand]="node.state.expanded()">
+                    @if (!treeViewService.expandableOptions.enabled || (treeViewService.expandableOptions.enabled && (node.nodes.length !== 0 && node.state.expanded))) {
+                        <ul class="mona-subtree-list" [@nodeExpand]="node.state.expanded">
                             <ng-container [ngTemplateOutlet]="treeTemplate"
                                           [ngTemplateOutletContext]="{$implicit: node.nodes}"></ng-container>
                         </ul>
