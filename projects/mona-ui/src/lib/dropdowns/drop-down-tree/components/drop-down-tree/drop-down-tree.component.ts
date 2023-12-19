@@ -25,6 +25,7 @@ import { PopupService } from "../../../../popup/services/popup.service";
 import { TreeViewComponent } from "../../../../tree-view/components/tree-view/tree-view.component";
 import { TreeViewDisableDirective } from "../../../../tree-view/directives/tree-view-disable.directive";
 import { TreeViewExpandableDirective } from "../../../../tree-view/directives/tree-view-expandable.directive";
+import { TreeViewFilterableDirective } from "../../../../tree-view/directives/tree-view-filterable.directive";
 import { TreeViewSelectableDirective } from "../../../../tree-view/directives/tree-view-selectable.directive";
 import { NodeLookupItem } from "../../../../tree-view/models/NodeLookupItem";
 import { SelectableOptions } from "../../../../tree-view/models/SelectableOptions";
@@ -41,7 +42,8 @@ import { DropDownTreeService } from "../../services/drop-down-tree.service";
         FaIconComponent,
         TreeViewSelectableDirective,
         TreeViewExpandableDirective,
-        TreeViewDisableDirective
+        TreeViewDisableDirective,
+        TreeViewFilterableDirective
     ],
     templateUrl: "./drop-down-tree.component.html",
     styleUrl: "./drop-down-tree.component.scss",
@@ -139,7 +141,7 @@ export class DropDownTreeComponent implements ControlValueAccessor {
             hasBackdrop: false,
             withPush: false,
             width: this.elementRef.nativeElement.getBoundingClientRect().width,
-            popupClass: ["mona-dropdown-popup-content"],
+            popupClass: ["mona-dropdown-popup-content", "mona-dropdown-tree-popup-content"],
             closeOnOutsideClick: false,
             positions: [
                 new ConnectionPositionPair(

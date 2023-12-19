@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TreeViewFilterComponent } from './tree-view-filter.component';
+import { FilterInputComponent } from './filter-input.component';
 
-describe('TreeViewFilterComponent', () => {
-  let component: TreeViewFilterComponent;
-  let fixture: ComponentFixture<TreeViewFilterComponent>;
+describe('FilterInputComponent', () => {
+  let component: FilterInputComponent;
+  let fixture: ComponentFixture<FilterInputComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TreeViewFilterComponent]
+      imports: [FilterInputComponent]
     })
     .compileComponents();
     
-    fixture = TestBed.createComponent(TreeViewFilterComponent);
+    fixture = TestBed.createComponent(FilterInputComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

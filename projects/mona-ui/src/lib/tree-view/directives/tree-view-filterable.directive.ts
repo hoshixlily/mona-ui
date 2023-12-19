@@ -1,6 +1,6 @@
 import { Directive, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { FilterChangeEvent } from "../../common/models/FilterChangeEvent";
 import { FilterableOptions } from "../models/FilterableOptions";
-import { FilterChangeEvent } from "../models/FilterChangeEvent";
 import { TreeViewService } from "../services/tree-view.service";
 
 @Directive({

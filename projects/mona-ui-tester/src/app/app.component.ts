@@ -137,7 +137,8 @@ import {
     DropDownTreeComponent,
     DropDownTreeExpandableDirective,
     TreeViewFilterableDirective,
-    FilterChangeEvent
+    FilterChangeEvent,
+    DropDownTreeFilterableDirective
 } from "mona-ui";
 import { v4 } from "uuid";
 import { TestComponentComponent } from "./test-component/test-component.component";
@@ -267,7 +268,8 @@ import { GridOrderData } from "./GridOrderData";
         ChipComponent,
         DropDownTreeComponent,
         DropDownTreeExpandableDirective,
-        TreeViewFilterableDirective
+        TreeViewFilterableDirective,
+        DropDownTreeFilterableDirective
     ]
 })
 export class AppComponent implements OnInit {

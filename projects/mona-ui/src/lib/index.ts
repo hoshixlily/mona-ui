@@ -10,6 +10,9 @@ export * from "./buttons/drop-down-button/drop-down-button.component";
 export * from "./buttons/split-button/directives/split-button-text-template.directive";
 export * from "./buttons/split-button/components/split-button/split-button.component";
 
+/** Common */
+export * from "./common/models/FilterChangeEvent";
+
 /** Date Inputs */
 export * from "./date-inputs/calendar/calendar.component";
 export * from "./date-inputs/date-picker/date-picker.component";
@@ -34,6 +37,7 @@ export * from "./dropdowns/drop-down-list/components/drop-down-list/drop-down-li
 
 //
 export * from "./dropdowns/drop-down-tree/directives/drop-down-tree-expandable.directive";
+export * from "./dropdowns/drop-down-tree/directives/drop-down-tree-filterable.directive";
 export * from "./dropdowns/drop-down-tree/components/drop-down-tree/drop-down-tree.component";
 
 //
@@ -204,7 +208,6 @@ export * from "./tree-view/models/CheckableOptions";
 export * from "./tree-view/models/ExpandableOptions";
 export * from "./tree-view/models/FilterableOptions";
 export * from "./tree-view/models/SelectableOptions";
-export * from "./tree-view/models/FilterChangeEvent";
 export * from "./tree-view/components/tree-view/tree-view.component";
 export * from "./tree-view/directives/tree-view-checkable.directive";
 export * from "./tree-view/directives/tree-view-disable.directive";

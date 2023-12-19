@@ -562,14 +562,32 @@ div.mona-time-picker-popup {
     & .mona-dropdown-value {
         color: var(--mona-text);
     }
+
 }
 
 .mona-dropdown-tree-popup-wrapper {
     max-height: 250px;
-    padding: 4px 2px;
-    overflow: auto;
-    @include scrollbars;
+    padding: 0 0 0 4px;
+    overflow: hidden;
+    & mona-tree-view ul.mona-tree-list {
+        max-height: 200px;
+        overflow: auto;
+        padding-bottom: 4px;
+        @include scrollbars;
+    }
 }
+
+.mona-dropdown-tree-popup-content {
+    & mona-filter-input {
+        & div.mona-text-box {
+            background-color: var(--mona-background-lighter);
+            & input {
+                background-color: transparent;
+            }
+        }
+    }
+}
+
 
 /** Multi Select */
 .mona-multi-select {
@@ -1621,7 +1639,6 @@ div.mona-popover-footer {
     @include font-medium;
 }
 .mona-tree-view-node {
-
     & .mona-disabled {
         @include disabled;
     }

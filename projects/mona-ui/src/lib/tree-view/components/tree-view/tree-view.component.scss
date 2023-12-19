@@ -5,7 +5,6 @@ div.mona-tree-view {
 ul {
     list-style-type: none;
     width: 100%;
-    padding: 0 4px;
 
     & li {
         list-style-type: none;
@@ -18,7 +17,13 @@ ul {
     }
 }
 
-mona-tree-view-filter {
-    display: block;
-    padding-top: 4px;
+div.mona-tree-view-filter-container {
+    display: flex;
+    width: 100%;
+    padding-right: 4px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    & mona-filter-input {
+        width: 100%;
+    }
 }

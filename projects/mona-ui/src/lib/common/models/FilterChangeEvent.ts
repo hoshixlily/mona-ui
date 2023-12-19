@@ -3,7 +3,7 @@ import { PreventableEvent } from "../../utils/PreventableEvent";
 export class FilterChangeEvent extends PreventableEvent {
     readonly #filter: string;
     public constructor(filterText: string) {
-        super("treeViewFilterChange");
+        super("filterInputChange");
         this.#filter = filterText;
     }
 

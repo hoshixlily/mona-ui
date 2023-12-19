@@ -34,6 +34,8 @@ import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { faArrowDown, faArrowUp, faPlus, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { Enumerable, List } from "@mirei/ts-collections";
 import { filter, fromEvent } from "rxjs";
+import { FilterInputComponent } from "../../../common/components/filter-input/filter-input.component";
+import { FilterChangeEvent } from "../../../common/models/FilterChangeEvent";
 import { Action } from "../../../utils/Action";
 import { TreeViewNodeTextTemplateDirective } from "../../directives/tree-view-node-text-template.directive";
 import { DropPosition } from "../../models/DropPosition";
@@ -46,7 +48,6 @@ import { NodeDragStartEvent } from "../../models/NodeDragStartEvent";
 import { NodeDropEvent } from "../../models/NodeDropEvent";
 import { NodeLookupItem } from "../../models/NodeLookupItem";
 import { TreeViewService } from "../../services/tree-view.service";
-import { TreeViewFilterComponent } from "../tree-view-filter/tree-view-filter.component";
 import { TreeViewNodeComponent } from "../tree-view-node/tree-view-node.component";
 
 @Component({
@@ -73,7 +74,7 @@ import { TreeViewNodeComponent } from "../tree-view-node/tree-view-node.componen
         CdkDragPreview,
         FontAwesomeModule,
         FormsModule,
-        TreeViewFilterComponent
+        FilterInputComponent
     ]
 })
 export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit {
@@ -196,6 +197,13 @@ export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit {
 
     public nodeTrackBy(index: number, item: Node): string {
         return item.key;
+    }
+
+    public onFilterChange(event: FilterChangeEvent): void {
+        this.treeViewService.filterChange.emit(event);
+        if (!event.isDefaultPrevented()) {
+            this.treeViewService.filter$.next(event.filter);
+        }
     }
 
     public onNodeDragEnd(event: CdkDragEnd<Node>): void {

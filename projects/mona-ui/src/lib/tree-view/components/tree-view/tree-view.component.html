@@ -1,9 +1,14 @@
 <div class="mona-tree-view" tabindex="0">
+    @if (treeViewService.filterableOptions.enabled) {
+        <div class="mona-tree-view-filter-container">
+            <mona-filter-input [filter]="treeViewService.filterText()"
+                               [placeholder]="treeViewService.filterPlaceholder()"
+                               (filterChange)="onFilterChange($event)"
+            ></mona-filter-input>
+        </div>
+    }
     <ul class="mona-tree-list" cdkDropList [cdkDropListSortingDisabled]="true"
         (cdkDropListDropped)="onNodeDrop($event)">
-        @if (treeViewService.filterableOptions.enabled) {
-            <mona-tree-view-filter></mona-tree-view-filter>
-        }
         <ng-template #treeTemplate let-nodes>
             <ng-container *ngFor="let node of nodes; let nx = index; trackBy:nodeTrackBy;">
                 <li class="mona-tree-list-item" cdkDrag [cdkDragData]="node" (cdkDragStarted)="onNodeDragStart($event)"
