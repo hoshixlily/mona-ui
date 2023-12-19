@@ -1065,7 +1065,7 @@ export class AppComponent implements OnInit {
 
     public onTreeFilterChange(event: FilterChangeEvent): void {
         // event.preventDefault();
-        console.log(event.filter);
+        // console.log(event.filter);
     }
 
     public onTreeNodeClick(event: NodeClickEvent): void {

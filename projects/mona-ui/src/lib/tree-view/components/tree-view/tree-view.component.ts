@@ -9,7 +9,7 @@ import {
     CdkDragStart,
     CdkDropList
 } from "@angular/cdk/drag-drop";
-import { NgFor, NgIf, NgTemplateOutlet } from "@angular/common";
+import { NgFor, NgTemplateOutlet } from "@angular/common";
 import {
     AfterViewInit,
     ChangeDetectorRef,
@@ -31,11 +31,9 @@ import {
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FormsModule } from "@angular/forms";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { faArrowDown, faArrowUp, faPlus, faSearch, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { faArrowDown, faArrowUp, faPlus, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { Enumerable, List } from "@mirei/ts-collections";
 import { filter, fromEvent } from "rxjs";
-import { TextBoxComponent } from "../../../inputs/text-box/components/text-box/text-box.component";
-import { TextBoxPrefixTemplateDirective } from "../../../inputs/text-box/directives/text-box-prefix-template.directive";
 import { Action } from "../../../utils/Action";
 import { TreeViewNodeTextTemplateDirective } from "../../directives/tree-view-node-text-template.directive";
 import { DropPosition } from "../../models/DropPosition";
@@ -71,7 +69,6 @@ import { TreeViewNodeComponent } from "../tree-view-node/tree-view-node.componen
         NgFor,
         CdkDrag,
         TreeViewNodeComponent,
-        NgIf,
         NgTemplateOutlet,
         CdkDragPreview,
         FontAwesomeModule,
@@ -87,7 +84,6 @@ export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit {
     protected readonly dropAfterIcon: IconDefinition = faArrowDown;
     protected readonly dropBeforeIcon: IconDefinition = faArrowUp;
     protected readonly dropInsideIcon: IconDefinition = faPlus;
-    protected readonly filterIcon: IconDefinition = faSearch;
     public dragging: boolean = false;
     public dropPosition?: DropPosition;
 
@@ -251,85 +247,11 @@ export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit {
             return;
         }
         if (this.dropPosition === "inside") {
-            if (draggedNode.parent?.uid === this.dropTargetNode.uid) {
-                return;
-            }
-            if (draggedNode.parent) {
-                draggedNode.parent.nodes = draggedNode.parent.nodes.filter(node => node.uid !== draggedNode.uid);
-            } else {
-                this.treeViewService.nodeList.update(list => list.filter(node => node.uid !== draggedNode.uid));
-            }
-            this.dropTargetNode.nodes = [...this.dropTargetNode.nodes, draggedNode];
-            if (draggedNode.parent) {
-                this.treeViewService.updateNodeCheckStatus(draggedNode.parent);
-            }
-            draggedNode.parent = this.dropTargetNode;
-            this.dropTargetNode.state.expanded = true;
-            this.treeViewService.updateNodeCheckStatus(draggedNode.parent);
+            this.handleDropInside(event, this.dropTargetNode);
         } else if (this.dropPosition === "before") {
-            if (draggedNode.parent) {
-                draggedNode.parent.nodes = draggedNode.parent.nodes.filter(node => node.uid !== draggedNode.uid);
-            }
-            if (this.dropTargetNode.parent) {
-                const index = this.dropTargetNode.parent.nodes.findIndex(node => node.uid === this.dropTargetNode?.uid);
-                if (index >= 0) {
-                    this.dropTargetNode.parent.nodes.splice(index, 0, draggedNode);
-                    if (draggedNode.parent) {
-                        this.treeViewService.updateNodeCheckStatus(draggedNode.parent);
-                    } else {
-                        this.treeViewService.nodeList.update(list => list.filter(node => node.uid !== draggedNode.uid));
-                    }
-                    draggedNode.parent = this.dropTargetNode.parent;
-                }
-                this.treeViewService.updateNodeCheckStatus(this.dropTargetNode.parent);
-            } else {
-                const index = this.treeViewService.nodeList().findIndex(node => node.uid === this.dropTargetNode?.uid);
-                if (index >= 0) {
-                    this.treeViewService.nodeList.update(list => {
-                        const filteredList = list.filter(node => node.uid !== draggedNode.uid);
-                        filteredList.splice(index, 0, draggedNode);
-                        return filteredList;
-                    });
-                    if (draggedNode.parent) {
-                        this.treeViewService.updateNodeCheckStatus(draggedNode.parent);
-                    } else {
-                        this.treeViewService.nodeList.update(list => list.filter(node => node.uid !== draggedNode.uid));
-                    }
-                    draggedNode.parent = undefined;
-                }
-            }
+            this.handleDropBefore(event, this.dropTargetNode);
         } else if (this.dropPosition === "after") {
-            if (draggedNode.parent) {
-                draggedNode.parent.nodes = draggedNode.parent.nodes.filter(node => node.uid !== draggedNode.uid);
-            }
-            if (this.dropTargetNode.parent) {
-                const index = this.dropTargetNode.parent.nodes.findIndex(node => node.uid === this.dropTargetNode?.uid);
-                if (index >= 0) {
-                    this.dropTargetNode.parent.nodes.splice(index + 1, 0, draggedNode);
-                    if (draggedNode.parent) {
-                        this.treeViewService.updateNodeCheckStatus(draggedNode.parent);
-                    } else {
-                        this.treeViewService.nodeList.update(list => list.filter(node => node.uid !== draggedNode.uid));
-                    }
-                    draggedNode.parent = this.dropTargetNode.parent;
-                }
-                this.treeViewService.updateNodeCheckStatus(this.dropTargetNode.parent);
-            } else {
-                const index = this.treeViewService.nodeList().findIndex(node => node.uid === this.dropTargetNode?.uid);
-                if (index >= 0) {
-                    this.treeViewService.nodeList.update(list => {
-                        const filteredList = list.filter(node => node.uid !== draggedNode.uid);
-                        filteredList.splice(index + 1, 0, draggedNode);
-                        return filteredList;
-                    });
-                    if (draggedNode.parent) {
-                        this.treeViewService.updateNodeCheckStatus(draggedNode.parent);
-                    } else {
-                        this.treeViewService.nodeList.update(list => list.filter(node => node.uid !== draggedNode.uid));
-                    }
-                    draggedNode.parent = undefined;
-                }
-            }
+            this.handleDropAfter(event, this.dropTargetNode);
         }
         this.dragging = false;
         this.treeViewService.updateNodeIndices();
@@ -347,6 +269,95 @@ export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit {
             this.keyManager?.setActiveItem(component);
         }
         this.selectionChange.emit(node.getLookupItem());
+    }
+
+    private handleDropAfter(event: CdkDragDrop<Node, Node, Node>, dropTargetNode: Node): void {
+        const draggedNode = event.item.data;
+        if (draggedNode.parent) {
+            draggedNode.parent.nodes = draggedNode.parent.nodes.filter(node => node.uid !== draggedNode.uid);
+        }
+        if (dropTargetNode.parent) {
+            const index = dropTargetNode.parent.nodes.findIndex(node => node.uid === dropTargetNode?.uid);
+            if (index >= 0) {
+                dropTargetNode.parent.nodes.splice(index + 1, 0, draggedNode);
+                if (draggedNode.parent) {
+                    this.treeViewService.updateNodeCheckStatus(draggedNode.parent);
+                } else {
+                    this.treeViewService.nodeList.update(list => list.filter(node => node.uid !== draggedNode.uid));
+                }
+                draggedNode.parent = dropTargetNode.parent;
+            }
+            this.treeViewService.updateNodeCheckStatus(dropTargetNode.parent);
+        } else {
+            const index = this.treeViewService.nodeList().findIndex(node => node.uid === dropTargetNode?.uid);
+            if (index >= 0) {
+                this.treeViewService.nodeList.update(list => {
+                    const filteredList = list.filter(node => node.uid !== draggedNode.uid);
+                    filteredList.splice(index + 1, 0, draggedNode);
+                    return filteredList;
+                });
+                if (draggedNode.parent) {
+                    this.treeViewService.updateNodeCheckStatus(draggedNode.parent);
+                } else {
+                    this.treeViewService.nodeList.update(list => list.filter(node => node.uid !== draggedNode.uid));
+                }
+                draggedNode.parent = undefined;
+            }
+        }
+    }
+
+    private handleDropBefore(event: CdkDragDrop<Node, Node, Node>, dropTargetNode: Node): void {
+        const draggedNode = event.item.data;
+        if (draggedNode.parent) {
+            draggedNode.parent.nodes = draggedNode.parent.nodes.filter(node => node.uid !== draggedNode.uid);
+        }
+        if (dropTargetNode.parent) {
+            const index = dropTargetNode.parent.nodes.findIndex(node => node.uid === dropTargetNode?.uid);
+            if (index >= 0) {
+                dropTargetNode.parent.nodes.splice(index, 0, draggedNode);
+                if (draggedNode.parent) {
+                    this.treeViewService.updateNodeCheckStatus(draggedNode.parent);
+                } else {
+                    this.treeViewService.nodeList.update(list => list.filter(node => node.uid !== draggedNode.uid));
+                }
+                draggedNode.parent = dropTargetNode.parent;
+            }
+            this.treeViewService.updateNodeCheckStatus(dropTargetNode.parent);
+        } else {
+            const index = this.treeViewService.nodeList().findIndex(node => node.uid === dropTargetNode?.uid);
+            if (index >= 0) {
+                this.treeViewService.nodeList.update(list => {
+                    const filteredList = list.filter(node => node.uid !== draggedNode.uid);
+                    filteredList.splice(index, 0, draggedNode);
+                    return filteredList;
+                });
+                if (draggedNode.parent) {
+                    this.treeViewService.updateNodeCheckStatus(draggedNode.parent);
+                } else {
+                    this.treeViewService.nodeList.update(list => list.filter(node => node.uid !== draggedNode.uid));
+                }
+                draggedNode.parent = undefined;
+            }
+        }
+    }
+
+    private handleDropInside(event: CdkDragDrop<Node, Node, Node>, dropTargetNode: Node): void {
+        const draggedNode = event.item.data;
+        if (draggedNode.parent?.uid === dropTargetNode.uid) {
+            return;
+        }
+        if (draggedNode.parent) {
+            draggedNode.parent.nodes = draggedNode.parent.nodes.filter(node => node.uid !== draggedNode.uid);
+        } else {
+            this.treeViewService.nodeList.update(list => list.filter(node => node.uid !== draggedNode.uid));
+        }
+        dropTargetNode.nodes = [...dropTargetNode.nodes, draggedNode];
+        if (draggedNode.parent) {
+            this.treeViewService.updateNodeCheckStatus(draggedNode.parent);
+        }
+        draggedNode.parent = dropTargetNode;
+        dropTargetNode.state.expanded = true;
+        this.treeViewService.updateNodeCheckStatus(draggedNode.parent);
     }
 
     private prepareNodeList(): void {
