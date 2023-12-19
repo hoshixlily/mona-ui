@@ -11,6 +11,13 @@
            (ngModelChange)="onValueChange($event)"
            (blur)="inputBlur.emit($event)"
            (focus)="inputFocus.emit($event)" monaTextBox />
+
+    @if (clearButton && value.length !== 0) {
+        <button monaButton [flat]="true" (click)="onClearClick()">
+            <fa-icon [icon]="clearIcon"></fa-icon>
+        </button>
+    }
+
     <ng-container *ngFor="let suffixTemplate of suffixTemplateList">
         <span class="mona-text-box-suffix">
             <ng-container *ngTemplateOutlet="suffixTemplate"></ng-container>

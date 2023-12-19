@@ -1,3 +1,4 @@
+import { NgFor, NgTemplateOutlet } from "@angular/common";
 import {
     ChangeDetectionStrategy,
     Component,
@@ -6,17 +7,18 @@ import {
     EventEmitter,
     forwardRef,
     Input,
-    OnInit,
     Output,
     QueryList,
     TemplateRef
 } from "@angular/core";
+import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from "@angular/forms";
+import { FaIconComponent } from "@fortawesome/angular-fontawesome";
+import { faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { ButtonDirective } from "../../../../buttons/button/button.directive";
+import { Action } from "../../../../utils/Action";
 import { TextBoxPrefixTemplateDirective } from "../../directives/text-box-prefix-template.directive";
 import { TextBoxSuffixTemplateDirective } from "../../directives/text-box-suffix-template.directive";
-import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from "@angular/forms";
-import { Action } from "../../../../utils/Action";
 import { TextBoxDirective } from "../../directives/text-box.directive";
-import { NgFor, NgTemplateOutlet } from "@angular/common";
 
 @Component({
     selector: "mona-text-box",
@@ -31,11 +33,15 @@ import { NgFor, NgTemplateOutlet } from "@angular/common";
         }
     ],
     standalone: true,
-    imports: [NgFor, NgTemplateOutlet, TextBoxDirective, FormsModule]
+    imports: [NgFor, NgTemplateOutlet, TextBoxDirective, FormsModule, ButtonDirective, FaIconComponent]
 })
-export class TextBoxComponent implements OnInit, ControlValueAccessor {
+export class TextBoxComponent implements ControlValueAccessor {
     private propagateChange: Action<string, any> | null = null;
+    protected readonly clearIcon: IconDefinition = faTimes;
     public value: string = "";
+
+    @Input()
+    public clearButton: boolean = false;
 
     @Input()
     public disabled: boolean = false;
@@ -60,7 +66,10 @@ export class TextBoxComponent implements OnInit, ControlValueAccessor {
 
     public constructor(public readonly elementRef: ElementRef<HTMLDivElement>) {}
 
-    public ngOnInit(): void {}
+    public onClearClick(): void {
+        this.value = "";
+        this.propagateChange?.(this.value);
+    }
 
     public onValueChange(value: string): void {
         this.value = value;
