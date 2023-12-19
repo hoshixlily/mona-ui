@@ -48,6 +48,7 @@ import { NodeDragStartEvent } from "../../models/NodeDragStartEvent";
 import { NodeDropEvent } from "../../models/NodeDropEvent";
 import { NodeLookupItem } from "../../models/NodeLookupItem";
 import { TreeViewService } from "../../services/tree-view.service";
+import { TreeViewFilterComponent } from "../tree-view-filter/tree-view-filter.component";
 import { TreeViewNodeComponent } from "../tree-view-node/tree-view-node.component";
 
 @Component({
@@ -74,9 +75,8 @@ import { TreeViewNodeComponent } from "../tree-view-node/tree-view-node.componen
         NgTemplateOutlet,
         CdkDragPreview,
         FontAwesomeModule,
-        TextBoxComponent,
         FormsModule,
-        TextBoxPrefixTemplateDirective
+        TreeViewFilterComponent
     ]
 })
 export class TreeViewComponent implements OnInit, OnChanges, AfterViewInit {

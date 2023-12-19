@@ -4,7 +4,13 @@
             <ng-container *ngTemplateOutlet="prefixTemplate"></ng-container>
         </span>
     </ng-container>
-    <input [disabled]="disabled" [readonly]="readonly" [ngModel]="value" (ngModelChange)="onValueChange($event)" (blur)="inputBlur.emit($event)" (focus)="inputFocus.emit($event)" monaTextBox />
+    <input [disabled]="disabled"
+           [readonly]="readonly"
+           [placeholder]="placeholder"
+           [ngModel]="value"
+           (ngModelChange)="onValueChange($event)"
+           (blur)="inputBlur.emit($event)"
+           (focus)="inputFocus.emit($event)" monaTextBox />
     <ng-container *ngFor="let suffixTemplate of suffixTemplateList">
         <span class="mona-text-box-suffix">
             <ng-container *ngTemplateOutlet="suffixTemplate"></ng-container>

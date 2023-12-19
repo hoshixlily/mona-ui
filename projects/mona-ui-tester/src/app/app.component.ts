@@ -135,7 +135,9 @@ import {
     GridEditableDirective,
     ChipComponent,
     DropDownTreeComponent,
-    DropDownTreeExpandableDirective
+    DropDownTreeExpandableDirective,
+    TreeViewFilterableDirective,
+    FilterChangeEvent
 } from "mona-ui";
 import { v4 } from "uuid";
 import { TestComponentComponent } from "./test-component/test-component.component";
@@ -264,7 +266,8 @@ import { GridOrderData } from "./GridOrderData";
         TreeViewNodeTextTemplateDirective,
         ChipComponent,
         DropDownTreeComponent,
-        DropDownTreeExpandableDirective
+        DropDownTreeExpandableDirective,
+        TreeViewFilterableDirective
     ]
 })
 export class AppComponent implements OnInit {
@@ -681,7 +684,8 @@ export class AppComponent implements OnInit {
             ]
         }
     ];
-    public treeDataRandom: any[] = this.generateRandomTreeData(10);
+    public treeDataRandom: any[] = this.generateRandomTreeData(100);
+    public treeFilter: WritableSignal<string> = signal("Apple");
 
     public dropdownTreeDisabler: (item: any) => boolean = (item: any) => item.text.toLowerCase().startsWith("c");
     public dropdownTreeExpandedKeys: string[] = ["1", "1-4"];
@@ -1059,6 +1063,11 @@ export class AppComponent implements OnInit {
         this.treeExpandedKeys = expandedKeys as string[];
     }
 
+    public onTreeFilterChange(event: FilterChangeEvent): void {
+        // event.preventDefault();
+        console.log(event.filter);
+    }
+
     public onTreeNodeClick(event: NodeClickEvent): void {
         console.log(event);
         // event.preventDefault();
@@ -1090,9 +1099,9 @@ export class AppComponent implements OnInit {
         }
     }
 
-    public onTreeSelectedKeysChange(selectedKeys: string[]): void {
+    public onTreeSelectedKeysChange(selectedKeys: unknown[]): void {
         console.log(selectedKeys);
-        this.treeSelectedKeys = selectedKeys;
+        this.treeSelectedKeys = selectedKeys as string[];
     }
 
     public openFilterPopup(anchor: HTMLButtonElement): void {

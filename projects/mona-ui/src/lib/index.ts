@@ -201,10 +201,15 @@ export * from "./tree-view/models/NodeDragEvent";
 export * from "./tree-view/models/NodeDropEvent";
 export * from "./tree-view/models/NodeLookupItem";
 export * from "./tree-view/models/CheckableOptions";
+export * from "./tree-view/models/ExpandableOptions";
+export * from "./tree-view/models/FilterableOptions";
+export * from "./tree-view/models/SelectableOptions";
+export * from "./tree-view/models/FilterChangeEvent";
 export * from "./tree-view/components/tree-view/tree-view.component";
 export * from "./tree-view/directives/tree-view-checkable.directive";
 export * from "./tree-view/directives/tree-view-disable.directive";
 export * from "./tree-view/directives/tree-view-expandable.directive";
+export * from "./tree-view/directives/tree-view-filterable.directive";
 export * from "./tree-view/directives/tree-view-selectable.directive";
 export * from "./tree-view/directives/tree-view-node-text-template.directive";
 

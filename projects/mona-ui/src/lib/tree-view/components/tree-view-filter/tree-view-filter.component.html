@@ -1,0 +1,11 @@
+<div class="mona-tree-view-filter">
+    <mona-text-box [ngModel]="treeViewService.filterText()"
+                   [placeholder]="treeViewService.filterPlaceholder()"
+                   (ngModelChange)="onFilterChange($event)">
+        <ng-template monaTextBoxPrefixTemplate>
+            <div class="mona-tree-view-filter-icon">
+                <fa-icon [icon]="filterIcon"></fa-icon>
+            </div>
+        </ng-template>
+    </mona-text-box>
+</div>

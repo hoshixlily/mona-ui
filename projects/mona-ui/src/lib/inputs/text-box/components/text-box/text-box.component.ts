@@ -46,6 +46,9 @@ export class TextBoxComponent implements OnInit, ControlValueAccessor {
     @Output()
     public inputFocus: EventEmitter<Event> = new EventEmitter<Event>();
 
+    @Input()
+    public placeholder: string = "";
+
     @ContentChildren(TextBoxPrefixTemplateDirective, { read: TemplateRef })
     public prefixTemplateList: QueryList<TemplateRef<any>> = new QueryList<TemplateRef<any>>();
 

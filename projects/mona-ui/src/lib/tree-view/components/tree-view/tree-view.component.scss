@@ -4,7 +4,7 @@ div.mona-tree-view {
 
 ul {
     list-style-type: none;
-    width: max-content;
+    width: 100%;
     padding: 0 4px;
 
     & li {
@@ -18,10 +18,7 @@ ul {
     }
 }
 
-div.mona-tree-view-filter-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding-left: 8px;
-    padding-top: 2px;
+mona-tree-view-filter {
+    display: block;
+    padding-top: 4px;
 }

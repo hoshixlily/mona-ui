@@ -1,7 +1,11 @@
 import { computed, EventEmitter, Injectable, Signal, signal, WritableSignal } from "@angular/core";
+import { toSignal } from "@angular/core/rxjs-interop";
 import { aggregate, Dictionary, EnumerableSet, sequenceEqual, SortedSet } from "@mirei/ts-collections";
+import { debounceTime, distinctUntilChanged, ReplaySubject } from "rxjs";
 import { CheckableOptions } from "../models/CheckableOptions";
 import { ExpandableOptions } from "../models/ExpandableOptions";
+import { FilterableOptions } from "../models/FilterableOptions";
+import { FilterChangeEvent } from "../models/FilterChangeEvent";
 import { Node } from "../models/Node";
 import { NodeCheckOptions } from "../models/NodeCheckOptions";
 import { NodeDisabler, NodeDisablerAction } from "../models/NodeDisabler";
@@ -9,41 +13,55 @@ import { SelectableOptions } from "../models/SelectableOptions";
 
 @Injectable()
 export class TreeViewService {
-    public checkableOptions: CheckableOptions = {
+    public readonly checkableOptions: Required<CheckableOptions> = {
         checkChildren: true,
         mode: "multiple",
         checkParents: true,
         enabled: false
     };
-    public checkedKeys: EnumerableSet<unknown> = new EnumerableSet<unknown>();
-    public checkedKeysChange: EventEmitter<unknown[]> = new EventEmitter<unknown[]>();
-    public disabledKeys: EnumerableSet<unknown> = new EnumerableSet<unknown>();
-    public expandableOptions: ExpandableOptions = {
+    public readonly expandableOptions: Required<ExpandableOptions> = {
         enabled: false
     };
-    public expandedKeys: EnumerableSet<unknown> = new EnumerableSet<unknown>();
-    public expandedKeysChange: EventEmitter<unknown[]> = new EventEmitter<unknown[]>();
-    public filterText: WritableSignal<string> = signal("");
-    public lastSelectedNode?: Node;
-    public nodeDictionary: Signal<Dictionary<string, Node>> = computed(() => {
+    public readonly filterableOptions: Required<FilterableOptions> = {
+        caseSensitive: false,
+        debounce: 0,
+        enabled: false,
+        operator: "contains"
+    };
+    public readonly filter$: ReplaySubject<string> = new ReplaySubject<string>(1);
+    public readonly filterPlaceholder: WritableSignal<string> = signal("");
+    public readonly filterText: Signal<string> = toSignal(
+        this.filter$.pipe(debounceTime(this.filterableOptions.debounce), distinctUntilChanged()),
+        {
+            initialValue: ""
+        }
+    );
+    public readonly nodeDictionary: Signal<Dictionary<string, Node>> = computed(() => {
         const nodeDict = new Dictionary<string, Node>();
         this.prepareNodeDictionary(this.nodeList(), nodeDict);
         return nodeDict;
     });
-    public nodeList: WritableSignal<Node[]> = signal([]);
-    public selectableOptions: SelectableOptions = {
+    public readonly nodeList: WritableSignal<Node[]> = signal([]);
+    public readonly selectableOptions: Required<SelectableOptions> = {
         childrenOnly: false,
         enabled: false,
         mode: "single"
     };
-    public selectedKeys: EnumerableSet<string> = new EnumerableSet<string>();
-    public selectedKeysChange: EventEmitter<string[]> = new EventEmitter<string[]>();
-    public viewNodeList: Signal<Node[]> = computed(() => {
+    public readonly viewNodeList: Signal<Node[]> = computed(() => {
         if (this.filterText()) {
             return this.filterTree(this.nodeList(), this.filterText());
         }
         return this.nodeList();
     });
+    public checkedKeys: EnumerableSet<unknown> = new EnumerableSet<unknown>();
+    public checkedKeysChange: EventEmitter<unknown[]> = new EventEmitter<unknown[]>();
+    public disabledKeys: EnumerableSet<unknown> = new EnumerableSet<unknown>();
+    public expandedKeys: EnumerableSet<unknown> = new EnumerableSet<unknown>();
+    public expandedKeysChange: EventEmitter<unknown[]> = new EventEmitter<unknown[]>();
+    public filterChange: EventEmitter<FilterChangeEvent> = new EventEmitter<FilterChangeEvent>();
+    public lastSelectedNode?: Node;
+    public selectedKeys: EnumerableSet<string> = new EnumerableSet<string>();
+    public selectedKeysChange: EventEmitter<string[]> = new EventEmitter<string[]>();
 
     public constructor() {}
 
@@ -123,11 +141,15 @@ export class TreeViewService {
     }
 
     public setCheckableOptions(options: CheckableOptions): void {
-        this.checkableOptions = { ...this.checkableOptions, ...options };
+        Object.assign(this.checkableOptions, options);
     }
 
     public setExpandableOptions(options: ExpandableOptions): void {
-        this.expandableOptions = { ...this.expandableOptions, ...options };
+        Object.assign(this.expandableOptions, options);
+    }
+
+    public setFilterableOptions(options: FilterableOptions): void {
+        Object.assign(this.filterableOptions, options);
     }
 
     public setNodeCheck(node: Node, checked: boolean): void {
@@ -154,7 +176,7 @@ export class TreeViewService {
     }
 
     public setSelectableOptions(options: SelectableOptions): void {
-        this.selectableOptions = { ...this.selectableOptions, ...options };
+        Object.assign(this.selectableOptions, options);
     }
 
     public toggleNodeSelection(node: Node): void {
@@ -291,9 +313,9 @@ export class TreeViewService {
         return aggregate(
             nodes,
             (result, node) => {
-                if (node.text.toLowerCase().indexOf((filterText || "").toLowerCase()) >= 0) {
+                if (this.isFiltered(node.text, filterText)) {
                     result.push(node);
-                    this.expandAllParents(node);
+                    // this.expandAllParents(node);
                 } else if (node.nodes && node.nodes.length > 0) {
                     const newNodes = this.filterTree(node.nodes, filterText);
                     if (newNodes.length > 0) {
@@ -306,6 +328,25 @@ export class TreeViewService {
             },
             [] as Node[]
         );
+    }
+
+    private isFiltered(nodeText: string, filterText: string): boolean {
+        const text = this.filterableOptions.caseSensitive ? nodeText : nodeText.toLowerCase();
+        const filter = this.filterableOptions.caseSensitive ? filterText : filterText.toLowerCase();
+        const operator = this.filterableOptions.operator;
+        if (typeof operator === "function") {
+            return operator(text, filter);
+        }
+        if (operator === "contains") {
+            return text.indexOf(filter) >= 0;
+        }
+        if (operator === "endsWith") {
+            return text.endsWith(filter);
+        }
+        if (operator === "startsWith") {
+            return text.startsWith(filter);
+        }
+        return text.indexOf(filter) >= 0;
     }
 
     private prepareNodeDictionary(nodes: Node[], nodeDict: Dictionary<string, Node>): void {
