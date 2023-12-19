@@ -1,5 +1,6 @@
 <div class="mona-tree-view-filter">
     <mona-text-box [ngModel]="treeViewService.filterText()"
+                   [clearButton]="true"
                    [placeholder]="treeViewService.filterPlaceholder()"
                    (ngModelChange)="onFilterChange($event)">
         <ng-template monaTextBoxPrefixTemplate>
