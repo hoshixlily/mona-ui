@@ -1,12 +1,11 @@
+@if (filterable) {
+    <mona-filter-input [filter]="filterText()"
+                       (filterChange)="filter$.next($event.filter)"
+                       class="mona-popup-filter-input"
+    ></mona-filter-input>
+}
 <ul class="mona-list" [attr.tabindex]="-1">
     @if (popupListService.viewListData.length !== 0) {
-        @if (filterable) {
-            <mona-text-box class="filter-box" [ngModel]="filter$|async" (ngModelChange)="filter$.next($event)">
-                <ng-template monaTextBoxPrefixTemplate>
-                    <fa-icon [icon]="filterIcon"></fa-icon>
-                </ng-template>
-            </mona-text-box>
-        }
         <ng-container *ngFor="let group of popupListService.viewListData">
             <ng-container *ngIf="$any(group.source).length !== 0">
                 <ng-container *ngIf="!groupTemplate">

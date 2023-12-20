@@ -1,11 +1,10 @@
+import { CommonModule } from "@angular/common";
 import {
     AfterViewInit,
     ChangeDetectionStrategy,
-    ChangeDetectorRef,
     Component,
     ContentChild,
     DestroyRef,
-    ElementRef,
     EventEmitter,
     inject,
     Input,
@@ -14,27 +13,28 @@ import {
     OnInit,
     Output,
     QueryList,
+    Signal,
     SimpleChanges,
     SkipSelf,
     TemplateRef,
     ViewChildren
 } from "@angular/core";
-import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { TextBoxPrefixTemplateDirective } from "../../../../inputs/text-box/directives/text-box-prefix-template.directive";
-import { TextBoxComponent } from "../../../../inputs/text-box/components/text-box/text-box.component";
-import { PopupListItem } from "../../../models/PopupListItem";
-import { SelectionMode } from "../../../../models/SelectionMode";
-import { PopupListService } from "../../services/popup-list.service";
-import { debounceTime, fromEvent, Subject, takeUntil } from "rxjs";
-import { CommonModule } from "@angular/common";
-import { PopupListItemComponent } from "../popup-list-item/popup-list-item.component";
-import { PopupListValueChangeEvent } from "../../../models/PopupListValueChangeEvent";
-import { ListItemTemplateDirective } from "../../directives/list-item-template.directive";
-import { ListGroupTemplateDirective } from "../../directives/list-group-template.directive";
+import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
+import { FormsModule } from "@angular/forms";
 
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { faSearch, IconDefinition } from "@fortawesome/free-solid-svg-icons";
-import { FormsModule } from "@angular/forms";
+import { debounceTime, fromEvent, Subject } from "rxjs";
+import { FilterInputComponent } from "../../../../common/components/filter-input/filter-input.component";
+import { TextBoxComponent } from "../../../../inputs/text-box/components/text-box/text-box.component";
+import { TextBoxPrefixTemplateDirective } from "../../../../inputs/text-box/directives/text-box-prefix-template.directive";
+import { SelectionMode } from "../../../../models/SelectionMode";
+import { TypeCastPipe } from "../../../../pipes/type-cast.pipe";
+import { PopupListItem } from "../../../models/PopupListItem";
+import { PopupListValueChangeEvent } from "../../../models/PopupListValueChangeEvent";
+import { ListGroupTemplateDirective } from "../../directives/list-group-template.directive";
+import { ListItemTemplateDirective } from "../../directives/list-item-template.directive";
+import { PopupListService } from "../../services/popup-list.service";
+import { PopupListItemComponent } from "../popup-list-item/popup-list-item.component";
 
 @Component({
     selector: "mona-popup-list",
@@ -47,14 +47,18 @@ import { FormsModule } from "@angular/forms";
         FontAwesomeModule,
         FormsModule,
         TextBoxComponent,
-        TextBoxPrefixTemplateDirective
+        TextBoxPrefixTemplateDirective,
+        FilterInputComponent,
+        TypeCastPipe
     ],
-    changeDetection: ChangeDetectionStrategy.Default
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PopupListComponent implements OnInit, OnChanges, AfterViewInit, OnDestroy {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
-    public readonly filterIcon: IconDefinition = faSearch;
     public readonly filter$: Subject<string> = new Subject<string>();
+    public readonly filterText: Signal<string> = toSignal(this.filter$.pipe(debounceTime(0)), {
+        initialValue: ""
+    });
 
     @Input()
     public filterable: boolean = false;
@@ -96,9 +100,7 @@ export class PopupListComponent implements OnInit, OnChanges, AfterViewInit, OnD
 
     public constructor(
         @SkipSelf()
-        public readonly popupListService: PopupListService,
-        private readonly cdr: ChangeDetectorRef,
-        private elementRef: ElementRef<HTMLElement>
+        public readonly popupListService: PopupListService
     ) {}
 
     public ngAfterViewInit(): void {
@@ -130,7 +132,7 @@ export class PopupListComponent implements OnInit, OnChanges, AfterViewInit, OnD
     }
 
     public ngOnDestroy(): void {
-        this.popupListService.viewListData.selectMany(g => g.source).forEach(i => i.selected.set(false));
+        this.popupListService.sourceListData.selectMany(g => g.source).forEach(i => i.selected.set(false));
     }
 
     public ngOnInit(): void {
