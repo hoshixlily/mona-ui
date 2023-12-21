@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
+import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 
 import { TreeViewComponent } from "./tree-view.component";
 
@@ -38,7 +39,7 @@ describe("TreeViewComponent", () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [TreeViewComponent]
+            imports: [TreeViewComponent, BrowserAnimationsModule]
         });
         fixture = TestBed.createComponent(TreeViewComponent);
         component = fixture.componentInstance;

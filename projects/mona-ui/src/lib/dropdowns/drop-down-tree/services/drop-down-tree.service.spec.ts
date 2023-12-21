@@ -1,16 +1,18 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed } from "@angular/core/testing";
 
-import { DropDownTreeService } from './drop-down-tree.service';
+import { DropDownTreeService } from "./drop-down-tree.service";
 
-describe('DropDownTreeService', () => {
-  let service: DropDownTreeService;
+describe("DropDownTreeService", () => {
+    let service: DropDownTreeService;
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({});
-    service = TestBed.inject(DropDownTreeService);
-  });
+    beforeEach(() => {
+        TestBed.configureTestingModule({
+            providers: [DropDownTreeService]
+        });
+        service = TestBed.inject(DropDownTreeService);
+    });
 
-  it('should be created', () => {
-    expect(service).toBeTruthy();
-  });
+    it("should be created", () => {
+        expect(service).toBeTruthy();
+    });
 });

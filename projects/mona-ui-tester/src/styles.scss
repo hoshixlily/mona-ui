@@ -1,7 +1,14 @@
 /* You can add global styles to this file, and also import other style files */
 @import url("https://use.typekit.net/zop2fdb.css");
-@import "projects/mona-ui/styles/kafka";
-//@import "dist/mona-ui/styles/base-light";
+//@import "projects/mona-ui/styles/kafka";
+//@import "projects/mona-ui/styles/lumine";
+@import "projects/mona-ui/styles/lisa";
+//@import "projects/mona-ui/styles/base-light";
+//@import "projects/mona-ui/styles/noelle-light";
+
+:root {
+    --mona-border-radius: 0;
+}
 
 html, body {
     width: 100%;
