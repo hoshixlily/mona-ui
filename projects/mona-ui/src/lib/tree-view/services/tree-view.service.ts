@@ -294,7 +294,7 @@ export class TreeViewService {
 
     private expandAllParents(node: Node): void {
         if (node.parent) {
-            node.parent.state.expanded = true;
+            this.expandNode(node.parent, true, false, false);
             this.expandAllParents(node.parent);
         }
     }
@@ -315,7 +315,7 @@ export class TreeViewService {
             (result, node) => {
                 if (this.isFiltered(node.text, filterText)) {
                     result.push(node);
-                    // this.expandAllParents(node);
+                    this.expandAllParents(node);
                 } else if (node.nodes && node.nodes.length > 0) {
                     const newNodes = this.filterTree(node.nodes, filterText);
                     if (newNodes.length > 0) {

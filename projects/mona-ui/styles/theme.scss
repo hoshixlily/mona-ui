@@ -570,13 +570,22 @@ div.mona-time-picker-popup {
 
 .mona-dropdown-tree-popup-wrapper {
     max-height: 250px;
-    padding: 0 0 0 4px;
+    padding: 0;
     overflow: hidden;
     & mona-tree-view ul.mona-tree-list {
         max-height: 200px;
         overflow: auto;
         padding-bottom: 4px;
+        padding-top: 4px;
+        padding-left: 4px;
         @include scrollbars;
+    }
+    & div.mona-tree-view-filter-container {
+        margin-top: 4px;
+        padding-left: 4px;
+        padding-bottom: 4px;
+        margin-bottom: 0 !important;
+        border-bottom: 1px solid var(--mona-border-color);
     }
 }
 
