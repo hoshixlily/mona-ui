@@ -10,6 +10,9 @@ export * from "./buttons/drop-down-button/drop-down-button.component";
 export * from "./buttons/split-button/directives/split-button-text-template.directive";
 export * from "./buttons/split-button/components/split-button/split-button.component";
 
+/** Common */
+export * from "./common/models/FilterChangeEvent";
+
 /** Date Inputs */
 export * from "./date-inputs/calendar/calendar.component";
 export * from "./date-inputs/date-picker/date-picker.component";
@@ -31,6 +34,11 @@ export * from "./dropdowns/drop-down-list/directives/drop-down-list-group-templa
 export * from "./dropdowns/drop-down-list/directives/drop-down-list-item-template.directive";
 export * from "./dropdowns/drop-down-list/directives/drop-down-list-value-template.directive";
 export * from "./dropdowns/drop-down-list/components/drop-down-list/drop-down-list.component";
+
+//
+export * from "./dropdowns/drop-down-tree/directives/drop-down-tree-expandable.directive";
+export * from "./dropdowns/drop-down-tree/directives/drop-down-tree-filterable.directive";
+export * from "./dropdowns/drop-down-tree/components/drop-down-tree/drop-down-tree.component";
 
 //
 export * from "./dropdowns/multi-select/directives/multi-select-group-template.directive";
@@ -197,10 +205,14 @@ export * from "./tree-view/models/NodeDragEvent";
 export * from "./tree-view/models/NodeDropEvent";
 export * from "./tree-view/models/NodeLookupItem";
 export * from "./tree-view/models/CheckableOptions";
+export * from "./tree-view/models/ExpandableOptions";
+export * from "./tree-view/models/FilterableOptions";
+export * from "./tree-view/models/SelectableOptions";
 export * from "./tree-view/components/tree-view/tree-view.component";
 export * from "./tree-view/directives/tree-view-checkable.directive";
 export * from "./tree-view/directives/tree-view-disable.directive";
 export * from "./tree-view/directives/tree-view-expandable.directive";
+export * from "./tree-view/directives/tree-view-filterable.directive";
 export * from "./tree-view/directives/tree-view-selectable.directive";
 export * from "./tree-view/directives/tree-view-node-text-template.directive";
 

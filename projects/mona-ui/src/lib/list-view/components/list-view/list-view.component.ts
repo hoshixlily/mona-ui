@@ -226,10 +226,7 @@ export class ListViewComponent<T = any> implements OnInit, AfterViewInit {
                         headerText: group.key
                     });
                     header.groupHeader = true;
-                    return new List<ListViewItem>([
-                        header,
-                        ...group.source.select(item => new ListViewItem(item)).toList()
-                    ]);
+                    return new List<ListViewItem>(group.source.select(item => new ListViewItem(item)).prepend(header));
                 })
                 .selectMany(g => g)
                 .toList();
@@ -252,7 +249,7 @@ export class ListViewComponent<T = any> implements OnInit, AfterViewInit {
                         headerText: group.key
                     });
                     header.groupHeader = true;
-                    return new List<ListViewItem>([header, ...group.source.toList()]);
+                    return new List<ListViewItem>(group.source.prepend(header));
                 })
                 .selectMany(g => g)
                 .toList();

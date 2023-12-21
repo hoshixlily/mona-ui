@@ -290,7 +290,7 @@ export class MultiSelectComponent implements OnInit, OnChanges, OnDestroy, Contr
 
     private updateValue(value: any[]): void {
         this.#value = value;
-        const items = this.popupListService.viewListData
+        const items = this.popupListService.sourceListData
             .selectMany(g => g.source)
             .where(d => (this.value as any[]).some(v => d.dataEquals(v)))
             .toArray();

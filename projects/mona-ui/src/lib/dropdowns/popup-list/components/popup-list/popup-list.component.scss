@@ -1,6 +1,7 @@
 :host {
     width: 100%;
     height: 100%;
+    display: block;
 }
 
 ul.mona-list {
@@ -8,6 +9,7 @@ ul.mona-list {
     user-select: none;
     width: 100%;
     outline: none;
+    overflow: hidden auto;
     & li {
         display: flex;
         align-items: center;
@@ -22,12 +24,13 @@ ul.mona-list {
 li.mona-list-group-header {
     pointer-events: none;
     font-weight: bold;
+    &:first-child {
+        border-top-color: transparent;
+    }
 }
 
-mona-text-box.filter-box {
-    border: none;
-    & fa-icon {
-        margin-left: 8px;
-        font-size: 14px;
-    }
+mona-filter-input {
+    display: block;
+    padding: 4px;
+    border-bottom: 1px solid var(--mona-border-color);
 }

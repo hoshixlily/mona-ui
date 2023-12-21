@@ -7,7 +7,7 @@ import { TreeViewService } from "../services/tree-view.service";
 })
 export class TreeViewDisableDirective implements OnChanges {
     @Input()
-    public set disabledKeys(disabledKeys: Iterable<string>) {
+    public set disabledKeys(disabledKeys: Iterable<unknown>) {
         this.treeViewService.disabledKeys.clear();
         this.treeViewService.disabledKeys.addAll(disabledKeys);
     }

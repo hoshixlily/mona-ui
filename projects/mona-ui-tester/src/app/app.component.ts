@@ -133,7 +133,12 @@ import {
     TextBoxSuffixTemplateDirective,
     TreeViewNodeTextTemplateDirective,
     GridEditableDirective,
-    ChipComponent
+    ChipComponent,
+    DropDownTreeComponent,
+    DropDownTreeExpandableDirective,
+    TreeViewFilterableDirective,
+    FilterChangeEvent,
+    DropDownTreeFilterableDirective
 } from "mona-ui";
 import { v4 } from "uuid";
 import { TestComponentComponent } from "./test-component/test-component.component";
@@ -149,7 +154,7 @@ import {
     faSun,
     faTimes
 } from "@fortawesome/free-solid-svg-icons";
-import { Enumerable, IndexableList } from "@mirei/ts-collections";
+import { Enumerable, IndexableList, List } from "@mirei/ts-collections";
 import { map, Observable, take } from "rxjs";
 import { DateTime } from "luxon";
 import { GridProductData } from "./GridProductData";
@@ -260,7 +265,11 @@ import { GridOrderData } from "./GridOrderData";
         TreeViewExpandableDirective,
         TreeViewSelectableDirective,
         TreeViewNodeTextTemplateDirective,
-        ChipComponent
+        ChipComponent,
+        DropDownTreeComponent,
+        DropDownTreeExpandableDirective,
+        TreeViewFilterableDirective,
+        DropDownTreeFilterableDirective
     ]
 })
 export class AppComponent implements OnInit {
@@ -424,6 +433,7 @@ export class AppComponent implements OnInit {
         "Linden",
         "Maidenhair Tree"
     ];
+
     public filterMenuValue: FilterMenuValue = {
         value1: "Item 2",
         value2: "Item 63",
@@ -676,8 +686,16 @@ export class AppComponent implements OnInit {
             ]
         }
     ];
+    public treeDataRandom: any[] = this.generateRandomTreeData(100);
+    public treeFilter: WritableSignal<string> = signal("Apple");
 
-    public treeDisabledKeys: string[] = ["1-1-1", "1-1-4", "1-4"];
+    public dropdownTreeDisabler: (item: any) => boolean = (item: any) => item.text.toLowerCase().startsWith("c");
+    public dropdownTreeExpandedKeys: string[] = ["1", "1-4"];
+    public dropdownTreeSelectedValue = this.treeData[0].items[1].items[0];
+
+    public treeDisabledKeys: string[] = [
+        /*"1-1-1", "1-1-4", "1-4"*/
+    ];
     public treeExpandedKeys: string[] = ["1", "1-1", "1-2", "1-3", "1-4"];
     public treeSelectedKeys: string[] = [
         /*"1-2-1", "1-2-2", "1-2-3", "1-2-4"*/
@@ -878,6 +896,16 @@ export class AppComponent implements OnInit {
         // console.log(value);
     }
 
+    public onDropdownTreeExpandedKeysChange(expandedKeys: unknown[]): void {
+        this.dropdownTreeExpandedKeys = expandedKeys as string[];
+        console.log(expandedKeys);
+    }
+
+    public onDropdownTreeValueChange(value: unknown): void {
+        this.dropdownTreeSelectedValue = value;
+        console.log(`Dropdown tree value changed`, value);
+    }
+
     public onFilterMenuFilterApply(filter: CompositeFilterDescriptor): void {
         console.log(filter);
         const data = Enumerable.range(1, 100)
@@ -1022,9 +1050,9 @@ export class AppComponent implements OnInit {
         this.textBoxValue = value;
     }
 
-    public onTreeCheckedKeysChange(checkedKeys: string[]): void {
+    public onTreeCheckedKeysChange(checkedKeys: unknown[]): void {
         console.log(checkedKeys);
-        this.treeCheckedKeys = checkedKeys;
+        this.treeCheckedKeys = checkedKeys as string[];
     }
 
     public onTreeDisabledKeysChange(disabledKeys: string[]): void {
@@ -1032,9 +1060,14 @@ export class AppComponent implements OnInit {
         this.treeDisabledKeys = disabledKeys;
     }
 
-    public onTreeExpandedKeysChange(expandedKeys: string[]): void {
-        console.log(expandedKeys);
-        this.treeExpandedKeys = expandedKeys;
+    public onTreeExpandedKeysChange(expandedKeys: unknown[]): void {
+        // console.log(expandedKeys);
+        this.treeExpandedKeys = expandedKeys as string[];
+    }
+
+    public onTreeFilterChange(event: FilterChangeEvent): void {
+        // event.preventDefault();
+        // console.log(event.filter);
     }
 
     public onTreeNodeClick(event: NodeClickEvent): void {
@@ -1068,9 +1101,9 @@ export class AppComponent implements OnInit {
         }
     }
 
-    public onTreeSelectedKeysChange(selectedKeys: string[]): void {
+    public onTreeSelectedKeysChange(selectedKeys: unknown[]): void {
         console.log(selectedKeys);
-        this.treeSelectedKeys = selectedKeys;
+        this.treeSelectedKeys = selectedKeys as string[];
     }
 
     public openFilterPopup(anchor: HTMLButtonElement): void {
@@ -1325,5 +1358,38 @@ export class AppComponent implements OnInit {
         }
 
         return generatedData;
+    }
+
+    private generateRandomTreeData(nodeCount: number): any[] {
+        function generateNode(idPrefix: string, remainingNodes: number): [any, number] {
+            const node: any = {
+                text: Math.random().toString(36).substring(7),
+                id: idPrefix,
+                items: []
+            };
+
+            if (remainingNodes > 0) {
+                const childCount = Math.min(Math.floor(Math.random() * remainingNodes), remainingNodes);
+                for (let i = 0; i < childCount; i++) {
+                    const [childNode, newRemainingNodes] = generateNode(`${idPrefix}-${i + 1}`, remainingNodes - 1);
+                    node.items.push(childNode);
+                    remainingNodes = newRemainingNodes;
+                }
+            }
+
+            return [node, remainingNodes];
+        }
+
+        const trees: any[] = [];
+        let remainingNodes = nodeCount;
+        let rootId = 1;
+        while (remainingNodes > 0) {
+            const [tree, newRemainingNodes] = generateNode(rootId.toString(), remainingNodes - 1);
+            trees.push(tree);
+            remainingNodes = newRemainingNodes;
+            rootId++;
+        }
+
+        return trees;
     }
 }

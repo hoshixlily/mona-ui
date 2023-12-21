@@ -225,25 +225,23 @@ export class ListBoxComponent<T = any> {
     private updateToolbarOptions(options: boolean | Partial<ToolbarOptions>) {
         if (typeof options === "boolean") {
             this.toolbarOptions = options ? this.getDefaultToolbarOptions() : null;
-        } else {
-            if (options.actions && options.actions.length > 0 && options.position) {
-                this.toolbarOptions = options as Required<ToolbarOptions>;
-            } else if (options.actions && options.actions.length > 0 && !options.position) {
-                this.toolbarOptions = { ...options, position: "right" } as Required<ToolbarOptions>;
-            } else if ((!options.actions || options.actions.length === 0) && options.position) {
-                this.toolbarOptions = {
-                    ...options,
-                    actions: [
-                        "moveDown",
-                        "moveUp",
-                        "remove",
-                        "transferAllFrom",
-                        "transferAllTo",
-                        "transferFrom",
-                        "transferTo"
-                    ]
-                } as Required<ToolbarOptions>;
-            }
+        } else if (options.actions && options.actions.length > 0 && options.position) {
+            this.toolbarOptions = options as Required<ToolbarOptions>;
+        } else if (options.actions && options.actions.length > 0 && !options.position) {
+            this.toolbarOptions = { ...options, position: "right" } as Required<ToolbarOptions>;
+        } else if ((!options.actions || options.actions.length === 0) && options.position) {
+            this.toolbarOptions = {
+                ...options,
+                actions: [
+                    "moveDown",
+                    "moveUp",
+                    "remove",
+                    "transferAllFrom",
+                    "transferAllTo",
+                    "transferFrom",
+                    "transferTo"
+                ]
+            } as Required<ToolbarOptions>;
         }
         this.updateDirection();
     }

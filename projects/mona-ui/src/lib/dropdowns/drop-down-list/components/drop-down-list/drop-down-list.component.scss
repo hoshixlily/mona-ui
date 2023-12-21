@@ -11,4 +11,10 @@ div.mona-dropdown-value {
     padding: 0 8px;
     cursor: pointer;
     user-select: none;
+    overflow: hidden;
+    white-space: nowrap;
+    & > span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 }

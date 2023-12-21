@@ -1,82 +1,70 @@
-import { NodeCheckOptions } from "./NodeCheckOptions";
-import { NodeLookupItem } from "./NodeLookupItem";
-import { v4 } from "uuid";
 import { signal, WritableSignal } from "@angular/core";
+import { v4 } from "uuid";
+import { NodeLookupItem } from "./NodeLookupItem";
 
 export interface NodeOptions<T = any> {
-    checked?: boolean;
     data?: T;
     disabled?: boolean;
-    expanded?: boolean;
-    indeterminate?: boolean;
     index: number;
     key: string;
     nodes?: NodeOptions<T>[];
     parent?: Node<T>;
-    selected?: boolean;
     text?: string;
+}
+
+export interface NodeState {
+    checked: boolean;
+    expanded: boolean;
+    indeterminate: boolean;
+    selected: boolean;
 }
 
 export class Node<T = any> {
     public readonly uid: string = v4();
-    public checked: boolean = false;
     public data?: T;
     public disabled: boolean = false;
-    public expanded: boolean = false;
     public focused: WritableSignal<boolean> = signal(false);
-    public indeterminate: boolean = false;
     public index: number = 0;
     public key: string;
     public nodes: Node<T>[] = [];
     public parent?: Node<T>;
-    public selected: boolean = false;
+    public state: NodeState = {
+        checked: false,
+        expanded: false,
+        indeterminate: false,
+        selected: false
+    };
     public text: string = "";
+
     public constructor(options: NodeOptions<T>) {
-        this.checked = options.checked ?? false;
         this.data = options.data;
         this.disabled = options.disabled ?? false;
-        this.expanded = options.expanded ?? false;
-        this.indeterminate = options.indeterminate ?? false;
         this.index = options.index;
         this.key = options.key;
         this.nodes = options.nodes?.map(node => new Node(node)) ?? [];
         this.parent = options.parent;
-        this.selected = options.selected ?? false;
         this.text = options.text ?? "";
     }
 
     public anyParentCollapsed(): boolean {
         if (this.parent) {
-            return !this.parent.expanded || this.parent.anyParentCollapsed();
+            return !this.parent.state.expanded || this.parent.anyParentCollapsed();
         }
         return false;
     }
 
-    public check(options: NodeCheckOptions): void {
-        this.checked = options.checked;
-        if (options.checkChildren) {
-            this.nodes.forEach(node => node.check(options));
-        }
-        if (options.checkParent) {
-            const siblings = this.parent?.nodes ?? [];
-            const checkedSiblings = siblings.filter(sibling => sibling.checked);
-            const indeterminateSiblings = siblings.filter(sibling => sibling.indeterminate);
-            const allSiblingsChecked = checkedSiblings.length === siblings.length;
-            const someSiblingsChecked = checkedSiblings.length > 0;
-            const someSiblingsIndeterminate = indeterminateSiblings.length > 0;
-            const parent = this.parent;
-            if (parent) {
-                parent.indeterminate = !allSiblingsChecked && (someSiblingsChecked || someSiblingsIndeterminate);
-                parent.check({ checked: allSiblingsChecked, checkChildren: false, checkParent: true });
-            }
-        }
-    }
-
-    public expand(expanded: boolean, expandChildren: boolean = false): void {
-        this.expanded = expanded;
-        if (expandChildren) {
-            this.nodes.forEach(node => node.expand(expanded, expandChildren));
-        }
+    public cloneForFilter(): Node<T> {
+        const node = new Node<T>({
+            data: this.data,
+            disabled: this.disabled,
+            index: this.index,
+            key: this.key,
+            nodes: this.nodes.map(node => node.cloneForFilter()),
+            parent: this.parent,
+            text: this.text
+        });
+        node.state = this.state;
+        return node;
     }
 
     public isDescendantOf(node: Node): boolean {
@@ -88,9 +76,5 @@ export class Node<T = any> {
 
     public getLookupItem(): NodeLookupItem<T> {
         return new NodeLookupItem(this);
-    }
-
-    public setSelected(selected: boolean): void {
-        this.selected = selected;
     }
 }

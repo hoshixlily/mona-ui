@@ -1,4 +1,5 @@
 import { Directive, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from "@angular/core";
+import { ExpandableOptions } from "../models/ExpandableOptions";
 import { TreeViewService } from "../services/tree-view.service";
 
 @Directive({
@@ -7,13 +8,16 @@ import { TreeViewService } from "../services/tree-view.service";
 })
 export class TreeViewExpandableDirective implements OnInit, OnChanges {
     @Input()
-    public set expandedKeys(expandedKeys: Iterable<string>) {
+    public set expandedKeys(expandedKeys: Iterable<unknown>) {
         this.treeViewService.expandedKeys.clear();
         this.treeViewService.expandedKeys.addAll(expandedKeys);
     }
 
     @Output()
-    public expandedKeysChange: EventEmitter<string[]> = new EventEmitter<string[]>();
+    public expandedKeysChange: EventEmitter<unknown[]> = new EventEmitter<unknown[]>();
+
+    @Input("monaTreeViewExpandable")
+    public options?: ExpandableOptions | "";
 
     public constructor(private readonly treeViewService: TreeViewService) {}
 
@@ -25,6 +29,11 @@ export class TreeViewExpandableDirective implements OnInit, OnChanges {
 
     public ngOnInit(): void {
         this.treeViewService.expandedKeysChange = this.expandedKeysChange;
+        if (this.options) {
+            this.treeViewService.setExpandableOptions(this.options);
+        } else if (this.options === "") {
+            this.treeViewService.setExpandableOptions({ enabled: true });
+        }
         this.treeViewService.loadExpandedKeys(this.treeViewService.expandedKeys);
     }
 }

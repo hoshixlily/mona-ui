@@ -327,7 +327,7 @@ mona-popup-list-item {
 }
 
 .mona-dropdown-popup-list-wrapper {
-    max-height: 250px;
+    height: 100%;
 }
 
 ul.mona-list mona-text-box.filter-box {
@@ -526,7 +526,6 @@ div.mona-time-picker-popup {
     align-items: center;
     justify-content: center;
     height: 100px;
-    //font-size: 14px;
     color: var(--mona-disabled-color);
 }
 
@@ -534,7 +533,7 @@ div.mona-time-picker-popup {
     flex-direction: column;
     user-select: none;
     padding: 0 !important;
-    overflow: hidden auto;
+    overflow: hidden;
 
     & mona-text-box.filter-box {
         & div.mona-text-box {
@@ -544,9 +543,13 @@ div.mona-time-picker-popup {
             }
         }
     }
-
     @include scrollbars;
 }
+
+.mona-dropdown-popup-content ul.mona-list {
+    max-height: 250px;
+}
+
 
 .mona-dropdown-popup-content-bottom {
     //border-top: 1px solid transparent !important;
@@ -555,6 +558,45 @@ div.mona-time-picker-popup {
 .mona-dropdown-popup-content-top {
     //border-bottom: 1px solid transparent !important;
     box-shadow: 0 -3px 10px -3px var(--mona-popup-shadow-color) !important;
+}
+
+/** Dropdown Tree */
+.mona-dropdown-tree {
+    & .mona-dropdown-value {
+        color: var(--mona-text);
+    }
+
+}
+
+.mona-dropdown-tree-popup-wrapper {
+    max-height: 250px;
+    padding: 0;
+    overflow: hidden;
+    & mona-tree-view ul.mona-tree-list {
+        max-height: 200px;
+        overflow: auto;
+        padding-bottom: 4px;
+        padding-top: 4px;
+        padding-left: 4px;
+        @include scrollbars;
+    }
+    & div.mona-tree-view-filter-container {
+        margin-top: 4px;
+        padding-left: 4px;
+        padding-bottom: 4px;
+        margin-bottom: 0 !important;
+        border-bottom: 1px solid var(--mona-border-color);
+    }
+}
+
+mona-filter-input.mona-popup-filter-input,
+.mona-dropdown-tree-popup-content mona-filter-input {
+    & div.mona-text-box {
+        background-color: var(--mona-background-lighter);
+        & input {
+            background-color: transparent;
+        }
+    }
 }
 
 /** Multi Select */
@@ -705,7 +747,6 @@ input[type="checkbox"][monaCheckBox] {
             background-color: var(--mona-background);
             border: 1px solid var(--mona-border-color);
             border-radius: var(--mona-border-radius);
-            //border-radius: 0;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -743,7 +784,6 @@ input[type="checkbox"][monaCheckBox] {
         background-color: var(--mona-primary);
         color: var(--mona-background);
         border: 1px solid var(--mona-selected-border-color);
-        box-shadow: inset 0 0 0 1px var(--mona-background);
     }
     &:indeterminate:disabled + label:before {
         @include disabled;
@@ -1607,7 +1647,7 @@ div.mona-popover-footer {
     @include font-medium;
 }
 .mona-tree-view-node {
-    &.mona-disabled {
+    & .mona-disabled {
         @include disabled;
     }
 }
@@ -1618,6 +1658,14 @@ div.mona-popover-footer {
 
 div.mona-tree-view-node-text {
     color: var(--mona-text);
+    &:hover:not(.mona-tree-view-node-selected) {
+        background-color: var(--mona-background-hover-darker);
+        box-shadow: 0 0 0 1px var(--mona-border-color-dark);
+    }
+    &:active:not(.mona-tree-view-node-selected) {
+        background-color: var(--mona-background-active-darker);
+        box-shadow: 0 0 0 1px var(--mona-border-color-dark);
+    }
 }
 
 div.mona-tree-view-node-selected {

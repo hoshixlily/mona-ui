@@ -1,26 +1,52 @@
 <div class="mona-tree-view-node" #nodeElement>
-    <div class="mona-tree-view-drop-magnet" *ngIf="dragging && dropMagnetVisible && dropPosition==='before'" [attr.data-nid]="node.uid" [attr.data-pos]="'before'">
-        <fa-icon [icon]="dropMagnetIcon"></fa-icon>
-        <div></div>
-    </div>
-    <div class="mona-tree-node-expander" (click)="onExpandToggle($event)" [ngClass]="{'mona-interactive': node.nodes.length !== 0, 'mona-disabled': node.disabled}">
-        <fa-icon [icon]="expandIcon" *ngIf="node.nodes.length !== 0 && !node.expanded"></fa-icon>
-        <fa-icon [icon]="collapseIcon" *ngIf="node.nodes.length !== 0 && node.expanded"></fa-icon>
-    </div>
-    <div class="mona-tree-node-content"  [ngClass]="{'mona-disabled': node.disabled}">
-        <input type="checkbox" id="mona-tree-node-checkbox-{{node.uid}}" [indeterminate]="node.indeterminate" [disabled]="node.disabled"
-               [ngModel]="node.checked" (ngModelChange)="onCheckToggle($event)" monaCheckBox *ngIf="treeViewService.checkableOptions.enabled">
+
+    @if (dragging && dropMagnetVisible && dropPosition === 'before') {
+        <div class="mona-tree-view-drop-magnet" [attr.data-nid]="node.uid" [attr.data-pos]="'before'">
+            <fa-icon [icon]="dropMagnetIcon"></fa-icon>
+            <div></div>
+        </div>
+    }
+
+    @if (treeViewService.expandableOptions.enabled) {
+        <div class="mona-tree-node-expander" (click)="onExpandToggle($event)"
+             [ngClass]="{'mona-interactive': node.nodes.length !== 0, 'mona-disabled': node.disabled}">
+            @if (node.nodes.length !== 0 && !node.state.expanded) {
+                <fa-icon [icon]="expandIcon"></fa-icon>
+            } @else if (node.nodes.length !== 0 && node.state.expanded) {
+                <fa-icon [icon]="collapseIcon"></fa-icon>
+            }
+        </div>
+    }
+
+    <div class="mona-tree-node-content" [ngClass]="{'mona-disabled': node.disabled}">
+        @if (treeViewService.checkableOptions.enabled) {
+            <input type="checkbox" id="mona-tree-node-checkbox-{{node.uid}}"
+                   [indeterminate]="node.state.indeterminate"
+                   [disabled]="node.disabled"
+                   [ngModel]="node.state.checked" (ngModelChange)="onCheckToggle($event)" monaCheckBox>
+        }
         <label for="mona-tree-node-checkbox-{{node.uid}}"></label>
-        <div class="mona-tree-view-node-text" [ngClass]="{'mona-tree-view-node-selected': node.selected, 'mona-tree-view-node-dropping': dragging && dropPosition==='inside', 'mona-tree-view-node-focused': node.focused()}"
+        <div class="mona-tree-view-node-text"
+             [ngClass]="{'mona-tree-view-node-selected': node.state.selected,
+                         'mona-tree-view-node-dropping': dragging && dropPosition==='inside',
+                         'mona-tree-view-node-focused': node.focused()}"
              (click)="click$.next($event)"
              (dblclick)="click$.next($event)"
              (contextmenu)="onNodeClick($event, 'contextmenu')">
-            <ng-container *ngIf="!nodeTextTemplate">{{node.text}}</ng-container>
-            <ng-container [ngTemplateOutlet]="nodeTextTemplate" [ngTemplateOutletContext]="{$implicit: node.data, node: node}" *ngIf="!!nodeTextTemplate"></ng-container>
+            @if (nodeTextTemplate) {
+                <ng-container [ngTemplateOutlet]="nodeTextTemplate"
+                              [ngTemplateOutletContext]="{$implicit: node.data, node: node}"></ng-container>
+            } @else {
+                {{ node.text }}
+            }
         </div>
     </div>
-    <div class="mona-tree-view-drop-magnet" *ngIf="dragging && dropMagnetVisible && dropPosition==='after'" [attr.data-nid]="node.uid" [attr.data-pos]="'after'">
-        <fa-icon [icon]="dropMagnetIcon"></fa-icon>
-        <div></div>
-    </div>
+
+    @if (dragging && dropMagnetVisible && dropPosition === 'after') {
+        <div class="mona-tree-view-drop-magnet" [attr.data-nid]="node.uid" [attr.data-pos]="'after'">
+            <fa-icon [icon]="dropMagnetIcon"></fa-icon>
+            <div></div>
+        </div>
+    }
+
 </div>

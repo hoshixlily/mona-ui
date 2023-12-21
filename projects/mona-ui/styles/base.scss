@@ -11,8 +11,10 @@
 
     --mona-background-hover: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) + 2%));
     --mona-background-hover-dark: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) + 1%));
+    --mona-background-hover-darker: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) - 1%));
     --mona-background-active: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) + 3%));
     --mona-background-active-dark: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) + 2%));
+    --mona-background-active-darker: hsl(var(--mona-background-base), calc(var(--mona-background-base-lightness) - 2%));
 
     --mona-primary-base: 46, 100%;
     --mona-primary-base-lightness: 46%;
