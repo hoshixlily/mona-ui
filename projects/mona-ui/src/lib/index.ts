@@ -15,6 +15,7 @@ export * from "./common/filter-input/models/FilterChangeEvent";
 export * from "./common/list/services/list.service";
 export * from "./common/list/directives/list-group-header-template.directive";
 export * from "./common/list/directives/list-item-template.directive";
+export * from "./common/list/directives/list-selectable.directive";
 export * from "./common/list/components/list/list.component";
 
 /** Date Inputs */

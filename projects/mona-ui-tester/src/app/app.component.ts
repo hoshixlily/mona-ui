@@ -142,7 +142,8 @@ import {
     ListComponent,
     ListService,
     ListItemTemplateDirective,
-    ListGroupHeaderTemplateDirective
+    ListGroupHeaderTemplateDirective,
+    ListSelectableDirective
 } from "mona-ui";
 import { v4 } from "uuid";
 import { TestComponentComponent } from "./test-component/test-component.component";
@@ -277,7 +278,8 @@ import { GridOrderData } from "./GridOrderData";
 
         ListComponent,
         ListGroupHeaderTemplateDirective,
-        ListItemTemplateDirective
+        ListItemTemplateDirective,
+        ListSelectableDirective
     ],
     providers: [ListService]
 })
@@ -750,9 +752,9 @@ export class AppComponent implements OnInit {
         this.listService.setTextField(i => i.text);
         this.listService.setGroupSelector(i => `${i.text.charAt(0).toUpperCase()}`);
         this.listService.setDisabledBy(this.dropdownItemDisabler);
-        this.listService.setValueField(i => i.value);
-        // console.log(this.listService.viewItems().toArray());
-        this.listService.setSelectedKeys([this.dropdownListDataItems.get(2)]);
+        this.listService.setSelectableOptions({ enabled: true, mode: "multiple" });
+        this.listService.setValueField(i => i);
+        this.listService.setSelectedKeys([this.dropdownListDataItems.get(2).value]);
     }
 
     public filterData(): void {
@@ -783,7 +785,7 @@ export class AppComponent implements OnInit {
             // this.contextMenuItemVisible = !this.contextMenuItemVisible;
             // this.dropdownItemDisabler = (item: any): boolean => turn % item.value === 0;
             // this.listService.setDisabledBy(this.dropdownItemDisabler);
-            // this.listService.setGroupSelector(i => i.text.charAt(turn % 3).toUpperCase());
+            // this.listService.setGroupSelector(i => i.text.charAt(turn % 4).toUpperCase());
             // this.listService.setValueField(i => (turn % 2 === 0 ? i.value : i));
             turn++;
         }, 3000);

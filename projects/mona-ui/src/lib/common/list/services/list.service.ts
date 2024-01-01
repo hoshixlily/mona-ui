@@ -1,9 +1,10 @@
 import { computed, Injectable, Signal, signal, WritableSignal } from "@angular/core";
 import { from, IEnumerable, IGroup, ImmutableSet, Predicate, Selector } from "@mirei/ts-collections";
 import { ListItem } from "../models/ListItem";
+import { SelectableOptions } from "../models/SelectableOptions";
 
 @Injectable()
-export class ListService<TData = any> {
+export class ListService<TData> {
     private readonly data: WritableSignal<Iterable<TData>> = signal([]);
     private readonly listItems: Signal<ImmutableSet<ListItem<TData>>> = computed(() => {
         const data = this.data();
@@ -13,6 +14,11 @@ export class ListService<TData = any> {
     });
     public readonly disabledBy: WritableSignal<string | Predicate<TData>> = signal("");
     public readonly filterText: WritableSignal<string> = signal("");
+    public readonly selectableOptions: WritableSignal<SelectableOptions> = signal({
+        mode: "single",
+        enabled: false,
+        toggleable: false
+    });
     public readonly selectedKeys: WritableSignal<ImmutableSet<any>> = signal(ImmutableSet.create());
     public readonly groupSelector: WritableSignal<string | Selector<TData, any> | null> = signal(null);
     public readonly textField: WritableSignal<string | Selector<TData, string>> = signal("");
@@ -72,6 +78,10 @@ export class ListService<TData = any> {
     }
 
     public isSelected(item: ListItem<TData>): boolean {
+        const options = this.selectableOptions();
+        if (!options.enabled) {
+            return false;
+        }
         const selectedKeys = this.selectedKeys();
         const key = this.getItemKey(item);
         return selectedKeys.contains(key);
@@ -79,10 +89,25 @@ export class ListService<TData = any> {
 
     public selectItem(item: ListItem<TData>): void {
         const key = this.getItemKey(item);
-        if (this.isSelected(item)) {
-            this.selectedKeys.update(set => set.remove(key));
+        const options = this.selectableOptions();
+        if (options.mode === "single") {
+            if (options.toggleable) {
+                this.selectedKeys.update(set => {
+                    if (set.contains(key)) {
+                        return set.remove(key);
+                    }
+                    return set.clear().add(key);
+                });
+            } else {
+                this.selectedKeys.update(set => set.clear().add(key));
+            }
         } else {
-            this.selectedKeys.update(set => set.add(key));
+            this.selectedKeys.update(set => {
+                if (set.contains(key)) {
+                    return set.remove(key);
+                }
+                return set.add(key);
+            });
         }
     }
 
@@ -96,6 +121,10 @@ export class ListService<TData = any> {
 
     public setGroupSelector(groupSelector: string | Selector<TData, any> | null): void {
         this.groupSelector.set(groupSelector);
+    }
+
+    public setSelectableOptions(options: SelectableOptions): void {
+        this.selectableOptions.set(options);
     }
 
     public setSelectedKeys(selectedKeys: Iterable<any>): void {

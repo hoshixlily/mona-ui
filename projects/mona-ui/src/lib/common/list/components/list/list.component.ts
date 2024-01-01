@@ -1,5 +1,5 @@
 import { NgTemplateOutlet } from "@angular/common";
-import { Component, ContentChild, Input, TemplateRef } from "@angular/core";
+import { ChangeDetectionStrategy, Component, ContentChild, Input, TemplateRef } from "@angular/core";
 import { Selector } from "@mirei/ts-collections";
 import { ContainsPipe } from "../../../../pipes/contains.pipe";
 import { FilterInputComponent } from "../../../filter-input/components/filter-input/filter-input.component";
@@ -15,7 +15,8 @@ import { ListItemComponent } from "../list-item/list-item.component";
     standalone: true,
     imports: [FilterInputComponent, ListItemComponent, NgTemplateOutlet, ContainsPipe, ListItemDirective],
     templateUrl: "./list.component.html",
-    styleUrl: "./list.component.scss"
+    styleUrl: "./list.component.scss",
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ListComponent<TData> {
     @Input({ required: false })

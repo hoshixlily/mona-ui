@@ -16,7 +16,7 @@ export class ListItemDirective<TData> {
 
     public constructor(
         private readonly host: ElementRef<HTMLLIElement>,
-        private readonly listService: ListService,
+        private readonly listService: ListService<TData>,
         private readonly renderer: Renderer2
     ) {
         effect(() => {
