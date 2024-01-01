@@ -22,6 +22,7 @@ export class ListItemDirective<TData> {
         effect(() => {
             const item = this.#item();
             this.updateDisabled(item);
+            this.updateHighlighted(item);
             this.updateSelected(item);
         });
     }
@@ -32,6 +33,15 @@ export class ListItemDirective<TData> {
             this.renderer.addClass(this.host.nativeElement, "mona-disabled");
         } else {
             this.renderer.removeClass(this.host.nativeElement, "mona-disabled");
+        }
+    }
+
+    private updateHighlighted(item: ListItem<TData> | null): void {
+        const highlighted = item ? this.listService.isHighlighted(item) : false;
+        if (highlighted) {
+            this.renderer.addClass(this.host.nativeElement, "mona-highlighted");
+        } else {
+            this.renderer.removeClass(this.host.nativeElement, "mona-highlighted");
         }
     }
 

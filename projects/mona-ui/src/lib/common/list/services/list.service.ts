@@ -33,6 +33,8 @@ export class ListService<TData> {
         enabled: false,
         headerOrder: "asc"
     });
+    public readonly highlightedItem: WritableSignal<ListItem<TData> | null> = signal(null);
+    public readonly scrollToItem$: ReplaySubject<ListItem<TData>> = new ReplaySubject<ListItem<TData>>(1);
     public readonly selectableOptions: WritableSignal<SelectableOptions> = signal({
         mode: "single",
         enabled: false,
@@ -119,6 +121,11 @@ export class ListService<TData> {
         return disabledBy(item.data);
     }
 
+    public isHighlighted(item: ListItem<TData>): boolean {
+        const highlightedItem = this.highlightedItem();
+        return highlightedItem === item;
+    }
+
     public isSelected(item: ListItem<TData>): boolean {
         const options = this.selectableOptions();
         if (!options.enabled) {
@@ -127,6 +134,86 @@ export class ListService<TData> {
         const selectedKeys = this.selectedKeys();
         const key = this.getItemKey(item);
         return selectedKeys.contains(key);
+    }
+
+    public navigateItem(direction: "up" | "down"): void {
+        const viewItems = this.viewItems()
+            .where(i => !i.header && !this.isDisabled(i))
+            .toImmutableSet();
+        if (viewItems.isEmpty()) {
+            return;
+        }
+        const selectedKeys = this.selectedKeys();
+        const firstItem = viewItems.first();
+
+        const selectableOptions = this.selectableOptions();
+        if (selectableOptions.mode === "single") {
+            if (selectedKeys.isEmpty()) {
+                this.selectItem(firstItem);
+                return;
+            }
+            const lastSelectedItem = viewItems.lastOrDefault(i => selectedKeys.contains(this.getItemKey(i)));
+            if (!lastSelectedItem) {
+                return;
+            }
+            if (direction === "down") {
+                const nextItem = viewItems
+                    .skipWhile(i => i !== lastSelectedItem)
+                    .skip(1)
+                    .firstOrDefault(i => !this.isDisabled(i));
+                if (nextItem) {
+                    this.selectItem(nextItem);
+                    this.scrollToItem$.next(nextItem);
+                }
+            } else {
+                const prevItem = viewItems
+                    .takeWhile(i => i !== lastSelectedItem)
+                    .lastOrDefault(i => !this.isDisabled(i));
+                if (prevItem) {
+                    this.selectItem(prevItem);
+                    this.scrollToItem$.next(prevItem);
+                }
+            }
+        } else {
+            if (selectedKeys.isEmpty() && !this.highlightedItem()) {
+                this.highlightedItem.set(firstItem);
+                return;
+            }
+            const firstSelectedItem = viewItems.firstOrDefault(i => selectedKeys.contains(this.getItemKey(i)));
+            const lastSelectedItem = viewItems.lastOrDefault(i => selectedKeys.contains(this.getItemKey(i)));
+            const lastHighlightedItem = this.highlightedItem();
+
+            if (direction === "down") {
+                const navigationItem = lastHighlightedItem ?? lastSelectedItem ?? firstItem;
+                const nextItem = viewItems
+                    .skipWhile(i => i !== navigationItem)
+                    .skip(1)
+                    .firstOrDefault(i => !this.isDisabled(i));
+                if (nextItem) {
+                    this.highlightedItem.set(nextItem);
+                    this.scrollToItem$.next(nextItem);
+                } else {
+                    const firstItem = viewItems.firstOrDefault(i => !this.isDisabled(i));
+                    if (firstItem) {
+                        this.highlightedItem.set(firstItem);
+                        this.scrollToItem$.next(firstItem);
+                    }
+                }
+            } else {
+                const navigationItem = lastHighlightedItem ?? firstSelectedItem ?? firstItem;
+                const prevItem = viewItems.takeWhile(i => i !== navigationItem).lastOrDefault(i => !this.isDisabled(i));
+                if (prevItem) {
+                    this.highlightedItem.set(prevItem);
+                    this.scrollToItem$.next(prevItem);
+                } else {
+                    const lastItem = viewItems.lastOrDefault(i => !this.isDisabled(i));
+                    if (lastItem) {
+                        this.highlightedItem.set(lastItem);
+                        this.scrollToItem$.next(lastItem);
+                    }
+                }
+            }
+        }
     }
 
     public selectItem(item: ListItem<TData>): void {

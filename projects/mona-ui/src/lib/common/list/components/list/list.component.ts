@@ -1,7 +1,19 @@
 import { CdkFixedSizeVirtualScroll, CdkVirtualForOf, CdkVirtualScrollViewport } from "@angular/cdk/scrolling";
 import { NgTemplateOutlet } from "@angular/common";
-import { ChangeDetectionStrategy, Component, ContentChild, Input, TemplateRef } from "@angular/core";
+import {
+    ChangeDetectionStrategy,
+    Component,
+    ContentChild,
+    DestroyRef,
+    ElementRef,
+    inject,
+    Input,
+    OnInit,
+    TemplateRef
+} from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { Selector } from "@mirei/ts-collections";
+import { takeUntil } from "rxjs";
 import { PlaceholderComponent } from "../../../../layout/placeholder/placeholder.component";
 import { FilterInputComponent } from "../../../filter-input/components/filter-input/filter-input.component";
 import { FilterChangeEvent } from "../../../filter-input/models/FilterChangeEvent";
@@ -11,6 +23,7 @@ import { ListHeaderTemplateDirective } from "../../directives/list-header-templa
 import { ListItemTemplateDirective } from "../../directives/list-item-template.directive";
 import { ListItemDirective } from "../../directives/list-item.directive";
 import { ListNoDataTemplateDirective } from "../../directives/list-no-data-template.directive";
+import { ListItem } from "../../models/ListItem";
 import { ListItemTemplateContext } from "../../models/ListItemTemplateContext";
 import { ListService } from "../../services/list.service";
 import { ListItemComponent } from "../list-item/list-item.component";
@@ -32,7 +45,9 @@ import { ListItemComponent } from "../list-item/list-item.component";
     styleUrl: "./list.component.scss",
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ListComponent<TData> {
+export class ListComponent<TData> implements OnInit {
+    readonly #destroyRef: DestroyRef = inject(DestroyRef);
+
     @Input({ required: false })
     public set data(value: Iterable<TData>) {
         this.listService.setData(value);
@@ -58,12 +73,32 @@ export class ListComponent<TData> {
         this.listService.setTextField(textField ?? "");
     }
 
-    public constructor(protected readonly listService: ListService<TData>) {}
+    public constructor(
+        private readonly elementRef: ElementRef<HTMLElement>,
+        protected readonly listService: ListService<TData>
+    ) {}
+
+    public ngOnInit(): void {
+        this.setSubscriptions();
+    }
 
     public onFilterChange(event: FilterChangeEvent): void {
         this.listService.filterChange.emit(event);
         if (!event.isDefaultPrevented()) {
             this.listService.setFilter(event.filter);
         }
+    }
+
+    private scrollToItem(item: ListItem<TData>): void {
+        const element = this.elementRef.nativeElement.querySelector(`[data-uid="${item.uid}"]`);
+        if (element) {
+            element.scrollIntoView({ block: "center", behavior: "auto" });
+        }
+    }
+
+    private setSubscriptions(): void {
+        this.listService.scrollToItem$
+            .pipe(takeUntilDestroyed(this.#destroyRef))
+            .subscribe(item => this.scrollToItem(item));
     }
 }

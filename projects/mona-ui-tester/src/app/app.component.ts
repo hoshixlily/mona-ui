@@ -759,33 +759,36 @@ export class AppComponent implements OnInit {
     // }
 
     public ngAfterViewInit(): void {
-        // this.listService.setTextField(i => i.text);
+        this.listService.setTextField(i => i.text);
         // this.listService.setDisabledBy(this.dropdownItemDisabler);
-        //
-        // this.listService.setSelectableOptions({ enabled: true, mode: "multiple" });
-        // this.listService.setValueField(i => i.value);
-        // this.listService.setSelectedKeys([this.dropdownListDataItems.get(2).value]);
-        //
-        // this.listService.setGroupBy(i => `${i.text.charAt(0).toUpperCase()}`);
-        // this.listService.setGroupableOptions({
-        //     enabled: true,
-        //     headerOrder: "asc",
-        //     orderBy: i => i.text.charAt(i.text.length - 1),
-        //     orderByDirection: "desc"
-        // });
-        //
-        // this.listService.setFilterableOptions({ enabled: true, caseSensitive: true });
-        // this.listService.setFilterPlaceholder("Search items...");
+
+        this.listService.setSelectableOptions({ enabled: true, mode: "single" });
+        this.listService.setValueField(i => i.value);
+        this.listService.setSelectedKeys([
+            this.dropdownListDataItems.get(2).value,
+            this.dropdownListDataItems.get(14).value
+        ]);
+
+        this.listService.setGroupBy(i => `${i.text.charAt(0).toUpperCase()}`);
+        this.listService.setGroupableOptions({
+            enabled: true,
+            headerOrder: "asc",
+            orderBy: i => i.text.charAt(i.text.length - 1),
+            orderByDirection: "desc"
+        });
+
+        this.listService.setFilterableOptions({ enabled: true, caseSensitive: true });
+        this.listService.setFilterPlaceholder("Search items...");
         // this.listService.setFilter("n");
-        // this.listService.filterChange = new EventEmitter<FilterChangeEvent>();
-        // this.listService.filterChange.subscribe((e: FilterChangeEvent) => {
-        //     // e.preventDefault();
-        //     console.log(e);
-        // });
-        //
+        this.listService.filterChange = new EventEmitter<FilterChangeEvent>();
+        this.listService.filterChange.subscribe((e: FilterChangeEvent) => {
+            // e.preventDefault();
+            console.log(e);
+        });
+
         // this.listService.setVirtualScrollOptions({ enabled: true, height: 28 });
-        //
-        // this.listService.setData(this.listViewDataItems);
+
+        this.listService.setData(this.listViewDataItems);
     }
 
     public filterData(): void {
