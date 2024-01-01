@@ -1,5 +1,6 @@
 import { computed, Injectable, Signal, signal, WritableSignal } from "@angular/core";
 import { from, IEnumerable, IGroup, ImmutableSet, Predicate, Selector } from "@mirei/ts-collections";
+import { GroupableOptions } from "../models/GroupableOptions";
 import { ListItem } from "../models/ListItem";
 import { SelectableOptions } from "../models/SelectableOptions";
 
@@ -14,26 +15,42 @@ export class ListService<TData> {
     });
     public readonly disabledBy: WritableSignal<string | Predicate<TData>> = signal("");
     public readonly filterText: WritableSignal<string> = signal("");
+    public readonly groupBy: WritableSignal<string | Selector<TData, any> | null> = signal(null);
+    public readonly groupableOptions: WritableSignal<GroupableOptions<TData, any>> = signal({
+        enabled: false
+    });
     public readonly selectableOptions: WritableSignal<SelectableOptions> = signal({
         mode: "single",
         enabled: false,
         toggleable: false
     });
     public readonly selectedKeys: WritableSignal<ImmutableSet<any>> = signal(ImmutableSet.create());
-    public readonly groupSelector: WritableSignal<string | Selector<TData, any> | null> = signal(null);
     public readonly textField: WritableSignal<string | Selector<TData, string>> = signal("");
     public readonly valueField: WritableSignal<string | Selector<TData, any>> = signal("");
     public readonly viewItems: Signal<ImmutableSet<ListItem<TData>>> = computed(() => {
         const listItems = this.listItems();
         const filterText = this.filterText();
-        const groupSelector = this.groupSelector();
+        const groupableOptions = this.groupableOptions();
         let enumerable: IEnumerable<ListItem<TData>> = listItems;
         if (filterText) {
             enumerable = enumerable.where(item => this.filterItem(item, filterText));
         }
-        let groupedEnumerable: IEnumerable<IGroup<any, ListItem<TData>>>;
-        if (groupSelector != null) {
-            groupedEnumerable = enumerable.groupBy(item => this.getGroupField(item));
+        if (groupableOptions.enabled) {
+            if (groupableOptions.orderBy) {
+                if (groupableOptions.orderByDirection === "desc") {
+                    enumerable = enumerable.orderByDescending(item => this.getOrderKey(item));
+                } else {
+                    enumerable = enumerable.orderBy(item => this.getOrderKey(item));
+                }
+            }
+            let groupedEnumerable = enumerable.groupBy(item => this.getGroupField(item));
+            if (groupableOptions.headerOrder) {
+                if (groupableOptions.headerOrder === "desc") {
+                    groupedEnumerable = groupedEnumerable.orderByDescending(g => g.key);
+                } else {
+                    groupedEnumerable = groupedEnumerable.orderBy(g => g.key);
+                }
+            }
             return groupedEnumerable
                 .selectMany(g => {
                     const groupHeaderItem = new ListItem({ data: g.key, header: String(g.key) });
@@ -48,7 +65,7 @@ export class ListService<TData> {
     public constructor() {}
 
     public getGroupField(item: ListItem<TData>): any {
-        const groupSelector = this.groupSelector();
+        const groupSelector = this.groupBy();
         if (groupSelector == null) {
             return "";
         }
@@ -119,8 +136,12 @@ export class ListService<TData> {
         this.disabledBy.set(disabledBy);
     }
 
-    public setGroupSelector(groupSelector: string | Selector<TData, any> | null): void {
-        this.groupSelector.set(groupSelector);
+    public setGroupBy(groupSelector: string | Selector<TData, any> | null): void {
+        this.groupBy.set(groupSelector);
+    }
+
+    public setGroupableOptions(options: GroupableOptions<TData, any>): void {
+        this.groupableOptions.set(options);
     }
 
     public setSelectableOptions(options: SelectableOptions): void {
@@ -153,5 +174,17 @@ export class ListService<TData> {
             return (item.data as any)?.[valueField] ?? item.data;
         }
         return valueField(item.data);
+    }
+
+    private getOrderKey(item: ListItem<TData>): any | null {
+        const orderBy = this.groupableOptions().orderBy;
+        if (orderBy) {
+            if (typeof orderBy === "string") {
+                return (item.data as any)[orderBy];
+            } else {
+                return orderBy(item.data);
+            }
+        }
+        return null;
     }
 }

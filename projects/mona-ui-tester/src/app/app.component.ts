@@ -143,7 +143,8 @@ import {
     ListService,
     ListItemTemplateDirective,
     ListGroupHeaderTemplateDirective,
-    ListSelectableDirective
+    ListSelectableDirective,
+    ListGroupableDirective
 } from "mona-ui";
 import { v4 } from "uuid";
 import { TestComponentComponent } from "./test-component/test-component.component";
@@ -278,6 +279,7 @@ import { GridOrderData } from "./GridOrderData";
 
         ListComponent,
         ListGroupHeaderTemplateDirective,
+        ListGroupableDirective,
         ListItemTemplateDirective,
         ListSelectableDirective
     ],
@@ -750,10 +752,16 @@ export class AppComponent implements OnInit {
     public ngAfterViewInit(): void {
         this.listService.setData(this.dropdownListDataItems);
         this.listService.setTextField(i => i.text);
-        this.listService.setGroupSelector(i => `${i.text.charAt(0).toUpperCase()}`);
+        this.listService.setGroupBy(i => `${i.text.charAt(0).toUpperCase()}`);
         this.listService.setDisabledBy(this.dropdownItemDisabler);
         this.listService.setSelectableOptions({ enabled: true, mode: "multiple" });
-        this.listService.setValueField(i => i);
+        this.listService.setGroupableOptions({
+            enabled: true,
+            headerOrder: "asc",
+            orderBy: i => i.text.charAt(i.text.length - 1),
+            orderByDirection: "desc"
+        });
+        this.listService.setValueField(i => i.value);
         this.listService.setSelectedKeys([this.dropdownListDataItems.get(2).value]);
     }
 
@@ -787,6 +795,7 @@ export class AppComponent implements OnInit {
             // this.listService.setDisabledBy(this.dropdownItemDisabler);
             // this.listService.setGroupSelector(i => i.text.charAt(turn % 4).toUpperCase());
             // this.listService.setValueField(i => (turn % 2 === 0 ? i.value : i));
+            // this.listService.setGroupableOptions({ enabled: true, headerOrder: turn % 2 === 0 ? "asc" : "desc" });
             turn++;
         }, 3000);
         this.selectedDropdownListDataItem = { ...this.dropdownListDataItems.get(4) };

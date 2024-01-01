@@ -1,7 +1,6 @@
 import { NgTemplateOutlet } from "@angular/common";
 import { ChangeDetectionStrategy, Component, ContentChild, Input, TemplateRef } from "@angular/core";
 import { Selector } from "@mirei/ts-collections";
-import { ContainsPipe } from "../../../../pipes/contains.pipe";
 import { FilterInputComponent } from "../../../filter-input/components/filter-input/filter-input.component";
 import { ListGroupHeaderTemplateDirective } from "../../directives/list-group-header-template.directive";
 import { ListItemTemplateDirective } from "../../directives/list-item-template.directive";
@@ -13,7 +12,7 @@ import { ListItemComponent } from "../list-item/list-item.component";
 @Component({
     selector: "mona-list",
     standalone: true,
-    imports: [FilterInputComponent, ListItemComponent, NgTemplateOutlet, ContainsPipe, ListItemDirective],
+    imports: [FilterInputComponent, ListItemComponent, NgTemplateOutlet, ListItemDirective],
     templateUrl: "./list.component.html",
     styleUrl: "./list.component.scss",
     changeDetection: ChangeDetectionStrategy.OnPush
@@ -33,11 +32,6 @@ export class ListComponent<TData> {
     @Input()
     public set textField(textField: string | Selector<TData, string> | null | undefined) {
         this.listService.setTextField(textField ?? "");
-    }
-
-    @Input()
-    public set valueField(valueField: string | Selector<TData, any> | null | undefined) {
-        this.listService.setValueField(valueField ?? "");
     }
 
     public constructor(protected readonly listService: ListService<TData>) {}
