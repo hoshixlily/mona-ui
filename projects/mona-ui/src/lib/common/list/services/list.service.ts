@@ -1,12 +1,13 @@
 import { computed, EventEmitter, Injectable, Signal, signal, WritableSignal } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
-import { from, IEnumerable, IGroup, ImmutableSet, Predicate, Selector } from "@mirei/ts-collections";
-import { debounce, debounceTime, distinctUntilChanged, ReplaySubject } from "rxjs";
+import { from, IEnumerable, ImmutableSet, Predicate, Selector } from "@mirei/ts-collections";
+import { debounceTime, distinctUntilChanged, ReplaySubject } from "rxjs";
 import { FilterChangeEvent } from "../../filter-input/models/FilterChangeEvent";
-import { FilterableOptions, FilterOperator } from "../models/FilterableOptions";
+import { FilterableOptions } from "../models/FilterableOptions";
 import { GroupableOptions } from "../models/GroupableOptions";
 import { ListItem } from "../models/ListItem";
 import { SelectableOptions } from "../models/SelectableOptions";
+import { VirtualScrollOptions } from "../models/VirtualScrollOptions";
 
 @Injectable()
 export class ListService<TData> {
@@ -74,6 +75,10 @@ export class ListService<TData> {
         } else {
             return enumerable.toImmutableSet();
         }
+    });
+    public readonly virtualScrollOptions: WritableSignal<VirtualScrollOptions> = signal({
+        enabled: false,
+        height: 28
     });
     public filterChange: EventEmitter<FilterChangeEvent> = new EventEmitter<FilterChangeEvent>();
 
@@ -190,6 +195,10 @@ export class ListService<TData> {
 
     public setValueField(valueField: string | Selector<TData, any>): void {
         this.valueField.set(valueField);
+    }
+
+    public setVirtualScrollOptions(options: VirtualScrollOptions): void {
+        this.virtualScrollOptions.update(o => ({ ...o, ...options }));
     }
 
     private filterItem(item: ListItem<TData>, filterText: string): boolean {

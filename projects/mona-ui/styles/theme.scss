@@ -1259,6 +1259,14 @@ legend.mona-fieldset-legend {
     @include font-medium;
 }
 
+/** Placeholder */
+.mona-placeholder {
+    & span.mona-placeholder-text {
+        color: var(--mona-text);
+        filter: brightness(0.5);
+    }
+}
+
 /** Scroll View */
 div.mona-scroll-view-arrow {
     & fa-icon {

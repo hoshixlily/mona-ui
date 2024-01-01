@@ -17,6 +17,7 @@ export * from "./common/list/directives/list-group-header-template.directive";
 export * from "./common/list/directives/list-groupable.directive";
 export * from "./common/list/directives/list-item-template.directive";
 export * from "./common/list/directives/list-selectable.directive";
+export * from "./common/list/directives/list-virtual-scroll.directive";
 export * from "./common/list/components/list/list.component";
 
 /** Date Inputs */
@@ -107,6 +108,9 @@ export * from "./layout/expansion-panel/directives/expansion-panel-title-templat
 /* Fieldset */
 export * from "./layout/fieldset/directives/fieldset-legend-template.directive";
 export * from "./layout/fieldset/components/fieldset/fieldset.component";
+
+/* Placeholder */
+export * from "./layout/placeholder/placeholder.component";
 
 /** Scroll View */
 export * from "./layout/scroll-view/components/scroll-view/scroll-view.component";

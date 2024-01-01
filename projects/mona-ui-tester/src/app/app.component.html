@@ -650,7 +650,7 @@
                             </div>
 
                             <div style="width: 250px;background: var(--mona-background);">
-                                <mona-list>
+                                <mona-list [data]="listViewDataItems" textField="text" monaListVirtualScroll>
                                     <ng-template monaListItemTemplate let-item>
                                         @if (item.value % 2 === 0) {
                                             <span style="color: #ffcc75;">{{item.text}}</span>
