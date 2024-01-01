@@ -150,7 +150,7 @@ input, textarea, button {
 
 div.mona-list {
     @include font-medium;
-    border: 1px solid var(--mona-border-color);
+    //border: 1px solid var(--mona-border-color);
     & ul {
         @include scrollbars-thin;
         & li {

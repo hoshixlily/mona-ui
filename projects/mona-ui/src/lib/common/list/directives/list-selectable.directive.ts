@@ -36,7 +36,7 @@ export class ListSelectableDirective<T> implements OnInit {
     }
 
     @Output()
-    public selectedKeysChange: EventEmitter<ImmutableSet<any>> = new EventEmitter<ImmutableSet<any>>();
+    public selectedKeysChange: EventEmitter<Array<any>> = new EventEmitter<Array<any>>();
 
     public constructor(private readonly listService: ListService<T>) {}
 

@@ -1,4 +1,4 @@
-<div class="mona-list">
+<div class="mona-list" [tabindex]="-1" [style.width]="listWidth()" [style.height]="listHeight()">
     @if (listService.filterableOptions().enabled) {
         <mona-filter-input [filter]="listService.filterText()"
                            [debounce]="listService.filterableOptions().debounce"
@@ -50,7 +50,8 @@
         </li>
     } @else {
         <li class="mona-list-item" [attr.data-uid]="item.uid"
-            (click)="onListItemClick(item)"
+            (click)="onListItemSelect(item)"
+            (keydown.enter)="onListItemSelect(item)"
             monaListItem [item]="item">
             <mona-list-item [item]="item" [template]="itemTemplate"></mona-list-item>
         </li>

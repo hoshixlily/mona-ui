@@ -1,18 +1,23 @@
 import { CdkFixedSizeVirtualScroll, CdkVirtualForOf, CdkVirtualScrollViewport } from "@angular/cdk/scrolling";
 import { NgTemplateOutlet } from "@angular/common";
 import {
+    afterNextRender,
     AfterViewInit,
     ChangeDetectionStrategy,
     Component,
     ContentChild,
     DestroyRef,
     ElementRef,
+    EventEmitter,
     inject,
     Input,
     OnInit,
+    Output,
     QueryList,
+    signal,
     TemplateRef,
-    ViewChildren
+    ViewChildren,
+    WritableSignal
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { Selector } from "@mirei/ts-collections";
@@ -52,6 +57,9 @@ export class ListComponent<TData> implements OnInit, AfterViewInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     #viewport: CdkVirtualScrollViewport | null = null;
 
+    protected listHeight: WritableSignal<string | undefined> = signal(undefined);
+    protected listWidth: WritableSignal<string | undefined> = signal(undefined);
+
     @Input({ required: false })
     public set data(value: Iterable<TData>) {
         this.listService.setData(value);
@@ -65,6 +73,20 @@ export class ListComponent<TData> implements OnInit, AfterViewInit {
 
     @ContentChild(ListHeaderTemplateDirective, { read: TemplateRef })
     public headerTemplate: TemplateRef<any> | null = null;
+
+    @Input()
+    public set height(value: string | number | undefined) {
+        if (value == null) {
+            this.listHeight.set(undefined);
+        } else if (typeof value === "number") {
+            this.listHeight.set(`${value}px`);
+        } else {
+            this.listHeight.set(value);
+        }
+    }
+
+    @Output()
+    public itemSelect: EventEmitter<ListItem<TData>> = new EventEmitter<ListItem<TData>>();
 
     @ContentChild(ListItemTemplateDirective, { read: TemplateRef })
     public itemTemplate: TemplateRef<ListItemTemplateContext<TData>> | null = null;
@@ -80,10 +102,30 @@ export class ListComponent<TData> implements OnInit, AfterViewInit {
     @ViewChildren(CdkVirtualScrollViewport)
     public virtualScrollViewport: QueryList<CdkVirtualScrollViewport> = new QueryList<CdkVirtualScrollViewport>();
 
+    @Input()
+    public set width(value: string | number | undefined) {
+        if (value == null) {
+            this.listWidth.set(undefined);
+        } else if (typeof value === "number") {
+            this.listWidth.set(`${value}px`);
+        } else {
+            this.listWidth.set(value);
+        }
+    }
+
     public constructor(
         private readonly elementRef: ElementRef<HTMLElement>,
         protected readonly listService: ListService<TData>
-    ) {}
+    ) {
+        afterNextRender(() => {
+            window.setTimeout(() => {
+                const selectedItem = this.listService.selectedListItems().firstOrDefault();
+                if (selectedItem) {
+                    this.scrollToItem(selectedItem);
+                }
+            });
+        });
+    }
 
     public ngAfterViewInit(): void {
         this.#viewport = this.virtualScrollViewport.first;
@@ -103,9 +145,19 @@ export class ListComponent<TData> implements OnInit, AfterViewInit {
         }
     }
 
-    public onListItemClick(item: ListItem<TData>): void {
-        this.listService.selectItem(item);
-        this.listService.selectedKeysChange.emit(this.listService.selectedKeys());
+    public onListItemSelect(item: ListItem<TData>): void {
+        const selectedItem = this.listService.selectedListItems();
+        const options = this.listService.selectableOptions();
+
+        if (
+            (options.mode === "single" && !selectedItem.contains(item)) ||
+            (options.mode === "single" && options.toggleable) ||
+            options.mode === "multiple"
+        ) {
+            this.listService.selectItem(item);
+            this.listService.selectedKeysChange.emit(this.listService.selectedKeys().toArray());
+        }
+        this.itemSelect.emit(item);
     }
 
     private scrollToItem(item: ListItem<TData>): void {
@@ -141,7 +193,7 @@ export class ListComponent<TData> implements OnInit, AfterViewInit {
                     item = this.listService.navigate("previous", navigableOptions.mode);
                 }
                 if (item) {
-                    this.listService.selectedKeysChange.emit(this.listService.selectedKeys());
+                    this.listService.selectedKeysChange.emit(this.listService.selectedKeys().toArray());
                 }
             });
     }

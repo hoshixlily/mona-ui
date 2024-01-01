@@ -50,7 +50,7 @@ export class ListService<TData> {
     public readonly selectedListItems: Signal<ImmutableSet<ListItem<TData>>> = computed(() => {
         const selectedKeys = this.selectedKeys();
         return this.viewItems()
-            .where(i => selectedKeys.contains(this.getItemKey(i)))
+            .where(i => selectedKeys.contains(this.getSelectionKey(i)))
             .toImmutableSet();
     });
     public readonly textField: WritableSignal<string | Selector<TData, string>> = signal("");
@@ -95,9 +95,13 @@ export class ListService<TData> {
         height: 28
     });
     public filterChange: EventEmitter<FilterChangeEvent> = new EventEmitter<FilterChangeEvent>();
-    public selectedKeysChange: EventEmitter<ImmutableSet<any>> = new EventEmitter<ImmutableSet<any>>();
+    public selectedKeysChange: EventEmitter<Array<any>> = new EventEmitter<Array<any>>();
 
     public constructor() {}
+
+    public clearSelections(): void {
+        this.selectedKeys.update(set => set.clear());
+    }
 
     public getGroupField(item: ListItem<TData>): any {
         const groupSelector = this.groupBy();
@@ -140,7 +144,7 @@ export class ListService<TData> {
             return false;
         }
         const selectedKeys = this.selectedKeys();
-        const key = this.getItemKey(item);
+        const key = this.getSelectionKey(item);
         return selectedKeys.contains(key);
     }
 
@@ -169,7 +173,7 @@ export class ListService<TData> {
     }
 
     public selectItem(item: ListItem<TData>): void {
-        const key = this.getItemKey(item);
+        const key = this.getSelectionKey(item);
         const options = this.selectableOptions();
         if (options.mode === "single") {
             if (options.toggleable) {
@@ -228,6 +232,20 @@ export class ListService<TData> {
         this.selectableOptions.update(o => ({ ...o, ...options }));
     }
 
+    public setSelectedDataItems(dataItems: Iterable<TData>): void {
+        const valueField = this.valueField();
+        if (!valueField) {
+            this.selectedKeys.update(set => set.clear().addAll(dataItems));
+        } else {
+            const selectedKeys = from(dataItems)
+                .select(item => {
+                    return this.getDataItemSelectionKey(item);
+                })
+                .toImmutableSet();
+            this.selectedKeys.update(set => set.clear().addAll(selectedKeys));
+        }
+    }
+
     public setSelectedKeys(selectedKeys: Iterable<any>): void {
         this.selectedKeys.update(set => set.clear().addAll(selectedKeys));
     }
@@ -270,15 +288,15 @@ export class ListService<TData> {
         }
     }
 
-    private getItemKey(item: ListItem<TData>): any | null {
+    private getDataItemSelectionKey(dataItem: TData): any | null {
         const valueField = this.valueField();
         if (!valueField) {
-            return item.data;
+            return dataItem;
         }
         if (typeof valueField === "string") {
-            return (item.data as any)?.[valueField] ?? item.data;
+            return (dataItem as any)?.[valueField] ?? dataItem;
         }
-        return valueField(item.data);
+        return valueField(dataItem);
     }
 
     private getPreviousItemForNavigation(
@@ -309,6 +327,10 @@ export class ListService<TData> {
         return null;
     }
 
+    private getSelectionKey(item: ListItem<TData>): any | null {
+        return this.getDataItemSelectionKey(item.data);
+    }
+
     private navigateForMultipleSelection(
         viewItems: ImmutableSet<ListItem<TData>>,
         direction: NavigationDirection
@@ -319,8 +341,8 @@ export class ListService<TData> {
             this.highlightedItem.set(firstItem);
             return firstItem;
         }
-        const firstSelectedItem = viewItems.firstOrDefault(i => selectedKeys.contains(this.getItemKey(i)));
-        const lastSelectedItem = viewItems.lastOrDefault(i => selectedKeys.contains(this.getItemKey(i)));
+        const firstSelectedItem = viewItems.firstOrDefault(i => selectedKeys.contains(this.getSelectionKey(i)));
+        const lastSelectedItem = viewItems.lastOrDefault(i => selectedKeys.contains(this.getSelectionKey(i)));
         const lastHighlightedItem = this.highlightedItem();
 
         if (direction === "next") {
@@ -367,7 +389,7 @@ export class ListService<TData> {
             }
             return firstItem;
         }
-        const selectedItem = viewItems.lastOrDefault(i => selectedKeys.contains(this.getItemKey(i)));
+        const selectedItem = viewItems.lastOrDefault(i => selectedKeys.contains(this.getSelectionKey(i)));
         const lastHighlightedItem = this.highlightedItem();
         const navigationItem = lastHighlightedItem ?? selectedItem ?? firstItem;
         if (direction === "next") {

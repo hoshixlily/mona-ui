@@ -3,9 +3,6 @@ div.mona-list {
     display: flex;
     flex-direction: column;
     outline: none;
-
-    height: 550px;
-    //overflow: auto;
 }
 
 ul {
@@ -19,6 +16,9 @@ ul {
         padding: 4px 8px;
         user-select: none;
         cursor: pointer;
+    }
+    & li.mona-list-group-header {
+        pointer-events: none;
     }
 }
 

@@ -789,7 +789,7 @@ export class AppComponent implements OnInit {
             // e.preventDefault();
             console.log(e);
         });
-        this.listService.selectedKeysChange = new EventEmitter<ImmutableSet<any>>();
+        this.listService.selectedKeysChange = new EventEmitter<Array<any>>();
         this.listService.selectedKeysChange.subscribe((e: ImmutableSet<any>) => {
             // console.log("Selected Keys: ", e.toArray());
             console.log(

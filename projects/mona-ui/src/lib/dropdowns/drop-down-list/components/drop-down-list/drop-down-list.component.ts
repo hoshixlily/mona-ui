@@ -4,6 +4,7 @@ import {
     ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
+    computed,
     ContentChild,
     DestroyRef,
     ElementRef,
@@ -12,6 +13,7 @@ import {
     inject,
     Input,
     OnInit,
+    Signal,
     TemplateRef,
     ViewChild
 } from "@angular/core";
@@ -23,18 +25,19 @@ import { fromEvent, take } from "rxjs";
 import { AnimationState } from "../../../../animations/models/AnimationState";
 import { PopupAnimationService } from "../../../../animations/services/popup-animation.service";
 import { ButtonDirective } from "../../../../buttons/button/button.directive";
+import { ListComponent } from "../../../../common/list/components/list/list.component";
+import { ListGroupHeaderTemplateDirective } from "../../../../common/list/directives/list-group-header-template.directive";
+import { ListItemTemplateDirective } from "../../../../common/list/directives/list-item-template.directive";
+import { ListSelectableDirective } from "../../../../common/list/directives/list-selectable.directive";
+import { ListItem } from "../../../../common/list/models/ListItem";
+import { SelectableOptions } from "../../../../common/list/models/SelectableOptions";
+import { ListService } from "../../../../common/list/services/list.service";
 import { PopupRef } from "../../../../popup/models/PopupRef";
 import { PopupService } from "../../../../popup/services/popup.service";
 import { Action } from "../../../../utils/Action";
 import { DropDownListGroupTemplateDirective } from "../../directives/drop-down-list-group-template.directive";
 import { DropDownListItemTemplateDirective } from "../../directives/drop-down-list-item-template.directive";
 import { DropDownListValueTemplateDirective } from "../../directives/drop-down-list-value-template.directive";
-import { ListGroupTemplateDirective } from "../../../popup-list/directives/list-group-template.directive";
-import { ListItemTemplateDirective } from "../../../popup-list/directives/list-item-template.directive";
-import { PopupListItem } from "../../../models/PopupListItem";
-import { PopupListValueChangeEvent } from "../../../models/PopupListValueChangeEvent";
-import { PopupListComponent } from "../../../popup-list/components/popup-list/popup-list.component";
-import { PopupListService } from "../../../popup-list/services/popup-list.service";
 
 @Component({
     selector: "mona-drop-down-list",
@@ -42,7 +45,7 @@ import { PopupListService } from "../../../popup-list/services/popup-list.servic
     styleUrls: ["./drop-down-list.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [
-        PopupListService,
+        ListService,
         {
             provide: NG_VALUE_ACCESSOR,
             useExisting: forwardRef(() => DropDownListComponent),
@@ -57,25 +60,44 @@ import { PopupListService } from "../../../popup-list/services/popup-list.servic
         FormsModule,
         FontAwesomeModule,
         ButtonDirective,
-        PopupListComponent,
+        ListComponent,
         ListItemTemplateDirective,
-        ListGroupTemplateDirective
+        ListGroupHeaderTemplateDirective,
+        ListSelectableDirective
     ]
 })
-export class DropDownListComponent implements OnInit, ControlValueAccessor {
+export class DropDownListComponent<TData> implements OnInit, ControlValueAccessor {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
-    #propagateChange: any = () => {};
-    #value: any;
-    public readonly clearIcon: IconDefinition = faTimes;
-    public readonly dropdownIcon: IconDefinition = faChevronDown;
-    public popupRef: PopupRef | null = null;
-    public valuePopupListItem?: PopupListItem | null = null;
+    #popupRef: PopupRef | null = null;
+    #propagateChange: Action<TData | null> | null = null;
+    #value: TData | null = null;
+
+    protected readonly clearIcon: IconDefinition = faTimes;
+    protected readonly dropdownIcon: IconDefinition = faChevronDown;
+    protected readonly dropdownText: Signal<string> = computed(() => {
+        const listItem = this.selectedListItem();
+        if (!listItem) {
+            return "";
+        }
+        return this.listService.getItemText(listItem);
+    });
+    protected readonly selectableOptions: SelectableOptions = {
+        enabled: true,
+        mode: "single",
+        toggleable: false
+    };
+    protected readonly selectedDataItem: Signal<TData | null> = computed(() => {
+        return this.selectedListItem()?.data ?? null;
+    });
+    protected readonly selectedListItem: Signal<ListItem<TData> | null> = computed(() => {
+        return this.listService.selectedListItems().firstOrDefault();
+    });
 
     @HostBinding("class.mona-dropdown")
     public readonly hostClass: boolean = true;
 
     @Input()
-    public data: Iterable<any> = [];
+    public data: Iterable<TData> = [];
 
     @Input()
     public disabled: boolean = false;
@@ -108,7 +130,9 @@ export class DropDownListComponent implements OnInit, ControlValueAccessor {
     public showClearButton: boolean = false;
 
     @Input()
-    public textField?: string;
+    public set textField(textField: string | null | undefined) {
+        this.listService.setTextField(textField ?? "");
+    }
 
     @Input()
     public valueField?: string;
@@ -119,20 +143,21 @@ export class DropDownListComponent implements OnInit, ControlValueAccessor {
     public constructor(
         private readonly cdr: ChangeDetectorRef,
         private readonly elementRef: ElementRef<HTMLElement>,
+        private readonly listService: ListService<TData>,
         private readonly popupAnimationService: PopupAnimationService,
-        private readonly popupListService: PopupListService,
         private readonly popupService: PopupService
     ) {}
 
     public clearValue(event: MouseEvent): void {
         event.stopImmediatePropagation();
-        this.updateValue(undefined);
-        this.#propagateChange?.(this.value);
+        this.updateValue(null);
+        this.listService.clearSelections();
+        this.#propagateChange?.(this.#value);
     }
 
     public close(): void {
-        this.popupRef?.close();
-        this.popupRef = null;
+        this.#popupRef?.close();
+        this.#popupRef = null;
     }
 
     public ngOnInit(): void {
@@ -140,36 +165,22 @@ export class DropDownListComponent implements OnInit, ControlValueAccessor {
         this.setEventListeners();
     }
 
-    public onPopupListValueChange(event: PopupListValueChangeEvent): void {
-        if (!event.value || event.value.length === 0) {
-            if (this.#value === undefined) {
-                return;
-            }
-            this.#value = undefined;
-            this.valuePopupListItem = undefined;
-            this.#propagateChange?.(undefined);
-            return;
-        }
-        if (this.value && event.value[0].dataEquals(this.value)) {
-            if (event.via === "selection") {
-                this.close();
-            }
-            return;
-        }
-        if (event.via === "selection") {
-            this.close();
-        }
-        this.#value = event.value[0].data;
-        this.valuePopupListItem = event.value[0];
-        this.#propagateChange?.(this.value);
+    public onItemSelect(item: ListItem<TData>): void {
+        this.close();
+    }
+
+    public onSelectedKeysChange(keys: Array<any>): void {
+        const item = this.selectedDataItem();
+        this.updateValue(item);
+        this.close();
     }
 
     public open(): void {
         this.dropdownWrapper.nativeElement.focus();
-        if (this.popupRef) {
+        if (this.#popupRef) {
             return;
         }
-        this.popupRef = this.popupService.create({
+        this.#popupRef = this.popupService.create({
             anchor: this.dropdownWrapper,
             content: this.popupTemplate,
             hasBackdrop: false,
@@ -194,13 +205,17 @@ export class DropDownListComponent implements OnInit, ControlValueAccessor {
                 )
             ]
         });
-        this.popupAnimationService.setupDropdownOutsideClickCloseAnimation(this.popupRef);
-        this.popupAnimationService.animateDropdown(this.popupRef, AnimationState.Show);
+        this.popupAnimationService.setupDropdownOutsideClickCloseAnimation(this.#popupRef);
+        this.popupAnimationService.animateDropdown(this.#popupRef, AnimationState.Show);
         this.cdr.markForCheck();
-        this.popupRef.closed.pipe(take(1)).subscribe(() => {
-            this.popupRef = null;
+        const previousItem = this.selectedListItem();
+        this.#popupRef.closed.pipe(take(1)).subscribe(() => {
+            this.#popupRef = null;
             (this.elementRef.nativeElement.firstElementChild as HTMLElement)?.focus();
-            this.popupListService.clearFilters();
+            // this.popupListService.clearFilters();
+            if (previousItem !== this.selectedListItem()) {
+                this.notifyValueChange();
+            }
         });
     }
 
@@ -221,25 +236,30 @@ export class DropDownListComponent implements OnInit, ControlValueAccessor {
         this.cdr.markForCheck();
     }
 
-    public writeValue(obj: any): void {
+    public writeValue(obj: TData): void {
         this.updateValue(obj);
+        if (obj != null) {
+            this.listService.setSelectedDataItems([obj]);
+        }
     }
 
     private handleArrowKeys(event: KeyboardEvent): void {
-        if (this.popupRef) {
+        if (this.#popupRef) {
             return;
         }
-        const listItem = this.popupListService.navigate(event, "single");
-        if (listItem) {
-            if (!listItem.dataEquals(this.value)) {
-                this.updateValue(listItem.data);
-                this.#propagateChange?.(this.value);
+        const previousItem = this.selectedListItem();
+        const item = this.listService.navigate(event.key === "ArrowDown" ? "next" : "previous", "select");
+        if (item) {
+            if (previousItem === item) {
+                return;
             }
+            this.updateValue(item.data);
+            this.notifyValueChange();
         }
     }
 
     private handleEnterKey(): void {
-        if (this.popupRef) {
+        if (this.#popupRef) {
             this.close();
             return;
         }
@@ -247,7 +267,7 @@ export class DropDownListComponent implements OnInit, ControlValueAccessor {
     }
 
     private handleEscapeKey(): void {
-        if (this.popupRef) {
+        if (this.#popupRef) {
             this.close();
         }
     }
@@ -263,19 +283,16 @@ export class DropDownListComponent implements OnInit, ControlValueAccessor {
     }
 
     private initialize(): void {
-        this.popupListService.initializeListData({
-            data: this.data,
-            disabler: this.itemDisabler,
-            textField: this.textField,
-            valueField: this.valueField,
-            groupField: this.groupField
-        });
-        this.valuePopupListItem = this.popupListService.viewListData
-            .selectMany(g => g.source)
-            .singleOrDefault(d => d.dataEquals(this.value));
-        if (this.valuePopupListItem) {
-            this.valuePopupListItem.selected.set(true);
-        }
+        this.listService.setSelectableOptions(this.selectableOptions);
+        this.listService.setValueField(this.valueField ?? "");
+        this.listService.setNavigableOptions({ enabled: true, mode: "select" });
+        this.listService.setGroupableOptions({ enabled: true });
+        this.listService.setGroupBy(this.groupField ?? "");
+        this.listService.setData(this.data);
+    }
+
+    private notifyValueChange(): void {
+        this.#propagateChange?.(this.#value);
     }
 
     private setEventListeners(): void {
@@ -286,14 +303,7 @@ export class DropDownListComponent implements OnInit, ControlValueAccessor {
             });
     }
 
-    private updateValue(value: any): void {
+    private updateValue(value: TData | null): void {
         this.#value = value;
-        this.valuePopupListItem = this.popupListService.viewListData
-            .selectMany(g => g.source)
-            .singleOrDefault(d => d.dataEquals(this.value));
-    }
-
-    public get value(): any {
-        return this.#value;
     }
 }

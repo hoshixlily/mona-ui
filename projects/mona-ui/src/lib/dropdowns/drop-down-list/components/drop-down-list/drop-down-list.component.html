@@ -2,16 +2,17 @@
      [attr.tabindex]="disabled ? -1 : 0" (click)="open()" #dropdownWrapper>
     <div class="mona-dropdown-value">
         @if (!valueTemplate) {
-            @if (valuePopupListItem) {
-                <span>{{valuePopupListItem?.text}}</span>
+            @if (selectedListItem()) {
+                <span>{{dropdownText()}}</span>
             } @else {
                 <span>{{placeholder}}</span>
             }
         } @else {
-            <ng-container [ngTemplateOutlet]="valueTemplate" [ngTemplateOutletContext]="{$implicit: valuePopupListItem?.data, listItem: valuePopupListItem}"></ng-container>
+            <ng-container [ngTemplateOutlet]="valueTemplate"
+                          [ngTemplateOutletContext]="{$implicit: selectedDataItem()}"></ng-container>
         }
     </div>
-    @if (showClearButton && valuePopupListItem) {
+    @if (showClearButton && selectedListItem()) {
         <span class="mona-input-clear-icon" (click)="clearValue($event)">
             <fa-icon [icon]="clearIcon"></fa-icon>
         </span>
@@ -23,19 +24,23 @@
 
 <ng-template #popupTemplate>
     <div class="mona-dropdown-popup-list-wrapper">
-        <mona-popup-list [textField]="textField" [valueField]="valueField" [groupField]="groupField" [value]="value ? [value] : []"
-                         [filterable]="filterable"
-                         (valueChange)="onPopupListValueChange($event)">
+        <mona-list [height]="200"
+                   (itemSelect)="onItemSelect($event)"
+                   [monaListSelectable]="selectableOptions"
+                   [selectBy]="valueField"
+                   (selectedKeysChange)="onSelectedKeysChange($event)">
             @if (itemTemplate) {
-                <ng-template monaListItemTemplate let-dataItem let-listItem="listItem">
-                    <ng-container [ngTemplateOutlet]="itemTemplate" [ngTemplateOutletContext]="{$implicit: dataItem, listItem}"></ng-container>
+                <ng-template monaListItemTemplate let-dataItem>
+                    <ng-container [ngTemplateOutlet]="itemTemplate"
+                                  [ngTemplateOutletContext]="{$implicit: dataItem}"></ng-container>
                 </ng-template>
             }
             @if (groupTemplate) {
-                <ng-template monaListGroupTemplate let-dataItem let-listItem="listItem">
-                    <ng-container [ngTemplateOutlet]="groupTemplate" [ngTemplateOutletContext]="{$implicit: dataItem, listItem}"></ng-container>
+                <ng-template monaListGroupHeaderTemplate let-group>
+                    <ng-container [ngTemplateOutlet]="groupTemplate"
+                                  [ngTemplateOutletContext]="{$implicit: group}"></ng-container>
                 </ng-template>
             }
-        </mona-popup-list>
+        </mona-list>
     </div>
 </ng-template>
