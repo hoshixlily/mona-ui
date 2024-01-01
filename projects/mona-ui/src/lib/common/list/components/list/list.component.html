@@ -1,6 +1,7 @@
 <div class="mona-list">
     @if (listService.filterableOptions().enabled) {
         <mona-filter-input [filter]="listService.filterText()"
+                           [debounce]="listService.filterableOptions().debounce ?? 0"
                            [placeholder]="listService.filterPlaceholder()"
                            (filterChange)="onFilterChange($event)"
                            class="mona-list-filter-input"></mona-filter-input>
@@ -11,7 +12,7 @@
     @if (listService.virtualScrollOptions().enabled) {
         @if (listService.viewItems().length !== 0) {
             <cdk-virtual-scroll-viewport [itemSize]="listService.virtualScrollOptions().height">
-                <ul>
+                <ul [tabIndex]="-1">
                     <ng-container *cdkVirtualFor="let item of listService.viewItems()">
                         <ng-container [ngTemplateOutlet]="listItemTemplate"
                                       [ngTemplateOutletContext]="{$implicit: item}"></ng-container>
@@ -25,7 +26,7 @@
         }
     } @else {
         @if (listService.viewItems().length !== 0) {
-            <ul>
+            <ul [tabIndex]="-1">
                 @for (item of listService.viewItems(); track item.uid) {
                     <ng-container [ngTemplateOutlet]="listItemTemplate"
                                   [ngTemplateOutletContext]="{$implicit: item}"></ng-container>

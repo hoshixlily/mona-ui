@@ -13,7 +13,7 @@ import {
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { Selector } from "@mirei/ts-collections";
-import { takeUntil } from "rxjs";
+import { filter, fromEvent, takeUntil, tap } from "rxjs";
 import { PlaceholderComponent } from "../../../../layout/placeholder/placeholder.component";
 import { FilterInputComponent } from "../../../filter-input/components/filter-input/filter-input.component";
 import { FilterChangeEvent } from "../../../filter-input/models/FilterChangeEvent";
@@ -96,7 +96,24 @@ export class ListComponent<TData> implements OnInit {
         }
     }
 
+    private setNavigationEvents(): void {
+        fromEvent<KeyboardEvent>(this.elementRef.nativeElement, "keydown")
+            .pipe(
+                takeUntilDestroyed(this.#destroyRef),
+                filter(event => event.key === "ArrowDown" || event.key === "ArrowUp"),
+                tap(event => event.preventDefault())
+            )
+            .subscribe(event => {
+                if (event.key === "ArrowDown") {
+                    this.listService.navigate("next");
+                } else if (event.key === "ArrowUp") {
+                    this.listService.navigate("previous");
+                }
+            });
+    }
+
     private setSubscriptions(): void {
+        this.setNavigationEvents();
         this.listService.scrollToItem$
             .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe(item => this.scrollToItem(item));

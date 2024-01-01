@@ -2,7 +2,7 @@
     <mona-text-box [ngModel]="filterText()"
                    [clearButton]="true"
                    [placeholder]="filterPlaceholder()"
-                   (ngModelChange)="onFilterChange($event)">
+                   (ngModelChange)="filter$.next($event)">
         <ng-template monaTextBoxPrefixTemplate>
             <div class="mona-filter-input-icon">
                 <fa-icon [icon]="filterIcon"></fa-icon>

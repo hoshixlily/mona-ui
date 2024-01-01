@@ -1,7 +1,6 @@
 import { computed, EventEmitter, Injectable, Signal, signal, WritableSignal } from "@angular/core";
-import { toSignal } from "@angular/core/rxjs-interop";
 import { from, IEnumerable, ImmutableSet, Predicate, Selector } from "@mirei/ts-collections";
-import { debounceTime, distinctUntilChanged, ReplaySubject } from "rxjs";
+import { ReplaySubject } from "rxjs";
 import { FilterChangeEvent } from "../../filter-input/models/FilterChangeEvent";
 import { FilterableOptions } from "../models/FilterableOptions";
 import { GroupableOptions } from "../models/GroupableOptions";
@@ -20,9 +19,8 @@ export class ListService<TData> {
             .toImmutableSet();
     });
     public readonly disabledBy: WritableSignal<string | Predicate<TData>> = signal("");
-    public readonly filter$: ReplaySubject<string> = new ReplaySubject<string>(1);
     public readonly filterPlaceholder: WritableSignal<string> = signal("");
-    public readonly filterText: Signal<string> = signal("");
+    public readonly filterText: WritableSignal<string> = signal("");
     public readonly filterableOptions: WritableSignal<FilterableOptions> = signal({
         enabled: false,
         caseSensitive: false,
@@ -85,12 +83,7 @@ export class ListService<TData> {
     });
     public filterChange: EventEmitter<FilterChangeEvent> = new EventEmitter<FilterChangeEvent>();
 
-    public constructor() {
-        this.filterText = toSignal(
-            this.filter$.pipe(debounceTime(this.filterableOptions().debounce ?? 0), distinctUntilChanged()),
-            { initialValue: "" }
-        );
-    }
+    public constructor() {}
 
     public getGroupField(item: ListItem<TData>): any {
         const groupSelector = this.groupBy();
@@ -137,19 +130,24 @@ export class ListService<TData> {
         return selectedKeys.contains(key);
     }
 
-    public navigate(direction: NavigationDirection): void {
+    public navigate(direction: NavigationDirection): ListItem<TData> | null {
         const viewItems = this.viewItems()
             .where(i => !i.header && !this.isDisabled(i))
             .toImmutableSet();
         if (viewItems.isEmpty()) {
-            return;
+            return null;
         }
         const selectableOptions = this.selectableOptions();
+        let item: ListItem<TData> | null;
         if (selectableOptions.mode === "single") {
-            this.navigateForSingleSelection(viewItems, direction);
+            item = this.navigateForSingleSelection(viewItems, direction);
         } else {
-            this.navigateForMultipleSelection(viewItems, direction);
+            item = this.navigateForMultipleSelection(viewItems, direction);
         }
+        if (item) {
+            this.scrollToItem$.next(item);
+        }
+        return item;
     }
 
     public selectItem(item: ListItem<TData>): void {
@@ -185,7 +183,7 @@ export class ListService<TData> {
     }
 
     public setFilter(filter: string): void {
-        this.filter$.next(filter);
+        this.filterText.set(filter);
     }
 
     public setFilterPlaceholder(placeholder: string): void {
@@ -276,12 +274,12 @@ export class ListService<TData> {
     private navigateForMultipleSelection(
         viewItems: ImmutableSet<ListItem<TData>>,
         direction: NavigationDirection
-    ): void {
+    ): ListItem<TData> | null {
         const selectedKeys = this.selectedKeys();
         const firstItem = viewItems.first();
         if (selectedKeys.isEmpty() && !this.highlightedItem()) {
             this.highlightedItem.set(firstItem);
-            return;
+            return firstItem;
         }
         const firstSelectedItem = viewItems.firstOrDefault(i => selectedKeys.contains(this.getItemKey(i)));
         const lastSelectedItem = viewItems.lastOrDefault(i => selectedKeys.contains(this.getItemKey(i)));
@@ -295,37 +293,41 @@ export class ListService<TData> {
                 .firstOrDefault(i => !this.isDisabled(i));
             if (nextItem) {
                 this.highlightedItem.set(nextItem);
-                this.scrollToItem$.next(nextItem);
+                return nextItem;
             } else {
                 this.highlightedItem.set(firstItem);
-                this.scrollToItem$.next(firstItem);
+                return firstItem;
             }
         } else {
             const navigationItem = lastHighlightedItem ?? firstSelectedItem ?? firstItem;
             const prevItem = viewItems.takeWhile(i => i !== navigationItem).lastOrDefault(i => !this.isDisabled(i));
             if (prevItem) {
                 this.highlightedItem.set(prevItem);
-                this.scrollToItem$.next(prevItem);
+                return prevItem;
             } else {
                 const lastItem = viewItems.lastOrDefault(i => !this.isDisabled(i));
                 if (lastItem) {
                     this.highlightedItem.set(lastItem);
-                    this.scrollToItem$.next(lastItem);
+                    return lastItem;
                 }
             }
         }
+        return null;
     }
 
-    private navigateForSingleSelection(viewItems: ImmutableSet<ListItem<TData>>, direction: NavigationDirection): void {
+    private navigateForSingleSelection(
+        viewItems: ImmutableSet<ListItem<TData>>,
+        direction: NavigationDirection
+    ): ListItem<TData> | null {
         const selectedKeys = this.selectedKeys();
         const firstItem = viewItems.first();
         if (selectedKeys.isEmpty()) {
             this.selectItem(firstItem);
-            return;
+            return firstItem;
         }
         const lastSelectedItem = viewItems.lastOrDefault(i => selectedKeys.contains(this.getItemKey(i)));
         if (!lastSelectedItem) {
-            return;
+            return null;
         }
         if (direction === "next") {
             const nextItem = viewItems
@@ -334,14 +336,15 @@ export class ListService<TData> {
                 .firstOrDefault(i => !this.isDisabled(i));
             if (nextItem) {
                 this.selectItem(nextItem);
-                this.scrollToItem$.next(nextItem);
+                return nextItem;
             }
         } else {
             const prevItem = viewItems.takeWhile(i => i !== lastSelectedItem).lastOrDefault(i => !this.isDisabled(i));
             if (prevItem) {
                 this.selectItem(prevItem);
-                this.scrollToItem$.next(prevItem);
+                return prevItem;
             }
         }
+        return null;
     }
 }

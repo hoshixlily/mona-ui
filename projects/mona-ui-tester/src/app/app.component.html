@@ -650,7 +650,7 @@
                             </div>
 
                             <div style="width: 250px;background: var(--mona-background);">
-                                <mona-list>
+                                <mona-list *ngIf="false">
                                     <ng-template monaListItemTemplate let-item>
                                         @if (item.value % 2 === 0) {
                                             <span style="color: #ffcc75;">{{item.text}}</span>
@@ -666,11 +666,18 @@
                                     </ng-template>
                                     <ng-template monaListFooterTemplate>
                                         <div style="display: flex; padding: 2px 4px; column-gap: 4px; border-top: 1px solid var(--mona-border-color-dark); background: var(--mona-background-dark);">
-                                            <button monaButton (click)="listService.navigate('previous')">Up</button>
-                                            <button monaButton (click)="listService.navigate('next')">Down</button>
+                                            <button monaButton (click)="selectedListItem = listService.navigate('previous')">Up</button>
+                                            <button monaButton (click)="selectedListItem = listService.navigate('next')">Down</button>
                                         </div>
                                     </ng-template>
                                 </mona-list>
+                                <span>
+                                    <div style="display: flex; padding: 2px 4px; column-gap: 4px; border-top: 1px solid var(--mona-border-color-dark); background: var(--mona-background-dark);">
+                                        <button monaButton (click)="selectedListItem = listService.navigate('previous')">Up</button>
+                                        <button monaButton (click)="selectedListItem = listService.navigate('next')">Down</button>
+                                    </div>
+                                    Selected List Item: {{selectedListItem?.data?.text}}
+                                </span>
                             </div>
                         </div>
 

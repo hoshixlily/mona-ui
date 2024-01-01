@@ -618,6 +618,7 @@ export class AppComponent implements OnInit {
     ];
     public selectedComboBoxDataItem: any = null;
     public selectedDropdownListDataItem: any;
+    public selectedListItem: any;
     public selectedMultiSelectDataItems: any[] = [this.dropdownListDataItems.get(2), this.dropdownListDataItems.get(4)];
     public selectedMultiSelectDataItems2: any[] = [
         { text: "REPLACED WITH PAPRIKA", value: 13, group: "Fruit", active: true },
@@ -762,7 +763,7 @@ export class AppComponent implements OnInit {
         this.listService.setTextField(i => i.text);
         // this.listService.setDisabledBy(this.dropdownItemDisabler);
 
-        this.listService.setSelectableOptions({ enabled: true, mode: "multiple" });
+        this.listService.setSelectableOptions({ enabled: true, mode: "single" });
         this.listService.setValueField(i => i.value);
         this.listService.setSelectedKeys([
             this.dropdownListDataItems.get(0).value
@@ -777,7 +778,7 @@ export class AppComponent implements OnInit {
             // orderByDirection: "desc"
         });
 
-        this.listService.setFilterableOptions({ enabled: true, caseSensitive: true });
+        this.listService.setFilterableOptions({ enabled: true, caseSensitive: true, debounce: 0 });
         this.listService.setFilterPlaceholder("Search items...");
         // this.listService.setFilter("n");
         this.listService.filterChange = new EventEmitter<FilterChangeEvent>();
@@ -788,7 +789,7 @@ export class AppComponent implements OnInit {
 
         // this.listService.setVirtualScrollOptions({ enabled: true, height: 28 });
 
-        this.listService.setData(this.listViewDataItems);
+        this.listService.setData(this.dropdownListDataItems);
     }
 
     public filterData(): void {
