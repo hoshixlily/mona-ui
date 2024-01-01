@@ -5,7 +5,9 @@ import { Selector } from "@mirei/ts-collections";
 import { PlaceholderComponent } from "../../../../layout/placeholder/placeholder.component";
 import { FilterInputComponent } from "../../../filter-input/components/filter-input/filter-input.component";
 import { FilterChangeEvent } from "../../../filter-input/models/FilterChangeEvent";
+import { ListFooterTemplateDirective } from "../../directives/list-footer-template.directive";
 import { ListGroupHeaderTemplateDirective } from "../../directives/list-group-header-template.directive";
+import { ListHeaderTemplateDirective } from "../../directives/list-header-template.directive";
 import { ListItemTemplateDirective } from "../../directives/list-item-template.directive";
 import { ListItemDirective } from "../../directives/list-item.directive";
 import { ListNoDataTemplateDirective } from "../../directives/list-no-data-template.directive";
@@ -36,8 +38,14 @@ export class ListComponent<TData> {
         this.listService.setData(value);
     }
 
+    @ContentChild(ListFooterTemplateDirective, { read: TemplateRef })
+    public footerTemplate: TemplateRef<any> | null = null;
+
     @ContentChild(ListGroupHeaderTemplateDirective, { read: TemplateRef })
     public groupHeaderTemplate: TemplateRef<ListItemTemplateContext<string>> | null = null;
+
+    @ContentChild(ListHeaderTemplateDirective, { read: TemplateRef })
+    public headerTemplate: TemplateRef<any> | null = null;
 
     @ContentChild(ListItemTemplateDirective, { read: TemplateRef })
     public itemTemplate: TemplateRef<ListItemTemplateContext<TData>> | null = null;

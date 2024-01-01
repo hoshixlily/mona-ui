@@ -146,7 +146,9 @@ import {
     ListGroupHeaderTemplateDirective,
     ListSelectableDirective,
     ListGroupableDirective,
-    ListVirtualScrollDirective
+    ListVirtualScrollDirective,
+    ListFooterTemplateDirective,
+    ListHeaderTemplateDirective
 } from "mona-ui";
 import { v4 } from "uuid";
 import { ListFilterableDirective } from "../../../mona-ui/src/lib/common/list/directives/list-filterable.directive";
@@ -282,8 +284,10 @@ import { GridOrderData } from "./GridOrderData";
 
         ListComponent,
         ListFilterableDirective,
+        ListFooterTemplateDirective,
         ListGroupHeaderTemplateDirective,
         ListGroupableDirective,
+        ListHeaderTemplateDirective,
         ListItemTemplateDirective,
         ListSelectableDirective,
         ListVirtualScrollDirective

@@ -650,7 +650,7 @@
                             </div>
 
                             <div style="width: 250px;background: var(--mona-background);">
-                                <mona-list [data]="listViewDataItems" textField="text" monaListVirtualScroll>
+                                <mona-list [data]="listViewDataItems" textField="text" monaListVirtualScroll monaListFilterable>
                                     <ng-template monaListItemTemplate let-item>
                                         @if (item.value % 2 === 0) {
                                             <span style="color: #ffcc75;">{{item.text}}</span>
@@ -660,6 +660,12 @@
                                     </ng-template>
                                     <ng-template monaListGroupHeaderTemplate let-group>
                                         <span style="color: #F0A970; font-weight: bold;">{{group}}</span>
+                                    </ng-template>
+                                    <ng-template monaListHeaderTemplate>
+                                        <div style="background: var(--mona-background-dark); color: coral; border-bottom: 1px solid var(--mona-border-color-dark); padding: 2px 4px;">Header</div>
+                                    </ng-template>
+                                    <ng-template monaListFooterTemplate>
+                                        <div style="background: var(--mona-background-dark); color: darkorange; border-top: 1px solid var(--mona-border-color-dark); padding: 2px 4px;">Footer</div>
                                     </ng-template>
                                 </mona-list>
                             </div>

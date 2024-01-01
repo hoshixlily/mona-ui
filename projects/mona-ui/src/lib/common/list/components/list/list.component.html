@@ -5,6 +5,9 @@
                            (filterChange)="onFilterChange($event)"
                            class="mona-list-filter-input"></mona-filter-input>
     }
+    @if (headerTemplate) {
+        <ng-container [ngTemplateOutlet]="headerTemplate"></ng-container>
+    }
     @if (listService.virtualScrollOptions().enabled) {
         @if (listService.viewItems().length !== 0) {
             <cdk-virtual-scroll-viewport [itemSize]="listService.virtualScrollOptions().height">
@@ -33,6 +36,9 @@
         } @else {
             <mona-placeholder text="No data"></mona-placeholder>
         }
+    }
+    @if (footerTemplate) {
+        <ng-container [ngTemplateOutlet]="footerTemplate"></ng-container>
     }
 </div>
 

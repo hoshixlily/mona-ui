@@ -13,8 +13,10 @@ export * from "./buttons/split-button/components/split-button/split-button.compo
 /** Common */
 export * from "./common/filter-input/models/FilterChangeEvent";
 export * from "./common/list/services/list.service";
+export * from "./common/list/directives/list-footer-template.directive";
 export * from "./common/list/directives/list-group-header-template.directive";
 export * from "./common/list/directives/list-groupable.directive";
+export * from "./common/list/directives/list-header-template.directive";
 export * from "./common/list/directives/list-item-template.directive";
 export * from "./common/list/directives/list-selectable.directive";
 export * from "./common/list/directives/list-virtual-scroll.directive";
