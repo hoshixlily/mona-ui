@@ -762,19 +762,19 @@ export class AppComponent implements OnInit {
         this.listService.setTextField(i => i.text);
         // this.listService.setDisabledBy(this.dropdownItemDisabler);
 
-        this.listService.setSelectableOptions({ enabled: true, mode: "single" });
+        this.listService.setSelectableOptions({ enabled: true, mode: "multiple" });
         this.listService.setValueField(i => i.value);
         this.listService.setSelectedKeys([
-            this.dropdownListDataItems.get(2).value,
-            this.dropdownListDataItems.get(14).value
+            this.dropdownListDataItems.get(0).value
+            // this.dropdownListDataItems.get(14).value
         ]);
 
         this.listService.setGroupBy(i => `${i.text.charAt(0).toUpperCase()}`);
         this.listService.setGroupableOptions({
             enabled: true,
-            headerOrder: "asc",
-            orderBy: i => i.text.charAt(i.text.length - 1),
-            orderByDirection: "desc"
+            headerOrder: "asc"
+            // orderBy: i => i.text.charAt(i.text.length - 1),
+            // orderByDirection: "desc"
         });
 
         this.listService.setFilterableOptions({ enabled: true, caseSensitive: true });

@@ -6,6 +6,7 @@ import { FilterChangeEvent } from "../../filter-input/models/FilterChangeEvent";
 import { FilterableOptions } from "../models/FilterableOptions";
 import { GroupableOptions } from "../models/GroupableOptions";
 import { ListItem } from "../models/ListItem";
+import { NavigationDirection } from "../models/NavigationDirection";
 import { SelectableOptions } from "../models/SelectableOptions";
 import { VirtualScrollOptions } from "../models/VirtualScrollOptions";
 
@@ -136,83 +137,18 @@ export class ListService<TData> {
         return selectedKeys.contains(key);
     }
 
-    public navigateItem(direction: "up" | "down"): void {
+    public navigate(direction: NavigationDirection): void {
         const viewItems = this.viewItems()
             .where(i => !i.header && !this.isDisabled(i))
             .toImmutableSet();
         if (viewItems.isEmpty()) {
             return;
         }
-        const selectedKeys = this.selectedKeys();
-        const firstItem = viewItems.first();
-
         const selectableOptions = this.selectableOptions();
         if (selectableOptions.mode === "single") {
-            if (selectedKeys.isEmpty()) {
-                this.selectItem(firstItem);
-                return;
-            }
-            const lastSelectedItem = viewItems.lastOrDefault(i => selectedKeys.contains(this.getItemKey(i)));
-            if (!lastSelectedItem) {
-                return;
-            }
-            if (direction === "down") {
-                const nextItem = viewItems
-                    .skipWhile(i => i !== lastSelectedItem)
-                    .skip(1)
-                    .firstOrDefault(i => !this.isDisabled(i));
-                if (nextItem) {
-                    this.selectItem(nextItem);
-                    this.scrollToItem$.next(nextItem);
-                }
-            } else {
-                const prevItem = viewItems
-                    .takeWhile(i => i !== lastSelectedItem)
-                    .lastOrDefault(i => !this.isDisabled(i));
-                if (prevItem) {
-                    this.selectItem(prevItem);
-                    this.scrollToItem$.next(prevItem);
-                }
-            }
+            this.navigateForSingleSelection(viewItems, direction);
         } else {
-            if (selectedKeys.isEmpty() && !this.highlightedItem()) {
-                this.highlightedItem.set(firstItem);
-                return;
-            }
-            const firstSelectedItem = viewItems.firstOrDefault(i => selectedKeys.contains(this.getItemKey(i)));
-            const lastSelectedItem = viewItems.lastOrDefault(i => selectedKeys.contains(this.getItemKey(i)));
-            const lastHighlightedItem = this.highlightedItem();
-
-            if (direction === "down") {
-                const navigationItem = lastHighlightedItem ?? lastSelectedItem ?? firstItem;
-                const nextItem = viewItems
-                    .skipWhile(i => i !== navigationItem)
-                    .skip(1)
-                    .firstOrDefault(i => !this.isDisabled(i));
-                if (nextItem) {
-                    this.highlightedItem.set(nextItem);
-                    this.scrollToItem$.next(nextItem);
-                } else {
-                    const firstItem = viewItems.firstOrDefault(i => !this.isDisabled(i));
-                    if (firstItem) {
-                        this.highlightedItem.set(firstItem);
-                        this.scrollToItem$.next(firstItem);
-                    }
-                }
-            } else {
-                const navigationItem = lastHighlightedItem ?? firstSelectedItem ?? firstItem;
-                const prevItem = viewItems.takeWhile(i => i !== navigationItem).lastOrDefault(i => !this.isDisabled(i));
-                if (prevItem) {
-                    this.highlightedItem.set(prevItem);
-                    this.scrollToItem$.next(prevItem);
-                } else {
-                    const lastItem = viewItems.lastOrDefault(i => !this.isDisabled(i));
-                    if (lastItem) {
-                        this.highlightedItem.set(lastItem);
-                        this.scrollToItem$.next(lastItem);
-                    }
-                }
-            }
+            this.navigateForMultipleSelection(viewItems, direction);
         }
     }
 
@@ -335,5 +271,77 @@ export class ListService<TData> {
             }
         }
         return null;
+    }
+
+    private navigateForMultipleSelection(
+        viewItems: ImmutableSet<ListItem<TData>>,
+        direction: NavigationDirection
+    ): void {
+        const selectedKeys = this.selectedKeys();
+        const firstItem = viewItems.first();
+        if (selectedKeys.isEmpty() && !this.highlightedItem()) {
+            this.highlightedItem.set(firstItem);
+            return;
+        }
+        const firstSelectedItem = viewItems.firstOrDefault(i => selectedKeys.contains(this.getItemKey(i)));
+        const lastSelectedItem = viewItems.lastOrDefault(i => selectedKeys.contains(this.getItemKey(i)));
+        const lastHighlightedItem = this.highlightedItem();
+
+        if (direction === "next") {
+            const navigationItem = lastHighlightedItem ?? lastSelectedItem ?? firstItem;
+            const nextItem = viewItems
+                .skipWhile(i => i !== navigationItem)
+                .skip(1)
+                .firstOrDefault(i => !this.isDisabled(i));
+            if (nextItem) {
+                this.highlightedItem.set(nextItem);
+                this.scrollToItem$.next(nextItem);
+            } else {
+                this.highlightedItem.set(firstItem);
+                this.scrollToItem$.next(firstItem);
+            }
+        } else {
+            const navigationItem = lastHighlightedItem ?? firstSelectedItem ?? firstItem;
+            const prevItem = viewItems.takeWhile(i => i !== navigationItem).lastOrDefault(i => !this.isDisabled(i));
+            if (prevItem) {
+                this.highlightedItem.set(prevItem);
+                this.scrollToItem$.next(prevItem);
+            } else {
+                const lastItem = viewItems.lastOrDefault(i => !this.isDisabled(i));
+                if (lastItem) {
+                    this.highlightedItem.set(lastItem);
+                    this.scrollToItem$.next(lastItem);
+                }
+            }
+        }
+    }
+
+    private navigateForSingleSelection(viewItems: ImmutableSet<ListItem<TData>>, direction: NavigationDirection): void {
+        const selectedKeys = this.selectedKeys();
+        const firstItem = viewItems.first();
+        if (selectedKeys.isEmpty()) {
+            this.selectItem(firstItem);
+            return;
+        }
+        const lastSelectedItem = viewItems.lastOrDefault(i => selectedKeys.contains(this.getItemKey(i)));
+        if (!lastSelectedItem) {
+            return;
+        }
+        if (direction === "next") {
+            const nextItem = viewItems
+                .skipWhile(i => i !== lastSelectedItem)
+                .skip(1)
+                .firstOrDefault(i => !this.isDisabled(i));
+            if (nextItem) {
+                this.selectItem(nextItem);
+                this.scrollToItem$.next(nextItem);
+            }
+        } else {
+            const prevItem = viewItems.takeWhile(i => i !== lastSelectedItem).lastOrDefault(i => !this.isDisabled(i));
+            if (prevItem) {
+                this.selectItem(prevItem);
+                this.scrollToItem$.next(prevItem);
+            }
+        }
     }
 }

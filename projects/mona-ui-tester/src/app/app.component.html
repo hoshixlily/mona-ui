@@ -666,8 +666,8 @@
                                     </ng-template>
                                     <ng-template monaListFooterTemplate>
                                         <div style="display: flex; padding: 2px 4px; column-gap: 4px; border-top: 1px solid var(--mona-border-color-dark); background: var(--mona-background-dark);">
-                                            <button monaButton (click)="listService.navigateItem('up')">Up</button>
-                                            <button monaButton (click)="listService.navigateItem('down')">Down</button>
+                                            <button monaButton (click)="listService.navigate('previous')">Up</button>
+                                            <button monaButton (click)="listService.navigate('next')">Down</button>
                                         </div>
                                     </ng-template>
                                 </mona-list>
