@@ -1,7 +1,8 @@
 <div class="mona-list">
-    @if (true) {
+    @if (listService.filterableOptions().enabled) {
         <mona-filter-input [filter]="listService.filterText()"
-                           (filterChange)="listService.filterText.set($event.filter)"
+                           [placeholder]="listService.filterPlaceholder()"
+                           (filterChange)="onFilterChange($event)"
                            class="mona-list-filter-input"></mona-filter-input>
     }
     <ul>

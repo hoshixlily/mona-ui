@@ -2,6 +2,7 @@ import { NgTemplateOutlet } from "@angular/common";
 import { ChangeDetectionStrategy, Component, ContentChild, Input, TemplateRef } from "@angular/core";
 import { Selector } from "@mirei/ts-collections";
 import { FilterInputComponent } from "../../../filter-input/components/filter-input/filter-input.component";
+import { FilterChangeEvent } from "../../../filter-input/models/FilterChangeEvent";
 import { ListGroupHeaderTemplateDirective } from "../../directives/list-group-header-template.directive";
 import { ListItemTemplateDirective } from "../../directives/list-item-template.directive";
 import { ListItemDirective } from "../../directives/list-item.directive";
@@ -35,4 +36,11 @@ export class ListComponent<TData> {
     }
 
     public constructor(protected readonly listService: ListService<TData>) {}
+
+    public onFilterChange(event: FilterChangeEvent): void {
+        this.listService.filterChange.emit(event);
+        if (!event.isDefaultPrevented()) {
+            this.listService.setFilter(event.filter);
+        }
+    }
 }

@@ -4,6 +4,7 @@ import {
     ChangeDetectorRef,
     Component,
     ElementRef,
+    EventEmitter,
     OnInit,
     signal,
     TemplateRef,
@@ -147,6 +148,7 @@ import {
     ListGroupableDirective
 } from "mona-ui";
 import { v4 } from "uuid";
+import { ListFilterableDirective } from "../../../mona-ui/src/lib/common/list/directives/list-filterable.directive";
 import { TestComponentComponent } from "./test-component/test-component.component";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import {
@@ -278,6 +280,7 @@ import { GridOrderData } from "./GridOrderData";
         DropDownTreeFilterableDirective,
 
         ListComponent,
+        ListFilterableDirective,
         ListGroupHeaderTemplateDirective,
         ListGroupableDirective,
         ListItemTemplateDirective,
@@ -752,17 +755,28 @@ export class AppComponent implements OnInit {
     public ngAfterViewInit(): void {
         this.listService.setData(this.dropdownListDataItems);
         this.listService.setTextField(i => i.text);
-        this.listService.setGroupBy(i => `${i.text.charAt(0).toUpperCase()}`);
         this.listService.setDisabledBy(this.dropdownItemDisabler);
+
         this.listService.setSelectableOptions({ enabled: true, mode: "multiple" });
+        this.listService.setValueField(i => i.value);
+        this.listService.setSelectedKeys([this.dropdownListDataItems.get(2).value]);
+
+        this.listService.setGroupBy(i => `${i.text.charAt(0).toUpperCase()}`);
         this.listService.setGroupableOptions({
             enabled: true,
             headerOrder: "asc",
             orderBy: i => i.text.charAt(i.text.length - 1),
             orderByDirection: "desc"
         });
-        this.listService.setValueField(i => i.value);
-        this.listService.setSelectedKeys([this.dropdownListDataItems.get(2).value]);
+
+        this.listService.setFilterableOptions({ enabled: true, caseSensitive: true });
+        this.listService.setFilterPlaceholder("Search items...");
+        this.listService.setFilter("n");
+        this.listService.filterChange = new EventEmitter<FilterChangeEvent>();
+        this.listService.filterChange.subscribe((e: FilterChangeEvent) => {
+            // e.preventDefault();
+            console.log(e);
+        });
     }
 
     public filterData(): void {
@@ -990,6 +1004,10 @@ export class AppComponent implements OnInit {
     public onGridSortChange(sort: SortDescriptor[]): void {
         this.gridSort = sort;
         console.log(sort);
+    }
+
+    public onListFilterChange(event: FilterChangeEvent): void {
+        console.log(event);
     }
 
     public onListBoxActionClick(event: ListBoxActionClickEvent): void {

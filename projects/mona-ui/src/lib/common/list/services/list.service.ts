@@ -1,5 +1,9 @@
-import { computed, Injectable, Signal, signal, WritableSignal } from "@angular/core";
+import { computed, EventEmitter, Injectable, Signal, signal, WritableSignal } from "@angular/core";
+import { toSignal } from "@angular/core/rxjs-interop";
 import { from, IEnumerable, IGroup, ImmutableSet, Predicate, Selector } from "@mirei/ts-collections";
+import { debounce, debounceTime, distinctUntilChanged, ReplaySubject } from "rxjs";
+import { FilterChangeEvent } from "../../filter-input/models/FilterChangeEvent";
+import { FilterableOptions, FilterOperator } from "../models/FilterableOptions";
 import { GroupableOptions } from "../models/GroupableOptions";
 import { ListItem } from "../models/ListItem";
 import { SelectableOptions } from "../models/SelectableOptions";
@@ -14,10 +18,19 @@ export class ListService<TData> {
             .toImmutableSet();
     });
     public readonly disabledBy: WritableSignal<string | Predicate<TData>> = signal("");
-    public readonly filterText: WritableSignal<string> = signal("");
+    public readonly filter$: ReplaySubject<string> = new ReplaySubject<string>(1);
+    public readonly filterPlaceholder: WritableSignal<string> = signal("");
+    public readonly filterText: Signal<string> = signal("");
+    public readonly filterableOptions: WritableSignal<FilterableOptions> = signal({
+        enabled: false,
+        caseSensitive: false,
+        debounce: 0,
+        operator: "contains"
+    });
     public readonly groupBy: WritableSignal<string | Selector<TData, any> | null> = signal(null);
     public readonly groupableOptions: WritableSignal<GroupableOptions<TData, any>> = signal({
-        enabled: false
+        enabled: false,
+        headerOrder: "asc"
     });
     public readonly selectableOptions: WritableSignal<SelectableOptions> = signal({
         mode: "single",
@@ -30,9 +43,10 @@ export class ListService<TData> {
     public readonly viewItems: Signal<ImmutableSet<ListItem<TData>>> = computed(() => {
         const listItems = this.listItems();
         const filterText = this.filterText();
+        const filterableOptions = this.filterableOptions();
         const groupableOptions = this.groupableOptions();
         let enumerable: IEnumerable<ListItem<TData>> = listItems;
-        if (filterText) {
+        if (filterableOptions.enabled) {
             enumerable = enumerable.where(item => this.filterItem(item, filterText));
         }
         if (groupableOptions.enabled) {
@@ -61,8 +75,14 @@ export class ListService<TData> {
             return enumerable.toImmutableSet();
         }
     });
+    public filterChange: EventEmitter<FilterChangeEvent> = new EventEmitter<FilterChangeEvent>();
 
-    public constructor() {}
+    public constructor() {
+        this.filterText = toSignal(
+            this.filter$.pipe(debounceTime(this.filterableOptions().debounce ?? 0), distinctUntilChanged()),
+            { initialValue: "" }
+        );
+    }
 
     public getGroupField(item: ListItem<TData>): any {
         const groupSelector = this.groupBy();
@@ -136,16 +156,28 @@ export class ListService<TData> {
         this.disabledBy.set(disabledBy);
     }
 
+    public setFilter(filter: string): void {
+        this.filter$.next(filter);
+    }
+
+    public setFilterPlaceholder(placeholder: string): void {
+        this.filterPlaceholder.set(placeholder);
+    }
+
+    public setFilterableOptions(options: FilterableOptions): void {
+        this.filterableOptions.update(o => ({ ...o, ...options }));
+    }
+
     public setGroupBy(groupSelector: string | Selector<TData, any> | null): void {
         this.groupBy.set(groupSelector);
     }
 
     public setGroupableOptions(options: GroupableOptions<TData, any>): void {
-        this.groupableOptions.set(options);
+        this.groupableOptions.update(o => ({ ...o, ...options }));
     }
 
     public setSelectableOptions(options: SelectableOptions): void {
-        this.selectableOptions.set(options);
+        this.selectableOptions.update(o => ({ ...o, ...options }));
     }
 
     public setSelectedKeys(selectedKeys: Iterable<any>): void {
@@ -161,8 +193,29 @@ export class ListService<TData> {
     }
 
     private filterItem(item: ListItem<TData>, filterText: string): boolean {
-        const text = this.getItemText(item);
-        return text.toLowerCase().includes(filterText.toLowerCase());
+        if (filterText === "") {
+            return true;
+        }
+
+        const options = this.filterableOptions();
+        const itemText = this.getItemText(item);
+        const text = options.caseSensitive ? itemText : itemText.toLowerCase();
+        const filter = options.caseSensitive ? filterText : filterText.toLowerCase();
+
+        if (typeof options.operator === "function") {
+            return options.operator(text, filter);
+        }
+
+        switch (options.operator) {
+            case "contains":
+                return text.includes(filter);
+            case "startsWith":
+                return text.startsWith(filter);
+            case "endsWith":
+                return text.endsWith(filter);
+            default:
+                return false;
+        }
     }
 
     private getItemKey(item: ListItem<TData>): any | null {
