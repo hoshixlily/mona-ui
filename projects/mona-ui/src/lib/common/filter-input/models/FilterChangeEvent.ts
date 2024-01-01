@@ -1,4 +1,4 @@
-import { PreventableEvent } from "../../utils/PreventableEvent";
+import { PreventableEvent } from "../../../utils/PreventableEvent";
 
 export class FilterChangeEvent extends PreventableEvent {
     readonly #filter: string;

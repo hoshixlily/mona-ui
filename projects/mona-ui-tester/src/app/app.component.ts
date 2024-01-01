@@ -138,7 +138,9 @@ import {
     DropDownTreeExpandableDirective,
     TreeViewFilterableDirective,
     FilterChangeEvent,
-    DropDownTreeFilterableDirective
+    DropDownTreeFilterableDirective,
+    ListComponent,
+    ListService
 } from "mona-ui";
 import { v4 } from "uuid";
 import { TestComponentComponent } from "./test-component/test-component.component";
@@ -154,7 +156,7 @@ import {
     faSun,
     faTimes
 } from "@fortawesome/free-solid-svg-icons";
-import { Enumerable, IndexableList, List } from "@mirei/ts-collections";
+import { Enumerable, ImmutableList, IndexableList, List } from "@mirei/ts-collections";
 import { map, Observable, take } from "rxjs";
 import { DateTime } from "luxon";
 import { GridProductData } from "./GridProductData";
@@ -269,8 +271,11 @@ import { GridOrderData } from "./GridOrderData";
         DropDownTreeComponent,
         DropDownTreeExpandableDirective,
         TreeViewFilterableDirective,
-        DropDownTreeFilterableDirective
-    ]
+        DropDownTreeFilterableDirective,
+
+        ListComponent
+    ],
+    providers: [ListService]
 })
 export class AppComponent implements OnInit {
     public readonly closeIcon: IconDefinition = faTimes;
@@ -376,7 +381,7 @@ export class AppComponent implements OnInit {
         new Date(2023, 1, 21),
         new Date(2023, 1, 28)
     ];
-    public dropdownListDataItems: IndexableList<any> = new IndexableList([
+    public dropdownListDataItems: ImmutableList<any> = ImmutableList.create([
         { text: "Cherry", value: 1, group: "Fruit", active: true },
         { text: "Cabbage", value: 2, group: "Vegetable", active: true },
         { text: "Grilled Meat", value: 3, group: "Food", active: true },
@@ -596,7 +601,7 @@ export class AppComponent implements OnInit {
     ];
     public selectedComboBoxDataItem: any = null;
     public selectedDropdownListDataItem: any;
-    public selectedMultiSelectDataItems: any[] = [this.dropdownListDataItems[2], this.dropdownListDataItems[4]];
+    public selectedMultiSelectDataItems: any[] = [this.dropdownListDataItems.get(2), this.dropdownListDataItems.get(4)];
     public selectedMultiSelectDataItems2: any[] = [
         { text: "REPLACED WITH PAPRIKA", value: 13, group: "Fruit", active: true },
         { text: "REPLACED WITH Okonomiyaki", value: 29, group: "FOODIE", active: true }
@@ -723,6 +728,7 @@ export class AppComponent implements OnInit {
     public constructor(
         private readonly popupService: PopupService,
         public readonly windowService: WindowService,
+        protected readonly listService: ListService<{ text: string; value: number; group: string; active: boolean }>,
         private readonly cdr: ChangeDetectorRef,
         private readonly notificationService: NotificationService,
         private readonly dialogService: DialogService
@@ -734,6 +740,16 @@ export class AppComponent implements OnInit {
     // public ngAfterContentChecked(): void {
     //     console.log("ngAfterContentChecked :: AppComponent");
     // }
+
+    public ngAfterViewInit(): void {
+        this.listService.setData(this.dropdownListDataItems);
+        this.listService.setTextField(i => i.text);
+        this.listService.setGroupSelector(i => `<${i.text.charAt(0).toUpperCase()}>`);
+        this.listService.setDisabledBy(this.dropdownItemDisabler);
+        this.listService.setValueField(i => i.value);
+        // console.log(this.listService.viewItems().toArray());
+        this.listService.setSelectedKeys([this.dropdownListDataItems.get(2)]);
+    }
 
     public filterData(): void {
         // const data = Enumerable.range(1, 100)
@@ -758,11 +774,16 @@ export class AppComponent implements OnInit {
     public ngOnInit(): void {
         this.selectedDropdownListDataItem = { text: "REPLACED WITH PAPRIKA", value: 13, group: "Fruit", active: true };
         this.selectedComboBoxDataItem = { text: "REPLACED WITH PAPRIKA", value: 13, group: "Fruit", active: true };
-        // window.setInterval(() => {
-        //     // this.contextMenuItemVisible = !this.contextMenuItemVisible;
-        //     // this.dropdownItemDisabler = (item: any): boolean => item.value % 3 === 0;
-        // }, 3000);
-        this.selectedDropdownListDataItem = { ...this.dropdownListDataItems[4] };
+        let turn: number = 0;
+        window.setInterval(() => {
+            // this.contextMenuItemVisible = !this.contextMenuItemVisible;
+            // this.dropdownItemDisabler = (item: any): boolean => turn % item.value === 0;
+            // this.listService.setDisabledBy(this.dropdownItemDisabler);
+            // this.listService.setGroupSelector(i => i.text.charAt(turn % 3).toUpperCase());
+            // this.listService.setValueField(i => (turn % 2 === 0 ? i.value : i));
+            turn++;
+        }, 3000);
+        this.selectedDropdownListDataItem = { ...this.dropdownListDataItems.get(4) };
         this.selectedPrimitiveComboBoxDataItem = this.dropdownPrimitiveDataItems[7];
 
         this.dropdownPartialPrimitiveDataItems = this.dropdownPrimitiveDataItems.slice();

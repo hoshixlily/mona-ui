@@ -24,7 +24,7 @@ import { FormsModule } from "@angular/forms";
 
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { debounceTime, fromEvent, Subject } from "rxjs";
-import { FilterInputComponent } from "../../../../common/components/filter-input/filter-input.component";
+import { FilterInputComponent } from "../../../../common/filter-input/components/filter-input/filter-input.component";
 import { TextBoxComponent } from "../../../../inputs/text-box/components/text-box/text-box.component";
 import { TextBoxPrefixTemplateDirective } from "../../../../inputs/text-box/directives/text-box-prefix-template.directive";
 import { SelectionMode } from "../../../../models/SelectionMode";

@@ -101,7 +101,7 @@
                         </div>
                     </ng-template>
                 </mona-tab>
-                <mona-tab [title]="'TAB I'" [closable]="false" [selected]="true">
+                <mona-tab [title]="'TAB I'" [closable]="false" [selected]="false">
                     <ng-template monaTabTitleTemplate>
                         <span style="color: deeppink; font-weight: bold;">Components</span>
                     </ng-template>
@@ -603,7 +603,7 @@
                         </div>
                     </ng-template>
                 </mona-tab>
-                <mona-tab title="Expansion Panel" [disabled]="false">
+                <mona-tab title="Expansion Panel" [disabled]="false" [selected]="true">
                     <ng-template monaTabContentTemplate>
                         <div style="width: 100%; height: 100%; padding: 20px;">
                             <mona-expansion-panel title="Panel {{x}}" *ngFor="let x of [1,2,3]">
@@ -648,7 +648,12 @@
                                 <input type="radio" monaRadioButton id="radioButton3" name="A" [disabled]="true"/>
                                 <label for="radioButton3">Radio Button Label 3</label>
                             </div>
+
+                            <div style="width: 250px;background: var(--mona-background);">
+                                <mona-list></mona-list>
+                            </div>
                         </div>
+
                     </ng-template>
                 </mona-tab>
                 <!--                <mona-tab [title]="item"  *ngFor="let item of dropdownPrimitiveDataItems |slice:0:5; let ix=index;">-->

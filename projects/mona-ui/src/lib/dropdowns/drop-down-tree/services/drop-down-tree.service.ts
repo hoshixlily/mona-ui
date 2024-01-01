@@ -2,7 +2,7 @@ import { EventEmitter, Injectable, Signal, signal, WritableSignal } from "@angul
 import { toSignal } from "@angular/core/rxjs-interop";
 import { ImmutableSet } from "@mirei/ts-collections";
 import { debounceTime, distinctUntilChanged, ReplaySubject } from "rxjs";
-import { FilterChangeEvent } from "../../../common/models/FilterChangeEvent";
+import { FilterChangeEvent } from "../../../common/filter-input/models/FilterChangeEvent";
 import { ExpandableOptions } from "../../../tree-view/models/ExpandableOptions";
 import { FilterableOptions } from "../../../tree-view/models/FilterableOptions";
 

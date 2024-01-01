@@ -2,8 +2,8 @@ import { Component, EventEmitter, Input, Output, signal, WritableSignal } from "
 import { FormsModule } from "@angular/forms";
 import { FaIconComponent } from "@fortawesome/angular-fontawesome";
 import { faSearch } from "@fortawesome/free-solid-svg-icons";
-import { TextBoxComponent } from "../../../inputs/text-box/components/text-box/text-box.component";
-import { TextBoxPrefixTemplateDirective } from "../../../inputs/text-box/directives/text-box-prefix-template.directive";
+import { TextBoxComponent } from "../../../../inputs/text-box/components/text-box/text-box.component";
+import { TextBoxPrefixTemplateDirective } from "../../../../inputs/text-box/directives/text-box-prefix-template.directive";
 import { FilterChangeEvent } from "../../models/FilterChangeEvent";
 
 @Component({

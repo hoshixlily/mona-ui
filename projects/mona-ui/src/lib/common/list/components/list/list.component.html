@@ -1,0 +1,27 @@
+<div class="mona-list">
+    @if (true) {
+        <mona-filter-input [filter]="listService.filterText()"
+                           (filterChange)="listService.filterText.set($event.filter)"
+                           class="mona-list-filter-input"></mona-filter-input>
+    }
+    <ul>
+        @for (item of listService.viewItems(); track item.uid) {
+            <ng-container [ngTemplateOutlet]="listItemTemplate"
+                          [ngTemplateOutletContext]="{$implicit: item}"></ng-container>
+        }
+    </ul>
+</div>
+
+<ng-template #listItemTemplate let-item>
+    @if (item.header) {
+        <li class="mona-list-group-header">
+            <mona-list-item [item]="item"></mona-list-item>
+        </li>
+    } @else {
+        <li class="mona-list-item" [attr.data-uid]="item.uid"
+            (click)="listService.selectItem(item)"
+            monaListItem [item]="item">
+            <mona-list-item [item]="item"></mona-list-item>
+        </li>
+    }
+</ng-template>

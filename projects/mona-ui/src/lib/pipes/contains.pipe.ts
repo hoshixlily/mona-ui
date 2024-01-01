@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from "@angular/core";
-import { Enumerable } from "@mirei/ts-collections";
+import { Enumerable, EnumerableSet, ImmutableSet, ImmutableSortedSet, SortedSet } from "@mirei/ts-collections";
 
 @Pipe({
     name: "monaContains",
@@ -11,7 +11,14 @@ export class ContainsPipe implements PipeTransform {
             return false;
         }
         if (typeof value === "string") {
-            return Enumerable.from(sequence).contains(value as any);
+            if (
+                sequence instanceof EnumerableSet ||
+                sequence instanceof ImmutableSet ||
+                sequence instanceof SortedSet ||
+                sequence instanceof ImmutableSortedSet
+            ) {
+                return sequence.contains(value);
+            }
         }
         if (Symbol.iterator in Object(value)) {
             const enumerableSequence = Enumerable.from(sequence);

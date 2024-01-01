@@ -11,7 +11,9 @@ export * from "./buttons/split-button/directives/split-button-text-template.dire
 export * from "./buttons/split-button/components/split-button/split-button.component";
 
 /** Common */
-export * from "./common/models/FilterChangeEvent";
+export * from "./common/filter-input/models/FilterChangeEvent";
+export * from "./common/list/services/list.service";
+export * from "./common/list/components/list/list.component";
 
 /** Date Inputs */
 export * from "./date-inputs/calendar/calendar.component";

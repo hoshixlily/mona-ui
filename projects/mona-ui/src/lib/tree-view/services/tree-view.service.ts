@@ -2,7 +2,7 @@ import { computed, EventEmitter, Injectable, Signal, signal, WritableSignal } fr
 import { toSignal } from "@angular/core/rxjs-interop";
 import { aggregate, Dictionary, EnumerableSet, sequenceEqual, SortedSet } from "@mirei/ts-collections";
 import { debounceTime, distinctUntilChanged, ReplaySubject } from "rxjs";
-import { FilterChangeEvent } from "../../common/models/FilterChangeEvent";
+import { FilterChangeEvent } from "../../common/filter-input/models/FilterChangeEvent";
 import { CheckableOptions } from "../models/CheckableOptions";
 import { ExpandableOptions } from "../models/ExpandableOptions";
 import { FilterableOptions } from "../models/FilterableOptions";

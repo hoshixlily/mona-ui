@@ -19,7 +19,7 @@
         "test:lib:watch": "ng test mona-ui --code-coverage --watch",
         "test:app": "ng test mona-ui-tester"
     },
-    "author": "Lumine",
+    "author": "Nanahoshi",
     "files": [
         "dist",
         "README.md"
@@ -56,7 +56,7 @@
         "@fortawesome/angular-fontawesome": "^0.14.0",
         "@fortawesome/fontawesome-svg-core": "^6.4.2",
         "@fortawesome/free-solid-svg-icons": "^6.4.2",
-        "@mirei/ts-collections": "^13.0.0",
+        "@mirei/ts-collections": "^13.0.2",
         "luxon": "^3.4.3",
         "rxjs": "~7.8.1",
         "tslib": "^2.6.2",

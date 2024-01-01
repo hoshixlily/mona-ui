@@ -1,5 +1,5 @@
 import { TestBed } from "@angular/core/testing";
-import { FilterChangeEvent } from "../../common/models/FilterChangeEvent";
+import { FilterChangeEvent } from "../../common/filter-input/models/FilterChangeEvent";
 import { TreeViewService } from "../services/tree-view.service";
 import { TreeViewFilterableDirective } from "./tree-view-filterable.directive";
 
