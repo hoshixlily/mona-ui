@@ -18,6 +18,7 @@ export * from "./common/list/directives/list-group-header-template.directive";
 export * from "./common/list/directives/list-groupable.directive";
 export * from "./common/list/directives/list-header-template.directive";
 export * from "./common/list/directives/list-item-template.directive";
+export * from "./common/list/directives/list-navigable.directive";
 export * from "./common/list/directives/list-selectable.directive";
 export * from "./common/list/directives/list-virtual-scroll.directive";
 export * from "./common/list/components/list/list.component";

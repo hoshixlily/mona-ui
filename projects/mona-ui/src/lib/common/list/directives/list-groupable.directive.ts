@@ -8,6 +8,10 @@ import { ListService } from "../services/list.service";
     standalone: true
 })
 export class ListGroupableDirective<TData> {
+    readonly #defaultOptions: GroupableOptions<TData, any> = {
+        enabled: true,
+        headerOrder: "asc"
+    };
     @Input()
     public set groupBy(value: string | Selector<TData, any> | null | undefined) {
         this.listService.setGroupBy(value ?? "");
@@ -16,12 +20,12 @@ export class ListGroupableDirective<TData> {
     @Input("monaListGroupable")
     public set options(value: GroupableOptions<TData, any> | "") {
         if (value === "") {
-            this.listService.setGroupableOptions({
-                enabled: true,
-                headerOrder: "asc"
-            });
+            this.listService.setGroupableOptions(this.#defaultOptions);
         } else {
-            this.listService.setGroupableOptions(value);
+            this.listService.setGroupableOptions({
+                ...this.#defaultOptions,
+                ...value
+            });
         }
     }
 

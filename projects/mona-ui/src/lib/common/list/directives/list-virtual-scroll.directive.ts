@@ -7,15 +7,19 @@ import { ListService } from "../services/list.service";
     standalone: true
 })
 export class ListVirtualScrollDirective<T> {
+    readonly #defaultOptions: VirtualScrollOptions = {
+        enabled: true,
+        height: 28
+    };
     @Input("monaListVirtualScroll")
-    public set options(value: VirtualScrollOptions | "") {
+    public set options(value: Partial<VirtualScrollOptions> | "") {
         if (value === "") {
-            this.listService.setVirtualScrollOptions({
-                enabled: true,
-                height: 28
-            });
+            this.listService.setVirtualScrollOptions(this.#defaultOptions);
         } else {
-            this.listService.setVirtualScrollOptions(value);
+            this.listService.setVirtualScrollOptions({
+                ...this.#defaultOptions,
+                ...value
+            });
         }
     }
 

@@ -8,6 +8,12 @@ import { ListService } from "../services/list.service";
     standalone: true
 })
 export class ListFilterableDirective<TData> implements OnInit {
+    readonly #defaultOptions: FilterableOptions = {
+        enabled: true,
+        operator: "contains",
+        debounce: 0,
+        caseSensitive: false
+    };
     @Input()
     public set filter(value: string) {
         this.listService.setFilter(value);
@@ -22,16 +28,14 @@ export class ListFilterableDirective<TData> implements OnInit {
     }
 
     @Input("monaListFilterable")
-    public set options(value: FilterableOptions | "") {
+    public set options(value: Partial<FilterableOptions> | "") {
         if (value === "") {
-            this.listService.setFilterableOptions({
-                enabled: true,
-                operator: "contains",
-                debounce: 0,
-                caseSensitive: false
-            });
+            this.listService.setFilterableOptions(this.#defaultOptions);
         } else {
-            this.listService.setFilterableOptions(value);
+            this.listService.setFilterableOptions({
+                ...this.#defaultOptions,
+                ...value
+            });
         }
     }
 

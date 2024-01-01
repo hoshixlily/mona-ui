@@ -1,4 +1,4 @@
 export interface VirtualScrollOptions {
-    enabled?: boolean;
+    enabled: boolean;
     height: number;
 }

@@ -148,7 +148,8 @@ import {
     ListGroupableDirective,
     ListVirtualScrollDirective,
     ListFooterTemplateDirective,
-    ListHeaderTemplateDirective
+    ListHeaderTemplateDirective,
+    ListNavigableDirective
 } from "mona-ui";
 import { v4 } from "uuid";
 import { ListFilterableDirective } from "../../../mona-ui/src/lib/common/list/directives/list-filterable.directive";
@@ -165,7 +166,7 @@ import {
     faSun,
     faTimes
 } from "@fortawesome/free-solid-svg-icons";
-import { Enumerable, ImmutableList, IndexableList, List } from "@mirei/ts-collections";
+import { Enumerable, ImmutableList, ImmutableSet, IndexableList, List } from "@mirei/ts-collections";
 import { map, Observable, take } from "rxjs";
 import { DateTime } from "luxon";
 import { GridProductData } from "./GridProductData";
@@ -289,6 +290,7 @@ import { GridOrderData } from "./GridOrderData";
         ListGroupableDirective,
         ListHeaderTemplateDirective,
         ListItemTemplateDirective,
+        ListNavigableDirective,
         ListSelectableDirective,
         ListVirtualScrollDirective
     ],
@@ -763,10 +765,10 @@ export class AppComponent implements OnInit {
         this.listService.setTextField(i => i.text);
         // this.listService.setDisabledBy(this.dropdownItemDisabler);
 
-        this.listService.setSelectableOptions({ enabled: true, mode: "single" });
+        this.listService.setSelectableOptions({ enabled: true, mode: "multiple" });
         this.listService.setValueField(i => i.value);
         this.listService.setSelectedKeys([
-            this.dropdownListDataItems.get(0).value
+            this.dropdownListDataItems.get(17).value
             // this.dropdownListDataItems.get(14).value
         ]);
 
@@ -777,6 +779,7 @@ export class AppComponent implements OnInit {
             // orderBy: i => i.text.charAt(i.text.length - 1),
             // orderByDirection: "desc"
         });
+        this.listService.setNavigableOptions({ enabled: true, mode: "select", wrap: true });
 
         this.listService.setFilterableOptions({ enabled: true, caseSensitive: true, debounce: 0 });
         this.listService.setFilterPlaceholder("Search items...");
@@ -786,8 +789,21 @@ export class AppComponent implements OnInit {
             // e.preventDefault();
             console.log(e);
         });
+        this.listService.selectedKeysChange = new EventEmitter<ImmutableSet<any>>();
+        this.listService.selectedKeysChange.subscribe((e: ImmutableSet<any>) => {
+            // console.log("Selected Keys: ", e.toArray());
+            console.log(
+                "Selected Items: ",
+                this.listService
+                    .selectedListItems()
+                    .select(i => i.data)
+                    .toArray()
+            );
+        });
 
-        // this.listService.setVirtualScrollOptions({ enabled: true, height: 28 });
+        // window.setTimeout(() => {
+        //     this.listService.setVirtualScrollOptions({ enabled: true, height: 28 });
+        // }, 6000);
 
         this.listService.setData(this.dropdownListDataItems);
     }

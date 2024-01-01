@@ -1,7 +1,7 @@
 <div class="mona-list">
     @if (listService.filterableOptions().enabled) {
         <mona-filter-input [filter]="listService.filterText()"
-                           [debounce]="listService.filterableOptions().debounce ?? 0"
+                           [debounce]="listService.filterableOptions().debounce"
                            [placeholder]="listService.filterPlaceholder()"
                            (filterChange)="onFilterChange($event)"
                            class="mona-list-filter-input"></mona-filter-input>
@@ -50,7 +50,7 @@
         </li>
     } @else {
         <li class="mona-list-item" [attr.data-uid]="item.uid"
-            (click)="listService.selectItem(item)"
+            (click)="onListItemClick(item)"
             monaListItem [item]="item">
             <mona-list-item [item]="item" [template]="itemTemplate"></mona-list-item>
         </li>

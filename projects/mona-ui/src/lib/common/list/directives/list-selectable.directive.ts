@@ -1,5 +1,5 @@
-import { Directive, Input } from "@angular/core";
-import { Selector } from "@mirei/ts-collections";
+import { Directive, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { ImmutableSet, Selector } from "@mirei/ts-collections";
 import { SelectableOptions } from "../models/SelectableOptions";
 import { ListService } from "../services/list.service";
 
@@ -7,17 +7,21 @@ import { ListService } from "../services/list.service";
     selector: "mona-list[monaListSelectable]",
     standalone: true
 })
-export class ListSelectableDirective<T> {
+export class ListSelectableDirective<T> implements OnInit {
+    readonly #defaultOptions: SelectableOptions = {
+        mode: "single",
+        enabled: true,
+        toggleable: false
+    };
     @Input("monaListSelectable")
-    public set options(value: SelectableOptions | "") {
+    public set options(value: Partial<SelectableOptions> | "") {
         if (value === "") {
-            this.listService.setSelectableOptions({
-                mode: "single",
-                enabled: true,
-                toggleable: false
-            });
+            this.listService.setSelectableOptions(this.#defaultOptions);
         } else {
-            this.listService.setSelectableOptions(value);
+            this.listService.setSelectableOptions({
+                ...this.#defaultOptions,
+                ...value
+            });
         }
     }
 
@@ -31,5 +35,12 @@ export class ListSelectableDirective<T> {
         this.listService.setSelectedKeys(value ?? []);
     }
 
+    @Output()
+    public selectedKeysChange: EventEmitter<ImmutableSet<any>> = new EventEmitter<ImmutableSet<any>>();
+
     public constructor(private readonly listService: ListService<T>) {}
+
+    public ngOnInit(): void {
+        this.listService.selectedKeysChange = this.selectedKeysChange;
+    }
 }
