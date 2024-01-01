@@ -6,11 +6,11 @@ import { ListService } from "../services/list.service";
     selector: "li[monaListItem]",
     standalone: true
 })
-export class ListItemDirective {
-    readonly #item: WritableSignal<ListItem | null> = signal(null);
+export class ListItemDirective<TData> {
+    readonly #item: WritableSignal<ListItem<TData> | null> = signal(null);
 
     @Input({ required: true })
-    public set item(value: ListItem) {
+    public set item(value: ListItem<TData>) {
         this.#item.set(value);
     }
 
@@ -26,7 +26,7 @@ export class ListItemDirective {
         });
     }
 
-    private updateDisabled(item: ListItem | null): void {
+    private updateDisabled(item: ListItem<TData> | null): void {
         const disabled = item ? this.listService.isDisabled(item) : false;
         if (disabled) {
             this.renderer.addClass(this.host.nativeElement, "mona-disabled");
@@ -35,7 +35,7 @@ export class ListItemDirective {
         }
     }
 
-    private updateSelected(item: ListItem | null): void {
+    private updateSelected(item: ListItem<TData> | null): void {
         const selected = item ? this.listService.isSelected(item) : false;
         if (selected) {
             this.renderer.addClass(this.host.nativeElement, "mona-selected");

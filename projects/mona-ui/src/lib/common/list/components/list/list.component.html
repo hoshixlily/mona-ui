@@ -15,13 +15,13 @@
 <ng-template #listItemTemplate let-item>
     @if (item.header) {
         <li class="mona-list-group-header">
-            <mona-list-item [item]="item"></mona-list-item>
+            <mona-list-item [item]="item" [template]="groupHeaderTemplate"></mona-list-item>
         </li>
     } @else {
         <li class="mona-list-item" [attr.data-uid]="item.uid"
             (click)="listService.selectItem(item)"
             monaListItem [item]="item">
-            <mona-list-item [item]="item"></mona-list-item>
+            <mona-list-item [item]="item" [template]="itemTemplate"></mona-list-item>
         </li>
     }
 </ng-template>

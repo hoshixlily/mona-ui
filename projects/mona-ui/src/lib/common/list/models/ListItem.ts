@@ -1,19 +1,17 @@
 import { v4 } from "uuid";
 
-export interface ListItemOptions {
-    data?: any | null;
+export interface ListItemOptions<T> {
+    data: T;
     header?: string;
 }
 
-export class ListItem {
-    public readonly data: any | null = null;
+export class ListItem<TData> {
+    public readonly data: TData;
     public readonly header: string = "";
     public readonly uid: string = v4();
 
-    public constructor(options?: ListItemOptions) {
-        if (options) {
-            this.data = options.data ?? this.data;
-            this.header = options.header ?? this.header;
-        }
+    public constructor(options: ListItemOptions<TData>) {
+        this.data = options.data;
+        this.header = options.header ?? this.header;
     }
 }

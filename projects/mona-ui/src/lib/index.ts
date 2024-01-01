@@ -13,6 +13,8 @@ export * from "./buttons/split-button/components/split-button/split-button.compo
 /** Common */
 export * from "./common/filter-input/models/FilterChangeEvent";
 export * from "./common/list/services/list.service";
+export * from "./common/list/directives/list-group-header-template.directive";
+export * from "./common/list/directives/list-item-template.directive";
 export * from "./common/list/components/list/list.component";
 
 /** Date Inputs */
@@ -25,7 +27,7 @@ export * from "./date-inputs/time-picker/time-picker.component";
 
 export * from "./dropdowns/popup-list/components/popup-list/popup-list.component";
 export * from "./dropdowns/popup-list/directives/list-group-template.directive";
-export * from "./dropdowns/popup-list/directives/list-item-template.directive";
+// export * from "./dropdowns/popup-list/directives/list-item-template.directive";
 export * from "./dropdowns/auto-complete/auto-complete.component";
 export * from "./dropdowns/combo-box/directives/combo-box-group-template.directive";
 export * from "./dropdowns/combo-box/directives/combo-box-item-template.directive";

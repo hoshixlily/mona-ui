@@ -650,7 +650,18 @@
                             </div>
 
                             <div style="width: 250px;background: var(--mona-background);">
-                                <mona-list></mona-list>
+                                <mona-list>
+                                    <ng-template monaListItemTemplate let-item>
+                                        @if (item.value % 2 === 0) {
+                                            <span style="color: #ffcc75;">{{item.text}}</span>
+                                        } @else {
+                                            <span style="color: #ff3055;">{{item.text}}</span>
+                                        }
+                                    </ng-template>
+                                    <ng-template monaListGroupHeaderTemplate let-group>
+                                        <span style="color: #F0A970; font-weight: bold;">{{group}}</span>
+                                    </ng-template>
+                                </mona-list>
                             </div>
                         </div>
 

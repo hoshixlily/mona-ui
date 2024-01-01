@@ -140,7 +140,9 @@ import {
     FilterChangeEvent,
     DropDownTreeFilterableDirective,
     ListComponent,
-    ListService
+    ListService,
+    ListItemTemplateDirective,
+    ListGroupHeaderTemplateDirective
 } from "mona-ui";
 import { v4 } from "uuid";
 import { TestComponentComponent } from "./test-component/test-component.component";
@@ -273,7 +275,9 @@ import { GridOrderData } from "./GridOrderData";
         TreeViewFilterableDirective,
         DropDownTreeFilterableDirective,
 
-        ListComponent
+        ListComponent,
+        ListGroupHeaderTemplateDirective,
+        ListItemTemplateDirective
     ],
     providers: [ListService]
 })
@@ -744,7 +748,7 @@ export class AppComponent implements OnInit {
     public ngAfterViewInit(): void {
         this.listService.setData(this.dropdownListDataItems);
         this.listService.setTextField(i => i.text);
-        this.listService.setGroupSelector(i => `<${i.text.charAt(0).toUpperCase()}>`);
+        this.listService.setGroupSelector(i => `${i.text.charAt(0).toUpperCase()}`);
         this.listService.setDisabledBy(this.dropdownItemDisabler);
         this.listService.setValueField(i => i.value);
         // console.log(this.listService.viewItems().toArray());
