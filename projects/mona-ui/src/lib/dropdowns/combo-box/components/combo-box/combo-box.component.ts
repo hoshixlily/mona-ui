@@ -191,26 +191,35 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
 
     public onKeydown(event: KeyboardEvent): void {
         if (event.key === "Enter") {
-            // const item = this.popupListService.viewListData
-            //     .selectMany(g => g.source)
-            //     .firstOrDefault(i => i.text.toLowerCase() === this.comboBoxValue().toLowerCase());
-            // if (item) {
-            //     if (item.dataEquals(this.value)) {
-            //         this.close();
-            //         return;
-            //     }
-            //     this.popupListService.selectItem(item, "single");
-            //     this.updateValue(item.data);
-            //     this.#propagateChange?.(item.data);
-            // } else {
-            //     if (this.allowCustomValue) {
-            //         this.handleCustomValue();
-            //     } else {
-            //         this.comboBoxValue.set("");
-            //     }
-            // }
+            const item = this.selectedDataItem();
+            if (item && this.comboBoxValue() === this.dropdownText()) {
+                this.updateValue(item);
+            } else if (item && this.comboBoxValue() !== this.dropdownText()) {
+                const targetItem = this.listService
+                    .viewItems()
+                    .firstOrDefault(i =>
+                        this.listService.getItemText(i).toLowerCase().startsWith(this.comboBoxValue().toLowerCase())
+                    );
+                if (targetItem) {
+                    this.listService.selectItem(targetItem);
+                    this.updateValue(targetItem.data);
+                } else {
+                    if (this.allowCustomValue) {
+                        this.handleCustomValue();
+                    } else {
+                        this.comboBoxValue.set("");
+                    }
+                }
+            } else {
+                if (this.allowCustomValue) {
+                    this.handleCustomValue();
+                } else {
+                    this.comboBoxValue.set("");
+                }
+            }
             this.close();
         } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+            event.preventDefault();
             this.handleArrowKeys(event);
         } else if (event.key === "Escape") {
             this.close();
@@ -239,7 +248,6 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
         });
         this.popupAnimationService.setupDropdownOutsideClickCloseAnimation(this.#popupRef);
         this.popupAnimationService.animateDropdown(this.#popupRef, AnimationState.Show);
-        // this.dropDownService.focusPopup(this.#popupUidClass);
         window.setTimeout(() => {
             const input = this.elementRef.nativeElement.querySelector("input");
             if (input) {
@@ -289,9 +297,6 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
     }
 
     private handleArrowKeys(event: KeyboardEvent): void {
-        // if (this.#popupRef) {
-        //     return;
-        // }
         const previousItem = this.selectedListItem();
         const direction = event.key === "ArrowDown" ? "next" : "previous";
         const listItem = this.listService.navigate(direction, "select");
@@ -308,35 +313,21 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
         this.valueNormalizer(of(this.comboBoxValue()))
             .pipe(take(1))
             .subscribe(normalizedValue => {
-                const updatedData = [...this.data, normalizedValue];
-                this.listService.setData(updatedData);
+                this.listService.addNewDataItems([normalizedValue]);
                 const item = this.listService
                     .viewItems()
+                    .where(i => !i.header && !this.listService.isDisabled(i))
                     .firstOrDefault(
                         i => this.listService.getItemText(i).toLowerCase() === this.comboBoxValue().toLowerCase()
                     );
                 if (item) {
                     this.listService.selectItem(item);
                     this.updateValue(item.data);
-                    this.notifyValueChange();
                 }
             });
     }
 
     private initialize(): void {
-        // this.popupListService.initializeListData({
-        //     data: this.data,
-        //     disabler: this.itemDisabler,
-        //     textField: this.textField,
-        //     valueField: this.valueField,
-        //     groupField: this.groupField
-        // });
-        // this.valuePopupListItem = this.popupListService.viewListData
-        //     .selectMany(g => g.source)
-        //     .singleOrDefault(d => d.dataEquals(this.value));
-        // if (this.valuePopupListItem) {
-        //     this.valuePopupListItem.selected.set(true);
-        // }
         this.listService.setNavigableOptions({ enabled: true, mode: "select" });
         this.listService.setSelectableOptions(this.selectableOptions);
         this.comboBoxValue.set(this.dropdownText());
@@ -358,7 +349,6 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
                 ) {
                     return;
                 }
-                // this.close();
             });
         fromEvent<FocusEvent>(this.elementRef.nativeElement, "focusin")
             .pipe(takeUntilDestroyed(this.#destroyRef))
@@ -389,31 +379,26 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
                 //     this.popupListService.filterModeActive = true;
                 // }
             }
-            // this.popupListService.viewListData
-            //     .selectMany(g => g.source)
-            //     .forEach(i => {
-            //         i.highlighted.set(false);
-            //         i.selected.set(false);
-            //     });
-            // const popupListItem = this.popupListService.viewListData
-            //     .selectMany(g => g.source)
-            //     .firstOrDefault(item => !item.disabled && item.text.toLowerCase().includes(value.toLowerCase()));
-            // if (!this.popupRef) {
-            //     this.open();
-            // }
-            // if (popupListItem) {
-            //     popupListItem.highlighted.set(true);
-            //     this.popupListService.scrollToListItem$.next(popupListItem);
-            // }
+            const item = this.listService
+                .viewItems()
+                .where(i => !i.header && !this.listService.isDisabled(i))
+                .firstOrDefault(i => {
+                    return this.listService.getItemText(i).toLowerCase().includes(value.toLowerCase());
+                });
+            if (!this.#popupRef) {
+                this.open();
+            }
+            if (item) {
+                this.listService.clearSelections();
+                this.listService.highlightedItem.set(item);
+                this.listService.scrollToItem$.next(item);
+            }
             this.comboBoxValue.set(value);
         });
     }
 
     private updateValue(value: TData | null) {
         this.#value = value;
-        // this.valuePopupListItem = this.popupListService.viewListData
-        //     .selectMany(g => g.source)
-        //     .singleOrDefault(d => d.dataEquals(this.value));
         this.comboBoxValue.set(this.dropdownText());
     }
 }

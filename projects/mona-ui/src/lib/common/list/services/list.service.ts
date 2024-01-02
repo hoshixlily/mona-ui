@@ -1,5 +1,5 @@
 import { computed, EventEmitter, Injectable, Signal, signal, WritableSignal } from "@angular/core";
-import { from, IEnumerable, ImmutableSet, Predicate, Selector } from "@mirei/ts-collections";
+import { from, IEnumerable, ImmutableList, ImmutableSet, Predicate, Selector } from "@mirei/ts-collections";
 import { ReplaySubject } from "rxjs";
 import { FilterChangeEvent } from "../../filter-input/models/FilterChangeEvent";
 import { FilterableOptions } from "../models/FilterableOptions";
@@ -13,7 +13,7 @@ import { VirtualScrollOptions } from "../models/VirtualScrollOptions";
 
 @Injectable()
 export class ListService<TData> {
-    private readonly data: WritableSignal<Iterable<TData>> = signal([]);
+    private readonly data: WritableSignal<ImmutableList<TData>> = signal(ImmutableList.create());
     private readonly listItems: Signal<ImmutableSet<ListItem<TData>>> = computed(() => {
         const data = this.data();
         return from(data)
@@ -98,6 +98,10 @@ export class ListService<TData> {
     public selectedKeysChange: EventEmitter<Array<any>> = new EventEmitter<Array<any>>();
 
     public constructor() {}
+
+    public addNewDataItems(dataItems: Iterable<TData>): void {
+        this.data.update(list => list.addAll(dataItems));
+    }
 
     public clearFilter(): void {
         this.filterText.set("");
@@ -201,7 +205,7 @@ export class ListService<TData> {
     }
 
     public setData(data: Iterable<TData>) {
-        this.data.set(data);
+        this.data.update(list => list.clear().addAll(data));
     }
 
     public setDisabledBy(disabledBy: string | Predicate<TData>): void {
@@ -392,6 +396,12 @@ export class ListService<TData> {
                 this.highlightedItem.set(firstItem);
             }
             return firstItem;
+        } else if (selectedKeys.isEmpty() && this.highlightedItem()) {
+            const highlightedItem = this.highlightedItem() as ListItem<TData>;
+            if (mode === "select") {
+                this.selectItem(highlightedItem);
+            }
+            return highlightedItem;
         }
         const selectedItem = viewItems.lastOrDefault(i => selectedKeys.contains(this.getSelectionKey(i)));
         const lastHighlightedItem = this.highlightedItem();
@@ -411,6 +421,7 @@ export class ListService<TData> {
             if (nextItem) {
                 if (mode === "select") {
                     this.selectItem(nextItem);
+                    this.highlightedItem.set(null);
                 } else {
                     this.highlightedItem.set(nextItem);
                 }
@@ -421,6 +432,7 @@ export class ListService<TData> {
             if (prevItem) {
                 if (mode === "select") {
                     this.selectItem(prevItem);
+                    this.highlightedItem.set(null);
                 } else {
                     this.highlightedItem.set(prevItem);
                 }
