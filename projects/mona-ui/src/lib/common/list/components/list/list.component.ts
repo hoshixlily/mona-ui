@@ -11,6 +11,7 @@ import {
     EventEmitter,
     inject,
     Input,
+    OnDestroy,
     OnInit,
     Output,
     QueryList,
@@ -53,7 +54,7 @@ import { ListItemComponent } from "../list-item/list-item.component";
     styleUrl: "./list.component.scss",
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ListComponent<TData> implements OnInit, AfterViewInit {
+export class ListComponent<TData> implements OnInit, AfterViewInit, OnDestroy {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     #viewport: CdkVirtualScrollViewport | null = null;
 
@@ -134,6 +135,10 @@ export class ListComponent<TData> implements OnInit, AfterViewInit {
         });
     }
 
+    public ngOnDestroy(): void {
+        this.listService.highlightedItem.set(null);
+    }
+
     public ngOnInit(): void {
         this.setSubscriptions();
     }
@@ -172,6 +177,24 @@ export class ListComponent<TData> implements OnInit, AfterViewInit {
         }
     }
 
+    private setKeyboardEvents(): void {
+        fromEvent<KeyboardEvent>(this.elementRef.nativeElement, "keydown")
+            .pipe(
+                takeUntilDestroyed(this.#destroyRef),
+                filter(event => event.key === "Enter" || event.key === "NumPadEnter")
+            )
+            .subscribe(() => {
+                const highlightedItem = this.listService.highlightedItem();
+                const selectedItem = this.listService.selectedListItems().firstOrDefault();
+                if (highlightedItem) {
+                    this.onListItemSelect(highlightedItem);
+                } else if (selectedItem) {
+                    this.listService.selectedKeysChange.emit(this.listService.selectedKeys().toArray());
+                    this.itemSelect.emit(selectedItem);
+                }
+            });
+    }
+
     private setNavigationEvents(): void {
         fromEvent<KeyboardEvent>(this.elementRef.nativeElement, "keydown")
             .pipe(
@@ -200,6 +223,7 @@ export class ListComponent<TData> implements OnInit, AfterViewInit {
 
     private setSubscriptions(): void {
         this.setNavigationEvents();
+        this.setKeyboardEvents();
         this.listService.scrollToItem$
             .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe(item => this.scrollToItem(item));

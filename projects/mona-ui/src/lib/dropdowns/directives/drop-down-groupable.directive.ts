@@ -1,22 +1,27 @@
-import { Directive, Input, SkipSelf } from "@angular/core";
+import { Directive, Input } from "@angular/core";
 import { Selector } from "@mirei/ts-collections";
-import { GroupableOptions } from "../models/GroupableOptions";
-import { ListService } from "../services/list.service";
+import { GroupableOptions } from "../../common/list/models/GroupableOptions";
+import { ListService } from "../../common/list/services/list.service";
 
 @Directive({
-    selector: "mona-list[monaListGroupable]",
+    selector: `
+        mona-drop-down-list[monaDropDownGroupable],
+        mona-combo-box[monaDropDownGroupable]
+    `,
     standalone: true
 })
-export class ListGroupableDirective<TData> {
+export class DropDownGroupableDirective<TData> {
     readonly #defaultOptions: GroupableOptions<TData, any> = {
-        enabled: true
+        enabled: true,
+        headerOrder: "asc"
     };
-    @Input()
+
+    @Input({ required: true })
     public set groupBy(value: string | Selector<TData, any> | null | undefined) {
         this.listService.setGroupBy(value ?? "");
     }
 
-    @Input("monaListGroupable")
+    @Input("monaDropDownGroupable")
     public set options(value: GroupableOptions<TData, any> | "") {
         if (value === "") {
             this.listService.setGroupableOptions(this.#defaultOptions);

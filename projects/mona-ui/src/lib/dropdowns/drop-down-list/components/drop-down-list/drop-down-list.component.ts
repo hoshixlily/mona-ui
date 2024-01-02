@@ -21,7 +21,9 @@ import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { faChevronDown, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { Predicate } from "@mirei/ts-collections";
 import { fromEvent, take } from "rxjs";
+import { v4 } from "uuid";
 import { AnimationState } from "../../../../animations/models/AnimationState";
 import { PopupAnimationService } from "../../../../animations/services/popup-animation.service";
 import { ButtonDirective } from "../../../../buttons/button/button.directive";
@@ -35,6 +37,7 @@ import { ListService } from "../../../../common/list/services/list.service";
 import { PopupRef } from "../../../../popup/models/PopupRef";
 import { PopupService } from "../../../../popup/services/popup.service";
 import { Action } from "../../../../utils/Action";
+import { DropDownService } from "../../../services/drop-down.service";
 import { DropDownListGroupTemplateDirective } from "../../directives/drop-down-list-group-template.directive";
 import { DropDownListItemTemplateDirective } from "../../directives/drop-down-list-item-template.directive";
 import { DropDownListValueTemplateDirective } from "../../directives/drop-down-list-value-template.directive";
@@ -46,6 +49,7 @@ import { DropDownListValueTemplateDirective } from "../../directives/drop-down-l
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [
         ListService,
+        DropDownService,
         {
             provide: NG_VALUE_ACCESSOR,
             useExisting: forwardRef(() => DropDownListComponent),
@@ -68,6 +72,7 @@ import { DropDownListValueTemplateDirective } from "../../directives/drop-down-l
 })
 export class DropDownListComponent<TData> implements OnInit, ControlValueAccessor {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
+    readonly #popupUidClass: string = `mona-dropdown-popup-${v4()}`;
     #popupRef: PopupRef | null = null;
     #propagateChange: Action<TData | null> | null = null;
     #value: TData | null = null;
@@ -97,7 +102,9 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
     public readonly hostClass: boolean = true;
 
     @Input()
-    public data: Iterable<TData> = [];
+    public set data(value: Iterable<TData>) {
+        this.listService.setData(value);
+    }
 
     @Input()
     public disabled: boolean = false;
@@ -105,17 +112,13 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
     @ViewChild("dropdownWrapper")
     public dropdownWrapper!: ElementRef<HTMLDivElement>;
 
-    @Input()
-    public filterable: boolean = false;
-
-    @Input()
-    public groupField?: string;
-
     @ContentChild(DropDownListGroupTemplateDirective, { read: TemplateRef })
     public groupTemplate: TemplateRef<any> | null = null;
 
     @Input()
-    public itemDisabler?: Action<any, boolean> | string;
+    public set itemDisabled(value: string | Predicate<TData> | null | undefined) {
+        this.listService.setDisabledBy(value ?? "");
+    }
 
     @ContentChild(DropDownListItemTemplateDirective, { read: TemplateRef })
     public itemTemplate: TemplateRef<any> | null = null;
@@ -135,13 +138,16 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
     }
 
     @Input()
-    public valueField?: string;
+    public set valueField(valueField: string | null | undefined) {
+        this.listService.setValueField(valueField ?? "");
+    }
 
     @ContentChild(DropDownListValueTemplateDirective, { read: TemplateRef })
     public valueTemplate: TemplateRef<any> | null = null;
 
     public constructor(
         private readonly cdr: ChangeDetectorRef,
+        private readonly dropDownService: DropDownService,
         private readonly elementRef: ElementRef<HTMLElement>,
         private readonly listService: ListService<TData>,
         private readonly popupAnimationService: PopupAnimationService,
@@ -172,11 +178,9 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
     public onSelectedKeysChange(keys: Array<any>): void {
         const item = this.selectedDataItem();
         this.updateValue(item);
-        this.close();
     }
 
     public open(): void {
-        this.dropdownWrapper.nativeElement.focus();
         if (this.#popupRef) {
             return;
         }
@@ -186,33 +190,19 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
             hasBackdrop: false,
             withPush: false,
             width: this.elementRef.nativeElement.getBoundingClientRect().width,
-            popupClass: ["mona-dropdown-popup-content"],
+            popupClass: ["mona-dropdown-popup-content", this.#popupUidClass],
             closeOnOutsideClick: false,
-            positions: [
-                new ConnectionPositionPair(
-                    { originX: "start", originY: "bottom" },
-                    { overlayX: "start", overlayY: "top" },
-                    -1,
-                    0,
-                    "mona-dropdown-popup-content-bottom"
-                ),
-                new ConnectionPositionPair(
-                    { originX: "start", originY: "top" },
-                    { overlayX: "start", overlayY: "bottom" },
-                    -1,
-                    -1,
-                    "mona-dropdown-popup-content-top"
-                )
-            ]
+            positions: DropDownService.getDefaultPositions()
         });
+
         this.popupAnimationService.setupDropdownOutsideClickCloseAnimation(this.#popupRef);
         this.popupAnimationService.animateDropdown(this.#popupRef, AnimationState.Show);
-        this.cdr.markForCheck();
+        this.dropDownService.focusPopup(this.#popupUidClass);
         const previousItem = this.selectedListItem();
         this.#popupRef.closed.pipe(take(1)).subscribe(() => {
             this.#popupRef = null;
-            (this.elementRef.nativeElement.firstElementChild as HTMLElement)?.focus();
-            // this.popupListService.clearFilters();
+            this.focus();
+            this.listService.clearFilter();
             if (previousItem !== this.selectedListItem()) {
                 this.notifyValueChange();
             }
@@ -241,6 +231,10 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
         if (obj != null) {
             this.listService.setSelectedDataItems([obj]);
         }
+    }
+
+    private focus(): void {
+        (this.elementRef.nativeElement.firstElementChild as HTMLElement)?.focus();
     }
 
     private handleArrowKeys(event: KeyboardEvent): void {
@@ -283,12 +277,8 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
     }
 
     private initialize(): void {
-        this.listService.setSelectableOptions(this.selectableOptions);
-        this.listService.setValueField(this.valueField ?? "");
         this.listService.setNavigableOptions({ enabled: true, mode: "select" });
-        this.listService.setGroupableOptions({ enabled: true });
-        this.listService.setGroupBy(this.groupField ?? "");
-        this.listService.setData(this.data);
+        this.listService.setSelectableOptions(this.selectableOptions);
     }
 
     private notifyValueChange(): void {

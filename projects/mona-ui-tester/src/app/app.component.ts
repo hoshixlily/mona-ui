@@ -149,7 +149,9 @@ import {
     ListVirtualScrollDirective,
     ListFooterTemplateDirective,
     ListHeaderTemplateDirective,
-    ListNavigableDirective
+    ListNavigableDirective,
+    DropDownGroupableDirective,
+    DropDownFilterableDirective
 } from "mona-ui";
 import { v4 } from "uuid";
 import { ListFilterableDirective } from "../../../mona-ui/src/lib/common/list/directives/list-filterable.directive";
@@ -200,6 +202,8 @@ import { GridOrderData } from "./GridOrderData";
         DatePickerComponent,
         DateTimePickerComponent,
         DropDownButtonComponent,
+        DropDownFilterableDirective,
+        DropDownGroupableDirective,
         DropDownListComponent,
         DropDownListGroupTemplateDirective,
         DropDownListItemTemplateDirective,
@@ -293,8 +297,8 @@ import { GridOrderData } from "./GridOrderData";
         ListNavigableDirective,
         ListSelectableDirective,
         ListVirtualScrollDirective
-    ],
-    providers: [ListService]
+    ]
+    // providers: [ListService]
 })
 export class AppComponent implements OnInit {
     public readonly closeIcon: IconDefinition = faTimes;
@@ -748,7 +752,7 @@ export class AppComponent implements OnInit {
     public constructor(
         private readonly popupService: PopupService,
         public readonly windowService: WindowService,
-        protected readonly listService: ListService<{ text: string; value: number; group: string; active: boolean }>,
+        // protected readonly listService: ListService<{ text: string; value: number; group: string; active: boolean }>,
         private readonly cdr: ChangeDetectorRef,
         private readonly notificationService: NotificationService,
         private readonly dialogService: DialogService
@@ -762,50 +766,50 @@ export class AppComponent implements OnInit {
     // }
 
     public ngAfterViewInit(): void {
-        this.listService.setTextField(i => i.text);
-        // this.listService.setDisabledBy(this.dropdownItemDisabler);
-
-        this.listService.setSelectableOptions({ enabled: true, mode: "multiple" });
-        this.listService.setValueField(i => i.value);
-        this.listService.setSelectedKeys([
-            this.dropdownListDataItems.get(17).value
-            // this.dropdownListDataItems.get(14).value
-        ]);
-
-        this.listService.setGroupBy(i => `${i.text.charAt(0).toUpperCase()}`);
-        this.listService.setGroupableOptions({
-            enabled: true,
-            headerOrder: "asc"
-            // orderBy: i => i.text.charAt(i.text.length - 1),
-            // orderByDirection: "desc"
-        });
-        this.listService.setNavigableOptions({ enabled: true, mode: "select", wrap: true });
-
-        this.listService.setFilterableOptions({ enabled: true, caseSensitive: true, debounce: 0 });
-        this.listService.setFilterPlaceholder("Search items...");
-        // this.listService.setFilter("n");
-        this.listService.filterChange = new EventEmitter<FilterChangeEvent>();
-        this.listService.filterChange.subscribe((e: FilterChangeEvent) => {
-            // e.preventDefault();
-            console.log(e);
-        });
-        this.listService.selectedKeysChange = new EventEmitter<Array<any>>();
-        this.listService.selectedKeysChange.subscribe((e: ImmutableSet<any>) => {
-            // console.log("Selected Keys: ", e.toArray());
-            console.log(
-                "Selected Items: ",
-                this.listService
-                    .selectedListItems()
-                    .select(i => i.data)
-                    .toArray()
-            );
-        });
-
-        // window.setTimeout(() => {
-        //     this.listService.setVirtualScrollOptions({ enabled: true, height: 28 });
-        // }, 6000);
-
-        this.listService.setData(this.dropdownListDataItems);
+        // this.listService.setTextField(i => i.text);
+        // // this.listService.setDisabledBy(this.dropdownItemDisabler);
+        //
+        // this.listService.setSelectableOptions({ enabled: true, mode: "multiple" });
+        // this.listService.setValueField(i => i.value);
+        // this.listService.setSelectedKeys([
+        //     this.dropdownListDataItems.get(17).value
+        //     // this.dropdownListDataItems.get(14).value
+        // ]);
+        //
+        // this.listService.setGroupBy(i => `${i.text.charAt(0).toUpperCase()}`);
+        // this.listService.setGroupableOptions({
+        //     enabled: true,
+        //     headerOrder: "asc"
+        //     // orderBy: i => i.text.charAt(i.text.length - 1),
+        //     // orderByDirection: "desc"
+        // });
+        // this.listService.setNavigableOptions({ enabled: true, mode: "select", wrap: true });
+        //
+        // this.listService.setFilterableOptions({ enabled: true, caseSensitive: true, debounce: 0 });
+        // this.listService.setFilterPlaceholder("Search items...");
+        // // this.listService.setFilter("n");
+        // this.listService.filterChange = new EventEmitter<FilterChangeEvent>();
+        // this.listService.filterChange.subscribe((e: FilterChangeEvent) => {
+        //     // e.preventDefault();
+        //     console.log(e);
+        // });
+        // this.listService.selectedKeysChange = new EventEmitter<Array<any>>();
+        // this.listService.selectedKeysChange.subscribe((e: ImmutableSet<any>) => {
+        //     // console.log("Selected Keys: ", e.toArray());
+        //     console.log(
+        //         "Selected Items: ",
+        //         this.listService
+        //             .selectedListItems()
+        //             .select(i => i.data)
+        //             .toArray()
+        //     );
+        // });
+        //
+        // // window.setTimeout(() => {
+        // //     this.listService.setVirtualScrollOptions({ enabled: true, height: 28 });
+        // // }, 6000);
+        //
+        // this.listService.setData(this.dropdownListDataItems);
     }
 
     public filterData(): void {
@@ -841,7 +845,7 @@ export class AppComponent implements OnInit {
             // this.listService.setGroupableOptions({ enabled: true, headerOrder: turn % 2 === 0 ? "asc" : "desc" });
             turn++;
         }, 3000);
-        this.selectedDropdownListDataItem = { ...this.dropdownListDataItems.get(4) };
+        this.selectedDropdownListDataItem = { ...this.dropdownListDataItems.get(14) };
         this.selectedPrimitiveComboBoxDataItem = this.dropdownPrimitiveDataItems[7];
 
         this.dropdownPartialPrimitiveDataItems = this.dropdownPrimitiveDataItems.slice();

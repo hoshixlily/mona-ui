@@ -51,7 +51,6 @@
     } @else {
         <li class="mona-list-item" [attr.data-uid]="item.uid"
             (click)="onListItemSelect(item)"
-            (keydown.enter)="onListItemSelect(item)"
             monaListItem [item]="item">
             <mona-list-item [item]="item" [template]="itemTemplate"></mona-list-item>
         </li>

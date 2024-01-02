@@ -27,7 +27,6 @@
         <mona-list [height]="200"
                    (itemSelect)="onItemSelect($event)"
                    [monaListSelectable]="selectableOptions"
-                   [selectBy]="valueField"
                    (selectedKeysChange)="onSelectedKeysChange($event)">
             @if (itemTemplate) {
                 <ng-template monaListItemTemplate let-dataItem>

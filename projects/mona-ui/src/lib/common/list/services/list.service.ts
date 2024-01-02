@@ -99,6 +99,10 @@ export class ListService<TData> {
 
     public constructor() {}
 
+    public clearFilter(): void {
+        this.filterText.set("");
+    }
+
     public clearSelections(): void {
         this.selectedKeys.update(set => set.clear());
     }

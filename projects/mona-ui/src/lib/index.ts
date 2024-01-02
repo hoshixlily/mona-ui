@@ -31,7 +31,9 @@ export * from "./date-inputs/time-picker/time-picker.component";
 
 /** Dropdowns */
 
-export * from "./dropdowns/popup-list/components/popup-list/popup-list.component";
+export * from "./dropdowns/directives/drop-down-filterable.directive";
+export * from "./dropdowns/directives/drop-down-groupable.directive";
+
 export * from "./dropdowns/popup-list/directives/list-group-template.directive";
 // export * from "./dropdowns/popup-list/directives/list-item-template.directive";
 export * from "./dropdowns/auto-complete/auto-complete.component";

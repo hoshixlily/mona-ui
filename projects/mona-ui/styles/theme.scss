@@ -155,11 +155,12 @@ div.mona-list {
         @include scrollbars-thin;
         & li {
             color: var(--mona-text);
-            transition: background-color 0.15s ease-out;
             &:hover {
+                transition: background-color 0.15s ease-out;
                 background-color: var(--mona-background-hover);
             }
             &:active:not(.mona-selected) {
+                transition: background-color 0.15s ease-out;
                 background-color: var(--mona-background-active);
             }
         }

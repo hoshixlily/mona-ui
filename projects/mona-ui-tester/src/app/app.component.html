@@ -264,26 +264,30 @@
                                 <input monaTextBox [ngModel]="textBoxValue">
                                 <!--                                <mona-text-box [ngModel]="textBoxValue"></mona-text-box>-->
 
-                                <mona-drop-down-list [data]="dropdownListDataItems" textField="text" valueField="value"
-                                                     groupField="group" [filterable]="true" [disabled]="false"
+                                <mona-drop-down-list [data]="dropdownListDataItems"
+                                                     textField="text"
+                                                     valueField="value"
+                                                     [monaDropDownGroupable]="{orderBy:'text'}"
+                                                     groupBy="group"
+                                                     monaDropDownFilterable
+                                                     [disabled]="false"
                                                      [showClearButton]="true" placeholder="Select an item..."
                                                      [ngModel]="selectedDropdownListDataItem"
-                                                     [itemDisabler]="dropdownItemDisabler"
+                                                     [itemDisabled]="dropdownItemDisabler"
                                                      (ngModelChange)="onDropDownValueChange($event)"
                                                      style="width: 200px; ">
-<!--                                    <ng-template monaDropDownListItemTemplate let-dataItem let-listItem="listItem">-->
-<!--                                        <span style="color: deeppink;"-->
-<!--                                              *ngIf="dataItem.value % 3 === 0 && !listItem.disabled">{{dataItem.text}}</span>-->
-<!--                                        <span style="color: dodgerblue;"-->
-<!--                                              *ngIf="dataItem.value % 3 !== 0 && !listItem.disabled">{{dataItem.text}}</span>-->
-<!--                                        <span *ngIf="listItem.disabled">{{dataItem.text}}</span>-->
-<!--                                    </ng-template>-->
-<!--                                    <ng-template monaDropDownListValueTemplate let-dataItem>-->
-<!--                                        <span style="color: darkorange; font-weight: 600;">{{dataItem?.text}}</span>-->
-<!--                                    </ng-template>-->
-<!--                                    <ng-template monaDropDownListGroupTemplate let-group>-->
-<!--                                        <span style="color: crimson; font-weight: bold;">{{group}}</span>-->
-<!--                                    </ng-template>-->
+                                    <ng-template monaDropDownListItemTemplate let-dataItem>
+                                        <span style="color: #ffcc75;"
+                                              *ngIf="dataItem.value % 3 === 0">{{dataItem.text}}</span>
+                                        <span style="color: #F03193;"
+                                              *ngIf="dataItem.value % 3 !== 0">{{dataItem.text}}</span>
+                                    </ng-template>
+                                    <ng-template monaDropDownListValueTemplate let-dataItem>
+                                        <span style="color: darkorange; font-weight: 600;">{{dataItem?.text}}</span>
+                                    </ng-template>
+                                    <ng-template monaDropDownListGroupTemplate let-group>
+                                        <span style="color: crimson; font-weight: bold;">{{group}}</span>
+                                    </ng-template>
                                 </mona-drop-down-list>
                                 <mona-multi-select [data]="dropdownListDataItems" textField="text" valueField="value"
                                                    groupField="group"
@@ -650,27 +654,27 @@
                             </div>
 
                             <div style="width: 250px;background: var(--mona-background); border: 1px solid var(--mona-border-color)">
-                                <mona-list>
-                                    <ng-template monaListItemTemplate let-item>
-                                        @if (item.value % 2 === 0) {
-                                            <span style="color: #ffcc75;">{{item.text}}</span>
-                                        } @else {
-                                            <span style="color: #ff3055;">{{item.text}}</span>
-                                        }
-                                    </ng-template>
-                                    <ng-template monaListGroupHeaderTemplate let-group>
-                                        <span style="color: #F0A970; font-weight: bold;">{{group}}</span>
-                                    </ng-template>
-                                    <ng-template monaListHeaderTemplate>
-                                        <div style="background: var(--mona-background-dark); color: coral; border-bottom: 1px solid var(--mona-border-color-dark); padding: 2px 4px;">Header</div>
-                                    </ng-template>
-                                    <ng-template monaListFooterTemplate>
-                                        <div style="display: flex; padding: 2px 4px; column-gap: 4px; border-top: 1px solid var(--mona-border-color-dark); background: var(--mona-background-dark);">
-                                            <button monaButton (click)="selectedListItem = listService.navigate('previous', 'highlight')">Up</button>
-                                            <button monaButton (click)="selectedListItem = listService.navigate('next', 'highlight')">Down</button>
-                                        </div>
-                                    </ng-template>
-                                </mona-list>
+<!--                                <mona-list>-->
+<!--                                    <ng-template monaListItemTemplate let-item>-->
+<!--                                        @if (item.value % 2 === 0) {-->
+<!--                                            <span style="color: #ffcc75;">{{item.text}}</span>-->
+<!--                                        } @else {-->
+<!--                                            <span style="color: #ff3055;">{{item.text}}</span>-->
+<!--                                        }-->
+<!--                                    </ng-template>-->
+<!--                                    <ng-template monaListGroupHeaderTemplate let-group>-->
+<!--                                        <span style="color: #F0A970; font-weight: bold;">{{group}}</span>-->
+<!--                                    </ng-template>-->
+<!--                                    <ng-template monaListHeaderTemplate>-->
+<!--                                        <div style="background: var(&#45;&#45;mona-background-dark); color: coral; border-bottom: 1px solid var(&#45;&#45;mona-border-color-dark); padding: 2px 4px;">Header</div>-->
+<!--                                    </ng-template>-->
+<!--                                    <ng-template monaListFooterTemplate>-->
+<!--&lt;!&ndash;                                        <div style="display: flex; padding: 2px 4px; column-gap: 4px; border-top: 1px solid var(&#45;&#45;mona-border-color-dark); background: var(&#45;&#45;mona-background-dark);">&ndash;&gt;-->
+<!--&lt;!&ndash;                                            <button monaButton (click)="selectedListItem = listService.navigate('previous', 'highlight')">Up</button>&ndash;&gt;-->
+<!--&lt;!&ndash;                                            <button monaButton (click)="selectedListItem = listService.navigate('next', 'highlight')">Down</button>&ndash;&gt;-->
+<!--&lt;!&ndash;                                        </div>&ndash;&gt;-->
+<!--                                    </ng-template>-->
+<!--                                </mona-list>-->
                                 <span>
 <!--                                    <div style="display: flex; padding: 2px 4px; column-gap: 4px; border-top: 1px solid var(&#45;&#45;mona-border-color-dark); background: var(&#45;&#45;mona-background-dark);">-->
 <!--                                        <button monaButton (click)="selectedListItem = listService.navigate('previous', 'select')">Up</button>-->
