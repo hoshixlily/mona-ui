@@ -78,13 +78,6 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
 
     protected readonly clearIcon: IconDefinition = faTimes;
     protected readonly dropdownIcon: IconDefinition = faChevronDown;
-    protected readonly dropdownText: Signal<string> = computed(() => {
-        const listItem = this.selectedListItem();
-        if (!listItem) {
-            return "";
-        }
-        return this.listService.getItemText(listItem);
-    });
     protected readonly selectableOptions: SelectableOptions = {
         enabled: true,
         mode: "single",
@@ -95,6 +88,13 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
     });
     protected readonly selectedListItem: Signal<ListItem<TData> | null> = computed(() => {
         return this.listService.selectedListItems().firstOrDefault();
+    });
+    protected readonly valueText: Signal<string> = computed(() => {
+        const listItem = this.selectedListItem();
+        if (!listItem) {
+            return "";
+        }
+        return this.listService.getItemText(listItem);
     });
 
     @HostBinding("class.mona-dropdown")

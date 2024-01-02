@@ -58,10 +58,10 @@ export class ListService<TData> {
     public readonly viewItems: Signal<ImmutableSet<ListItem<TData>>> = computed(() => {
         const listItems = this.listItems();
         const filterText = this.filterText();
-        const filterableOptions = this.filterableOptions();
+        // const filterableOptions = this.filterableOptions();
         const groupableOptions = this.groupableOptions();
         let enumerable: IEnumerable<ListItem<TData>> = listItems;
-        if (filterableOptions.enabled) {
+        if (filterText) {
             enumerable = enumerable.where(item => this.filterItem(item, filterText));
         }
         if (groupableOptions.enabled) {
@@ -109,6 +109,7 @@ export class ListService<TData> {
 
     public clearSelections(): void {
         this.selectedKeys.update(set => set.clear());
+        this.highlightedItem.set(null);
     }
 
     public getGroupField(item: ListItem<TData>): any {
@@ -400,8 +401,9 @@ export class ListService<TData> {
             const highlightedItem = this.highlightedItem() as ListItem<TData>;
             if (mode === "select") {
                 this.selectItem(highlightedItem);
+                return highlightedItem;
             }
-            return highlightedItem;
+            // return highlightedItem;
         }
         const selectedItem = viewItems.lastOrDefault(i => selectedKeys.contains(this.getSelectionKey(i)));
         const lastHighlightedItem = this.highlightedItem();

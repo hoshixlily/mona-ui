@@ -11,7 +11,6 @@ import {
     EventEmitter,
     inject,
     Input,
-    OnDestroy,
     OnInit,
     Output,
     QueryList,
@@ -54,7 +53,7 @@ import { ListItemComponent } from "../list-item/list-item.component";
     styleUrl: "./list.component.scss",
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ListComponent<TData> implements OnInit, AfterViewInit, OnDestroy {
+export class ListComponent<TData> implements OnInit, AfterViewInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     #viewport: CdkVirtualScrollViewport | null = null;
 
@@ -133,10 +132,6 @@ export class ListComponent<TData> implements OnInit, AfterViewInit, OnDestroy {
         this.virtualScrollViewport.changes.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(viewport => {
             this.#viewport = viewport.first;
         });
-    }
-
-    public ngOnDestroy(): void {
-        this.listService.highlightedItem.set(null);
     }
 
     public ngOnInit(): void {

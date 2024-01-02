@@ -5,8 +5,9 @@ import { ListService } from "../../common/list/services/list.service";
 
 @Directive({
     selector: `
+        mona-auto-complete[monaDropDownGroupable],
+        mona-combo-box[monaDropDownGroupable],
         mona-drop-down-list[monaDropDownGroupable],
-        mona-combo-box[monaDropDownGroupable]
     `,
     standalone: true
 })

@@ -75,16 +75,9 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     readonly #popupUidClass: string = `mona-dropdown-popup-${v4()}`;
     #popupRef: PopupRef | null = null;
-    #propagateChange: any = () => {};
+    #propagateChange: Action<TData | null> | null = null;
     #value: any;
 
-    protected readonly dropdownText: Signal<string> = computed(() => {
-        const listItem = this.selectedListItem();
-        if (!listItem) {
-            return "";
-        }
-        return this.listService.getItemText(listItem);
-    });
     protected readonly selectableOptions: SelectableOptions = {
         enabled: true,
         mode: "single",
@@ -95,6 +88,13 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
     });
     protected readonly selectedListItem: Signal<ListItem<TData> | null> = computed(() => {
         return this.listService.selectedListItems().firstOrDefault();
+    });
+    protected readonly valueText: Signal<string> = computed(() => {
+        const listItem = this.selectedListItem();
+        if (!listItem) {
+            return "";
+        }
+        return this.listService.getItemText(listItem);
     });
 
     public readonly clearIcon: IconDefinition = faTimes;
@@ -118,12 +118,6 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
 
     @ViewChild("dropdownWrapper")
     public dropdownWrapper!: ElementRef<HTMLDivElement>;
-
-    @Input()
-    public filterable: boolean = false;
-
-    @Input()
-    public groupField?: string;
 
     @ContentChild(ComboBoxGroupTemplateDirective, { read: TemplateRef })
     public groupTemplate: TemplateRef<any> | null = null;
@@ -161,7 +155,6 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
 
     public constructor(
         private readonly elementRef: ElementRef<HTMLElement>,
-        private readonly dropDownService: DropDownService,
         private readonly listService: ListService<TData>,
         private readonly popupAnimationService: PopupAnimationService,
         private readonly popupService: PopupService
@@ -170,7 +163,8 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
     public clearValue(event: MouseEvent): void {
         event.stopImmediatePropagation();
         this.updateValue(null);
-        this.#propagateChange?.(undefined);
+        this.listService.clearSelections();
+        this.#propagateChange?.(null);
         this.comboBoxValue.set("");
     }
 
@@ -192,9 +186,9 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
     public onKeydown(event: KeyboardEvent): void {
         if (event.key === "Enter") {
             const item = this.selectedDataItem();
-            if (item && this.comboBoxValue() === this.dropdownText()) {
+            if (item && this.comboBoxValue() === this.valueText()) {
                 this.updateValue(item);
-            } else if (item && this.comboBoxValue() !== this.dropdownText()) {
+            } else if (item && this.comboBoxValue() !== this.valueText()) {
                 const targetItem = this.listService
                     .viewItems()
                     .firstOrDefault(i =>
@@ -263,12 +257,6 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
             if (previousItem !== this.selectedListItem()) {
                 this.notifyValueChange();
             }
-            // const item = this.popupListService.viewListData
-            //     .selectMany(g => g.source)
-            //     .firstOrDefault(i => i.text.toLowerCase() === this.comboBoxValue().toLowerCase());
-            // if (!item) {
-            //     this.comboBoxValue.set("");
-            // }
         });
     }
 
@@ -288,7 +276,7 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
         this.updateValue(obj);
         if (obj != null) {
             this.listService.setSelectedDataItems([obj]);
-            this.comboBoxValue.set(this.dropdownText());
+            this.comboBoxValue.set(this.valueText());
         }
     }
 
@@ -330,7 +318,7 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
     private initialize(): void {
         this.listService.setNavigableOptions({ enabled: true, mode: "select" });
         this.listService.setSelectableOptions(this.selectableOptions);
-        this.comboBoxValue.set(this.dropdownText());
+        this.comboBoxValue.set(this.valueText());
     }
 
     private notifyValueChange(): void {
@@ -363,22 +351,6 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
 
     private setSubscriptions(): void {
         this.comboBoxValue$.pipe(takeUntilDestroyed(this.#destroyRef), distinctUntilChanged()).subscribe(value => {
-            if (this.filterable) {
-                // if (!value) {
-                //     this.popupListService.viewListData = this.popupListService.sourceListData.toList();
-                //     this.popupListService.filterModeActive = false;
-                // } else {
-                //     this.popupListService.viewListData = this.popupListService.sourceListData
-                //         .select(g => {
-                //             const filteredItems = g.source.where(i =>
-                //                 i.text.toLowerCase().includes(value.toLowerCase())
-                //             );
-                //             return new Group<string, PopupListItem>(g.key, filteredItems.toList());
-                //         })
-                //         .toList();
-                //     this.popupListService.filterModeActive = true;
-                // }
-            }
             const item = this.listService
                 .viewItems()
                 .where(i => !i.header && !this.listService.isDisabled(i))
@@ -399,6 +371,6 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
 
     private updateValue(value: TData | null) {
         this.#value = value;
-        this.comboBoxValue.set(this.dropdownText());
+        this.comboBoxValue.set(this.valueText());
     }
 }
