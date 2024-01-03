@@ -112,6 +112,13 @@ export class ListService<TData> {
         this.highlightedItem.set(null);
     }
 
+    public deselectItems(item: Iterable<ListItem<TData>>): void {
+        const keys = from(item)
+            .select(i => this.getSelectionKey(i))
+            .toImmutableSet();
+        this.selectedKeys.update(set => set.removeAll(keys));
+    }
+
     public getGroupField(item: ListItem<TData>): any {
         const groupSelector = this.groupBy();
         if (groupSelector == null) {

@@ -294,14 +294,14 @@
                                     </ng-template>
                                 </mona-drop-down-list>
                                 <mona-multi-select [data]="dropdownListDataItems" textField="text" valueField="value"
-                                                   groupField="group"
                                                    style="width: auto; min-width: 200px;"
+                                                   monaDropDownGroupable groupBy="group"
                                                    [monaMultiSelectSummaryTag]="multiSelectTagCount" [filterable]="true"
                                                    [showClearButton]="true"
                                                    [ngModel]="selectedMultiSelectDataItems"
                                                    (ngModelChange)="onMultiSelectValueChange($event)">
                                     <ng-template monaMultiSelectItemTemplate let-dataItem>
-                                        <span style="color: greenyellow; font-weight: bold">{{dataItem.text}}</span>
+                                        <span style="color: darksalmon; font-weight: bold">{{dataItem.text}}</span>
                                     </ng-template>
                                     <ng-template monaMultiSelectGroupTemplate let-group>
                                         <span

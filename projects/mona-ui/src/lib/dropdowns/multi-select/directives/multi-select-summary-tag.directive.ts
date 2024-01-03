@@ -6,20 +6,22 @@ import { MultiSelectSummaryTagTemplateDirective } from "./multi-select-summary-t
     selector: "mona-multi-select[monaMultiSelectSummaryTag]",
     standalone: true
 })
-export class MultiSelectSummaryTagDirective implements OnInit, AfterContentInit {
+export class MultiSelectSummaryTagDirective<TData> implements OnInit, AfterContentInit {
     @ContentChild(MultiSelectSummaryTagTemplateDirective, { read: TemplateRef })
     public summaryTagTemplate: TemplateRef<any> | null = null;
 
     @Input("monaMultiSelectSummaryTag")
-    public tagCount: number = 0;
+    public set tagCount(value: number) {
+        this.host.tagCount.set(value);
+    }
 
-    public constructor(private readonly host: MultiSelectComponent) {}
+    public constructor(private readonly host: MultiSelectComponent<TData>) {}
 
     public ngAfterContentInit(): void {
         this.host.summaryTagTemplate = this.summaryTagTemplate;
     }
 
     public ngOnInit(): void {
-        this.host.tagCount = this.tagCount;
+        // this.host.tagCount = this.tagCount;
     }
 }
