@@ -172,7 +172,6 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
     }
 
     public constructor(
-        private readonly cdr: ChangeDetectorRef,
         private readonly elementRef: ElementRef<HTMLElement>,
         private readonly listService: ListService<TData>,
         private readonly popupAnimationService: PopupAnimationService,
@@ -211,7 +210,6 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
 
     public onSelectedItemRemove(event: Event, listItem: ListItem<TData>): void {
         event.stopImmediatePropagation();
-        // const remainingItems = this.valuePopupListItem.filter(item => !item.dataEquals(popupListItem.data)) ?? [];
         this.listService.deselectItems([listItem]);
         this.updateValue(this.selectedDataItems().toArray());
         // this.#propagateChange(this.#value);
@@ -223,7 +221,6 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
         const removedItems = this.selectedListItems()
             .takeLast(selectedItemCount - this.visibleTagCount())
             .toArray();
-        // const remainingItems = this.selectedListItems().skipLast(this.visibleTagCount()).toArray();
         this.listService.deselectItems(removedItems);
         this.updateValue(this.selectedDataItems().toArray());
         // this.#propagateChange(this.#value);
@@ -271,24 +268,16 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
         }
     }
 
-    // private containsValue(popupListItems: PopupListItem[], value: any): boolean {
-    //     return popupListItems.some(popupListItem => popupListItem.dataEquals(value));
-    // }
+    private handleArrowKeys(event: KeyboardEvent): void {
+        if (event.key === "ArrowDown") {
+            this.listService.navigate("next", "highlight");
+        } else if (event.key === "ArrowUp") {
+            this.listService.navigate("previous", "highlight");
+        }
+    }
 
     private initialize(): void {
-        // this.popupListService.initializeListData({
-        //     data: this.data,
-        //     disabler: this.itemDisabler,
-        //     textField: this.textField,
-        //     valueField: this.valueField,
-        //     groupField: this.groupField
-        // });
-        // this.valuePopupListItem = this.popupListService.viewListData
-        //     .selectMany(g => g.source)
-        //     .where(d => this.value.some(v => d.dataEquals(v)))
-        //     .toArray();
-        // this.valuePopupListItem.forEach(d => d.selected.set(true));
-        this.listService.setNavigableOptions({ enabled: true, mode: "highlight" });
+        this.listService.setNavigableOptions({ enabled: true, mode: "highlight", wrap: true });
         this.listService.setSelectableOptions({
             enabled: true,
             mode: "multiple"
@@ -310,12 +299,31 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
             .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe((event: KeyboardEvent) => {
                 if (event.key === "Enter") {
-                    if (this.popupRef) {
+                    if (!this.popupRef) {
+                        this.open();
                         return;
+                    }
+                    const highlightedItem = this.listService.highlightedItem();
+                    if (!highlightedItem) {
+                        return;
+                    }
+                    const selected = this.listService.isSelected(highlightedItem);
+                    if (selected) {
+                        this.listService.deselectItems([highlightedItem]);
+                    } else {
+                        this.listService.selectItem(highlightedItem);
                     }
                 } else if (event.key === "Escape") {
                     this.close();
+                } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+                    this.handleArrowKeys(event);
                 }
+            });
+
+        fromEvent<FocusEvent>(this.elementRef.nativeElement, "focusout")
+            .pipe(takeUntilDestroyed(this.#destroyRef))
+            .subscribe(() => {
+                this.close();
             });
     }
 

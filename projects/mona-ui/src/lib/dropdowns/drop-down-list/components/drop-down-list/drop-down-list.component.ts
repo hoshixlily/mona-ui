@@ -196,11 +196,11 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
 
         this.popupAnimationService.setupDropdownOutsideClickCloseAnimation(this.#popupRef);
         this.popupAnimationService.animateDropdown(this.#popupRef, AnimationState.Show);
-        this.dropDownService.focusPopup(this.#popupUidClass);
+        // this.dropDownService.focusPopup(this.#popupUidClass);
         const previousItem = this.selectedListItem();
         this.#popupRef.closed.pipe(take(1)).subscribe(() => {
             this.#popupRef = null;
-            this.focus();
+            // this.focus();
             this.listService.clearFilter();
             if (previousItem !== this.selectedListItem()) {
                 this.notifyValueChange();
@@ -237,9 +237,9 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
     }
 
     private handleArrowKeys(event: KeyboardEvent): void {
-        if (this.#popupRef) {
-            return;
-        }
+        // if (this.#popupRef) {
+        //     return;
+        // }
         const previousItem = this.selectedListItem();
         const item = this.listService.navigate(event.key === "ArrowDown" ? "next" : "previous", "select");
         if (item) {
@@ -289,6 +289,11 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
             .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe(event => {
                 this.handleKeyDown(event);
+            });
+        fromEvent<FocusEvent>(this.elementRef.nativeElement, "focusout")
+            .pipe(takeUntilDestroyed(this.#destroyRef))
+            .subscribe(() => {
+                this.close();
             });
     }
 

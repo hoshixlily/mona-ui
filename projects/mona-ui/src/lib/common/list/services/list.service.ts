@@ -49,8 +49,10 @@ export class ListService<TData> {
     public readonly selectedKeys: WritableSignal<ImmutableSet<any>> = signal(ImmutableSet.create());
     public readonly selectedListItems: Signal<ImmutableSet<ListItem<TData>>> = computed(() => {
         const selectedKeys = this.selectedKeys();
-        return this.viewItems()
-            .where(i => selectedKeys.contains(this.getSelectionKey(i)))
+        return selectedKeys
+            .select(key => this.listItems().firstOrDefault(i => this.getSelectionKey(i) === key))
+            .where(i => i != null)
+            .cast<ListItem<TData>>()
             .toImmutableSet();
     });
     public readonly textField: WritableSignal<string | Selector<TData, string>> = signal("");

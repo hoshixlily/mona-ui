@@ -119,7 +119,7 @@ export class ListComponent<TData> implements OnInit, AfterViewInit {
     ) {
         afterNextRender(() => {
             window.setTimeout(() => {
-                const selectedItem = this.listService.selectedListItems().firstOrDefault();
+                const selectedItem = this.listService.selectedListItems().lastOrDefault();
                 if (selectedItem) {
                     this.scrollToItem(selectedItem);
                 }
