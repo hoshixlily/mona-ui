@@ -1,19 +1,19 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
-import { PopupAnimationService } from "../../../../animations/services/popup-animation.service";
+import { PopupAnimationService } from "../../../animations/services/popup-animation.service";
 
-import { MultiSelectComponent } from "./multi-select.component";
+import { AutoCompleteComponent } from "./auto-complete.component";
 
-describe("MultiSelectComponent", () => {
-    let component: MultiSelectComponent<any>;
-    let fixture: ComponentFixture<MultiSelectComponent<any>>;
+describe("AutoCompleteComponent", () => {
+    let component: AutoCompleteComponent;
+    let fixture: ComponentFixture<AutoCompleteComponent>;
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [MultiSelectComponent, BrowserAnimationsModule],
+            imports: [AutoCompleteComponent, BrowserAnimationsModule],
             providers: [PopupAnimationService]
         });
-        fixture = TestBed.createComponent(MultiSelectComponent);
+        fixture = TestBed.createComponent(AutoCompleteComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

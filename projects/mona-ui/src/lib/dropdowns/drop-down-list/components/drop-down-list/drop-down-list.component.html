@@ -28,16 +28,31 @@
                    (itemSelect)="onItemSelect($event)"
                    [monaListSelectable]="selectableOptions"
                    (selectedKeysChange)="onSelectedKeysChange($event)">
+            @if (footerTemplate) {
+                <ng-template monaListFooterTemplate>
+                    <ng-container [ngTemplateOutlet]="footerTemplate"></ng-container>
+                </ng-template>
+            }
+            @if (groupHeaderTemplate) {
+                <ng-template monaListGroupHeaderTemplate let-group>
+                    <ng-container [ngTemplateOutlet]="groupHeaderTemplate"
+                                  [ngTemplateOutletContext]="{$implicit: group}"></ng-container>
+                </ng-template>
+            }
+            @if (headerTemplate) {
+                <ng-template monaListHeaderTemplate>
+                    <ng-container [ngTemplateOutlet]="headerTemplate"></ng-container>
+                </ng-template>
+            }
             @if (itemTemplate) {
                 <ng-template monaListItemTemplate let-dataItem>
                     <ng-container [ngTemplateOutlet]="itemTemplate"
                                   [ngTemplateOutletContext]="{$implicit: dataItem}"></ng-container>
                 </ng-template>
             }
-            @if (groupTemplate) {
-                <ng-template monaListGroupHeaderTemplate let-group>
-                    <ng-container [ngTemplateOutlet]="groupTemplate"
-                                  [ngTemplateOutletContext]="{$implicit: group}"></ng-container>
+            @if (noDataTemplate) {
+                <ng-template monaListNoDataTemplate>
+                    <ng-container [ngTemplateOutlet]="noDataTemplate"></ng-container>
                 </ng-template>
             }
         </mona-list>

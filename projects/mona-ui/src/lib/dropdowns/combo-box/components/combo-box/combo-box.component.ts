@@ -28,7 +28,10 @@ import { AnimationState } from "../../../../animations/models/AnimationState";
 import { PopupAnimationService } from "../../../../animations/services/popup-animation.service";
 import { ButtonDirective } from "../../../../buttons/button/button.directive";
 import { ListComponent } from "../../../../common/list/components/list/list.component";
+import { ListFooterTemplateDirective } from "../../../../common/list/directives/list-footer-template.directive";
 import { ListGroupHeaderTemplateDirective } from "../../../../common/list/directives/list-group-header-template.directive";
+import { ListHeaderTemplateDirective } from "../../../../common/list/directives/list-header-template.directive";
+import { ListNoDataTemplateDirective } from "../../../../common/list/directives/list-no-data-template.directive";
 import { ListSelectableDirective } from "../../../../common/list/directives/list-selectable.directive";
 import { ListItem } from "../../../../common/list/models/ListItem";
 import { SelectableOptions } from "../../../../common/list/models/SelectableOptions";
@@ -37,10 +40,12 @@ import { TextBoxDirective } from "../../../../inputs/text-box/directives/text-bo
 import { PopupRef } from "../../../../popup/models/PopupRef";
 import { PopupService } from "../../../../popup/services/popup.service";
 import { Action } from "../../../../utils/Action";
-import { ListItemTemplateDirective } from "../../../popup-list/directives/list-item-template.directive";
 import { DropDownService } from "../../../services/drop-down.service";
-import { ComboBoxGroupTemplateDirective } from "../../directives/combo-box-group-template.directive";
+import { ComboBoxFooterTemplateDirective } from "../../directives/combo-box-footer-template.directive";
+import { ComboBoxGroupHeaderTemplateDirective } from "../../directives/combo-box-group-header-template.directive";
+import { ComboBoxHeaderTemplateDirective } from "../../directives/combo-box-header-template.directive";
 import { ComboBoxItemTemplateDirective } from "../../directives/combo-box-item-template.directive";
+import { ComboBoxNoDataTemplateDirective } from "../../directives/combo-box-no-data-template.directive";
 
 @Component({
     selector: "mona-combo-box",
@@ -68,7 +73,9 @@ import { ComboBoxItemTemplateDirective } from "../../directives/combo-box-item-t
         ListComponent,
         ListSelectableDirective,
         ListGroupHeaderTemplateDirective,
-        ListItemTemplateDirective
+        ListFooterTemplateDirective,
+        ListHeaderTemplateDirective,
+        ListNoDataTemplateDirective
     ]
 })
 export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
@@ -119,8 +126,14 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
     @ViewChild("dropdownWrapper")
     public dropdownWrapper!: ElementRef<HTMLDivElement>;
 
-    @ContentChild(ComboBoxGroupTemplateDirective, { read: TemplateRef })
-    public groupTemplate: TemplateRef<any> | null = null;
+    @ContentChild(ComboBoxFooterTemplateDirective, { read: TemplateRef })
+    public footerTemplate: TemplateRef<any> | null = null;
+
+    @ContentChild(ComboBoxGroupHeaderTemplateDirective, { read: TemplateRef })
+    public groupHeaderTemplate: TemplateRef<any> | null = null;
+
+    @ContentChild(ComboBoxHeaderTemplateDirective, { read: TemplateRef })
+    public headerTemplate: TemplateRef<any> | null = null;
 
     @Input()
     public set itemDisabled(value: string | Predicate<TData> | null | undefined) {
@@ -129,6 +142,9 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
 
     @ContentChild(ComboBoxItemTemplateDirective, { read: TemplateRef })
     public itemTemplate: TemplateRef<any> | null = null;
+
+    @ContentChild(ComboBoxNoDataTemplateDirective, { read: TemplateRef })
+    public noDataTemplate: TemplateRef<any> | null = null;
 
     @Input()
     public placeholder?: string;

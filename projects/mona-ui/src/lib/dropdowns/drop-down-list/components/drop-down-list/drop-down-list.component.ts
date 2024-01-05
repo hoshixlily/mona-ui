@@ -27,8 +27,11 @@ import { AnimationState } from "../../../../animations/models/AnimationState";
 import { PopupAnimationService } from "../../../../animations/services/popup-animation.service";
 import { ButtonDirective } from "../../../../buttons/button/button.directive";
 import { ListComponent } from "../../../../common/list/components/list/list.component";
+import { ListFooterTemplateDirective } from "../../../../common/list/directives/list-footer-template.directive";
 import { ListGroupHeaderTemplateDirective } from "../../../../common/list/directives/list-group-header-template.directive";
+import { ListHeaderTemplateDirective } from "../../../../common/list/directives/list-header-template.directive";
 import { ListItemTemplateDirective } from "../../../../common/list/directives/list-item-template.directive";
+import { ListNoDataTemplateDirective } from "../../../../common/list/directives/list-no-data-template.directive";
 import { ListSelectableDirective } from "../../../../common/list/directives/list-selectable.directive";
 import { ListItem } from "../../../../common/list/models/ListItem";
 import { SelectableOptions } from "../../../../common/list/models/SelectableOptions";
@@ -37,8 +40,11 @@ import { PopupRef } from "../../../../popup/models/PopupRef";
 import { PopupService } from "../../../../popup/services/popup.service";
 import { Action } from "../../../../utils/Action";
 import { DropDownService } from "../../../services/drop-down.service";
-import { DropDownListGroupTemplateDirective } from "../../directives/drop-down-list-group-template.directive";
+import { DropDownListFooterTemplateDirective } from "../../directives/drop-down-list-footer-template.directive";
+import { DropDownListGroupHeaderTemplateDirective } from "../../directives/drop-down-list-group-header-template.directive";
+import { DropDownListHeaderTemplateDirective } from "../../directives/drop-down-list-header-template.directive";
 import { DropDownListItemTemplateDirective } from "../../directives/drop-down-list-item-template.directive";
+import { DropDownListNoDataTemplateDirective } from "../../directives/drop-down-list-no-data-template.directive";
 import { DropDownListValueTemplateDirective } from "../../directives/drop-down-list-value-template.directive";
 
 @Component({
@@ -66,7 +72,10 @@ import { DropDownListValueTemplateDirective } from "../../directives/drop-down-l
         ListComponent,
         ListItemTemplateDirective,
         ListGroupHeaderTemplateDirective,
-        ListSelectableDirective
+        ListSelectableDirective,
+        ListFooterTemplateDirective,
+        ListHeaderTemplateDirective,
+        ListNoDataTemplateDirective
     ]
 })
 export class DropDownListComponent<TData> implements OnInit, ControlValueAccessor {
@@ -111,8 +120,14 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
     @ViewChild("dropdownWrapper")
     public dropdownWrapper!: ElementRef<HTMLDivElement>;
 
-    @ContentChild(DropDownListGroupTemplateDirective, { read: TemplateRef })
-    public groupTemplate: TemplateRef<any> | null = null;
+    @ContentChild(DropDownListFooterTemplateDirective, { read: TemplateRef })
+    public footerTemplate: TemplateRef<any> | null = null;
+
+    @ContentChild(DropDownListGroupHeaderTemplateDirective, { read: TemplateRef })
+    public groupHeaderTemplate: TemplateRef<any> | null = null;
+
+    @ContentChild(DropDownListHeaderTemplateDirective, { read: TemplateRef })
+    public headerTemplate: TemplateRef<any> | null = null;
 
     @Input()
     public set itemDisabled(value: string | Predicate<TData> | null | undefined) {
@@ -121,6 +136,9 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
 
     @ContentChild(DropDownListItemTemplateDirective, { read: TemplateRef })
     public itemTemplate: TemplateRef<any> | null = null;
+
+    @ContentChild(DropDownListNoDataTemplateDirective, { read: TemplateRef })
+    public noDataTemplate: TemplateRef<any> | null = null;
 
     @Input()
     public placeholder?: string;

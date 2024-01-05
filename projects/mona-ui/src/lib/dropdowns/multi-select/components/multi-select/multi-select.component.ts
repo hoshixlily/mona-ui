@@ -30,18 +30,23 @@ import { PopupAnimationService } from "../../../../animations/services/popup-ani
 import { ButtonDirective } from "../../../../buttons/button/button.directive";
 import { ChipComponent } from "../../../../buttons/chip/chip.component";
 import { ListComponent } from "../../../../common/list/components/list/list.component";
+import { ListFooterTemplateDirective } from "../../../../common/list/directives/list-footer-template.directive";
 import { ListGroupHeaderTemplateDirective } from "../../../../common/list/directives/list-group-header-template.directive";
+import { ListHeaderTemplateDirective } from "../../../../common/list/directives/list-header-template.directive";
 import { ListItemTemplateDirective } from "../../../../common/list/directives/list-item-template.directive";
+import { ListNoDataTemplateDirective } from "../../../../common/list/directives/list-no-data-template.directive";
 import { ListItem } from "../../../../common/list/models/ListItem";
 import { ListService } from "../../../../common/list/services/list.service";
 import { SlicePipe } from "../../../../pipes/slice.pipe";
 import { PopupRef } from "../../../../popup/models/PopupRef";
 import { PopupService } from "../../../../popup/services/popup.service";
 import { Action } from "../../../../utils/Action";
-import { PopupListService } from "../../../popup-list/services/popup-list.service";
 import { DropDownService } from "../../../services/drop-down.service";
-import { MultiSelectGroupTemplateDirective } from "../../directives/multi-select-group-template.directive";
+import { MultiSelectFooterTemplateDirective } from "../../directives/multi-select-footer-template.directive";
+import { MultiSelectGroupHeaderTemplateDirective } from "../../directives/multi-select-group-header-template.directive";
+import { MultiSelectHeaderTemplateDirective } from "../../directives/multi-select-header-template.directive";
 import { MultiSelectItemTemplateDirective } from "../../directives/multi-select-item-template.directive";
+import { MultiSelectNoDataTemplateDirective } from "../../directives/multi-select-no-data-template.directive";
 import { MultiSelectTagTemplateDirective } from "../../directives/multi-select-tag-template.directive";
 
 @Component({
@@ -49,7 +54,6 @@ import { MultiSelectTagTemplateDirective } from "../../directives/multi-select-t
     templateUrl: "./multi-select.component.html",
     styleUrls: ["./multi-select.component.scss"],
     providers: [
-        PopupListService,
         ListService,
         {
             provide: NG_VALUE_ACCESSOR,
@@ -70,7 +74,10 @@ import { MultiSelectTagTemplateDirective } from "../../directives/multi-select-t
         SlicePipe,
         ListComponent,
         ListGroupHeaderTemplateDirective,
-        ListItemTemplateDirective
+        ListItemTemplateDirective,
+        ListFooterTemplateDirective,
+        ListHeaderTemplateDirective,
+        ListNoDataTemplateDirective
     ]
 })
 export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlValueAccessor {
@@ -134,11 +141,14 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
     @ViewChild("dropdownWrapper")
     public dropdownWrapper!: ElementRef<HTMLDivElement>;
 
-    @Input()
-    public filterable: boolean = false;
+    @ContentChild(MultiSelectFooterTemplateDirective, { read: TemplateRef })
+    public footerTemplate: TemplateRef<any> | null = null;
 
-    @ContentChild(MultiSelectGroupTemplateDirective, { read: TemplateRef })
-    public groupTemplate: TemplateRef<any> | null = null;
+    @ContentChild(MultiSelectGroupHeaderTemplateDirective, { read: TemplateRef })
+    public groupHeaderTemplate: TemplateRef<any> | null = null;
+
+    @ContentChild(MultiSelectHeaderTemplateDirective, { read: TemplateRef })
+    public headerTemplate: TemplateRef<any> | null = null;
 
     @Input()
     public set itemDisabled(value: string | Predicate<TData> | null | undefined) {
@@ -147,6 +157,9 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
 
     @ContentChild(MultiSelectItemTemplateDirective, { read: TemplateRef })
     public itemTemplate: TemplateRef<any> | null = null;
+
+    @ContentChild(MultiSelectNoDataTemplateDirective, { read: TemplateRef })
+    public noDataTemplate: TemplateRef<any> | null = null;
 
     @Input()
     public placeholder?: string;
