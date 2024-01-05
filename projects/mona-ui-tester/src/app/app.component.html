@@ -247,7 +247,7 @@
                                 <button monaButton>Line 1</button>
                                 <mona-combo-box [data]="dropdownListDataItems" textField="text" valueField="value"
                                                 monaDropDownGroupable [groupBy]="'group'"
-                                                monaDropDownFilterable
+                                                [monaDropDownFilterable]="{debounce: 0}"
                                                 style="width: 200px;" [disabled]="false"
                                                 [showClearButton]="true" [allowCustomValue]="true"
                                                 [valueNormalizer]="comboBoxValueNormalizer$"
@@ -261,10 +261,12 @@
                                                     textField="text"
                                                     valueField="value"
                                                     monaDropDownGroupable [groupBy]="'group'"
+                                                    monaDropDownFilterable
                                                     [showClearButton]="true"
                                                     [ngModel]="autoCompleteValue"
                                                     (ngModelChange)="onAutoCompleteValueChange($event)"
-                                                    style="width: 200px;"></mona-auto-complete>
+                                                    style="width: 200px;">
+                                </mona-auto-complete>
                                 <input monaTextBox [ngModel]="textBoxValue">
                                 <!--                                <mona-text-box [ngModel]="textBoxValue"></mona-text-box>-->
 

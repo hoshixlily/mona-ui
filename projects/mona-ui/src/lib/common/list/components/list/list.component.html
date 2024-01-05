@@ -1,5 +1,5 @@
 <div class="mona-list" [tabindex]="-1" [style.width]="listWidth()" [style.height]="listHeight()">
-    @if (listService.filterableOptions().enabled) {
+    @if (listService.filterableOptions().enabled && listService.filterInputVisible()) {
         <mona-filter-input [filter]="listService.filterText()"
                            [debounce]="listService.filterableOptions().debounce"
                            [placeholder]="listService.filterPlaceholder()"

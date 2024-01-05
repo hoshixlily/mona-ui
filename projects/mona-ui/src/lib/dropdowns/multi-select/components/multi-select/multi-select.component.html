@@ -38,7 +38,7 @@
 
 <ng-template #popupTemplate>
     <div class="mona-dropdown-popup-list-wrapper">
-        <mona-list [height]="200">
+        <mona-list [height]="200" (itemSelect)="onItemSelect($event)">
             @if (itemTemplate) {
                 <ng-template monaListItemTemplate let-dataItem>
                     <ng-container [ngTemplateOutlet]="itemTemplate"

@@ -21,6 +21,7 @@ export class ListService<TData> {
             .toImmutableSet();
     });
     public readonly disabledBy: WritableSignal<string | Predicate<TData>> = signal("");
+    public readonly filterInputVisible: WritableSignal<boolean> = signal(true);
     public readonly filterPlaceholder: WritableSignal<string> = signal("");
     public readonly filterText: WritableSignal<string> = signal("");
     public readonly filterableOptions: WritableSignal<FilterableOptions> = signal({

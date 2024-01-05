@@ -22,7 +22,7 @@ import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from "@angular/f
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { faChevronDown, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { Predicate, Selector } from "@mirei/ts-collections";
-import { distinctUntilChanged, fromEvent, map, Observable, of, Subject, take } from "rxjs";
+import { debounceTime, distinctUntilChanged, fromEvent, map, Observable, of, Subject, take, tap } from "rxjs";
 import { v4 } from "uuid";
 import { AnimationState } from "../../../../animations/models/AnimationState";
 import { PopupAnimationService } from "../../../../animations/services/popup-animation.service";
@@ -215,7 +215,7 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
         } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
             event.preventDefault();
             this.handleArrowKeys(event);
-        } else if (event.key === "Escape") {
+        } else if (event.key === "Escape" || event.key === "Tab") {
             this.close();
         }
     }
@@ -253,7 +253,10 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
         this.#popupRef.closed.pipe(take(1)).subscribe(() => {
             this.#popupRef = null;
             this.listService.clearFilter();
-            this.focus();
+            const popupElement = document.querySelector(`.${this.#popupUidClass}`);
+            if (DropDownService.shouldFocusAfterClose(this.elementRef.nativeElement, popupElement)) {
+                this.focus();
+            }
             if (previousItem !== this.selectedListItem()) {
                 this.notifyValueChange();
             }
@@ -318,6 +321,7 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
     private initialize(): void {
         this.listService.setNavigableOptions({ enabled: true, mode: "select" });
         this.listService.setSelectableOptions(this.selectableOptions);
+        this.listService.filterInputVisible.set(false);
         this.comboBoxValue.set(this.valueText());
     }
 
@@ -350,23 +354,37 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
     }
 
     private setSubscriptions(): void {
-        this.comboBoxValue$.pipe(takeUntilDestroyed(this.#destroyRef), distinctUntilChanged()).subscribe(value => {
-            const item = this.listService
-                .viewItems()
-                .where(i => !i.header && !this.listService.isDisabled(i))
-                .firstOrDefault(i => {
-                    return this.listService.getItemText(i).toLowerCase().includes(value.toLowerCase());
-                });
-            if (!this.#popupRef) {
-                this.open();
-            }
-            if (item) {
-                this.listService.clearSelections();
-                this.listService.highlightedItem.set(item);
-                this.listService.scrollToItem$.next(item);
-            }
-            this.comboBoxValue.set(value);
-        });
+        const debounce = this.listService.filterableOptions().enabled
+            ? this.listService.filterableOptions().debounce
+            : 0;
+        this.comboBoxValue$
+            .pipe(
+                tap(() => {
+                    if (!this.#popupRef) {
+                        this.open();
+                    }
+                }),
+                debounceTime(debounce),
+                takeUntilDestroyed(this.#destroyRef),
+                distinctUntilChanged()
+            )
+            .subscribe(value => {
+                if (this.listService.filterableOptions().enabled) {
+                    this.listService.setFilter(value);
+                }
+                const item = this.listService
+                    .viewItems()
+                    .where(i => !i.header && !this.listService.isDisabled(i))
+                    .firstOrDefault(i => {
+                        return this.listService.getItemText(i).toLowerCase().includes(value.toLowerCase());
+                    });
+                if (item) {
+                    this.listService.clearSelections();
+                    this.listService.highlightedItem.set(item);
+                    this.listService.scrollToItem$.next(item);
+                }
+                this.comboBoxValue.set(value);
+            });
     }
 
     private updateValue(value: TData | null) {

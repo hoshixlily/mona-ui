@@ -26,10 +26,10 @@ export class DropDownService {
         ];
     }
 
-    public focusPopup(popupClass: string): void {
-        const popupElement = document.querySelector(`.${popupClass} ul`);
-        if (popupElement) {
-            (popupElement as HTMLElement).focus();
-        }
+    public static shouldFocusAfterClose(element: HTMLElement, popupElement: Element | null): boolean {
+        const popupHasFocus = popupElement?.contains(document.activeElement);
+        const elementHasFocus = element.contains(document.activeElement);
+        const bodyHasFocus = document.activeElement === document.body;
+        return popupHasFocus || elementHasFocus || bodyHasFocus;
     }
 }

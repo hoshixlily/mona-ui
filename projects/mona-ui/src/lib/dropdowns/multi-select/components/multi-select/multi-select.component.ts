@@ -1,7 +1,6 @@
 import { NgClass, NgFor, NgIf, NgTemplateOutlet } from "@angular/common";
 import {
     ChangeDetectionStrategy,
-    ChangeDetectorRef,
     Component,
     computed,
     ContentChild,
@@ -77,7 +76,7 @@ import { MultiSelectTagTemplateDirective } from "../../directives/multi-select-t
 export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlValueAccessor {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     readonly #popupUidClass: string = `mona-dropdown-popup-${v4()}`;
-    #propagateChange: Action<TData | null> | null = null;
+    #propagateChange: Action<TData[]> | null = null;
     #value: TData[] = [];
 
     protected readonly selectedDataItems: Signal<ImmutableSet<TData>> = computed(() => {
@@ -182,7 +181,7 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
         event.stopImmediatePropagation();
         this.updateValue([]);
         this.listService.clearSelections();
-        // this.#propagateChange(this.#value);
+        this.notifyValueChange();
     }
 
     public close(): void {
@@ -199,20 +198,16 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
         this.setEventListeners();
     }
 
-    // public onPopupListValueChange(event: PopupListValueChangeEvent): void {
-    //     if (this.value && this.containsValue(event.value, this.value)) {
-    //         return;
-    //     }
-    //     this.updateValue(event.value.map(v => v.data));
-    //     this.#propagateChange(this.#value);
-    //     this.cdr.detectChanges();
-    // }
+    public onItemSelect(item: ListItem<TData>): void {
+        this.updateValue(this.selectedDataItems().toArray());
+        this.notifyValueChange();
+    }
 
     public onSelectedItemRemove(event: Event, listItem: ListItem<TData>): void {
         event.stopImmediatePropagation();
         this.listService.deselectItems([listItem]);
         this.updateValue(this.selectedDataItems().toArray());
-        // this.#propagateChange(this.#value);
+        this.notifyValueChange();
     }
 
     public onSelectedItemGroupRemove(event: Event): void {
@@ -223,14 +218,14 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
             .toArray();
         this.listService.deselectItems(removedItems);
         this.updateValue(this.selectedDataItems().toArray());
-        // this.#propagateChange(this.#value);
+        this.notifyValueChange();
     }
 
     public open(): void {
         if (this.popupRef) {
             return;
         }
-        this.dropdownWrapper.nativeElement.focus();
+        this.focus();
         this.popupRef = this.popupService.create({
             anchor: this.dropdownWrapper,
             content: this.popupTemplate,
@@ -246,8 +241,11 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
         this.popupRef.closed.pipe(take(1)).subscribe(() => {
             this.popupRef = null;
             this.listService.highlightedItem.set(null);
-            (this.elementRef.nativeElement.firstElementChild as HTMLElement)?.focus();
             this.listService.clearFilter();
+            const popupElement = document.querySelector(`.${this.#popupUidClass}`);
+            if (DropDownService.shouldFocusAfterClose(this.elementRef.nativeElement, popupElement)) {
+                this.focus();
+            }
         });
     }
 
@@ -268,11 +266,32 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
         }
     }
 
+    private focus(): void {
+        (this.elementRef.nativeElement.firstElementChild as HTMLElement)?.focus();
+    }
+
     private handleArrowKeys(event: KeyboardEvent): void {
         if (event.key === "ArrowDown") {
             this.listService.navigate("next", "highlight");
         } else if (event.key === "ArrowUp") {
             this.listService.navigate("previous", "highlight");
+        }
+    }
+
+    private handleEnterKey(): void {
+        if (!this.popupRef) {
+            this.open();
+            return;
+        }
+        const highlightedItem = this.listService.highlightedItem();
+        if (!highlightedItem) {
+            return;
+        }
+        const selected = this.listService.isSelected(highlightedItem);
+        if (selected) {
+            this.listService.deselectItems([highlightedItem]);
+        } else {
+            this.listService.selectItem(highlightedItem);
         }
     }
 
@@ -282,6 +301,10 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
             enabled: true,
             mode: "multiple"
         });
+    }
+
+    private notifyValueChange(): void {
+        this.#propagateChange?.(this.#value);
     }
 
     private setEventListeners(): void {
@@ -299,41 +322,31 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
             .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe((event: KeyboardEvent) => {
                 if (event.key === "Enter") {
-                    if (!this.popupRef) {
-                        this.open();
-                        return;
-                    }
-                    const highlightedItem = this.listService.highlightedItem();
-                    if (!highlightedItem) {
-                        return;
-                    }
-                    const selected = this.listService.isSelected(highlightedItem);
-                    if (selected) {
-                        this.listService.deselectItems([highlightedItem]);
-                    } else {
-                        this.listService.selectItem(highlightedItem);
-                    }
+                    this.handleEnterKey();
                 } else if (event.key === "Escape") {
                     this.close();
                 } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+                    event.preventDefault();
                     this.handleArrowKeys(event);
                 }
             });
-
         fromEvent<FocusEvent>(this.elementRef.nativeElement, "focusout")
             .pipe(takeUntilDestroyed(this.#destroyRef))
-            .subscribe(() => {
-                this.close();
+            .subscribe(event => {
+                const target = event.relatedTarget as HTMLElement;
+                if (
+                    !(
+                        target &&
+                        (this.elementRef.nativeElement.contains(target) ||
+                            this.popupRef?.overlayRef.overlayElement.contains(target))
+                    )
+                ) {
+                    this.close();
+                }
             });
     }
 
     private updateValue(value: TData[]): void {
         this.#value = value;
-        // const items = this.popupListService.sourceListData
-        //     .selectMany(g => g.source)
-        //     .where(d => (this.value as any[]).some(v => d.dataEquals(v)))
-        //     .toArray();
-        // this.popupListValues = items.map(i => i.data);
-        // this.valuePopupListItem = items;
     }
 }

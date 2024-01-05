@@ -146,7 +146,6 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
 
     public constructor(
         private readonly cdr: ChangeDetectorRef,
-        private readonly dropDownService: DropDownService,
         private readonly elementRef: ElementRef<HTMLElement>,
         private readonly listService: ListService<TData>,
         private readonly popupAnimationService: PopupAnimationService,
@@ -180,6 +179,7 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
     }
 
     public open(): void {
+        this.dropdownWrapper.nativeElement.focus();
         if (this.#popupRef) {
             return;
         }
@@ -196,11 +196,13 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
 
         this.popupAnimationService.setupDropdownOutsideClickCloseAnimation(this.#popupRef);
         this.popupAnimationService.animateDropdown(this.#popupRef, AnimationState.Show);
-        // this.dropDownService.focusPopup(this.#popupUidClass);
         const previousItem = this.selectedListItem();
         this.#popupRef.closed.pipe(take(1)).subscribe(() => {
             this.#popupRef = null;
-            // this.focus();
+            const popupElement = document.querySelector(`.${this.#popupUidClass}`);
+            if (DropDownService.shouldFocusAfterClose(this.elementRef.nativeElement, popupElement)) {
+                this.focus();
+            }
             this.listService.clearFilter();
             if (previousItem !== this.selectedListItem()) {
                 this.notifyValueChange();
@@ -237,17 +239,17 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
     }
 
     private handleArrowKeys(event: KeyboardEvent): void {
-        // if (this.#popupRef) {
-        //     return;
-        // }
         const previousItem = this.selectedListItem();
-        const item = this.listService.navigate(event.key === "ArrowDown" ? "next" : "previous", "select");
+        const direction = event.key === "ArrowDown" ? "next" : "previous";
+        const item = this.listService.navigate(direction, "select");
         if (item) {
             if (previousItem === item) {
                 return;
             }
             this.updateValue(item.data);
-            this.notifyValueChange();
+            if (!this.#popupRef) {
+                this.notifyValueChange();
+            }
         }
     }
 
@@ -259,19 +261,14 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
         this.open();
     }
 
-    private handleEscapeKey(): void {
-        if (this.#popupRef) {
-            this.close();
-        }
-    }
-
     private handleKeyDown(event: KeyboardEvent): void {
         if (event.key === "Enter") {
             this.handleEnterKey();
         } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+            event.preventDefault();
             this.handleArrowKeys(event);
-        } else if (event.key === "Escape") {
-            this.handleEscapeKey();
+        } else if (event.key === "Escape" || event.key === "Tab") {
+            this.close();
         }
     }
 
@@ -292,8 +289,15 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
             });
         fromEvent<FocusEvent>(this.elementRef.nativeElement, "focusout")
             .pipe(takeUntilDestroyed(this.#destroyRef))
-            .subscribe(() => {
-                this.close();
+            .subscribe(event => {
+                const target = event.relatedTarget as HTMLElement;
+                if (
+                    target &&
+                    (this.elementRef.nativeElement.contains(target) ||
+                        this.#popupRef?.overlayRef.overlayElement.contains(target))
+                ) {
+                    return;
+                }
             });
     }
 

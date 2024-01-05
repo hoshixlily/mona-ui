@@ -21,7 +21,7 @@ import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from "@angular/f
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { Predicate, Selector } from "@mirei/ts-collections";
-import { fromEvent, Subject, take } from "rxjs";
+import { debounceTime, fromEvent, Subject, take, tap } from "rxjs";
 import { v4 } from "uuid";
 import { AnimationState } from "../../animations/models/AnimationState";
 import { PopupAnimationService } from "../../animations/services/popup-animation.service";
@@ -100,9 +100,6 @@ export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccesso
     @ViewChild("dropdownWrapper")
     public dropdownWrapper!: ElementRef<HTMLDivElement>;
 
-    @Input()
-    public filterable: boolean = false;
-
     @ContentChild(ComboBoxGroupTemplateDirective, { read: TemplateRef })
     public groupTemplate: TemplateRef<any> | null = null;
 
@@ -169,13 +166,13 @@ export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccesso
     }
 
     public onKeydown(event: KeyboardEvent): void {
-        if (event.key === "Enter") {
+        if (event.key === "Escape" || event.key === "Tab") {
+            this.close();
+        } else if (event.key === "Enter") {
             this.handleEnterKey();
         } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
             event.preventDefault();
             this.handleArrowKeys(event);
-        } else if (event.key === "Escape") {
-            this.close();
         }
     }
 
@@ -204,7 +201,10 @@ export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccesso
             this.popupRef = null;
             this.listService.clearSelections();
             this.listService.clearFilter();
-            this.focus();
+            const popupElement = document.querySelector(`.${this.#popupUidClass}`);
+            if (DropDownService.shouldFocusAfterClose(this.elementRef.nativeElement, popupElement)) {
+                this.focus();
+            }
             const input = this.elementRef.nativeElement.querySelector("input");
             if (input) {
                 input.focus();
@@ -264,7 +264,7 @@ export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccesso
     private initialize(): void {
         this.listService.setNavigableOptions({ enabled: true, mode: "highlight" });
         this.listService.setSelectableOptions(this.selectableOptions);
-        // this.autoCompleteValue.set(this.valueText());
+        this.listService.filterInputVisible.set(false);
     }
 
     private notifyValueChange(): void {
@@ -298,27 +298,39 @@ export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccesso
     }
 
     private setSubscriptions(): void {
-        this.autoCompleteValue$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe((value: string) => {
-            if (!value) {
+        const debounce = this.listService.filterableOptions().enabled
+            ? this.listService.filterableOptions().debounce
+            : 0;
+        this.autoCompleteValue$
+            .pipe(
+                tap(() => {
+                    if (!this.popupRef) {
+                        this.open();
+                    }
+                }),
+                debounceTime(debounce),
+                takeUntilDestroyed(this.#destroyRef)
+            )
+            .subscribe((value: string) => {
+                if (!value) {
+                    this.autoCompleteValue.set(value);
+                    this.close();
+                    return;
+                }
+                if (this.listService.filterableOptions().enabled) {
+                    this.listService.setFilter(value);
+                }
+                const item = this.getItemStartsWith(value);
+                if (item) {
+                    this.listService.clearSelections();
+                    this.listService.highlightedItem.set(item);
+                    this.listService.scrollToItem$.next(item);
+                } else {
+                    this.listService.clearSelections();
+                    this.listService.highlightedItem.set(null);
+                }
                 this.autoCompleteValue.set(value);
-                this.close();
-                return;
-            }
-            // this.listService.setFilter(value);
-            const item = this.getItemStartsWith(value);
-            if (!this.popupRef) {
-                this.open();
-            }
-            if (item) {
-                this.listService.clearSelections();
-                this.listService.highlightedItem.set(item);
-                this.listService.scrollToItem$.next(item);
-            } else {
-                this.listService.clearSelections();
-                this.listService.highlightedItem.set(null);
-            }
-            this.autoCompleteValue.set(value);
-        });
+            });
     }
 
     private updateValue(value: string) {

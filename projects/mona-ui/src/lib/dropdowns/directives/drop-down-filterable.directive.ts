@@ -1,12 +1,14 @@
-import { Directive, EventEmitter, Input, Output } from "@angular/core";
+import { Directive, EventEmitter, Input, Output, Type } from "@angular/core";
 import { FilterChangeEvent } from "../../common/filter-input/models/FilterChangeEvent";
 import { FilterableOptions } from "../../common/list/models/FilterableOptions";
 import { ListService } from "../../common/list/services/list.service";
 
 @Directive({
     selector: `
+        mona-auto-complete[monaDropDownFilterable],
         mona-drop-down-list[monaDropDownFilterable],
-        mona-combo-box[monaDropDownFilterable]
+        mona-combo-box[monaDropDownFilterable],
+        mona-multi-select[monaDropDownFilterable]
     `,
     standalone: true
 })
