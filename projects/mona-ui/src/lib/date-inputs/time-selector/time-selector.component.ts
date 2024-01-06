@@ -40,22 +40,33 @@ import { NgClass, NgFor, NgIf, DecimalPipe } from "@angular/common";
 export class TimeSelectorComponent implements OnInit, AfterViewInit, ControlValueAccessor {
     #propagateChange: Action<Date | null> | null = null;
     #value: Date | null = null;
-    public amMeridiemVisible: boolean = true;
-    public hour: Signal<number> = signal(0);
-    public hours: TimeUnit[] = [];
-    public meridiem: Meridiem = "AM";
-    public minute: Signal<number> = signal(0);
-    public minutes: TimeUnit[] = [];
-    public navigatedDate: WritableSignal<Date> = signal(new Date());
-    public pmMeridiemVisible: boolean = true;
-    public second: Signal<number> = signal(0);
-    public seconds: TimeUnit[] = [];
+    protected readonly amMeridiemVisible: Signal<boolean> = computed(() => {
+        const min = this.minDate();
+        return !(min && min.getHours() >= 12);
+    });
+    protected readonly hour: Signal<number> = computed(() => {
+        const hour = this.navigatedDate().getHours();
+        if (this.hourFormat === "24") {
+            return hour;
+        }
+        return hour % 12 || 12;
+    });
+    protected readonly maxDate: WritableSignal<Date | null> = signal(null);
+    protected readonly minDate: WritableSignal<Date | null> = signal(null);
+    protected readonly minute: Signal<number> = computed(() => this.navigatedDate().getMinutes());
+    protected readonly navigatedDate: WritableSignal<Date> = signal(new Date());
+    protected readonly pmMeridiemVisible: Signal<boolean> = computed(() => {
+        const max = this.maxDate();
+        return !(max && max.getHours() < 12);
+    });
+    protected readonly second: Signal<number> = computed(() => this.navigatedDate().getSeconds());
+    protected hours: TimeUnit[] = [];
+    protected meridiem: Meridiem = "AM";
+    protected minutes: TimeUnit[] = [];
+    protected seconds: TimeUnit[] = [];
 
     @Input()
     public disabled: boolean = false;
-
-    @Input()
-    public format: string = "HH:mm";
 
     @Input()
     public hourFormat: "12" | "24" = "24";
@@ -64,10 +75,14 @@ export class TimeSelectorComponent implements OnInit, AfterViewInit, ControlValu
     public hoursListElement!: ElementRef<HTMLOListElement>;
 
     @Input()
-    public max: Date | null = null;
+    public set max(value: Date | null) {
+        this.maxDate.set(value);
+    }
 
     @Input()
-    public min: Date | null = null;
+    public set min(value: Date | null) {
+        this.minDate.set(value);
+    }
 
     @ViewChild("minutesListElement")
     public minutesListElement!: ElementRef<HTMLOListElement>;
@@ -100,29 +115,8 @@ export class TimeSelectorComponent implements OnInit, AfterViewInit, ControlValu
         this.seconds = Enumerable.range(0, 60)
             .select<TimeUnit>(s => ({ value: s, viewValue: s }))
             .toArray();
-        if (this.value) {
-            this.navigatedDate.set(this.value);
-        }
-        this.hour = computed(() => {
-            const hour = this.navigatedDate().getHours();
-            if (this.hourFormat === "24") {
-                return hour;
-            }
-            return hour % 12 || 12;
-        });
-        this.minute = computed(() => this.navigatedDate().getMinutes());
-        this.second = computed(() => this.navigatedDate().getSeconds());
-
-        if (this.min) {
-            if (this.min.getHours() >= 12) {
-                this.amMeridiemVisible = false;
-            }
-        }
-
-        if (this.max) {
-            if (this.max.getHours() < 12) {
-                this.pmMeridiemVisible = false;
-            }
+        if (this.#value) {
+            this.navigatedDate.set(this.#value);
         }
     }
 
@@ -201,12 +195,14 @@ export class TimeSelectorComponent implements OnInit, AfterViewInit, ControlValu
     }
 
     private initializeNavigatedDate(date: Date | null): void {
+        const min = this.minDate();
+        const max = this.maxDate();
         if (!date) {
             this.navigatedDate.set(DateTime.now().toJSDate());
-        } else if (this.min && date < this.min) {
-            this.navigatedDate.set(this.min);
-        } else if (this.max && date > this.max) {
-            this.navigatedDate.set(this.max);
+        } else if (min && date < min) {
+            this.navigatedDate.set(min);
+        } else if (max && date > max) {
+            this.navigatedDate.set(max);
         } else {
             this.navigatedDate.set(date);
         }
@@ -236,14 +232,16 @@ export class TimeSelectorComponent implements OnInit, AfterViewInit, ControlValu
     }
 
     private setDateValues(): void {
-        this.initializeNavigatedDate(this.value);
+        this.initializeNavigatedDate(this.#value);
         this.meridiem = this.navigatedDate().getHours() >= 12 ? "PM" : "AM";
     }
 
     private updateHourToFitInMaxAndMin(): TimeUnit | null {
+        const min = this.minDate();
+        const max = this.maxDate();
         const timeLimiterPipe = new TimeLimiterPipe();
         const hours = new HourSelectorPipe().transform([], this.hourFormat, this.meridiem);
-        const hourRange = timeLimiterPipe.transform(hours, "h", this.navigatedDate(), this.min, this.max);
+        const hourRange = timeLimiterPipe.transform(hours, "h", this.navigatedDate(), min, max);
         if (!hourRange.map(h => h.value).includes(this.hour())) {
             const date = new Date(this.navigatedDate());
             date.setHours(hourRange[0].value);
@@ -254,8 +252,10 @@ export class TimeSelectorComponent implements OnInit, AfterViewInit, ControlValu
     }
 
     private updateMinuteToFitInMaxAndMin(): TimeUnit | null {
+        const min = this.minDate();
+        const max = this.maxDate();
         const timeLimiterPipe = new TimeLimiterPipe();
-        const minuteRange = timeLimiterPipe.transform(this.minutes, "m", this.navigatedDate(), this.min, this.max);
+        const minuteRange = timeLimiterPipe.transform(this.minutes, "m", this.navigatedDate(), min, max);
         if (!minuteRange.map(m => m.value).includes(this.minute())) {
             const date = new Date(this.navigatedDate());
             date.setMinutes(minuteRange[0].value);
@@ -266,8 +266,10 @@ export class TimeSelectorComponent implements OnInit, AfterViewInit, ControlValu
     }
 
     private updateSecondToFitInMaxAndMin(): TimeUnit | null {
+        const min = this.minDate();
+        const max = this.maxDate();
         const timeLimiterPipe = new TimeLimiterPipe();
-        const secondRange = timeLimiterPipe.transform(this.seconds, "s", this.navigatedDate(), this.min, this.max);
+        const secondRange = timeLimiterPipe.transform(this.seconds, "s", this.navigatedDate(), min, max);
         if (!secondRange.map(s => s.value).includes(this.second())) {
             const date = new Date(this.navigatedDate());
             date.setSeconds(secondRange[0].value);
@@ -275,9 +277,5 @@ export class TimeSelectorComponent implements OnInit, AfterViewInit, ControlValu
             return secondRange[0];
         }
         return null;
-    }
-
-    public get value(): Date | null {
-        return this.#value;
     }
 }

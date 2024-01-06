@@ -11,6 +11,7 @@ import {
     ViewChild,
     WritableSignal
 } from "@angular/core";
+import { DropDownService } from "../../dropdowns/services/drop-down.service";
 import { PopupService } from "../../popup/services/popup.service";
 import { FocusMonitor } from "@angular/cdk/a11y";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from "@angular/forms";
@@ -141,10 +142,9 @@ export class DatePickerComponent implements OnInit, ControlValueAccessor {
     }
 
     public onDateInputButtonClick(): void {
-        if (!this.datePopupTemplateRef || this.readonly) {
+        if (!this.datePopupTemplateRef || this.readonly || this.popupRef) {
             return;
         }
-
         const input = this.elementRef.nativeElement.querySelector("input") as HTMLElement;
         this.popupRef = this.popupService.create({
             anchor: this.popupAnchor,
@@ -156,22 +156,7 @@ export class DatePickerComponent implements OnInit, ControlValueAccessor {
             hasBackdrop: false,
             withPush: false,
             closeOnOutsideClick: false,
-            positions: [
-                new ConnectionPositionPair(
-                    { originX: "start", originY: "bottom" },
-                    { overlayX: "start", overlayY: "top" },
-                    -1,
-                    0,
-                    "mona-dropdown-popup-content-bottom"
-                ),
-                new ConnectionPositionPair(
-                    { originX: "start", originY: "top" },
-                    { overlayX: "start", overlayY: "bottom" },
-                    -1,
-                    -1,
-                    "mona-dropdown-popup-content-top"
-                )
-            ]
+            positions: DropDownService.getDefaultPositions()
         });
         this.popupAnimationService.setupDropdownOutsideClickCloseAnimation(this.popupRef);
         this.popupAnimationService.animateDropdown(this.popupRef, AnimationState.Show);
