@@ -115,7 +115,7 @@ export class PagerComponent implements OnInit, AfterViewInit, OnDestroy {
     public pageSizeChange: EventEmitter<PageSizeChangeEvent> = new EventEmitter<PageSizeChangeEvent>();
 
     @ViewChild("pageSizeDropdownList")
-    public pageSizeDropdownList?: DropDownListComponent;
+    public pageSizeDropdownList?: DropDownListComponent<number>;
 
     @Input()
     public previousNext: boolean = true;

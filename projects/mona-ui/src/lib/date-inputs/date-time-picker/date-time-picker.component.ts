@@ -2,15 +2,20 @@ import {
     ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
+    computed,
     ElementRef,
     forwardRef,
     HostBinding,
     Input,
     OnInit,
+    Signal,
+    signal,
     TemplateRef,
-    ViewChild
+    ViewChild,
+    WritableSignal
 } from "@angular/core";
 import { faCalendar, faClock, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { DropDownService } from "../../dropdowns/services/drop-down.service";
 import { PopupService } from "../../popup/services/popup.service";
 import { FocusMonitor } from "@angular/cdk/a11y";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from "@angular/forms";
@@ -52,13 +57,42 @@ import { NgClass } from "@angular/common";
     ]
 })
 export class DateTimePickerComponent implements OnInit, ControlValueAccessor {
-    #value: Date | null = null;
+    readonly #format: WritableSignal<string> = signal("dd/MM/yyyy HH:mm");
+    readonly #value: WritableSignal<Date | null> = signal(null);
+    #popupRef: PopupRef | null = null;
     #propagateChange: Action<Date | null> | null = null;
-    public readonly dateIcon: IconDefinition = faCalendar;
-    public readonly timeIcon: IconDefinition = faClock;
-    private popupRef: PopupRef | null = null;
-    public currentDateString: string = "";
-    public navigatedDate: Date = new Date();
+    protected readonly currentDateString: WritableSignal<string> = signal("");
+    protected readonly dateIcon: IconDefinition = faCalendar;
+    protected readonly maxDate: WritableSignal<Date | null> = signal(null);
+    protected readonly minDate: WritableSignal<Date | null> = signal(null);
+    protected readonly navigatedDate: WritableSignal<Date> = signal(new Date());
+    protected readonly timeIcon: IconDefinition = faClock;
+    protected readonly timePickerMax: Signal<Date | null> = computed(() => {
+        const maxDate = this.maxDate();
+        const navigatedDate = this.navigatedDate();
+        if (!maxDate) {
+            return null;
+        }
+        const max = DateTime.fromJSDate(maxDate);
+        const date = DateTime.fromJSDate(navigatedDate);
+        if (max.year === date.year && max.month === date.month && max.day === date.day) {
+            return maxDate;
+        }
+        return null;
+    });
+    protected readonly timePickerMin: Signal<Date | null> = computed(() => {
+        const minDate = this.minDate();
+        const navigatedDate = this.navigatedDate();
+        if (!minDate) {
+            return null;
+        }
+        const min = DateTime.fromJSDate(minDate);
+        const date = DateTime.fromJSDate(navigatedDate);
+        if (min.year === date.year && min.month === date.month && min.day === date.day) {
+            return minDate;
+        }
+        return null;
+    });
 
     @HostBinding("class.mona-dropdown")
     public readonly hostClass: boolean = true;
@@ -73,16 +107,22 @@ export class DateTimePickerComponent implements OnInit, ControlValueAccessor {
     public disabledDates: Iterable<Date> = [];
 
     @Input()
-    public format: string = "dd/MM/yyyy HH:mm";
+    public set format(value: string) {
+        this.#format.set(value);
+    }
 
     @Input()
     public hourFormat: "12" | "24" = "24";
 
     @Input()
-    public max: Date | null = null;
+    public set max(value: Date | null) {
+        this.maxDate.set(value);
+    }
 
     @Input()
-    public min: Date | null = null;
+    public set min(value: Date | null) {
+        this.minDate.set(value);
+    }
 
     @Input()
     public readonly: boolean = false;
@@ -112,40 +152,37 @@ export class DateTimePickerComponent implements OnInit, ControlValueAccessor {
         if (date) {
             const inRangeDate = this.updateDateIfNotInRange(date);
             this.setCurrentDate(inRangeDate);
-            this.navigatedDate = inRangeDate;
+            this.navigatedDate.set(inRangeDate);
         }
-        if (this.popupRef) {
-            this.popupAnimationService.animateDropdown(this.popupRef, AnimationState.Hide);
-            this.popupRef.closeWithDelay();
+        if (this.#popupRef) {
+            this.popupAnimationService.animateDropdown(this.#popupRef, AnimationState.Hide);
+            this.#popupRef.closeWithDelay();
         }
     }
 
     public onDateInputBlur(): void {
-        if (this.popupRef) {
+        if (this.#popupRef) {
             return;
         }
-        if (!this.currentDateString && this.value) {
+        if (!this.currentDateString() && this.#value()) {
             this.setCurrentDate(null);
             return;
         }
 
-        const dateTime = DateTime.fromFormat(this.currentDateString, this.format);
-        if (this.dateStringEquals(this.value, dateTime.toJSDate())) {
+        const dateTime = DateTime.fromFormat(this.currentDateString(), this.#format());
+        if (this.dateStringEquals(this.#value(), dateTime.toJSDate())) {
             return;
         }
         if (dateTime.isValid) {
-            if (this.value && DateTime.fromJSDate(this.value).equals(dateTime)) {
+            const value = this.#value();
+            if (value && DateTime.fromJSDate(value).equals(dateTime)) {
                 return;
             }
             const inRangeDate = this.updateDateIfNotInRange(dateTime.toJSDate());
             this.setCurrentDate(inRangeDate);
-            this.navigatedDate = inRangeDate;
+            this.navigatedDate.set(inRangeDate);
         } else {
-            if (this.value) {
-                this.currentDateString = DateTime.fromJSDate(this.value).toFormat(this.format);
-            } else {
-                this.currentDateString = "";
-            }
+            this.updateCurrentDateString(this.#value(), this.#format());
         }
         this.cdr.detectChanges();
     }
@@ -156,7 +193,7 @@ export class DateTimePickerComponent implements OnInit, ControlValueAccessor {
         }
 
         const input = this.elementRef.nativeElement.querySelector("input") as HTMLElement;
-        this.popupRef = this.popupService.create({
+        this.#popupRef = this.popupService.create({
             anchor: this.popupAnchor,
             content: this.datePopupTemplateRef,
             width: this.elementRef.nativeElement.getBoundingClientRect().width,
@@ -166,39 +203,24 @@ export class DateTimePickerComponent implements OnInit, ControlValueAccessor {
             hasBackdrop: false,
             withPush: false,
             closeOnOutsideClick: false,
-            positions: [
-                new ConnectionPositionPair(
-                    { originX: "start", originY: "bottom" },
-                    { overlayX: "start", overlayY: "top" },
-                    -1,
-                    0,
-                    "mona-dropdown-popup-content-bottom"
-                ),
-                new ConnectionPositionPair(
-                    { originX: "start", originY: "top" },
-                    { overlayX: "start", overlayY: "bottom" },
-                    -1,
-                    -1,
-                    "mona-dropdown-popup-content-top"
-                )
-            ]
+            positions: DropDownService.getDefaultPositions()
         });
-        this.setAnimations(this.popupRef, AnimationState.Show);
-        this.popupRef.closed.pipe(take(1)).subscribe(() => {
+        this.setAnimations(this.#popupRef, AnimationState.Show);
+        this.#popupRef.closed.pipe(take(1)).subscribe(() => {
             this.focusMonitor.focusVia(input, "program");
         });
         this.cdr.detectChanges();
     }
 
     public onDateStringEdit(dateString: string): void {
-        this.currentDateString = dateString;
+        this.currentDateString.set(dateString);
     }
 
     public onTimeInputButtonClick(): void {
         if (!this.timePopupTemplateRef || this.readonly) {
             return;
         }
-        this.popupRef = this.popupService.create({
+        this.#popupRef = this.popupService.create({
             anchor: this.popupAnchor,
             content: this.timePopupTemplateRef,
             width: this.elementRef.nativeElement.getBoundingClientRect().width,
@@ -206,26 +228,11 @@ export class DateTimePickerComponent implements OnInit, ControlValueAccessor {
             hasBackdrop: false,
             withPush: false,
             closeOnOutsideClick: false,
-            positions: [
-                new ConnectionPositionPair(
-                    { originX: "start", originY: "bottom" },
-                    { overlayX: "start", overlayY: "top" },
-                    -1,
-                    0,
-                    "mona-dropdown-popup-content-bottom"
-                ),
-                new ConnectionPositionPair(
-                    { originX: "start", originY: "top" },
-                    { overlayX: "start", overlayY: "bottom" },
-                    -1,
-                    -1,
-                    "mona-dropdown-popup-content-top"
-                )
-            ]
+            positions: DropDownService.getDefaultPositions()
         });
-        this.setAnimations(this.popupRef, AnimationState.Show);
+        this.setAnimations(this.#popupRef, AnimationState.Show);
         const input = this.elementRef.nativeElement.querySelector("input") as HTMLElement;
-        this.popupRef.closed.pipe(take(1)).subscribe(() => {
+        this.#popupRef.closed.pipe(take(1)).subscribe(() => {
             this.focusMonitor.focusVia(input, "program");
         });
     }
@@ -234,7 +241,7 @@ export class DateTimePickerComponent implements OnInit, ControlValueAccessor {
         if (date) {
             const inRangeDate = this.updateDateIfNotInRange(date);
             this.setCurrentDate(inRangeDate);
-            this.navigatedDate = inRangeDate;
+            this.navigatedDate.set(inRangeDate);
         }
     }
 
@@ -249,19 +256,16 @@ export class DateTimePickerComponent implements OnInit, ControlValueAccessor {
     }
 
     public writeValue(date: Date | null | undefined): void {
-        this.#value = date ?? null;
-        if (date == null) {
-            this.currentDateString = "";
-        } else {
-            this.currentDateString = DateTime.fromJSDate(date).toFormat(this.format);
-        }
+        this.#value.set(date ?? null);
+        this.updateCurrentDateString(date, this.#format());
         this.setDateValues();
     }
 
     private dateStringEquals(date1: Date | null, date2: Date | null): boolean {
         if (date1 && date2) {
             return (
-                DateTime.fromJSDate(date1).toFormat(this.format) === DateTime.fromJSDate(date2).toFormat(this.format)
+                DateTime.fromJSDate(date1).toFormat(this.#format()) ===
+                DateTime.fromJSDate(date2).toFormat(this.#format())
             );
         }
         return date1 === date2;
@@ -273,72 +277,54 @@ export class DateTimePickerComponent implements OnInit, ControlValueAccessor {
     }
 
     private setCurrentDate(date: Date | null): void {
-        this.#value = date;
-        if (date) {
-            this.currentDateString = DateTime.fromJSDate(date).toFormat(this.format);
-        } else {
-            this.currentDateString = "";
-        }
+        this.#value.set(date);
+        this.updateCurrentDateString(date, this.#format());
         this.#propagateChange?.(date);
         this.cdr.markForCheck();
     }
 
     private setDateValues(): void {
-        if (this.value) {
-            this.navigatedDate = DateTime.fromJSDate(this.value).toJSDate();
+        const value = this.#value();
+        const maxDate = this.maxDate();
+        const minDate = this.minDate();
+        if (value) {
+            this.navigatedDate.set(DateTime.fromJSDate(value).toJSDate());
         } else {
-            if (this.min) {
-                this.navigatedDate = DateTime.fromJSDate(this.min).toJSDate();
-            } else if (this.max) {
-                if (this.max.getTime() < DateTime.now().toMillis()) {
-                    this.navigatedDate = DateTime.fromJSDate(this.max).toJSDate();
+            if (minDate) {
+                this.navigatedDate.set(DateTime.fromJSDate(minDate).toJSDate());
+            } else if (maxDate) {
+                if (maxDate.getTime() < DateTime.now().toMillis()) {
+                    this.navigatedDate.set(DateTime.fromJSDate(maxDate).toJSDate());
                 } else {
-                    this.navigatedDate = DateTime.now().toJSDate();
+                    this.navigatedDate.set(DateTime.now().toJSDate());
                 }
             } else {
-                this.navigatedDate = DateTime.now().toJSDate();
+                this.navigatedDate.set(DateTime.now().toJSDate());
             }
         }
-        if (this.value) {
-            this.currentDateString = DateTime.fromJSDate(this.value).toFormat(this.format);
+        if (this.#value()) {
+            this.updateCurrentDateString(this.#value(), this.#format());
         }
     }
 
     private updateDateIfNotInRange(date: Date): Date {
-        if (this.min && date < this.min) {
-            return this.min;
+        const maxDate = this.maxDate();
+        const minDate = this.minDate();
+        if (minDate && date < minDate) {
+            return minDate;
         }
-        if (this.max && date > this.max) {
-            return this.max;
+        if (maxDate && date > maxDate) {
+            return maxDate;
         }
         return date;
     }
 
-    public get timePickerMax(): Date | null {
-        if (!this.max) {
-            return null;
+    private updateCurrentDateString(date: Date | null | undefined, format: string): void {
+        if (!date) {
+            this.currentDateString.set("");
+            return;
         }
-        const max = DateTime.fromJSDate(this.max);
-        const date = DateTime.fromJSDate(this.navigatedDate);
-        if (max.year === date.year && max.month === date.month && max.day === date.day) {
-            return this.max;
-        }
-        return null;
-    }
-
-    public get timePickerMin(): Date | null {
-        if (!this.min) {
-            return null;
-        }
-        const min = DateTime.fromJSDate(this.min);
-        const date = DateTime.fromJSDate(this.navigatedDate);
-        if (min.year === date.year && min.month === date.month && min.day === date.day) {
-            return this.min;
-        }
-        return null;
-    }
-
-    public get value(): Date | null {
-        return this.#value;
+        const dateString = DateTime.fromJSDate(date).toFormat(format);
+        this.currentDateString.set(dateString);
     }
 }

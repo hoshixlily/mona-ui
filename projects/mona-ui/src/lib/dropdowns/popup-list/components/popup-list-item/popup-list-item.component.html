@@ -1,5 +1,0 @@
-@if (itemTemplate) {
-    <ng-container [ngTemplateOutlet]="itemTemplate" [ngTemplateOutletContext]="{$implicit: item?.data, listItem: item}"></ng-container>
-} @else {
-    {{item?.text}}
-}

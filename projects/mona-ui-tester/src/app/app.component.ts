@@ -97,9 +97,9 @@ import {
     BreadcrumbItemTemplateDirective,
     BreadcrumbSeparatorTemplateDirective,
     CircularProgressBarLabelTemplateDirective,
-    ComboBoxGroupTemplateDirective,
+    ComboBoxGroupHeaderTemplateDirective,
     ComboBoxItemTemplateDirective,
-    DropDownListGroupTemplateDirective,
+    DropDownListGroupHeaderTemplateDirective,
     DropDownListItemTemplateDirective,
     DropDownListValueTemplateDirective,
     ExpansionPanelActionsTemplateDirective,
@@ -113,7 +113,7 @@ import {
     ListViewHeaderTemplateDirective,
     MenuItemIconTemplateDirective,
     MenuItemTextTemplateDirective,
-    MultiSelectGroupTemplateDirective,
+    MultiSelectGroupHeaderTemplateDirective,
     MultiSelectItemTemplateDirective,
     MultiSelectSummaryTagTemplateDirective,
     MultiSelectTagTemplateDirective,
@@ -138,9 +138,31 @@ import {
     DropDownTreeExpandableDirective,
     TreeViewFilterableDirective,
     FilterChangeEvent,
-    DropDownTreeFilterableDirective
+    DropDownTreeFilterableDirective,
+    // ListComponent,
+    // ListService,
+    // ListItemTemplateDirective,
+    // ListGroupHeaderTemplateDirective,
+    // ListSelectableDirective,
+    // ListGroupableDirective,
+    // ListVirtualScrollDirective,
+    // ListFooterTemplateDirective,
+    // ListHeaderTemplateDirective,
+    // ListNavigableDirective,
+    DropDownGroupableDirective,
+    DropDownFilterableDirective,
+    ComboBoxFooterTemplateDirective,
+    ComboBoxHeaderTemplateDirective,
+    ComboBoxNoDataTemplateDirective,
+    DropDownListFooterTemplateDirective,
+    DropDownListHeaderTemplateDirective,
+    DropDownListNoDataTemplateDirective,
+    MultiSelectFooterTemplateDirective,
+    MultiSelectHeaderTemplateDirective,
+    MultiSelectNoDataTemplateDirective
 } from "mona-ui";
 import { v4 } from "uuid";
+import { ListFilterableDirective } from "../../../mona-ui/src/lib/common/list/directives/list-filterable.directive";
 import { TestComponentComponent } from "./test-component/test-component.component";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import {
@@ -154,7 +176,7 @@ import {
     faSun,
     faTimes
 } from "@fortawesome/free-solid-svg-icons";
-import { Enumerable, IndexableList, List } from "@mirei/ts-collections";
+import { Enumerable, ImmutableList, ImmutableSet, IndexableList, List } from "@mirei/ts-collections";
 import { map, Observable, take } from "rxjs";
 import { DateTime } from "luxon";
 import { GridProductData } from "./GridProductData";
@@ -181,16 +203,24 @@ import { GridOrderData } from "./GridOrderData";
         ColorPaletteComponent,
         ColorPickerComponent,
         ComboBoxComponent,
-        ComboBoxGroupTemplateDirective,
+        ComboBoxFooterTemplateDirective,
+        ComboBoxHeaderTemplateDirective,
+        ComboBoxGroupHeaderTemplateDirective,
         ComboBoxItemTemplateDirective,
+        ComboBoxNoDataTemplateDirective,
         CommonModule,
         ContextMenuComponent,
         DatePickerComponent,
         DateTimePickerComponent,
         DropDownButtonComponent,
+        DropDownFilterableDirective,
+        DropDownGroupableDirective,
         DropDownListComponent,
-        DropDownListGroupTemplateDirective,
+        DropDownListFooterTemplateDirective,
+        DropDownListGroupHeaderTemplateDirective,
+        DropDownListHeaderTemplateDirective,
         DropDownListItemTemplateDirective,
+        DropDownListNoDataTemplateDirective,
         DropDownListValueTemplateDirective,
         ExpansionPanelComponent,
         ExpansionPanelActionsTemplateDirective,
@@ -220,8 +250,11 @@ import { GridOrderData } from "./GridOrderData";
         MenuItemIconTemplateDirective,
         MenuItemTextTemplateDirective,
         MultiSelectComponent,
-        MultiSelectGroupTemplateDirective,
+        MultiSelectFooterTemplateDirective,
+        MultiSelectGroupHeaderTemplateDirective,
+        MultiSelectHeaderTemplateDirective,
         MultiSelectItemTemplateDirective,
+        MultiSelectNoDataTemplateDirective,
         MultiSelectSummaryTagDirective,
         MultiSelectSummaryTagTemplateDirective,
         MultiSelectTagTemplateDirective,
@@ -269,8 +302,20 @@ import { GridOrderData } from "./GridOrderData";
         DropDownTreeComponent,
         DropDownTreeExpandableDirective,
         TreeViewFilterableDirective,
-        DropDownTreeFilterableDirective
+        DropDownTreeFilterableDirective,
+
+        // ListComponent,
+        ListFilterableDirective
+        // ListFooterTemplateDirective,
+        // ListGroupHeaderTemplateDirective,
+        // ListGroupableDirective,
+        // ListHeaderTemplateDirective,
+        // ListItemTemplateDirective,
+        // ListNavigableDirective,
+        // ListSelectableDirective,
+        // ListVirtualScrollDirective
     ]
+    // providers: [ListService]
 })
 export class AppComponent implements OnInit {
     public readonly closeIcon: IconDefinition = faTimes;
@@ -376,7 +421,7 @@ export class AppComponent implements OnInit {
         new Date(2023, 1, 21),
         new Date(2023, 1, 28)
     ];
-    public dropdownListDataItems: IndexableList<any> = new IndexableList([
+    public dropdownListDataItems: ImmutableList<any> = ImmutableList.create([
         { text: "Cherry", value: 1, group: "Fruit", active: true },
         { text: "Cabbage", value: 2, group: "Vegetable", active: true },
         { text: "Grilled Meat", value: 3, group: "Food", active: true },
@@ -596,7 +641,8 @@ export class AppComponent implements OnInit {
     ];
     public selectedComboBoxDataItem: any = null;
     public selectedDropdownListDataItem: any;
-    public selectedMultiSelectDataItems: any[] = [this.dropdownListDataItems[2], this.dropdownListDataItems[4]];
+    public selectedListItem: any;
+    public selectedMultiSelectDataItems: any[] = [this.dropdownListDataItems.get(2), this.dropdownListDataItems.get(4)];
     public selectedMultiSelectDataItems2: any[] = [
         { text: "REPLACED WITH PAPRIKA", value: 13, group: "Fruit", active: true },
         { text: "REPLACED WITH Okonomiyaki", value: 29, group: "FOODIE", active: true }
@@ -723,6 +769,7 @@ export class AppComponent implements OnInit {
     public constructor(
         private readonly popupService: PopupService,
         public readonly windowService: WindowService,
+        // protected readonly listService: ListService<{ text: string; value: number; group: string; active: boolean }>,
         private readonly cdr: ChangeDetectorRef,
         private readonly notificationService: NotificationService,
         private readonly dialogService: DialogService
@@ -734,6 +781,53 @@ export class AppComponent implements OnInit {
     // public ngAfterContentChecked(): void {
     //     console.log("ngAfterContentChecked :: AppComponent");
     // }
+
+    public ngAfterViewInit(): void {
+        // this.listService.setTextField(i => i.text);
+        // // this.listService.setDisabledBy(this.dropdownItemDisabler);
+        //
+        // this.listService.setSelectableOptions({ enabled: true, mode: "multiple" });
+        // this.listService.setValueField(i => i.value);
+        // this.listService.setSelectedKeys([
+        //     this.dropdownListDataItems.get(17).value
+        //     // this.dropdownListDataItems.get(14).value
+        // ]);
+        //
+        // this.listService.setGroupBy(i => `${i.text.charAt(0).toUpperCase()}`);
+        // this.listService.setGroupableOptions({
+        //     enabled: true,
+        //     headerOrder: "asc"
+        //     // orderBy: i => i.text.charAt(i.text.length - 1),
+        //     // orderByDirection: "desc"
+        // });
+        // this.listService.setNavigableOptions({ enabled: true, mode: "select", wrap: true });
+        //
+        // this.listService.setFilterableOptions({ enabled: true, caseSensitive: true, debounce: 0 });
+        // this.listService.setFilterPlaceholder("Search items...");
+        // // this.listService.setFilter("n");
+        // this.listService.filterChange = new EventEmitter<FilterChangeEvent>();
+        // this.listService.filterChange.subscribe((e: FilterChangeEvent) => {
+        //     // e.preventDefault();
+        //     console.log(e);
+        // });
+        // this.listService.selectedKeysChange = new EventEmitter<Array<any>>();
+        // this.listService.selectedKeysChange.subscribe((e: ImmutableSet<any>) => {
+        //     // console.log("Selected Keys: ", e.toArray());
+        //     console.log(
+        //         "Selected Items: ",
+        //         this.listService
+        //             .selectedListItems()
+        //             .select(i => i.data)
+        //             .toArray()
+        //     );
+        // });
+        //
+        // // window.setTimeout(() => {
+        // //     this.listService.setVirtualScrollOptions({ enabled: true, height: 28 });
+        // // }, 6000);
+        //
+        // this.listService.setData(this.dropdownListDataItems);
+    }
 
     public filterData(): void {
         // const data = Enumerable.range(1, 100)
@@ -758,11 +852,17 @@ export class AppComponent implements OnInit {
     public ngOnInit(): void {
         this.selectedDropdownListDataItem = { text: "REPLACED WITH PAPRIKA", value: 13, group: "Fruit", active: true };
         this.selectedComboBoxDataItem = { text: "REPLACED WITH PAPRIKA", value: 13, group: "Fruit", active: true };
-        // window.setInterval(() => {
-        //     // this.contextMenuItemVisible = !this.contextMenuItemVisible;
-        //     // this.dropdownItemDisabler = (item: any): boolean => item.value % 3 === 0;
-        // }, 3000);
-        this.selectedDropdownListDataItem = { ...this.dropdownListDataItems[4] };
+        let turn: number = 0;
+        window.setInterval(() => {
+            // this.contextMenuItemVisible = !this.contextMenuItemVisible;
+            // this.dropdownItemDisabler = (item: any): boolean => turn % item.value === 0;
+            // this.listService.setDisabledBy(this.dropdownItemDisabler);
+            // this.listService.setGroupSelector(i => i.text.charAt(turn % 4).toUpperCase());
+            // this.listService.setValueField(i => (turn % 2 === 0 ? i.value : i));
+            // this.listService.setGroupableOptions({ enabled: true, headerOrder: turn % 2 === 0 ? "asc" : "desc" });
+            turn++;
+        }, 3000);
+        this.selectedDropdownListDataItem = { ...this.dropdownListDataItems.get(14) };
         this.selectedPrimitiveComboBoxDataItem = this.dropdownPrimitiveDataItems[7];
 
         this.dropdownPartialPrimitiveDataItems = this.dropdownPrimitiveDataItems.slice();
@@ -846,9 +946,13 @@ export class AppComponent implements OnInit {
         return Math.floor(Math.random() * (max - min)) + min;
     }
 
+    public onAutoCompleteFilterChange(event: FilterChangeEvent): void {
+        event.preventDefault();
+        console.log(event);
+    }
+
     public onAutoCompleteValueChange(value: string): void {
         this.autoCompleteValue = value;
-        console.log("Auto-complete value changed: ", value);
     }
 
     public onBreadcrumbItemClick(item: BreadcrumbItem): void {
@@ -868,6 +972,10 @@ export class AppComponent implements OnInit {
     public onColorPickerValueChange(value: string | null): void {
         this.colorPickerValue = value;
         console.log(value);
+    }
+
+    public onComboBoxFilterChange(event: FilterChangeEvent): void {
+        console.log(event);
     }
 
     public onComboBoxPrimitiveValueChange(value: string): void {
@@ -954,6 +1062,10 @@ export class AppComponent implements OnInit {
     public onGridSortChange(sort: SortDescriptor[]): void {
         this.gridSort = sort;
         console.log(sort);
+    }
+
+    public onListFilterChange(event: FilterChangeEvent): void {
+        console.log(event);
     }
 
     public onListBoxActionClick(event: ListBoxActionClickEvent): void {

@@ -1,0 +1,58 @@
+<div class="mona-list" [tabindex]="-1" [style.width]="listWidth()" [style.height]="listHeight()">
+    @if (listService.filterableOptions().enabled && listService.filterInputVisible()) {
+        <mona-filter-input [filter]="listService.filterText()"
+                           [debounce]="listService.filterableOptions().debounce"
+                           [placeholder]="listService.filterPlaceholder()"
+                           (filterChange)="onFilterChange($event)"
+                           class="mona-list-filter-input"></mona-filter-input>
+    }
+    @if (headerTemplate) {
+        <ng-container [ngTemplateOutlet]="headerTemplate"></ng-container>
+    }
+    @if (listService.virtualScrollOptions().enabled) {
+        @if (listService.viewItems().length !== 0) {
+            <cdk-virtual-scroll-viewport [itemSize]="listService.virtualScrollOptions().height">
+                <ul [tabIndex]="-1">
+                    <ng-container *cdkVirtualFor="let item of listService.viewItems()">
+                        <ng-container [ngTemplateOutlet]="listItemTemplate"
+                                      [ngTemplateOutletContext]="{$implicit: item}"></ng-container>
+                    </ng-container>
+                </ul>
+            </cdk-virtual-scroll-viewport>
+        } @else if (noDataTemplate) {
+            <ng-container [ngTemplateOutlet]="noDataTemplate"></ng-container>
+        } @else {
+            <mona-placeholder text="No data"></mona-placeholder>
+        }
+    } @else {
+        @if (listService.viewItems().length !== 0) {
+            <ul [tabIndex]="-1">
+                @for (item of listService.viewItems(); track item.uid) {
+                    <ng-container [ngTemplateOutlet]="listItemTemplate"
+                                  [ngTemplateOutletContext]="{$implicit: item}"></ng-container>
+                }
+            </ul>
+        } @else if (noDataTemplate) {
+            <ng-container [ngTemplateOutlet]="noDataTemplate"></ng-container>
+        } @else {
+            <mona-placeholder text="No data"></mona-placeholder>
+        }
+    }
+    @if (footerTemplate) {
+        <ng-container [ngTemplateOutlet]="footerTemplate"></ng-container>
+    }
+</div>
+
+<ng-template #listItemTemplate let-item>
+    @if (item.header) {
+        <li class="mona-list-group-header">
+            <mona-list-item [item]="item" [template]="groupHeaderTemplate"></mona-list-item>
+        </li>
+    } @else {
+        <li class="mona-list-item" [attr.data-uid]="item.uid"
+            (click)="onListItemSelect(item)"
+            monaListItem [item]="item">
+            <mona-list-item [item]="item" [template]="itemTemplate"></mona-list-item>
+        </li>
+    }
+</ng-template>

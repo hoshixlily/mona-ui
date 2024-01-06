@@ -47,10 +47,10 @@ export class GridCellComponent implements OnInit {
     public editForm!: FormGroup;
     public editing: boolean = false;
 
-    @Input()
+    @Input({ required: true })
     public column!: Column;
 
-    @Input()
+    @Input({ required: true })
     public row!: Row;
 
     public constructor(

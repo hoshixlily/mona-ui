@@ -246,68 +246,61 @@
                             <div style="display: flex; align-items: center;">
                                 <button monaButton>Line 1</button>
                                 <mona-combo-box [data]="dropdownListDataItems" textField="text" valueField="value"
-                                                groupField="group" [filterable]="false"
+                                                monaDropDownGroupable [groupBy]="'group'"
+                                                [monaDropDownFilterable]="{debounce: 0}"
+                                                (filterChange)="onComboBoxFilterChange($event)"
                                                 style="width: 200px;" [disabled]="false"
                                                 [showClearButton]="true" [allowCustomValue]="true"
                                                 [valueNormalizer]="comboBoxValueNormalizer$"
-                                                [ngModel]="selectedComboBoxDataItem" [itemDisabler]="dropdownItemDisabler"
+                                                [ngModel]="selectedComboBoxDataItem" [itemDisabled]="dropdownItemDisabler"
                                                 (ngModelChange)="onComboBoxValueChange($event)">
-                                    <ng-template monaComboBoxGroupTemplate let-group>
+                                    <ng-template monaComboBoxGroupHeaderTemplate let-group>
                                         <span style="color: crimson; font-weight: bold;">{{group}}</span>
                                     </ng-template>
                                 </mona-combo-box>
-                                <mona-auto-complete [data]="dropdownListDataItems" textField="text" valueField="value"
-                                                    groupField="group" [showClearButton]="true"
+                                <mona-auto-complete [data]="dropdownListDataItems"
+                                                    textField="text"
+                                                    valueField="value"
+                                                    monaDropDownGroupable [groupBy]="'group'"
+                                                    monaDropDownFilterable
+                                                    (filterChange)="onAutoCompleteFilterChange($event)"
+                                                    [showClearButton]="true"
                                                     [ngModel]="autoCompleteValue"
                                                     (ngModelChange)="onAutoCompleteValueChange($event)"
-                                                    style="width: 200px;"></mona-auto-complete>
+                                                    style="width: 200px;">
+                                </mona-auto-complete>
                                 <input monaTextBox [ngModel]="textBoxValue">
                                 <!--                                <mona-text-box [ngModel]="textBoxValue"></mona-text-box>-->
 
-                                <mona-drop-down-list [data]="dropdownListDataItems" textField="text" valueField="value"
-                                                     groupField="group" [filterable]="true" [disabled]="false"
+                                <mona-drop-down-list [data]="dropdownListDataItems"
+                                                     textField="text"
+                                                     valueField="value"
+                                                     [monaDropDownGroupable]="{orderBy:'text'}"
+                                                     groupBy="group"
+                                                     monaDropDownFilterable
+                                                     [disabled]="false"
                                                      [showClearButton]="true" placeholder="Select an item..."
                                                      [ngModel]="selectedDropdownListDataItem"
-                                                     [itemDisabler]="dropdownItemDisabler"
+                                                     [itemDisabled]="dropdownItemDisabler"
                                                      (ngModelChange)="onDropDownValueChange($event)"
                                                      style="width: 200px; ">
-<!--                                    <ng-template monaDropDownListItemTemplate let-dataItem let-listItem="listItem">-->
-<!--                                        <span style="color: deeppink;"-->
-<!--                                              *ngIf="dataItem.value % 3 === 0 && !listItem.disabled">{{dataItem.text}}</span>-->
-<!--                                        <span style="color: dodgerblue;"-->
-<!--                                              *ngIf="dataItem.value % 3 !== 0 && !listItem.disabled">{{dataItem.text}}</span>-->
-<!--                                        <span *ngIf="listItem.disabled">{{dataItem.text}}</span>-->
-<!--                                    </ng-template>-->
-<!--                                    <ng-template monaDropDownListValueTemplate let-dataItem>-->
-<!--                                        <span style="color: darkorange; font-weight: 600;">{{dataItem?.text}}</span>-->
-<!--                                    </ng-template>-->
-<!--                                    <ng-template monaDropDownListGroupTemplate let-group>-->
-<!--                                        <span style="color: crimson; font-weight: bold;">{{group}}</span>-->
-<!--                                    </ng-template>-->
+                                    <ng-template monaDropDownListItemTemplate let-dataItem>
+                                        <span style="color: #ffcc75;"
+                                              *ngIf="dataItem.value % 3 === 0">{{dataItem.text}}</span>
+                                        <span style="color: #F03193;"
+                                              *ngIf="dataItem.value % 3 !== 0">{{dataItem.text}}</span>
+                                    </ng-template>
+                                    <ng-template monaDropDownListValueTemplate let-dataItem>
+                                        <span style="color: darkorange; font-weight: 600;">{{dataItem?.text}}</span>
+                                    </ng-template>
+                                    <ng-template monaDropDownListGroupHeaderTemplate let-group>
+                                        <span style="color: crimson; font-weight: bold;">{{group}}</span>
+                                    </ng-template>
                                 </mona-drop-down-list>
-                                <mona-multi-select [data]="dropdownListDataItems" textField="text" valueField="value"
-                                                   groupField="group"
-                                                   style="width: auto; min-width: 200px;"
-                                                   [monaMultiSelectSummaryTag]="multiSelectTagCount" [filterable]="true"
-                                                   [showClearButton]="true"
-                                                   [ngModel]="selectedMultiSelectDataItems"
-                                                   (ngModelChange)="onMultiSelectValueChange($event)">
-                                    <ng-template monaMultiSelectItemTemplate let-dataItem>
-                                        <span style="color: greenyellow; font-weight: bold">{{dataItem.text}}</span>
-                                    </ng-template>
-                                    <ng-template monaMultiSelectGroupTemplate let-group>
-                                        <span
-                                            style="color: deepskyblue; font-weight: bold">{{group.toUpperCase()}}</span>
-                                    </ng-template>
-                                    <ng-template monaMultiSelectSummaryTagTemplate let-dataItems>
-                                        <span style="color: deeppink;"><span
-                                            style="font-weight: bold; color: deepskyblue;">+{{dataItems.length - multiSelectTagCount}}</span> items</span>
-                                    </ng-template>
-                                </mona-multi-select>
+
                             </div>
                             <div style="display: flex; align-items: center;">
                                 <button monaButton>Line 2</button>
-
                                 <mona-date-picker format="d/M/yyyy" style="width: 250px;" [readonly]="false"
                                                   [min]="datePickerMinValue" [max]="datePickerMaxValue" [ngModel]="datePickerValue"
                                                   (ngModelChange)="onDatePickerValueChange($event)"></mona-date-picker>
@@ -461,6 +454,26 @@
                                                      [expandedKeys]="dropdownTreeExpandedKeys"
                                                      (expandedKeysChange)="onDropdownTreeExpandedKeysChange($event)"
                                                      style="width: 220px;"></mona-drop-down-tree>
+                                <mona-multi-select [data]="dropdownListDataItems" textField="text" valueField="value"
+                                                   style="width: auto; min-width: 200px;"
+                                                   monaDropDownGroupable groupBy="group"
+                                                   [monaMultiSelectSummaryTag]="multiSelectTagCount"
+                                                   monaDropDownFilterable
+                                                   [showClearButton]="true"
+                                                   [ngModel]="selectedMultiSelectDataItems"
+                                                   (ngModelChange)="onMultiSelectValueChange($event)">
+                                    <ng-template monaMultiSelectItemTemplate let-dataItem>
+                                        <span style="color: darksalmon; font-weight: bold">{{dataItem.text}}</span>
+                                    </ng-template>
+                                    <ng-template monaMultiSelectGroupHeaderTemplate let-group>
+                                        <span
+                                                style="color: deepskyblue; font-weight: bold">{{group.toUpperCase()}}</span>
+                                    </ng-template>
+                                    <ng-template monaMultiSelectSummaryTagTemplate let-dataItems>
+                                        <span style="color: deeppink;"><span
+                                                style="font-weight: bold; color: deepskyblue;">+{{dataItems.length - multiSelectTagCount}}</span> items</span>
+                                    </ng-template>
+                                </mona-multi-select>
                             </div>
 
                             <div style="display: flex; align-items: center; margin-top: 40px;">
@@ -603,7 +616,7 @@
                         </div>
                     </ng-template>
                 </mona-tab>
-                <mona-tab title="Expansion Panel" [disabled]="false">
+                <mona-tab title="Expansion Panel" [disabled]="false" [selected]="false">
                     <ng-template monaTabContentTemplate>
                         <div style="width: 100%; height: 100%; padding: 20px;">
                             <mona-expansion-panel title="Panel {{x}}" *ngFor="let x of [1,2,3]">
@@ -648,7 +661,39 @@
                                 <input type="radio" monaRadioButton id="radioButton3" name="A" [disabled]="true"/>
                                 <label for="radioButton3">Radio Button Label 3</label>
                             </div>
+
+                            <div style="width: 250px;background: var(--mona-background); border: 1px solid var(--mona-border-color)">
+<!--                                <mona-list>-->
+<!--                                    <ng-template monaListItemTemplate let-item>-->
+<!--                                        @if (item.value % 2 === 0) {-->
+<!--                                            <span style="color: #ffcc75;">{{item.text}}</span>-->
+<!--                                        } @else {-->
+<!--                                            <span style="color: #ff3055;">{{item.text}}</span>-->
+<!--                                        }-->
+<!--                                    </ng-template>-->
+<!--                                    <ng-template monaListGroupHeaderTemplate let-group>-->
+<!--                                        <span style="color: #F0A970; font-weight: bold;">{{group}}</span>-->
+<!--                                    </ng-template>-->
+<!--                                    <ng-template monaListHeaderTemplate>-->
+<!--                                        <div style="background: var(&#45;&#45;mona-background-dark); color: coral; border-bottom: 1px solid var(&#45;&#45;mona-border-color-dark); padding: 2px 4px;">Header</div>-->
+<!--                                    </ng-template>-->
+<!--                                    <ng-template monaListFooterTemplate>-->
+<!--&lt;!&ndash;                                        <div style="display: flex; padding: 2px 4px; column-gap: 4px; border-top: 1px solid var(&#45;&#45;mona-border-color-dark); background: var(&#45;&#45;mona-background-dark);">&ndash;&gt;-->
+<!--&lt;!&ndash;                                            <button monaButton (click)="selectedListItem = listService.navigate('previous', 'highlight')">Up</button>&ndash;&gt;-->
+<!--&lt;!&ndash;                                            <button monaButton (click)="selectedListItem = listService.navigate('next', 'highlight')">Down</button>&ndash;&gt;-->
+<!--&lt;!&ndash;                                        </div>&ndash;&gt;-->
+<!--                                    </ng-template>-->
+<!--                                </mona-list>-->
+                                <span>
+<!--                                    <div style="display: flex; padding: 2px 4px; column-gap: 4px; border-top: 1px solid var(&#45;&#45;mona-border-color-dark); background: var(&#45;&#45;mona-background-dark);">-->
+<!--                                        <button monaButton (click)="selectedListItem = listService.navigate('previous', 'select')">Up</button>-->
+<!--                                        <button monaButton (click)="selectedListItem = listService.navigate('next', 'select')">Down</button>-->
+<!--                                    </div>-->
+<!--                                    Selected List Item: {{selectedListItem?.data?.text}}-->
+                                </span>
+                            </div>
                         </div>
+
                     </ng-template>
                 </mona-tab>
                 <!--                <mona-tab [title]="item"  *ngFor="let item of dropdownPrimitiveDataItems |slice:0:5; let ix=index;">-->

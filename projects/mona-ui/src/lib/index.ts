@@ -11,7 +11,7 @@ export * from "./buttons/split-button/directives/split-button-text-template.dire
 export * from "./buttons/split-button/components/split-button/split-button.component";
 
 /** Common */
-export * from "./common/models/FilterChangeEvent";
+export * from "./common/filter-input/models/FilterChangeEvent";
 
 /** Date Inputs */
 export * from "./date-inputs/calendar/calendar.component";
@@ -21,28 +21,45 @@ export * from "./date-inputs/time-picker/time-picker.component";
 
 /** Dropdowns */
 
-export * from "./dropdowns/popup-list/components/popup-list/popup-list.component";
-export * from "./dropdowns/popup-list/directives/list-group-template.directive";
-export * from "./dropdowns/popup-list/directives/list-item-template.directive";
-export * from "./dropdowns/auto-complete/auto-complete.component";
-export * from "./dropdowns/combo-box/directives/combo-box-group-template.directive";
+export * from "./dropdowns/directives/drop-down-filterable.directive";
+export * from "./dropdowns/directives/drop-down-groupable.directive";
+
+/* Auto Complete */
+export * from "./dropdowns/auto-complete/components/auto-complete.component";
+export * from "./dropdowns/auto-complete/directives/auto-complete-footer-template.directive";
+export * from "./dropdowns/auto-complete/directives/auto-complete-group-header-template.directive";
+export * from "./dropdowns/auto-complete/directives/auto-complete-header-template.directive";
+export * from "./dropdowns/auto-complete/directives/auto-complete-item-template.directive";
+export * from "./dropdowns/auto-complete/directives/auto-complete-no-data-template.directive";
+
+/* Combo Box */
+export * from "./dropdowns/combo-box/directives/combo-box-footer-template.directive";
+export * from "./dropdowns/combo-box/directives/combo-box-group-header-template.directive";
+export * from "./dropdowns/combo-box/directives/combo-box-header-template.directive";
 export * from "./dropdowns/combo-box/directives/combo-box-item-template.directive";
+export * from "./dropdowns/combo-box/directives/combo-box-no-data-template.directive";
 export * from "./dropdowns/combo-box/components/combo-box/combo-box.component";
 
-//
-export * from "./dropdowns/drop-down-list/directives/drop-down-list-group-template.directive";
+/* Drop Down List */
+export * from "./dropdowns/drop-down-list/directives/drop-down-list-footer-template.directive";
+export * from "./dropdowns/drop-down-list/directives/drop-down-list-group-header-template.directive";
+export * from "./dropdowns/drop-down-list/directives/drop-down-list-header-template.directive";
 export * from "./dropdowns/drop-down-list/directives/drop-down-list-item-template.directive";
+export * from "./dropdowns/drop-down-list/directives/drop-down-list-no-data-template.directive";
 export * from "./dropdowns/drop-down-list/directives/drop-down-list-value-template.directive";
 export * from "./dropdowns/drop-down-list/components/drop-down-list/drop-down-list.component";
 
-//
+/* Drop Down Tree */
 export * from "./dropdowns/drop-down-tree/directives/drop-down-tree-expandable.directive";
 export * from "./dropdowns/drop-down-tree/directives/drop-down-tree-filterable.directive";
 export * from "./dropdowns/drop-down-tree/components/drop-down-tree/drop-down-tree.component";
 
-//
-export * from "./dropdowns/multi-select/directives/multi-select-group-template.directive";
+/* Multi Select */
+export * from "./dropdowns/multi-select/directives/multi-select-footer-template.directive";
+export * from "./dropdowns/multi-select/directives/multi-select-group-header-template.directive";
+export * from "./dropdowns/multi-select/directives/multi-select-header-template.directive";
 export * from "./dropdowns/multi-select/directives/multi-select-item-template.directive";
+export * from "./dropdowns/multi-select/directives/multi-select-no-data-template.directive";
 export * from "./dropdowns/multi-select/directives/multi-select-summary-tag.directive";
 export * from "./dropdowns/multi-select/directives/multi-select-summary-tag-template.directive";
 export * from "./dropdowns/multi-select/directives/multi-select-tag-template.directive";
@@ -101,6 +118,9 @@ export * from "./layout/expansion-panel/directives/expansion-panel-title-templat
 /* Fieldset */
 export * from "./layout/fieldset/directives/fieldset-legend-template.directive";
 export * from "./layout/fieldset/components/fieldset/fieldset.component";
+
+/* Placeholder */
+export * from "./layout/placeholder/placeholder.component";
 
 /** Scroll View */
 export * from "./layout/scroll-view/components/scroll-view/scroll-view.component";

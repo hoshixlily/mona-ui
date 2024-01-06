@@ -1,5 +1,5 @@
 import { TestBed } from "@angular/core/testing";
-import { FilterChangeEvent } from "../../../common/models/FilterChangeEvent";
+import { FilterChangeEvent } from "../../../common/filter-input/models/FilterChangeEvent";
 import { DropDownTreeService } from "../services/drop-down-tree.service";
 import { DropDownTreeFilterableDirective } from "./drop-down-tree-filterable.directive";
 

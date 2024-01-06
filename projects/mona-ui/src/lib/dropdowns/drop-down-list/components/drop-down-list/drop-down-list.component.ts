@@ -1,9 +1,9 @@
-import { ConnectionPositionPair } from "@angular/cdk/overlay";
 import { NgClass, NgIf, NgTemplateOutlet } from "@angular/common";
 import {
     ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
+    computed,
     ContentChild,
     DestroyRef,
     ElementRef,
@@ -12,6 +12,7 @@ import {
     inject,
     Input,
     OnInit,
+    Signal,
     TemplateRef,
     ViewChild
 } from "@angular/core";
@@ -19,22 +20,32 @@ import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { faChevronDown, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { Predicate } from "@mirei/ts-collections";
 import { fromEvent, take } from "rxjs";
+import { v4 } from "uuid";
 import { AnimationState } from "../../../../animations/models/AnimationState";
 import { PopupAnimationService } from "../../../../animations/services/popup-animation.service";
 import { ButtonDirective } from "../../../../buttons/button/button.directive";
+import { ListComponent } from "../../../../common/list/components/list/list.component";
+import { ListFooterTemplateDirective } from "../../../../common/list/directives/list-footer-template.directive";
+import { ListGroupHeaderTemplateDirective } from "../../../../common/list/directives/list-group-header-template.directive";
+import { ListHeaderTemplateDirective } from "../../../../common/list/directives/list-header-template.directive";
+import { ListItemTemplateDirective } from "../../../../common/list/directives/list-item-template.directive";
+import { ListNoDataTemplateDirective } from "../../../../common/list/directives/list-no-data-template.directive";
+import { ListSelectableDirective } from "../../../../common/list/directives/list-selectable.directive";
+import { ListItem } from "../../../../common/list/models/ListItem";
+import { SelectableOptions } from "../../../../common/list/models/SelectableOptions";
+import { ListService } from "../../../../common/list/services/list.service";
 import { PopupRef } from "../../../../popup/models/PopupRef";
 import { PopupService } from "../../../../popup/services/popup.service";
 import { Action } from "../../../../utils/Action";
-import { DropDownListGroupTemplateDirective } from "../../directives/drop-down-list-group-template.directive";
+import { DropDownService } from "../../../services/drop-down.service";
+import { DropDownListFooterTemplateDirective } from "../../directives/drop-down-list-footer-template.directive";
+import { DropDownListGroupHeaderTemplateDirective } from "../../directives/drop-down-list-group-header-template.directive";
+import { DropDownListHeaderTemplateDirective } from "../../directives/drop-down-list-header-template.directive";
 import { DropDownListItemTemplateDirective } from "../../directives/drop-down-list-item-template.directive";
+import { DropDownListNoDataTemplateDirective } from "../../directives/drop-down-list-no-data-template.directive";
 import { DropDownListValueTemplateDirective } from "../../directives/drop-down-list-value-template.directive";
-import { ListGroupTemplateDirective } from "../../../popup-list/directives/list-group-template.directive";
-import { ListItemTemplateDirective } from "../../../popup-list/directives/list-item-template.directive";
-import { PopupListItem } from "../../../models/PopupListItem";
-import { PopupListValueChangeEvent } from "../../../models/PopupListValueChangeEvent";
-import { PopupListComponent } from "../../../popup-list/components/popup-list/popup-list.component";
-import { PopupListService } from "../../../popup-list/services/popup-list.service";
 
 @Component({
     selector: "mona-drop-down-list",
@@ -42,7 +53,8 @@ import { PopupListService } from "../../../popup-list/services/popup-list.servic
     styleUrls: ["./drop-down-list.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [
-        PopupListService,
+        ListService,
+        DropDownService,
         {
             provide: NG_VALUE_ACCESSOR,
             useExisting: forwardRef(() => DropDownListComponent),
@@ -57,25 +69,50 @@ import { PopupListService } from "../../../popup-list/services/popup-list.servic
         FormsModule,
         FontAwesomeModule,
         ButtonDirective,
-        PopupListComponent,
+        ListComponent,
         ListItemTemplateDirective,
-        ListGroupTemplateDirective
+        ListGroupHeaderTemplateDirective,
+        ListSelectableDirective,
+        ListFooterTemplateDirective,
+        ListHeaderTemplateDirective,
+        ListNoDataTemplateDirective
     ]
 })
-export class DropDownListComponent implements OnInit, ControlValueAccessor {
+export class DropDownListComponent<TData> implements OnInit, ControlValueAccessor {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
-    #propagateChange: any = () => {};
-    #value: any;
-    public readonly clearIcon: IconDefinition = faTimes;
-    public readonly dropdownIcon: IconDefinition = faChevronDown;
-    public popupRef: PopupRef | null = null;
-    public valuePopupListItem?: PopupListItem | null = null;
+    readonly #popupUidClass: string = `mona-dropdown-popup-${v4()}`;
+    #popupRef: PopupRef | null = null;
+    #propagateChange: Action<TData | null> | null = null;
+    #value: TData | null = null;
+
+    protected readonly clearIcon: IconDefinition = faTimes;
+    protected readonly dropdownIcon: IconDefinition = faChevronDown;
+    protected readonly selectableOptions: SelectableOptions = {
+        enabled: true,
+        mode: "single",
+        toggleable: false
+    };
+    protected readonly selectedDataItem: Signal<TData | null> = computed(() => {
+        return this.selectedListItem()?.data ?? null;
+    });
+    protected readonly selectedListItem: Signal<ListItem<TData> | null> = computed(() => {
+        return this.listService.selectedListItems().firstOrDefault();
+    });
+    protected readonly valueText: Signal<string> = computed(() => {
+        const listItem = this.selectedListItem();
+        if (!listItem) {
+            return "";
+        }
+        return this.listService.getItemText(listItem);
+    });
 
     @HostBinding("class.mona-dropdown")
     public readonly hostClass: boolean = true;
 
     @Input()
-    public data: Iterable<any> = [];
+    public set data(value: Iterable<TData>) {
+        this.listService.setData(value);
+    }
 
     @Input()
     public disabled: boolean = false;
@@ -83,20 +120,25 @@ export class DropDownListComponent implements OnInit, ControlValueAccessor {
     @ViewChild("dropdownWrapper")
     public dropdownWrapper!: ElementRef<HTMLDivElement>;
 
-    @Input()
-    public filterable: boolean = false;
+    @ContentChild(DropDownListFooterTemplateDirective, { read: TemplateRef })
+    public footerTemplate: TemplateRef<any> | null = null;
+
+    @ContentChild(DropDownListGroupHeaderTemplateDirective, { read: TemplateRef })
+    public groupHeaderTemplate: TemplateRef<any> | null = null;
+
+    @ContentChild(DropDownListHeaderTemplateDirective, { read: TemplateRef })
+    public headerTemplate: TemplateRef<any> | null = null;
 
     @Input()
-    public groupField?: string;
-
-    @ContentChild(DropDownListGroupTemplateDirective, { read: TemplateRef })
-    public groupTemplate: TemplateRef<any> | null = null;
-
-    @Input()
-    public itemDisabler?: Action<any, boolean> | string;
+    public set itemDisabled(value: string | Predicate<TData> | null | undefined) {
+        this.listService.setDisabledBy(value ?? "");
+    }
 
     @ContentChild(DropDownListItemTemplateDirective, { read: TemplateRef })
     public itemTemplate: TemplateRef<any> | null = null;
+
+    @ContentChild(DropDownListNoDataTemplateDirective, { read: TemplateRef })
+    public noDataTemplate: TemplateRef<any> | null = null;
 
     @Input()
     public placeholder?: string;
@@ -108,10 +150,14 @@ export class DropDownListComponent implements OnInit, ControlValueAccessor {
     public showClearButton: boolean = false;
 
     @Input()
-    public textField?: string;
+    public set textField(textField: string | null | undefined) {
+        this.listService.setTextField(textField ?? "");
+    }
 
     @Input()
-    public valueField?: string;
+    public set valueField(valueField: string | null | undefined) {
+        this.listService.setValueField(valueField ?? "");
+    }
 
     @ContentChild(DropDownListValueTemplateDirective, { read: TemplateRef })
     public valueTemplate: TemplateRef<any> | null = null;
@@ -119,20 +165,21 @@ export class DropDownListComponent implements OnInit, ControlValueAccessor {
     public constructor(
         private readonly cdr: ChangeDetectorRef,
         private readonly elementRef: ElementRef<HTMLElement>,
+        private readonly listService: ListService<TData>,
         private readonly popupAnimationService: PopupAnimationService,
-        private readonly popupListService: PopupListService,
         private readonly popupService: PopupService
     ) {}
 
     public clearValue(event: MouseEvent): void {
         event.stopImmediatePropagation();
-        this.updateValue(undefined);
-        this.#propagateChange?.(this.value);
+        this.updateValue(null);
+        this.listService.clearSelections();
+        this.#propagateChange?.(this.#value);
     }
 
     public close(): void {
-        this.popupRef?.close();
-        this.popupRef = null;
+        this.#popupRef?.close();
+        this.#popupRef = null;
     }
 
     public ngOnInit(): void {
@@ -140,67 +187,44 @@ export class DropDownListComponent implements OnInit, ControlValueAccessor {
         this.setEventListeners();
     }
 
-    public onPopupListValueChange(event: PopupListValueChangeEvent): void {
-        if (!event.value || event.value.length === 0) {
-            if (this.#value === undefined) {
-                return;
-            }
-            this.#value = undefined;
-            this.valuePopupListItem = undefined;
-            this.#propagateChange?.(undefined);
-            return;
-        }
-        if (this.value && event.value[0].dataEquals(this.value)) {
-            if (event.via === "selection") {
-                this.close();
-            }
-            return;
-        }
-        if (event.via === "selection") {
-            this.close();
-        }
-        this.#value = event.value[0].data;
-        this.valuePopupListItem = event.value[0];
-        this.#propagateChange?.(this.value);
+    public onItemSelect(item: ListItem<TData>): void {
+        this.close();
+    }
+
+    public onSelectedKeysChange(keys: Array<any>): void {
+        const item = this.selectedDataItem();
+        this.updateValue(item);
     }
 
     public open(): void {
         this.dropdownWrapper.nativeElement.focus();
-        if (this.popupRef) {
+        if (this.#popupRef) {
             return;
         }
-        this.popupRef = this.popupService.create({
+        this.#popupRef = this.popupService.create({
             anchor: this.dropdownWrapper,
             content: this.popupTemplate,
             hasBackdrop: false,
             withPush: false,
             width: this.elementRef.nativeElement.getBoundingClientRect().width,
-            popupClass: ["mona-dropdown-popup-content"],
+            popupClass: ["mona-dropdown-popup-content", this.#popupUidClass],
             closeOnOutsideClick: false,
-            positions: [
-                new ConnectionPositionPair(
-                    { originX: "start", originY: "bottom" },
-                    { overlayX: "start", overlayY: "top" },
-                    -1,
-                    0,
-                    "mona-dropdown-popup-content-bottom"
-                ),
-                new ConnectionPositionPair(
-                    { originX: "start", originY: "top" },
-                    { overlayX: "start", overlayY: "bottom" },
-                    -1,
-                    -1,
-                    "mona-dropdown-popup-content-top"
-                )
-            ]
+            positions: DropDownService.getDefaultPositions()
         });
-        this.popupAnimationService.setupDropdownOutsideClickCloseAnimation(this.popupRef);
-        this.popupAnimationService.animateDropdown(this.popupRef, AnimationState.Show);
-        this.cdr.markForCheck();
-        this.popupRef.closed.pipe(take(1)).subscribe(() => {
-            this.popupRef = null;
-            (this.elementRef.nativeElement.firstElementChild as HTMLElement)?.focus();
-            this.popupListService.clearFilters();
+
+        this.popupAnimationService.setupDropdownOutsideClickCloseAnimation(this.#popupRef);
+        this.popupAnimationService.animateDropdown(this.#popupRef, AnimationState.Show);
+        const previousItem = this.selectedListItem();
+        this.#popupRef.closed.pipe(take(1)).subscribe(() => {
+            this.#popupRef = null;
+            const popupElement = document.querySelector(`.${this.#popupUidClass}`);
+            if (DropDownService.shouldFocusAfterClose(this.elementRef.nativeElement, popupElement)) {
+                this.focus();
+            }
+            this.listService.clearFilter();
+            if (previousItem !== this.selectedListItem()) {
+                this.notifyValueChange();
+            }
         });
     }
 
@@ -221,61 +245,58 @@ export class DropDownListComponent implements OnInit, ControlValueAccessor {
         this.cdr.markForCheck();
     }
 
-    public writeValue(obj: any): void {
+    public writeValue(obj: TData): void {
         this.updateValue(obj);
+        if (obj != null) {
+            this.listService.setSelectedDataItems([obj]);
+        }
+    }
+
+    private focus(): void {
+        (this.elementRef.nativeElement.firstElementChild as HTMLElement)?.focus();
     }
 
     private handleArrowKeys(event: KeyboardEvent): void {
-        if (this.popupRef) {
-            return;
-        }
-        const listItem = this.popupListService.navigate(event, "single");
-        if (listItem) {
-            if (!listItem.dataEquals(this.value)) {
-                this.updateValue(listItem.data);
-                this.#propagateChange?.(this.value);
+        const previousItem = this.selectedListItem();
+        const direction = event.key === "ArrowDown" ? "next" : "previous";
+        const item = this.listService.navigate(direction, "select");
+        if (item) {
+            if (previousItem === item) {
+                return;
+            }
+            this.updateValue(item.data);
+            if (!this.#popupRef) {
+                this.notifyValueChange();
             }
         }
     }
 
     private handleEnterKey(): void {
-        if (this.popupRef) {
+        if (this.#popupRef) {
             this.close();
             return;
         }
         this.open();
     }
 
-    private handleEscapeKey(): void {
-        if (this.popupRef) {
-            this.close();
-        }
-    }
-
     private handleKeyDown(event: KeyboardEvent): void {
         if (event.key === "Enter") {
             this.handleEnterKey();
         } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+            event.preventDefault();
             this.handleArrowKeys(event);
-        } else if (event.key === "Escape") {
-            this.handleEscapeKey();
+        } else if (event.key === "Escape" || event.key === "Tab") {
+            this.close();
         }
     }
 
     private initialize(): void {
-        this.popupListService.initializeListData({
-            data: this.data,
-            disabler: this.itemDisabler,
-            textField: this.textField,
-            valueField: this.valueField,
-            groupField: this.groupField
-        });
-        this.valuePopupListItem = this.popupListService.viewListData
-            .selectMany(g => g.source)
-            .singleOrDefault(d => d.dataEquals(this.value));
-        if (this.valuePopupListItem) {
-            this.valuePopupListItem.selected.set(true);
-        }
+        this.listService.setNavigableOptions({ enabled: true, mode: "select" });
+        this.listService.setSelectableOptions(this.selectableOptions);
+    }
+
+    private notifyValueChange(): void {
+        this.#propagateChange?.(this.#value);
     }
 
     private setEventListeners(): void {
@@ -284,16 +305,21 @@ export class DropDownListComponent implements OnInit, ControlValueAccessor {
             .subscribe(event => {
                 this.handleKeyDown(event);
             });
+        fromEvent<FocusEvent>(this.elementRef.nativeElement, "focusout")
+            .pipe(takeUntilDestroyed(this.#destroyRef))
+            .subscribe(event => {
+                const target = event.relatedTarget as HTMLElement;
+                if (
+                    target &&
+                    (this.elementRef.nativeElement.contains(target) ||
+                        this.#popupRef?.overlayRef.overlayElement.contains(target))
+                ) {
+                    return;
+                }
+            });
     }
 
-    private updateValue(value: any): void {
+    private updateValue(value: TData | null): void {
         this.#value = value;
-        this.valuePopupListItem = this.popupListService.viewListData
-            .selectMany(g => g.source)
-            .singleOrDefault(d => d.dataEquals(this.value));
-    }
-
-    public get value(): any {
-        return this.#value;
     }
 }

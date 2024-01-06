@@ -1,0 +1,46 @@
+<div class="mona-auto-complete" [ngClass]="{'mona-disabled': disabled}"
+     [attr.tabindex]="-1" #dropdownWrapper>
+    <input monaTextBox class="mona-input-inner"
+           [ngModel]="autoCompleteValue()"
+           (ngModelChange)="autoCompleteValue$.next($event)"
+           (keydown)="onKeydown($event)">
+    @if (showClearButton && autoCompleteValue()) {
+        <span class="mona-input-clear-icon" (click)="clearValue($event)">
+            <fa-icon [icon]="clearIcon"></fa-icon>
+        </span>
+    }
+</div>
+
+<ng-template #popupTemplate>
+    <div class="mona-dropdown-popup-list-wrapper">
+        <mona-list [height]="200" (itemSelect)="onItemSelect($event)">
+            @if (footerTemplate) {
+                <ng-template monaListFooterTemplate>
+                    <ng-container [ngTemplateOutlet]="footerTemplate"></ng-container>
+                </ng-template>
+            }
+            @if (groupHeaderTemplate) {
+                <ng-template monaListGroupHeaderTemplate let-group>
+                    <ng-container [ngTemplateOutlet]="groupHeaderTemplate"
+                                  [ngTemplateOutletContext]="{$implicit: group}"></ng-container>
+                </ng-template>
+            }
+            @if (headerTemplate) {
+                <ng-template monaListHeaderTemplate>
+                    <ng-container [ngTemplateOutlet]="headerTemplate"></ng-container>
+                </ng-template>
+            }
+            @if (itemTemplate) {
+                <ng-template monaListItemTemplate let-dataItem>
+                    <ng-container [ngTemplateOutlet]="itemTemplate"
+                                  [ngTemplateOutletContext]="{$implicit: dataItem}"></ng-container>
+                </ng-template>
+            }
+            @if (noDataTemplate) {
+                <ng-template monaListNoDataTemplate>
+                    <ng-container [ngTemplateOutlet]="noDataTemplate"></ng-container>
+                </ng-template>
+            }
+        </mona-list>
+    </div>
+</ng-template>

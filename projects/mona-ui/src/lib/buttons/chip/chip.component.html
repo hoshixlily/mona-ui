@@ -7,7 +7,7 @@
         }
     </div>
     @if (removable) {
-        <button monaButton [flat]="true" class="mona-chip-remove" (click)="remove.emit($event)">
+        <button monaButton [tabindex]="-1" [flat]="true" class="mona-chip-remove" (click)="remove.emit($event)">
             <span class="mona-chip-remove-icon">
                 <fa-icon [icon]="closeIcon"></fa-icon>
             </span>

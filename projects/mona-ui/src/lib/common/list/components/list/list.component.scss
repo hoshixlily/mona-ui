@@ -1,0 +1,34 @@
+div.mona-list {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    outline: none;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    overflow: hidden auto;
+    height: 100%;
+    outline: none;
+    & li {
+        padding: 4px 8px;
+        user-select: none;
+        cursor: pointer;
+    }
+    & li.mona-list-group-header {
+        pointer-events: none;
+    }
+}
+
+mona-filter-input {
+    display: block;
+    padding: 4px;
+    border-bottom: 1px solid var(--mona-border-color);
+}
+
+.cdk-virtual-scrollable {
+    width: 100%;
+    height: 100%;
+}

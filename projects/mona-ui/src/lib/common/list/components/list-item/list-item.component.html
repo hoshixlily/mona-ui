@@ -1,0 +1,6 @@
+@if (itemTemplate()) {
+    <ng-container [ngTemplateOutlet]="itemTemplate()"
+                  [ngTemplateOutletContext]="{$implicit: dataItem()}"></ng-container>
+} @else {
+    <span>{{itemText()}}</span>
+}

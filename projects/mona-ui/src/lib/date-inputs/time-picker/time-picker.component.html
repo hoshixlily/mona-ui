@@ -1,16 +1,15 @@
 <div class="mona-time-picker" #popupAnchor>
-    <input monaTextBox class="mona-input-inner" [disabled]="disabled" [readonly]="readonly" [ngModel]="currentDateString"
+    <input monaTextBox class="mona-input-inner" [disabled]="disabled" [readonly]="readonly"
+           [ngModel]="currentDateString()"
            (ngModelChange)="onDateStringEdit($event)" (blur)="onTimeInputBlur()">
-    <!--    <span class="mona-input-clear-icon" *ngIf="showClearButton && valuePopupListItem" (click)="clearValue($event)">-->
-    <!--        <fa-icon [icon]="clearIcon"></fa-icon>-->
-    <!--    </span>-->
-    <button monaButton class="mona-input-button" (click)="onTimeInputButtonClick()" [disabled]="disabled" [tabIndex]="-1">
+    <button monaButton class="mona-input-button" (click)="onTimeInputButtonClick()"
+            [disabled]="disabled" [tabIndex]="-1">
         <fa-icon [icon]="timeIcon"></fa-icon>
     </button>
 </div>
 
 <ng-template #timePopupTemplate>
-    <mona-time-selector [ngModel]="value" (ngModelChange)="onTimeSelectorValueChange($event)"
-                        [max]="max" [min]="min"
+    <mona-time-selector [ngModel]="value()" (ngModelChange)="onTimeSelectorValueChange($event)"
+                        [max]="maxDate()" [min]="minDate()"
                         [hourFormat]="hourFormat" [showSeconds]="showSeconds"></mona-time-selector>
 </ng-template>

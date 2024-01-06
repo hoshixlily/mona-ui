@@ -1,24 +1,25 @@
 <div class="mona-date-time-picker" [ngClass]="{'mona-disabled': disabled}" #popupAnchor>
-    <input monaTextBox class="mona-input-inner" [disabled]="disabled" [readonly]="readonly" [ngModel]="currentDateString"
+    <input monaTextBox class="mona-input-inner" [disabled]="disabled" [readonly]="readonly"
+           [ngModel]="currentDateString()"
            (ngModelChange)="onDateStringEdit($event)" (blur)="onDateInputBlur()">
-    <!--    <span class="mona-input-clear-icon" *ngIf="showClearButton && valuePopupListItem" (click)="clearValue($event)">-->
-    <!--        <fa-icon [icon]="clearIcon"></fa-icon>-->
-    <!--    </span>-->
-    <button monaButton class="mona-input-button" (click)="onDateInputButtonClick()" [disabled]="disabled" [tabIndex]="-1">
+    <button monaButton class="mona-input-button" (click)="onDateInputButtonClick()"
+            [disabled]="disabled" [tabIndex]="-1">
         <fa-icon [icon]="dateIcon"></fa-icon>
     </button>
-    <button monaButton class="mona-input-button" (click)="onTimeInputButtonClick()" [disabled]="disabled" [tabIndex]="-1">
+    <button monaButton class="mona-input-button" (click)="onTimeInputButtonClick()"
+            [disabled]="disabled" [tabIndex]="-1">
         <fa-icon [icon]="timeIcon"></fa-icon>
     </button>
 </div>
 
 <ng-template #datePopupTemplate>
-    <mona-calendar [disabledDates]="disabledDates" [min]="min" [max]="max"
-                   [ngModel]="navigatedDate" (ngModelChange)="onCalendarValueChange($event)"></mona-calendar>
+    <mona-calendar [disabledDates]="disabledDates" [min]="minDate()" [max]="maxDate()"
+                   [ngModel]="navigatedDate()"
+                   (ngModelChange)="onCalendarValueChange($event)"></mona-calendar>
 </ng-template>
 
 <ng-template #timePopupTemplate>
-    <mona-time-selector [ngModel]="navigatedDate" (ngModelChange)="onTimeSelectorValueChange($event)"
-                        [max]="timePickerMax" [min]="timePickerMin"
+    <mona-time-selector [ngModel]="navigatedDate()" (ngModelChange)="onTimeSelectorValueChange($event)"
+                        [max]="timePickerMax()" [min]="timePickerMin()"
                         [hourFormat]="hourFormat" [showSeconds]="showSeconds"></mona-time-selector>
 </ng-template>

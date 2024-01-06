@@ -8,19 +8,21 @@ import {
     Input,
     OnChanges,
     OnInit,
+    signal,
     SimpleChanges,
     TemplateRef,
-    ViewChild
+    ViewChild,
+    WritableSignal
 } from "@angular/core";
 import { faClock, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { FocusMonitor } from "@angular/cdk/a11y";
+import { DropDownService } from "../../dropdowns/services/drop-down.service";
 import { PopupService } from "../../popup/services/popup.service";
 import { DateTime } from "luxon";
 import { take } from "rxjs";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from "@angular/forms";
 import { Action } from "../../utils/Action";
 import { PopupRef } from "../../popup/models/PopupRef";
-import { ConnectionPositionPair } from "@angular/cdk/overlay";
 import { PopupAnimationService } from "../../animations/services/popup-animation.service";
 import { AnimationState } from "../../animations/models/AnimationState";
 import { TimeSelectorComponent } from "../time-selector/time-selector.component";
@@ -44,12 +46,15 @@ import { TextBoxDirective } from "../../inputs/text-box/directives/text-box.dire
     imports: [TextBoxDirective, FormsModule, ButtonDirective, FontAwesomeModule, TimeSelectorComponent]
 })
 export class TimePickerComponent implements OnInit, OnChanges, ControlValueAccessor {
-    #value: Date | null = null;
+    readonly #format: WritableSignal<string> = signal("HH:mm");
     #propagateChange: Action<Date | null> | null = null;
     private popupRef: PopupRef | null = null;
+    protected readonly currentDateString: WritableSignal<string> = signal("");
+    protected readonly maxDate: WritableSignal<Date | null> = signal(null);
+    protected readonly minDate: WritableSignal<Date | null> = signal(null);
+    protected readonly navigatedDate: WritableSignal<Date> = signal(new Date());
+    protected readonly value: WritableSignal<Date | null> = signal(null);
     public readonly timeIcon: IconDefinition = faClock;
-    public currentDateString: string = "";
-    public navigatedDate: Date = new Date();
 
     @HostBinding("class.mona-dropdown")
     public readonly hostClass: boolean = true;
@@ -58,16 +63,22 @@ export class TimePickerComponent implements OnInit, OnChanges, ControlValueAcces
     public disabled: boolean = false;
 
     @Input()
-    public format: string = "HH:mm";
+    public set format(value: string) {
+        this.#format.set(value);
+    }
 
     @Input()
     public hourFormat: "12" | "24" = "24";
 
     @Input()
-    public max: Date | null = null;
+    public set max(value: Date | null) {
+        this.maxDate.set(value);
+    }
 
     @Input()
-    public min: Date | null = null;
+    public set min(value: Date | null) {
+        this.minDate.set(value);
+    }
 
     @ViewChild("popupAnchor")
     public popupAnchor!: ElementRef<HTMLDivElement>;
@@ -90,8 +101,9 @@ export class TimePickerComponent implements OnInit, OnChanges, ControlValueAcces
     ) {}
 
     public ngOnChanges(changes: SimpleChanges): void {
-        if (changes["hourFormat"] && this.value) {
-            this.currentDateString = DateTime.fromJSDate(this.value).toFormat(this.format);
+        const value = this.value();
+        if (changes["hourFormat"] && value) {
+            this.currentDateString.set(DateTime.fromJSDate(value).toFormat(this.#format()));
         }
     }
 
@@ -100,33 +112,33 @@ export class TimePickerComponent implements OnInit, OnChanges, ControlValueAcces
     }
 
     public onDateStringEdit(dateString: string): void {
-        this.currentDateString = dateString;
+        this.currentDateString.set(dateString);
     }
 
     public onTimeInputBlur(): void {
         if (this.popupRef) {
             return;
         }
-        let dateTime = this.generateValidDateTime(this.currentDateString);
+        let dateTime = this.generateValidDateTime(this.currentDateString());
         if (!dateTime) {
             this.setCurrentDate(null);
             return;
         }
-        if (this.dateStringEquals(dateTime.toJSDate(), this.value)) {
-            this.setCurrentDateString(this.value);
+        if (this.dateStringEquals(dateTime.toJSDate(), this.value())) {
+            this.setCurrentDateString(this.value());
             return;
         }
         if (dateTime.isValid) {
             const inRangeDate = this.updateTimeIfNotInMinMax(dateTime.toJSDate());
             this.setCurrentDate(inRangeDate);
-            this.navigatedDate = inRangeDate;
+            this.navigatedDate.set(inRangeDate);
         } else {
             this.setCurrentDate(null);
         }
     }
 
     public onTimeInputButtonClick(): void {
-        if (!this.timePopupTemplateRef || this.readonly) {
+        if (!this.timePopupTemplateRef || this.readonly || this.popupRef) {
             return;
         }
         this.popupRef = this.popupService.create({
@@ -136,22 +148,7 @@ export class TimePickerComponent implements OnInit, OnChanges, ControlValueAcces
             popupClass: "mona-time-picker-popup",
             hasBackdrop: false,
             closeOnOutsideClick: false,
-            positions: [
-                new ConnectionPositionPair(
-                    { originX: "start", originY: "bottom" },
-                    { overlayX: "start", overlayY: "top" },
-                    -1,
-                    -1,
-                    "mona-dropdown-popup-content-bottom"
-                ),
-                new ConnectionPositionPair(
-                    { originX: "start", originY: "top" },
-                    { overlayX: "start", overlayY: "bottom" },
-                    -1,
-                    -1,
-                    "mona-dropdown-popup-content-top"
-                )
-            ]
+            positions: DropDownService.getDefaultPositions()
         });
         this.popupAnimationService.setupDropdownOutsideClickCloseAnimation(this.popupRef);
         this.popupAnimationService.animateDropdown(this.popupRef, AnimationState.Show);
@@ -176,19 +173,16 @@ export class TimePickerComponent implements OnInit, OnChanges, ControlValueAcces
     }
 
     public writeValue(date: Date | null | undefined): void {
-        this.#value = date ?? null;
-        if (date == null) {
-            this.currentDateString = "";
-        } else {
-            this.currentDateString = DateTime.fromJSDate(date).toFormat(this.format);
-        }
+        this.value.set(date ?? null);
+        this.updateCurrentDateString(date, this.#format());
         this.setDateValues();
     }
 
     private dateStringEquals(date1: Date | null, date2: Date | null): boolean {
         if (date1 && date2) {
             return (
-                DateTime.fromJSDate(date1).toFormat(this.format) === DateTime.fromJSDate(date2).toFormat(this.format)
+                DateTime.fromJSDate(date1).toFormat(this.#format()) ===
+                DateTime.fromJSDate(date2).toFormat(this.#format())
             );
         }
         return date1 === date2;
@@ -200,11 +194,12 @@ export class TimePickerComponent implements OnInit, OnChanges, ControlValueAcces
      * @private
      */
     private generateValidDateTime(dateString: string): DateTime | null {
-        if (!this.value) {
+        const value = this.value();
+        if (!value) {
             return null;
         }
-        const valueDate = DateTime.fromJSDate(this.value);
-        let dateTime = DateTime.fromFormat(dateString, this.format);
+        const valueDate = DateTime.fromJSDate(value);
+        let dateTime = DateTime.fromFormat(dateString, this.#format());
         if (dateTime.isValid) {
             return dateTime.set({
                 year: valueDate.year,
@@ -212,7 +207,9 @@ export class TimePickerComponent implements OnInit, OnChanges, ControlValueAcces
                 day: valueDate.day
             });
         }
-        const date = this.min ? this.min : this.max;
+        const maxDate = this.maxDate();
+        const minDate = this.minDate();
+        const date = minDate || maxDate;
         if (date) {
             const newDate = DateTime.fromJSDate(date);
             dateTime = newDate.set({
@@ -226,30 +223,29 @@ export class TimePickerComponent implements OnInit, OnChanges, ControlValueAcces
     }
 
     private setCurrentDate(date: Date | null): void {
-        this.#value = date;
+        this.value.set(date);
         this.setCurrentDateString(date);
         this.#propagateChange?.(date);
         this.cdr.markForCheck();
     }
 
     private setCurrentDateString(date: Date | null): void {
-        if (date) {
-            this.currentDateString = DateTime.fromJSDate(date).toFormat(this.format);
-        } else {
-            this.currentDateString = "";
-        }
+        this.updateCurrentDateString(date, this.#format());
     }
 
     private setDateValues(): void {
-        this.navigatedDate = this.value ?? DateTime.now().toJSDate();
-        if (this.value) {
-            this.currentDateString = DateTime.fromJSDate(this.value).toFormat(this.format);
+        const value = this.value();
+        this.navigatedDate.set(value ?? DateTime.now().toJSDate());
+        if (value) {
+            this.updateCurrentDateString(value, this.#format());
         }
     }
 
     private updateTimeIfNotInMinMax(date: Date): Date {
-        const minDate = this.min ? DateTime.fromJSDate(this.min) : null;
-        const maxDate = this.max ? DateTime.fromJSDate(this.max) : null;
+        const min = this.minDate();
+        const max = this.maxDate();
+        const minDate = min ? DateTime.fromJSDate(min) : null;
+        const maxDate = max ? DateTime.fromJSDate(max) : null;
         let currentDate = DateTime.fromJSDate(date);
 
         if (minDate) {
@@ -283,7 +279,12 @@ export class TimePickerComponent implements OnInit, OnChanges, ControlValueAcces
         return currentDate.toJSDate();
     }
 
-    public get value(): Date | null {
-        return this.#value;
+    private updateCurrentDateString(date: Date | null | undefined, format: string): void {
+        if (!date) {
+            this.currentDateString.set("");
+            return;
+        }
+        const dateString = DateTime.fromJSDate(date).toFormat(format);
+        this.currentDateString.set(dateString);
     }
 }
