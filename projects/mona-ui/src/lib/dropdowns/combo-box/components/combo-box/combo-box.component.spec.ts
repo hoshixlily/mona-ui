@@ -7,8 +7,8 @@ import { TextBoxDirective } from "../../../../inputs/text-box/directives/text-bo
 import { ComboBoxComponent } from "./combo-box.component";
 
 describe("ComboBoxComponent", () => {
-    let component: ComboBoxComponent;
-    let fixture: ComponentFixture<ComboBoxComponent>;
+    let component: ComboBoxComponent<any>;
+    let fixture: ComponentFixture<ComboBoxComponent<any>>;
 
     beforeEach(() => {
         TestBed.configureTestingModule({

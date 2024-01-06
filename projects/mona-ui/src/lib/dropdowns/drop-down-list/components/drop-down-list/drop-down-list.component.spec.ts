@@ -5,8 +5,8 @@ import { PopupAnimationService } from "../../../../animations/services/popup-ani
 import { DropDownListComponent } from "./drop-down-list.component";
 
 describe("DropDownListComponent", () => {
-    let component: DropDownListComponent;
-    let fixture: ComponentFixture<DropDownListComponent>;
+    let component: DropDownListComponent<any>;
+    let fixture: ComponentFixture<DropDownListComponent<any>>;
 
     beforeEach(() => {
         TestBed.configureTestingModule({

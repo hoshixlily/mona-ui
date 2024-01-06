@@ -5,8 +5,8 @@ import { PopupAnimationService } from "../../../animations/services/popup-animat
 import { AutoCompleteComponent } from "./auto-complete.component";
 
 describe("AutoCompleteComponent", () => {
-    let component: AutoCompleteComponent;
-    let fixture: ComponentFixture<AutoCompleteComponent>;
+    let component: AutoCompleteComponent<any>;
+    let fixture: ComponentFixture<AutoCompleteComponent<any>>;
 
     beforeEach(() => {
         TestBed.configureTestingModule({
