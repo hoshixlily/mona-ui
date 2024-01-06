@@ -1,5 +1,5 @@
 <div class="mona-date-picker" [ngClass]="{'mona-disabled': disabled}" #popupAnchor>
-    <input monaTextBox class="mona-input-inner" [disabled]="disabled" [readonly]="readonly" [ngModel]="currentDateString"
+    <input monaTextBox class="mona-input-inner" [disabled]="disabled" [readonly]="readonly" [ngModel]="currentDateString()"
            (ngModelChange)="onDateStringEdit($event)" (blur)="onDateInputBlur()">
     <button monaButton class="mona-input-button" (click)="onDateInputButtonClick()" [disabled]="disabled" [tabIndex]="-1">
         <fa-icon [icon]="dateIcon"></fa-icon>
@@ -7,5 +7,7 @@
 </div>
 
 <ng-template #datePopupTemplate>
-    <mona-calendar [disabledDates]="disabledDates" [min]="min" [max]="max" [ngModel]="value" (ngModelChange)="onCalendarValueChange($event)"></mona-calendar>
+    <mona-calendar [disabledDates]="disabledDates" [min]="minDate()" [max]="maxDate()"
+                   [ngModel]="value()"
+                   (ngModelChange)="onCalendarValueChange($event)"></mona-calendar>
 </ng-template>
