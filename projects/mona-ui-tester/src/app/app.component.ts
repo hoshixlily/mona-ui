@@ -946,9 +946,13 @@ export class AppComponent implements OnInit {
         return Math.floor(Math.random() * (max - min)) + min;
     }
 
+    public onAutoCompleteFilterChange(event: FilterChangeEvent): void {
+        event.preventDefault();
+        console.log(event);
+    }
+
     public onAutoCompleteValueChange(value: string): void {
         this.autoCompleteValue = value;
-        console.log("Auto-complete value changed: ", value);
     }
 
     public onBreadcrumbItemClick(item: BreadcrumbItem): void {
@@ -968,6 +972,10 @@ export class AppComponent implements OnInit {
     public onColorPickerValueChange(value: string | null): void {
         this.colorPickerValue = value;
         console.log(value);
+    }
+
+    public onComboBoxFilterChange(event: FilterChangeEvent): void {
+        console.log(event);
     }
 
     public onComboBoxPrimitiveValueChange(value: string): void {

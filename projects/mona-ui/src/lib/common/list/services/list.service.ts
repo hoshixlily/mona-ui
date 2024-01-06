@@ -61,7 +61,6 @@ export class ListService<TData> {
     public readonly viewItems: Signal<ImmutableSet<ListItem<TData>>> = computed(() => {
         const listItems = this.listItems();
         const filterText = this.filterText();
-        // const filterableOptions = this.filterableOptions();
         const groupableOptions = this.groupableOptions();
         let enumerable: IEnumerable<ListItem<TData>> = listItems;
         if (filterText) {

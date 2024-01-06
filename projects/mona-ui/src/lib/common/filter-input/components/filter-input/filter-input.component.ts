@@ -7,6 +7,7 @@ import {
     inject,
     Injector,
     Input,
+    OnInit,
     Output,
     signal,
     WritableSignal
@@ -27,7 +28,7 @@ import { FilterChangeEvent } from "../../models/FilterChangeEvent";
     templateUrl: "./filter-input.component.html",
     styleUrl: "./filter-input.component.scss"
 })
-export class FilterInputComponent {
+export class FilterInputComponent implements OnInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     readonly #injector: Injector = inject(Injector);
     protected readonly filter$: Subject<string> = new Subject<string>();

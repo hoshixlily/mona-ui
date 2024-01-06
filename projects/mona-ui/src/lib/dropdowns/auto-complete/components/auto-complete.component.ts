@@ -23,10 +23,12 @@ import { debounceTime, fromEvent, Subject, take, tap } from "rxjs";
 import { v4 } from "uuid";
 import { AnimationState } from "../../../animations/models/AnimationState";
 import { PopupAnimationService } from "../../../animations/services/popup-animation.service";
+import { FilterChangeEvent } from "../../../common/filter-input/models/FilterChangeEvent";
 import { ListComponent } from "../../../common/list/components/list/list.component";
 import { ListFooterTemplateDirective } from "../../../common/list/directives/list-footer-template.directive";
 import { ListGroupHeaderTemplateDirective } from "../../../common/list/directives/list-group-header-template.directive";
 import { ListHeaderTemplateDirective } from "../../../common/list/directives/list-header-template.directive";
+import { ListItemTemplateDirective } from "../../../common/list/directives/list-item-template.directive";
 import { ListNoDataTemplateDirective } from "../../../common/list/directives/list-no-data-template.directive";
 import { ListSelectableDirective } from "../../../common/list/directives/list-selectable.directive";
 import { ListItem } from "../../../common/list/models/ListItem";
@@ -68,7 +70,8 @@ import { AutoCompleteNoDataTemplateDirective } from "../directives/auto-complete
         ListGroupHeaderTemplateDirective,
         ListFooterTemplateDirective,
         ListHeaderTemplateDirective,
-        ListNoDataTemplateDirective
+        ListNoDataTemplateDirective,
+        ListItemTemplateDirective
     ]
 })
 export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccessor {
@@ -278,6 +281,12 @@ export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccesso
         this.listService.filterInputVisible.set(false);
     }
 
+    private notifyFilterChange(filter: string): FilterChangeEvent {
+        const event = new FilterChangeEvent(filter);
+        this.listService.filterChange.emit(event);
+        return event;
+    }
+
     private notifyValueChange(): void {
         this.#propagateChange?.(this.#value);
     }
@@ -303,7 +312,7 @@ export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccesso
                             this.popupRef?.overlayRef.overlayElement.contains(target))
                     )
                 ) {
-                    this.close();
+                    return;
                 }
             });
     }
@@ -329,7 +338,10 @@ export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccesso
                     return;
                 }
                 if (this.listService.filterableOptions().enabled) {
-                    this.listService.setFilter(value);
+                    const event = this.notifyFilterChange(value);
+                    if (!event.isDefaultPrevented()) {
+                        this.listService.setFilter(value);
+                    }
                 }
                 const item = this.getItemStartsWith(value);
                 if (item) {

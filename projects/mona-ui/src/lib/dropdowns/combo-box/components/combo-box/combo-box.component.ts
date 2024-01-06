@@ -27,6 +27,7 @@ import { v4 } from "uuid";
 import { AnimationState } from "../../../../animations/models/AnimationState";
 import { PopupAnimationService } from "../../../../animations/services/popup-animation.service";
 import { ButtonDirective } from "../../../../buttons/button/button.directive";
+import { FilterChangeEvent } from "../../../../common/filter-input/models/FilterChangeEvent";
 import { ListComponent } from "../../../../common/list/components/list/list.component";
 import { ListFooterTemplateDirective } from "../../../../common/list/directives/list-footer-template.directive";
 import { ListGroupHeaderTemplateDirective } from "../../../../common/list/directives/list-group-header-template.directive";
@@ -341,6 +342,12 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
         this.comboBoxValue.set(this.valueText());
     }
 
+    private notifyFilterChange(filter: string): FilterChangeEvent {
+        const event = new FilterChangeEvent(filter);
+        this.listService.filterChange.emit(event);
+        return event;
+    }
+
     private notifyValueChange(): void {
         this.#propagateChange?.(this.#value);
     }
@@ -386,7 +393,10 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
             )
             .subscribe(value => {
                 if (this.listService.filterableOptions().enabled) {
-                    this.listService.setFilter(value);
+                    const event = this.notifyFilterChange(value);
+                    if (!event.isDefaultPrevented()) {
+                        this.listService.setFilter(value);
+                    }
                 }
                 const item = this.listService
                     .viewItems()
