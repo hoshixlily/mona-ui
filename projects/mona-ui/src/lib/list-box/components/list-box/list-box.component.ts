@@ -27,9 +27,11 @@ import { ButtonDirective } from "../../../buttons/button/button.directive";
 import { ListViewComponent } from "../../../list-view/components/list-view/list-view.component";
 import { ListViewItemTemplateDirective } from "../../../list-view/directives/list-view-item-template.directive";
 import { ListViewNavigableDirective } from "../../../list-view/directives/list-view-navigable.directive";
+import { ListViewNoDataTemplateDirective } from "../../../list-view/directives/list-view-no-data-template.directive";
 import { ListViewSelectableDirective } from "../../../list-view/directives/list-view-selectable.directive";
 import { ContainsPipe } from "../../../pipes/contains.pipe";
 import { ListBoxItemTemplateDirective } from "../../directives/list-box-item-template.directive";
+import { ListBoxNoDataTemplateDirective } from "../../directives/list-box-no-data-template.directive";
 import { ListBoxActionClickEvent } from "../../models/ListBoxActionClickEvent";
 import { ListBoxItemTemplateContext } from "../../models/ListBoxItemTemplateContext";
 import { ListBoxSelectionEvent } from "../../models/ListBoxSelectionEvent";
@@ -51,7 +53,8 @@ type ListBoxDirection = "horizontal" | "horizontal-reverse" | "vertical" | "vert
         ButtonDirective,
         FontAwesomeModule,
         ContainsPipe,
-        ListViewNavigableDirective
+        ListViewNavigableDirective,
+        ListViewNoDataTemplateDirective
     ]
 })
 export class ListBoxComponent<T = any> {
@@ -81,6 +84,9 @@ export class ListBoxComponent<T = any> {
     public set items(value: Iterable<T>) {
         this.listBoxItems.set(new List<T>(value));
     }
+
+    @ContentChild(ListBoxNoDataTemplateDirective, { read: TemplateRef })
+    public noDataTemplate: TemplateRef<any> | null = null;
 
     @Output()
     public selectionChange: EventEmitter<ListBoxSelectionEvent> = new EventEmitter<ListBoxSelectionEvent>();

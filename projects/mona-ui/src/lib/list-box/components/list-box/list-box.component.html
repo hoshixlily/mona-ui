@@ -16,6 +16,11 @@
                                   [ngTemplateOutletContext]="{$implicit:dataItem}"></ng-container>
                 </ng-template>
             }
+            @if (noDataTemplate) {
+                <ng-template monaListViewNoDataTemplate>
+                    <ng-container [ngTemplateOutlet]="noDataTemplate"></ng-container>
+                </ng-template>
+            }
         </mona-list-view>
     </div>
     @if (toolbarOptions != null) {
