@@ -1,5 +1,5 @@
 import { CdkFixedSizeVirtualScroll, CdkVirtualForOf, CdkVirtualScrollViewport } from "@angular/cdk/scrolling";
-import { NgFor, NgIf, NgTemplateOutlet } from "@angular/common";
+import { NgTemplateOutlet } from "@angular/common";
 import {
     AfterViewInit,
     ChangeDetectionStrategy,
@@ -47,12 +47,10 @@ import { PageState } from "../../models/PageState";
     providers: [ListService],
     standalone: true,
     imports: [
-        NgIf,
         NgTemplateOutlet,
         CdkVirtualScrollViewport,
         CdkFixedSizeVirtualScroll,
         CdkVirtualForOf,
-        NgFor,
         PagerComponent,
         ListComponent,
         ListHeaderTemplateDirective,

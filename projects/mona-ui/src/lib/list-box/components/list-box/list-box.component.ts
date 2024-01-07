@@ -1,3 +1,4 @@
+import { NgTemplateOutlet } from "@angular/common";
 import {
     ChangeDetectionStrategy,
     Component,
@@ -10,6 +11,7 @@ import {
     TemplateRef,
     WritableSignal
 } from "@angular/core";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import {
     faAngleDown,
     faAngleLeft,
@@ -21,19 +23,17 @@ import {
     IconDefinition
 } from "@fortawesome/free-solid-svg-icons";
 import { Collections, Enumerable, List } from "@mirei/ts-collections";
-import {ListViewNavigableDirective} from "../../../list-view/directives/list-view-navigable.directive";
+import { ButtonDirective } from "../../../buttons/button/button.directive";
+import { ListViewComponent } from "../../../list-view/components/list-view/list-view.component";
+import { ListViewItemTemplateDirective } from "../../../list-view/directives/list-view-item-template.directive";
+import { ListViewNavigableDirective } from "../../../list-view/directives/list-view-navigable.directive";
+import { ListViewSelectableDirective } from "../../../list-view/directives/list-view-selectable.directive";
+import { ContainsPipe } from "../../../pipes/contains.pipe";
 import { ListBoxItemTemplateDirective } from "../../directives/list-box-item-template.directive";
 import { ListBoxActionClickEvent } from "../../models/ListBoxActionClickEvent";
 import { ListBoxItemTemplateContext } from "../../models/ListBoxItemTemplateContext";
 import { ListBoxSelectionEvent } from "../../models/ListBoxSelectionEvent";
 import { ToolbarAction, ToolbarOptions } from "../../models/ToolbarOptions";
-import { ContainsPipe } from "../../../pipes/contains.pipe";
-import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { ButtonDirective } from "../../../buttons/button/button.directive";
-import { NgIf, NgTemplateOutlet } from "@angular/common";
-import { ListViewItemTemplateDirective } from "../../../list-view/directives/list-view-item-template.directive";
-import { ListViewSelectableDirective } from "../../../list-view/directives/list-view-selectable.directive";
-import { ListViewComponent } from "../../../list-view/components/list-view/list-view.component";
 
 type ListBoxDirection = "horizontal" | "horizontal-reverse" | "vertical" | "vertical-reverse";
 
@@ -47,7 +47,6 @@ type ListBoxDirection = "horizontal" | "horizontal-reverse" | "vertical" | "vert
         ListViewComponent,
         ListViewSelectableDirective,
         ListViewItemTemplateDirective,
-        NgIf,
         NgTemplateOutlet,
         ButtonDirective,
         FontAwesomeModule,
