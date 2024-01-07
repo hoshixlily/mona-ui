@@ -580,9 +580,8 @@
                                                 textField="text"
                                                 [height]="350"
                                                 [monaListViewSelectable]="{enabled: true, mode: 'single', toggleable: true}"
-                                                [monaListViewVirtualScroll]="{enabled: false, height: 28}"
+                                                [monaListViewVirtualScroll]="{enabled: true, height: 28}"
                                                 monaListViewGroupable [groupBy]="'group'"
-                                                monaListViewPageable
                                                 (scrollBottom)="onListViewScrollBottom($event)"
                                                 [selectedKeys]="listViewSelectedKeys" selectionKey="text"
                                                 (selectedKeysChange)="onListViewSelectionChange($event)"

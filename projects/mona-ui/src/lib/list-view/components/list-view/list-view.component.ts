@@ -63,6 +63,10 @@ import { PageState } from "../../models/PageState";
 export class ListViewComponent<T = any> implements AfterViewInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     readonly #items: WritableSignal<ImmutableSet<any>> = signal(ImmutableSet.create());
+    readonly #scrollBottomEnabled: Signal<boolean> = computed(() => {
+        const pageableOptions = this.pagerSettings();
+        return !pageableOptions.enabled;
+    });
 
     protected readonly listHeight: WritableSignal<string | undefined> = signal(undefined);
     protected readonly listWidth: WritableSignal<string | undefined> = signal(undefined);
@@ -178,7 +182,7 @@ export class ListViewComponent<T = any> implements AfterViewInit {
             .pipe(
                 takeUntilDestroyed(this.#destroyRef),
                 filter(event => {
-                    if (this.pagerSettings().enabled) {
+                    if (!this.#scrollBottomEnabled()) {
                         return false;
                     }
                     const target = event.target as HTMLElement;
