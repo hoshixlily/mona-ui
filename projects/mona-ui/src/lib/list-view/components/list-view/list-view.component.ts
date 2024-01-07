@@ -19,12 +19,13 @@ import {
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ImmutableSet, Selector } from "@mirei/ts-collections";
-import { filter, fromEvent, tap } from "rxjs";
+import { filter, fromEvent } from "rxjs";
 import { ListComponent } from "../../../common/list/components/list/list.component";
 import { ListFooterTemplateDirective } from "../../../common/list/directives/list-footer-template.directive";
 import { ListGroupHeaderTemplateDirective } from "../../../common/list/directives/list-group-header-template.directive";
 import { ListHeaderTemplateDirective } from "../../../common/list/directives/list-header-template.directive";
 import { ListItemTemplateDirective } from "../../../common/list/directives/list-item-template.directive";
+import { ListNoDataTemplateDirective } from "../../../common/list/directives/list-no-data-template.directive";
 import { ListService } from "../../../common/list/services/list.service";
 import { PagerComponent } from "../../../pager/components/pager/pager.component";
 import { PageChangeEvent } from "../../../pager/models/PageChangeEvent";
@@ -33,6 +34,7 @@ import { ListViewFooterTemplateDirective } from "../../directives/list-view-foot
 import { ListViewGroupHeaderTemplateDirective } from "../../directives/list-view-group-header-template.directive";
 import { ListViewHeaderTemplateDirective } from "../../directives/list-view-header-template.directive";
 import { ListViewItemTemplateDirective } from "../../directives/list-view-item-template.directive";
+import { ListViewNoDataTemplateDirective } from "../../directives/list-view-no-data-template.directive";
 import { ListViewItemTemplateContext } from "../../models/ListViewItemTemplateContext";
 import { PagerSettings } from "../../models/PagerSettings";
 import { PageState } from "../../models/PageState";
@@ -56,7 +58,8 @@ import { PageState } from "../../models/PageState";
         ListHeaderTemplateDirective,
         ListFooterTemplateDirective,
         ListGroupHeaderTemplateDirective,
-        ListItemTemplateDirective
+        ListItemTemplateDirective,
+        ListNoDataTemplateDirective
     ]
 })
 export class ListViewComponent<T = any> implements AfterViewInit {
@@ -111,12 +114,14 @@ export class ListViewComponent<T = any> implements AfterViewInit {
 
     @Input()
     public set items(value: Iterable<T>) {
-        // this.listService.setData(value);
         this.#items.set(ImmutableSet.create(value));
     }
 
     @ContentChild(ListViewItemTemplateDirective, { read: TemplateRef })
     public itemTemplate!: TemplateRef<ListViewItemTemplateContext>;
+
+    @ContentChild(ListViewNoDataTemplateDirective, { read: TemplateRef })
+    public noDataTemplate: TemplateRef<any> | null = null;
 
     @Input()
     public pageSize: number = 5;

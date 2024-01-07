@@ -166,6 +166,7 @@ import {
 } from "mona-ui";
 import { v4 } from "uuid";
 import { ListFilterableDirective } from "../../../mona-ui/src/lib/common/list/directives/list-filterable.directive";
+import { ListViewNoDataTemplateDirective } from "../../../mona-ui/src/lib/list-view/directives/list-view-no-data-template.directive";
 import { TestComponentComponent } from "./test-component/test-component.component";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import {
@@ -249,6 +250,7 @@ import { GridOrderData } from "./GridOrderData";
         ListViewGroupHeaderTemplateDirective,
         ListViewHeaderTemplateDirective,
         ListViewNavigableDirective,
+        ListViewNoDataTemplateDirective,
         ListViewPageableDirective,
         MenubarComponent,
         MenuComponent,

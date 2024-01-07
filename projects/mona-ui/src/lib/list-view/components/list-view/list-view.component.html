@@ -1,9 +1,9 @@
 <div class="mona-list-view" [attr.tabindex]="-1">
     <div class="mona-list-container">
         <mona-list [data]="viewItems()" height="100%">
-            @if (headerTemplate) {
-                <ng-template monaListHeaderTemplate>
-                    <ng-container [ngTemplateOutlet]="headerTemplate"></ng-container>
+            @if (footerTemplate) {
+                <ng-template monaListFooterTemplate>
+                    <ng-container [ngTemplateOutlet]="footerTemplate"></ng-container>
                 </ng-template>
             }
             @if (groupHeaderTemplate) {
@@ -12,15 +12,20 @@
                                   [ngTemplateOutletContext]="{$implicit: groupHeader}"></ng-container>
                 </ng-template>
             }
+            @if (headerTemplate) {
+                <ng-template monaListHeaderTemplate>
+                    <ng-container [ngTemplateOutlet]="headerTemplate"></ng-container>
+                </ng-template>
+            }
             @if (itemTemplate) {
                 <ng-template monaListItemTemplate let-dataItem>
                     <ng-container [ngTemplateOutlet]="itemTemplate"
                                   [ngTemplateOutletContext]="{$implicit: dataItem}"></ng-container>
                 </ng-template>
             }
-            @if (footerTemplate) {
-                <ng-template monaListFooterTemplate>
-                    <ng-container [ngTemplateOutlet]="footerTemplate"></ng-container>
+            @if (noDataTemplate) {
+                <ng-template monaListNoDataTemplate>
+                    <ng-container [ngTemplateOutlet]="noDataTemplate"></ng-container>
                 </ng-template>
             }
         </mona-list>
