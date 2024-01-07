@@ -8,11 +8,12 @@ div.mona-list-view {
     display: flex;
     flex-direction: column;
     outline: none;
+    overflow: hidden;
 }
 
-div.mona-list-view-content {
+div.mona-list-container {
     flex: 1;
-    overflow: auto;
+    overflow: hidden;
 }
 
 .cdk-virtual-scrollable {
@@ -20,24 +21,6 @@ div.mona-list-view-content {
     height: 100%;
 }
 
-ul.mona-list-view-list {
-    list-style: none;
-    outline: none;
-}
-
-div.mona-list-view-header {
-    border-bottom: 1px solid var(--mona-border-color);
-}
-
-div.mona-list-view-footer {
-    border-top: 1px solid var(--mona-border-color);
-}
-
 div.mona-list-view-pager {
     border-top: 1px solid var(--mona-border-color);
-}
-
-div.mona-list-view-group-header {
-    font-weight: bold;
-    padding: 4px 8px;
 }

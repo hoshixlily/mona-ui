@@ -5,58 +5,72 @@
      [class.mona-list-box-vertical-reverse]="direction()==='vertical-reverse'"
 >
     <div class="mona-list-box-view">
-        <mona-list-view [items]="listBoxItems()" [monaListViewSelectable]="{enabled: true, mode: 'single'}"
-                        [navigable]="{enabled: true, mode: 'select'}"
+        <mona-list-view [items]="listBoxItems()"
+                        [textField]="textField"
+                        [monaListViewSelectable]="{enabled: true, mode: 'single'}"
+                        [monaListViewNavigable]="{enabled: true, mode: 'select'}"
                         [selectedKeys]="selectedItems" (selectedKeysChange)="onSelectedItemChange($event)">
-            <ng-template monaListViewItemTemplate let-item let-index="index">
-                <div class="mona-list-box-item" [attr.data-item]="textField?item[textField]:item" *ngIf="!itemTemplate">
-                    {{textField ? item[textField] : item}}
-                </div>
-                <ng-container [ngTemplateOutlet]="itemTemplate"
-                              [ngTemplateOutletContext]="{$implicit: item, index}"></ng-container>
-            </ng-template>
+            @if (itemTemplate) {
+                <ng-template monaListViewItemTemplate let-dataItem>
+                    <ng-container [ngTemplateOutlet]="itemTemplate"
+                                  [ngTemplateOutletContext]="{$implicit:dataItem}"></ng-container>
+                </ng-template>
+            }
+            @if (noDataTemplate) {
+                <ng-template monaListViewNoDataTemplate>
+                    <ng-container [ngTemplateOutlet]="noDataTemplate"></ng-container>
+                </ng-template>
+            }
         </mona-list-view>
     </div>
-    <div class="mona-list-box-toolbar"
-         [class.mona-list-box-toolbar-horizontal]="direction()==='horizontal'"
-         [class.mona-list-box-toolbar-vertical]="direction()==='vertical'"
-         [class.mona-list-box-toolbar-horizontal-reverse]="direction()==='horizontal-reverse'"
-         [class.mona-list-box-toolbar-vertical-reverse]="direction()==='vertical-reverse'"
-         *ngIf="toolbarOptions != null">
-        <button monaButton (click)="onMoveUpClick()"
-                [disabled]="selectedItem == null"
-                *ngIf="toolbarOptions?.actions|monaContains:'moveUp'">
-            <fa-icon [icon]="moveUpIcon"></fa-icon>
-        </button>
-        <button monaButton (click)="onMoveDownClick()"
-                [disabled]="selectedItem == null"
-                *ngIf="toolbarOptions?.actions|monaContains:'moveDown'">
-            <fa-icon [icon]="moveDownIcon"></fa-icon>
-        </button>
-        <button monaButton (click)="onTransferFromClick()"
-                [disabled]="connectedList?.selectedItem == null"
-                *ngIf="toolbarOptions?.actions|monaContains:'transferFrom'">
-            <fa-icon [icon]="transferFromIcon"></fa-icon>
-        </button>
-        <button monaButton (click)="onTransferToClick()"
-                [disabled]="selectedItem == null"
-                *ngIf="toolbarOptions?.actions|monaContains:'transferTo'">
-            <fa-icon [icon]="transferToIcon"></fa-icon>
-        </button>
-        <button monaButton (click)="onTransferAllFromClick()"
-                [disabled]="!connectedList || connectedList.listBoxItems().length === 0"
-                *ngIf="toolbarOptions?.actions|monaContains:'transferAllFrom'">
-            <fa-icon [icon]="transferAllFromIcon"></fa-icon>
-        </button>
-        <button monaButton (click)="onTransferAllToClick()"
-                [disabled]="listBoxItems().length === 0"
-                *ngIf="toolbarOptions?.actions|monaContains:'transferAllTo'">
-            <fa-icon [icon]="transferAllToIcon"></fa-icon>
-        </button>
-        <button monaButton (click)="onRemoveClick()"
-                [disabled]="selectedItem == null"
-                *ngIf="toolbarOptions?.actions|monaContains:'remove'">
-            <fa-icon [icon]="removeIcon"></fa-icon>
-        </button>
-    </div>
+    @if (toolbarOptions != null) {
+        <div class="mona-list-box-toolbar"
+             [class.mona-list-box-toolbar-horizontal]="direction()==='horizontal'"
+             [class.mona-list-box-toolbar-vertical]="direction()==='vertical'"
+             [class.mona-list-box-toolbar-horizontal-reverse]="direction()==='horizontal-reverse'"
+             [class.mona-list-box-toolbar-vertical-reverse]="direction()==='vertical-reverse'">
+            @if (toolbarOptions?.actions|monaContains:'moveUp') {
+                <button monaButton (click)="onMoveUpClick()"
+                        [disabled]="selectedItem == null">
+                    <fa-icon [icon]="moveUpIcon"></fa-icon>
+                </button>
+            }
+            @if (toolbarOptions?.actions|monaContains:'moveDown') {
+                <button monaButton (click)="onMoveDownClick()"
+                        [disabled]="selectedItem == null">
+                    <fa-icon [icon]="moveDownIcon"></fa-icon>
+                </button>
+            }
+            @if (toolbarOptions?.actions|monaContains:'transferFrom') {
+                <button monaButton (click)="onTransferFromClick()"
+                        [disabled]="connectedList?.selectedItem == null">
+                    <fa-icon [icon]="transferFromIcon"></fa-icon>
+                </button>
+            }
+            @if (toolbarOptions?.actions|monaContains:'transferTo') {
+                <button monaButton (click)="onTransferToClick()"
+                        [disabled]="selectedItem == null">
+                    <fa-icon [icon]="transferToIcon"></fa-icon>
+                </button>
+            }
+            @if (toolbarOptions?.actions|monaContains:'transferAllFrom') {
+                <button monaButton (click)="onTransferAllFromClick()"
+                        [disabled]="!connectedList || connectedList.listBoxItems().length === 0">
+                    <fa-icon [icon]="transferAllFromIcon"></fa-icon>
+                </button>
+            }
+            @if (toolbarOptions?.actions|monaContains:'transferAllTo') {
+                <button monaButton (click)="onTransferAllToClick()"
+                        [disabled]="listBoxItems().length === 0">
+                    <fa-icon [icon]="transferAllToIcon"></fa-icon>
+                </button>
+            }
+            @if (toolbarOptions?.actions|monaContains:'remove') {
+                <button monaButton (click)="onRemoveClick()"
+                        [disabled]="selectedItem == null">
+                    <fa-icon [icon]="removeIcon"></fa-icon>
+                </button>
+            }
+        </div>
+    }
 </div>

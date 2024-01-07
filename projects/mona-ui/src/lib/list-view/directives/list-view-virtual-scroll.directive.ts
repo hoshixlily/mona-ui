@@ -1,21 +1,19 @@
 import { Directive, Input } from "@angular/core";
-import { VirtualScrollOptions } from "../models/VirtualScrollOptions";
-import { ListViewService } from "../services/list-view.service";
+import { VirtualScrollOptions } from "../../common/list/models/VirtualScrollOptions";
+import { ListService } from "../../common/list/services/list.service";
 
 @Directive({
     selector: "mona-list-view[monaListViewVirtualScroll]",
     standalone: true
 })
-export class ListViewVirtualScrollDirective {
+export class ListViewVirtualScrollDirective<T> {
     @Input({
         alias: "monaListViewVirtualScroll",
         required: true
     })
-    public options: VirtualScrollOptions = { enabled: true, itemHeight: 30 };
-
-    public constructor(private readonly listViewService: ListViewService) {}
-
-    public ngOnInit(): void {
-        this.listViewService.setVirtualScrollOptions(this.options);
+    public set options(value: VirtualScrollOptions) {
+        this.listService.setVirtualScrollOptions(value);
     }
+
+    public constructor(private readonly listService: ListService<T>) {}
 }

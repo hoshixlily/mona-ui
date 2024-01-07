@@ -109,7 +109,7 @@ import {
     GridCellTemplateDirective,
     ListBoxItemTemplateDirective,
     ListViewFooterTemplateDirective,
-    ListViewGroupTemplateDirective,
+    ListViewGroupHeaderTemplateDirective,
     ListViewHeaderTemplateDirective,
     MenuItemIconTemplateDirective,
     MenuItemTextTemplateDirective,
@@ -159,10 +159,14 @@ import {
     DropDownListNoDataTemplateDirective,
     MultiSelectFooterTemplateDirective,
     MultiSelectHeaderTemplateDirective,
-    MultiSelectNoDataTemplateDirective
+    MultiSelectNoDataTemplateDirective,
+    ListViewNavigableDirective,
+    ListViewGroupableDirective,
+    ListViewPageableDirective
 } from "mona-ui";
 import { v4 } from "uuid";
 import { ListFilterableDirective } from "../../../mona-ui/src/lib/common/list/directives/list-filterable.directive";
+import { ListViewNoDataTemplateDirective } from "../../../mona-ui/src/lib/list-view/directives/list-view-no-data-template.directive";
 import { TestComponentComponent } from "./test-component/test-component.component";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import {
@@ -242,8 +246,12 @@ import { GridOrderData } from "./GridOrderData";
         ListViewItemTemplateDirective,
         ListViewVirtualScrollDirective,
         ListViewFooterTemplateDirective,
-        ListViewGroupTemplateDirective,
+        ListViewGroupableDirective,
+        ListViewGroupHeaderTemplateDirective,
         ListViewHeaderTemplateDirective,
+        ListViewNavigableDirective,
+        ListViewNoDataTemplateDirective,
+        ListViewPageableDirective,
         MenubarComponent,
         MenuComponent,
         MenuItemComponent,
@@ -923,9 +931,9 @@ export class AppComponent implements OnInit {
         //     console.log(this.gridOrderData[0]);
         // }, 3000);
 
-        const listViewItems = new Array<{ text: string; value: number }>();
+        const listViewItems = new Array<{ text: string; value: number; group: string }>();
         for (let vx = 1; vx <= 3000; ++vx) {
-            listViewItems.push({ text: `Item ${vx}`, value: vx });
+            listViewItems.push({ text: `Item ${vx}`, value: vx, group: vx % 3 === 0 ? "Group 1" : "Group 2" });
         }
         this.listViewDataItems = new IndexableList(listViewItems);
         this.listViewSelectedKeys = new Set([
@@ -953,6 +961,7 @@ export class AppComponent implements OnInit {
 
     public onAutoCompleteValueChange(value: string): void {
         this.autoCompleteValue = value;
+        console.log("AutoComplete value changed: ", value);
     }
 
     public onBreadcrumbItemClick(item: BreadcrumbItem): void {
@@ -1073,6 +1082,11 @@ export class AppComponent implements OnInit {
             event.preventDefault();
             console.log(event);
         }
+    }
+
+    public onListViewScrollBottom(event: Event): void {
+        this.listViewScrollBottomItemCount = this.listViewScrollBottomItemCount + 10;
+        console.log("ListView scroll bottom", event);
     }
 
     public onListViewSelectionChange(keys: string[]): void {

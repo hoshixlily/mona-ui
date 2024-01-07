@@ -197,18 +197,18 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
     }
 
     public open(): void {
-        this.dropdownWrapper.nativeElement.focus();
+        this.focus();
         if (this.#popupRef) {
             return;
         }
         this.#popupRef = this.popupService.create({
             anchor: this.dropdownWrapper,
+            closeOnOutsideClick: false,
             content: this.popupTemplate,
             hasBackdrop: false,
             withPush: false,
             width: this.elementRef.nativeElement.getBoundingClientRect().width,
             popupClass: ["mona-dropdown-popup-content", this.#popupUidClass],
-            closeOnOutsideClick: false,
             positions: DropDownService.getDefaultPositions()
         });
 

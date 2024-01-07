@@ -241,9 +241,9 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
         this.focus();
         this.popupRef = this.popupService.create({
             anchor: this.dropdownWrapper,
+            closeOnOutsideClick: false,
             content: this.popupTemplate,
             hasBackdrop: false,
-            closeOnOutsideClick: false,
             withPush: false,
             width: this.elementRef.nativeElement.getBoundingClientRect().width,
             popupClass: ["mona-dropdown-popup-content", this.#popupUidClass],
@@ -306,6 +306,8 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
         } else {
             this.listService.selectItem(highlightedItem);
         }
+        this.updateValue(this.selectedDataItems().toArray());
+        this.notifyValueChange();
     }
 
     private initialize(): void {

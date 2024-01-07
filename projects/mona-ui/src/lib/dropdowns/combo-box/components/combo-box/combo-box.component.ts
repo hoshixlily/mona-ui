@@ -32,6 +32,7 @@ import { ListComponent } from "../../../../common/list/components/list/list.comp
 import { ListFooterTemplateDirective } from "../../../../common/list/directives/list-footer-template.directive";
 import { ListGroupHeaderTemplateDirective } from "../../../../common/list/directives/list-group-header-template.directive";
 import { ListHeaderTemplateDirective } from "../../../../common/list/directives/list-header-template.directive";
+import { ListItemTemplateDirective } from "../../../../common/list/directives/list-item-template.directive";
 import { ListNoDataTemplateDirective } from "../../../../common/list/directives/list-no-data-template.directive";
 import { ListSelectableDirective } from "../../../../common/list/directives/list-selectable.directive";
 import { ListItem } from "../../../../common/list/models/ListItem";
@@ -76,7 +77,8 @@ import { ComboBoxNoDataTemplateDirective } from "../../directives/combo-box-no-d
         ListGroupHeaderTemplateDirective,
         ListFooterTemplateDirective,
         ListHeaderTemplateDirective,
-        ListNoDataTemplateDirective
+        ListNoDataTemplateDirective,
+        ListItemTemplateDirective
     ]
 })
 export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
