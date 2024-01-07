@@ -58,6 +58,7 @@ export class ListComponent<TData> implements OnInit, AfterViewInit {
     #viewport: CdkVirtualScrollViewport | null = null;
 
     protected listHeight: WritableSignal<string | undefined> = signal(undefined);
+    protected listMaxHeight: WritableSignal<string | undefined> = signal(undefined);
     protected listWidth: WritableSignal<string | undefined> = signal(undefined);
 
     @Input({ required: false })
@@ -90,6 +91,17 @@ export class ListComponent<TData> implements OnInit, AfterViewInit {
 
     @ContentChild(ListItemTemplateDirective, { read: TemplateRef })
     public itemTemplate: TemplateRef<ListItemTemplateContext<TData>> | null = null;
+
+    @Input()
+    public set maxHeight(value: string | number | undefined) {
+        if (value == null) {
+            this.listMaxHeight.set(undefined);
+        } else if (typeof value === "number") {
+            this.listMaxHeight.set(`${value}px`);
+        } else {
+            this.listMaxHeight.set(value);
+        }
+    }
 
     @ContentChild(ListNoDataTemplateDirective, { read: TemplateRef })
     public noDataTemplate: TemplateRef<any> | null = null;
@@ -152,7 +164,8 @@ export class ListComponent<TData> implements OnInit, AfterViewInit {
         if (
             (options.mode === "single" && !selectedItem.contains(item)) ||
             (options.mode === "single" && options.toggleable) ||
-            options.mode === "multiple"
+            options.mode === "multiple" ||
+            (options.mode === "single" && selectedItem.size() > 1)
         ) {
             this.listService.selectItem(item);
             this.listService.selectedKeysChange.emit(this.listService.selectedKeys().toArray());
@@ -204,6 +217,7 @@ export class ListComponent<TData> implements OnInit, AfterViewInit {
             )
             .subscribe(event => {
                 const navigableOptions = this.listService.navigableOptions();
+                const previousSelectedItems = this.listService.selectedListItems();
                 let item: ListItem<TData> | null = null;
                 if (event.key === "ArrowDown") {
                     item = this.listService.navigate("next", navigableOptions.mode);
@@ -211,6 +225,12 @@ export class ListComponent<TData> implements OnInit, AfterViewInit {
                     item = this.listService.navigate("previous", navigableOptions.mode);
                 }
                 if (item) {
+                    this.itemSelect.emit(item);
+                }
+                if (item /* && navigableOptions.mode === "select"*/) {
+                    if (previousSelectedItems.contains(item)) {
+                        return;
+                    }
                     this.listService.selectedKeysChange.emit(this.listService.selectedKeys().toArray());
                 }
             });

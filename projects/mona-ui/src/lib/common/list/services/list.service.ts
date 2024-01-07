@@ -197,6 +197,9 @@ export class ListService<TData> {
             if (options.toggleable) {
                 this.selectedKeys.update(set => {
                     if (set.contains(key)) {
+                        if (set.size() > 1) {
+                            return set.where(k => k === key).toImmutableSet();
+                        }
                         return set.remove(key);
                     }
                     return set.clear().add(key);
@@ -412,7 +415,6 @@ export class ListService<TData> {
                 this.selectItem(highlightedItem);
                 return highlightedItem;
             }
-            // return highlightedItem;
         }
         const selectedItem = viewItems.lastOrDefault(i => selectedKeys.contains(this.getSelectionKey(i)));
         const lastHighlightedItem = this.highlightedItem();
@@ -431,6 +433,10 @@ export class ListService<TData> {
             }
             if (nextItem) {
                 if (mode === "select") {
+                    const previouslySelectedItem = this.selectedListItems().firstOrDefault();
+                    if (previouslySelectedItem === nextItem) {
+                        return null;
+                    }
                     this.selectItem(nextItem);
                     this.highlightedItem.set(null);
                 } else {
@@ -442,6 +448,10 @@ export class ListService<TData> {
             let prevItem = this.getPreviousItemForNavigation(viewItems, navigationItem);
             if (prevItem) {
                 if (mode === "select") {
+                    const previouslySelectedItem = this.selectedListItems().firstOrDefault();
+                    if (previouslySelectedItem === prevItem) {
+                        return null;
+                    }
                     this.selectItem(prevItem);
                     this.highlightedItem.set(null);
                 } else {

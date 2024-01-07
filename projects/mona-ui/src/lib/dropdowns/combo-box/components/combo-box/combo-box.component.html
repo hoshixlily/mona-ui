@@ -16,7 +16,7 @@
 
 <ng-template #popupTemplate>
     <div class="mona-dropdown-popup-list-wrapper">
-        <mona-list [height]="200"
+        <mona-list [maxHeight]="200"
                    (itemSelect)="onItemSelect($event)"
                    [monaListSelectable]="selectableOptions"
                    (selectedKeysChange)="onSelectedKeysChange($event)">

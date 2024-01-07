@@ -577,28 +577,31 @@
                                 </mona-fieldset>
 
                                 <mona-list-view [items]="listViewDataItems|monaSlice:0:listViewScrollBottomItemCount"
-                                                [monaListViewSelectable]="{enabled: true, mode: 'single'}"
-                                                (scrollBottom)="listViewScrollBottomItemCount=listViewScrollBottomItemCount+10"
+                                                textField="text"
+                                                [height]="350"
+                                                [monaListViewSelectable]="{enabled: true, mode: 'single', toggleable: true}"
+                                                [monaListViewVirtualScroll]="{enabled: false, height: 28}"
+                                                monaListViewGroupable [groupBy]="'group'"
+                                                monaListViewPageable
+                                                (scrollBottom)="onListViewScrollBottom($event)"
                                                 [selectedKeys]="listViewSelectedKeys" selectionKey="text"
-                                                [monaListViewVirtualScroll]="{enabled: true, itemHeight: 28}"
                                                 (selectedKeysChange)="onListViewSelectionChange($event)"
-                                                [navigable]="{enabled: true, mode: 'focus'}"
+                                                [monaListViewNavigable]="{wrap: true}"
                                                 style="height: 350px; width: 350px;">
                                     <ng-template monaListViewHeaderTemplate>
-                                        <div style="padding: 4px 8px; font-weight: 600;">List of Products</div>
+                                        <div style="padding: 4px 8px; font-weight: 600; border-bottom: 1px solid var(--mona-border-color);">List of Products</div>
                                     </ng-template>
                                     <ng-template monaListViewItemTemplate let-dataItem>
-                                        <div style="padding:4px 8px; color: #32BEA6;">
+                                        <div style="color: #32BEA6;">
                                             {{dataItem.text}}
                                         </div>
                                     </ng-template>
                                     <ng-template monaListViewFooterTemplate>
-                                        <div style="padding: 4px 8px; font-weight: 600;">
+                                        <div style="padding: 4px 8px; font-weight: 600; border-top: 1px solid var(--mona-border-color);">
                                             <span style="color: var(--mona-primary-light);">{{listViewDataItems.length}}</span> items | <span style="color: #FF3055;">{{listViewSelectedKeys.size}}</span> selected
                                         </div>
                                     </ng-template>
                                 </mona-list-view>
-
 
                             </div>
                             <div style="display: flex; align-items: center; justify-content: center;">

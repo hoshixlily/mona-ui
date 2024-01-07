@@ -21,6 +21,7 @@ import {
     IconDefinition
 } from "@fortawesome/free-solid-svg-icons";
 import { Collections, Enumerable, List } from "@mirei/ts-collections";
+import {ListViewNavigableDirective} from "../../../list-view/directives/list-view-navigable.directive";
 import { ListBoxItemTemplateDirective } from "../../directives/list-box-item-template.directive";
 import { ListBoxActionClickEvent } from "../../models/ListBoxActionClickEvent";
 import { ListBoxItemTemplateContext } from "../../models/ListBoxItemTemplateContext";
@@ -50,7 +51,8 @@ type ListBoxDirection = "horizontal" | "horizontal-reverse" | "vertical" | "vert
         NgTemplateOutlet,
         ButtonDirective,
         FontAwesomeModule,
-        ContainsPipe
+        ContainsPipe,
+        ListViewNavigableDirective
     ]
 })
 export class ListBoxComponent<T = any> {

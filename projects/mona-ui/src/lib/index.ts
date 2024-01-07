@@ -152,15 +152,15 @@ export * from "./list-box/directives/list-box-item-template.directive";
 export * from "./list-box/components/list-box/list-box.component";
 
 /** List View */
-export * from "./list-view/models/NavigableOptions";
 export * from "./list-view/models/PagerSettings";
-export { SelectableOptions, SelectMode } from "./list-view/models/SelectableOptions";
-export * from "./list-view/models/VirtualScrollOptions";
 export * from "./list-view/components/list-view/list-view.component";
-export * from "./list-view/directives/list-view-item-template.directive";
 export * from "./list-view/directives/list-view-footer-template.directive";
-export * from "./list-view/directives/list-view-group-template.directive";
+export * from "./list-view/directives/list-view-group-header-template.directive";
+export * from "./list-view/directives/list-view-groupable.directive";
 export * from "./list-view/directives/list-view-header-template.directive";
+export * from "./list-view/directives/list-view-item-template.directive";
+export * from "./list-view/directives/list-view-navigable.directive";
+export * from "./list-view/directives/list-view-pageable.directive";
 export * from "./list-view/directives/list-view-selectable.directive";
 export * from "./list-view/directives/list-view-virtual-scroll.directive";
 
@@ -227,7 +227,7 @@ export * from "./tree-view/models/NodeLookupItem";
 export * from "./tree-view/models/CheckableOptions";
 export * from "./tree-view/models/ExpandableOptions";
 export * from "./tree-view/models/FilterableOptions";
-export * from "./tree-view/models/SelectableOptions";
+export { SelectableOptions } from "./tree-view/models/SelectableOptions";
 export * from "./tree-view/components/tree-view/tree-view.component";
 export * from "./tree-view/directives/tree-view-checkable.directive";
 export * from "./tree-view/directives/tree-view-disable.directive";

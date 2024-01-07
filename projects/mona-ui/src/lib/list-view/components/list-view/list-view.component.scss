@@ -8,6 +8,12 @@ div.mona-list-view {
     display: flex;
     flex-direction: column;
     outline: none;
+    overflow: hidden;
+}
+
+div.mona-list-container {
+    flex: 1;
+    overflow: hidden;
 }
 
 div.mona-list-view-content {

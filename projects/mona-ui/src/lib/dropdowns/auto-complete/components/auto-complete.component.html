@@ -13,7 +13,7 @@
 
 <ng-template #popupTemplate>
     <div class="mona-dropdown-popup-list-wrapper">
-        <mona-list [height]="200" (itemSelect)="onItemSelect($event)">
+        <mona-list [maxHeight]="200" (itemSelect)="onItemSelect($event)">
             @if (footerTemplate) {
                 <ng-template monaListFooterTemplate>
                     <ng-container [ngTemplateOutlet]="footerTemplate"></ng-container>
