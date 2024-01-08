@@ -30,6 +30,7 @@ import { TreeViewSelectableDirective } from "../../../../tree-view/directives/tr
 import { NodeLookupItem } from "../../../../tree-view/models/NodeLookupItem";
 import { SelectableOptions } from "../../../../tree-view/models/SelectableOptions";
 import { Action } from "../../../../utils/Action";
+import { DropDownService } from "../../../services/drop-down.service";
 import { DropDownTreeService } from "../../services/drop-down-tree.service";
 
 @Component({
@@ -90,7 +91,7 @@ export class DropDownTreeComponent implements ControlValueAccessor {
     public readonly hostClass: boolean = true;
 
     @Input()
-    public set itemDisabler(nodeDisabler: Action<unknown, boolean> | string) {
+    public set itemDisabled(nodeDisabler: Action<unknown, boolean> | string) {
         this.disabler.set(nodeDisabler);
     }
 
@@ -143,22 +144,7 @@ export class DropDownTreeComponent implements ControlValueAccessor {
             width: this.elementRef.nativeElement.getBoundingClientRect().width,
             popupClass: ["mona-dropdown-popup-content", "mona-dropdown-tree-popup-content"],
             closeOnOutsideClick: false,
-            positions: [
-                new ConnectionPositionPair(
-                    { originX: "start", originY: "bottom" },
-                    { overlayX: "start", overlayY: "top" },
-                    -1,
-                    0,
-                    "mona-dropdown-popup-content-bottom"
-                ),
-                new ConnectionPositionPair(
-                    { originX: "start", originY: "top" },
-                    { overlayX: "start", overlayY: "bottom" },
-                    -1,
-                    -1,
-                    "mona-dropdown-popup-content-top"
-                )
-            ]
+            positions: DropDownService.getDefaultPositions()
         });
         this.popupAnimationService.setupDropdownOutsideClickCloseAnimation(this.#popupRef);
         this.popupAnimationService.animateDropdown(this.#popupRef, AnimationState.Show);

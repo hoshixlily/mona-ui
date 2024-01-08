@@ -296,6 +296,12 @@
                                     <ng-template monaDropDownListGroupHeaderTemplate let-group>
                                         <span style="color: crimson; font-weight: bold;">{{group}}</span>
                                     </ng-template>
+                                    <ng-template monaDropDownListHeaderTemplate>
+                                        <div style="background: var(--mona-background-dark); display: flex; align-items: center; padding: 2px 4px;
+                                                    border-bottom: 1px solid var(--mona-border-color);">
+                                            <span style="color: #00a86b; font-weight: bold;">Header</span>
+                                        </div>
+                                    </ng-template>
                                 </mona-drop-down-list>
 
                             </div>
@@ -446,7 +452,7 @@
                                                      keyField="id"
                                                      childrenField="items"
                                                      textField="text"
-                                                     [itemDisabler]="dropdownTreeDisabler"
+                                                     [itemDisabled]="dropdownTreeDisabler"
                                                      monaDropDownTreeExpandable
                                                      monaDropDownTreeFilterable
                                                      [ngModel]="dropdownTreeSelectedValue"

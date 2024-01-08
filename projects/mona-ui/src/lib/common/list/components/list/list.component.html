@@ -1,14 +1,14 @@
 <div class="mona-list" [tabindex]="-1" [style.width]="listWidth()" [style.height]="listHeight()"
      [style.max-height]="listMaxHeight()">
+    @if (headerTemplate) {
+        <ng-container [ngTemplateOutlet]="headerTemplate"></ng-container>
+    }
     @if (listService.filterableOptions().enabled && listService.filterInputVisible()) {
         <mona-filter-input [filter]="listService.filterText()"
                            [debounce]="listService.filterableOptions().debounce"
                            [placeholder]="listService.filterPlaceholder()"
                            (filterChange)="onFilterChange($event)"
                            class="mona-list-filter-input"></mona-filter-input>
-    }
-    @if (headerTemplate) {
-        <ng-container [ngTemplateOutlet]="headerTemplate"></ng-container>
     }
     @if (listService.virtualScrollOptions().enabled) {
         @if (listService.viewItems().length !== 0) {
