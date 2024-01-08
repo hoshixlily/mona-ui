@@ -162,7 +162,9 @@ import {
     MultiSelectNoDataTemplateDirective,
     ListViewNavigableDirective,
     ListViewGroupableDirective,
-    ListViewPageableDirective
+    ListViewPageableDirective,
+    TreeService,
+    TreeComponent
 } from "mona-ui";
 import { v4 } from "uuid";
 import { ListFilterableDirective } from "../../../mona-ui/src/lib/common/list/directives/list-filterable.directive";
@@ -313,7 +315,7 @@ import { GridOrderData } from "./GridOrderData";
         DropDownTreeFilterableDirective,
 
         // ListComponent,
-        ListFilterableDirective
+        // ListFilterableDirective
         // ListFooterTemplateDirective,
         // ListGroupHeaderTemplateDirective,
         // ListGroupableDirective,
@@ -321,9 +323,12 @@ import { GridOrderData } from "./GridOrderData";
         // ListItemTemplateDirective,
         // ListNavigableDirective,
         // ListSelectableDirective,
-        // ListVirtualScrollDirective
-    ]
-    // providers: [ListService]
+        // ListVirtualScrollDirective,
+
+        TreeComponent
+    ],
+    // providers: [ListService],
+    providers: [TreeService]
 })
 export class AppComponent implements OnInit {
     public readonly closeIcon: IconDefinition = faTimes;
@@ -780,7 +785,8 @@ export class AppComponent implements OnInit {
         // protected readonly listService: ListService<{ text: string; value: number; group: string; active: boolean }>,
         private readonly cdr: ChangeDetectorRef,
         private readonly notificationService: NotificationService,
-        private readonly dialogService: DialogService
+        private readonly dialogService: DialogService,
+        private readonly treeService: TreeService<any>
     ) {}
 
     public dropdownItemDisabler = (item: any): boolean => !item.active;
@@ -946,6 +952,10 @@ export class AppComponent implements OnInit {
             "Item 15",
             "Item 2999"
         ]);
+
+        this.treeService.setData(this.treeData);
+        this.treeService.setChildrenSelector(i => i.items);
+        this.treeService.setTextField(i => i.text);
     }
 
     public numericTextBoxFormatter = (value: number | null): string => (value != null ? `${value} °C` : "");

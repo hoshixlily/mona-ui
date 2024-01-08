@@ -13,6 +13,9 @@ export * from "./buttons/split-button/components/split-button/split-button.compo
 /** Common */
 export * from "./common/filter-input/models/FilterChangeEvent";
 
+export * from "./common/tree/services/tree.service";
+export * from "./common/tree/components/tree/tree.component";
+
 /** Date Inputs */
 export * from "./date-inputs/calendar/calendar.component";
 export * from "./date-inputs/date-picker/date-picker.component";

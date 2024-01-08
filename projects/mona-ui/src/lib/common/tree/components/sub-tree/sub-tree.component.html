@@ -1,0 +1,12 @@
+<div class="mona-sub-tree">
+    <ul>
+        @for (node of nodeSet(); track node.uid;) {
+            <li>
+                <mona-tree-node [node]="node"></mona-tree-node>
+                @if (node.children.length > 0) {
+                    <mona-sub-tree [nodes]="node.children" [depth]="subTreeDepth()+1"></mona-sub-tree>
+                }
+            </li>
+        }
+    </ul>
+</div>
