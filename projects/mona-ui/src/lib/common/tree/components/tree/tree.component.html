@@ -1,9 +1,3 @@
-<div class="mona-tree">
-    <ul>
-        @for (node of treeService.nodeSet(); track node.uid) {
-            <li>
-                <mona-sub-tree [nodes]="[node]" [depth]="0"></mona-sub-tree>
-            </li>
-        }
-    </ul>
+<div class="mona-tree" >
+    <mona-sub-tree [nodes]="treeService.nodeSet()" [parent]="null" [depth]="0"></mona-sub-tree>
 </div>

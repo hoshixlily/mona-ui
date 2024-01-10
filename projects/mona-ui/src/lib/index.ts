@@ -13,6 +13,8 @@ export * from "./buttons/split-button/components/split-button/split-button.compo
 /** Common */
 export * from "./common/filter-input/models/FilterChangeEvent";
 
+export * from "./common/tree/models/NodeClickEvent";
+export * from "./common/tree/models/NodeItem";
 export * from "./common/tree/services/tree.service";
 export * from "./common/tree/components/tree/tree.component";
 
@@ -222,7 +224,7 @@ export * from "./tooltips/tooltip/tooltip.component";
 
 /** TreeView */
 export { NodeOptions } from "./tree-view/models/Node";
-export * from "./tree-view/models/NodeClickEvent";
+// export { NodeClickEvent } from "./tree-view/models/NodeClickEvent";
 export * from "./tree-view/models/NodeDragEndEvent";
 export * from "./tree-view/models/NodeDragStartEvent";
 export * from "./tree-view/models/NodeDragEvent";

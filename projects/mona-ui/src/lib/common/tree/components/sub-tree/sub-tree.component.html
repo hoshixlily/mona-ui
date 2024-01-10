@@ -1,12 +1,29 @@
-<div class="mona-sub-tree">
-    <ul>
-        @for (node of nodeSet(); track node.uid;) {
-            <li>
-                <mona-tree-node [node]="node"></mona-tree-node>
-                @if (node.children.length > 0) {
-                    <mona-sub-tree [nodes]="node.children" [depth]="subTreeDepth()+1"></mona-sub-tree>
+    <ul class="mona-sub-tree" [style.padding-left.px]="paddingLeft()">
+        @for (node of nodeSet(); track node.uid) {
+            <li [style.padding-left.px]="nodeComponent.paddingLeft()">
+                <div class="mona-tree-node-container">
+                    @if (treeService.expandableOptions().enabled && node.children.length > 0) {
+                        <div class="mona-tree-node-expander"
+                             (click)="onExpandStateChange(node, !nodeComponent.expanded())">
+                                @if (nodeComponent.expanded()) {
+                                    <fa-icon [icon]="expandedIcon"></fa-icon>
+                                } @else {
+                                    <fa-icon [icon]="collapsedIcon"></fa-icon>
+                                }
+                        </div>
+                    }
+                    <mona-tree-node [node]="node" #nodeComponent></mona-tree-node>
+                </div>
+                @if (node.children.length > 0 && nodeComponent.expanded()) {
+                    <div class="mona-sub-tree-container"
+                            [@nodeExpand]="nodeComponent.expanded()"
+                         [@.disabled]="!treeService.animationEnabled()">
+                        <mona-sub-tree [nodes]="node.children"
+                                       [depth]="subTreeDepth()+1"
+                                       [parent]="node"
+                        ></mona-sub-tree>
+                    </div>
                 }
             </li>
         }
     </ul>
-</div>

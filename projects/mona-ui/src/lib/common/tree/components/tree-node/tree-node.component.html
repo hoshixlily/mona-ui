@@ -1,3 +1,4 @@
-<div class="mona-tree-node">
-    <span>{{nodeText()}}</span>
+<div class="mona-tree-node"
+     [class.mona-selected]="selected()" (click)="onNodeClick($event)">
+    <span class="mona-tree-node-text">{{nodeText()}}</span>
 </div>

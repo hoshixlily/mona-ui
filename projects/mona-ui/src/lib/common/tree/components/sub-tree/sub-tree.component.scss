@@ -1,7 +1,31 @@
-div.mona-sub-tree {
-    padding-left: 16px;
-}
-
 ul {
     list-style: none;
+    display: flex;
+    flex-direction: column;
+    row-gap: 1px;
+}
+
+ul li {
+    overflow: hidden;
+}
+
+div.mona-tree-node-container {
+    display: flex;
+    align-items: center;
+}
+
+div.mona-tree-node-expander {
+    width: 24px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+
+    color: var(--mona-text);
+    font-size: 14px;
+}
+
+div.mona-sub-tree-container {
+    margin-top: 1px;
 }

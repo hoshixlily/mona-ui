@@ -953,9 +953,32 @@ export class AppComponent implements OnInit {
             "Item 2999"
         ]);
 
-        this.treeService.setData(this.treeData);
+        this.treeService.setData(this.treeDataRandom);
         this.treeService.setChildrenSelector(i => i.items);
         this.treeService.setTextField(i => i.text);
+        this.treeService.setExpandableOptions({ enabled: true });
+        this.treeService.setExpandBy(i => i.id);
+        this.treeService.setAnimationEnabled(true);
+        this.treeService.setExpandedKeys(["1", "1-1", "1-2", "1-3", "1-4"]);
+        this.treeService.setSelectableOptions({ enabled: true, mode: "multiple", childrenOnly: true });
+        this.treeService.setSelectBy(i => i.id);
+        this.treeService.setSelectedKeys(["1-2", "1-2-2", "1-2-3", "1-3-4"]);
+
+        // let turn2 = 0;
+        // window.setInterval(() => {
+        //     const randomKeys = () => {
+        //         const keys = [
+        //             ["1", "1-1"],
+        //             ["1", "1-2"],
+        //             ["1", "1-3"],
+        //             ["1", "1-4"]
+        //         ];
+        //         const keys2 = keys[turn2++ % keys.length];
+        //         console.log(keys2);
+        //         return keys2;
+        //     };
+        //     this.treeService.setExpandedKeys(randomKeys());
+        // }, 1000);
     }
 
     public numericTextBoxFormatter = (value: number | null): string => (value != null ? `${value} °C` : "");
@@ -1206,12 +1229,13 @@ export class AppComponent implements OnInit {
         // console.log(event.filter);
     }
 
-    public onTreeNodeClick(event: NodeClickEvent): void {
+    public onTreeNodeClick(event: NodeClickEvent<any>): void {
+        event.preventDefault();
         console.log(event);
         // event.preventDefault();
     }
 
-    public onTreeNodeDoubleClick(event: NodeClickEvent): void {
+    public onTreeNodeDoubleClick(event: NodeClickEvent<any>): void {
         console.log(event);
         event.preventDefault();
     }
