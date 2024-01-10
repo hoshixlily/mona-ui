@@ -1,15 +1,5 @@
-import { computed, Injectable, Signal, signal, WritableSignal } from "@angular/core";
-import {
-    Dictionary,
-    empty,
-    forEach,
-    IEnumerable,
-    ImmutableDictionary,
-    ImmutableSet,
-    List,
-    selectMany,
-    Selector
-} from "@mirei/ts-collections";
+import { computed, EventEmitter, Injectable, Signal, signal, WritableSignal } from "@angular/core";
+import { Dictionary, ImmutableDictionary, ImmutableSet, List, Selector } from "@mirei/ts-collections";
 import { Observable, Subject, take } from "rxjs";
 import { ExpandableOptions } from "../models/ExpandableOptions";
 import { NodeClickEvent } from "../models/NodeClickEvent";
@@ -34,6 +24,7 @@ export class TreeService<T> {
     public readonly expandableOptions: WritableSignal<ExpandableOptions> = signal({ enabled: false });
     public readonly expandedKeys: WritableSignal<ImmutableSet<any>> = signal(ImmutableSet.create());
     public readonly nodeClick$: Subject<NodeClickEvent<T>> = new Subject();
+    public readonly nodeSelect$: Subject<TreeNode<T>> = new Subject();
     public readonly nodeSet: Signal<ImmutableSet<TreeNode<T>>> = computed(() => {
         const data = this.data();
         return this.createNodes(data);
@@ -46,6 +37,8 @@ export class TreeService<T> {
     });
     public readonly selectedKeys: WritableSignal<ImmutableSet<any>> = signal(ImmutableSet.create());
     public readonly textField: WritableSignal<string | Selector<T, string>> = signal("");
+    public selectedKeysChange: EventEmitter<Array<any>> = new EventEmitter<Array<any>>();
+
     public constructor() {}
 
     public getNodeText(node: TreeNode<T>): string {

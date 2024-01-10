@@ -60,6 +60,7 @@ export class TreeNodeComponent<T> {
         }
         if (!nodeClickEvent.isDefaultPrevented()) {
             this.treeService.setNodeSelect(node, !this.selected());
+            this.treeService.nodeSelect$.next(node);
         }
     }
 

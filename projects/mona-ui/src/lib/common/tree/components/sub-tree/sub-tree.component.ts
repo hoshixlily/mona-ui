@@ -33,13 +33,6 @@ export class SubTreeComponent<T> {
         return depth === 0 ? 0 : 24;
     });
     protected readonly parentNode: WritableSignal<TreeNode<T> | null> = signal(null);
-    protected readonly parentNodeExpanded: Signal<boolean> = computed(() => {
-        const parent = this.parentNode();
-        if (!parent) {
-            return false;
-        }
-        return this.treeService.isExpanded(parent);
-    });
     protected readonly subTreeDepth: WritableSignal<number> = signal(0);
 
     @Input({ required: true })

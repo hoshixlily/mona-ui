@@ -164,7 +164,8 @@ import {
     ListViewGroupableDirective,
     ListViewPageableDirective,
     TreeService,
-    TreeComponent
+    TreeComponent,
+    TreeSelectableDirective
 } from "mona-ui";
 import { v4 } from "uuid";
 import { ListFilterableDirective } from "../../../mona-ui/src/lib/common/list/directives/list-filterable.directive";
@@ -187,6 +188,12 @@ import { map, Observable, take } from "rxjs";
 import { DateTime } from "luxon";
 import { GridProductData } from "./GridProductData";
 import { GridOrderData } from "./GridOrderData";
+
+interface TreeNodeDataItem {
+    id: string;
+    text: string;
+    items: TreeNodeDataItem[];
+}
 
 @Component({
     selector: "app-root",
@@ -325,7 +332,8 @@ import { GridOrderData } from "./GridOrderData";
         // ListSelectableDirective,
         // ListVirtualScrollDirective,
 
-        TreeComponent
+        TreeComponent,
+        TreeSelectableDirective
     ],
     // providers: [ListService],
     providers: [TreeService]
@@ -786,7 +794,7 @@ export class AppComponent implements OnInit {
         private readonly cdr: ChangeDetectorRef,
         private readonly notificationService: NotificationService,
         private readonly dialogService: DialogService,
-        private readonly treeService: TreeService<any>
+        private readonly treeService: TreeService<TreeNodeDataItem>
     ) {}
 
     public dropdownItemDisabler = (item: any): boolean => !item.active;
@@ -960,9 +968,10 @@ export class AppComponent implements OnInit {
         this.treeService.setExpandBy(i => i.id);
         this.treeService.setAnimationEnabled(true);
         this.treeService.setExpandedKeys(["1", "1-1", "1-2", "1-3", "1-4"]);
-        this.treeService.setSelectableOptions({ enabled: true, mode: "multiple", childrenOnly: true });
+        this.treeService.setSelectableOptions({ enabled: true, mode: "single", childrenOnly: true });
         this.treeService.setSelectBy(i => i.id);
-        this.treeService.setSelectedKeys(["1-2", "1-2-2", "1-2-3", "1-3-4"]);
+        // window.setTimeout(() => this.treeService.setSelectedKeys(["1", "1-1"]));
+        this.treeSelectedKeys = ["1-1-1", "1-4-2"];
 
         // let turn2 = 0;
         // window.setInterval(() => {
@@ -977,7 +986,8 @@ export class AppComponent implements OnInit {
         //         console.log(keys2);
         //         return keys2;
         //     };
-        //     this.treeService.setExpandedKeys(randomKeys());
+        //     // this.treeService.setExpandedKeys(randomKeys());
+        //     // this.treeSelectedKeys = randomKeys();
         // }, 1000);
     }
 
@@ -1230,8 +1240,10 @@ export class AppComponent implements OnInit {
     }
 
     public onTreeNodeClick(event: NodeClickEvent<any>): void {
-        event.preventDefault();
-        console.log(event);
+        if (event.nodeItem.hasChildren) {
+            event.preventDefault();
+            console.log(event);
+        }
         // event.preventDefault();
     }
 
@@ -1520,9 +1532,9 @@ export class AppComponent implements OnInit {
         return generatedData;
     }
 
-    private generateRandomTreeData(nodeCount: number): any[] {
+    private generateRandomTreeData(nodeCount: number): TreeNodeDataItem[] {
         function generateNode(idPrefix: string, remainingNodes: number): [any, number] {
-            const node: any = {
+            const node: TreeNodeDataItem = {
                 text: Math.random().toString(36).substring(7),
                 id: idPrefix,
                 items: []
@@ -1540,7 +1552,7 @@ export class AppComponent implements OnInit {
             return [node, remainingNodes];
         }
 
-        const trees: any[] = [];
+        const trees: TreeNodeDataItem[] = [];
         let remainingNodes = nodeCount;
         let rootId = 1;
         while (remainingNodes > 0) {

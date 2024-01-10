@@ -7,9 +7,6 @@
                             (checkedKeysChange)="onTreeCheckedKeysChange($event)"
                             monaTreeViewExpandable [expandedKeys]="treeExpandedKeys"
                             (expandedKeysChange)="onTreeExpandedKeysChange($event)"
-                            [monaTreeViewSelectable]="{enabled: true, mode: 'single', childrenOnly: true}"
-                            [selectedKeys]="treeSelectedKeys"
-                            (selectedKeysChange)="onTreeSelectedKeysChange($event)"
                             [monaTreeViewFilterable]="{enabled: true, operator: 'contains', caseSensitive: false}"
                             filterPlaceholder="Search..."
                             [filter]="treeFilter()"
@@ -34,7 +31,11 @@
 <!--                            </ng-template>-->
             </mona-tree-view>
 
-            <mona-tree (nodeClick)="onTreeNodeClick($event)"></mona-tree>
+            <mona-tree
+                    monaTreeSelectable
+                    [selectedKeys]="treeSelectedKeys"
+                    (selectedKeysChange)="onTreeSelectedKeysChange($event)"
+                    (nodeClick)="onTreeNodeClick($event)"></mona-tree>
         </mona-splitter-pane>
         <mona-splitter-pane>
             <mona-tab-strip [keepTabContent]="true" [closable]="false" (tabClose)="onTabStripTabClose($event)">
