@@ -19,6 +19,13 @@ export class TreeNodeComponent<T> {
         return this.treeService.getNodeText(node);
     });
     protected readonly treeNode: WritableSignal<TreeNode<T> | null> = signal(null);
+    public readonly checkable: Signal<boolean> = computed(() => {
+        const node = this.treeNode();
+        if (node === null) {
+            return false;
+        }
+        return this.treeService.isCheckable(node);
+    });
     public readonly checked: Signal<boolean> = computed(() => {
         const node = this.treeNode();
         if (node === null) {

@@ -12,7 +12,7 @@
                         }
                     </div>
                 }
-                @if (treeService.checkableOptions().enabled) {
+                @if (nodeComponent.checkable()) {
                     <input type="checkbox"
                            id="mona-tree-node-checkbox-{{node.uid}}"
                            [indeterminate]="nodeComponent.indeterminate()"

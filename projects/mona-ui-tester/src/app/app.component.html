@@ -4,9 +4,6 @@
             <mona-splitter orientation="vertical">
                 <mona-splitter-pane size="10%">
                     <mona-tree-view *ngIf="true" [data]="treeData" textField="text" childrenField="items" keyField="id"
-                                    [monaTreeViewCheckable]="{enabled: true, checkChildren: true, checkParents: true, mode: 'multiple'}"
-                                    [checkedKeys]="treeCheckedKeys"
-                                    (checkedKeysChange)="onTreeCheckedKeysChange($event)"
                                     monaTreeViewExpandable [expandedKeys]="treeExpandedKeys"
                                     (expandedKeysChange)="onTreeExpandedKeysChange($event)"
                                     [monaTreeViewFilterable]="{enabled: true, operator: 'contains', caseSensitive: false}"
@@ -39,6 +36,10 @@
                 </mona-splitter-pane>
                 <mona-splitter-pane>
                     <mona-tree
+                            monaTreeCheckable
+                            checkBy="id"
+                            [checkedKeys]="treeCheckedKeys"
+                            (checkedKeysChange)="onTreeCheckedKeysChange($event)"
                             monaTreeSelectable
                             [selectedKeys]="treeSelectedKeys"
                             (selectedKeysChange)="onTreeSelectedKeysChange($event)"

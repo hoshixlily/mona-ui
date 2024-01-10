@@ -165,7 +165,8 @@ import {
     ListViewPageableDirective,
     TreeService,
     TreeComponent,
-    TreeSelectableDirective
+    TreeSelectableDirective,
+    TreeCheckableDirective
 } from "mona-ui";
 import { v4 } from "uuid";
 import { ListViewNoDataTemplateDirective } from "../../../mona-ui/src/lib/list-view/directives/list-view-no-data-template.directive";
@@ -332,6 +333,7 @@ interface TreeNodeDataItem {
         // ListVirtualScrollDirective,
 
         TreeComponent,
+        TreeCheckableDirective,
         TreeSelectableDirective
     ],
     // providers: [ListService],
@@ -700,7 +702,7 @@ export class AppComponent implements OnInit {
     public timePickerMinValue: Date | null = new Date(2000, 2, 10, 8, 30, 0);
     public timePickerValue: Date | null = new Date(2000, 2, 10, 10, 0, 0);
     public toggleableButtonSelected: boolean = true;
-    public treeCheckedKeys: string[] = ["1-2", "1-3-1"];
+    public treeCheckedKeys: string[] = ["1-4-3"];
 
     public treeData: any[] = [
         {
@@ -975,9 +977,11 @@ export class AppComponent implements OnInit {
         this.treeService.setCheckableOptions({
             enabled: true,
             mode: "multiple",
+            childrenOnly: false,
             checkChildren: true,
             checkParents: true
         });
+        // this.treeService.setCheckBy(i => i.id);
 
         // window.setTimeout(() => this.treeService.setSelectedKeys(["1", "1-1"]));
         // const treeDataR = this.generateRandomTreeData(500);

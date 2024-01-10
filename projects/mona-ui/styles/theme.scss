@@ -782,7 +782,7 @@ input[type="checkbox"][monaCheckBox] {
         display: flex;
         align-items: center;
         cursor: pointer;
-        color: var(--mona-text);
+        color: var(--mona-text-inverted);
         user-select: none;
         &:before {
             content: " ";
@@ -795,7 +795,6 @@ input[type="checkbox"][monaCheckBox] {
             width: 20px;
             height: 20px;
             margin-right: 4px;
-            color: transparent;
             transition: background-color 0.3s ease-out, color 0.3s ease-out, border 0.3s ease-out, box-shadow 0.3s ease-out;
         }
     }
@@ -824,7 +823,7 @@ input[type="checkbox"][monaCheckBox] {
     &:indeterminate + label:before {
         content: " ";
         background-color: var(--mona-primary);
-        color: var(--mona-background);
+        color: var(--mona-text-inverted);
         border: 1px solid var(--mona-selected-border-color);
     }
     &:indeterminate:disabled + label:before {

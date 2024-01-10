@@ -26,12 +26,11 @@ export class TreeService<T> {
     public readonly checkableOptions: WritableSignal<CheckableOptions> = signal({
         checkChildren: true,
         checkParents: true,
+        childrenOnly: false,
         enabled: false,
         mode: "multiple"
     });
-    public readonly checkedKeys: WritableSignal<ImmutableDictionary<any, boolean>> = signal(
-        ImmutableDictionary.create()
-    );
+    public readonly checkedKeys: WritableSignal<ImmutableSet<any>> = signal(ImmutableSet.create());
     public readonly children: WritableSignal<string | Selector<T, Iterable<T>> | Observable<Iterable<T>>> = signal("");
     public readonly expandBy: WritableSignal<string | Selector<T, any> | null> = signal(null);
     public readonly expandableOptions: WritableSignal<ExpandableOptions> = signal({ enabled: false });
@@ -80,13 +79,21 @@ export class TreeService<T> {
         return textField(node.data);
     }
 
+    public isCheckable(node: TreeNode<T>): boolean {
+        const checkableOptions = this.checkableOptions();
+        if (!checkableOptions.enabled) {
+            return false;
+        }
+        return !(checkableOptions.childrenOnly && !node.children.isEmpty());
+    }
+
     public isChecked(node: TreeNode<T>): boolean {
         const checkableOptions = this.checkableOptions();
         if (!checkableOptions.enabled) {
             return false;
         }
         const key = this.getCheckKey(node);
-        return this.checkedKeys().containsKey(key);
+        return this.checkedKeys().contains(key);
     }
 
     public isExpanded(node: TreeNode<T>): boolean {
@@ -149,14 +156,7 @@ export class TreeService<T> {
     }
 
     public setCheckedKeys(keys: Iterable<any>): void {
-        this.checkedKeys.set(
-            ImmutableDictionary.create(
-                from(keys).toDictionary(
-                    k => k,
-                    k => true
-                )
-            )
-        );
+        this.checkedKeys.set(ImmutableSet.create(keys));
     }
 
     public setExpandBy(selector: string | Selector<T, any> | null): void {
@@ -178,19 +178,17 @@ export class TreeService<T> {
         }
         const checkParents = checkableOptions.checkParents;
         const checkChildren = checkableOptions.checkChildren;
+        const childrenOnly = checkableOptions.childrenOnly;
         const mode = checkableOptions.mode;
         const key = this.getCheckKey(node);
 
-        const checkedKeys = this.checkedKeys().toDictionary(
-            p => p.key,
-            p => p.value
-        );
+        const checkedKeys = this.checkedKeys().toEnumerableSet();
 
         if (mode === "single") {
             checkedKeys.clear();
-            checkedKeys.put(key, true);
+            checkedKeys.add(key);
         } else if (checked) {
-            checkedKeys.put(key, true);
+            checkedKeys.add(key);
         } else {
             checkedKeys.remove(key);
         }
@@ -200,34 +198,29 @@ export class TreeService<T> {
             childNodes.forEach(n => {
                 const childKey = this.getCheckKey(n);
                 if (checked) {
-                    checkedKeys.put(childKey, true);
+                    checkedKeys.add(childKey);
                 } else {
                     checkedKeys.remove(childKey);
                 }
             });
         }
-        if (checkParents) {
+        if (checkParents && !childrenOnly) {
             const parentNodes = this.getParentNodes(node);
             parentNodes.forEach(n => {
                 const childNodes = this.getChildNodes(n);
                 const allChecked = childNodes.all(c => {
                     const childKey = this.getCheckKey(c);
-                    return checkedKeys.containsKey(childKey);
+                    return checkedKeys.contains(childKey);
                 });
                 const parentKey = this.getCheckKey(n);
                 if (allChecked) {
-                    checkedKeys.put(parentKey, true);
+                    checkedKeys.add(parentKey);
                 } else {
                     checkedKeys.remove(parentKey);
                 }
             });
         }
-        this.checkedKeys.set(
-            checkedKeys.toImmutableDictionary(
-                p => p.key,
-                p => p.value
-            )
-        );
+        this.checkedKeys.set(checkedKeys.toImmutableSet());
     }
 
     public setNodeExpand(node: TreeNode<T>, expanded: boolean): void {
