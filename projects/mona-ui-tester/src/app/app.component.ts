@@ -168,7 +168,6 @@ import {
     TreeSelectableDirective
 } from "mona-ui";
 import { v4 } from "uuid";
-import { ListFilterableDirective } from "../../../mona-ui/src/lib/common/list/directives/list-filterable.directive";
 import { ListViewNoDataTemplateDirective } from "../../../mona-ui/src/lib/list-view/directives/list-view-no-data-template.directive";
 import { TestComponentComponent } from "./test-component/test-component.component";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
@@ -753,7 +752,7 @@ export class AppComponent implements OnInit {
             ]
         }
     ];
-    public treeDataRandom: any[] = this.generateRandomTreeData(100);
+    public treeDataRandom: any[] = this.generateRandomTreeData(10);
     public treeFilter: WritableSignal<string> = signal("Apple");
 
     public dropdownTreeDisabler: (item: any) => boolean = (item: any) => item.text.toLowerCase().startsWith("c");
@@ -961,7 +960,7 @@ export class AppComponent implements OnInit {
             "Item 2999"
         ]);
 
-        this.treeService.setData(this.treeDataRandom);
+        this.treeService.setData(this.treeData);
         this.treeService.setChildrenSelector(i => i.items);
         this.treeService.setTextField(i => i.text);
         this.treeService.setExpandableOptions({ enabled: true });
@@ -970,8 +969,32 @@ export class AppComponent implements OnInit {
         this.treeService.setExpandedKeys(["1", "1-1", "1-2", "1-3", "1-4"]);
         this.treeService.setSelectableOptions({ enabled: true, mode: "single", childrenOnly: true });
         this.treeService.setSelectBy(i => i.id);
-        // window.setTimeout(() => this.treeService.setSelectedKeys(["1", "1-1"]));
+
         this.treeSelectedKeys = ["1-1-1", "1-4-2"];
+
+        this.treeService.setCheckableOptions({
+            enabled: true,
+            mode: "multiple",
+            checkChildren: true,
+            checkParents: true
+        });
+
+        // window.setTimeout(() => this.treeService.setSelectedKeys(["1", "1-1"]));
+        // const treeDataR = this.generateRandomTreeData(500);
+        // const flatten = (items: any[]): any[] => {
+        //     const flattenedNodes = [];
+        //     for (const node of items) {
+        //         flattenedNodes.push(node);
+        //         if (node.items.length !== 0) {
+        //             flattenedNodes.push(...flatten(node.items));
+        //         }
+        //     }
+        //     return flattenedNodes;
+        // };
+        // const flatTreeDataR = flatten(treeDataR);
+        // console.log(flatTreeDataR);
+        // this.treeDataRandom = treeDataR;
+        // this.treeService.setData(this.treeDataRandom);
 
         // let turn2 = 0;
         // window.setInterval(() => {

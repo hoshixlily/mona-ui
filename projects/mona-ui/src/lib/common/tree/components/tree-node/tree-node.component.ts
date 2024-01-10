@@ -19,12 +19,26 @@ export class TreeNodeComponent<T> {
         return this.treeService.getNodeText(node);
     });
     protected readonly treeNode: WritableSignal<TreeNode<T> | null> = signal(null);
+    public readonly checked: Signal<boolean> = computed(() => {
+        const node = this.treeNode();
+        if (node === null) {
+            return false;
+        }
+        return this.treeService.isChecked(node);
+    });
     public readonly expanded: Signal<boolean> = computed(() => {
         const node = this.treeNode();
         if (node === null) {
             return true;
         }
         return this.treeService.isExpanded(node);
+    });
+    public readonly indeterminate: Signal<boolean> = computed(() => {
+        const node = this.treeNode();
+        if (node === null) {
+            return false;
+        }
+        return this.treeService.isIndeterminate(node);
     });
     public readonly paddingLeft: Signal<number> = computed(() => {
         const node = this.treeNode();

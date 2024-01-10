@@ -12,6 +12,14 @@
                         }
                     </div>
                 }
+                @if (treeService.checkableOptions().enabled) {
+                    <input type="checkbox"
+                           id="mona-tree-node-checkbox-{{node.uid}}"
+                           [indeterminate]="nodeComponent.indeterminate()"
+                           [ngModel]="nodeComponent.checked()"
+                           (ngModelChange)="onCheckStateChange(node, !nodeComponent.checked())" monaCheckBox />
+                    <label for="mona-tree-node-checkbox-{{node.uid}}"></label>
+                }
                 <mona-tree-node [node]="node" #nodeComponent></mona-tree-node>
             </div>
             @if (node.children.length > 0 && nodeComponent.expanded()) {

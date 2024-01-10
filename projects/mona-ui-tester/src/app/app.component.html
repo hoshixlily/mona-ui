@@ -1,41 +1,50 @@
 <div class="wrapper">
     <mona-splitter orientation="horizontal">
         <mona-splitter-pane [size]="300" [collapsible]="true">
-            <mona-tree-view *ngIf="true" [data]="treeData" textField="text" childrenField="items" keyField="id"
-                            [monaTreeViewCheckable]="{enabled: true, checkChildren: true, checkParents: true, mode: 'multiple'}"
-                            [checkedKeys]="treeCheckedKeys"
-                            (checkedKeysChange)="onTreeCheckedKeysChange($event)"
-                            monaTreeViewExpandable [expandedKeys]="treeExpandedKeys"
-                            (expandedKeysChange)="onTreeExpandedKeysChange($event)"
-                            [monaTreeViewFilterable]="{enabled: true, operator: 'contains', caseSensitive: false}"
-                            filterPlaceholder="Search..."
-                            [filter]="treeFilter()"
-                            (filterChange)="onTreeFilterChange($event)"
-                            (nodeDragStart)="onTreeNodeDragStart($event)"
-                            (nodeDrag)="onTreeNodeDrag($event)"
-                            (nodeDrop)="onTreeNodeDrop($event)"
-                            (nodeDragEnd)="onTreeNodeDragEnd($event)"
-                            monaTreeViewDisable [disabledKeys]="treeDisabledKeys"
-            >
-                <!--            monaTreeViewDisable [disabledKeys]="treeDisabledKeys"-->
-<!--                            <ng-template monaTreeViewNodeTextTemplate let-dataItem>-->
-<!--                                <span #anchor>-->
-<!--                                    <span style="color: crimson; font-weight: bold;" *ngIf="dataItem.items && dataItem.items?.length !== 0">{{dataItem.text}}</span>-->
-<!--                                    <span style="color: snow; font-weight: bold;" *ngIf="!dataItem.items || dataItem.items?.length === 0">{{dataItem.text}}</span>-->
-<!--                                </span>-->
-<!--                                <mona-contextmenu [target]="anchor">-->
-<!--                                    <mona-menu-item text="Print" (menuClick)="print(dataItem)"></mona-menu-item>-->
-<!--                                    <mona-menu-item text="Noop"></mona-menu-item>-->
-<!--                                    <mona-menu-item text="Refresh" (menuClick)="updateTreeData()"></mona-menu-item>-->
-<!--                                </mona-contextmenu>-->
-<!--                            </ng-template>-->
-            </mona-tree-view>
+            <mona-splitter orientation="vertical">
+                <mona-splitter-pane size="10%">
+                    <mona-tree-view *ngIf="true" [data]="treeData" textField="text" childrenField="items" keyField="id"
+                                    [monaTreeViewCheckable]="{enabled: true, checkChildren: true, checkParents: true, mode: 'multiple'}"
+                                    [checkedKeys]="treeCheckedKeys"
+                                    (checkedKeysChange)="onTreeCheckedKeysChange($event)"
+                                    monaTreeViewExpandable [expandedKeys]="treeExpandedKeys"
+                                    (expandedKeysChange)="onTreeExpandedKeysChange($event)"
+                                    [monaTreeViewFilterable]="{enabled: true, operator: 'contains', caseSensitive: false}"
+                                    filterPlaceholder="Search..."
+                                    [filter]="treeFilter()"
+                                    (filterChange)="onTreeFilterChange($event)"
+                                    (nodeDragStart)="onTreeNodeDragStart($event)"
+                                    (nodeDrag)="onTreeNodeDrag($event)"
+                                    (nodeDrop)="onTreeNodeDrop($event)"
+                                    (nodeDragEnd)="onTreeNodeDragEnd($event)"
+                                    monaTreeViewDisable [disabledKeys]="treeDisabledKeys"
+                    >
+                        <!--            monaTreeViewDisable [disabledKeys]="treeDisabledKeys"-->
+                        <!--                            <ng-template monaTreeViewNodeTextTemplate let-dataItem>-->
+                        <!--                                <span #anchor>-->
+                        <!--                                    <span style="color: crimson; font-weight: bold;" *ngIf="dataItem.items && dataItem.items?.length !== 0">{{dataItem.text}}</span>-->
+                        <!--                                    <span style="color: snow; font-weight: bold;" *ngIf="!dataItem.items || dataItem.items?.length === 0">{{dataItem.text}}</span>-->
+                        <!--                                </span>-->
+                        <!--                                <mona-contextmenu [target]="anchor">-->
+                        <!--                                    <mona-menu-item text="Print" (menuClick)="print(dataItem)"></mona-menu-item>-->
+                        <!--                                    <mona-menu-item text="Noop"></mona-menu-item>-->
+                        <!--                                    <mona-menu-item text="Refresh" (menuClick)="updateTreeData()"></mona-menu-item>-->
+                        <!--                                </mona-contextmenu>-->
+                        <!--                            </ng-template>-->
+                    </mona-tree-view>
 
-            <mona-tree
-                    monaTreeSelectable
-                    [selectedKeys]="treeSelectedKeys"
-                    (selectedKeysChange)="onTreeSelectedKeysChange($event)"
-                    (nodeClick)="onTreeNodeClick($event)"></mona-tree>
+                    <div style="display: flex"></div>
+
+
+                </mona-splitter-pane>
+                <mona-splitter-pane>
+                    <mona-tree
+                            monaTreeSelectable
+                            [selectedKeys]="treeSelectedKeys"
+                            (selectedKeysChange)="onTreeSelectedKeysChange($event)"
+                            (nodeClick)="onTreeNodeClick($event)"></mona-tree>
+                </mona-splitter-pane>
+            </mona-splitter>
         </mona-splitter-pane>
         <mona-splitter-pane>
             <mona-tab-strip [keepTabContent]="true" [closable]="false" (tabClose)="onTabStripTabClose($event)">

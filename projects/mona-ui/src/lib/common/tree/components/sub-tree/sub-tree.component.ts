@@ -1,9 +1,11 @@
 import { animate, style, transition, trigger } from "@angular/animations";
 import { NgStyle } from "@angular/common";
 import { Component, computed, Input, Signal, signal, WritableSignal } from "@angular/core";
+import { FormsModule } from "@angular/forms";
 import { FaIconComponent } from "@fortawesome/angular-fontawesome";
 import { faCaretDown, faCaretRight, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { ImmutableSet } from "@mirei/ts-collections";
+import { CheckBoxDirective } from "../../../../inputs/check-box/check-box.directive";
 import { TreeNode } from "../../models/TreeNode";
 import { TreeService } from "../../services/tree.service";
 import { TreeNodeComponent } from "../tree-node/tree-node.component";
@@ -11,7 +13,7 @@ import { TreeNodeComponent } from "../tree-node/tree-node.component";
 @Component({
     selector: "mona-sub-tree",
     standalone: true,
-    imports: [TreeNodeComponent, FaIconComponent, NgStyle],
+    imports: [TreeNodeComponent, FaIconComponent, NgStyle, CheckBoxDirective, FormsModule],
     templateUrl: "./sub-tree.component.html",
     styleUrl: "./sub-tree.component.scss",
     animations: [
@@ -52,7 +54,13 @@ export class SubTreeComponent<T> {
 
     public constructor(protected readonly treeService: TreeService<T>) {}
 
+    public onCheckStateChange(node: TreeNode<T>, checked: boolean): void {
+        this.treeService.setNodeCheck(node, checked);
+        this.treeService.nodeCheck$.next({ node, checked });
+    }
+
     public onExpandStateChange(node: TreeNode<T>, expanded: boolean): void {
         this.treeService.setNodeExpand(node, expanded);
+        this.treeService.nodeExpand$.next({ node, expanded });
     }
 }
