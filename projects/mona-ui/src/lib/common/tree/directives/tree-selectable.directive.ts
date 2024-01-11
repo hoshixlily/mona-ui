@@ -49,7 +49,7 @@ export class TreeSelectableDirective<T> implements OnInit {
     }
 
     private setNodeSelectSubscription(): void {
-        this.treeService.nodeSelect$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(event => {
+        this.treeService.nodeSelectChange$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(event => {
             this.treeService.selectedKeysChange.emit(this.treeService.selectedKeys().toArray());
         });
     }

@@ -15,6 +15,7 @@ export * from "./common/filter-input/models/FilterChangeEvent";
 
 export * from "./common/tree/models/NodeClickEvent";
 export * from "./common/tree/models/NodeItem";
+export * from "./common/tree/models/NodeSelectEvent";
 export * from "./common/tree/models/SelectableOptions";
 export * from "./common/tree/services/tree.service";
 export * from "./common/tree/directives/tree-checkable.directive";

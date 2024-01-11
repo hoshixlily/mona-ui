@@ -1,6 +1,6 @@
 import { TreeNode } from "./TreeNode";
 
-export interface NodeCheckEvent<T> {
+export interface TreeNodeCheckEvent<T> {
     checked: boolean;
     node: TreeNode<T>;
 }

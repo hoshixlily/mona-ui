@@ -35,6 +35,8 @@
 
                 </mona-splitter-pane>
                 <mona-splitter-pane>
+                    <button monaButton (click)="treeService.navigate('previous')">Previous</button>
+                    <button monaButton (click)="treeService.navigate('next')">Next</button>
                     <mona-tree
                             monaTreeCheckable
                             checkBy="id"
@@ -43,6 +45,7 @@
                             monaTreeSelectable
                             [selectedKeys]="treeSelectedKeys"
                             (selectedKeysChange)="onTreeSelectedKeysChange($event)"
+                            (nodeSelect)="onTreeNodeSelect($event)"
                             (nodeClick)="onTreeNodeClick($event)"></mona-tree>
                 </mona-splitter-pane>
             </mona-splitter>

@@ -1,25 +1,27 @@
 import { computed, EventEmitter, Injectable, Signal, signal, WritableSignal } from "@angular/core";
-import { Dictionary, from, ImmutableDictionary, ImmutableSet, List, Selector } from "@mirei/ts-collections";
+import { ImmutableDictionary, ImmutableSet, List, Selector } from "@mirei/ts-collections";
 import { Observable, Subject, take } from "rxjs";
 import { CheckableOptions } from "../models/CheckableOptions";
 import { ExpandableOptions } from "../models/ExpandableOptions";
-import { NodeCheckEvent } from "../models/NodeCheckEvent";
+import { TreeNodeCheckEvent } from "../models/TreeNodeCheckEvent";
 import { NodeClickEvent } from "../models/NodeClickEvent";
-import { NodeExpandEvent } from "../models/NodeExpandEvent";
+import { TreeNodeExpandEvent } from "../models/TreeNodeExpandEvent";
+import { NodeSelectEvent } from "../models/NodeSelectEvent";
 import { SelectableOptions } from "../models/SelectableOptions";
 import { TreeNode } from "../models/TreeNode";
 
 @Injectable()
 export class TreeService<T> {
     private readonly data: WritableSignal<ImmutableSet<T>> = signal(ImmutableSet.create());
+    private readonly navigableNodes: Signal<ImmutableSet<TreeNode<T>>> = computed(() => {
+        return this.nodeDictionary()
+            .where(n => n.value.parent === null || !this.isAnyParentCollapsed(n.value))
+            .select(n => n.value)
+            .toImmutableSet();
+    });
     private readonly nodeDictionary: Signal<ImmutableDictionary<string, TreeNode<T>>> = computed(() => {
-        const data = this.data();
-        const nodes = this.createNodes(data);
-        const nodeDict = this.createNodeDictionary(nodes);
-        return nodeDict.toImmutableDictionary(
-            p => p.key,
-            p => p.value
-        );
+        const nodes = this.nodeSet();
+        return this.createNodeDictionary(nodes);
     });
     public readonly animationEnabled: WritableSignal<boolean> = signal(true);
     public readonly checkBy: WritableSignal<string | Selector<T, any> | null> = signal(null);
@@ -35,10 +37,12 @@ export class TreeService<T> {
     public readonly expandBy: WritableSignal<string | Selector<T, any> | null> = signal(null);
     public readonly expandableOptions: WritableSignal<ExpandableOptions> = signal({ enabled: false });
     public readonly expandedKeys: WritableSignal<ImmutableSet<any>> = signal(ImmutableSet.create());
-    public readonly nodeCheck$: Subject<NodeCheckEvent<T>> = new Subject();
+    public readonly navigatedNode: WritableSignal<TreeNode<T> | null> = signal(null);
+    public readonly nodeCheck$: Subject<TreeNodeCheckEvent<T>> = new Subject();
     public readonly nodeClick$: Subject<NodeClickEvent<T>> = new Subject();
-    public readonly nodeExpand$: Subject<NodeExpandEvent<T>> = new Subject();
-    public readonly nodeSelect$: Subject<TreeNode<T>> = new Subject();
+    public readonly nodeExpand$: Subject<TreeNodeExpandEvent<T>> = new Subject();
+    public readonly nodeSelect$: Subject<NodeSelectEvent<T>> = new Subject();
+    public readonly nodeSelectChange$: Subject<TreeNode<T>> = new Subject();
     public readonly nodeSet: Signal<ImmutableSet<TreeNode<T>>> = computed(() => {
         const data = this.data();
         return this.createNodes(data);
@@ -126,6 +130,11 @@ export class TreeService<T> {
         return checkedCount > 0 && checkedCount < childCount;
     }
 
+    public isNavigated(node: TreeNode<T>): boolean {
+        const navigatedNode = this.navigatedNode();
+        return navigatedNode === node;
+    }
+
     public isSelected(node: TreeNode<T>): boolean {
         const selectableOptions = this.selectableOptions();
         if (!selectableOptions.enabled) {
@@ -133,6 +142,25 @@ export class TreeService<T> {
         }
         const key = this.getSelectKey(node);
         return this.selectedKeys().contains(key);
+    }
+    public navigate(direction: "next" | "previous"): TreeNode<T> | null {
+        const navigableNodes = this.navigableNodes();
+        const navigatedNode = this.navigatedNode();
+        if (navigableNodes.isEmpty()) {
+            return null;
+        }
+        const firstNode = navigableNodes.first();
+        if (navigatedNode === null) {
+            this.navigatedNode.set(firstNode);
+            return firstNode;
+        }
+        if (direction === "next") {
+            return this.navigateToNextNode();
+        }
+        if (direction === "previous") {
+            return this.navigateToPreviousNode();
+        }
+        return null;
     }
 
     public setAnimationEnabled(enabled: boolean): void {
@@ -225,12 +253,16 @@ export class TreeService<T> {
 
     public setNodeExpand(node: TreeNode<T>, expanded: boolean): void {
         const key = this.getExpandKey(node);
+        const expandedKeys = this.expandedKeys().toEnumerableSet();
+
         this.expandedKeys.update(keys => {
             if (expanded) {
                 return keys.add(key);
             }
             return keys.remove(key);
         });
+        this.navigatedNode.set(node);
+        console.log(this.expandedKeys().toArray());
     }
 
     public setNodeSelect(node: TreeNode<T>, selected: boolean): void {
@@ -271,8 +303,8 @@ export class TreeService<T> {
         this.textField.set(selector);
     }
 
-    private createNodeDictionary(nodes: Iterable<TreeNode<T>>): Dictionary<string, TreeNode<T>> {
-        return TreeService.flatten(nodes).toDictionary(
+    private createNodeDictionary(nodes: Iterable<TreeNode<T>>): ImmutableDictionary<string, TreeNode<T>> {
+        return TreeService.flatten(nodes).toImmutableDictionary(
             n => n.uid,
             n => n
         );
@@ -281,8 +313,6 @@ export class TreeService<T> {
     private createNodes(data: Iterable<T>): ImmutableSet<TreeNode<T>> {
         const nodes: List<TreeNode<any>> = new List();
         this.createNodesRecursively(data, nodes, null);
-        console.log("Nodes: ", nodes.toArray());
-        console.log("Flattened nodes: ", TreeService.flatten(nodes).toArray());
         return ImmutableSet.create(nodes);
     }
 
@@ -363,5 +393,42 @@ export class TreeService<T> {
             return (node.data as any)[selectBy];
         }
         return selectBy(node.data);
+    }
+
+    private isAnyParentCollapsed(node: TreeNode<T>): boolean {
+        if (node.parent) {
+            return !this.isExpanded(node.parent) || this.isAnyParentCollapsed(node.parent);
+        }
+        return false;
+    }
+
+    private navigateToNextNode(): TreeNode<T> {
+        const navigableNodes = this.navigableNodes();
+        const navigatedNode = this.navigatedNode();
+        const firstNode = navigableNodes.first();
+        let nextNode: TreeNode<T> | null = navigableNodes
+            .skipWhile(n => n !== navigatedNode)
+            .skip(1)
+            .firstOrDefault();
+        if (nextNode === null) {
+            this.navigatedNode.set(firstNode);
+            return firstNode;
+        } else {
+            this.navigatedNode.set(nextNode);
+            return nextNode;
+        }
+    }
+
+    private navigateToPreviousNode(): TreeNode<T> {
+        const navigableNodes = this.navigableNodes();
+        const navigatedNode = this.navigatedNode();
+        let previousNode: TreeNode<T> | null = navigableNodes.takeWhile(n => n !== navigatedNode).lastOrDefault();
+        if (previousNode === null) {
+            this.navigatedNode.set(navigableNodes.last());
+            return navigableNodes.last();
+        } else {
+            this.navigatedNode.set(previousNode);
+            return previousNode;
+        }
     }
 }

@@ -1,6 +1,6 @@
 import { TreeNode } from "./TreeNode";
 
-export interface NodeExpandEvent<T> {
+export interface TreeNodeExpandEvent<T> {
     expanded: boolean;
     node: TreeNode<T>;
 }

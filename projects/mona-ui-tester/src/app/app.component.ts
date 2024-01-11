@@ -166,7 +166,8 @@ import {
     TreeService,
     TreeComponent,
     TreeSelectableDirective,
-    TreeCheckableDirective
+    TreeCheckableDirective,
+    NodeSelectEvent
 } from "mona-ui";
 import { v4 } from "uuid";
 import { ListViewNoDataTemplateDirective } from "../../../mona-ui/src/lib/list-view/directives/list-view-no-data-template.directive";
@@ -795,7 +796,7 @@ export class AppComponent implements OnInit {
         private readonly cdr: ChangeDetectorRef,
         private readonly notificationService: NotificationService,
         private readonly dialogService: DialogService,
-        private readonly treeService: TreeService<TreeNodeDataItem>
+        protected readonly treeService: TreeService<TreeNodeDataItem>
     ) {}
 
     public dropdownItemDisabler = (item: any): boolean => !item.active;
@@ -969,10 +970,10 @@ export class AppComponent implements OnInit {
         this.treeService.setExpandBy(i => i.id);
         this.treeService.setAnimationEnabled(true);
         this.treeService.setExpandedKeys(["1", "1-1", "1-2", "1-3", "1-4"]);
-        this.treeService.setSelectableOptions({ enabled: true, mode: "single", childrenOnly: true });
+        this.treeService.setSelectableOptions({ enabled: true, mode: "multiple", childrenOnly: true });
         this.treeService.setSelectBy(i => i.id);
 
-        this.treeSelectedKeys = ["1-1-1", "1-4-2"];
+        // this.treeSelectedKeys = ["1-1-1", "1-4-2"];
 
         this.treeService.setCheckableOptions({
             enabled: true,
@@ -981,6 +982,11 @@ export class AppComponent implements OnInit {
             checkChildren: true,
             checkParents: true
         });
+
+        // window.setInterval(() => {
+        //     this.treeService.setData(this.generateRandomTreeData(10));
+        // }, 2000);
+
         // this.treeService.setCheckBy(i => i.id);
 
         // window.setTimeout(() => this.treeService.setSelectedKeys(["1", "1-1"]));
@@ -1297,6 +1303,13 @@ export class AppComponent implements OnInit {
         console.log(event);
         if (event.destinationNode?.text === "Pine" && event.position === "inside") {
             event.preventDefault();
+        }
+    }
+
+    public onTreeNodeSelect(event: NodeSelectEvent<any>): void {
+        if (event.nodeItem.data.text.startsWith("P")) {
+            event.preventDefault();
+            console.log(event);
         }
     }
 

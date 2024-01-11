@@ -1,5 +1,6 @@
 import { Component, computed, Input, Signal, signal, WritableSignal } from "@angular/core";
 import { NodeClickEvent } from "../../models/NodeClickEvent";
+import { NodeSelectEvent } from "../../models/NodeSelectEvent";
 import { TreeNode } from "../../models/TreeNode";
 import { TreeService } from "../../services/tree.service";
 
@@ -47,6 +48,13 @@ export class TreeNodeComponent<T> {
         }
         return this.treeService.isIndeterminate(node);
     });
+    public readonly navigated: Signal<boolean> = computed(() => {
+        const node = this.treeNode();
+        if (node === null) {
+            return false;
+        }
+        return this.treeService.isNavigated(node);
+    });
     public readonly paddingLeft: Signal<number> = computed(() => {
         const node = this.treeNode();
         if (node === null) {
@@ -75,21 +83,20 @@ export class TreeNodeComponent<T> {
             return;
         }
         const nodeClickEvent = this.notifyNodeClick(event);
-        if (nodeClickEvent === null) {
-            this.treeService.setNodeSelect(node, !this.selected());
+        if (nodeClickEvent.isDefaultPrevented()) {
             return;
         }
-        if (!nodeClickEvent.isDefaultPrevented()) {
-            this.treeService.setNodeSelect(node, !this.selected());
-            this.treeService.nodeSelect$.next(node);
+        const nodeSelectEvent = new NodeSelectEvent(node, event);
+        this.treeService.nodeSelect$.next(nodeSelectEvent);
+        if (nodeSelectEvent.isDefaultPrevented()) {
+            return;
         }
+        this.treeService.setNodeSelect(node, !this.selected());
+        this.treeService.selectedKeysChange.emit(this.treeService.selectedKeys().toArray());
     }
 
-    private notifyNodeClick(event: MouseEvent): NodeClickEvent<T> | null {
-        const node = this.treeNode();
-        if (node === null) {
-            return null;
-        }
+    private notifyNodeClick(event: MouseEvent): NodeClickEvent<T> {
+        const node = this.treeNode() as TreeNode<T>;
         const nodeClickEvent = new NodeClickEvent(node, event);
         this.treeService.nodeClick$.next(nodeClickEvent);
         return nodeClickEvent;
