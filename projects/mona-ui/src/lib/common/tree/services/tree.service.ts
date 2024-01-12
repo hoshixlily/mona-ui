@@ -306,6 +306,7 @@ export class TreeService<T> {
             }
             return keys.remove(key);
         });
+        this.navigatedNode.set(node);
     }
 
     public setSelectBy(selector: string | Selector<T, any> | null): void {
