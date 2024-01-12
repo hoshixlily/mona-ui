@@ -102,7 +102,7 @@ export class TreeNodeComponent<T> {
             return;
         }
         this.treeService.setNodeSelect(node, !this.selected());
-        this.treeService.selectedKeysChange.emit(this.treeService.selectedKeys().toArray());
+        this.treeService.nodeSelectChange$.next({ node, selected: !this.selected() });
     }
 
     private notifyNodeClick(event: MouseEvent): NodeClickEvent<T> {

@@ -1,6 +1,7 @@
 import { DestroyRef, Directive, EventEmitter, inject, Input, OnInit, Output } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { Selector } from "@mirei/ts-collections";
+import { Selector, sequenceEqual } from "@mirei/ts-collections";
+import { distinctUntilChanged, pairwise } from "rxjs";
 import { SelectableOptions } from "../models/SelectableOptions";
 import { TreeService } from "../services/tree.service";
 
@@ -12,7 +13,8 @@ export class TreeSelectableDirective<T> implements OnInit {
     readonly #defaultOptions: SelectableOptions = {
         childrenOnly: false,
         enabled: true,
-        mode: "single"
+        mode: "single",
+        toggleable: false
     };
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
 
@@ -49,8 +51,15 @@ export class TreeSelectableDirective<T> implements OnInit {
     }
 
     private setNodeSelectSubscription(): void {
-        this.treeService.nodeSelectChange$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(event => {
-            this.treeService.selectedKeysChange.emit(this.treeService.selectedKeys().toArray());
-        });
+        this.treeService.selectedKeys$
+            .pipe(pairwise(), takeUntilDestroyed(this.#destroyRef))
+            .subscribe(([oldKeys, keys]) => {
+                const orderedOldKeys = oldKeys.orderBy(k => k);
+                const orderedKeys = keys.orderBy(k => k);
+                if (sequenceEqual(orderedOldKeys, orderedKeys)) {
+                    return;
+                }
+                this.treeService.selectedKeysChange.emit(keys.toArray());
+            });
     }
 }

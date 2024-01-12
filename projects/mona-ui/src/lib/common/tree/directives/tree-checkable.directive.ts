@@ -1,6 +1,7 @@
 import { DestroyRef, Directive, EventEmitter, inject, Input, OnInit, Output } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { Selector } from "@mirei/ts-collections";
+import { Selector, sequenceEqual } from "@mirei/ts-collections";
+import { pairwise } from "rxjs";
 import { CheckableOptions } from "../models/CheckableOptions";
 import { TreeService } from "../services/tree.service";
 
@@ -50,8 +51,15 @@ export class TreeCheckableDirective<T> implements OnInit {
     }
 
     private setNodeCheckSubscription(): void {
-        this.treeService.nodeCheckChange$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(event => {
-            this.treeService.checkedKeysChange.emit(this.treeService.checkedKeys().toArray());
-        });
+        this.treeService.checkedKeys$
+            .pipe(pairwise(), takeUntilDestroyed(this.#destroyRef))
+            .subscribe(([oldKeys, keys]) => {
+                const orderedOldKeys = oldKeys.orderBy(k => k);
+                const orderedKeys = keys.orderBy(k => k);
+                if (sequenceEqual(orderedOldKeys, orderedKeys)) {
+                    return;
+                }
+                this.treeService.checkedKeysChange.emit(keys.toArray());
+            });
     }
 }

@@ -39,12 +39,13 @@
                     <button monaButton (click)="treeService.navigate('next')">Next</button>
                     <mona-tree
                             monaTreeCheckable
-                            checkBy="id"
                             [checkedKeys]="treeCheckedKeys"
                             (checkedKeysChange)="onTreeCheckedKeysChange($event)"
-                            monaTreeSelectable
+                            [monaTreeSelectable]="{ enabled: true, mode: 'single', childrenOnly: true, toggleable: false }"
                             [selectedKeys]="treeSelectedKeys"
                             (selectedKeysChange)="onTreeSelectedKeysChange($event)"
+                            monaTreeExpandable
+                            [expandedKeys]="treeExpandedKeys"
                             (nodeSelect)="onTreeNodeSelect($event)"
                             (nodeCheck)="onTreeNodeCheck($event)"
                             (nodeClick)="onTreeNodeClick($event)"></mona-tree>

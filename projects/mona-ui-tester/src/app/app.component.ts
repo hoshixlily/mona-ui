@@ -168,7 +168,8 @@ import {
     TreeSelectableDirective,
     TreeCheckableDirective,
     NodeSelectEvent,
-    NodeCheckEvent
+    NodeCheckEvent,
+    TreeExpandableDirective
 } from "mona-ui";
 import { v4 } from "uuid";
 import { ListViewNoDataTemplateDirective } from "../../../mona-ui/src/lib/list-view/directives/list-view-no-data-template.directive";
@@ -336,6 +337,7 @@ interface TreeNodeDataItem {
 
         TreeComponent,
         TreeCheckableDirective,
+        TreeExpandableDirective,
         TreeSelectableDirective
     ],
     // providers: [ListService],
@@ -704,7 +706,7 @@ export class AppComponent implements OnInit {
     public timePickerMinValue: Date | null = new Date(2000, 2, 10, 8, 30, 0);
     public timePickerValue: Date | null = new Date(2000, 2, 10, 10, 0, 0);
     public toggleableButtonSelected: boolean = true;
-    public treeCheckedKeys: string[] = ["1-4-3"];
+    public treeCheckedKeys: string[] = [];
 
     public treeData: any[] = [
         {
@@ -967,12 +969,14 @@ export class AppComponent implements OnInit {
         this.treeService.setData(this.treeData);
         this.treeService.setChildrenSelector(i => i.items);
         this.treeService.setTextField(i => i.text);
-        this.treeService.setExpandableOptions({ enabled: true });
-        this.treeService.setExpandBy(i => i.id);
+        // this.treeService.setExpandableOptions({ enabled: true });
+        // this.treeService.setExpandBy(i => i.id);
         this.treeService.setAnimationEnabled(true);
-        this.treeService.setExpandedKeys(["1", "1-1", "1-2", "1-3", "1-4"]);
-        this.treeService.setSelectableOptions({ enabled: true, mode: "multiple", childrenOnly: true });
-        this.treeService.setSelectBy(i => i.id);
+        // this.treeService.setExpandedKeys(["1", "1-1", "1-2", "1-3", "1-4"]);
+        this.treeCheckedKeys = [this.treeData[0].items[0].items[0], this.treeData[0].items[0].items[2]];
+        this.treeExpandedKeys = [this.treeData[0], this.treeData[0].items[1]];
+        // this.treeService.setSelectableOptions({ enabled: true, mode: "single", childrenOnly: true, toggleable: false });
+        // this.treeService.setSelectBy(i => i.id);
 
         // this.treeSelectedKeys = ["1-1-1", "1-4-2"];
 
@@ -1264,7 +1268,7 @@ export class AppComponent implements OnInit {
     }
 
     public onTreeExpandedKeysChange(expandedKeys: unknown[]): void {
-        // console.log(expandedKeys);
+        console.log(expandedKeys);
         this.treeExpandedKeys = expandedKeys as string[];
     }
 
@@ -1281,10 +1285,10 @@ export class AppComponent implements OnInit {
     }
 
     public onTreeNodeClick(event: NodeClickEvent<any>): void {
-        if (event.nodeItem.hasChildren) {
-            event.preventDefault();
-            console.log(event);
-        }
+        // if (event.nodeItem.hasChildren) {
+        //     event.preventDefault();
+        //     console.log(event);
+        // }
         // event.preventDefault();
     }
 

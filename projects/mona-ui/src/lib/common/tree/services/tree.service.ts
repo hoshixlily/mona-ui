@@ -1,15 +1,17 @@
 import { computed, EventEmitter, Injectable, Signal, signal, WritableSignal } from "@angular/core";
-import { ImmutableDictionary, ImmutableSet, List, Selector } from "@mirei/ts-collections";
+import { toObservable } from "@angular/core/rxjs-interop";
+import { from, ImmutableDictionary, ImmutableSet, List, Selector, sequenceEqual } from "@mirei/ts-collections";
 import { Observable, Subject, take } from "rxjs";
 import { CheckableOptions } from "../models/CheckableOptions";
 import { ExpandableOptions } from "../models/ExpandableOptions";
 import { NodeCheckEvent } from "../models/NodeCheckEvent";
-import { TreeNodeCheckEvent } from "../models/TreeNodeCheckEvent";
 import { NodeClickEvent } from "../models/NodeClickEvent";
-import { TreeNodeExpandEvent } from "../models/TreeNodeExpandEvent";
 import { NodeSelectEvent } from "../models/NodeSelectEvent";
 import { SelectableOptions } from "../models/SelectableOptions";
 import { TreeNode } from "../models/TreeNode";
+import { TreeNodeCheckEvent } from "../models/TreeNodeCheckEvent";
+import { TreeNodeExpandEvent } from "../models/TreeNodeExpandEvent";
+import { TreeNodeSelectEvent } from "../models/TreeNodeSelectEvent";
 
 @Injectable()
 export class TreeService<T> {
@@ -34,17 +36,19 @@ export class TreeService<T> {
         mode: "multiple"
     });
     public readonly checkedKeys: WritableSignal<ImmutableSet<any>> = signal(ImmutableSet.create());
+    public readonly checkedKeys$: Observable<ImmutableSet<any>> = toObservable(this.checkedKeys);
     public readonly children: WritableSignal<string | Selector<T, Iterable<T>> | Observable<Iterable<T>>> = signal("");
     public readonly expandBy: WritableSignal<string | Selector<T, any> | null> = signal(null);
     public readonly expandableOptions: WritableSignal<ExpandableOptions> = signal({ enabled: false });
     public readonly expandedKeys: WritableSignal<ImmutableSet<any>> = signal(ImmutableSet.create());
+    public readonly expandedKeys$: Observable<ImmutableSet<any>> = toObservable(this.expandedKeys);
     public readonly navigatedNode: WritableSignal<TreeNode<T> | null> = signal(null);
     public readonly nodeCheck$: Subject<NodeCheckEvent<T>> = new Subject();
     public readonly nodeCheckChange$: Subject<TreeNodeCheckEvent<T>> = new Subject();
     public readonly nodeClick$: Subject<NodeClickEvent<T>> = new Subject();
     public readonly nodeExpand$: Subject<TreeNodeExpandEvent<T>> = new Subject();
     public readonly nodeSelect$: Subject<NodeSelectEvent<T>> = new Subject();
-    public readonly nodeSelectChange$: Subject<TreeNode<T>> = new Subject();
+    public readonly nodeSelectChange$: Subject<TreeNodeSelectEvent<T>> = new Subject();
     public readonly nodeSet: Signal<ImmutableSet<TreeNode<T>>> = computed(() => {
         const data = this.data();
         return this.createNodes(data);
@@ -53,9 +57,11 @@ export class TreeService<T> {
     public readonly selectableOptions: WritableSignal<SelectableOptions> = signal({
         childrenOnly: false,
         enabled: false,
-        mode: "single"
+        mode: "single",
+        toggleable: false
     });
     public readonly selectedKeys: WritableSignal<ImmutableSet<any>> = signal(ImmutableSet.create());
+    public readonly selectedKeys$: Observable<ImmutableSet<any>> = toObservable(this.selectedKeys);
     public readonly textField: WritableSignal<string | Selector<T, string>> = signal("");
     public checkedKeysChange: EventEmitter<Array<any>> = new EventEmitter<Array<any>>();
     public expandedKeysChange: EventEmitter<Array<any>> = new EventEmitter<Array<any>>();
@@ -145,6 +151,7 @@ export class TreeService<T> {
         const key = this.getSelectKey(node);
         return this.selectedKeys().contains(key);
     }
+
     public navigate(direction: "next" | "previous"): TreeNode<T> | null {
         const navigableNodes = this.navigableNodes();
         const navigatedNode = this.navigatedNode();
@@ -186,6 +193,11 @@ export class TreeService<T> {
     }
 
     public setCheckedKeys(keys: Iterable<any>): void {
+        const checkedKeys = this.checkedKeys().orderBy(k => k);
+        const orderedKeys = from(keys).orderBy(k => k);
+        if (sequenceEqual(checkedKeys, orderedKeys)) {
+            return;
+        }
         this.checkedKeys.set(ImmutableSet.create(keys));
     }
 
@@ -198,6 +210,11 @@ export class TreeService<T> {
     }
 
     public setExpandedKeys(keys: Iterable<any>): void {
+        const expandedKeys = this.expandedKeys().orderBy(k => k);
+        const orderedKeys = from(keys).orderBy(k => k);
+        if (sequenceEqual(expandedKeys, orderedKeys)) {
+            return;
+        }
         this.expandedKeys.set(ImmutableSet.create(keys));
     }
 
@@ -255,8 +272,6 @@ export class TreeService<T> {
 
     public setNodeExpand(node: TreeNode<T>, expanded: boolean): void {
         const key = this.getExpandKey(node);
-        const expandedKeys = this.expandedKeys().toEnumerableSet();
-
         this.expandedKeys.update(keys => {
             if (expanded) {
                 return keys.add(key);
@@ -264,7 +279,6 @@ export class TreeService<T> {
             return keys.remove(key);
         });
         this.navigatedNode.set(node);
-        console.log(this.expandedKeys().toArray());
     }
 
     public setNodeSelect(node: TreeNode<T>, selected: boolean): void {
@@ -280,7 +294,12 @@ export class TreeService<T> {
         const mode = selectableOptions.mode;
         this.selectedKeys.update(keys => {
             if (mode === "single") {
-                return keys.clear().add(key);
+                const toggleable = selectableOptions.toggleable;
+                if (toggleable && keys.contains(key)) {
+                    return keys.remove(key);
+                } else {
+                    return keys.clear().add(key);
+                }
             }
             if (selected) {
                 return keys.add(key);
@@ -298,6 +317,11 @@ export class TreeService<T> {
     }
 
     public setSelectedKeys(keys: Iterable<any>): void {
+        const selectedKeys = this.selectedKeys().orderBy(k => k);
+        const orderedKeys = from(keys).orderBy(k => k);
+        if (sequenceEqual(selectedKeys, orderedKeys)) {
+            return;
+        }
         this.selectedKeys.set(ImmutableSet.create(keys));
     }
 
@@ -352,7 +376,7 @@ export class TreeService<T> {
     public getCheckKey(node: TreeNode<T>): any {
         const checkBy = this.checkBy();
         if (!checkBy) {
-            return node.uid;
+            return node.data;
         }
         if (typeof checkBy === "string") {
             return (node.data as any)[checkBy];
@@ -363,7 +387,7 @@ export class TreeService<T> {
     private getExpandKey(node: TreeNode<T>): any {
         const expandBy = this.expandBy();
         if (!expandBy) {
-            return node.uid;
+            return node.data;
         }
         if (typeof expandBy === "string") {
             return (node.data as any)[expandBy];
@@ -389,7 +413,7 @@ export class TreeService<T> {
     private getSelectKey(node: TreeNode<T>): any {
         const selectBy = this.selectBy();
         if (!selectBy) {
-            return node.uid;
+            return node.data;
         }
         if (typeof selectBy === "string") {
             return (node.data as any)[selectBy];

@@ -1,6 +1,7 @@
 import { DestroyRef, Directive, EventEmitter, inject, Input, OnInit, Output } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { Selector } from "@mirei/ts-collections";
+import { Selector, sequenceEqual } from "@mirei/ts-collections";
+import { pairwise } from "rxjs";
 import { ExpandableOptions } from "../models/ExpandableOptions";
 import { TreeService } from "../services/tree.service";
 
@@ -47,8 +48,15 @@ export class TreeExpandableDirective<T> implements OnInit {
     }
 
     private setNodeExpandSubscription(): void {
-        this.treeService.nodeExpand$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(event => {
-            this.treeService.expandedKeysChange.emit(this.treeService.expandedKeys().toArray());
-        });
+        this.treeService.expandedKeys$
+            .pipe(pairwise(), takeUntilDestroyed(this.#destroyRef))
+            .subscribe(([oldKeys, keys]) => {
+                const orderedOldKeys = oldKeys.orderBy(k => k);
+                const orderedKeys = keys.orderBy(k => k);
+                if (sequenceEqual(orderedOldKeys, orderedKeys)) {
+                    return;
+                }
+                this.treeService.expandedKeysChange.emit(keys.toArray());
+            });
     }
 }

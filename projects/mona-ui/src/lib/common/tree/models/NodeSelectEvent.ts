@@ -5,7 +5,7 @@ import { TreeNode } from "./TreeNode";
 export class NodeSelectEvent<T> extends PreventableEvent {
     readonly #node: TreeNode<T>;
 
-    public constructor(node: TreeNode<T>, event: MouseEvent) {
+    public constructor(node: TreeNode<T>, event: MouseEvent | KeyboardEvent) {
         super("nodeSelect", event);
         this.#node = node;
     }

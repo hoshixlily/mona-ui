@@ -249,7 +249,7 @@ export class ListService<TData> {
         this.navigableOptions.update(o => ({ ...o, ...options }));
     }
 
-    public setSelectableOptions(options: SelectableOptions): void {
+    public setSelectableOptions(options: Partial<SelectableOptions>): void {
         this.selectableOptions.update(o => ({ ...o, ...options }));
     }
 

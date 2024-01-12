@@ -80,17 +80,31 @@ export class TreeComponent<T> implements OnInit {
                         this.treeService.setNodeExpand(navigatedNode, true);
                     }
                 } else if (event.key === " ") {
-                    if (navigatedNode) {
-                        const nodeCheckEvent = new NodeCheckEvent(navigatedNode, event);
-                        this.treeService.nodeCheck$.next(nodeCheckEvent);
-                        if (!nodeCheckEvent.isDefaultPrevented()) {
-                            const newCheckState = !this.treeService.isChecked(navigatedNode);
-                            this.treeService.setNodeCheck(navigatedNode, newCheckState);
-                            this.treeService.nodeCheckChange$.next({
-                                node: navigatedNode,
-                                checked: newCheckState
-                            });
-                        }
+                    if (!navigatedNode) {
+                        return;
+                    }
+                    const nodeCheckEvent = new NodeCheckEvent(navigatedNode, event);
+                    this.treeService.nodeCheck$.next(nodeCheckEvent);
+                    if (!nodeCheckEvent.isDefaultPrevented()) {
+                        const newCheckState = !this.treeService.isChecked(navigatedNode);
+                        this.treeService.setNodeCheck(navigatedNode, newCheckState);
+                        this.treeService.nodeCheckChange$.next({
+                            node: navigatedNode,
+                            checked: newCheckState
+                        });
+                    }
+                } else if (event.key === "Enter") {
+                    if (!navigatedNode) {
+                        return;
+                    }
+                    const nodeSelectEvent = new NodeSelectEvent(navigatedNode, event);
+                    this.treeService.nodeSelect$.next(nodeSelectEvent);
+                    if (!nodeSelectEvent.isDefaultPrevented()) {
+                        this.treeService.setNodeSelect(navigatedNode, !this.treeService.isSelected(navigatedNode));
+                        this.treeService.nodeSelectChange$.next({
+                            node: navigatedNode,
+                            selected: this.treeService.isSelected(navigatedNode)
+                        });
                     }
                 }
             });

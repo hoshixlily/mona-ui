@@ -1,5 +1,4 @@
-export interface SelectableOptions {
+export type SelectableOptions = {
     childrenOnly: boolean;
     enabled: boolean;
-    mode: "single" | "multiple";
-}
+} & ({ mode: "single"; toggleable?: boolean } | { mode: "multiple" });
