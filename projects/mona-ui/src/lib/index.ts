@@ -13,6 +13,7 @@ export * from "./buttons/split-button/components/split-button/split-button.compo
 /** Common */
 export * from "./common/filter-input/models/FilterChangeEvent";
 
+export * from "./common/tree/models/NodeCheckEvent";
 export * from "./common/tree/models/NodeClickEvent";
 export * from "./common/tree/models/NodeItem";
 export * from "./common/tree/models/NodeSelectEvent";

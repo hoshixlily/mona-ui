@@ -17,7 +17,8 @@
                            id="mona-tree-node-checkbox-{{node.uid}}"
                            [indeterminate]="nodeComponent.indeterminate()"
                            [ngModel]="nodeComponent.checked()"
-                           (ngModelChange)="onCheckStateChange(node, !nodeComponent.checked())" monaCheckBox />
+                           (click)="nodeComponent.checkboxClick$.next($event)"
+                           (ngModelChange)="nodeComponent.checkboxCheck$.next($event)" monaCheckBox />
                     <label for="mona-tree-node-checkbox-{{node.uid}}"></label>
                 }
                 <mona-tree-node [node]="node" #nodeComponent></mona-tree-node>

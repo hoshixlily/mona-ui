@@ -54,11 +54,6 @@ export class SubTreeComponent<T> {
 
     public constructor(protected readonly treeService: TreeService<T>) {}
 
-    public onCheckStateChange(node: TreeNode<T>, checked: boolean): void {
-        this.treeService.setNodeCheck(node, checked);
-        this.treeService.nodeCheck$.next({ node, checked });
-    }
-
     public onExpandStateChange(node: TreeNode<T>, expanded: boolean): void {
         this.treeService.setNodeExpand(node, expanded);
         this.treeService.nodeExpand$.next({ node, expanded });

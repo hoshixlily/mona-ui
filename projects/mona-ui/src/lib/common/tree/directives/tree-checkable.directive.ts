@@ -50,7 +50,7 @@ export class TreeCheckableDirective<T> implements OnInit {
     }
 
     private setNodeCheckSubscription(): void {
-        this.treeService.nodeCheck$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(event => {
+        this.treeService.nodeCheckChange$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(event => {
             this.treeService.checkedKeysChange.emit(this.treeService.checkedKeys().toArray());
         });
     }

@@ -167,7 +167,8 @@ import {
     TreeComponent,
     TreeSelectableDirective,
     TreeCheckableDirective,
-    NodeSelectEvent
+    NodeSelectEvent,
+    NodeCheckEvent
 } from "mona-ui";
 import { v4 } from "uuid";
 import { ListViewNoDataTemplateDirective } from "../../../mona-ui/src/lib/list-view/directives/list-view-no-data-template.directive";
@@ -1270,6 +1271,13 @@ export class AppComponent implements OnInit {
     public onTreeFilterChange(event: FilterChangeEvent): void {
         // event.preventDefault();
         // console.log(event.filter);
+    }
+
+    public onTreeNodeCheck(event: NodeCheckEvent<any>): void {
+        if (event.nodeItem.data.text.startsWith("C")) {
+            event.preventDefault();
+            console.log(event);
+        }
     }
 
     public onTreeNodeClick(event: NodeClickEvent<any>): void {

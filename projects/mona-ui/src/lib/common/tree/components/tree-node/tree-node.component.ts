@@ -1,4 +1,7 @@
-import { Component, computed, Input, Signal, signal, WritableSignal } from "@angular/core";
+import { Component, computed, DestroyRef, inject, Input, Signal, signal, WritableSignal } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { map, startWith, Subject, withLatestFrom } from "rxjs";
+import { NodeCheckEvent } from "../../models/NodeCheckEvent";
 import { NodeClickEvent } from "../../models/NodeClickEvent";
 import { NodeSelectEvent } from "../../models/NodeSelectEvent";
 import { TreeNode } from "../../models/TreeNode";
@@ -12,6 +15,7 @@ import { TreeService } from "../../services/tree.service";
     styleUrl: "./tree-node.component.scss"
 })
 export class TreeNodeComponent<T> {
+    readonly #destroyRef: DestroyRef = inject(DestroyRef);
     protected readonly nodeText: Signal<string> = computed(() => {
         const node = this.treeNode();
         if (node === null) {
@@ -27,6 +31,8 @@ export class TreeNodeComponent<T> {
         }
         return this.treeService.isCheckable(node);
     });
+    public readonly checkboxCheck$: Subject<boolean> = new Subject<boolean>();
+    public readonly checkboxClick$: Subject<MouseEvent> = new Subject<MouseEvent>();
     public readonly checked: Signal<boolean> = computed(() => {
         const node = this.treeNode();
         if (node === null) {
@@ -77,6 +83,10 @@ export class TreeNodeComponent<T> {
 
     public constructor(protected readonly treeService: TreeService<T>) {}
 
+    public ngOnInit(): void {
+        this.setSubscriptions();
+    }
+
     public onNodeClick(event: MouseEvent): void {
         const node = this.treeNode();
         if (node === null) {
@@ -100,5 +110,32 @@ export class TreeNodeComponent<T> {
         const nodeClickEvent = new NodeClickEvent(node, event);
         this.treeService.nodeClick$.next(nodeClickEvent);
         return nodeClickEvent;
+    }
+
+    private setCheckboxClickSubscription(): void {
+        this.checkboxClick$
+            .pipe(
+                takeUntilDestroyed(this.#destroyRef),
+                map(event => {
+                    const nodeCheckEvent = new NodeCheckEvent(this.treeNode() as TreeNode<T>, event);
+                    this.treeService.nodeCheck$.next(nodeCheckEvent);
+                    return nodeCheckEvent;
+                }),
+                withLatestFrom(
+                    this.checkboxCheck$.pipe(startWith(this.treeService.isChecked(this.treeNode() as TreeNode<T>)))
+                )
+            )
+            .subscribe(([event, checked]) => {
+                if (event.isDefaultPrevented()) {
+                    event.originalEvent?.preventDefault();
+                    return;
+                }
+                this.treeService.setNodeCheck(this.treeNode() as TreeNode<T>, !checked);
+                this.treeService.nodeCheckChange$.next({ node: this.treeNode() as TreeNode<T>, checked: !checked });
+            });
+    }
+
+    private setSubscriptions(): void {
+        this.setCheckboxClickSubscription();
     }
 }

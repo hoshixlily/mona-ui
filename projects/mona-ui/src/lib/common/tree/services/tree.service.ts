@@ -3,6 +3,7 @@ import { ImmutableDictionary, ImmutableSet, List, Selector } from "@mirei/ts-col
 import { Observable, Subject, take } from "rxjs";
 import { CheckableOptions } from "../models/CheckableOptions";
 import { ExpandableOptions } from "../models/ExpandableOptions";
+import { NodeCheckEvent } from "../models/NodeCheckEvent";
 import { TreeNodeCheckEvent } from "../models/TreeNodeCheckEvent";
 import { NodeClickEvent } from "../models/NodeClickEvent";
 import { TreeNodeExpandEvent } from "../models/TreeNodeExpandEvent";
@@ -38,7 +39,8 @@ export class TreeService<T> {
     public readonly expandableOptions: WritableSignal<ExpandableOptions> = signal({ enabled: false });
     public readonly expandedKeys: WritableSignal<ImmutableSet<any>> = signal(ImmutableSet.create());
     public readonly navigatedNode: WritableSignal<TreeNode<T> | null> = signal(null);
-    public readonly nodeCheck$: Subject<TreeNodeCheckEvent<T>> = new Subject();
+    public readonly nodeCheck$: Subject<NodeCheckEvent<T>> = new Subject();
+    public readonly nodeCheckChange$: Subject<TreeNodeCheckEvent<T>> = new Subject();
     public readonly nodeClick$: Subject<NodeClickEvent<T>> = new Subject();
     public readonly nodeExpand$: Subject<TreeNodeExpandEvent<T>> = new Subject();
     public readonly nodeSelect$: Subject<NodeSelectEvent<T>> = new Subject();

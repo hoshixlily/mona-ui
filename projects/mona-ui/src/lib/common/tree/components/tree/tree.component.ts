@@ -12,6 +12,7 @@ import {
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { fromEvent } from "rxjs";
+import { NodeCheckEvent } from "../../models/NodeCheckEvent";
 import { NodeClickEvent } from "../../models/NodeClickEvent";
 import { NodeSelectEvent } from "../../models/NodeSelectEvent";
 import { TreeService } from "../../services/tree.service";
@@ -29,6 +30,9 @@ import { TreeNodeComponent } from "../tree-node/tree-node.component";
 })
 export class TreeComponent<T> implements OnInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
+
+    @Output()
+    public nodeCheck: EventEmitter<NodeCheckEvent<T>> = new EventEmitter();
 
     @Output()
     public nodeClick: EventEmitter<NodeClickEvent<T>> = new EventEmitter();
@@ -77,11 +81,25 @@ export class TreeComponent<T> implements OnInit {
                     }
                 } else if (event.key === " ") {
                     if (navigatedNode) {
-                        this.treeService.setNodeCheck(navigatedNode, !this.treeService.isChecked(navigatedNode));
-                        this.treeService.checkedKeysChange.emit(this.treeService.checkedKeys().toArray());
+                        const nodeCheckEvent = new NodeCheckEvent(navigatedNode, event);
+                        this.treeService.nodeCheck$.next(nodeCheckEvent);
+                        if (!nodeCheckEvent.isDefaultPrevented()) {
+                            const newCheckState = !this.treeService.isChecked(navigatedNode);
+                            this.treeService.setNodeCheck(navigatedNode, newCheckState);
+                            this.treeService.nodeCheckChange$.next({
+                                node: navigatedNode,
+                                checked: newCheckState
+                            });
+                        }
                     }
                 }
             });
+    }
+
+    private setNodeCheckSubscription(): void {
+        this.treeService.nodeCheck$
+            .pipe(takeUntilDestroyed(this.#destroyRef))
+            .subscribe(event => this.nodeCheck.emit(event));
     }
 
     private setNodeClickSubscription(): void {
@@ -99,6 +117,7 @@ export class TreeComponent<T> implements OnInit {
     private setSubscriptions(): void {
         this.setFocusSubscription();
         this.setKeydownSubscription();
+        this.setNodeCheckSubscription();
         this.setNodeClickSubscription();
         this.setNodeSelectSubscription();
     }
