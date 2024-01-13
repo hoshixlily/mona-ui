@@ -1,5 +1,5 @@
 import { Component, computed, DestroyRef, inject, Input, Signal, signal, WritableSignal } from "@angular/core";
-import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
 import { map, startWith, Subject, withLatestFrom } from "rxjs";
 import { NodeCheckEvent } from "../../models/NodeCheckEvent";
 import { NodeClickEvent } from "../../models/NodeClickEvent";
@@ -16,12 +16,8 @@ import { TreeService } from "../../services/tree.service";
 })
 export class TreeNodeComponent<T> {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
-    protected readonly nodeText: Signal<string> = computed(() => {
-        const node = this.treeNode();
-        if (node === null) {
-            return "";
-        }
-        return this.treeService.getNodeText(node);
+    readonly #dragging: Signal<boolean> = toSignal(this.treeService.dragging$, {
+        initialValue: false
     });
     protected readonly treeNode: WritableSignal<TreeNode<T> | null> = signal(null);
     public readonly checkable: Signal<boolean> = computed(() => {
@@ -35,6 +31,7 @@ export class TreeNodeComponent<T> {
     public readonly checkboxClick$: Subject<MouseEvent> = new Subject<MouseEvent>();
     public readonly checked: Signal<boolean> = computed(() => {
         const node = this.treeNode();
+        this.#dragging();
         if (node === null) {
             return false;
         }
@@ -49,6 +46,7 @@ export class TreeNodeComponent<T> {
     });
     public readonly indeterminate: Signal<boolean> = computed(() => {
         const node = this.treeNode();
+        this.#dragging();
         if (node === null) {
             return false;
         }
@@ -61,8 +59,16 @@ export class TreeNodeComponent<T> {
         }
         return this.treeService.isNavigated(node);
     });
+    public readonly nodeText: Signal<string> = computed(() => {
+        const node = this.treeNode();
+        if (node === null) {
+            return "";
+        }
+        return this.treeService.getNodeText(node);
+    });
     public readonly paddingLeft: Signal<number> = computed(() => {
         const node = this.treeNode();
+        this.#dragging();
         if (node === null) {
             return 0;
         }

@@ -7,6 +7,7 @@ ul {
 
 ul li {
     overflow: hidden;
+    position: relative;
 }
 
 div.mona-tree-node-container {
@@ -28,4 +29,20 @@ div.mona-tree-node-expander {
 
 div.mona-sub-tree-container {
     margin-top: 1px;
+}
+
+div.mona-tree-drop-magnet {
+    //height: 4px;
+    background-color: var(--mona-primary);
+    width: 100%;
+    display: flex;
+    position: absolute;
+    &-top {
+        top: 0;
+        background-color: #ffcc75;
+    }
+    &-bottom {
+        bottom: 0;
+        background-color: #ffcc75;
+    }
 }

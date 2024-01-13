@@ -230,7 +230,22 @@ div.mona-tree-node {
 
 span.mona-tree-node-text {
     color: var(--mona-text);
+}
 
+div.mona-tree-node-dragging {
+    background-color: var(--mona-background);
+    border: 1px solid var(--mona-border-color);
+    border-radius: var(--mona-border-radius);
+    box-shadow: var(--mona-popup-shadow);
+    padding: 4px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--mona-text);
+    top: 10px;
+    & fa-icon {
+        margin-right: 4px;
+    }
 }
 
 /** Buttons */

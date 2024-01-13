@@ -7,14 +7,16 @@ import {
     ElementRef,
     EventEmitter,
     inject,
+    NgZone,
     OnInit,
     Output
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { fromEvent } from "rxjs";
+import { fromEvent, takeWhile } from "rxjs";
 import { NodeCheckEvent } from "../../models/NodeCheckEvent";
 import { NodeClickEvent } from "../../models/NodeClickEvent";
 import { NodeSelectEvent } from "../../models/NodeSelectEvent";
+import { TreeNode } from "../../models/TreeNode";
 import { TreeService } from "../../services/tree.service";
 import { SubTreeComponent } from "../sub-tree/sub-tree.component";
 import { TreeNodeComponent } from "../tree-node/tree-node.component";
@@ -30,6 +32,7 @@ import { TreeNodeComponent } from "../tree-node/tree-node.component";
 })
 export class TreeComponent<T> implements OnInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
+    readonly #zone: NgZone = inject(NgZone);
 
     @Output()
     public nodeCheck: EventEmitter<NodeCheckEvent<T>> = new EventEmitter();
@@ -47,6 +50,73 @@ export class TreeComponent<T> implements OnInit {
 
     public ngOnInit(): void {
         this.setSubscriptions();
+    }
+
+    private handleMouseMove(): void {
+        this.#zone.runOutsideAngular(() => {
+            fromEvent<MouseEvent>(document, "mousemove")
+                .pipe(
+                    takeUntilDestroyed(this.#destroyRef),
+                    takeWhile(() => this.treeService.dragging())
+                )
+                .subscribe(event => {
+                    if (this.isMouseOutsideTree(event)) {
+                        this.treeService.dropPositionChange$.next({
+                            targetNode: null,
+                            position: "outside"
+                        });
+                        return;
+                    }
+                    const element = event.target as HTMLElement;
+                    const closest = element.closest("li");
+                    if (!closest) {
+                        return;
+                    }
+                    const nodeUid = closest?.getAttribute("data-uid");
+                    if (!nodeUid) {
+                        return;
+                    }
+                    const node = this.treeService.getNodeByUid(nodeUid);
+                    if (!node) {
+                        return;
+                    }
+                    const nodeElement = closest.querySelector("mona-tree-node");
+                    if (!nodeElement) {
+                        return;
+                    }
+                    this.notifyDropPositionChange(event, nodeElement, node);
+                });
+        });
+    }
+
+    private isMouseOutsideTree(event: MouseEvent): boolean {
+        const rect = this.elementRef.nativeElement.getBoundingClientRect();
+        return event.clientY < rect.top || event.clientY > rect.bottom;
+    }
+
+    private notifyDropPositionChange(event: MouseEvent, nodeElement: Element, node: TreeNode<T>): void {
+        const rect = nodeElement.getBoundingClientRect();
+        if (event.clientY > rect.top && event.clientY - rect.top <= 5) {
+            this.treeService.dropPositionChange$.next({
+                targetNode: node,
+                position: "before"
+            });
+        } else if (event.clientY < rect.bottom && rect.bottom - event.clientY <= 5) {
+            this.treeService.dropPositionChange$.next({
+                targetNode: node,
+                position: "after"
+            });
+        } else if (event.clientY < rect.top || event.clientY > rect.bottom) {
+            this.treeService.dropPositionChange$.next({
+                targetNode: node,
+                position: "outside"
+            });
+        } else {
+            this.treeService.dropPositionChange$.next({
+                targetNode: node,
+                position: "inside"
+            });
+        }
     }
 
     private setFocusSubscription(): void {
@@ -122,6 +192,15 @@ export class TreeComponent<T> implements OnInit {
             .subscribe(event => this.nodeClick.emit(event));
     }
 
+    private setNodeDragSubscription(): void {
+        this.treeService.dragging$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(dragging => {
+            if (!dragging) {
+                return;
+            }
+            this.handleMouseMove();
+        });
+    }
+
     private setNodeSelectSubscription(): void {
         this.treeService.nodeSelect$
             .pipe(takeUntilDestroyed(this.#destroyRef))
@@ -133,6 +212,7 @@ export class TreeComponent<T> implements OnInit {
         this.setKeydownSubscription();
         this.setNodeCheckSubscription();
         this.setNodeClickSubscription();
+        this.setNodeDragSubscription();
         this.setNodeSelectSubscription();
     }
 }

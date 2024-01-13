@@ -1,8 +1,10 @@
 import { computed, EventEmitter, Injectable, Signal, signal, WritableSignal } from "@angular/core";
 import { toObservable } from "@angular/core/rxjs-interop";
 import { from, ImmutableDictionary, ImmutableSet, List, Selector, sequenceEqual } from "@mirei/ts-collections";
-import { Observable, Subject, take } from "rxjs";
+import { Observable, ReplaySubject, Subject, take } from "rxjs";
 import { CheckableOptions } from "../models/CheckableOptions";
+import { DraggableOptions } from "../models/DraggableOptions";
+import { DropPosition, DropPositionChangeEvent } from "../models/DropPositionChangeEvent";
 import { ExpandableOptions } from "../models/ExpandableOptions";
 import { NodeCheckEvent } from "../models/NodeCheckEvent";
 import { NodeClickEvent } from "../models/NodeClickEvent";
@@ -38,6 +40,12 @@ export class TreeService<T> {
     public readonly checkedKeys: WritableSignal<ImmutableSet<any>> = signal(ImmutableSet.create());
     public readonly checkedKeys$: Observable<ImmutableSet<any>> = toObservable(this.checkedKeys);
     public readonly children: WritableSignal<string | Selector<T, Iterable<T>> | Observable<Iterable<T>>> = signal("");
+    public readonly draggableOptions: WritableSignal<DraggableOptions> = signal({ enabled: true });
+    public readonly dragging: WritableSignal<boolean> = signal(false);
+    public readonly dragging$: Observable<boolean> = toObservable(this.dragging);
+    public readonly dropPositionChange$: ReplaySubject<DropPositionChangeEvent<T>> = new ReplaySubject<
+        DropPositionChangeEvent<T>
+    >(1);
     public readonly expandBy: WritableSignal<string | Selector<T, any> | null> = signal(null);
     public readonly expandableOptions: WritableSignal<ExpandableOptions> = signal({ enabled: false });
     public readonly expandedKeys: WritableSignal<ImmutableSet<any>> = signal(ImmutableSet.create());
@@ -49,10 +57,7 @@ export class TreeService<T> {
     public readonly nodeExpand$: Subject<TreeNodeExpandEvent<T>> = new Subject();
     public readonly nodeSelect$: Subject<NodeSelectEvent<T>> = new Subject();
     public readonly nodeSelectChange$: Subject<TreeNodeSelectEvent<T>> = new Subject();
-    public readonly nodeSet: Signal<ImmutableSet<TreeNode<T>>> = computed(() => {
-        const data = this.data();
-        return this.createNodes(data);
-    });
+    public readonly nodeSet: WritableSignal<ImmutableSet<TreeNode<T>>> = signal(ImmutableSet.create());
     public readonly selectBy: WritableSignal<string | Selector<T, any> | null> = signal(null);
     public readonly selectableOptions: WritableSignal<SelectableOptions> = signal({
         childrenOnly: false,
@@ -78,6 +83,11 @@ export class TreeService<T> {
             }
         }
         return flattenedNodes;
+    }
+
+    public getNodeByUid(uid: string): TreeNode<T> | null {
+        const nodeDictionary = this.nodeDictionary();
+        return nodeDictionary.get(uid) ?? null;
     }
 
     public getNodeText(node: TreeNode<T>): string {
@@ -128,9 +138,6 @@ export class TreeService<T> {
         if (node.children.isEmpty()) {
             return false;
         }
-        if (this.isChecked(node)) {
-            return false;
-        }
         const childNodes = this.getChildNodes(node);
         const checkedNodes = childNodes.where(n => this.isChecked(n));
         const checkedCount = checkedNodes.count();
@@ -150,6 +157,22 @@ export class TreeService<T> {
         }
         const key = this.getSelectKey(node);
         return this.selectedKeys().contains(key);
+    }
+
+    public moveNode(sourceNode: TreeNode<T>, targetNode: TreeNode<T>, position: DropPosition): void {
+        switch (position) {
+            case "inside":
+                this.moveNodeInside(sourceNode, targetNode);
+                break;
+            case "before":
+                this.moveNodeBefore(sourceNode, targetNode);
+                break;
+            case "after":
+                this.moveNodeAfter(sourceNode, targetNode);
+                break;
+        }
+        // this.updateNodeCheckStatus(targetNode);
+        // this.checkedKeys.update(keys => keys.toImmutableSet());
     }
 
     public navigate(direction: "next" | "previous"): TreeNode<T> | null {
@@ -178,10 +201,12 @@ export class TreeService<T> {
 
     public setChildrenSelector(selector: string | Selector<T, Iterable<T>> | Observable<Iterable<T>>): void {
         this.children.set(selector);
+        this.nodeSet.set(this.createNodes(this.data()));
     }
 
     public setData(data: Iterable<T>): void {
         this.data.set(ImmutableSet.create(data));
+        this.nodeSet.set(this.createNodes(data));
     }
 
     public setCheckBy(selector: string | Selector<T, any> | null): void {
@@ -429,6 +454,85 @@ export class TreeService<T> {
         return false;
     }
 
+    private moveNodeAfter(sourceNode: TreeNode<T>, targetNode: TreeNode<T>): void {
+        if (sourceNode.parent) {
+            sourceNode.parent.children = sourceNode.parent.children.where(n => n !== sourceNode).toList();
+        }
+        if (targetNode.parent) {
+            const index = targetNode.parent.children.indexOf(targetNode);
+            if (index === -1) {
+                return;
+            }
+            targetNode.parent.children.addAt(sourceNode, index + 1);
+            targetNode.parent.children = targetNode.parent.children.toList();
+            if (!sourceNode.parent) {
+                this.nodeSet.update(nodes => nodes.remove(sourceNode));
+            }
+            sourceNode.parent = targetNode.parent;
+        } else {
+            const index = this.nodeSet().toList().indexOf(targetNode);
+            if (index === -1) {
+                return;
+            }
+            this.nodeSet.update(nodes => {
+                const newNodes = nodes.where(n => n !== sourceNode).toList();
+                newNodes.addAt(sourceNode, index + 1);
+                return newNodes.toImmutableSet();
+            });
+            if (!sourceNode.parent) {
+                this.nodeSet.update(nodes => nodes.remove(sourceNode));
+            }
+            sourceNode.parent = null;
+        }
+    }
+
+    private moveNodeBefore(sourceNode: TreeNode<T>, targetNode: TreeNode<T>): void {
+        if (sourceNode.parent) {
+            sourceNode.parent.children = sourceNode.parent.children.where(n => n !== sourceNode).toList();
+        }
+        if (targetNode.parent) {
+            const index = targetNode.parent.children.indexOf(targetNode);
+            if (index === -1) {
+                return;
+            }
+            targetNode.parent.children.addAt(sourceNode, index);
+            targetNode.parent.children = targetNode.parent.children.toList();
+            if (!sourceNode.parent) {
+                this.nodeSet.update(nodes => nodes.remove(sourceNode));
+            }
+            sourceNode.parent = targetNode.parent;
+        } else {
+            const index = this.nodeSet().toList().indexOf(targetNode);
+            if (index === -1) {
+                return;
+            }
+            this.nodeSet.update(nodes => {
+                const newNodes = nodes.where(n => n !== sourceNode).toList();
+                newNodes.addAt(sourceNode, index);
+                return newNodes.toImmutableSet();
+            });
+            if (!sourceNode.parent) {
+                this.nodeSet.update(nodes => nodes.remove(sourceNode));
+            }
+            sourceNode.parent = null;
+        }
+    }
+
+    private moveNodeInside(sourceNode: TreeNode<T>, targetNode: TreeNode<T>): void {
+        if (sourceNode.parent === targetNode) {
+            return;
+        }
+        if (sourceNode.parent) {
+            sourceNode.parent.children = sourceNode.parent.children.where(n => n !== sourceNode).toList();
+        } else {
+            this.nodeSet.update(nodes => nodes.remove(sourceNode));
+        }
+        targetNode.children = targetNode.children.append(sourceNode).toList();
+        sourceNode.parent = targetNode;
+        this.setNodeExpand(targetNode, true);
+        this.nodeSet.update(n => n.toImmutableSet());
+    }
+
     private navigateToNextNode(): TreeNode<T> {
         const navigableNodes = this.navigableNodes();
         const navigatedNode = this.navigatedNode();
@@ -456,6 +560,25 @@ export class TreeService<T> {
         } else {
             this.navigatedNode.set(previousNode);
             return previousNode;
+        }
+    }
+
+    public updateNodeCheckStatus(node: TreeNode<T>): void {
+        if (!node.children.isEmpty()) {
+            const allChecked = node.children.all(n => this.isChecked(n));
+            if (allChecked) {
+                const key = this.getCheckKey(node);
+                this.checkedKeys.update(keys => keys.add(key));
+            }
+        }
+        let parent = node.parent;
+        while (parent) {
+            const allChecked = parent.children.all(n => this.isChecked(n));
+            if (allChecked) {
+                const key = this.getCheckKey(parent);
+                this.checkedKeys.update(keys => keys.add(key));
+            }
+            parent = parent.parent;
         }
     }
 }

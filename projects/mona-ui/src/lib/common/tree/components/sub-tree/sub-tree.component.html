@@ -1,6 +1,14 @@
-<ul class="mona-sub-tree" [style.padding-left.px]="paddingLeft()">
+<ul class="mona-sub-tree" [style.padding-left.px]="paddingLeft()"
+    cdkDropList [cdkDropListSortingDisabled]="true" (cdkDropListDropped)="onNodeDrop($event)">
     @for (node of nodeSet(); track node.uid) {
-        <li [style.padding-left.px]="nodeComponent.paddingLeft()">
+        <li [style.padding-left.px]="nodeComponent.paddingLeft()"
+            [attr.data-uid]="node.uid"
+            cdkDrag
+            [cdkDragData]="node"
+            [cdkDragDisabled]="!treeService.draggableOptions().enabled"
+            (cdkDragStarted)="onNodeDragStart($event)"
+            (cdkDragEnded)="onNodeDragEnd($event)"
+            (cdkDragMoved)="onNodeDragMove($event, node)">
             <div class="mona-tree-node-container">
                 @if (treeService.expandableOptions().enabled && node.children.length > 0) {
                     <div class="mona-tree-node-expander"
@@ -33,6 +41,22 @@
                     ></mona-sub-tree>
                 </div>
             }
+            <ng-template cdkDragPreview [data]="node">
+                <div class="mona-tree-node-dragging">
+                    <span>
+                        @if ((treeService.dropPositionChange$|async)?.position === 'before') {
+                            <fa-icon [icon]="dropBeforeIcon"></fa-icon>
+                        } @else if ((treeService.dropPositionChange$|async)?.position === 'after') {
+                            <fa-icon [icon]="dropAfterIcon"></fa-icon>
+                        } @else if ((treeService.dropPositionChange$|async)?.position === 'inside') {
+                            <fa-icon [icon]="dropInsideIcon"></fa-icon>
+                        } @else {
+                            <fa-icon [icon]="dropNotAllowIcon"></fa-icon>
+                        }
+                    </span>
+                    <span>{{nodeComponent.nodeText()}}</span>
+                </div>
+            </ng-template>
         </li>
     }
 </ul>
