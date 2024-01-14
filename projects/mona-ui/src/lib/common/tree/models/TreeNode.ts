@@ -1,5 +1,6 @@
 import { List } from "@mirei/ts-collections";
 import { v4 } from "uuid";
+import { NodeItem } from "./NodeItem";
 
 export class TreeNode<T> {
     public readonly data: T;
@@ -10,5 +11,12 @@ export class TreeNode<T> {
 
     public constructor(data: T) {
         this.data = data;
+    }
+
+    public get nodeItem(): NodeItem<T> {
+        return {
+            data: this.data,
+            hasChildren: this.children.length > 0
+        };
     }
 }

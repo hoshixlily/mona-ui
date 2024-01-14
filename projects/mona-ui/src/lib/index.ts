@@ -15,6 +15,9 @@ export * from "./common/filter-input/models/FilterChangeEvent";
 
 export * from "./common/tree/models/NodeCheckEvent";
 export * from "./common/tree/models/NodeClickEvent";
+export * from "./common/tree/models/NodeDragStartEvent";
+export * from "./common/tree/models/NodeDragEndEvent";
+export * from "./common/tree/models/NodeDropEvent";
 export * from "./common/tree/models/NodeItem";
 export * from "./common/tree/models/NodeSelectEvent";
 export * from "./common/tree/models/SelectableOptions";
@@ -231,10 +234,10 @@ export * from "./tooltips/tooltip/tooltip.component";
 /** TreeView */
 export { NodeOptions } from "./tree-view/models/Node";
 // export { NodeClickEvent } from "./tree-view/models/NodeClickEvent";
-export * from "./tree-view/models/NodeDragEndEvent";
-export * from "./tree-view/models/NodeDragStartEvent";
+// export * from "./tree-view/models/NodeDragEndEvent";
+// export * from "./tree-view/models/NodeDragStartEvent";
 export * from "./tree-view/models/NodeDragEvent";
-export * from "./tree-view/models/NodeDropEvent";
+// export * from "./tree-view/models/NodeDropEvent";
 export * from "./tree-view/models/NodeLookupItem";
 export * from "./tree-view/models/CheckableOptions";
 export * from "./tree-view/models/ExpandableOptions";

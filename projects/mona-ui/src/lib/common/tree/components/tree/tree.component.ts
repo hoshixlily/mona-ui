@@ -15,6 +15,8 @@ import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { fromEvent, takeWhile } from "rxjs";
 import { NodeCheckEvent } from "../../models/NodeCheckEvent";
 import { NodeClickEvent } from "../../models/NodeClickEvent";
+import { NodeDragStartEvent } from "../../models/NodeDragStartEvent";
+import { NodeDropEvent } from "../../models/NodeDropEvent";
 import { NodeSelectEvent } from "../../models/NodeSelectEvent";
 import { TreeNode } from "../../models/TreeNode";
 import { TreeService } from "../../services/tree.service";
@@ -39,6 +41,15 @@ export class TreeComponent<T> implements OnInit {
 
     @Output()
     public nodeClick: EventEmitter<NodeClickEvent<T>> = new EventEmitter();
+
+    @Output()
+    public nodeDragEnd: EventEmitter<NodeDragStartEvent<T>> = new EventEmitter();
+
+    @Output()
+    public nodeDragStart: EventEmitter<NodeDragStartEvent<T>> = new EventEmitter();
+
+    @Output()
+    public nodeDrop: EventEmitter<NodeDropEvent<T>> = new EventEmitter();
 
     @Output()
     public nodeSelect: EventEmitter<NodeSelectEvent<T>> = new EventEmitter();
@@ -192,13 +203,31 @@ export class TreeComponent<T> implements OnInit {
             .subscribe(event => this.nodeClick.emit(event));
     }
 
-    private setNodeDragSubscription(): void {
+    private setNodeDragEndSubscription(): void {
+        this.treeService.nodeDragEnd$
+            .pipe(takeUntilDestroyed(this.#destroyRef))
+            .subscribe(event => this.nodeDragEnd.emit(event));
+    }
+
+    private setNodeDragHandlerSubscription(): void {
         this.treeService.dragging$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(dragging => {
             if (!dragging) {
                 return;
             }
             this.handleMouseMove();
         });
+    }
+
+    private setNodeDragStartSubscription(): void {
+        this.treeService.nodeDragStart$
+            .pipe(takeUntilDestroyed(this.#destroyRef))
+            .subscribe(event => this.nodeDragStart.emit(event));
+    }
+
+    private setNodeDropSubscription(): void {
+        this.treeService.nodeDrop$
+            .pipe(takeUntilDestroyed(this.#destroyRef))
+            .subscribe(event => this.nodeDrop.emit(event));
     }
 
     private setNodeSelectSubscription(): void {
@@ -212,7 +241,10 @@ export class TreeComponent<T> implements OnInit {
         this.setKeydownSubscription();
         this.setNodeCheckSubscription();
         this.setNodeClickSubscription();
-        this.setNodeDragSubscription();
+        this.setNodeDragEndSubscription();
+        this.setNodeDragHandlerSubscription();
+        this.setNodeDragStartSubscription();
+        this.setNodeDropSubscription();
         this.setNodeSelectSubscription();
     }
 }

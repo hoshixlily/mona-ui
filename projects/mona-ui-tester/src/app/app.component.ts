@@ -1302,18 +1302,18 @@ export class AppComponent implements OnInit {
         // event.preventDefault();
     }
 
-    public onTreeNodeDragEnd(event: NodeDragEndEvent): void {
+    public onTreeNodeDragEnd(event: NodeDragEndEvent<any>): void {
         console.log(event);
     }
 
-    public onTreeNodeDragStart(event: NodeDragStartEvent): void {
-        // console.log(event);
+    public onTreeNodeDragStart(event: NodeDragStartEvent<any>): void {
         // event.preventDefault();
+        console.log(event);
     }
 
-    public onTreeNodeDrop(event: NodeDropEvent): void {
+    public onTreeNodeDrop(event: NodeDropEvent<any>): void {
         console.log(event);
-        if (event.destinationNode?.text === "Pine" && event.position === "inside") {
+        if (event.targetNodeItem?.data.text.startsWith("A") && event.position === "inside") {
             event.preventDefault();
         }
     }

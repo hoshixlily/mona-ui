@@ -10,10 +10,8 @@
                                     filterPlaceholder="Search..."
                                     [filter]="treeFilter()"
                                     (filterChange)="onTreeFilterChange($event)"
-                                    (nodeDragStart)="onTreeNodeDragStart($event)"
                                     (nodeDrag)="onTreeNodeDrag($event)"
-                                    (nodeDrop)="onTreeNodeDrop($event)"
-                                    (nodeDragEnd)="onTreeNodeDragEnd($event)"
+
                                     monaTreeViewDisable [disabledKeys]="treeDisabledKeys"
                     >
                         <!--            monaTreeViewDisable [disabledKeys]="treeDisabledKeys"-->
@@ -41,12 +39,15 @@
                             monaTreeCheckable
                             [checkedKeys]="treeCheckedKeys"
                             (checkedKeysChange)="onTreeCheckedKeysChange($event)"
-                            [monaTreeSelectable]="{ enabled: true, mode: 'single', childrenOnly: true, toggleable: false }"
+                            [monaTreeSelectable]="{ enabled: true, mode: 'multiple', childrenOnly: true, }"
                             [selectedKeys]="treeSelectedKeys"
                             (selectedKeysChange)="onTreeSelectedKeysChange($event)"
                             monaTreeExpandable
                             [expandedKeys]="treeExpandedKeys"
                             (nodeSelect)="onTreeNodeSelect($event)"
+                            (nodeDragStart)="onTreeNodeDragStart($event)"
+                            (nodeDragEnd)="onTreeNodeDragEnd($event)"
+                            (nodeDrop)="onTreeNodeDrop($event)"
                             (nodeCheck)="onTreeNodeCheck($event)"
                             (nodeClick)="onTreeNodeClick($event)"></mona-tree>
                 </mona-splitter-pane>

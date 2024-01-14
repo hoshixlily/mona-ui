@@ -24,6 +24,9 @@ import {
 import { ImmutableSet } from "@mirei/ts-collections";
 import { take } from "rxjs";
 import { CheckBoxDirective } from "../../../../inputs/check-box/check-box.directive";
+import { NodeDragEndEvent } from "../../models/NodeDragEndEvent";
+import { NodeDragStartEvent } from "../../models/NodeDragStartEvent";
+import { NodeDropEvent } from "../../models/NodeDropEvent";
 import { TreeNode } from "../../models/TreeNode";
 import { TreeService } from "../../services/tree.service";
 import { TreeNodeComponent } from "../tree-node/tree-node.component";
@@ -92,6 +95,11 @@ export class SubTreeComponent<T> {
     }
 
     public onNodeDragEnd(event: CdkDragEnd<TreeNode<T>>): void {
+        const nodeDragEndEvent = new NodeDragEndEvent(event.source.data, event.event);
+        this.treeService.nodeDragEnd$.next(nodeDragEndEvent);
+        if (nodeDragEndEvent.isDefaultPrevented()) {
+            return;
+        }
         this.treeService.dragging.set(false);
     }
 
@@ -104,6 +112,11 @@ export class SubTreeComponent<T> {
     }
 
     public onNodeDragStart(event: CdkDragStart<TreeNode<T>>): void {
+        const nodeDragStartEvent = new NodeDragStartEvent(event.source.data, event.event);
+        this.treeService.nodeDragStart$.next(nodeDragStartEvent);
+        if (nodeDragStartEvent.isDefaultPrevented()) {
+            return;
+        }
         this.treeService.dragging.set(true);
     }
 
@@ -112,6 +125,11 @@ export class SubTreeComponent<T> {
             const sourceNode = event.item.data;
             const targetNode = e.targetNode;
             if (sourceNode === targetNode || e.position === "outside" || targetNode == null) {
+                return;
+            }
+            const nodeDropEvent = new NodeDropEvent(sourceNode, targetNode, e.position, event.event);
+            this.treeService.nodeDrop$.next(nodeDropEvent);
+            if (nodeDropEvent.isDefaultPrevented()) {
                 return;
             }
             if (e.position === "inside") {
