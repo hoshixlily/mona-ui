@@ -2,7 +2,6 @@ ul {
     list-style: none;
     display: flex;
     flex-direction: column;
-    row-gap: 1px;
 }
 
 ul li {
@@ -29,20 +28,4 @@ div.mona-tree-node-expander {
 
 div.mona-sub-tree-container {
     margin-top: 1px;
-}
-
-div.mona-tree-drop-magnet {
-    //height: 4px;
-    background-color: var(--mona-primary);
-    width: 100%;
-    display: flex;
-    position: absolute;
-    &-top {
-        top: 0;
-        background-color: #ffcc75;
-    }
-    &-bottom {
-        bottom: 0;
-        background-color: #ffcc75;
-    }
 }

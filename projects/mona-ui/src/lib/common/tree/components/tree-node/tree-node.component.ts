@@ -69,10 +69,11 @@ export class TreeNodeComponent<T> {
     public readonly paddingLeft: Signal<number> = computed(() => {
         const node = this.treeNode();
         this.#dragging();
+        const expandable = this.treeService.expandableOptions().enabled;
         if (node === null) {
             return 0;
         }
-        return node.children.length > 0 ? 0 : 24;
+        return expandable ? (node.children.length > 0 ? 0 : 24) : 0;
     });
     public readonly selected: Signal<boolean> = computed(() => {
         const node = this.treeNode();

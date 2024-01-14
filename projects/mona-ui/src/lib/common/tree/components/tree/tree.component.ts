@@ -1,8 +1,9 @@
 import { transition, trigger } from "@angular/animations";
-import { NgTemplateOutlet } from "@angular/common";
+import { NgStyle, NgTemplateOutlet } from "@angular/common";
 import {
     ChangeDetectionStrategy,
     Component,
+    computed,
     DestroyRef,
     ElementRef,
     EventEmitter,
@@ -10,10 +11,12 @@ import {
     Input,
     NgZone,
     OnInit,
-    Output
+    Output,
+    Signal
 } from "@angular/core";
-import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
 import { fromEvent, takeWhile } from "rxjs";
+import { DropPositionChangeEvent } from "../../models/DropPositionChangeEvent";
 import { NodeCheckEvent } from "../../models/NodeCheckEvent";
 import { NodeClickEvent } from "../../models/NodeClickEvent";
 import { NodeDragEvent } from "../../models/NodeDragEvent";
@@ -23,12 +26,13 @@ import { NodeSelectEvent } from "../../models/NodeSelectEvent";
 import { TreeNode } from "../../models/TreeNode";
 import { TreeService } from "../../services/tree.service";
 import { SubTreeComponent } from "../sub-tree/sub-tree.component";
+import { TreeDropHintComponent } from "../tree-drop-hint/tree-drop-hint.component";
 import { TreeNodeComponent } from "../tree-node/tree-node.component";
 
 @Component({
     selector: "mona-tree",
     standalone: true,
-    imports: [SubTreeComponent, TreeNodeComponent, NgTemplateOutlet],
+    imports: [SubTreeComponent, TreeNodeComponent, NgTemplateOutlet, NgStyle, TreeDropHintComponent],
     templateUrl: "./tree.component.html",
     styleUrl: "./tree.component.scss",
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -117,12 +121,12 @@ export class TreeComponent<T> implements OnInit {
 
     private notifyDropPositionChange(event: MouseEvent, nodeElement: Element, node: TreeNode<T>): void {
         const rect = nodeElement.getBoundingClientRect();
-        if (event.clientY > rect.top && event.clientY - rect.top <= 5) {
+        if (event.clientY > rect.top && event.clientY - rect.top <= 8) {
             this.treeService.dropPositionChange$.next({
                 targetNode: node,
                 position: "before"
             });
-        } else if (event.clientY < rect.bottom && rect.bottom - event.clientY <= 5) {
+        } else if (event.clientY < rect.bottom && rect.bottom - event.clientY <= 8) {
             this.treeService.dropPositionChange$.next({
                 targetNode: node,
                 position: "after"

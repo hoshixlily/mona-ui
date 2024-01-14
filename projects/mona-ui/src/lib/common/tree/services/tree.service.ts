@@ -1,7 +1,7 @@
 import { computed, EventEmitter, Injectable, Signal, signal, WritableSignal } from "@angular/core";
 import { toObservable } from "@angular/core/rxjs-interop";
 import { from, ImmutableDictionary, ImmutableSet, List, Selector, sequenceEqual } from "@mirei/ts-collections";
-import { Observable, ReplaySubject, Subject, take } from "rxjs";
+import { BehaviorSubject, Observable, ReplaySubject, Subject, take } from "rxjs";
 import { CheckableOptions } from "../models/CheckableOptions";
 import { DraggableOptions } from "../models/DraggableOptions";
 import { DropPosition, DropPositionChangeEvent } from "../models/DropPositionChangeEvent";
@@ -26,6 +26,7 @@ export class TreeService<T> {
         return this.nodeDictionary()
             .where(n => n.value.parent === null || !this.isAnyParentCollapsed(n.value))
             .select(n => n.value)
+            .orderBy(n => n.index)
             .toImmutableSet();
     });
     private readonly nodeDictionary: Signal<ImmutableDictionary<string, TreeNode<T>>> = computed(() => {
@@ -47,9 +48,8 @@ export class TreeService<T> {
     public readonly draggableOptions: WritableSignal<DraggableOptions> = signal({ enabled: true });
     public readonly dragging: WritableSignal<boolean> = signal(false);
     public readonly dragging$: Observable<boolean> = toObservable(this.dragging);
-    public readonly dropPositionChange$: ReplaySubject<DropPositionChangeEvent<T>> = new ReplaySubject<
-        DropPositionChangeEvent<T>
-    >(1);
+    public readonly dropPositionChange$: BehaviorSubject<DropPositionChangeEvent<T> | null> =
+        new BehaviorSubject<DropPositionChangeEvent<T> | null>(null);
     public readonly expandBy: WritableSignal<string | Selector<T, any> | null> = signal(null);
     public readonly expandableOptions: WritableSignal<ExpandableOptions> = signal({ enabled: false });
     public readonly expandedKeys: WritableSignal<ImmutableSet<any>> = signal(ImmutableSet.create());
@@ -179,8 +179,7 @@ export class TreeService<T> {
                 this.moveNodeAfter(sourceNode, targetNode);
                 break;
         }
-        // this.updateNodeCheckStatus(targetNode);
-        // this.checkedKeys.update(keys => keys.toImmutableSet());
+        this.updateNodeIndices();
     }
 
     public navigate(direction: "next" | "previous"): TreeNode<T> | null {
@@ -210,11 +209,13 @@ export class TreeService<T> {
     public setChildrenSelector(selector: string | Selector<T, Iterable<T>> | Observable<Iterable<T>>): void {
         this.children.set(selector);
         this.nodeSet.set(this.createNodes(this.data()));
+        this.updateNodeIndices();
     }
 
     public setData(data: Iterable<T>): void {
         this.data.set(ImmutableSet.create(data));
         this.nodeSet.set(this.createNodes(data));
+        this.updateNodeIndices();
     }
 
     public setCheckBy(selector: string | Selector<T, any> | null): void {
@@ -571,22 +572,14 @@ export class TreeService<T> {
         }
     }
 
-    public updateNodeCheckStatus(node: TreeNode<T>): void {
-        if (!node.children.isEmpty()) {
-            const allChecked = node.children.all(n => this.isChecked(n));
-            if (allChecked) {
-                const key = this.getCheckKey(node);
-                this.checkedKeys.update(keys => keys.add(key));
+    private updateNodeIndices(): void {
+        const updateRecursively = (nodes: Iterable<TreeNode<T>>, parent: TreeNode<T> | null) => {
+            let index = 0;
+            for (const node of nodes) {
+                node.index = parent == null ? String(index++) : `${parent.index}.${index++}`;
+                updateRecursively(node.children, node);
             }
-        }
-        let parent = node.parent;
-        while (parent) {
-            const allChecked = parent.children.all(n => this.isChecked(n));
-            if (allChecked) {
-                const key = this.getCheckKey(parent);
-                this.checkedKeys.update(keys => keys.add(key));
-            }
-            parent = parent.parent;
-        }
+        };
+        updateRecursively(this.nodeSet(), null);
     }
 }

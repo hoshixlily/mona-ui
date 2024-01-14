@@ -111,6 +111,9 @@ export class SubTreeComponent<T> {
             draggedElement.style.left = `${10}px`;
         }
         this.treeService.dropPositionChange$.pipe(take(1)).subscribe(e => {
+            if (e == null) {
+                return;
+            }
             const nodeDragEvent = new NodeDragEvent(node, e.targetNode, event.event);
             this.treeService.nodeDrag$.next(nodeDragEvent);
         });
@@ -127,6 +130,9 @@ export class SubTreeComponent<T> {
 
     public onNodeDrop(event: CdkDragDrop<TreeNode<T>, unknown, TreeNode<T>>): void {
         this.treeService.dropPositionChange$.pipe(take(1)).subscribe(e => {
+            if (e == null) {
+                return;
+            }
             const sourceNode = event.item.data;
             const targetNode = e.targetNode;
             if (sourceNode === targetNode || e.position === "outside" || targetNode == null) {
@@ -139,12 +145,12 @@ export class SubTreeComponent<T> {
             }
             if (e.position === "inside") {
                 this.treeService.moveNode(sourceNode, targetNode, "inside");
-                console.log("indeterminate", this.treeService.isIndeterminate(targetNode));
             } else if (e.position === "before") {
                 this.treeService.moveNode(sourceNode, targetNode, "before");
             } else if (e.position === "after") {
                 this.treeService.moveNode(sourceNode, targetNode, "after");
             }
+            this.treeService.dropPositionChange$.next(null);
         });
     }
 }
