@@ -7,6 +7,7 @@ import {
     ElementRef,
     EventEmitter,
     inject,
+    Input,
     NgZone,
     OnInit,
     Output
@@ -15,6 +16,7 @@ import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { fromEvent, takeWhile } from "rxjs";
 import { NodeCheckEvent } from "../../models/NodeCheckEvent";
 import { NodeClickEvent } from "../../models/NodeClickEvent";
+import { NodeDragEvent } from "../../models/NodeDragEvent";
 import { NodeDragStartEvent } from "../../models/NodeDragStartEvent";
 import { NodeDropEvent } from "../../models/NodeDropEvent";
 import { NodeSelectEvent } from "../../models/NodeSelectEvent";
@@ -36,11 +38,19 @@ export class TreeComponent<T> implements OnInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     readonly #zone: NgZone = inject(NgZone);
 
+    @Input()
+    public set data(value: Iterable<T>) {
+        this.treeService.setData(value);
+    }
+
     @Output()
     public nodeCheck: EventEmitter<NodeCheckEvent<T>> = new EventEmitter();
 
     @Output()
     public nodeClick: EventEmitter<NodeClickEvent<T>> = new EventEmitter();
+
+    @Output()
+    public nodeDrag: EventEmitter<NodeDragEvent<T>> = new EventEmitter();
 
     @Output()
     public nodeDragEnd: EventEmitter<NodeDragStartEvent<T>> = new EventEmitter();
@@ -119,7 +129,7 @@ export class TreeComponent<T> implements OnInit {
             });
         } else if (event.clientY < rect.top || event.clientY > rect.bottom) {
             this.treeService.dropPositionChange$.next({
-                targetNode: node,
+                targetNode: null,
                 position: "outside"
             });
         } else {
@@ -203,6 +213,12 @@ export class TreeComponent<T> implements OnInit {
             .subscribe(event => this.nodeClick.emit(event));
     }
 
+    private setNodeDragSubscription(): void {
+        this.treeService.nodeDrag$
+            .pipe(takeUntilDestroyed(this.#destroyRef))
+            .subscribe(event => this.nodeDrag.emit(event));
+    }
+
     private setNodeDragEndSubscription(): void {
         this.treeService.nodeDragEnd$
             .pipe(takeUntilDestroyed(this.#destroyRef))
@@ -241,6 +257,7 @@ export class TreeComponent<T> implements OnInit {
         this.setKeydownSubscription();
         this.setNodeCheckSubscription();
         this.setNodeClickSubscription();
+        this.setNodeDragSubscription();
         this.setNodeDragEndSubscription();
         this.setNodeDragHandlerSubscription();
         this.setNodeDragStartSubscription();

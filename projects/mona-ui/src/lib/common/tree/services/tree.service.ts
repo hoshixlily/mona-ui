@@ -9,6 +9,7 @@ import { ExpandableOptions } from "../models/ExpandableOptions";
 import { NodeCheckEvent } from "../models/NodeCheckEvent";
 import { NodeClickEvent } from "../models/NodeClickEvent";
 import { NodeDragEndEvent } from "../models/NodeDragEndEvent";
+import { NodeDragEvent } from "../models/NodeDragEvent";
 import { NodeDragStartEvent } from "../models/NodeDragStartEvent";
 import { NodeDropEvent } from "../models/NodeDropEvent";
 import { NodeSelectEvent } from "../models/NodeSelectEvent";
@@ -57,6 +58,7 @@ export class TreeService<T> {
     public readonly nodeCheck$: Subject<NodeCheckEvent<T>> = new Subject();
     public readonly nodeCheckChange$: Subject<TreeNodeCheckEvent<T>> = new Subject();
     public readonly nodeClick$: Subject<NodeClickEvent<T>> = new Subject();
+    public readonly nodeDrag$: Subject<NodeDragEvent<T>> = new Subject();
     public readonly nodeDragEnd$: Subject<NodeDragEndEvent<T>> = new Subject();
     public readonly nodeDragStart$: Subject<NodeDragStartEvent<T>> = new Subject();
     public readonly nodeDrop$: Subject<NodeDropEvent<T>> = new Subject();

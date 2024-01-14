@@ -25,6 +25,7 @@ import { ImmutableSet } from "@mirei/ts-collections";
 import { take } from "rxjs";
 import { CheckBoxDirective } from "../../../../inputs/check-box/check-box.directive";
 import { NodeDragEndEvent } from "../../models/NodeDragEndEvent";
+import { NodeDragEvent } from "../../models/NodeDragEvent";
 import { NodeDragStartEvent } from "../../models/NodeDragStartEvent";
 import { NodeDropEvent } from "../../models/NodeDropEvent";
 import { TreeNode } from "../../models/TreeNode";
@@ -109,6 +110,10 @@ export class SubTreeComponent<T> {
             draggedElement.style.top = `${10}px`;
             draggedElement.style.left = `${10}px`;
         }
+        this.treeService.dropPositionChange$.pipe(take(1)).subscribe(e => {
+            const nodeDragEvent = new NodeDragEvent(node, e.targetNode, event.event);
+            this.treeService.nodeDrag$.next(nodeDragEvent);
+        });
     }
 
     public onNodeDragStart(event: CdkDragStart<TreeNode<T>>): void {

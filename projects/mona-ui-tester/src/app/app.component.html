@@ -10,7 +10,7 @@
                                     filterPlaceholder="Search..."
                                     [filter]="treeFilter()"
                                     (filterChange)="onTreeFilterChange($event)"
-                                    (nodeDrag)="onTreeNodeDrag($event)"
+
 
                                     monaTreeViewDisable [disabledKeys]="treeDisabledKeys"
                     >
@@ -45,6 +45,7 @@
                             monaTreeExpandable
                             [expandedKeys]="treeExpandedKeys"
                             (nodeSelect)="onTreeNodeSelect($event)"
+                            (nodeDrag)="onTreeNodeDrag($event)"
                             (nodeDragStart)="onTreeNodeDragStart($event)"
                             (nodeDragEnd)="onTreeNodeDragEnd($event)"
                             (nodeDrop)="onTreeNodeDrop($event)"

@@ -1297,8 +1297,8 @@ export class AppComponent implements OnInit {
         event.preventDefault();
     }
 
-    public onTreeNodeDrag(event: NodeDragEvent): void {
-        // console.log(event);
+    public onTreeNodeDrag(event: NodeDragEvent<any>): void {
+        console.log(event);
         // event.preventDefault();
     }
 
