@@ -165,11 +165,13 @@ import {
     ListViewPageableDirective,
     TreeService,
     TreeComponent,
+    TreeDisableDirective,
     TreeSelectableDirective,
     TreeCheckableDirective,
     NodeSelectEvent,
     NodeCheckEvent,
-    TreeExpandableDirective
+    TreeExpandableDirective,
+    TreeNodeTemplateDirective
 } from "mona-ui";
 import { v4 } from "uuid";
 import { ListViewNoDataTemplateDirective } from "../../../mona-ui/src/lib/list-view/directives/list-view-no-data-template.directive";
@@ -338,7 +340,8 @@ interface TreeNodeDataItem {
         TreeComponent,
         TreeCheckableDirective,
         TreeExpandableDirective,
-        TreeSelectableDirective
+        TreeSelectableDirective,
+        TreeNodeTemplateDirective
     ],
     // providers: [ListService],
     providers: [TreeService]
@@ -758,7 +761,7 @@ export class AppComponent implements OnInit {
             ]
         }
     ];
-    public treeDataRandom: any[] = this.generateRandomTreeData(10);
+    public treeDataRandom: any[] = this.generateRandomTreeData(50);
     public treeFilter: WritableSignal<string> = signal("Apple");
 
     public dropdownTreeDisabler: (item: any) => boolean = (item: any) => item.text.toLowerCase().startsWith("c");
@@ -987,6 +990,10 @@ export class AppComponent implements OnInit {
             checkChildren: true,
             checkParents: true
         });
+
+        this.treeService.setDisableOptions({ enabled: true, disableChildren: true });
+        this.treeService.setDisabledKeys(["1-1-1", "1-4-2", "1-3"]);
+        this.treeService.setDisableBy(i => i.id);
 
         // window.setInterval(() => {
         //     this.treeService.setData(this.generateRandomTreeData(10));
@@ -1298,24 +1305,24 @@ export class AppComponent implements OnInit {
     }
 
     public onTreeNodeDrag(event: NodeDragEvent<any>): void {
-        console.log(event);
+        // console.log(event);
         // event.preventDefault();
     }
 
     public onTreeNodeDragEnd(event: NodeDragEndEvent<any>): void {
-        console.log(event);
+        // console.log(event);
     }
 
     public onTreeNodeDragStart(event: NodeDragStartEvent<any>): void {
         // event.preventDefault();
-        console.log(event);
+        // console.log(event);
     }
 
     public onTreeNodeDrop(event: NodeDropEvent<any>): void {
-        console.log(event);
-        if (event.targetNodeItem?.data.text.startsWith("A") && event.position === "inside") {
-            event.preventDefault();
-        }
+        // console.log(event);
+        // if (event.targetNodeItem?.data.text.startsWith("A") && event.position === "inside") {
+        //     event.preventDefault();
+        // }
     }
 
     public onTreeNodeSelect(event: NodeSelectEvent<any>): void {

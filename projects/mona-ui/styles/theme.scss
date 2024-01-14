@@ -210,11 +210,11 @@ div.mona-tree {
 
 div.mona-tree-node {
     padding: 4px 8px;
-    &:hover:not(.mona-disabled) {
+    &:hover:not(.mona-disabled):not(.mona-selected) {
         box-shadow: inset 0 0 0 1px var(--mona-border-color-dark);
         background-color: var(--mona-background-hover-darker);
     }
-    &:active:not(.mona-disabled) {
+    &:active:not(.mona-disabled):not(.mona-selected) {
         background-color: var(--mona-background-active-darker);
         box-shadow: inset 0 0 0 1px var(--mona-border-color-dark);
     }

@@ -1,4 +1,4 @@
-import { computed, EventEmitter, Injectable, Signal, signal, WritableSignal } from "@angular/core";
+import { computed, EventEmitter, Injectable, Signal, signal, TemplateRef, WritableSignal } from "@angular/core";
 import { toObservable } from "@angular/core/rxjs-interop";
 import { from, ImmutableDictionary, ImmutableSet, List, Selector, sequenceEqual } from "@mirei/ts-collections";
 import { BehaviorSubject, Observable, ReplaySubject, Subject, take } from "rxjs";
@@ -13,6 +13,7 @@ import { NodeDragEndEvent } from "../models/NodeDragEndEvent";
 import { NodeDragEvent } from "../models/NodeDragEvent";
 import { NodeDragStartEvent } from "../models/NodeDragStartEvent";
 import { NodeDropEvent } from "../models/NodeDropEvent";
+import { NodeItem } from "../models/NodeItem";
 import { NodeSelectEvent } from "../models/NodeSelectEvent";
 import { SelectableOptions } from "../models/SelectableOptions";
 import { TreeNode } from "../models/TreeNode";
@@ -73,6 +74,7 @@ export class TreeService<T> {
     public readonly nodeSelect$: Subject<NodeSelectEvent<T>> = new Subject();
     public readonly nodeSelectChange$: Subject<TreeNodeSelectEvent<T>> = new Subject();
     public readonly nodeSet: WritableSignal<ImmutableSet<TreeNode<T>>> = signal(ImmutableSet.create());
+    public readonly nodeTemplate: WritableSignal<TemplateRef<any> | null> = signal(null);
     public readonly selectBy: WritableSignal<string | Selector<T, any> | null> = signal(null);
     public readonly selectableOptions: WritableSignal<SelectableOptions> = signal({
         childrenOnly: false,

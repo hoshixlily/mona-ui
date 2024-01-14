@@ -36,6 +36,7 @@
                     <button monaButton (click)="treeService.navigate('previous')">Previous</button>
                     <button monaButton (click)="treeService.navigate('next')">Next</button>
                     <mona-tree
+                            [data]="treeData"
                             monaTreeCheckable
                             [checkedKeys]="treeCheckedKeys"
                             (checkedKeysChange)="onTreeCheckedKeysChange($event)"
@@ -50,7 +51,15 @@
                             (nodeDragEnd)="onTreeNodeDragEnd($event)"
                             (nodeDrop)="onTreeNodeDrop($event)"
                             (nodeCheck)="onTreeNodeCheck($event)"
-                            (nodeClick)="onTreeNodeClick($event)"></mona-tree>
+                            (nodeClick)="onTreeNodeClick($event)">
+                        <ng-template monaTreeNodeTemplate let-item>
+                            @if (item.text.startsWith('C')) {
+                                <span style="color: #F03193;">{{item?.text}}</span>
+                            } @else {
+                                <span style="color: #00a86b;">{{item?.text}}</span>
+                            }
+                        </ng-template>
+                    </mona-tree>
                 </mona-splitter-pane>
             </mona-splitter>
         </mona-splitter-pane>

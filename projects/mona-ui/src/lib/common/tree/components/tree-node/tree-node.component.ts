@@ -1,8 +1,10 @@
+import { NgTemplateOutlet } from "@angular/common";
 import { Component, computed, DestroyRef, inject, Input, Signal, signal, WritableSignal } from "@angular/core";
 import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
 import { map, startWith, Subject, withLatestFrom } from "rxjs";
 import { NodeCheckEvent } from "../../models/NodeCheckEvent";
 import { NodeClickEvent } from "../../models/NodeClickEvent";
+import { NodeItem } from "../../models/NodeItem";
 import { NodeSelectEvent } from "../../models/NodeSelectEvent";
 import { TreeNode } from "../../models/TreeNode";
 import { TreeService } from "../../services/tree.service";
@@ -10,7 +12,7 @@ import { TreeService } from "../../services/tree.service";
 @Component({
     selector: "mona-tree-node",
     standalone: true,
-    imports: [],
+    imports: [NgTemplateOutlet],
     templateUrl: "./tree-node.component.html",
     styleUrl: "./tree-node.component.scss"
 })
@@ -20,6 +22,9 @@ export class TreeNodeComponent<T> {
         initialValue: false
     });
     protected readonly treeNode: WritableSignal<TreeNode<T> | null> = signal(null);
+    protected readonly treeNodeItem: Signal<NodeItem<T> | null> = computed(() => {
+        return this.treeNode()?.nodeItem ?? null;
+    });
     public readonly checkable: Signal<boolean> = computed(() => {
         const node = this.treeNode();
         if (node === null) {

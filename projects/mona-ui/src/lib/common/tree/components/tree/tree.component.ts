@@ -4,6 +4,7 @@ import {
     ChangeDetectionStrategy,
     Component,
     computed,
+    ContentChild,
     DestroyRef,
     ElementRef,
     EventEmitter,
@@ -12,16 +13,19 @@ import {
     NgZone,
     OnInit,
     Output,
-    Signal
+    Signal,
+    TemplateRef
 } from "@angular/core";
 import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
 import { fromEvent, takeWhile } from "rxjs";
+import { TreeNodeTemplateDirective } from "../../directives/tree-node-template.directive";
 import { DropPositionChangeEvent } from "../../models/DropPositionChangeEvent";
 import { NodeCheckEvent } from "../../models/NodeCheckEvent";
 import { NodeClickEvent } from "../../models/NodeClickEvent";
 import { NodeDragEvent } from "../../models/NodeDragEvent";
 import { NodeDragStartEvent } from "../../models/NodeDragStartEvent";
 import { NodeDropEvent } from "../../models/NodeDropEvent";
+import { NodeItem } from "../../models/NodeItem";
 import { NodeSelectEvent } from "../../models/NodeSelectEvent";
 import { TreeNode } from "../../models/TreeNode";
 import { TreeService } from "../../services/tree.service";
@@ -64,6 +68,11 @@ export class TreeComponent<T> implements OnInit {
 
     @Output()
     public nodeDrop: EventEmitter<NodeDropEvent<T>> = new EventEmitter();
+
+    @ContentChild(TreeNodeTemplateDirective, { read: TemplateRef })
+    public set nodeTemplate(value: TemplateRef<NodeItem<T>>) {
+        this.treeService.nodeTemplate.set(value);
+    }
 
     @Output()
     public nodeSelect: EventEmitter<NodeSelectEvent<T>> = new EventEmitter();
