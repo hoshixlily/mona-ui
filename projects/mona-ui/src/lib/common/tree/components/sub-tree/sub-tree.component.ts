@@ -120,7 +120,12 @@ export class SubTreeComponent<T> {
     }
 
     public onNodeDragStart(event: CdkDragStart<TreeNode<T>>): void {
-        const nodeDragStartEvent = new NodeDragStartEvent(event.source.data, event.event);
+        const node = event.source.data;
+        if (this.treeService.isDisabled(node)) {
+            event.event.stopPropagation();
+            return;
+        }
+        const nodeDragStartEvent = new NodeDragStartEvent(node, event.event);
         this.treeService.nodeDragStart$.next(nodeDragStartEvent);
         if (nodeDragStartEvent.isDefaultPrevented()) {
             return;

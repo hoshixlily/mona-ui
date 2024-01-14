@@ -178,6 +178,9 @@ export class TreeComponent<T> implements OnInit {
                     if (!navigatedNode) {
                         return;
                     }
+                    if (this.treeService.isDisabled(navigatedNode)) {
+                        return;
+                    }
                     const nodeCheckEvent = new NodeCheckEvent(navigatedNode, event);
                     this.treeService.nodeCheck$.next(nodeCheckEvent);
                     if (!nodeCheckEvent.isDefaultPrevented()) {
@@ -190,6 +193,9 @@ export class TreeComponent<T> implements OnInit {
                     }
                 } else if (event.key === "Enter") {
                     if (!navigatedNode) {
+                        return;
+                    }
+                    if (this.treeService.isDisabled(navigatedNode)) {
                         return;
                     }
                     const nodeSelectEvent = new NodeSelectEvent(navigatedNode, event);

@@ -210,11 +210,11 @@ div.mona-tree {
 
 div.mona-tree-node {
     padding: 4px 8px;
-    &:hover {
+    &:hover:not(.mona-disabled) {
         box-shadow: inset 0 0 0 1px var(--mona-border-color-dark);
         background-color: var(--mona-background-hover-darker);
     }
-    &:active {
+    &:active:not(.mona-disabled) {
         background-color: var(--mona-background-active-darker);
         box-shadow: inset 0 0 0 1px var(--mona-border-color-dark);
     }
@@ -225,6 +225,10 @@ div.mona-tree-node {
     }
     &.mona-highlighted {
         box-shadow: inset 0 0 0 1px var(--mona-focus-border-color);
+    }
+    &.mona-disabled {
+        @include disabled;
+        pointer-events: auto; // for drag and drop
     }
 }
 

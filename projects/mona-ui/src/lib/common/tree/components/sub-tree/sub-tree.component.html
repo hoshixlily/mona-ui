@@ -23,6 +23,7 @@
                 @if (nodeComponent.checkable()) {
                     <input type="checkbox"
                            id="mona-tree-node-checkbox-{{node.uid}}"
+                           [disabled]="nodeComponent.disabled()"
                            [indeterminate]="nodeComponent.indeterminate()"
                            [ngModel]="nodeComponent.checked()"
                            (click)="nodeComponent.checkboxClick$.next($event)"
@@ -41,8 +42,9 @@
                     ></mona-sub-tree>
                 </div>
             }
-            <ng-template cdkDragPreview [data]="node">
-                <div class="mona-tree-node-dragging">
+            @if (!nodeComponent.disabled()) {
+                <ng-template cdkDragPreview [data]="node">
+                    <div class="mona-tree-node-dragging">
                     <span>
                         @if ((treeService.dropPositionChange$|async)?.position === 'before') {
                             <fa-icon [icon]="dropBeforeIcon"></fa-icon>
@@ -54,9 +56,12 @@
                             <fa-icon [icon]="dropNotAllowIcon"></fa-icon>
                         }
                     </span>
-                    <span>{{nodeComponent.nodeText()}}</span>
-                </div>
-            </ng-template>
+                        <span>{{nodeComponent.nodeText()}}</span>
+                    </div>
+                </ng-template>
+            } @else {
+                <ng-template cdkDragPreview></ng-template>
+            }
         </li>
     }
 </ul>

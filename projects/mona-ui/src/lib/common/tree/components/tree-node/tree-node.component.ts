@@ -37,6 +37,13 @@ export class TreeNodeComponent<T> {
         }
         return this.treeService.isChecked(node);
     });
+    public readonly disabled: Signal<boolean> = computed(() => {
+        const node = this.treeNode();
+        if (node === null) {
+            return false;
+        }
+        return this.treeService.isDisabled(node);
+    });
     public readonly expanded: Signal<boolean> = computed(() => {
         const node = this.treeNode();
         if (node === null) {
@@ -97,6 +104,9 @@ export class TreeNodeComponent<T> {
     public onNodeClick(event: MouseEvent): void {
         const node = this.treeNode();
         if (node === null) {
+            return;
+        }
+        if (this.treeService.isDisabled(node)) {
             return;
         }
         const nodeClickEvent = this.notifyNodeClick(event);

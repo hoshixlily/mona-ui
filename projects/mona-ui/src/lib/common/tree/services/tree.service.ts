@@ -3,6 +3,7 @@ import { toObservable } from "@angular/core/rxjs-interop";
 import { from, ImmutableDictionary, ImmutableSet, List, Selector, sequenceEqual } from "@mirei/ts-collections";
 import { BehaviorSubject, Observable, ReplaySubject, Subject, take } from "rxjs";
 import { CheckableOptions } from "../models/CheckableOptions";
+import { DisableOptions } from "../models/DisableOptions";
 import { DraggableOptions } from "../models/DraggableOptions";
 import { DropPosition, DropPositionChangeEvent } from "../models/DropPositionChangeEvent";
 import { ExpandableOptions } from "../models/ExpandableOptions";
@@ -45,6 +46,12 @@ export class TreeService<T> {
     public readonly checkedKeys: WritableSignal<ImmutableSet<any>> = signal(ImmutableSet.create());
     public readonly checkedKeys$: Observable<ImmutableSet<any>> = toObservable(this.checkedKeys);
     public readonly children: WritableSignal<string | Selector<T, Iterable<T>> | Observable<Iterable<T>>> = signal("");
+    public readonly disableBy: WritableSignal<string | Selector<T, any> | null> = signal(null);
+    public readonly disableOptions: WritableSignal<DisableOptions> = signal({
+        disableChildren: true,
+        enabled: false
+    });
+    public readonly disabledKeys: WritableSignal<ImmutableSet<any>> = signal(ImmutableSet.create());
     public readonly draggableOptions: WritableSignal<DraggableOptions> = signal({ enabled: true });
     public readonly dragging: WritableSignal<boolean> = signal(false);
     public readonly dragging$: Observable<boolean> = toObservable(this.dragging);
@@ -124,6 +131,20 @@ export class TreeService<T> {
         }
         const key = this.getCheckKey(node);
         return this.checkedKeys().contains(key);
+    }
+
+    public isDisabled(node: TreeNode<T>): boolean {
+        const disableOptions = this.disableOptions();
+        if (!disableOptions.enabled) {
+            return false;
+        }
+        const key = this.getDisableKey(node);
+        const disabled = this.disabledKeys().contains(key);
+        if (!disableOptions.disableChildren) {
+            return disabled;
+        }
+        const anyParentDisabled = this.isAnyParentDisabled(node);
+        return disabled || (disableOptions.disableChildren && anyParentDisabled);
     }
 
     public isExpanded(node: TreeNode<T>): boolean {
@@ -212,12 +233,6 @@ export class TreeService<T> {
         this.updateNodeIndices();
     }
 
-    public setData(data: Iterable<T>): void {
-        this.data.set(ImmutableSet.create(data));
-        this.nodeSet.set(this.createNodes(data));
-        this.updateNodeIndices();
-    }
-
     public setCheckBy(selector: string | Selector<T, any> | null): void {
         this.checkBy.set(selector);
     }
@@ -233,6 +248,29 @@ export class TreeService<T> {
             return;
         }
         this.checkedKeys.set(ImmutableSet.create(keys));
+    }
+
+    public setData(data: Iterable<T>): void {
+        this.data.set(ImmutableSet.create(data));
+        this.nodeSet.set(this.createNodes(data));
+        this.updateNodeIndices();
+    }
+
+    public setDisableBy(selector: string | Selector<T, any> | null): void {
+        this.disableBy.set(selector);
+    }
+
+    public setDisableOptions(options: Partial<DisableOptions>): void {
+        this.disableOptions.update(o => ({ ...o, ...options }));
+    }
+
+    public setDisabledKeys(keys: Iterable<any>): void {
+        const disabledKeys = this.disabledKeys().orderBy(k => k);
+        const orderedKeys = from(keys).orderBy(k => k);
+        if (sequenceEqual(disabledKeys, orderedKeys)) {
+            return;
+        }
+        this.disabledKeys.set(ImmutableSet.create(keys));
     }
 
     public setExpandBy(selector: string | Selector<T, any> | null): void {
@@ -419,6 +457,17 @@ export class TreeService<T> {
         return checkBy(node.data);
     }
 
+    public getDisableKey(node: TreeNode<T>): any {
+        const disableBy = this.disableBy();
+        if (!disableBy) {
+            return node.data;
+        }
+        if (typeof disableBy === "string") {
+            return (node.data as any)[disableBy];
+        }
+        return disableBy(node.data);
+    }
+
     private getExpandKey(node: TreeNode<T>): any {
         const expandBy = this.expandBy();
         if (!expandBy) {
@@ -459,6 +508,13 @@ export class TreeService<T> {
     private isAnyParentCollapsed(node: TreeNode<T>): boolean {
         if (node.parent) {
             return !this.isExpanded(node.parent) || this.isAnyParentCollapsed(node.parent);
+        }
+        return false;
+    }
+
+    private isAnyParentDisabled(node: TreeNode<T>): boolean {
+        if (node.parent) {
+            return this.isDisabled(node.parent) || this.isAnyParentDisabled(node.parent);
         }
         return false;
     }
@@ -528,7 +584,7 @@ export class TreeService<T> {
     }
 
     private moveNodeInside(sourceNode: TreeNode<T>, targetNode: TreeNode<T>): void {
-        if (sourceNode.parent === targetNode) {
+        if (sourceNode.parent === targetNode || this.isDisabled(targetNode)) {
             return;
         }
         if (sourceNode.parent) {

@@ -11,7 +11,8 @@
         (cdkDropListDropped)="onNodeDrop($event)">
         <ng-template #treeTemplate let-nodes>
             <ng-container *ngFor="let node of nodes; let nx = index; trackBy:nodeTrackBy;">
-                <li class="mona-tree-list-item" cdkDrag [cdkDragData]="node" (cdkDragStarted)="onNodeDragStart($event)"
+                <li class="mona-tree-list-item"
+                    cdkDrag [cdkDragData]="node" (cdkDragStarted)="onNodeDragStart($event)"
                     (cdkDragEnded)="onNodeDragEnd($event)" (cdkDragMoved)="onNodeDragMove($event, node)">
                     <mona-tree-view-node [node]="node" [nodeTextTemplate]="nodeTextTemplate" [dragging]="dragging"
                                          (dropPositionChange)="onNodeDropPositionChange($event)"

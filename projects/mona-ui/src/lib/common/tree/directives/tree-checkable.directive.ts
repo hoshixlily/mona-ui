@@ -6,7 +6,7 @@ import { CheckableOptions } from "../models/CheckableOptions";
 import { TreeService } from "../services/tree.service";
 
 @Directive({
-    selector: "[monaTreeCheckable]",
+    selector: "mona-tree[monaTreeCheckable]",
     standalone: true
 })
 export class TreeCheckableDirective<T> implements OnInit {
