@@ -232,6 +232,12 @@ div.mona-tree-node {
     }
 }
 
+div.mona-tree-node-expander {
+    &.mona-disabled {
+        @include disabled;
+    }
+}
+
 span.mona-tree-node-text {
     color: var(--mona-text);
 }

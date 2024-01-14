@@ -12,6 +12,7 @@
             <div class="mona-tree-node-container">
                 @if (treeService.expandableOptions().enabled && node.children.length > 0) {
                     <div class="mona-tree-node-expander"
+                         [class.mona-disabled]="nodeComponent.disabled()"
                          (click)="onExpandStateChange(node, !nodeComponent.expanded())">
                         @if (nodeComponent.expanded()) {
                             <fa-icon [icon]="expandedIcon"></fa-icon>
