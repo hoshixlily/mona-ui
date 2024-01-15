@@ -3,6 +3,8 @@
     @for (node of nodeSet(); track node.uid) {
         <li [style.padding-left.px]="nodeComponent.paddingLeft()"
             [attr.data-uid]="node.uid"
+            [tabindex]="0"
+            (focus)="treeService.navigatedNode.set(node)"
             cdkDrag
             [cdkDragData]="node"
             [cdkDragDisabled]="!treeService.draggableOptions().enabled"

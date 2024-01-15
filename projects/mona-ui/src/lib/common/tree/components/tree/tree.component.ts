@@ -1,9 +1,10 @@
 import { transition, trigger } from "@angular/animations";
+import { FocusMonitor } from "@angular/cdk/a11y";
 import { NgStyle, NgTemplateOutlet } from "@angular/common";
 import {
     ChangeDetectionStrategy,
+    ChangeDetectorRef,
     Component,
-    computed,
     ContentChild,
     DestroyRef,
     ElementRef,
@@ -13,13 +14,11 @@ import {
     NgZone,
     OnInit,
     Output,
-    Signal,
     TemplateRef
 } from "@angular/core";
-import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
-import { fromEvent, takeWhile } from "rxjs";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { asapScheduler, fromEvent, takeWhile } from "rxjs";
 import { TreeNodeTemplateDirective } from "../../directives/tree-node-template.directive";
-import { DropPositionChangeEvent } from "../../models/DropPositionChangeEvent";
 import { NodeCheckEvent } from "../../models/NodeCheckEvent";
 import { NodeClickEvent } from "../../models/NodeClickEvent";
 import { NodeDragEvent } from "../../models/NodeDragEvent";
@@ -44,6 +43,7 @@ import { TreeNodeComponent } from "../tree-node/tree-node.component";
 })
 export class TreeComponent<T> implements OnInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
+    readonly #cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
     readonly #zone: NgZone = inject(NgZone);
 
     @Input()
@@ -79,6 +79,7 @@ export class TreeComponent<T> implements OnInit {
 
     public constructor(
         private readonly elementRef: ElementRef<HTMLElement>,
+        private readonly focusMonitor: FocusMonitor,
         protected readonly treeService: TreeService<T>
     ) {}
 
@@ -154,15 +155,16 @@ export class TreeComponent<T> implements OnInit {
     }
 
     private setFocusSubscription(): void {
-        fromEvent<FocusEvent>(this.elementRef.nativeElement, "focusin")
+        this.focusMonitor
+            .monitor(this.elementRef.nativeElement, true)
             .pipe(takeUntilDestroyed(this.#destroyRef))
-            .subscribe(event => {
-                this.treeService.navigatedNode.set(this.treeService.nodeSet().firstOrDefault());
-            });
-        fromEvent<FocusEvent>(this.elementRef.nativeElement, "focusout")
-            .pipe(takeUntilDestroyed(this.#destroyRef))
-            .subscribe(event => {
-                this.treeService.navigatedNode.set(null);
+            .subscribe(origin => {
+                if (origin) {
+                    return;
+                }
+                asapScheduler.schedule(() => {
+                    this.treeService.navigatedNode.set(null);
+                });
             });
     }
 
@@ -176,18 +178,25 @@ export class TreeComponent<T> implements OnInit {
                 } else if (event.key === "ArrowDown") {
                     this.treeService.navigate("next");
                 } else if (event.key === "ArrowLeft") {
-                    if (navigatedNode && this.treeService.isExpanded(navigatedNode)) {
-                        this.treeService.setNodeExpand(navigatedNode, false);
-                    }
-                } else if (event.key === "ArrowRight") {
-                    if (navigatedNode && !this.treeService.isExpanded(navigatedNode)) {
-                        this.treeService.setNodeExpand(navigatedNode, true);
-                    }
-                } else if (event.key === " ") {
                     if (!navigatedNode) {
                         return;
                     }
-                    if (this.treeService.isDisabled(navigatedNode)) {
+                    const expanded = this.treeService.isExpanded(navigatedNode);
+                    const disabled = this.treeService.isDisabled(navigatedNode);
+                    if (!disabled && expanded) {
+                        this.treeService.setNodeExpand(navigatedNode, false);
+                    }
+                } else if (event.key === "ArrowRight") {
+                    if (!navigatedNode) {
+                        return;
+                    }
+                    const expanded = this.treeService.isExpanded(navigatedNode);
+                    const disabled = this.treeService.isDisabled(navigatedNode);
+                    if (!disabled && !expanded) {
+                        this.treeService.setNodeExpand(navigatedNode, true);
+                    }
+                } else if (event.key === " ") {
+                    if (!navigatedNode || this.treeService.isDisabled(navigatedNode)) {
                         return;
                     }
                     const nodeCheckEvent = new NodeCheckEvent(navigatedNode, event);
@@ -201,10 +210,7 @@ export class TreeComponent<T> implements OnInit {
                         });
                     }
                 } else if (event.key === "Enter") {
-                    if (!navigatedNode) {
-                        return;
-                    }
-                    if (this.treeService.isDisabled(navigatedNode)) {
+                    if (!navigatedNode || this.treeService.isDisabled(navigatedNode)) {
                         return;
                     }
                     const nodeSelectEvent = new NodeSelectEvent(navigatedNode, event);

@@ -52,12 +52,17 @@
                             (nodeDrop)="onTreeNodeDrop($event)"
                             (nodeCheck)="onTreeNodeCheck($event)"
                             (nodeClick)="onTreeNodeClick($event)">
-                        <ng-template monaTreeNodeTemplate let-item>
+                        <ng-template monaTreeNodeTemplate let-item let-element="element">
                             @if (item.text.startsWith('C')) {
                                 <span style="color: #F03193;">{{item?.text}}</span>
                             } @else {
-                                <span style="color: #00a86b;">{{item?.text}}</span>
+                                <span style="color: #ffcc75;">{{item?.text}}</span>
                             }
+                            <mona-contextmenu [target]="element" trigger="contextmenu">
+                                <mona-menu-item text="Print" (menuClick)="print(item)"></mona-menu-item>
+                                <mona-menu-item text="Noop"></mona-menu-item>
+                                <mona-menu-item text="Refresh" (menuClick)="updateTreeData()"></mona-menu-item>
+                            </mona-contextmenu>
                         </ng-template>
                     </mona-tree>
                 </mona-splitter-pane>

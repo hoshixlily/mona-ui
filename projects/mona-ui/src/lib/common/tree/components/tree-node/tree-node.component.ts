@@ -1,5 +1,5 @@
 import { NgTemplateOutlet } from "@angular/common";
-import { Component, computed, DestroyRef, inject, Input, Signal, signal, WritableSignal } from "@angular/core";
+import { Component, computed, DestroyRef, inject, Input, OnInit, Signal, signal, WritableSignal } from "@angular/core";
 import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
 import { map, startWith, Subject, withLatestFrom } from "rxjs";
 import { NodeCheckEvent } from "../../models/NodeCheckEvent";
@@ -16,7 +16,7 @@ import { TreeService } from "../../services/tree.service";
     templateUrl: "./tree-node.component.html",
     styleUrl: "./tree-node.component.scss"
 })
-export class TreeNodeComponent<T> {
+export class TreeNodeComponent<T> implements OnInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     readonly #dragging: Signal<boolean> = toSignal(this.treeService.dragging$, {
         initialValue: false
@@ -69,7 +69,11 @@ export class TreeNodeComponent<T> {
         if (node === null) {
             return false;
         }
-        return this.treeService.isNavigated(node);
+        const nv = this.treeService.isNavigated(node);
+        if ((this.treeNode()?.data as any).text === "Root") {
+            console.log("navigated", nv);
+        }
+        return nv;
     });
     public readonly nodeText: Signal<string> = computed(() => {
         const node = this.treeNode();
@@ -114,6 +118,10 @@ export class TreeNodeComponent<T> {
         if (this.treeService.isDisabled(node)) {
             return;
         }
+        if (event.type === "contextmenu") {
+            event.preventDefault();
+            return;
+        }
         const nodeClickEvent = this.notifyNodeClick(event);
         if (nodeClickEvent.isDefaultPrevented()) {
             return;
@@ -125,6 +133,17 @@ export class TreeNodeComponent<T> {
         }
         this.treeService.setNodeSelect(node, !this.selected());
         this.treeService.nodeSelectChange$.next({ node, selected: !this.selected() });
+    }
+
+    public onNodeContextMenu(event: MouseEvent): void {
+        const node = this.treeNode();
+        if (node === null) {
+            return;
+        }
+        if (this.treeService.isDisabled(node)) {
+            return;
+        }
+        this.treeService.navigatedNode.set(node);
     }
 
     private notifyNodeClick(event: MouseEvent): NodeClickEvent<T> {

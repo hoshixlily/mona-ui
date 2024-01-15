@@ -39,6 +39,7 @@ export class TreeService<T> {
     public readonly checkBy: WritableSignal<string | Selector<T, any> | null> = signal(null);
     public readonly checkableOptions: WritableSignal<CheckableOptions> = signal({
         checkChildren: true,
+        checkDisabledChildren: false,
         checkParents: true,
         childrenOnly: false,
         enabled: false,
@@ -300,6 +301,7 @@ export class TreeService<T> {
         const checkParents = checkableOptions.checkParents;
         const checkChildren = checkableOptions.checkChildren;
         const childrenOnly = checkableOptions.childrenOnly;
+        const checkDisabledChildren = checkableOptions.checkDisabledChildren;
         const mode = checkableOptions.mode;
         const key = this.getCheckKey(node);
 
@@ -317,11 +319,13 @@ export class TreeService<T> {
         if (checkChildren) {
             const childNodes = this.getChildNodes(node);
             childNodes.forEach(n => {
-                const childKey = this.getCheckKey(n);
-                if (checked) {
-                    checkedKeys.add(childKey);
-                } else {
-                    checkedKeys.remove(childKey);
+                if (checkDisabledChildren || !this.isDisabled(n)) {
+                    const childKey = this.getCheckKey(n);
+                    if (checked) {
+                        checkedKeys.add(childKey);
+                    } else {
+                        checkedKeys.remove(childKey);
+                    }
                 }
             });
         }

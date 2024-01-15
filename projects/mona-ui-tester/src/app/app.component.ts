@@ -988,6 +988,7 @@ export class AppComponent implements OnInit {
             mode: "multiple",
             childrenOnly: false,
             checkChildren: true,
+            checkDisabledChildren: false,
             checkParents: true
         });
 
