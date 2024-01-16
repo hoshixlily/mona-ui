@@ -171,7 +171,8 @@ import {
     NodeSelectEvent,
     NodeCheckEvent,
     TreeExpandableDirective,
-    TreeNodeTemplateDirective
+    TreeNodeTemplateDirective,
+    TreeFilterableDirective
 } from "mona-ui";
 import { v4 } from "uuid";
 import { ListViewNoDataTemplateDirective } from "../../../mona-ui/src/lib/list-view/directives/list-view-no-data-template.directive";
@@ -340,6 +341,7 @@ interface TreeNodeDataItem {
         TreeComponent,
         TreeCheckableDirective,
         TreeExpandableDirective,
+        TreeFilterableDirective,
         TreeSelectableDirective,
         TreeNodeTemplateDirective
     ],

@@ -2,7 +2,7 @@ import { computed, EventEmitter, Injectable, Signal, signal, WritableSignal } fr
 import { from, IEnumerable, ImmutableList, ImmutableSet, Predicate, Selector } from "@mirei/ts-collections";
 import { ReplaySubject } from "rxjs";
 import { FilterChangeEvent } from "../../filter-input/models/FilterChangeEvent";
-import { FilterableOptions } from "../models/FilterableOptions";
+import { FilterableOptions } from "../../models/FilterableOptions";
 import { GroupableOptions } from "../models/GroupableOptions";
 import { ListItem } from "../models/ListItem";
 import { NavigableOptions } from "../models/NavigableOptions";

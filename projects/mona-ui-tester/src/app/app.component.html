@@ -43,6 +43,7 @@
                             [monaTreeSelectable]="{ enabled: true, mode: 'multiple', childrenOnly: true, }"
                             [selectedKeys]="treeSelectedKeys"
                             (selectedKeysChange)="onTreeSelectedKeysChange($event)"
+                            [monaTreeFilterable]="{debounce: 0}"
                             monaTreeExpandable
                             [expandedKeys]="treeExpandedKeys"
                             (nodeSelect)="onTreeNodeSelect($event)"

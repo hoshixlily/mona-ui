@@ -1,22 +1,23 @@
 import { Directive, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { FilterChangeEvent } from "../../filter-input/models/FilterChangeEvent";
 import { FilterableOptions } from "../../models/FilterableOptions";
-import { ListService } from "../services/list.service";
+import { TreeService } from "../services/tree.service";
 
 @Directive({
-    selector: "mona-list[monaListFilterable]",
+    selector: "mona-tree[monaTreeFilterable]",
     standalone: true
 })
-export class ListFilterableDirective<TData> implements OnInit {
+export class TreeFilterableDirective<T> implements OnInit {
     readonly #defaultOptions: FilterableOptions = {
         enabled: true,
         operator: "contains",
-        debounce: 0,
-        caseSensitive: false
+        caseSensitive: false,
+        debounce: 0
     };
+
     @Input()
     public set filter(value: string) {
-        this.listService.setFilter(value);
+        this.treeService.filter$.next(value);
     }
 
     @Output()
@@ -24,24 +25,24 @@ export class ListFilterableDirective<TData> implements OnInit {
 
     @Input()
     public set filterPlaceholder(value: string) {
-        this.listService.setFilterPlaceholder(value);
+        this.treeService.filterPlaceholder.set(value);
     }
 
-    @Input("monaListFilterable")
+    @Input("monaTreeFilterable")
     public set options(value: Partial<FilterableOptions> | "") {
         if (value === "") {
-            this.listService.setFilterableOptions(this.#defaultOptions);
+            this.treeService.setFilterableOptions(this.#defaultOptions);
         } else {
-            this.listService.setFilterableOptions({
+            this.treeService.setFilterableOptions({
                 ...this.#defaultOptions,
                 ...value
             });
         }
     }
 
-    public constructor(private readonly listService: ListService<TData>) {}
+    public constructor(private readonly treeService: TreeService<T>) {}
 
     public ngOnInit(): void {
-        this.listService.filterChange = this.filterChange;
+        this.treeService.filterChange = this.filterChange;
     }
 }

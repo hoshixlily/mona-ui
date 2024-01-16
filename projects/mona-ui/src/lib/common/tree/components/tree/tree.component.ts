@@ -18,6 +18,8 @@ import {
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { asapScheduler, fromEvent, takeWhile } from "rxjs";
+import { FilterInputComponent } from "../../../filter-input/components/filter-input/filter-input.component";
+import { FilterChangeEvent } from "../../../filter-input/models/FilterChangeEvent";
 import { TreeNodeTemplateDirective } from "../../directives/tree-node-template.directive";
 import { NodeCheckEvent } from "../../models/NodeCheckEvent";
 import { NodeClickEvent } from "../../models/NodeClickEvent";
@@ -35,7 +37,14 @@ import { TreeNodeComponent } from "../tree-node/tree-node.component";
 @Component({
     selector: "mona-tree",
     standalone: true,
-    imports: [SubTreeComponent, TreeNodeComponent, NgTemplateOutlet, NgStyle, TreeDropHintComponent],
+    imports: [
+        SubTreeComponent,
+        TreeNodeComponent,
+        NgTemplateOutlet,
+        NgStyle,
+        TreeDropHintComponent,
+        FilterInputComponent
+    ],
     templateUrl: "./tree.component.html",
     styleUrl: "./tree.component.scss",
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -85,6 +94,13 @@ export class TreeComponent<T> implements OnInit {
 
     public ngOnInit(): void {
         this.setSubscriptions();
+    }
+
+    public onFilterChange(event: FilterChangeEvent): void {
+        this.treeService.filterChange.emit(event);
+        if (!event.isDefaultPrevented()) {
+            this.treeService.filter$.next(event.filter);
+        }
     }
 
     private handleMouseMove(): void {

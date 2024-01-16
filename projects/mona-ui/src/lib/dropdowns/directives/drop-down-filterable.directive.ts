@@ -1,6 +1,6 @@
 import { Directive, EventEmitter, Input, Output, Type } from "@angular/core";
 import { FilterChangeEvent } from "../../common/filter-input/models/FilterChangeEvent";
-import { FilterableOptions } from "../../common/list/models/FilterableOptions";
+import { FilterableOptions } from "../../common/models/FilterableOptions";
 import { ListService } from "../../common/list/services/list.service";
 
 @Directive({

@@ -69,11 +69,7 @@ export class TreeNodeComponent<T> implements OnInit {
         if (node === null) {
             return false;
         }
-        const nv = this.treeService.isNavigated(node);
-        if ((this.treeNode()?.data as any).text === "Root") {
-            console.log("navigated", nv);
-        }
-        return nv;
+        return this.treeService.isNavigated(node);
     });
     public readonly nodeText: Signal<string> = computed(() => {
         const node = this.treeNode();

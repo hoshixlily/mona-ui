@@ -32,9 +32,7 @@ export class TreeViewService {
     public readonly filterPlaceholder: WritableSignal<string> = signal("");
     public readonly filterText: Signal<string> = toSignal(
         this.filter$.pipe(debounceTime(this.filterableOptions.debounce), distinctUntilChanged()),
-        {
-            initialValue: ""
-        }
+        { initialValue: "" }
     );
     public readonly nodeDictionary: Signal<Dictionary<string, Node>> = computed(() => {
         const nodeDict = new Dictionary<string, Node>();

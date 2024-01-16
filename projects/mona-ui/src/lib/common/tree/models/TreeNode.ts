@@ -13,6 +13,14 @@ export class TreeNode<T> {
         this.data = data;
     }
 
+    public clone(): TreeNode<T> {
+        const node = new TreeNode<T>(this.data);
+        node.index = this.index;
+        node.children = this.children.select(c => c.clone()).toList();
+        node.parent = this.parent;
+        return node;
+    }
+
     public get nodeItem(): NodeItem<T> {
         return {
             data: this.data,

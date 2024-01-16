@@ -38,7 +38,7 @@
             @if (node.children.length > 0 && nodeComponent.expanded()) {
                 <div class="mona-sub-tree-container"
                      [@nodeExpand]="nodeComponent.expanded()"
-                     [@.disabled]="!treeService.animationEnabled()">
+                     [@.disabled]="!treeService.animationEnabled() || treeService.filterText().length !== 0">
                     <mona-sub-tree [nodes]="node.children"
                                    [depth]="subTreeDepth()+1"
                                    [parent]="node"
