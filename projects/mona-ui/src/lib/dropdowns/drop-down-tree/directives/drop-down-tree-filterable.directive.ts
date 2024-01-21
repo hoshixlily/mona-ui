@@ -1,6 +1,6 @@
 import { Directive, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { FilterChangeEvent } from "../../../common/filter-input/models/FilterChangeEvent";
-import { FilterableOptions } from "../../../tree-view/models/FilterableOptions";
+import { FilterableOptions } from "../../../common/models/FilterableOptions";
 import { DropDownTreeService } from "../services/drop-down-tree.service";
 
 @Directive({
@@ -26,7 +26,12 @@ export class DropDownTreeFilterableDirective implements OnInit {
         if (this.options) {
             this.dropdownTreeService.setFilterableOptions(this.options);
         } else if (this.options === "") {
-            this.dropdownTreeService.setFilterableOptions({ enabled: true });
+            this.dropdownTreeService.setFilterableOptions({
+                enabled: true,
+                debounce: 0,
+                caseSensitive: false,
+                operator: "contains"
+            });
         }
     }
 }

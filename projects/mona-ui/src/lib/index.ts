@@ -23,14 +23,14 @@ export * from "./common/tree/models/NodeDropEvent";
 export * from "./common/tree/models/NodeItem";
 export * from "./common/tree/models/NodeSelectEvent";
 export * from "./common/tree/models/SelectableOptions";
-export * from "./common/tree/services/tree.service";
-export * from "./common/tree/directives/tree-checkable.directive";
-export * from "./common/tree/directives/tree-disable.directive";
-export * from "./common/tree/directives/tree-expandable.directive";
-export * from "./common/tree/directives/tree-filterable.directive";
-export * from "./common/tree/directives/tree-node-template.directive";
-export * from "./common/tree/directives/tree-selectable.directive";
-export * from "./common/tree/components/tree/tree.component";
+// export * from "./common/tree/services/tree.service";
+// export * from "./common/tree/directives/tree-checkable.directive";
+// export * from "./common/tree/directives/tree-disable.directive";
+// export * from "./common/tree/directives/tree-expandable.directive";
+// export * from "./common/tree/directives/tree-filterable.directive";
+// export * from "./common/tree/directives/tree-node-template.directive";
+// export * from "./common/tree/directives/tree-selectable.directive";
+// export * from "./common/tree/components/tree/tree.component";
 
 /** Date Inputs */
 export * from "./date-inputs/calendar/calendar.component";
@@ -237,13 +237,13 @@ export * from "./tooltips/popover/components/popover/popover.component";
 export * from "./tooltips/tooltip/tooltip.component";
 
 /** TreeView */
-export { NodeOptions } from "./tree-view/models/Node";
+// export { NodeOptions } from "./tree-view/models/Node";
 // export { NodeClickEvent } from "./tree-view/models/NodeClickEvent";
 // export * from "./tree-view/models/NodeDragEndEvent";
 // export * from "./tree-view/models/NodeDragStartEvent";
 // export * from "./tree-view/models/NodeDragEvent";
 // export * from "./tree-view/models/NodeDropEvent";
-export * from "./tree-view/models/NodeLookupItem";
+// export * from "./tree-view/models/NodeLookupItem";
 // export * from "./tree-view/models/CheckableOptions";
 // export * from "./tree-view/models/ExpandableOptions";
 // export * from "./tree-view/models/FilterableOptions";
@@ -254,7 +254,7 @@ export * from "./tree-view/directives/tree-view-disable.directive";
 export * from "./tree-view/directives/tree-view-expandable.directive";
 export * from "./tree-view/directives/tree-view-filterable.directive";
 export * from "./tree-view/directives/tree-view-selectable.directive";
-export * from "./tree-view/directives/tree-view-node-text-template.directive";
+export * from "./tree-view/directives/tree-view-node-template.directive";
 
 /** Window */
 export * from "./window/models/DialogAction";

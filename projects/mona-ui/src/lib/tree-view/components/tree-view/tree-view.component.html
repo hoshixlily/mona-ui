@@ -1,48 +1,24 @@
-<div class="mona-tree-view" tabindex="0">
-    @if (treeViewService.filterableOptions.enabled) {
-        <div class="mona-tree-view-filter-container">
-            <mona-filter-input [filter]="treeViewService.filterText()"
-                               [placeholder]="treeViewService.filterPlaceholder()"
-                               (filterChange)="onFilterChange($event)"
-            ></mona-filter-input>
+<div class="mona-tree-view">
+    @if (treeService.filterableOptions().enabled) {
+        <div>
+            <mona-filter-input [filter]="treeService.filterText()"
+                               [debounce]="treeService.filterableOptions().debounce"
+                               [placeholder]="treeService.filterPlaceholder()"
+                               (filterChange)="onFilterChange($event)"></mona-filter-input>
         </div>
     }
-    <ul class="mona-tree-list" cdkDropList [cdkDropListSortingDisabled]="true"
-        (cdkDropListDropped)="onNodeDrop($event)">
-        <ng-template #treeTemplate let-nodes>
-            <ng-container *ngFor="let node of nodes; let nx = index; trackBy:nodeTrackBy;">
-                <li class="mona-tree-list-item"
-                    cdkDrag [cdkDragData]="node" (cdkDragStarted)="onNodeDragStart($event)"
-                    (cdkDragEnded)="onNodeDragEnd($event)" (cdkDragMoved)="onNodeDragMove($event, node)">
-                    <mona-tree-view-node [node]="node" [nodeTextTemplate]="nodeTextTemplate" [dragging]="dragging"
-                                         (dropPositionChange)="onNodeDropPositionChange($event)"
-                                         (nodeSelect)="onNodeSelect($event)"
-                                         (nodeClick)="nodeClick.emit($event)"
-                                         (nodeDoubleClick)="nodeDoubleClick.emit($event)"></mona-tree-view-node>
-                    @if (!treeViewService.expandableOptions.enabled || (treeViewService.expandableOptions.enabled && (node.nodes.length !== 0 && node.state.expanded))) {
-                        <ul class="mona-subtree-list" [@nodeExpand]="node.state.expanded">
-                            <ng-container [ngTemplateOutlet]="treeTemplate"
-                                          [ngTemplateOutletContext]="{$implicit: node.nodes}"></ng-container>
-                        </ul>
-                    }
-                    <ng-template cdkDragPreview [data]="node">
-                        <div class="mona-tree-view-node-dragging">
-                            <span>
-                                @if (dropPosition === 'inside') {
-                                    <fa-icon [icon]="dropInsideIcon"></fa-icon>
-                                } @else if (dropPosition === 'after') {
-                                    <fa-icon [icon]="dropAfterIcon"></fa-icon>
-                                } @else if (dropPosition === 'before') {
-                                    <fa-icon [icon]="dropBeforeIcon"></fa-icon>
-                                }
-                            </span>
-                            <span>{{node.text}}</span>
-                        </div>
-                    </ng-template>
-                </li>
-            </ng-container>
-        </ng-template>
-        <ng-container [ngTemplateOutlet]="treeTemplate"
-                      [ngTemplateOutletContext]="{$implicit: treeViewService.viewNodeList()}"></ng-container>
-    </ul>
+    <mona-tree (nodeCheck)="nodeCheck.emit($event)"
+               (nodeClick)="nodeClick.emit($event)"
+               (nodeDrag)="nodeDrag.emit($event)"
+               (nodeDragEnd)="nodeDragEnd.emit($event)"
+               (nodeDragStart)="nodeDragStart.emit($event)"
+               (nodeDrop)="nodeDrop.emit($event)"
+               (nodeSelect)="nodeSelect.emit($event)">
+        @if (nodeTemplate) {
+            <ng-template monaTreeNodeTemplate let-dataItem let-element="element">
+                <ng-container [ngTemplateOutlet]="nodeTemplate"
+                              [ngTemplateOutletContext]="{$implicit:dataItem, element}"></ng-container>
+            </ng-template>
+        }
+    </mona-tree>
 </div>

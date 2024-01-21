@@ -12,171 +12,6 @@ import {
 } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import {
-    PopupRef,
-    NodeDragStartEvent,
-    NodeDragEvent,
-    NodeDropEvent,
-    NodeDragEndEvent,
-    NodeClickEvent,
-    TabCloseEvent,
-    StepOptions,
-    PopupService,
-    WindowService,
-    PageSizeChangeEvent,
-    PageChangeEvent,
-    Query,
-    CompositeFilterDescriptor,
-    FilterMenuComponent,
-    FilterMenuValue,
-    SortDescriptor,
-    SortableOptions,
-    CellEditEvent,
-    NotificationService,
-    DialogService,
-    BreadcrumbItem,
-    PopoverShowEvent,
-    PopoverShownEvent,
-    PopoverHideEvent,
-    ListBoxActionClickEvent,
-    ButtonDirective,
-    TabComponent,
-    MenuItemComponent,
-    DropDownButtonComponent,
-    DropDownListComponent,
-    SplitterComponent,
-    SplitterPaneComponent,
-    CalendarComponent,
-    ScrollViewComponent,
-    FieldsetComponent,
-    ExpansionPanelComponent,
-    AvatarComponent,
-    ListBoxComponent,
-    ListViewComponent,
-    ListViewItemTemplateDirective,
-    ListViewVirtualScrollDirective,
-    ListViewSelectableDirective,
-    SlicePipe,
-    SliderComponent,
-    RangeSliderComponent,
-    NumericTextBoxComponent,
-    TextBoxComponent,
-    TextBoxDirective,
-    StepperComponent,
-    SplitButtonComponent,
-    PopoverComponent,
-    TooltipComponent,
-    ColorPaletteComponent,
-    ColorPickerComponent,
-    ColorGradientComponent,
-    SwitchComponent,
-    DatePickerComponent,
-    DateTimePickerComponent,
-    TimePickerComponent,
-    MultiSelectComponent,
-    MultiSelectSummaryTagDirective,
-    AutoCompleteComponent,
-    ComboBoxComponent,
-    ButtonGroupComponent,
-    ContextMenuComponent,
-    BreadcrumbComponent,
-    MenubarComponent,
-    MenuComponent,
-    ProgressBarComponent,
-    CircularProgressBarComponent,
-    GridComponent,
-    GridColumnComponent,
-    GridSelectableDirective,
-    TreeViewComponent,
-    TabStripComponent,
-    TreeViewCheckableDirective,
-    TreeViewSelectableDirective,
-    TreeViewExpandableDirective,
-    TreeViewDisableDirective,
-    TabContentTemplateDirective,
-    BreadcrumbItemTemplateDirective,
-    BreadcrumbSeparatorTemplateDirective,
-    CircularProgressBarLabelTemplateDirective,
-    ComboBoxGroupHeaderTemplateDirective,
-    ComboBoxItemTemplateDirective,
-    DropDownListGroupHeaderTemplateDirective,
-    DropDownListItemTemplateDirective,
-    DropDownListValueTemplateDirective,
-    ExpansionPanelActionsTemplateDirective,
-    ExpansionPanelTitleTemplateDirective,
-    FieldsetLegendTemplateDirective,
-    GridColumnTitleTemplateDirective,
-    GridCellTemplateDirective,
-    ListBoxItemTemplateDirective,
-    ListViewFooterTemplateDirective,
-    ListViewGroupHeaderTemplateDirective,
-    ListViewHeaderTemplateDirective,
-    MenuItemIconTemplateDirective,
-    MenuItemTextTemplateDirective,
-    MultiSelectGroupHeaderTemplateDirective,
-    MultiSelectItemTemplateDirective,
-    MultiSelectSummaryTagTemplateDirective,
-    MultiSelectTagTemplateDirective,
-    NumericTextBoxPrefixTemplateDirective,
-    PopoverFooterTemplateDirective,
-    PopoverTitleTemplateDirective,
-    RangeSliderTickValueTemplateDirective,
-    SliderTickValueTemplateDirective,
-    SplitButtonTextTemplateDirective,
-    StepperIndicatorTemplateDirective,
-    StepperLabelTemplateDirective,
-    StepperStepTemplateDirective,
-    SwitchOffLabelTemplateDirective,
-    SwitchOnLabelTemplateDirective,
-    TabTitleTemplateDirective,
-    TextBoxPrefixTemplateDirective,
-    TextBoxSuffixTemplateDirective,
-    TreeViewNodeTextTemplateDirective,
-    GridEditableDirective,
-    ChipComponent,
-    DropDownTreeComponent,
-    DropDownTreeExpandableDirective,
-    TreeViewFilterableDirective,
-    FilterChangeEvent,
-    DropDownTreeFilterableDirective,
-    // ListComponent,
-    // ListService,
-    // ListItemTemplateDirective,
-    // ListGroupHeaderTemplateDirective,
-    // ListSelectableDirective,
-    // ListGroupableDirective,
-    // ListVirtualScrollDirective,
-    // ListFooterTemplateDirective,
-    // ListHeaderTemplateDirective,
-    // ListNavigableDirective,
-    DropDownGroupableDirective,
-    DropDownFilterableDirective,
-    ComboBoxFooterTemplateDirective,
-    ComboBoxHeaderTemplateDirective,
-    ComboBoxNoDataTemplateDirective,
-    DropDownListFooterTemplateDirective,
-    DropDownListHeaderTemplateDirective,
-    DropDownListNoDataTemplateDirective,
-    MultiSelectFooterTemplateDirective,
-    MultiSelectHeaderTemplateDirective,
-    MultiSelectNoDataTemplateDirective,
-    ListViewNavigableDirective,
-    ListViewGroupableDirective,
-    ListViewPageableDirective,
-    TreeService,
-    TreeComponent,
-    TreeDisableDirective,
-    TreeSelectableDirective,
-    TreeCheckableDirective,
-    NodeSelectEvent,
-    NodeCheckEvent,
-    TreeExpandableDirective,
-    TreeNodeTemplateDirective,
-    TreeFilterableDirective
-} from "mona-ui";
-import { v4 } from "uuid";
-import { ListViewNoDataTemplateDirective } from "../../../mona-ui/src/lib/list-view/directives/list-view-no-data-template.directive";
-import { TestComponentComponent } from "./test-component/test-component.component";
 import { IconDefinition } from "@fortawesome/fontawesome-svg-core";
 import {
     faFilter,
@@ -189,16 +24,164 @@ import {
     faSun,
     faTimes
 } from "@fortawesome/free-solid-svg-icons";
-import { Enumerable, ImmutableList, ImmutableSet, IndexableList, List } from "@mirei/ts-collections";
-import { map, Observable, take } from "rxjs";
+import { Enumerable, ImmutableList, IndexableList } from "@mirei/ts-collections";
 import { DateTime } from "luxon";
-import { GridProductData } from "./GridProductData";
+import {
+    AutoCompleteComponent,
+    AvatarComponent,
+    BreadcrumbComponent,
+    BreadcrumbItem,
+    BreadcrumbItemTemplateDirective,
+    BreadcrumbSeparatorTemplateDirective,
+    ButtonDirective,
+    ButtonGroupComponent,
+    CalendarComponent,
+    CellEditEvent,
+    ChipComponent,
+    CircularProgressBarComponent,
+    CircularProgressBarLabelTemplateDirective,
+    ColorGradientComponent,
+    ColorPaletteComponent,
+    ColorPickerComponent,
+    ComboBoxComponent,
+    ComboBoxFooterTemplateDirective,
+    ComboBoxGroupHeaderTemplateDirective,
+    ComboBoxHeaderTemplateDirective,
+    ComboBoxItemTemplateDirective,
+    ComboBoxNoDataTemplateDirective,
+    CompositeFilterDescriptor,
+    ContextMenuComponent,
+    DatePickerComponent,
+    DateTimePickerComponent,
+    DialogService,
+    DropDownButtonComponent,
+    DropDownFilterableDirective,
+    DropDownGroupableDirective,
+    DropDownListComponent,
+    DropDownListFooterTemplateDirective,
+    DropDownListGroupHeaderTemplateDirective,
+    DropDownListHeaderTemplateDirective,
+    DropDownListItemTemplateDirective,
+    DropDownListNoDataTemplateDirective,
+    DropDownListValueTemplateDirective,
+    DropDownTreeComponent,
+    DropDownTreeExpandableDirective,
+    DropDownTreeFilterableDirective,
+    ExpansionPanelActionsTemplateDirective,
+    ExpansionPanelComponent,
+    ExpansionPanelTitleTemplateDirective,
+    FieldsetComponent,
+    FieldsetLegendTemplateDirective,
+    FilterChangeEvent,
+    FilterMenuComponent,
+    FilterMenuValue,
+    GridCellTemplateDirective,
+    GridColumnComponent,
+    GridColumnTitleTemplateDirective,
+    GridComponent,
+    GridEditableDirective,
+    GridSelectableDirective,
+    ListBoxActionClickEvent,
+    ListBoxComponent,
+    ListBoxItemTemplateDirective,
+    ListViewComponent,
+    ListViewFooterTemplateDirective,
+    ListViewGroupableDirective,
+    ListViewGroupHeaderTemplateDirective,
+    ListViewHeaderTemplateDirective,
+    ListViewItemTemplateDirective,
+    ListViewNavigableDirective,
+    ListViewPageableDirective,
+    ListViewSelectableDirective,
+    ListViewVirtualScrollDirective,
+    MenubarComponent,
+    MenuComponent,
+    MenuItemComponent,
+    MenuItemIconTemplateDirective,
+    MenuItemTextTemplateDirective,
+    MultiSelectComponent,
+    MultiSelectFooterTemplateDirective,
+    MultiSelectGroupHeaderTemplateDirective,
+    MultiSelectHeaderTemplateDirective,
+    MultiSelectItemTemplateDirective,
+    MultiSelectNoDataTemplateDirective,
+    MultiSelectSummaryTagDirective,
+    MultiSelectSummaryTagTemplateDirective,
+    MultiSelectTagTemplateDirective,
+    NodeCheckEvent,
+    NodeClickEvent,
+    NodeDragEndEvent,
+    NodeDragEvent,
+    NodeDragStartEvent,
+    NodeDropEvent,
+    NodeSelectEvent,
+    NotificationService,
+    NumericTextBoxComponent,
+    NumericTextBoxPrefixTemplateDirective,
+    PageChangeEvent,
+    PageSizeChangeEvent,
+    PopoverComponent,
+    PopoverFooterTemplateDirective,
+    PopoverHideEvent,
+    PopoverShowEvent,
+    PopoverShownEvent,
+    PopoverTitleTemplateDirective,
+    PopupRef,
+    PopupService,
+    ProgressBarComponent,
+    Query,
+    RangeSliderComponent,
+    RangeSliderTickValueTemplateDirective,
+    ScrollViewComponent,
+    SlicePipe,
+    SliderComponent,
+    SliderTickValueTemplateDirective,
+    SortableOptions,
+    SortDescriptor,
+    SplitButtonComponent,
+    SplitButtonTextTemplateDirective,
+    SplitterComponent,
+    SplitterPaneComponent,
+    StepOptions,
+    StepperComponent,
+    StepperIndicatorTemplateDirective,
+    StepperLabelTemplateDirective,
+    StepperStepTemplateDirective,
+    SwitchComponent,
+    SwitchOffLabelTemplateDirective,
+    SwitchOnLabelTemplateDirective,
+    TabCloseEvent,
+    TabComponent,
+    TabContentTemplateDirective,
+    TabStripComponent,
+    TabTitleTemplateDirective,
+    TextBoxComponent,
+    TextBoxDirective,
+    TextBoxPrefixTemplateDirective,
+    TextBoxSuffixTemplateDirective,
+    TimePickerComponent,
+    TooltipComponent,
+    TreeViewCheckableDirective,
+    TreeViewComponent,
+    TreeViewDisableDirective,
+    TreeViewExpandableDirective,
+    TreeViewFilterableDirective,
+    TreeViewNodeTemplateDirective,
+    TreeViewSelectableDirective,
+    WindowService
+} from "mona-ui";
+import { map, Observable, take } from "rxjs";
+import { v4 } from "uuid";
+import { ListViewNoDataTemplateDirective } from "../../../mona-ui/src/lib/list-view/directives/list-view-no-data-template.directive";
 import { GridOrderData } from "./GridOrderData";
+import { GridProductData } from "./GridProductData";
+import { TestComponentComponent } from "./test-component/test-component.component";
 
 interface TreeNodeDataItem {
     id: string;
     text: string;
     items: TreeNodeDataItem[];
+    disabled?: boolean;
 }
 
 @Component({
@@ -319,13 +302,13 @@ interface TreeNodeDataItem {
         TreeViewComponent,
         TreeViewDisableDirective,
         TreeViewExpandableDirective,
+        TreeViewFilterableDirective,
         TreeViewSelectableDirective,
-        TreeViewNodeTextTemplateDirective,
+        TreeViewNodeTemplateDirective,
         ChipComponent,
         DropDownTreeComponent,
         DropDownTreeExpandableDirective,
-        TreeViewFilterableDirective,
-        DropDownTreeFilterableDirective,
+        DropDownTreeFilterableDirective
 
         // ListComponent,
         // ListFilterableDirective
@@ -338,15 +321,15 @@ interface TreeNodeDataItem {
         // ListSelectableDirective,
         // ListVirtualScrollDirective,
 
-        TreeComponent,
-        TreeCheckableDirective,
-        TreeExpandableDirective,
-        TreeFilterableDirective,
-        TreeSelectableDirective,
-        TreeNodeTemplateDirective
-    ],
+        // TreeComponent,
+        // TreeViewCheckableDirective,
+        // TreeViewExpandableDirective,
+        // TreeViewFilterableDirective,
+        // TreeViewSelectableDirective,
+        // TreeNodeTemplateDirective
+    ]
     // providers: [ListService],
-    providers: [TreeService]
+    // providers: [TreeService]
 })
 export class AppComponent implements OnInit {
     public readonly closeIcon: IconDefinition = faTimes;
@@ -713,7 +696,7 @@ export class AppComponent implements OnInit {
     public toggleableButtonSelected: boolean = true;
     public treeCheckedKeys: string[] = [];
 
-    public treeData: any[] = [
+    public treeData: TreeNodeDataItem[] = [
         {
             text: "Root",
             id: "1",
@@ -722,42 +705,42 @@ export class AppComponent implements OnInit {
                     text: "Fruits",
                     id: "1-1",
                     items: [
-                        { text: "Apple", id: "1-1-1", disabled: true },
-                        { text: "Apricot", id: "1-1-2", disabled: false },
-                        { text: "Banana", id: "1-1-3" },
-                        { text: "Cherry", id: "1-1-4", disabled: true }
+                        { text: "Apple", id: "1-1-1", disabled: true, items: [] },
+                        { text: "Apricot", id: "1-1-2", disabled: false, items: [] },
+                        { text: "Banana", id: "1-1-3", items: [] },
+                        { text: "Cherry", id: "1-1-4", disabled: true, items: [] }
                     ]
                 },
                 {
                     text: "Foods",
                     id: "1-2",
                     items: [
-                        { text: "Yakisoba", id: "1-2-1" },
-                        { text: "Yakitori", id: "1-2-2" },
-                        { text: "Sushi", id: "1-2-3" },
-                        { text: "Sashimi", id: "1-2-4" }
+                        { text: "Yakisoba", id: "1-2-1", items: [] },
+                        { text: "Yakitori", id: "1-2-2", items: [] },
+                        { text: "Sushi", id: "1-2-3", items: [] },
+                        { text: "Sashimi", id: "1-2-4", items: [] }
                     ]
                 },
                 {
                     text: "Vegetables",
                     id: "1-3",
                     items: [
-                        { text: "Cabbage", id: "1-3-1" },
-                        { text: "Cabbage Black", id: "1-3-2" },
-                        { text: "Pumpkin", id: "1-3-3" },
-                        { text: "Potato", id: "1-3-4" }
+                        { text: "Cabbage", id: "1-3-1", items: [] },
+                        { text: "Cabbage Black", id: "1-3-2", items: [] },
+                        { text: "Pumpkin", id: "1-3-3", items: [] },
+                        { text: "Potato", id: "1-3-4", items: [] }
                     ]
                 },
                 {
                     text: "Trees",
                     id: "1-4",
                     items: [
-                        { text: "Willow", id: "1-4-1" },
-                        { text: "Birch", id: "1-4-2" },
-                        { text: "Oak", id: "1-4-3" },
-                        { text: "Pine", id: "1-4-4" },
-                        { text: "Maple", id: "1-4-5" },
-                        { text: "Cedar", id: "1-4-6" }
+                        { text: "Willow", id: "1-4-1", items: [] },
+                        { text: "Birch", id: "1-4-2", items: [] },
+                        { text: "Oak", id: "1-4-3", items: [] },
+                        { text: "Pine", id: "1-4-4", items: [] },
+                        { text: "Maple", id: "1-4-5", items: [] },
+                        { text: "Cedar", id: "1-4-6", items: [] }
                     ]
                 }
             ]
@@ -768,7 +751,7 @@ export class AppComponent implements OnInit {
 
     public dropdownTreeDisabler: (item: any) => boolean = (item: any) => item.text.toLowerCase().startsWith("c");
     public dropdownTreeExpandedKeys: string[] = ["1", "1-4"];
-    public dropdownTreeSelectedValue = this.treeData[0].items[1].items[0];
+    public dropdownTreeSelectedValue = this.treeData[0].items![1].items![0];
 
     public treeDisabledKeys: string[] = [
         /*"1-1-1", "1-1-4", "1-4"*/
@@ -803,8 +786,8 @@ export class AppComponent implements OnInit {
         // protected readonly listService: ListService<{ text: string; value: number; group: string; active: boolean }>,
         private readonly cdr: ChangeDetectorRef,
         private readonly notificationService: NotificationService,
-        private readonly dialogService: DialogService,
-        protected readonly treeService: TreeService<TreeNodeDataItem>
+        private readonly dialogService: DialogService
+        // protected readonly treeService: TreeService<TreeNodeDataItem>
     ) {}
 
     public dropdownItemDisabler = (item: any): boolean => !item.active;
@@ -971,32 +954,32 @@ export class AppComponent implements OnInit {
             "Item 2999"
         ]);
 
-        this.treeService.setData(this.treeData);
-        this.treeService.setChildrenSelector(i => i.items);
-        this.treeService.setTextField(i => i.text);
+        // this.treeService.setData(this.treeData);
+        // this.treeService.setChildrenSelector(i => i.items);
+        // this.treeService.setTextField(i => i.text);
         // this.treeService.setExpandableOptions({ enabled: true });
         // this.treeService.setExpandBy(i => i.id);
-        this.treeService.setAnimationEnabled(true);
+        // this.treeService.setAnimationEnabled(true);
         // this.treeService.setExpandedKeys(["1", "1-1", "1-2", "1-3", "1-4"]);
-        this.treeCheckedKeys = [this.treeData[0].items[0].items[0], this.treeData[0].items[0].items[2]];
-        this.treeExpandedKeys = [this.treeData[0], this.treeData[0].items[1]];
+        // this.treeCheckedKeys = [this.treeData[0].items[0].items[0], this.treeData[0].items[0].items[2]];
+        // this.treeExpandedKeys = [this.treeData[0], this.treeData[0].items[1]];
         // this.treeService.setSelectableOptions({ enabled: true, mode: "single", childrenOnly: true, toggleable: false });
         // this.treeService.setSelectBy(i => i.id);
 
         // this.treeSelectedKeys = ["1-1-1", "1-4-2"];
 
-        this.treeService.setCheckableOptions({
-            enabled: true,
-            mode: "multiple",
-            childrenOnly: false,
-            checkChildren: true,
-            checkDisabledChildren: false,
-            checkParents: true
-        });
-
-        this.treeService.setDisableOptions({ enabled: true, disableChildren: true });
-        this.treeService.setDisabledKeys(["1-1-1", "1-4-2", "1-3"]);
-        this.treeService.setDisableBy(i => i.id);
+        // this.treeService.setCheckableOptions({
+        //     enabled: true,
+        //     mode: "multiple",
+        //     childrenOnly: false,
+        //     checkChildren: true,
+        //     checkDisabledChildren: false,
+        //     checkParents: true
+        // });
+        //
+        // this.treeService.setDisableOptions({ enabled: true, disableChildren: true });
+        // this.treeService.setDisabledKeys(["1-1-1", "1-4-2", "1-3"]);
+        // this.treeService.setDisableBy(i => i.id);
 
         // window.setInterval(() => {
         //     this.treeService.setData(this.generateRandomTreeData(10));
@@ -1109,7 +1092,7 @@ export class AppComponent implements OnInit {
         console.log(expandedKeys);
     }
 
-    public onDropdownTreeValueChange(value: unknown): void {
+    public onDropdownTreeValueChange(value: TreeNodeDataItem): void {
         this.dropdownTreeSelectedValue = value;
         console.log(`Dropdown tree value changed`, value);
     }
@@ -1492,7 +1475,7 @@ export class AppComponent implements OnInit {
             {
                 text: Math.random().toString(),
                 id: Math.random().toString(),
-                items: [{ text: "New 2", id: Math.random().toString(), disabled: Math.random() * 100 < 50 }]
+                items: [{ text: "New 2", id: Math.random().toString(), disabled: Math.random() * 100 < 50, items: [] }]
             }
         ];
     }

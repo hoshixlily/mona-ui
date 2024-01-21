@@ -1,9 +1,9 @@
 import { Directive } from "@angular/core";
 
 @Directive({
-    selector: "ng-template[monaTreeViewNodeTextTemplate]",
+    selector: "ng-template[monaTreeViewNodeTemplate]",
     standalone: true
 })
-export class TreeViewNodeTextTemplateDirective {
+export class TreeViewNodeTemplateDirective {
     public constructor() {}
 }

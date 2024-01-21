@@ -1,9 +1,8 @@
 import { TreeViewSelectableDirective } from "./tree-view-selectable.directive";
 
-describe("TreeViewSelectableDirective", () => {
+describe("TreeSelectableDirective", () => {
     it("should create an instance", () => {
-        // const directive = new TreeViewSelectableDirective();
-        // expect(directive).toBeTruthy();
-        expect().nothing(); // TODO: Implement this test
+        const directive = new TreeViewSelectableDirective();
+        expect(directive).toBeTruthy();
     });
 });

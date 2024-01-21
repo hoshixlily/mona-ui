@@ -1,39 +1,62 @@
-import { Directive, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from "@angular/core";
-import { ExpandableOptions } from "../models/ExpandableOptions";
-import { TreeViewService } from "../services/tree-view.service";
+import { DestroyRef, Directive, EventEmitter, inject, Input, OnInit, Output } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { Selector, sequenceEqual } from "@mirei/ts-collections";
+import { pairwise } from "rxjs";
+import { ExpandableOptions } from "../../common/tree/models/ExpandableOptions";
+import { TreeService } from "../../common/tree/services/tree.service";
 
 @Directive({
     selector: "mona-tree-view[monaTreeViewExpandable]",
     standalone: true
 })
-export class TreeViewExpandableDirective implements OnInit, OnChanges {
+export class TreeViewExpandableDirective<T> implements OnInit {
+    readonly #defaultOptions: ExpandableOptions = {
+        enabled: true
+    };
+    readonly #destroyRef: DestroyRef = inject(DestroyRef);
+
     @Input()
-    public set expandedKeys(expandedKeys: Iterable<unknown>) {
-        this.treeViewService.expandedKeys.clear();
-        this.treeViewService.expandedKeys.addAll(expandedKeys);
+    public set expandBy(value: string | Selector<T, any> | null | undefined) {
+        this.treeService.setExpandBy(value ?? "");
+    }
+
+    @Input()
+    public set expandedKeys(value: Iterable<any> | null | undefined) {
+        this.treeService.setExpandedKeys(value ?? []);
     }
 
     @Output()
-    public expandedKeysChange: EventEmitter<unknown[]> = new EventEmitter<unknown[]>();
+    public expandedKeysChange: EventEmitter<Array<any>> = new EventEmitter<Array<any>>();
 
     @Input("monaTreeViewExpandable")
-    public options?: ExpandableOptions | "";
-
-    public constructor(private readonly treeViewService: TreeViewService) {}
-
-    public ngOnChanges(changes: SimpleChanges): void {
-        if (changes && changes["expandedKeys"] && !changes["expandedKeys"].isFirstChange()) {
-            this.treeViewService.loadExpandedKeys(this.treeViewService.expandedKeys);
+    public set options(value: Partial<ExpandableOptions> | "") {
+        if (value === "") {
+            this.treeService.setExpandableOptions(this.#defaultOptions);
+        } else {
+            this.treeService.setExpandableOptions({
+                ...this.#defaultOptions,
+                ...value
+            });
         }
     }
 
+    public constructor(private readonly treeService: TreeService<T>) {}
+
     public ngOnInit(): void {
-        this.treeViewService.expandedKeysChange = this.expandedKeysChange;
-        if (this.options) {
-            this.treeViewService.setExpandableOptions(this.options);
-        } else if (this.options === "") {
-            this.treeViewService.setExpandableOptions({ enabled: true });
-        }
-        this.treeViewService.loadExpandedKeys(this.treeViewService.expandedKeys);
+        this.treeService.expandedKeysChange = this.expandedKeysChange;
+        this.setNodeExpandSubscription();
+    }
+
+    private setNodeExpandSubscription(): void {
+        this.treeService.expandedKeys$
+            .pipe(pairwise(), takeUntilDestroyed(this.#destroyRef))
+            .subscribe(([oldKeys, keys]) => {
+                const orderedOldKeys = oldKeys.orderBy(k => k);
+                const orderedKeys = keys.orderBy(k => k);
+                if (sequenceEqual(orderedOldKeys, orderedKeys)) {
+                    return;
+                }
+                this.treeService.expandedKeysChange.emit(keys.toArray());
+            });
     }
 }

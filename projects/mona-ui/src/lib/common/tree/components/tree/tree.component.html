@@ -1,12 +1,4 @@
 <div class="mona-tree" [tabindex]="1">
-    @if (treeService.filterableOptions().enabled) {
-        <div>
-            <mona-filter-input [filter]="treeService.filterText()"
-                               [debounce]="treeService.filterableOptions().debounce"
-                               [placeholder]="treeService.filterPlaceholder()"
-                               (filterChange)="onFilterChange($event)"></mona-filter-input>
-        </div>
-    }
     <mona-sub-tree [nodes]="treeService.viewNodeSet()" [parent]="null" [depth]="0"></mona-sub-tree>
     <mona-tree-drop-hint></mona-tree-drop-hint>
 </div>

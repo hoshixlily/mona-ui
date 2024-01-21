@@ -1,5 +1,5 @@
 import { Directive, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from "@angular/core";
-import { ExpandableOptions } from "../../../tree-view/models/ExpandableOptions";
+import { ExpandableOptions } from "../../../common/tree/models/ExpandableOptions";
 import { DropDownTreeService } from "../services/drop-down-tree.service";
 
 @Directive({

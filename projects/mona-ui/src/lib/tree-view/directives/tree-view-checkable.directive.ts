@@ -1,39 +1,65 @@
-import { Directive, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from "@angular/core";
-import { CheckableOptions } from "../models/CheckableOptions";
-import { TreeViewService } from "../services/tree-view.service";
+import { DestroyRef, Directive, EventEmitter, inject, Input, OnInit, Output } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { Selector, sequenceEqual } from "@mirei/ts-collections";
+import { pairwise } from "rxjs";
+import { CheckableOptions } from "../../common/tree/models/CheckableOptions";
+import { TreeService } from "../../common/tree/services/tree.service";
 
 @Directive({
     selector: "mona-tree-view[monaTreeViewCheckable]",
     standalone: true
 })
-export class TreeViewCheckableDirective implements OnInit, OnChanges {
+export class TreeViewCheckableDirective<T> implements OnInit {
+    readonly #defaultOptions: CheckableOptions = {
+        checkChildren: true,
+        checkParents: true,
+        enabled: true,
+        mode: "multiple"
+    };
+    readonly #destroyRef: DestroyRef = inject(DestroyRef);
+
     @Input()
-    public set checkedKeys(checkedKeys: Iterable<unknown>) {
-        this.treeViewService.checkedKeys.clear();
-        this.treeViewService.checkedKeys.addAll(checkedKeys);
+    public set checkBy(value: string | Selector<T, any> | null | undefined) {
+        this.treeService.setCheckBy(value ?? "");
+    }
+
+    @Input()
+    public set checkedKeys(value: Iterable<any> | null | undefined) {
+        this.treeService.setCheckedKeys(value ?? []);
     }
 
     @Output()
-    public checkedKeysChange: EventEmitter<unknown[]> = new EventEmitter<unknown[]>();
+    public checkedKeysChange: EventEmitter<Array<any>> = new EventEmitter<Array<any>>();
 
     @Input("monaTreeViewCheckable")
-    public options?: CheckableOptions | "";
-
-    public constructor(private readonly treeViewService: TreeViewService) {}
-
-    public ngOnChanges(changes: SimpleChanges): void {
-        if (changes && changes["checkedKeys"] && !changes["checkedKeys"].isFirstChange()) {
-            this.treeViewService.loadCheckedKeys(this.treeViewService.checkedKeys);
+    public set options(value: Partial<CheckableOptions> | "") {
+        if (value === "") {
+            this.treeService.setCheckableOptions(this.#defaultOptions);
+        } else {
+            this.treeService.setCheckableOptions({
+                ...this.#defaultOptions,
+                ...value
+            });
         }
     }
 
+    public constructor(private readonly treeService: TreeService<T>) {}
+
     public ngOnInit(): void {
-        this.treeViewService.checkedKeysChange = this.checkedKeysChange;
-        if (this.options) {
-            this.treeViewService.setCheckableOptions(this.options);
-        } else if (this.options === "") {
-            this.treeViewService.setCheckableOptions({ enabled: true });
-        }
-        this.treeViewService.loadCheckedKeys(this.treeViewService.checkedKeys);
+        this.treeService.checkedKeysChange = this.checkedKeysChange;
+        this.setNodeCheckSubscription();
+    }
+
+    private setNodeCheckSubscription(): void {
+        this.treeService.checkedKeys$
+            .pipe(pairwise(), takeUntilDestroyed(this.#destroyRef))
+            .subscribe(([oldKeys, keys]) => {
+                const orderedOldKeys = oldKeys.orderBy(k => k);
+                const orderedKeys = keys.orderBy(k => k);
+                if (sequenceEqual(orderedOldKeys, orderedKeys)) {
+                    return;
+                }
+                this.treeService.checkedKeysChange.emit(keys.toArray());
+            });
     }
 }
