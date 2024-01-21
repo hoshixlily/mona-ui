@@ -170,7 +170,7 @@ import {
     TreeViewSelectableDirective,
     WindowService
 } from "mona-ui";
-import { map, Observable, take } from "rxjs";
+import { debounceTime, map, Observable, of, take, timer } from "rxjs";
 import { v4 } from "uuid";
 import { ListViewNoDataTemplateDirective } from "../../../mona-ui/src/lib/list-view/directives/list-view-no-data-template.directive";
 import { GridOrderData } from "./GridOrderData";
@@ -753,6 +753,7 @@ export class AppComponent implements OnInit {
     public dropdownTreeExpandedKeys: string[] = ["1", "1-4"];
     public dropdownTreeSelectedValue = this.treeData[0].items![1].items![0];
 
+    public treeChildren = (item: TreeNodeDataItem) => of(item.items ?? []);
     public treeDisabledKeys: string[] = [
         /*"1-1-1", "1-1-4", "1-4"*/
     ];

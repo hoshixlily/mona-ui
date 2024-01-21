@@ -37,7 +37,7 @@ export class TreeViewComponent<T> {
     }
 
     @Input()
-    public set children(value: string | Selector<T, Iterable<T>> | Observable<Iterable<T>>) {
+    public set children(value: string | Selector<T, Iterable<T> | Observable<Iterable<T>>>) {
         this.treeService.setChildrenSelector(value);
     }
 

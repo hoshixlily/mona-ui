@@ -1,0 +1,9 @@
+div.mona-tree-view {
+    display: flex;
+    flex-direction: column;
+}
+
+div.mona-tree-view-tree-container {
+    flex: 1;
+    overflow: auto;
+}

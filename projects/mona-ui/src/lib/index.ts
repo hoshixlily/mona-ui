@@ -23,14 +23,6 @@ export * from "./common/tree/models/NodeDropEvent";
 export * from "./common/tree/models/NodeItem";
 export * from "./common/tree/models/NodeSelectEvent";
 export * from "./common/tree/models/SelectableOptions";
-// export * from "./common/tree/services/tree.service";
-// export * from "./common/tree/directives/tree-checkable.directive";
-// export * from "./common/tree/directives/tree-disable.directive";
-// export * from "./common/tree/directives/tree-expandable.directive";
-// export * from "./common/tree/directives/tree-filterable.directive";
-// export * from "./common/tree/directives/tree-node-template.directive";
-// export * from "./common/tree/directives/tree-selectable.directive";
-// export * from "./common/tree/components/tree/tree.component";
 
 /** Date Inputs */
 export * from "./date-inputs/calendar/calendar.component";

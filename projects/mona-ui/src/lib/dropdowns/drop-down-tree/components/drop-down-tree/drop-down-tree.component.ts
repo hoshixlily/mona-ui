@@ -77,7 +77,7 @@ export class DropDownTreeComponent<T> implements ControlValueAccessor {
     public disabler: WritableSignal<Action<unknown, boolean> | string | undefined> = signal(undefined);
 
     @Input()
-    public childrenField: string | Selector<T, Iterable<T>> | Observable<Iterable<T>> = "";
+    public children: string | Selector<T, Iterable<T> | Observable<Iterable<T>>> = "";
 
     @Input()
     public data: Iterable<T> = [];
@@ -95,9 +95,6 @@ export class DropDownTreeComponent<T> implements ControlValueAccessor {
     public set itemDisabled(nodeDisabler: Action<unknown, boolean> | string) {
         this.disabler.set(nodeDisabler);
     }
-
-    @Input({ required: true })
-    public keyField: string = "";
 
     @ViewChild("popupTemplate")
     public popupTemplate!: TemplateRef<any>;
@@ -169,7 +166,7 @@ export class DropDownTreeComponent<T> implements ControlValueAccessor {
         if (obj == null) {
             this.selectedTreeKeys.set([]);
         } else {
-            this.selectedTreeKeys.set([obj[this.keyField]]);
+            this.selectedTreeKeys.set([obj]);
         }
     }
 }

@@ -21,10 +21,13 @@
 <!--                    (nodeClick)="onTreeNodeClick($event)">-->
 <!--            </mona-tree>-->
             <mona-tree-view [data]="treeData"
-                            [children]="'items'"
+                            [children]="treeChildren"
                             textField="text" monaTreeViewCheckable
                             [checkedKeys]="treeCheckedKeys"
                             (checkedKeysChange)="onTreeCheckedKeysChange($event)"
+                            monaTreeViewExpandable
+                            [expandedKeys]="treeExpandedKeys"
+                            (expandedKeysChange)="onTreeExpandedKeysChange($event)"
                             [monaTreeViewSelectable]="{ enabled: true, mode: 'multiple', childrenOnly: false }"
                             [selectedKeys]="treeSelectedKeys"
                             (selectedKeysChange)="onTreeSelectedKeysChange($event)"
@@ -456,12 +459,10 @@
                                     Chip I
                                 </mona-chip>
                                 <mona-drop-down-tree [data]="treeData"
-                                                     keyField="id"
-                                                     childrenField="items"
+                                                     children="items"
                                                      textField="text"
                                                      [itemDisabled]="dropdownTreeDisabler"
                                                      monaDropDownTreeExpandable
-                                                     monaDropDownTreeFilterable
                                                      [ngModel]="dropdownTreeSelectedValue"
                                                      (ngModelChange)="onDropdownTreeValueChange($event)"
                                                      [expandedKeys]="dropdownTreeExpandedKeys"

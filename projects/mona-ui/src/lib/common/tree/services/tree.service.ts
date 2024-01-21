@@ -60,7 +60,7 @@ export class TreeService<T> {
     });
     public readonly checkedKeys: WritableSignal<ImmutableSet<any>> = signal(ImmutableSet.create());
     public readonly checkedKeys$: Observable<ImmutableSet<any>> = toObservable(this.checkedKeys);
-    public readonly children: WritableSignal<string | Selector<T, Iterable<T>> | Observable<Iterable<T>>> = signal("");
+    public readonly children: WritableSignal<string | Selector<T, Iterable<T> | Observable<Iterable<T>>>> = signal("");
     public readonly disableBy: WritableSignal<string | Selector<T, any> | null> = signal(null);
     public readonly disableOptions: WritableSignal<DisableOptions> = signal({
         disableChildren: true,
@@ -290,7 +290,7 @@ export class TreeService<T> {
         this.animationEnabled.set(enabled);
     }
 
-    public setChildrenSelector(selector: string | Selector<T, Iterable<T>> | Observable<Iterable<T>>): void {
+    public setChildrenSelector(selector: string | Selector<T, Iterable<T> | Observable<Iterable<T>>>): void {
         this.children.set(selector);
         this.nodeSet.set(this.createNodes(this.data()));
         this.updateNodeIndices();
@@ -502,16 +502,14 @@ export class TreeService<T> {
                 if (subNodes) {
                     this.createNodesRecursively(subNodes, node.children, node);
                 }
-            } else if (children instanceof Observable) {
-                children.pipe(take(1)).subscribe(childrenData => {
-                    if (childrenData) {
-                        this.createNodesRecursively(childrenData, node.children, node);
-                    }
-                });
             } else {
-                const subNodes = children(dataItem);
-                if (subNodes) {
-                    this.createNodesRecursively(subNodes, node.children, node);
+                const result = children(dataItem);
+                if (result instanceof Observable) {
+                    result.pipe(take(1)).subscribe(subNodes => {
+                        this.createNodesRecursively(subNodes, node.children, node);
+                    });
+                } else {
+                    this.createNodesRecursively(result, node.children, node);
                 }
             }
             childNodes.add(node);

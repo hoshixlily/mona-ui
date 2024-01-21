@@ -1,24 +1,26 @@
 <div class="mona-tree-view">
     @if (treeService.filterableOptions().enabled) {
-        <div>
+        <div class="mona-tree-view-filter-container">
             <mona-filter-input [filter]="treeService.filterText()"
                                [debounce]="treeService.filterableOptions().debounce"
                                [placeholder]="treeService.filterPlaceholder()"
                                (filterChange)="onFilterChange($event)"></mona-filter-input>
         </div>
     }
-    <mona-tree (nodeCheck)="nodeCheck.emit($event)"
-               (nodeClick)="nodeClick.emit($event)"
-               (nodeDrag)="nodeDrag.emit($event)"
-               (nodeDragEnd)="nodeDragEnd.emit($event)"
-               (nodeDragStart)="nodeDragStart.emit($event)"
-               (nodeDrop)="nodeDrop.emit($event)"
-               (nodeSelect)="nodeSelect.emit($event)">
-        @if (nodeTemplate) {
-            <ng-template monaTreeNodeTemplate let-dataItem let-element="element">
-                <ng-container [ngTemplateOutlet]="nodeTemplate"
-                              [ngTemplateOutletContext]="{$implicit:dataItem, element}"></ng-container>
-            </ng-template>
-        }
-    </mona-tree>
+    <div class="mona-tree-view-tree-container">
+        <mona-tree (nodeCheck)="nodeCheck.emit($event)"
+                   (nodeClick)="nodeClick.emit($event)"
+                   (nodeDrag)="nodeDrag.emit($event)"
+                   (nodeDragEnd)="nodeDragEnd.emit($event)"
+                   (nodeDragStart)="nodeDragStart.emit($event)"
+                   (nodeDrop)="nodeDrop.emit($event)"
+                   (nodeSelect)="nodeSelect.emit($event)">
+            @if (nodeTemplate) {
+                <ng-template monaTreeNodeTemplate let-dataItem let-element="element">
+                    <ng-container [ngTemplateOutlet]="nodeTemplate"
+                                  [ngTemplateOutletContext]="{$implicit:dataItem, element}"></ng-container>
+                </ng-template>
+            }
+        </mona-tree>
+    </div>
 </div>

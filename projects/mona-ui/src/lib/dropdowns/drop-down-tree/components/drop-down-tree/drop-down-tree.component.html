@@ -11,12 +11,11 @@
 <ng-template #popupTemplate>
     <div class="mona-dropdown-tree-popup-wrapper">
         <mona-tree-view [data]="data"
-                        [children]="childrenField"
+                        [children]="children"
                         [textField]="textField"
                         monaTreeViewDisable
                         [monaTreeViewSelectable]="selectableOptions"
                         [selectedKeys]="selectedTreeKeys()"
-                        [selectBy]="'id'"
                         [monaTreeViewFilterable]="dropdownTreeService.filterableOptions"
                         [filter]="dropdownTreeService.filterText()"
                         [filterPlaceholder]="dropdownTreeService.filterPlaceholder()"
