@@ -125,6 +125,7 @@ export class TreeNodeComponent<T> implements OnInit {
         }
         this.treeService.setNodeSelect(node, !this.selected());
         this.treeService.nodeSelectChange$.next({ node, selected: !this.selected() });
+        this.treeService.notifySelectionChange(node);
     }
 
     public onNodeContextMenu(event: MouseEvent): void {

@@ -10,23 +10,21 @@
 
 <ng-template #popupTemplate>
     <div class="mona-dropdown-tree-popup-wrapper">
-<!--        <mona-tree-view [data]="data"-->
-<!--                        [keyField]="keyField"-->
-<!--                        [childrenField]="childrenField"-->
-<!--                        [textField]="textField"-->
-<!--                        monaTreeViewDisable-->
-<!--                        [nodeDisabler]="disabler()"-->
-<!--                        [monaTreeViewSelectable]="selectableOptions"-->
-<!--                        [selectedKeys]="selectedTreeKeys()"-->
-<!--                        [monaTreeViewFilterable]="dropdownTreeService.filterableOptions"-->
-<!--                        [filter]="dropdownTreeService.filterText()"-->
-<!--                        [filterPlaceholder]="dropdownTreeService.filterPlaceholder()"-->
-<!--                        (filterChange)="dropdownTreeService.filterChange.emit($event)"-->
-<!--                        [monaTreeViewExpandable]="dropdownTreeService.expandableOptions"-->
-<!--                        [expandedKeys]="dropdownTreeService.expandedKeys()"-->
-<!--                        (expandedKeysChange)="onExpandedKeysChange($event)"-->
-<!--                        (selectedKeysChange)="onSelectedKeysChange($event)"-->
-<!--                        (selectionChange)="onSelectionChange($event)"></mona-tree-view>-->
-        <div>TREE WILL BE HERE</div>
+        <mona-tree-view [data]="data"
+                        [children]="childrenField"
+                        [textField]="textField"
+                        monaTreeViewDisable
+                        [monaTreeViewSelectable]="selectableOptions"
+                        [selectedKeys]="selectedTreeKeys()"
+                        [selectBy]="'id'"
+                        [monaTreeViewFilterable]="dropdownTreeService.filterableOptions"
+                        [filter]="dropdownTreeService.filterText()"
+                        [filterPlaceholder]="dropdownTreeService.filterPlaceholder()"
+                        (filterChange)="dropdownTreeService.filterChange.emit($event)"
+                        [monaTreeViewExpandable]="dropdownTreeService.expandableOptions"
+                        [expandedKeys]="dropdownTreeService.expandedKeys()"
+                        (expandedKeysChange)="onExpandedKeysChange($event)"
+                        (selectedKeysChange)="onSelectedKeysChange($event)"
+                        (selectionChange)="onSelectionChange($event)"></mona-tree-view>
     </div>
 </ng-template>

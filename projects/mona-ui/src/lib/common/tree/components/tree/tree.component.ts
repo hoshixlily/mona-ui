@@ -227,6 +227,7 @@ export class TreeComponent<T> implements OnInit {
                             node: navigatedNode,
                             selected: this.treeService.isSelected(navigatedNode)
                         });
+                        this.treeService.notifySelectionChange(navigatedNode);
                     }
                 }
             });

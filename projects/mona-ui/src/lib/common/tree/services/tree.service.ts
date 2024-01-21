@@ -23,6 +23,7 @@ import { NodeDragEndEvent } from "../models/NodeDragEndEvent";
 import { NodeDragEvent } from "../models/NodeDragEvent";
 import { NodeDragStartEvent } from "../models/NodeDragStartEvent";
 import { NodeDropEvent } from "../models/NodeDropEvent";
+import { NodeItem } from "../models/NodeItem";
 import { NodeSelectEvent } from "../models/NodeSelectEvent";
 import { SelectableOptions } from "../models/SelectableOptions";
 import { TreeNode } from "../models/TreeNode";
@@ -115,6 +116,7 @@ export class TreeService<T> {
     });
     public readonly selectedKeys: WritableSignal<ImmutableSet<any>> = signal(ImmutableSet.create());
     public readonly selectedKeys$: Observable<ImmutableSet<any>> = toObservable(this.selectedKeys);
+    public readonly selectionChange$: Subject<NodeItem<T>> = new Subject();
     public readonly textField: WritableSignal<string | Selector<T, string>> = signal("");
     public readonly viewNodeSet: Signal<ImmutableSet<TreeNode<T>>> = computed(() => {
         if (this.filterText()) {
@@ -126,6 +128,7 @@ export class TreeService<T> {
     public expandedKeysChange: EventEmitter<Array<any>> = new EventEmitter<Array<any>>();
     public filterChange: EventEmitter<FilterChangeEvent> = new EventEmitter<FilterChangeEvent>();
     public selectedKeysChange: EventEmitter<Array<any>> = new EventEmitter<Array<any>>();
+    public selectionChange: EventEmitter<NodeItem<T>> = new EventEmitter<NodeItem<T>>();
 
     public constructor() {
         effect(
@@ -277,6 +280,10 @@ export class TreeService<T> {
             return this.navigateToPreviousNode();
         }
         return null;
+    }
+
+    public notifySelectionChange(node: TreeNode<T>): void {
+        this.selectionChange$.next(node.nodeItem);
     }
 
     public setAnimationEnabled(enabled: boolean): void {

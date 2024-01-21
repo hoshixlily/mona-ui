@@ -640,7 +640,7 @@ div.mona-time-picker-popup {
 
 .mona-dropdown-tree-popup-wrapper {
     max-height: 250px;
-    padding: 0;
+    padding: 4px;
     overflow: hidden;
     & mona-tree-view ul.mona-tree-list {
         max-height: 200px;
