@@ -1,5 +1,16 @@
-import { computed, effect, EventEmitter, Injectable, Signal, signal, TemplateRef, WritableSignal } from "@angular/core";
-import { toObservable, toSignal } from "@angular/core/rxjs-interop";
+import {
+    computed,
+    DestroyRef,
+    effect,
+    EventEmitter,
+    inject,
+    Injectable,
+    Signal,
+    signal,
+    TemplateRef,
+    WritableSignal
+} from "@angular/core";
+import { takeUntilDestroyed, toObservable, toSignal } from "@angular/core/rxjs-interop";
 import {
     aggregate,
     from,
@@ -9,7 +20,16 @@ import {
     Selector,
     sequenceEqual
 } from "@mirei/ts-collections";
-import { BehaviorSubject, debounceTime, distinctUntilChanged, Observable, ReplaySubject, Subject, take } from "rxjs";
+import {
+    BehaviorSubject,
+    debounceTime,
+    distinctUntilChanged,
+    Observable,
+    pairwise,
+    ReplaySubject,
+    Subject,
+    take
+} from "rxjs";
 import { FilterChangeEvent } from "../../filter-input/models/FilterChangeEvent";
 import { FilterableOptions } from "../../models/FilterableOptions";
 import { CheckableOptions } from "../models/CheckableOptions";
@@ -33,6 +53,7 @@ import { TreeNodeSelectEvent } from "../models/TreeNodeSelectEvent";
 
 @Injectable()
 export class TreeService<T> {
+    readonly #destroyRef: DestroyRef = inject(DestroyRef);
     private readonly data: WritableSignal<ImmutableSet<T>> = signal(ImmutableSet.create());
     private readonly filteredExpandedKeys: WritableSignal<ImmutableSet<any>> = signal(ImmutableSet.create());
     private readonly navigableNodes: Signal<ImmutableSet<TreeNode<T>>> = computed(() => {
@@ -116,6 +137,20 @@ export class TreeService<T> {
     });
     public readonly selectedKeys: WritableSignal<ImmutableSet<any>> = signal(ImmutableSet.create());
     public readonly selectedKeys$: Observable<ImmutableSet<any>> = toObservable(this.selectedKeys);
+    public readonly selectedNodes: Signal<ImmutableSet<TreeNode<T>>> = computed(() => {
+        const selectedKeys = this.selectedKeys();
+        const nodeDictionary = this.nodeDictionary();
+        return selectedKeys
+            .select(k => {
+                return nodeDictionary.values().firstOrDefault(n => {
+                    const key = this.getSelectKey(n);
+                    return key === k;
+                });
+            })
+            .where(n => n != null)
+            .cast<TreeNode<T>>()
+            .toImmutableSet();
+    });
     public readonly selectionChange$: Subject<NodeItem<T>> = new Subject();
     public readonly textField: WritableSignal<string | Selector<T, string>> = signal("");
     public readonly viewNodeSet: Signal<ImmutableSet<TreeNode<T>>> = computed(() => {
@@ -127,7 +162,6 @@ export class TreeService<T> {
     public checkedKeysChange: EventEmitter<Array<any>> = new EventEmitter<Array<any>>();
     public expandedKeysChange: EventEmitter<Array<any>> = new EventEmitter<Array<any>>();
     public filterChange: EventEmitter<FilterChangeEvent> = new EventEmitter<FilterChangeEvent>();
-    public selectedKeysChange: EventEmitter<Array<any>> = new EventEmitter<Array<any>>();
     public selectionChange: EventEmitter<NodeItem<T>> = new EventEmitter<NodeItem<T>>();
 
     public constructor() {
@@ -461,6 +495,16 @@ export class TreeService<T> {
         this.selectableOptions.update(o => ({ ...o, ...options }));
     }
 
+    public setSelectedDataItems(dataItems: Iterable<T>): void {
+        const selectBy = this.selectBy();
+        if (!selectBy) {
+            this.selectedKeys.update(set => set.clear().addAll(dataItems));
+        } else {
+            const selectedKeys = from(dataItems).select(d => this.getDataItemSelectKey(d));
+            this.selectedKeys.update(set => set.clear().addAll(selectedKeys));
+        }
+    }
+
     public setSelectedKeys(keys: Iterable<any>): void {
         const selectedKeys = this.selectedKeys().orderBy(k => k);
         const orderedKeys = from(keys).orderBy(k => k);
@@ -559,6 +603,17 @@ export class TreeService<T> {
         return disableBy(node.data);
     }
 
+    public setNodeExpandSubscription(): void {
+        this.expandedKeys$.pipe(pairwise(), takeUntilDestroyed(this.#destroyRef)).subscribe(([oldKeys, keys]) => {
+            const orderedOldKeys = oldKeys.orderBy(k => k);
+            const orderedKeys = keys.orderBy(k => k);
+            if (sequenceEqual(orderedOldKeys, orderedKeys)) {
+                return;
+            }
+            this.expandedKeysChange.emit(keys.toArray());
+        });
+    }
+
     private getExpandKey(node: TreeNode<T>): any {
         const expandBy = this.expandBy();
         if (!expandBy) {
@@ -573,6 +628,17 @@ export class TreeService<T> {
     private getChildNodes(node: TreeNode<T>): ImmutableSet<TreeNode<T>> {
         const nodes = TreeService.flatten([node]);
         return nodes.where(n => n !== node).toImmutableSet();
+    }
+
+    private getDataItemSelectKey(dataItem: T): any | null {
+        const selectBy = this.selectBy();
+        if (!selectBy) {
+            return dataItem;
+        }
+        if (typeof selectBy === "string") {
+            return (dataItem as any)[selectBy] ?? dataItem;
+        }
+        return selectBy(dataItem);
     }
 
     private getParentNodes(node: TreeNode<T>): ImmutableSet<TreeNode<T>> {

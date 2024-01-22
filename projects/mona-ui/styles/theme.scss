@@ -641,15 +641,16 @@ div.mona-time-picker-popup {
 .mona-dropdown-tree-popup-wrapper {
     max-height: 250px;
     overflow: hidden;
-    & div.mona-tree-view  {
-        max-height: 200px;
-        overflow: hidden;
-    }
-    & div.mona-tree-view-filter-container {
+    display: flex;
+    flex-direction: column;
+    & div.mona-dropdown-tree-filter {
         padding: 4px;
         border-bottom: 1px solid var(--mona-border-color);
     }
-    & div.mona-tree-view-tree-container {
+    & div.mona-dropdown-tree-container {
+        overflow: auto;
+        max-height: 200px;
+        width: 100%;
         padding: 4px;
         @include scrollbars;
     }

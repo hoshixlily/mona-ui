@@ -10,20 +10,23 @@
 
 <ng-template #popupTemplate>
     <div class="mona-dropdown-tree-popup-wrapper">
-        <mona-tree-view [data]="data"
-                        [children]="children"
-                        [textField]="textField"
-                        monaTreeViewDisable
-                        [monaTreeViewSelectable]="selectableOptions"
-                        [selectedKeys]="selectedTreeKeys()"
-                        [monaTreeViewFilterable]="dropdownTreeService.filterableOptions"
-                        [filter]="dropdownTreeService.filterText()"
-                        [filterPlaceholder]="dropdownTreeService.filterPlaceholder()"
-                        (filterChange)="dropdownTreeService.filterChange.emit($event)"
-                        [monaTreeViewExpandable]="dropdownTreeService.expandableOptions"
-                        [expandedKeys]="dropdownTreeService.expandedKeys()"
-                        (expandedKeysChange)="onExpandedKeysChange($event)"
-                        (selectedKeysChange)="onSelectedKeysChange($event)"
-                        (selectionChange)="onSelectionChange($event)"></mona-tree-view>
+        @if (treeService.filterableOptions().enabled) {
+            <div class="mona-dropdown-tree-filter">
+                <mona-filter-input [filter]="treeService.filterText()"
+                                   [debounce]="treeService.filterableOptions().debounce"
+                                   [placeholder]="treeService.filterPlaceholder()"
+                                   (filterChange)="onFilterChange($event)"></mona-filter-input>
+            </div>
+        }
+        <div class="mona-dropdown-tree-container">
+            <mona-tree>
+                @if (nodeTemplate) {
+                    <ng-template monaTreeNodeTemplate let-dataItem>
+                        <ng-container [ngTemplateOutlet]="nodeTemplate"
+                                      [ngTemplateOutletContext]="{$implicit: dataItem}"></ng-container>
+                    </ng-template>
+                }
+            </mona-tree>
+        </div>
     </div>
 </ng-template>

@@ -50,7 +50,6 @@ export class TreeViewSelectableDirective<T> implements OnInit {
     public constructor(private readonly treeService: TreeService<T>) {}
 
     public ngOnInit(): void {
-        this.treeService.selectedKeysChange = this.selectedKeysChange;
         this.treeService.selectionChange = this.selectionChange;
         this.setNodeSelectSubscription();
     }
@@ -64,7 +63,7 @@ export class TreeViewSelectableDirective<T> implements OnInit {
                 if (sequenceEqual(orderedOldKeys, orderedKeys)) {
                     return;
                 }
-                this.treeService.selectedKeysChange.emit(keys.toArray());
+                this.selectedKeysChange.emit(keys.toArray());
             });
         this.treeService.selectionChange$
             .pipe(

@@ -1,23 +1,22 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from "@angular/core/testing";
 
-import { TreeViewComponent } from './tree-view.component';
+import { TreeViewComponent } from "./tree-view.component";
 
-describe('TreeViewComponent', () => {
-  let component: TreeViewComponent;
-  let fixture: ComponentFixture<TreeViewComponent>;
+describe("TreeViewComponent", () => {
+    let component: TreeViewComponent<any>;
+    let fixture: ComponentFixture<TreeViewComponent<any>>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [TreeViewComponent]
-    })
-    .compileComponents();
-    
-    fixture = TestBed.createComponent(TreeViewComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+    beforeEach(async () => {
+        await TestBed.configureTestingModule({
+            imports: [TreeViewComponent]
+        }).compileComponents();
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+        fixture = TestBed.createComponent(TreeViewComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
+
+    it("should create", () => {
+        expect(component).toBeTruthy();
+    });
 });

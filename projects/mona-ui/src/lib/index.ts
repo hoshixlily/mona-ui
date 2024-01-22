@@ -61,8 +61,10 @@ export * from "./dropdowns/drop-down-list/directives/drop-down-list-value-templa
 export * from "./dropdowns/drop-down-list/components/drop-down-list/drop-down-list.component";
 
 /* Drop Down Tree */
+export * from "./dropdowns/drop-down-tree/directives/drop-down-tree-disable.directive";
 export * from "./dropdowns/drop-down-tree/directives/drop-down-tree-expandable.directive";
 export * from "./dropdowns/drop-down-tree/directives/drop-down-tree-filterable.directive";
+export * from "./dropdowns/drop-down-tree/directives/drop-down-tree-node-template.directive";
 export * from "./dropdowns/drop-down-tree/components/drop-down-tree/drop-down-tree.component";
 
 /* Multi Select */
@@ -229,22 +231,12 @@ export * from "./tooltips/popover/components/popover/popover.component";
 export * from "./tooltips/tooltip/tooltip.component";
 
 /** TreeView */
-// export { NodeOptions } from "./tree-view/models/Node";
-// export { NodeClickEvent } from "./tree-view/models/NodeClickEvent";
-// export * from "./tree-view/models/NodeDragEndEvent";
-// export * from "./tree-view/models/NodeDragStartEvent";
-// export * from "./tree-view/models/NodeDragEvent";
-// export * from "./tree-view/models/NodeDropEvent";
-// export * from "./tree-view/models/NodeLookupItem";
-// export * from "./tree-view/models/CheckableOptions";
-// export * from "./tree-view/models/ExpandableOptions";
-// export * from "./tree-view/models/FilterableOptions";
-// export { SelectableOptions } from "./tree-view/models/SelectableOptions";
 export * from "./tree-view/components/tree-view/tree-view.component";
 export * from "./tree-view/directives/tree-view-checkable.directive";
 export * from "./tree-view/directives/tree-view-disable.directive";
 export * from "./tree-view/directives/tree-view-expandable.directive";
 export * from "./tree-view/directives/tree-view-filterable.directive";
+export * from "./tree-view/directives/tree-view-node-template.directive";
 export * from "./tree-view/directives/tree-view-selectable.directive";
 export * from "./tree-view/directives/tree-view-node-template.directive";
 

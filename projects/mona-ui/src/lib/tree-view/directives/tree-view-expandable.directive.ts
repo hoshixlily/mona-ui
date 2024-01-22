@@ -1,7 +1,5 @@
-import { DestroyRef, Directive, EventEmitter, inject, Input, OnInit, Output } from "@angular/core";
-import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { Selector, sequenceEqual } from "@mirei/ts-collections";
-import { pairwise } from "rxjs";
+import { Directive, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { Selector } from "@mirei/ts-collections";
 import { ExpandableOptions } from "../../common/tree/models/ExpandableOptions";
 import { TreeService } from "../../common/tree/services/tree.service";
 
@@ -13,7 +11,6 @@ export class TreeViewExpandableDirective<T> implements OnInit {
     readonly #defaultOptions: ExpandableOptions = {
         enabled: true
     };
-    readonly #destroyRef: DestroyRef = inject(DestroyRef);
 
     @Input()
     public set expandBy(value: string | Selector<T, any> | null | undefined) {
@@ -44,19 +41,6 @@ export class TreeViewExpandableDirective<T> implements OnInit {
 
     public ngOnInit(): void {
         this.treeService.expandedKeysChange = this.expandedKeysChange;
-        this.setNodeExpandSubscription();
-    }
-
-    private setNodeExpandSubscription(): void {
-        this.treeService.expandedKeys$
-            .pipe(pairwise(), takeUntilDestroyed(this.#destroyRef))
-            .subscribe(([oldKeys, keys]) => {
-                const orderedOldKeys = oldKeys.orderBy(k => k);
-                const orderedKeys = keys.orderBy(k => k);
-                if (sequenceEqual(orderedOldKeys, orderedKeys)) {
-                    return;
-                }
-                this.treeService.expandedKeysChange.emit(keys.toArray());
-            });
+        this.treeService.setNodeExpandSubscription();
     }
 }

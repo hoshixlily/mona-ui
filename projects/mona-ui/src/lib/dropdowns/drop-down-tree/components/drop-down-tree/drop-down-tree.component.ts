@@ -2,26 +2,36 @@ import { CommonModule } from "@angular/common";
 import {
     Component,
     computed,
+    ContentChild,
+    DestroyRef,
     ElementRef,
     forwardRef,
     HostBinding,
+    inject,
     Input,
+    OnInit,
     Signal,
     signal,
     TemplateRef,
     ViewChild,
     WritableSignal
 } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { FaIconComponent } from "@fortawesome/angular-fontawesome";
 import { faChevronDown, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
-import { Selector, sequenceEqual } from "@mirei/ts-collections";
-import { Observable, take } from "rxjs";
+import { Selector } from "@mirei/ts-collections";
+import { distinctUntilChanged, Observable, take } from "rxjs";
 import { AnimationState } from "../../../../animations/models/AnimationState";
 import { PopupAnimationService } from "../../../../animations/services/popup-animation.service";
 import { ButtonDirective } from "../../../../buttons/button/button.directive";
-import { NodeItem } from "../../../../common/tree/models/NodeItem";
+import { FilterInputComponent } from "../../../../common/filter-input/components/filter-input/filter-input.component";
+import { FilterChangeEvent } from "../../../../common/filter-input/models/FilterChangeEvent";
+import { TreeComponent } from "../../../../common/tree/components/tree/tree.component";
+import { TreeNodeTemplateDirective } from "../../../../common/tree/directives/tree-node-template.directive";
 import { SelectableOptions } from "../../../../common/tree/models/SelectableOptions";
+import { TreeNode } from "../../../../common/tree/models/TreeNode";
+import { TreeService } from "../../../../common/tree/services/tree.service";
 import { PopupRef } from "../../../../popup/models/PopupRef";
 import { PopupService } from "../../../../popup/services/popup.service";
 import { TreeViewComponent } from "../../../../tree-view/components/tree-view/tree-view.component";
@@ -31,6 +41,7 @@ import { TreeViewFilterableDirective } from "../../../../tree-view/directives/tr
 import { TreeViewSelectableDirective } from "../../../../tree-view/directives/tree-view-selectable.directive";
 import { Action } from "../../../../utils/Action";
 import { DropDownService } from "../../../services/drop-down.service";
+import { DropDownTreeNodeTemplateDirective } from "../../directives/drop-down-tree-node-template.directive";
 import { DropDownTreeService } from "../../services/drop-down-tree.service";
 
 @Component({
@@ -44,11 +55,15 @@ import { DropDownTreeService } from "../../services/drop-down-tree.service";
         TreeViewDisableDirective,
         TreeViewSelectableDirective,
         TreeViewFilterableDirective,
-        TreeViewExpandableDirective
+        TreeViewExpandableDirective,
+        TreeComponent,
+        FilterInputComponent,
+        TreeNodeTemplateDirective
     ],
     templateUrl: "./drop-down-tree.component.html",
     styleUrl: "./drop-down-tree.component.scss",
     providers: [
+        TreeService,
         DropDownTreeService,
         {
             provide: NG_VALUE_ACCESSOR,
@@ -57,30 +72,40 @@ import { DropDownTreeService } from "../../services/drop-down-tree.service";
         }
     ]
 })
-export class DropDownTreeComponent<T> implements ControlValueAccessor {
+export class DropDownTreeComponent<T> implements ControlValueAccessor, OnInit {
+    readonly #destroyRef: DestroyRef = inject(DestroyRef);
+    readonly #selectedNode: Signal<TreeNode<T> | null> = computed(() => {
+        return this.treeService.selectedNodes().firstOrDefault();
+    });
     #popupRef: PopupRef | null = null;
-    #selectedNode: WritableSignal<NodeItem<T> | null> = signal(null);
-    #propagateChange: any = () => {};
+    #propagateChange: Action<any> | null = null;
     #value: WritableSignal<any | null> = signal(null);
+
     protected readonly selectableOptions: SelectableOptions = {
         enabled: true,
         mode: "single",
         toggleable: false,
         childrenOnly: false
     };
-    protected readonly selectedTreeKeys: WritableSignal<unknown[]> = signal([]);
     protected readonly text: Signal<string> = computed(() => {
-        return this.#value()?.[this.textField] ?? "";
+        const node = this.#selectedNode();
+        if (!node) {
+            return "";
+        }
+        return this.treeService.getNodeText(node);
     });
     public readonly clearIcon: IconDefinition = faTimes;
     public readonly dropdownIcon: IconDefinition = faChevronDown;
-    public disabler: WritableSignal<Action<unknown, boolean> | string | undefined> = signal(undefined);
 
     @Input()
-    public children: string | Selector<T, Iterable<T> | Observable<Iterable<T>>> = "";
+    public set children(value: string | Selector<T, Iterable<T> | Observable<Iterable<T>>>) {
+        this.treeService.setChildrenSelector(value);
+    }
 
     @Input()
-    public data: Iterable<T> = [];
+    public set data(value: Iterable<T>) {
+        this.treeService.setData(value);
+    }
 
     @Input()
     public disabled: boolean = false;
@@ -91,45 +116,43 @@ export class DropDownTreeComponent<T> implements ControlValueAccessor {
     @HostBinding("class.mona-dropdown")
     public readonly hostClass: boolean = true;
 
-    @Input()
-    public set itemDisabled(nodeDisabler: Action<unknown, boolean> | string) {
-        this.disabler.set(nodeDisabler);
-    }
+    @ContentChild(DropDownTreeNodeTemplateDirective, { read: TemplateRef })
+    public nodeTemplate: TemplateRef<any> | null = null;
 
     @ViewChild("popupTemplate")
     public popupTemplate!: TemplateRef<any>;
 
     @Input()
-    public textField: string = "";
+    public set textField(value: string | null | undefined) {
+        this.treeService.setTextField(value ?? "");
+    }
+
+    @Input()
+    public set valueField(valueField: string | null | undefined) {
+        this.treeService.setSelectBy(valueField ?? null);
+    }
 
     public constructor(
-        protected readonly dropdownTreeService: DropDownTreeService,
         private readonly elementRef: ElementRef<HTMLElement>,
         private readonly popupAnimationService: PopupAnimationService,
-        private readonly popupService: PopupService
+        private readonly popupService: PopupService,
+        protected readonly treeService: TreeService<T>
     ) {}
 
     public close(): void {
         this.#popupRef?.close();
     }
 
-    public onExpandedKeysChange(expandedKeys: unknown[]): void {
-        this.dropdownTreeService.expandedKeys.update(set => set.clear().addAll(expandedKeys));
-        this.dropdownTreeService.expandedKeysChange.emit(expandedKeys);
+    public ngOnInit(): void {
+        this.treeService.setSelectableOptions(this.selectableOptions);
+        this.setSubscriptions();
     }
 
-    public onSelectedKeysChange(selectedKeys: unknown[]): void {
-        if (sequenceEqual(this.selectedTreeKeys(), selectedKeys)) {
-            return;
+    public onFilterChange(event: FilterChangeEvent): void {
+        this.treeService.filterChange.emit(event);
+        if (!event.isDefaultPrevented()) {
+            this.treeService.filter$.next(event.filter);
         }
-        this.selectedTreeKeys.set(selectedKeys);
-        this.close();
-    }
-
-    public onSelectionChange(node: NodeItem<T>): void {
-        this.#selectedNode.set(node);
-        this.#value.set(node.data);
-        this.#propagateChange(this.#value());
     }
 
     public open(): void {
@@ -163,10 +186,21 @@ export class DropDownTreeComponent<T> implements ControlValueAccessor {
 
     public writeValue(obj: any | null) {
         this.#value.set(obj);
-        if (obj == null) {
-            this.selectedTreeKeys.set([]);
-        } else {
-            this.selectedTreeKeys.set([obj]);
+        if (obj != null) {
+            this.treeService.setSelectedDataItems([obj]);
         }
+    }
+
+    private setSubscriptions(): void {
+        this.treeService.selectedKeys$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(() => this.close());
+        this.treeService.selectionChange$
+            .pipe(
+                distinctUntilChanged((n1, n2) => n1.data === n2.data),
+                takeUntilDestroyed(this.#destroyRef)
+            )
+            .subscribe(node => {
+                this.#value.set(node.data);
+                this.#propagateChange?.(this.#value());
+            });
     }
 }

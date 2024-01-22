@@ -65,8 +65,10 @@ import {
     DropDownListNoDataTemplateDirective,
     DropDownListValueTemplateDirective,
     DropDownTreeComponent,
+    DropDownTreeDisableDirective,
     DropDownTreeExpandableDirective,
     DropDownTreeFilterableDirective,
+    DropDownTreeNodeTemplateDirective,
     ExpansionPanelActionsTemplateDirective,
     ExpansionPanelComponent,
     ExpansionPanelTitleTemplateDirective,
@@ -307,29 +309,11 @@ interface TreeNodeDataItem {
         TreeViewNodeTemplateDirective,
         ChipComponent,
         DropDownTreeComponent,
+        DropDownTreeDisableDirective,
         DropDownTreeExpandableDirective,
-        DropDownTreeFilterableDirective
-
-        // ListComponent,
-        // ListFilterableDirective
-        // ListFooterTemplateDirective,
-        // ListGroupHeaderTemplateDirective,
-        // ListGroupableDirective,
-        // ListHeaderTemplateDirective,
-        // ListItemTemplateDirective,
-        // ListNavigableDirective,
-        // ListSelectableDirective,
-        // ListVirtualScrollDirective,
-
-        // TreeComponent,
-        // TreeViewCheckableDirective,
-        // TreeViewExpandableDirective,
-        // TreeViewFilterableDirective,
-        // TreeViewSelectableDirective,
-        // TreeNodeTemplateDirective
+        DropDownTreeFilterableDirective,
+        DropDownTreeNodeTemplateDirective
     ]
-    // providers: [ListService],
-    // providers: [TreeService]
 })
 export class AppComponent implements OnInit {
     public readonly closeIcon: IconDefinition = faTimes;
@@ -754,9 +738,7 @@ export class AppComponent implements OnInit {
     public dropdownTreeSelectedValue = this.treeData[0].items![1].items![0];
 
     public treeChildren = (item: TreeNodeDataItem) => of(item.items ?? []);
-    public treeDisabledKeys: string[] = [
-        /*"1-1-1", "1-1-4", "1-4"*/
-    ];
+    public treeDisabledKeys: string[] = ["1-1-1", "1-1-4", "1-4"];
     public treeExpandedKeys: string[] = ["1", "1-1", "1-2", "1-3", "1-4"];
     public treeSelectedKeys: string[] = [
         /*"1-2-1", "1-2-2", "1-2-3", "1-2-4"*/
