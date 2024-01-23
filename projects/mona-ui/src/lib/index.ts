@@ -64,6 +64,9 @@ export * from "./dropdowns/drop-down-list/components/drop-down-list/drop-down-li
 export * from "./dropdowns/drop-down-tree/directives/drop-down-tree-disable.directive";
 export * from "./dropdowns/drop-down-tree/directives/drop-down-tree-expandable.directive";
 export * from "./dropdowns/drop-down-tree/directives/drop-down-tree-filterable.directive";
+export * from "./dropdowns/drop-down-tree/directives/drop-down-tree-footer-template.directive";
+export * from "./dropdowns/drop-down-tree/directives/drop-down-tree-header-template.directive";
+export * from "./dropdowns/drop-down-tree/directives/drop-down-tree-no-data-template.directive";
 export * from "./dropdowns/drop-down-tree/directives/drop-down-tree-node-template.directive";
 export * from "./dropdowns/drop-down-tree/components/drop-down-tree/drop-down-tree.component";
 

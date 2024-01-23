@@ -32,6 +32,7 @@ import { TreeNodeTemplateDirective } from "../../../../common/tree/directives/tr
 import { SelectableOptions } from "../../../../common/tree/models/SelectableOptions";
 import { TreeNode } from "../../../../common/tree/models/TreeNode";
 import { TreeService } from "../../../../common/tree/services/tree.service";
+import { PlaceholderComponent } from "../../../../layout/placeholder/placeholder.component";
 import { PopupRef } from "../../../../popup/models/PopupRef";
 import { PopupService } from "../../../../popup/services/popup.service";
 import { TreeViewComponent } from "../../../../tree-view/components/tree-view/tree-view.component";
@@ -40,7 +41,13 @@ import { TreeViewExpandableDirective } from "../../../../tree-view/directives/tr
 import { TreeViewFilterableDirective } from "../../../../tree-view/directives/tree-view-filterable.directive";
 import { TreeViewSelectableDirective } from "../../../../tree-view/directives/tree-view-selectable.directive";
 import { Action } from "../../../../utils/Action";
+import { DropDownListFooterTemplateDirective } from "../../../drop-down-list/directives/drop-down-list-footer-template.directive";
+import { DropDownListHeaderTemplateDirective } from "../../../drop-down-list/directives/drop-down-list-header-template.directive";
+import { DropDownListNoDataTemplateDirective } from "../../../drop-down-list/directives/drop-down-list-no-data-template.directive";
 import { DropDownService } from "../../../services/drop-down.service";
+import { DropDownTreeFooterTemplateDirective } from "../../directives/drop-down-tree-footer-template.directive";
+import { DropDownTreeHeaderTemplateDirective } from "../../directives/drop-down-tree-header-template.directive";
+import { DropDownTreeNoDataTemplateDirective } from "../../directives/drop-down-tree-no-data-template.directive";
 import { DropDownTreeNodeTemplateDirective } from "../../directives/drop-down-tree-node-template.directive";
 import { DropDownTreeService } from "../../services/drop-down-tree.service";
 
@@ -58,7 +65,8 @@ import { DropDownTreeService } from "../../services/drop-down-tree.service";
         TreeViewExpandableDirective,
         TreeComponent,
         FilterInputComponent,
-        TreeNodeTemplateDirective
+        TreeNodeTemplateDirective,
+        PlaceholderComponent
     ],
     templateUrl: "./drop-down-tree.component.html",
     styleUrl: "./drop-down-tree.component.scss",
@@ -97,6 +105,9 @@ export class DropDownTreeComponent<T> implements ControlValueAccessor, OnInit {
     public readonly clearIcon: IconDefinition = faTimes;
     public readonly dropdownIcon: IconDefinition = faChevronDown;
 
+    @HostBinding("class.mona-dropdown")
+    public readonly hostClass: boolean = true;
+
     @Input()
     public set children(value: string | Selector<T, Iterable<T> | Observable<Iterable<T>>>) {
         this.treeService.setChildrenSelector(value);
@@ -113,8 +124,14 @@ export class DropDownTreeComponent<T> implements ControlValueAccessor, OnInit {
     @ViewChild("dropdownWrapper")
     public dropdownWrapper!: ElementRef<HTMLDivElement>;
 
-    @HostBinding("class.mona-dropdown")
-    public readonly hostClass: boolean = true;
+    @ContentChild(DropDownTreeFooterTemplateDirective, { read: TemplateRef })
+    public footerTemplate: TemplateRef<any> | null = null;
+
+    @ContentChild(DropDownTreeHeaderTemplateDirective, { read: TemplateRef })
+    public headerTemplate: TemplateRef<any> | null = null;
+
+    @ContentChild(DropDownTreeNoDataTemplateDirective, { read: TemplateRef })
+    public noDataTemplate: TemplateRef<any> | null = null;
 
     @ContentChild(DropDownTreeNodeTemplateDirective, { read: TemplateRef })
     public nodeTemplate: TemplateRef<any> | null = null;

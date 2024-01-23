@@ -10,6 +10,11 @@
 
 <ng-template #popupTemplate>
     <div class="mona-dropdown-tree-popup-wrapper">
+        @if (headerTemplate) {
+            <div class="mona-dropdown-tree-header">
+                <ng-container [ngTemplateOutlet]="headerTemplate"></ng-container>
+            </div>
+        }
         @if (treeService.filterableOptions().enabled) {
             <div class="mona-dropdown-tree-filter">
                 <mona-filter-input [filter]="treeService.filterText()"
@@ -19,14 +24,27 @@
             </div>
         }
         <div class="mona-dropdown-tree-container">
-            <mona-tree>
-                @if (nodeTemplate) {
-                    <ng-template monaTreeNodeTemplate let-dataItem>
-                        <ng-container [ngTemplateOutlet]="nodeTemplate"
-                                      [ngTemplateOutletContext]="{$implicit: dataItem}"></ng-container>
-                    </ng-template>
+            @if (treeService.nodeSet().length === 0) {
+                @if (!noDataTemplate) {
+                    <mona-placeholder [text]="'No data'"></mona-placeholder>
+                } @else {
+                    <ng-container [ngTemplateOutlet]="noDataTemplate"></ng-container>
                 }
-            </mona-tree>
+            } @else {
+                <mona-tree>
+                    @if (nodeTemplate) {
+                        <ng-template monaTreeNodeTemplate let-dataItem>
+                            <ng-container [ngTemplateOutlet]="nodeTemplate"
+                                          [ngTemplateOutletContext]="{$implicit: dataItem}"></ng-container>
+                        </ng-template>
+                    }
+                </mona-tree>
+            }
         </div>
+        @if (footerTemplate) {
+            <div class="mona-dropdown-tree-footer">
+                <ng-container [ngTemplateOutlet]="footerTemplate"></ng-container>
+            </div>
+        }
     </div>
 </ng-template>

@@ -68,6 +68,9 @@ import {
     DropDownTreeDisableDirective,
     DropDownTreeExpandableDirective,
     DropDownTreeFilterableDirective,
+    DropDownTreeFooterTemplateDirective,
+    DropDownTreeHeaderTemplateDirective,
+    DropDownTreeNoDataTemplateDirective,
     DropDownTreeNodeTemplateDirective,
     ExpansionPanelActionsTemplateDirective,
     ExpansionPanelComponent,
@@ -312,6 +315,9 @@ interface TreeNodeDataItem {
         DropDownTreeDisableDirective,
         DropDownTreeExpandableDirective,
         DropDownTreeFilterableDirective,
+        DropDownTreeFooterTemplateDirective,
+        DropDownTreeHeaderTemplateDirective,
+        DropDownTreeNoDataTemplateDirective,
         DropDownTreeNodeTemplateDirective
     ]
 })
