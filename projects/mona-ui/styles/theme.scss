@@ -211,12 +211,19 @@ div.mona-tree {
 div.mona-tree-node {
     padding: 4px 8px;
     &:hover:not(.mona-disabled):not(.mona-selected) {
-        box-shadow: inset 0 0 0 1px var(--mona-border-color-dark);
         background-color: var(--mona-background-hover-darker);
+        &:not(.mona-highlighted) {
+            box-shadow: inset 0 0 0 1px var(--mona-border-color-dark);
+        }
     }
     &:active:not(.mona-disabled):not(.mona-selected) {
         background-color: var(--mona-background-active-darker);
-        box-shadow: inset 0 0 0 1px var(--mona-border-color-dark);
+        &:not(.mona-highlighted) {
+            box-shadow: inset 0 0 0 1px var(--mona-border-color-dark);
+        }
+    }
+    &:active:not(.mona-disabled).mona-selected {
+        background-color: var(--mona-primary-active);
     }
     &.mona-selected {
         background-color: var(--mona-primary);
