@@ -180,11 +180,13 @@ export class TreeComponent<T> implements OnInit {
             .subscribe(event => {
                 const navigatedNode = this.treeService.navigatedNode();
                 if (event.key === "ArrowUp") {
+                    event.preventDefault();
                     this.treeService.navigate("previous");
                 } else if (event.key === "ArrowDown") {
+                    event.preventDefault();
                     this.treeService.navigate("next");
                 } else if (event.key === "ArrowLeft") {
-                    if (!navigatedNode) {
+                    if (!navigatedNode || !navigatedNode.nodeItem.hasChildren) {
                         return;
                     }
                     const expanded = this.treeService.isExpanded(navigatedNode);
@@ -193,7 +195,7 @@ export class TreeComponent<T> implements OnInit {
                         this.treeService.setNodeExpand(navigatedNode, false);
                     }
                 } else if (event.key === "ArrowRight") {
-                    if (!navigatedNode) {
+                    if (!navigatedNode || !navigatedNode.nodeItem.hasChildren) {
                         return;
                     }
                     const expanded = this.treeService.isExpanded(navigatedNode);

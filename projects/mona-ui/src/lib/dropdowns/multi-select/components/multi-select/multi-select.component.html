@@ -1,6 +1,4 @@
-<div class="mona-multi-select" [attr.tabindex]="disabled ? -1 : 0"
-     [ngClass]="{'mona-disabled': disabled}"  (click)="open()"
-     #dropdownWrapper>
+<div class="mona-multi-select" (click)="open()" #dropdownWrapper>
     <div class="mona-multi-select-value">
         <div>
             @for (pair of valueTextMap(); track pair.key) {

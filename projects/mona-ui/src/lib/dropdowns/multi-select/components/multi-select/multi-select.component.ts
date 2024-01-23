@@ -78,7 +78,10 @@ import { MultiSelectTagTemplateDirective } from "../../directives/multi-select-t
         ListFooterTemplateDirective,
         ListHeaderTemplateDirective,
         ListNoDataTemplateDirective
-    ]
+    ],
+    host: {
+        "[class.mona-disabled]": "disabled"
+    }
 })
 export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlValueAccessor {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);

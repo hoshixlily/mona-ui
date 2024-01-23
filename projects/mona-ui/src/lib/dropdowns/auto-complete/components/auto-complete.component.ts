@@ -72,7 +72,10 @@ import { AutoCompleteNoDataTemplateDirective } from "../directives/auto-complete
         ListHeaderTemplateDirective,
         ListNoDataTemplateDirective,
         ListItemTemplateDirective
-    ]
+    ],
+    host: {
+        "[class.mona-disabled]": "disabled"
+    }
 })
 export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccessor {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);

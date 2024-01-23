@@ -76,7 +76,10 @@ import { DropDownListValueTemplateDirective } from "../../directives/drop-down-l
         ListFooterTemplateDirective,
         ListHeaderTemplateDirective,
         ListNoDataTemplateDirective
-    ]
+    ],
+    host: {
+        "[class.mona-disabled]": "disabled"
+    }
 })
 export class DropDownListComponent<TData> implements OnInit, ControlValueAccessor {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);

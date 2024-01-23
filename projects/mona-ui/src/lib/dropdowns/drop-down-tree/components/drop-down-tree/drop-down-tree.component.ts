@@ -4,10 +4,12 @@ import {
     computed,
     ContentChild,
     DestroyRef,
+    effect,
     ElementRef,
     forwardRef,
     HostBinding,
     inject,
+    Injector,
     Input,
     OnInit,
     Signal,
@@ -21,7 +23,8 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { FaIconComponent } from "@fortawesome/angular-fontawesome";
 import { faChevronDown, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { Selector } from "@mirei/ts-collections";
-import { distinctUntilChanged, Observable, take } from "rxjs";
+import { distinctUntilChanged, fromEvent, Observable, take } from "rxjs";
+import { v4 } from "uuid";
 import { AnimationState } from "../../../../animations/models/AnimationState";
 import { PopupAnimationService } from "../../../../animations/services/popup-animation.service";
 import { ButtonDirective } from "../../../../buttons/button/button.directive";
@@ -75,10 +78,15 @@ import { DropDownTreeService } from "../../services/drop-down-tree.service";
             useExisting: forwardRef(() => DropDownTreeComponent),
             multi: true
         }
-    ]
+    ],
+    host: {
+        "[class.mona-disabled]": "disabled"
+    }
 })
 export class DropDownTreeComponent<T> implements ControlValueAccessor, OnInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
+    readonly #injector: Injector = inject(Injector);
+    readonly #popupUidClass: string = `mona-dropdown-popup-${v4()}`;
     readonly #selectedNode: Signal<TreeNode<T> | null> = computed(() => {
         return this.treeService.selectedNodes().firstOrDefault();
     });
@@ -158,7 +166,9 @@ export class DropDownTreeComponent<T> implements ControlValueAccessor, OnInit {
 
     public ngOnInit(): void {
         this.treeService.setSelectableOptions(this.selectableOptions);
+        this.setEffects();
         this.setSubscriptions();
+        this.setEventListeners();
     }
 
     public onFilterChange(event: FilterChangeEvent): void {
@@ -179,10 +189,11 @@ export class DropDownTreeComponent<T> implements ControlValueAccessor, OnInit {
             hasBackdrop: false,
             withPush: false,
             width: this.elementRef.nativeElement.getBoundingClientRect().width,
-            popupClass: ["mona-dropdown-popup-content", "mona-dropdown-tree-popup-content"],
+            popupClass: ["mona-dropdown-popup-content", "mona-dropdown-tree-popup-content", this.#popupUidClass],
             closeOnOutsideClick: false,
             positions: DropDownService.getDefaultPositions()
         });
+        this.focusSelectedNode();
         this.popupAnimationService.setupDropdownOutsideClickCloseAnimation(this.#popupRef);
         this.popupAnimationService.animateDropdown(this.#popupRef, AnimationState.Show);
         this.#popupRef.closed.pipe(take(1)).subscribe(() => {
@@ -202,6 +213,88 @@ export class DropDownTreeComponent<T> implements ControlValueAccessor, OnInit {
         if (obj != null) {
             this.treeService.setSelectedDataItems([obj]);
         }
+    }
+
+    private focusSelectedNode(): void {
+        window.setTimeout(() => {
+            const popupElement = document.querySelector(`.${this.#popupUidClass}`);
+            if (!popupElement) {
+                return;
+            }
+            const firstElement = popupElement.querySelector(
+                ".mona-dropdown-popup-content ul:first-child li:first-child"
+            ) as HTMLElement;
+            const uid = this.#selectedNode()?.uid;
+            if (uid) {
+                const selectedElement = popupElement.querySelector(
+                    ".mona-dropdown-popup-content ul li[data-uid='" + uid + "']"
+                ) as HTMLElement;
+                if (selectedElement) {
+                    selectedElement?.scrollIntoView({
+                        behavior: "auto",
+                        block: "center"
+                    });
+                    selectedElement.focus();
+                    return;
+                } else {
+                    if (firstElement) {
+                        firstElement.focus();
+                    }
+                }
+            }
+            if (firstElement) {
+                firstElement.focus();
+            }
+        }, 200);
+    }
+
+    private handleEnterKey(): void {
+        if (this.#popupRef) {
+            this.close();
+            return;
+        }
+        this.open();
+    }
+
+    private handleKeyDown(event: KeyboardEvent): void {
+        if (event.key === "Enter") {
+            this.handleEnterKey();
+        }
+    }
+
+    private setEffects(): void {
+        effect(
+            () => {
+                window.setTimeout(() => {
+                    const highlightedNode = this.treeService.navigatedNode();
+                    if (!highlightedNode) {
+                        return;
+                    }
+                    const popupElement = document.querySelector(`.${this.#popupUidClass}`);
+                    if (!popupElement) {
+                        return;
+                    }
+                    const nodeElement = popupElement.querySelector(
+                        `[data-uid="${highlightedNode.uid}"]`
+                    ) as HTMLElement;
+                    if (nodeElement) {
+                        nodeElement.scrollIntoView({
+                            behavior: "auto",
+                            block: "center"
+                        });
+                    }
+                });
+            },
+            { injector: this.#injector }
+        );
+    }
+
+    private setEventListeners(): void {
+        fromEvent<KeyboardEvent>(this.elementRef.nativeElement, "keydown")
+            .pipe(takeUntilDestroyed(this.#destroyRef))
+            .subscribe((event: KeyboardEvent) => {
+                this.handleKeyDown(event);
+            });
     }
 
     private setSubscriptions(): void {

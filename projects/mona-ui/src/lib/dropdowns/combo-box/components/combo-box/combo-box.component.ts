@@ -79,7 +79,10 @@ import { ComboBoxNoDataTemplateDirective } from "../../directives/combo-box-no-d
         ListHeaderTemplateDirective,
         ListNoDataTemplateDirective,
         ListItemTemplateDirective
-    ]
+    ],
+    host: {
+        "[class.mona-disabled]": "disabled"
+    }
 })
 export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);

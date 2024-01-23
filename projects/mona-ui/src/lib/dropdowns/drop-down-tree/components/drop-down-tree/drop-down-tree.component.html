@@ -1,9 +1,8 @@
-<div class="mona-dropdown-tree" [ngClass]="{'mona-disabled': disabled}"
-     [attr.tabindex]="disabled ? -1 : 0" (click)="open()" #dropdownWrapper>
+<div class="mona-dropdown-tree" (click)="open()" #dropdownWrapper>
     <div class="mona-dropdown-value">
         <span>{{text()}}</span>
     </div>
-    <button monaButton class="mona-input-button">
+    <button monaButton [tabindex]="-1" class="mona-input-button">
         <fa-icon [icon]="dropdownIcon"></fa-icon>
     </button>
 </div>
