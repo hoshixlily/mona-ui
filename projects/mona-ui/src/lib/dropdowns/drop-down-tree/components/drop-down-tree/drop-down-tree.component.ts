@@ -41,9 +41,6 @@ import { TreeViewExpandableDirective } from "../../../../tree-view/directives/tr
 import { TreeViewFilterableDirective } from "../../../../tree-view/directives/tree-view-filterable.directive";
 import { TreeViewSelectableDirective } from "../../../../tree-view/directives/tree-view-selectable.directive";
 import { Action } from "../../../../utils/Action";
-import { DropDownListFooterTemplateDirective } from "../../../drop-down-list/directives/drop-down-list-footer-template.directive";
-import { DropDownListHeaderTemplateDirective } from "../../../drop-down-list/directives/drop-down-list-header-template.directive";
-import { DropDownListNoDataTemplateDirective } from "../../../drop-down-list/directives/drop-down-list-no-data-template.directive";
 import { DropDownService } from "../../../services/drop-down.service";
 import { DropDownTreeFooterTemplateDirective } from "../../directives/drop-down-tree-footer-template.directive";
 import { DropDownTreeHeaderTemplateDirective } from "../../directives/drop-down-tree-header-template.directive";
@@ -88,7 +85,6 @@ export class DropDownTreeComponent<T> implements ControlValueAccessor, OnInit {
     #popupRef: PopupRef | null = null;
     #propagateChange: Action<any> | null = null;
     #value: WritableSignal<any | null> = signal(null);
-
     protected readonly selectableOptions: SelectableOptions = {
         enabled: true,
         mode: "single",
