@@ -156,6 +156,17 @@ export class SubTreeComponent<T> {
                 this.treeService.moveNode(sourceNode, targetNode, "after");
             }
             this.treeService.dropPositionChange$.next(null);
+            this.focusNode(sourceNode);
         });
+    }
+
+    private focusNode(node: TreeNode<T>): void {
+        this.treeService.navigatedNode.set(node);
+        const element = document.querySelector(`li[data-uid="${node.uid}"]`)?.closest(".mona-tree") as HTMLElement;
+        if (element == null) {
+            console.warn(`Cannot find element for node ${node.uid}`);
+            return;
+        }
+        element.focus();
     }
 }

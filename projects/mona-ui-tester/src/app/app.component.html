@@ -27,6 +27,8 @@
                             (checkedKeysChange)="onTreeCheckedKeysChange($event)"
                             monaTreeViewExpandable
                             monaTreeViewFilterable
+                            monaTreeViewDragAndDrop
+                            (nodeDrop)="print($event)"
                             [expandedKeys]="treeExpandedKeys"
                             (expandedKeysChange)="onTreeExpandedKeysChange($event)"
                             [monaTreeViewSelectable]="{ enabled: true, mode: 'multiple', childrenOnly: false }"

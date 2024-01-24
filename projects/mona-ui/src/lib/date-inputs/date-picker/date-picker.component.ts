@@ -1,9 +1,11 @@
 import {
     ChangeDetectionStrategy,
     Component,
+    DestroyRef,
     ElementRef,
     forwardRef,
     HostBinding,
+    inject,
     Input,
     OnInit,
     signal,
@@ -11,6 +13,7 @@ import {
     ViewChild,
     WritableSignal
 } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { DropDownService } from "../../dropdowns/services/drop-down.service";
 import { PopupService } from "../../popup/services/popup.service";
 import { FocusMonitor } from "@angular/cdk/a11y";
@@ -20,7 +23,7 @@ import { Action } from "../../utils/Action";
 import { PopupRef } from "../../popup/models/PopupRef";
 import { faCalendar, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { ConnectionPositionPair } from "@angular/cdk/overlay";
-import { take } from "rxjs";
+import { fromEvent, take } from "rxjs";
 import { PopupAnimationService } from "../../animations/services/popup-animation.service";
 import { AnimationState } from "../../animations/models/AnimationState";
 import { CalendarComponent } from "../calendar/calendar.component";
@@ -42,11 +45,16 @@ import { NgClass } from "@angular/common";
         }
     ],
     standalone: true,
-    imports: [NgClass, TextBoxDirective, FormsModule, ButtonDirective, FontAwesomeModule, CalendarComponent]
+    imports: [NgClass, TextBoxDirective, FormsModule, ButtonDirective, FontAwesomeModule, CalendarComponent],
+    host: {
+        "[class.mona-disabled]": "disabled",
+        "[attr.tabindex]": "disabled ? null : 0"
+    }
 })
 export class DatePickerComponent implements OnInit, ControlValueAccessor {
-    #propagateChange: Action<Date | null> | null = null;
+    readonly #destroyRef: DestroyRef = inject(DestroyRef);
     readonly #format: WritableSignal<string> = signal("dd/MM/yyyy");
+    #propagateChange: Action<Date | null> | null = null;
 
     protected readonly dateIcon: IconDefinition = faCalendar;
     protected readonly maxDate: WritableSignal<Date | null> = signal(null);
@@ -99,6 +107,7 @@ export class DatePickerComponent implements OnInit, ControlValueAccessor {
 
     public ngOnInit(): void {
         this.setDateValues();
+        this.setSubscriptions();
     }
 
     public onCalendarValueChange(date: Date | null): void {
@@ -214,6 +223,18 @@ export class DatePickerComponent implements OnInit, ControlValueAccessor {
         if (this.value) {
             this.updateCurrentDateString(this.value(), this.#format());
         }
+    }
+
+    private setSubscriptions(): void {
+        fromEvent<FocusEvent>(this.elementRef.nativeElement, "focusin")
+            .pipe(takeUntilDestroyed(this.#destroyRef))
+            .subscribe(() => {
+                const input = this.elementRef.nativeElement.querySelector("input");
+                if (input) {
+                    input.focus();
+                    input.setSelectionRange(-1, -1);
+                }
+            });
     }
 
     private updateCurrentDateString(date: Date | null | undefined, format: string): void {

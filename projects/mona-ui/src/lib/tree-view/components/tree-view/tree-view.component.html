@@ -8,13 +8,13 @@
         </div>
     }
     <div class="mona-tree-view-tree-container">
-        <mona-tree (nodeCheck)="nodeCheck.emit($event)"
-                   (nodeClick)="nodeClick.emit($event)"
-                   (nodeDrag)="nodeDrag.emit($event)"
-                   (nodeDragEnd)="nodeDragEnd.emit($event)"
-                   (nodeDragStart)="nodeDragStart.emit($event)"
-                   (nodeDrop)="nodeDrop.emit($event)"
-                   (nodeSelect)="nodeSelect.emit($event)">
+        <mona-tree (nodeCheck)="treeService.nodeCheck.emit($event)"
+                   (nodeClick)="treeService.nodeClick.emit($event)"
+                   (nodeDrag)="treeService.nodeDrag.emit($event)"
+                   (nodeDragEnd)="treeService.nodeDragEnd.emit($event)"
+                   (nodeDragStart)="treeService.nodeDragStart.emit($event)"
+                   (nodeDrop)="treeService.nodeDrop.emit($event)"
+                   (nodeSelect)="treeService.nodeSelect.emit($event)">
             @if (nodeTemplate) {
                 <ng-template monaTreeNodeTemplate let-dataItem let-element="element">
                     <ng-container [ngTemplateOutlet]="nodeTemplate"

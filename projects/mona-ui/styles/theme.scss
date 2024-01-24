@@ -276,6 +276,8 @@ button[monaButton] {
     outline: none;
     user-select: none;
     cursor: pointer;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 
     @include font-medium;
     padding: 4px 8px;
@@ -397,6 +399,21 @@ mona-button-group button[monaButton] {
     }
 }
 
+/** Split Button */
+.mona-split-button {
+    & [monaButton] {
+        &:first-child {
+            border-right: none;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        &:nth-child(2) {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+    }
+}
+
 /** Dropdowns */
 
 mona-popup-list-item {
@@ -424,6 +441,7 @@ ul.mona-list mona-text-box.filter-box {
     border-radius: var(--mona-border-radius);
     background: var(--mona-background);
     transition: box-shadow 0.15s ease-in;
+    outline: none;
     &.mona-disabled {
         @include disabled;
     }
@@ -928,6 +946,7 @@ div.mona-alpha-slider {
     background: var(--mona-background);
     & > div:first-child {
         border: 1px solid black;
+        border-radius: var(--mona-border-radius);
     }
     & > button {
         color: var(--mona-text);

@@ -3,9 +3,11 @@ import {
     ChangeDetectorRef,
     Component,
     computed,
+    DestroyRef,
     ElementRef,
     forwardRef,
     HostBinding,
+    inject,
     Input,
     OnInit,
     Signal,
@@ -14,6 +16,7 @@ import {
     ViewChild,
     WritableSignal
 } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { faCalendar, faClock, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { DropDownService } from "../../dropdowns/services/drop-down.service";
 import { PopupService } from "../../popup/services/popup.service";
@@ -23,7 +26,7 @@ import { Action } from "../../utils/Action";
 import { PopupRef } from "../../popup/models/PopupRef";
 import { DateTime } from "luxon";
 import { ConnectionPositionPair } from "@angular/cdk/overlay";
-import { take } from "rxjs";
+import { fromEvent, take } from "rxjs";
 import { PopupAnimationService } from "../../animations/services/popup-animation.service";
 import { AnimationState } from "../../animations/models/AnimationState";
 import { TimeSelectorComponent } from "../time-selector/time-selector.component";
@@ -54,9 +57,14 @@ import { NgClass } from "@angular/common";
         FontAwesomeModule,
         CalendarComponent,
         TimeSelectorComponent
-    ]
+    ],
+    host: {
+        "[class.mona-disabled]": "disabled",
+        "[attr.tabindex]": "disabled ? null : 0"
+    }
 })
 export class DateTimePickerComponent implements OnInit, ControlValueAccessor {
+    readonly #destroyRef: DestroyRef = inject(DestroyRef);
     readonly #format: WritableSignal<string> = signal("dd/MM/yyyy HH:mm");
     readonly #value: WritableSignal<Date | null> = signal(null);
     #popupRef: PopupRef | null = null;
@@ -146,6 +154,7 @@ export class DateTimePickerComponent implements OnInit, ControlValueAccessor {
 
     public ngOnInit(): void {
         this.setDateValues();
+        this.setSubscriptions();
     }
 
     public onCalendarValueChange(date: Date | null): void {
@@ -305,6 +314,18 @@ export class DateTimePickerComponent implements OnInit, ControlValueAccessor {
         if (this.#value()) {
             this.updateCurrentDateString(this.#value(), this.#format());
         }
+    }
+
+    private setSubscriptions(): void {
+        fromEvent<FocusEvent>(this.elementRef.nativeElement, "focusin")
+            .pipe(takeUntilDestroyed(this.#destroyRef))
+            .subscribe(() => {
+                const input = this.elementRef.nativeElement.querySelector("input");
+                if (input) {
+                    input.focus();
+                    input.setSelectionRange(-1, -1);
+                }
+            });
     }
 
     private updateDateIfNotInRange(date: Date): Date {

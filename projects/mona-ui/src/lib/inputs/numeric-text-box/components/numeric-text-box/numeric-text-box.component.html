@@ -18,11 +18,11 @@
            (wheel)="wheel$.next($event)"
            autocomplete="off" tabindex="0" class="mona-input-inner" #valueTextBox>
     <div class="mona-numeric-text-box-spinners" *ngIf="spinners">
-        <button monaButton [disabled]="disabled" [tabIndex]="-1"
+        <button monaButton [disabled]="disabled" [tabindex]="-1"
                 (mousedown)="spin$.next('+')" (mouseup)="spinStop$.next()">
             <fa-icon [icon]="increaseIcon"></fa-icon>
         </button>
-        <button monaButton [disabled]="disabled" [tabIndex]="-1"
+        <button monaButton [disabled]="disabled" [tabindex]="-1"
                 (mousedown)="spin$.next('-')" (mouseup)="spinStop$.next()">
             <fa-icon [icon]="decreaseIcon"></fa-icon>
         </button>

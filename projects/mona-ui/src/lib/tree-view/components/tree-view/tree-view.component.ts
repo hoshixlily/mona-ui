@@ -41,29 +41,8 @@ export class TreeViewComponent<T> {
         this.treeService.setChildrenSelector(value);
     }
 
-    @Output()
-    public nodeCheck: EventEmitter<NodeCheckEvent<T>> = new EventEmitter();
-
-    @Output()
-    public nodeClick: EventEmitter<NodeClickEvent<T>> = new EventEmitter();
-
-    @Output()
-    public nodeDrag: EventEmitter<NodeDragEvent<T>> = new EventEmitter();
-
-    @Output()
-    public nodeDragEnd: EventEmitter<NodeDragStartEvent<T>> = new EventEmitter();
-
-    @Output()
-    public nodeDragStart: EventEmitter<NodeDragStartEvent<T>> = new EventEmitter();
-
-    @Output()
-    public nodeDrop: EventEmitter<NodeDropEvent<T>> = new EventEmitter();
-
     @ContentChild(TreeViewNodeTemplateDirective, { read: TemplateRef })
     public nodeTemplate: TemplateRef<any> | null = null;
-
-    @Output()
-    public nodeSelect: EventEmitter<NodeSelectEvent<T>> = new EventEmitter();
 
     @Input()
     public set textField(value: string | Selector<T, string>) {

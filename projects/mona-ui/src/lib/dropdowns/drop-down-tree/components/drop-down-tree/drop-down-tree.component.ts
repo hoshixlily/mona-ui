@@ -80,7 +80,8 @@ import { DropDownTreeService } from "../../services/drop-down-tree.service";
         }
     ],
     host: {
-        "[class.mona-disabled]": "disabled"
+        "[class.mona-disabled]": "disabled",
+        "[attr.tabindex]": "disabled ? null : 0"
     }
 })
 export class DropDownTreeComponent<T> implements ControlValueAccessor, OnInit {
@@ -181,7 +182,7 @@ export class DropDownTreeComponent<T> implements ControlValueAccessor, OnInit {
     public open(): void {
         this.dropdownWrapper.nativeElement.focus();
         if (this.#popupRef) {
-            this.#popupRef.close();
+            return;
         }
         this.#popupRef = this.popupService.create({
             anchor: this.dropdownWrapper,
@@ -198,7 +199,10 @@ export class DropDownTreeComponent<T> implements ControlValueAccessor, OnInit {
         this.popupAnimationService.animateDropdown(this.#popupRef, AnimationState.Show);
         this.#popupRef.closed.pipe(take(1)).subscribe(() => {
             this.#popupRef = null;
-            (this.elementRef.nativeElement.firstElementChild as HTMLElement)?.focus();
+            const popupElement = document.querySelector(`.${this.#popupUidClass}`);
+            if (DropDownService.shouldFocusAfterClose(this.elementRef.nativeElement, popupElement)) {
+                this.focus();
+            }
         });
     }
 
@@ -213,6 +217,10 @@ export class DropDownTreeComponent<T> implements ControlValueAccessor, OnInit {
         if (obj != null) {
             this.treeService.setSelectedDataItems([obj]);
         }
+    }
+
+    private focus(): void {
+        this.elementRef.nativeElement?.focus();
     }
 
     private focusSelectedNode(): void {
@@ -262,11 +270,15 @@ export class DropDownTreeComponent<T> implements ControlValueAccessor, OnInit {
         }
     }
 
+    private notifyValueChange(): void {
+        this.#propagateChange?.(this.#value());
+    }
+
     private setEffects(): void {
         effect(
             () => {
+                const highlightedNode = this.treeService.navigatedNode();
                 window.setTimeout(() => {
-                    const highlightedNode = this.treeService.navigatedNode();
                     if (!highlightedNode) {
                         return;
                     }
@@ -279,8 +291,9 @@ export class DropDownTreeComponent<T> implements ControlValueAccessor, OnInit {
                     ) as HTMLElement;
                     if (nodeElement) {
                         nodeElement.scrollIntoView({
-                            behavior: "auto",
-                            block: "center"
+                            behavior: "smooth",
+                            block: "nearest",
+                            inline: "center"
                         });
                     }
                 });
@@ -306,7 +319,7 @@ export class DropDownTreeComponent<T> implements ControlValueAccessor, OnInit {
             )
             .subscribe(node => {
                 this.#value.set(node.data);
-                this.#propagateChange?.(this.#value());
+                this.notifyValueChange();
             });
     }
 }

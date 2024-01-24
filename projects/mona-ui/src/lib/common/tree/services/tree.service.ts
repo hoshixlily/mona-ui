@@ -5,6 +5,7 @@ import {
     EventEmitter,
     inject,
     Injectable,
+    Output,
     Signal,
     signal,
     TemplateRef,
@@ -88,7 +89,7 @@ export class TreeService<T> {
         enabled: false
     });
     public readonly disabledKeys: WritableSignal<ImmutableSet<any>> = signal(ImmutableSet.create());
-    public readonly draggableOptions: WritableSignal<DraggableOptions> = signal({ enabled: true });
+    public readonly draggableOptions: WritableSignal<DraggableOptions> = signal({ enabled: false });
     public readonly dragging: WritableSignal<boolean> = signal(false);
     public readonly dragging$: Observable<boolean> = toObservable(this.dragging);
     public readonly dropPositionChange$: BehaviorSubject<DropPositionChangeEvent<T> | null> =
@@ -162,6 +163,13 @@ export class TreeService<T> {
     public checkedKeysChange: EventEmitter<Array<any>> = new EventEmitter<Array<any>>();
     public expandedKeysChange: EventEmitter<Array<any>> = new EventEmitter<Array<any>>();
     public filterChange: EventEmitter<FilterChangeEvent> = new EventEmitter<FilterChangeEvent>();
+    public nodeCheck: EventEmitter<NodeCheckEvent<T>> = new EventEmitter();
+    public nodeClick: EventEmitter<NodeClickEvent<T>> = new EventEmitter();
+    public nodeDrag: EventEmitter<NodeDragEvent<T>> = new EventEmitter();
+    public nodeDragEnd: EventEmitter<NodeDragEndEvent<T>> = new EventEmitter();
+    public nodeDragStart: EventEmitter<NodeDragStartEvent<T>> = new EventEmitter();
+    public nodeDrop: EventEmitter<NodeDropEvent<T>> = new EventEmitter();
+    public nodeSelect: EventEmitter<NodeSelectEvent<T>> = new EventEmitter();
     public selectionChange: EventEmitter<NodeItem<T>> = new EventEmitter<NodeItem<T>>();
 
     public constructor() {
@@ -368,6 +376,10 @@ export class TreeService<T> {
             return;
         }
         this.disabledKeys.set(ImmutableSet.create(keys));
+    }
+
+    public setDraggableOptions(options: Partial<DraggableOptions>): void {
+        this.draggableOptions.update(o => ({ ...o, ...options }));
     }
 
     public setExpandBy(selector: string | Selector<T, any> | null): void {

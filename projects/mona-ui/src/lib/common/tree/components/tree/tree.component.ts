@@ -16,7 +16,7 @@ import {
     TemplateRef
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { asapScheduler, fromEvent, takeWhile } from "rxjs";
+import { asapScheduler, fromEvent, takeWhile, tap } from "rxjs";
 import { FilterInputComponent } from "../../../filter-input/components/filter-input/filter-input.component";
 import { TreeNodeTemplateDirective } from "../../directives/tree-node-template.directive";
 import { NodeCheckEvent } from "../../models/NodeCheckEvent";
@@ -176,7 +176,10 @@ export class TreeComponent<T> implements OnInit {
 
     private setKeydownSubscription(): void {
         fromEvent<KeyboardEvent>(this.elementRef.nativeElement, "keydown")
-            .pipe(takeUntilDestroyed(this.#destroyRef))
+            .pipe(
+                tap(e => e.preventDefault()),
+                takeUntilDestroyed(this.#destroyRef)
+            )
             .subscribe(event => {
                 const navigatedNode = this.treeService.navigatedNode();
                 if (event.key === "ArrowUp") {
@@ -186,6 +189,7 @@ export class TreeComponent<T> implements OnInit {
                     event.preventDefault();
                     this.treeService.navigate("next");
                 } else if (event.key === "ArrowLeft") {
+                    event.preventDefault();
                     if (!navigatedNode || !navigatedNode.nodeItem.hasChildren) {
                         return;
                     }
@@ -194,7 +198,9 @@ export class TreeComponent<T> implements OnInit {
                     if (!disabled && expanded) {
                         this.treeService.setNodeExpand(navigatedNode, false);
                     }
+                    this.treeService.navigatedNode.set(navigatedNode);
                 } else if (event.key === "ArrowRight") {
+                    event.preventDefault();
                     if (!navigatedNode || !navigatedNode.nodeItem.hasChildren) {
                         return;
                     }
@@ -204,6 +210,7 @@ export class TreeComponent<T> implements OnInit {
                         this.treeService.setNodeExpand(navigatedNode, true);
                     }
                 } else if (event.key === " ") {
+                    event.preventDefault();
                     if (!navigatedNode || this.treeService.isDisabled(navigatedNode)) {
                         return;
                     }
@@ -218,6 +225,7 @@ export class TreeComponent<T> implements OnInit {
                         });
                     }
                 } else if (event.key === "Enter") {
+                    event.preventDefault();
                     if (!navigatedNode || this.treeService.isDisabled(navigatedNode)) {
                         return;
                     }

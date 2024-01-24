@@ -1,6 +1,7 @@
 import { computed, EventEmitter, Injectable, Signal, signal, WritableSignal } from "@angular/core";
+import { toObservable } from "@angular/core/rxjs-interop";
 import { from, IEnumerable, ImmutableList, ImmutableSet, Predicate, Selector } from "@mirei/ts-collections";
-import { ReplaySubject } from "rxjs";
+import { Observable, ReplaySubject, Subject } from "rxjs";
 import { FilterChangeEvent } from "../../filter-input/models/FilterChangeEvent";
 import { FilterableOptions } from "../../models/FilterableOptions";
 import { GroupableOptions } from "../models/GroupableOptions";
@@ -48,6 +49,7 @@ export class ListService<TData> {
         toggleable: false
     });
     public readonly selectedKeys: WritableSignal<ImmutableSet<any>> = signal(ImmutableSet.create());
+    public readonly selectionChange$: Subject<ListItem<TData>> = new Subject<ListItem<TData>>();
     public readonly selectedListItems: Signal<ImmutableSet<ListItem<TData>>> = computed(() => {
         const selectedKeys = this.selectedKeys();
         return selectedKeys
@@ -190,6 +192,10 @@ export class ListService<TData> {
         return item;
     }
 
+    public notifySelectionChange(item: ListItem<TData>): void {
+        this.selectionChange$.next(item);
+    }
+
     public selectItem(item: ListItem<TData>): void {
         const key = this.getSelectionKey(item);
         const options = this.selectableOptions();
@@ -215,6 +221,7 @@ export class ListService<TData> {
                 return set.add(key);
             });
         }
+        this.notifySelectionChange(item);
     }
 
     public setData(data: Iterable<TData>) {
