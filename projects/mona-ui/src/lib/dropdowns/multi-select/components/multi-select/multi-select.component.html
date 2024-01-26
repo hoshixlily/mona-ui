@@ -15,7 +15,7 @@
             @if (tagCount() >= 0 && selectedListItems().length > tagCount()) {
                 <mona-chip [tabindex]="-1" [removable]="true" (remove)="onSelectedItemGroupRemove($event)">
                     @if (!summaryTagTemplate) {
-                        <span class="mona-multi-select-label">{{summaryTagText}}</span>
+                        <span class="mona-multi-select-label">{{summaryTagText()}}</span>
                     } @else {
                         <ng-container [ngTemplateOutlet]="summaryTagTemplate"
                                       [ngTemplateOutletContext]="{$implicit: selectedDataItems()}"></ng-container>
