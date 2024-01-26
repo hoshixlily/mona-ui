@@ -72,7 +72,10 @@ import { AutoCompleteNoDataTemplateDirective } from "../directives/auto-complete
         ListHeaderTemplateDirective,
         ListNoDataTemplateDirective,
         ListItemTemplateDirective
-    ]
+    ],
+    host: {
+        "[class.mona-disabled]": "disabled"
+    }
 })
 export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccessor {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
@@ -191,7 +194,6 @@ export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccesso
     }
 
     public open(): void {
-        this.dropdownWrapper.nativeElement.focus();
         this.popupRef = this.popupService.create({
             anchor: this.dropdownWrapper,
             content: this.popupTemplate,
@@ -241,7 +243,7 @@ export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccesso
     }
 
     private focus(): void {
-        (this.elementRef.nativeElement.firstElementChild as HTMLElement)?.focus();
+        this.elementRef.nativeElement?.focus();
     }
 
     private getItemStartsWith(value: string): ListItem<TData> | null {

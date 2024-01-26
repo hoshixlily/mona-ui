@@ -2,9 +2,11 @@ import {
     ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
+    DestroyRef,
     ElementRef,
     forwardRef,
     HostBinding,
+    inject,
     Input,
     OnChanges,
     OnInit,
@@ -14,12 +16,13 @@ import {
     ViewChild,
     WritableSignal
 } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { faClock, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { FocusMonitor } from "@angular/cdk/a11y";
 import { DropDownService } from "../../dropdowns/services/drop-down.service";
 import { PopupService } from "../../popup/services/popup.service";
 import { DateTime } from "luxon";
-import { take } from "rxjs";
+import { fromEvent, take } from "rxjs";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from "@angular/forms";
 import { Action } from "../../utils/Action";
 import { PopupRef } from "../../popup/models/PopupRef";
@@ -43,9 +46,17 @@ import { TextBoxDirective } from "../../inputs/text-box/directives/text-box.dire
         }
     ],
     standalone: true,
-    imports: [TextBoxDirective, FormsModule, ButtonDirective, FontAwesomeModule, TimeSelectorComponent]
+    imports: [TextBoxDirective, FormsModule, ButtonDirective, FontAwesomeModule, TimeSelectorComponent],
+    host: {
+        "[class.mona-disabled]": "disabled",
+        "[attr.aria-disabled]": "disabled ? true : undefined",
+        "[attr.aria-readonly]": "readonly ? true : undefined",
+        "[attr.role]": "'grid'",
+        "[attr.tabindex]": "disabled ? null : 0"
+    }
 })
 export class TimePickerComponent implements OnInit, OnChanges, ControlValueAccessor {
+    readonly #destroyRef: DestroyRef = inject(DestroyRef);
     readonly #format: WritableSignal<string> = signal("HH:mm");
     #propagateChange: Action<Date | null> | null = null;
     private popupRef: PopupRef | null = null;
@@ -109,6 +120,7 @@ export class TimePickerComponent implements OnInit, OnChanges, ControlValueAcces
 
     public ngOnInit(): void {
         this.setDateValues();
+        this.setSubscriptions();
     }
 
     public onDateStringEdit(dateString: string): void {
@@ -239,6 +251,18 @@ export class TimePickerComponent implements OnInit, OnChanges, ControlValueAcces
         if (value) {
             this.updateCurrentDateString(value, this.#format());
         }
+    }
+
+    private setSubscriptions(): void {
+        fromEvent<FocusEvent>(this.elementRef.nativeElement, "focusin")
+            .pipe(takeUntilDestroyed(this.#destroyRef))
+            .subscribe(() => {
+                const input = this.elementRef.nativeElement.querySelector("input");
+                if (input) {
+                    input.focus();
+                    input.setSelectionRange(-1, -1);
+                }
+            });
     }
 
     private updateTimeIfNotInMinMax(date: Date): Date {

@@ -3,7 +3,7 @@
            [ngModel]="currentDateString()"
            (ngModelChange)="onDateStringEdit($event)" (blur)="onTimeInputBlur()">
     <button monaButton class="mona-input-button" (click)="onTimeInputButtonClick()"
-            [disabled]="disabled" [tabIndex]="-1">
+            [disabled]="disabled" [tabindex]="-1">
         <fa-icon [icon]="timeIcon"></fa-icon>
     </button>
 </div>

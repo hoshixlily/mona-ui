@@ -1,0 +1,70 @@
+<ul class="mona-sub-tree" [style.padding-left.px]="paddingLeft()"
+    cdkDropList [cdkDropListSortingDisabled]="true" (cdkDropListDropped)="onNodeDrop($event)">
+    @for (node of nodeSet(); track node.uid) {
+        <li [style.padding-left.px]="nodeComponent.paddingLeft()"
+            [attr.data-uid]="node.uid"
+            [tabindex]="0"
+            (focus)="treeService.navigatedNode.set(node)"
+            cdkDrag
+            [cdkDragData]="node"
+            [cdkDragDisabled]="!treeService.draggableOptions().enabled"
+            (cdkDragStarted)="onNodeDragStart($event)"
+            (cdkDragEnded)="onNodeDragEnd($event)"
+            (cdkDragMoved)="onNodeDragMove($event, node)">
+            <div class="mona-tree-node-container">
+                @if (treeService.expandableOptions().enabled && node.children.length > 0) {
+                    <div class="mona-tree-node-expander"
+                         [class.mona-disabled]="nodeComponent.disabled()"
+                         (click)="onExpandStateChange(node, !nodeComponent.expanded())">
+                        @if (nodeComponent.expanded()) {
+                            <fa-icon [icon]="expandedIcon"></fa-icon>
+                        } @else {
+                            <fa-icon [icon]="collapsedIcon"></fa-icon>
+                        }
+                    </div>
+                }
+                @if (nodeComponent.checkable()) {
+                    <input type="checkbox"
+                           id="mona-tree-node-checkbox-{{node.uid}}"
+                           [disabled]="nodeComponent.disabled()"
+                           [indeterminate]="nodeComponent.indeterminate()"
+                           [ngModel]="nodeComponent.checked()"
+                           (click)="nodeComponent.checkboxClick$.next($event)"
+                           (ngModelChange)="nodeComponent.checkboxCheck$.next($event)" monaCheckBox />
+                    <label for="mona-tree-node-checkbox-{{node.uid}}"></label>
+                }
+                <mona-tree-node [node]="node" #nodeComponent></mona-tree-node>
+            </div>
+            @if (node.children.length > 0 && nodeComponent.expanded()) {
+                <div class="mona-sub-tree-container"
+                     [@nodeExpand]="nodeComponent.expanded()"
+                     [@.disabled]="!treeService.animationEnabled() || treeService.filterText().length !== 0">
+                    <mona-sub-tree [nodes]="node.children"
+                                   [depth]="subTreeDepth()+1"
+                                   [parent]="node"
+                    ></mona-sub-tree>
+                </div>
+            }
+            @if (!nodeComponent.disabled()) {
+                <ng-template cdkDragPreview [data]="node">
+                    <div class="mona-tree-node-dragging">
+                    <span>
+                        @if ((treeService.dropPositionChange$|async)?.position === 'before') {
+                            <fa-icon [icon]="dropBeforeIcon"></fa-icon>
+                        } @else if ((treeService.dropPositionChange$|async)?.position === 'after') {
+                            <fa-icon [icon]="dropAfterIcon"></fa-icon>
+                        } @else if ((treeService.dropPositionChange$|async)?.position === 'inside') {
+                            <fa-icon [icon]="dropInsideIcon"></fa-icon>
+                        } @else {
+                            <fa-icon [icon]="dropNotAllowIcon"></fa-icon>
+                        }
+                    </span>
+                        <span>{{nodeComponent.nodeText()}}</span>
+                    </div>
+                </ng-template>
+            } @else {
+                <ng-template cdkDragPreview></ng-template>
+            }
+        </li>
+    }
+</ul>

@@ -1,32 +1,43 @@
 import { Directive, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { FilterChangeEvent } from "../../../common/filter-input/models/FilterChangeEvent";
-import { FilterableOptions } from "../../../tree-view/models/FilterableOptions";
-import { DropDownTreeService } from "../services/drop-down-tree.service";
+import { FilterableOptions } from "../../../common/models/FilterableOptions";
+import { TreeService } from "../../../common/tree/services/tree.service";
 
 @Directive({
     selector: "mona-drop-down-tree[monaDropDownTreeFilterable]",
     standalone: true
 })
-export class DropDownTreeFilterableDirective implements OnInit {
+export class DropDownTreeFilterableDirective<T> implements OnInit {
+    readonly #defaultOptions: FilterableOptions = {
+        enabled: true,
+        operator: "contains",
+        caseSensitive: false,
+        debounce: 0
+    };
+
     @Input()
     public set filter(value: string) {
-        this.dropdownTreeService.filter$.next(value);
+        this.treeService.filter$.next(value);
     }
 
     @Output()
     public filterChange: EventEmitter<FilterChangeEvent> = new EventEmitter<FilterChangeEvent>();
 
     @Input("monaDropDownTreeFilterable")
-    public options?: FilterableOptions | "";
+    public set options(value: Partial<FilterableOptions> | "") {
+        if (value === "") {
+            this.treeService.setFilterableOptions(this.#defaultOptions);
+        } else {
+            this.treeService.setFilterableOptions({
+                ...this.#defaultOptions,
+                ...value
+            });
+        }
+    }
 
-    public constructor(private readonly dropdownTreeService: DropDownTreeService) {}
+    public constructor(private readonly treeService: TreeService<T>) {}
 
     public ngOnInit(): void {
-        this.dropdownTreeService.filterChange = this.filterChange;
-        if (this.options) {
-            this.dropdownTreeService.setFilterableOptions(this.options);
-        } else if (this.options === "") {
-            this.dropdownTreeService.setFilterableOptions({ enabled: true });
-        }
+        this.treeService.filterChange = this.filterChange;
     }
 }

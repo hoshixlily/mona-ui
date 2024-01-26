@@ -1,6 +1,6 @@
-<div class="mona-combo-box" [ngClass]="{'mona-disabled': disabled}"
-     [attr.tabindex]="-1" #dropdownWrapper>
+<div class="mona-combo-box" #dropdownWrapper>
     <input monaTextBox class="mona-input-inner"
+           [disabled]="disabled"
            [ngModel]="comboBoxValue()"
            (ngModelChange)="comboBoxValue$.next($event)"
            (keydown)="onKeydown($event)">

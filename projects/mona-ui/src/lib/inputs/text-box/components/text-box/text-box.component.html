@@ -13,7 +13,7 @@
            (focus)="inputFocus.emit($event)" monaTextBox />
 
     @if (clearButton && value.length !== 0) {
-        <button monaButton [flat]="true" title="Clear" (click)="onClearClick()">
+        <button monaButton [flat]="true" [tabindex]="-1" title="Clear" (click)="onClearClick()">
             <fa-icon [icon]="clearIcon"></fa-icon>
         </button>
     }

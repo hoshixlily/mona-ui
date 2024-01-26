@@ -3,8 +3,8 @@ import { toSignal } from "@angular/core/rxjs-interop";
 import { ImmutableSet } from "@mirei/ts-collections";
 import { debounceTime, distinctUntilChanged, ReplaySubject } from "rxjs";
 import { FilterChangeEvent } from "../../../common/filter-input/models/FilterChangeEvent";
-import { ExpandableOptions } from "../../../tree-view/models/ExpandableOptions";
-import { FilterableOptions } from "../../../tree-view/models/FilterableOptions";
+import { FilterableOptions } from "../../../common/models/FilterableOptions";
+import { ExpandableOptions } from "../../../common/tree/models/ExpandableOptions";
 
 @Injectable()
 export class DropDownTreeService {

@@ -1,31 +1,49 @@
-<div class="mona-dropdown-tree" [ngClass]="{'mona-disabled': disabled}"
-     [attr.tabindex]="disabled ? -1 : 0" (click)="open()" #dropdownWrapper>
+<div class="mona-dropdown-tree" (click)="open()" #dropdownWrapper>
     <div class="mona-dropdown-value">
         <span>{{text()}}</span>
     </div>
-    <button monaButton class="mona-input-button">
+    <button monaButton [tabindex]="-1" class="mona-input-button">
         <fa-icon [icon]="dropdownIcon"></fa-icon>
     </button>
 </div>
 
 <ng-template #popupTemplate>
     <div class="mona-dropdown-tree-popup-wrapper">
-        <mona-tree-view [data]="data"
-                        [keyField]="keyField"
-                        [childrenField]="childrenField"
-                        [textField]="textField"
-                        monaTreeViewDisable
-                        [nodeDisabler]="disabler()"
-                        [monaTreeViewSelectable]="selectableOptions"
-                        [selectedKeys]="selectedTreeKeys()"
-                        [monaTreeViewFilterable]="dropdownTreeService.filterableOptions"
-                        [filter]="dropdownTreeService.filterText()"
-                        [filterPlaceholder]="dropdownTreeService.filterPlaceholder()"
-                        (filterChange)="dropdownTreeService.filterChange.emit($event)"
-                        [monaTreeViewExpandable]="dropdownTreeService.expandableOptions"
-                        [expandedKeys]="dropdownTreeService.expandedKeys()"
-                        (expandedKeysChange)="onExpandedKeysChange($event)"
-                        (selectedKeysChange)="onSelectedKeysChange($event)"
-                        (selectionChange)="onSelectionChange($event)"></mona-tree-view>
+        @if (headerTemplate) {
+            <div class="mona-dropdown-tree-header">
+                <ng-container [ngTemplateOutlet]="headerTemplate"></ng-container>
+            </div>
+        }
+        @if (treeService.filterableOptions().enabled) {
+            <div class="mona-dropdown-tree-filter">
+                <mona-filter-input [filter]="treeService.filterText()"
+                                   [debounce]="treeService.filterableOptions().debounce"
+                                   [placeholder]="treeService.filterPlaceholder()"
+                                   (filterChange)="onFilterChange($event)"></mona-filter-input>
+            </div>
+        }
+        <div class="mona-dropdown-tree-container">
+            @if (treeService.nodeSet().length === 0) {
+                @if (!noDataTemplate) {
+                    <mona-placeholder [text]="'No data'"></mona-placeholder>
+                } @else {
+                    <ng-container [ngTemplateOutlet]="noDataTemplate"></ng-container>
+                }
+            } @else {
+                <mona-tree>
+                    @if (nodeTemplate) {
+                        <ng-template monaTreeNodeTemplate let-dataItem>
+                            <ng-container [ngTemplateOutlet]="nodeTemplate"
+                                          [ngTemplateOutletContext]="{$implicit: dataItem}"></ng-container>
+                        </ng-template>
+                    }
+                </mona-tree>
+            }
+        </div>
+        @if (footerTemplate) {
+            <div class="mona-dropdown-tree-footer">
+                <ng-container [ngTemplateOutlet]="footerTemplate"></ng-container>
+            </div>
+        }
     </div>
 </ng-template>

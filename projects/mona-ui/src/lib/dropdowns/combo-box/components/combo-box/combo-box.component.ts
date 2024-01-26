@@ -22,7 +22,18 @@ import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from "@angular/f
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { faChevronDown, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { Predicate, Selector } from "@mirei/ts-collections";
-import { debounceTime, distinctUntilChanged, fromEvent, map, Observable, of, Subject, take, tap } from "rxjs";
+import {
+    debounceTime,
+    distinctUntilChanged,
+    fromEvent,
+    map,
+    Observable,
+    of,
+    Subject,
+    take,
+    tap,
+    withLatestFrom
+} from "rxjs";
 import { v4 } from "uuid";
 import { AnimationState } from "../../../../animations/models/AnimationState";
 import { PopupAnimationService } from "../../../../animations/services/popup-animation.service";
@@ -79,7 +90,10 @@ import { ComboBoxNoDataTemplateDirective } from "../../directives/combo-box-no-d
         ListHeaderTemplateDirective,
         ListNoDataTemplateDirective,
         ListItemTemplateDirective
-    ]
+    ],
+    host: {
+        "[class.mona-disabled]": "disabled"
+    }
 })
 export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
@@ -245,7 +259,7 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
     }
 
     public open(): void {
-        this.dropdownWrapper.nativeElement.focus();
+        this.focus();
         if (this.#popupRef) {
             return;
         }
@@ -259,6 +273,7 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
             popupClass: ["mona-dropdown-popup-content", this.#popupUidClass],
             positions: DropDownService.getDefaultPositions()
         });
+        this.notifyValueChangeOnPopupClose();
         this.popupAnimationService.setupDropdownOutsideClickCloseAnimation(this.#popupRef);
         this.popupAnimationService.animateDropdown(this.#popupRef, AnimationState.Show);
         window.setTimeout(() => {
@@ -268,16 +283,12 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
                 input.setSelectionRange(-1, -1);
             }
         });
-        const previousItem = this.selectedListItem();
         this.#popupRef.closed.pipe(take(1)).subscribe(() => {
             this.#popupRef = null;
             this.listService.clearFilter();
             const popupElement = document.querySelector(`.${this.#popupUidClass}`);
             if (DropDownService.shouldFocusAfterClose(this.elementRef.nativeElement, popupElement)) {
                 this.focus();
-            }
-            if (previousItem !== this.selectedListItem()) {
-                this.notifyValueChange();
             }
         });
     }
@@ -303,7 +314,7 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
     }
 
     private focus(): void {
-        (this.elementRef.nativeElement.firstElementChild as HTMLElement)?.focus();
+        this.elementRef.nativeElement?.focus();
     }
 
     private handleArrowKeys(event: KeyboardEvent): void {
@@ -352,6 +363,22 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
 
     private notifyValueChange(): void {
         this.#propagateChange?.(this.#value);
+    }
+
+    private notifyValueChangeOnPopupClose(): void {
+        if (!this.#popupRef) {
+            return;
+        }
+        this.#popupRef.closed
+            .pipe(
+                take(1),
+                withLatestFrom(
+                    this.listService.selectionChange$.pipe(distinctUntilChanged((s1, s2) => s1.data === s2.data))
+                )
+            )
+            .subscribe(() => {
+                this.notifyValueChange();
+            });
     }
 
     private setEventListeners(): void {

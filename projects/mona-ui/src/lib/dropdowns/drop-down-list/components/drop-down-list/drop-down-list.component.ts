@@ -21,7 +21,7 @@ import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from "@angular/f
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { faChevronDown, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { Predicate } from "@mirei/ts-collections";
-import { fromEvent, take } from "rxjs";
+import { distinctUntilChanged, fromEvent, take, withLatestFrom } from "rxjs";
 import { v4 } from "uuid";
 import { AnimationState } from "../../../../animations/models/AnimationState";
 import { PopupAnimationService } from "../../../../animations/services/popup-animation.service";
@@ -76,7 +76,13 @@ import { DropDownListValueTemplateDirective } from "../../directives/drop-down-l
         ListFooterTemplateDirective,
         ListHeaderTemplateDirective,
         ListNoDataTemplateDirective
-    ]
+    ],
+    host: {
+        "[class.mona-disabled]": "disabled",
+        "[attr.aria-disabled]": "disabled ? true : undefined",
+        "[attr.aria-haspopup]": "true",
+        "[attr.tabindex]": "disabled ? null : 0"
+    }
 })
 export class DropDownListComponent<TData> implements OnInit, ControlValueAccessor {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
@@ -211,10 +217,9 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
             popupClass: ["mona-dropdown-popup-content", this.#popupUidClass],
             positions: DropDownService.getDefaultPositions()
         });
-
+        this.notifyValueChangeOnPopupClose();
         this.popupAnimationService.setupDropdownOutsideClickCloseAnimation(this.#popupRef);
         this.popupAnimationService.animateDropdown(this.#popupRef, AnimationState.Show);
-        const previousItem = this.selectedListItem();
         this.#popupRef.closed.pipe(take(1)).subscribe(() => {
             this.#popupRef = null;
             const popupElement = document.querySelector(`.${this.#popupUidClass}`);
@@ -222,9 +227,6 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
                 this.focus();
             }
             this.listService.clearFilter();
-            if (previousItem !== this.selectedListItem()) {
-                this.notifyValueChange();
-            }
         });
     }
 
@@ -253,7 +255,7 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
     }
 
     private focus(): void {
-        (this.elementRef.nativeElement.firstElementChild as HTMLElement)?.focus();
+        this.elementRef.nativeElement?.focus();
     }
 
     private handleArrowKeys(event: KeyboardEvent): void {
@@ -281,6 +283,7 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
 
     private handleKeyDown(event: KeyboardEvent): void {
         if (event.key === "Enter") {
+            event.preventDefault();
             this.handleEnterKey();
         } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
             event.preventDefault();
@@ -297,6 +300,22 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
 
     private notifyValueChange(): void {
         this.#propagateChange?.(this.#value);
+    }
+
+    private notifyValueChangeOnPopupClose(): void {
+        if (!this.#popupRef) {
+            return;
+        }
+        this.#popupRef.closed
+            .pipe(
+                take(1),
+                withLatestFrom(
+                    this.listService.selectionChange$.pipe(distinctUntilChanged((s1, s2) => s1.data === s2.data))
+                )
+            )
+            .subscribe(() => {
+                this.notifyValueChange();
+            });
     }
 
     private setEventListeners(): void {

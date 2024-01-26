@@ -150,7 +150,6 @@ input, textarea, button {
 
 div.mona-list {
     @include font-medium;
-    //border: 1px solid var(--mona-border-color);
     & ul {
         @include scrollbars-thin;
         & li {
@@ -200,44 +199,70 @@ mona-filter-input.mona-list-filter-input {
     }
 }
 
-//ul.mona-list {
-//    & li {
-//        color: var(--mona-text);
-//
-//        &:hover {
-//            background-color: var(--mona-background-hover);
-//        }
-//        &:active:not(.mona-selected) {
-//            background-color: var(--mona-background-active);
-//        }
-//
-//        &.mona-selected {
-//            background-color: var(--mona-primary);
-//            color: var(--mona-text-inverted);
-//        }
-//
-//        // TODO: Update this to a better visual style
-//        &.mona-highlighted {
-//            //border: 1px solid darkgray;
-//            box-shadow: 0 0 0 1px var(--mona-focus-border-color) inset;
-//        }
-//
-//        &.mona-disabled {
-//            @include disabled;
-//        }
-//    }
-//    @include scrollbars-thin;
-//}
-
-//li.mona-list-group-header {
-//    background-color: var(--mona-background-dark);
-//    border-top: 1px solid var(--mona-border-color);
-//    border-bottom: 0.5px solid var(--mona-border-color);
-//}
-
 .mona-list-popup-content {
     padding: 0 !important;
     border-top: none !important;
+}
+
+div.mona-tree {
+    @include font-medium;
+}
+
+div.mona-tree-node {
+    padding: 4px 8px;
+    &:hover:not(.mona-disabled):not(.mona-selected) {
+        background-color: var(--mona-background-hover-darker);
+        &:not(.mona-highlighted) {
+            box-shadow: inset 0 0 0 1px var(--mona-border-color-dark);
+        }
+    }
+    &:active:not(.mona-disabled):not(.mona-selected) {
+        background-color: var(--mona-background-active-darker);
+        &:not(.mona-highlighted) {
+            box-shadow: inset 0 0 0 1px var(--mona-border-color-dark);
+        }
+    }
+    &:active:not(.mona-disabled).mona-selected {
+        background-color: var(--mona-primary-active);
+    }
+    &.mona-selected {
+        background-color: var(--mona-primary);
+        color: var(--mona-text-inverted);
+        box-shadow: inset 0 0 0 1px var(--mona-selected-border-color);
+    }
+    &.mona-highlighted {
+        box-shadow: inset 0 0 0 1px var(--mona-focus-border-color);
+    }
+    &.mona-disabled {
+        @include disabled;
+        pointer-events: auto; // for drag and drop
+    }
+}
+
+div.mona-tree-node-expander {
+    &.mona-disabled {
+        @include disabled;
+    }
+}
+
+span.mona-tree-node-text {
+    color: var(--mona-text);
+}
+
+div.mona-tree-node-dragging {
+    background-color: var(--mona-background);
+    border: 1px solid var(--mona-border-color);
+    border-radius: var(--mona-border-radius);
+    box-shadow: var(--mona-popup-shadow);
+    padding: 4px 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--mona-text);
+    top: 10px;
+    & fa-icon {
+        margin-right: 4px;
+    }
 }
 
 /** Buttons */
@@ -251,6 +276,8 @@ button[monaButton] {
     outline: none;
     user-select: none;
     cursor: pointer;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 
     @include font-medium;
     padding: 4px 8px;
@@ -372,6 +399,21 @@ mona-button-group button[monaButton] {
     }
 }
 
+/** Split Button */
+.mona-split-button {
+    & [monaButton] {
+        &:first-child {
+            border-right: none;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        &:nth-child(2) {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+    }
+}
+
 /** Dropdowns */
 
 mona-popup-list-item {
@@ -399,6 +441,7 @@ ul.mona-list mona-text-box.filter-box {
     border-radius: var(--mona-border-radius);
     background: var(--mona-background);
     transition: box-shadow 0.15s ease-in;
+    outline: none;
     &.mona-disabled {
         @include disabled;
     }
@@ -617,27 +660,23 @@ div.mona-time-picker-popup {
     & .mona-dropdown-value {
         color: var(--mona-text);
     }
-
 }
 
 .mona-dropdown-tree-popup-wrapper {
     max-height: 250px;
-    padding: 0;
     overflow: hidden;
-    & mona-tree-view ul.mona-tree-list {
-        max-height: 200px;
-        overflow: auto;
-        padding-bottom: 4px;
-        padding-top: 4px;
-        padding-left: 4px;
-        @include scrollbars;
-    }
-    & div.mona-tree-view-filter-container {
-        margin-top: 4px;
-        padding-left: 4px;
-        padding-bottom: 4px;
-        margin-bottom: 0 !important;
+    display: flex;
+    flex-direction: column;
+    & div.mona-dropdown-tree-filter {
+        padding: 4px;
         border-bottom: 1px solid var(--mona-border-color);
+    }
+    & div.mona-dropdown-tree-container {
+        overflow: auto;
+        max-height: 200px;
+        width: 100%;
+        padding: 4px;
+        @include scrollbars;
     }
 }
 
@@ -792,7 +831,7 @@ input[type="checkbox"][monaCheckBox] {
         display: flex;
         align-items: center;
         cursor: pointer;
-        color: var(--mona-text);
+        color: var(--mona-text-inverted);
         user-select: none;
         &:before {
             content: " ";
@@ -805,7 +844,6 @@ input[type="checkbox"][monaCheckBox] {
             width: 20px;
             height: 20px;
             margin-right: 4px;
-            color: transparent;
             transition: background-color 0.3s ease-out, color 0.3s ease-out, border 0.3s ease-out, box-shadow 0.3s ease-out;
         }
     }
@@ -834,7 +872,7 @@ input[type="checkbox"][monaCheckBox] {
     &:indeterminate + label:before {
         content: " ";
         background-color: var(--mona-primary);
-        color: var(--mona-background);
+        color: var(--mona-text-inverted);
         border: 1px solid var(--mona-selected-border-color);
     }
     &:indeterminate:disabled + label:before {
@@ -908,6 +946,7 @@ div.mona-alpha-slider {
     background: var(--mona-background);
     & > div:first-child {
         border: 1px solid black;
+        border-radius: var(--mona-border-radius);
     }
     & > button {
         color: var(--mona-text);

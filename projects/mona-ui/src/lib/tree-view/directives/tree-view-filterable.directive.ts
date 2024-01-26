@@ -1,16 +1,23 @@
 import { Directive, EventEmitter, Input, OnInit, Output } from "@angular/core";
 import { FilterChangeEvent } from "../../common/filter-input/models/FilterChangeEvent";
-import { FilterableOptions } from "../models/FilterableOptions";
-import { TreeViewService } from "../services/tree-view.service";
+import { FilterableOptions } from "../../common/models/FilterableOptions";
+import { TreeService } from "../../common/tree/services/tree.service";
 
 @Directive({
     selector: "mona-tree-view[monaTreeViewFilterable]",
     standalone: true
 })
-export class TreeViewFilterableDirective implements OnInit {
+export class TreeViewFilterableDirective<T> implements OnInit {
+    readonly #defaultOptions: FilterableOptions = {
+        enabled: true,
+        operator: "contains",
+        caseSensitive: false,
+        debounce: 0
+    };
+
     @Input()
     public set filter(value: string) {
-        this.treeViewService.filter$.next(value);
+        this.treeService.filter$.next(value);
     }
 
     @Output()
@@ -18,20 +25,24 @@ export class TreeViewFilterableDirective implements OnInit {
 
     @Input()
     public set filterPlaceholder(value: string) {
-        this.treeViewService.filterPlaceholder.set(value);
+        this.treeService.filterPlaceholder.set(value);
     }
 
     @Input("monaTreeViewFilterable")
-    public options?: FilterableOptions | "";
+    public set options(value: Partial<FilterableOptions> | "") {
+        if (value === "") {
+            this.treeService.setFilterableOptions(this.#defaultOptions);
+        } else {
+            this.treeService.setFilterableOptions({
+                ...this.#defaultOptions,
+                ...value
+            });
+        }
+    }
 
-    public constructor(private readonly treeViewService: TreeViewService) {}
+    public constructor(private readonly treeService: TreeService<T>) {}
 
     public ngOnInit(): void {
-        this.treeViewService.filterChange = this.filterChange;
-        if (this.options) {
-            this.treeViewService.setFilterableOptions(this.options);
-        } else if (this.options === "") {
-            this.treeViewService.setFilterableOptions({ enabled: true });
-        }
+        this.treeService.filterChange = this.filterChange;
     }
 }

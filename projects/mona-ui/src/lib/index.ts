@@ -13,6 +13,17 @@ export * from "./buttons/split-button/components/split-button/split-button.compo
 /** Common */
 export * from "./common/filter-input/models/FilterChangeEvent";
 
+export * from "./common/tree/models/DisableOptions";
+export * from "./common/tree/models/NodeCheckEvent";
+export * from "./common/tree/models/NodeClickEvent";
+export * from "./common/tree/models/NodeDragEvent";
+export * from "./common/tree/models/NodeDragEndEvent";
+export * from "./common/tree/models/NodeDragStartEvent";
+export * from "./common/tree/models/NodeDropEvent";
+export * from "./common/tree/models/NodeItem";
+export * from "./common/tree/models/NodeSelectEvent";
+export * from "./common/tree/models/SelectableOptions";
+
 /** Date Inputs */
 export * from "./date-inputs/calendar/calendar.component";
 export * from "./date-inputs/date-picker/date-picker.component";
@@ -50,8 +61,13 @@ export * from "./dropdowns/drop-down-list/directives/drop-down-list-value-templa
 export * from "./dropdowns/drop-down-list/components/drop-down-list/drop-down-list.component";
 
 /* Drop Down Tree */
+export * from "./dropdowns/drop-down-tree/directives/drop-down-tree-disable.directive";
 export * from "./dropdowns/drop-down-tree/directives/drop-down-tree-expandable.directive";
 export * from "./dropdowns/drop-down-tree/directives/drop-down-tree-filterable.directive";
+export * from "./dropdowns/drop-down-tree/directives/drop-down-tree-footer-template.directive";
+export * from "./dropdowns/drop-down-tree/directives/drop-down-tree-header-template.directive";
+export * from "./dropdowns/drop-down-tree/directives/drop-down-tree-no-data-template.directive";
+export * from "./dropdowns/drop-down-tree/directives/drop-down-tree-node-template.directive";
 export * from "./dropdowns/drop-down-tree/components/drop-down-tree/drop-down-tree.component";
 
 /* Multi Select */
@@ -75,7 +91,7 @@ export * from "./filter/components/filter-menu/filter-menu.component";
 /** Grid */
 export * from "./query/sort/SortDescriptor";
 export * from "./grid/models/CellEditEvent";
-export * from "./grid/models/SelectableOptions";
+export { SelectableOptions } from "./grid/models/SelectableOptions";
 export * from "./grid/models/SortableOptions";
 export * from "./grid/directives/grid-editable.directive";
 export * from "./grid/directives/grid-selectable.directive";
@@ -218,24 +234,15 @@ export * from "./tooltips/popover/components/popover/popover.component";
 export * from "./tooltips/tooltip/tooltip.component";
 
 /** TreeView */
-export { NodeOptions } from "./tree-view/models/Node";
-export * from "./tree-view/models/NodeClickEvent";
-export * from "./tree-view/models/NodeDragEndEvent";
-export * from "./tree-view/models/NodeDragStartEvent";
-export * from "./tree-view/models/NodeDragEvent";
-export * from "./tree-view/models/NodeDropEvent";
-export * from "./tree-view/models/NodeLookupItem";
-export * from "./tree-view/models/CheckableOptions";
-export * from "./tree-view/models/ExpandableOptions";
-export * from "./tree-view/models/FilterableOptions";
-export { SelectableOptions } from "./tree-view/models/SelectableOptions";
 export * from "./tree-view/components/tree-view/tree-view.component";
 export * from "./tree-view/directives/tree-view-checkable.directive";
 export * from "./tree-view/directives/tree-view-disable.directive";
+export * from "./tree-view/directives/tree-view-drag-and-drop.directive";
 export * from "./tree-view/directives/tree-view-expandable.directive";
 export * from "./tree-view/directives/tree-view-filterable.directive";
+export * from "./tree-view/directives/tree-view-node-template.directive";
 export * from "./tree-view/directives/tree-view-selectable.directive";
-export * from "./tree-view/directives/tree-view-node-text-template.directive";
+export * from "./tree-view/directives/tree-view-node-template.directive";
 
 /** Window */
 export * from "./window/models/DialogAction";

@@ -1,39 +1,52 @@
 <div class="wrapper">
     <mona-splitter orientation="horizontal">
         <mona-splitter-pane [size]="300" [collapsible]="true">
-            <mona-tree-view [data]="treeData" textField="text" childrenField="items" keyField="id"
-                            [monaTreeViewCheckable]="{enabled: true, checkChildren: true, checkParents: true, mode: 'multiple'}"
+<!--            <mona-tree-->
+<!--                    [data]="treeData"-->
+<!--                    monaTreeCheckable-->
+<!--                    [checkedKeys]="treeCheckedKeys"-->
+<!--                    (checkedKeysChange)="onTreeCheckedKeysChange($event)"-->
+<!--                    [monaTreeSelectable]="{ enabled: true, mode: 'multiple', childrenOnly: true, }"-->
+<!--                    [selectedKeys]="treeSelectedKeys"-->
+<!--                    (selectedKeysChange)="onTreeSelectedKeysChange($event)"-->
+<!--                    [monaTreeFilterable]="{debounce: 0}"-->
+<!--                    monaTreeExpandable-->
+<!--                    [expandedKeys]="treeExpandedKeys"-->
+<!--                    (nodeSelect)="onTreeNodeSelect($event)"-->
+<!--                    (nodeDrag)="onTreeNodeDrag($event)"-->
+<!--                    (nodeDragStart)="onTreeNodeDragStart($event)"-->
+<!--                    (nodeDragEnd)="onTreeNodeDragEnd($event)"-->
+<!--                    (nodeDrop)="onTreeNodeDrop($event)"-->
+<!--                    (nodeCheck)="onTreeNodeCheck($event)"-->
+<!--                    (nodeClick)="onTreeNodeClick($event)">-->
+<!--            </mona-tree>-->
+            <mona-tree-view [data]="treeData"
+                            [children]="treeChildren"
+                            textField="text" monaTreeViewCheckable
                             [checkedKeys]="treeCheckedKeys"
                             (checkedKeysChange)="onTreeCheckedKeysChange($event)"
-                            monaTreeViewExpandable [expandedKeys]="treeExpandedKeys"
+                            monaTreeViewExpandable
+                            monaTreeViewFilterable
+                            monaTreeViewDragAndDrop
+                            (nodeDrop)="print($event)"
+                            [expandedKeys]="treeExpandedKeys"
                             (expandedKeysChange)="onTreeExpandedKeysChange($event)"
-                            [monaTreeViewSelectable]="{enabled: true, mode: 'single', childrenOnly: true}"
+                            [monaTreeViewSelectable]="{ enabled: true, mode: 'multiple', childrenOnly: false }"
                             [selectedKeys]="treeSelectedKeys"
                             (selectedKeysChange)="onTreeSelectedKeysChange($event)"
-                            [monaTreeViewFilterable]="{enabled: true, operator: 'contains', caseSensitive: false}"
-                            filterPlaceholder="Search..."
-                            [filter]="treeFilter()"
-                            (filterChange)="onTreeFilterChange($event)"
-                            (nodeDragStart)="onTreeNodeDragStart($event)"
-                            (nodeDrag)="onTreeNodeDrag($event)"
-                            (nodeDrop)="onTreeNodeDrop($event)"
-                            (nodeDragEnd)="onTreeNodeDragEnd($event)"
-                            (nodeClick)="onTreeNodeClick($event)"
-                            (nodeDoubleClick)="onTreeNodeDoubleClick($event)"
-                            monaTreeViewDisable [disabledKeys]="treeDisabledKeys"
             >
-                <!--            monaTreeViewDisable [disabledKeys]="treeDisabledKeys"-->
-<!--                            <ng-template monaTreeViewNodeTextTemplate let-dataItem>-->
-<!--                                <span #anchor>-->
-<!--                                    <span style="color: crimson; font-weight: bold;" *ngIf="dataItem.items && dataItem.items?.length !== 0">{{dataItem.text}}</span>-->
-<!--                                    <span style="color: snow; font-weight: bold;" *ngIf="!dataItem.items || dataItem.items?.length === 0">{{dataItem.text}}</span>-->
-<!--                                </span>-->
-<!--                                <mona-contextmenu [target]="anchor">-->
-<!--                                    <mona-menu-item text="Print" (menuClick)="print(dataItem)"></mona-menu-item>-->
-<!--                                    <mona-menu-item text="Noop"></mona-menu-item>-->
-<!--                                    <mona-menu-item text="Refresh" (menuClick)="updateTreeData()"></mona-menu-item>-->
-<!--                                </mona-contextmenu>-->
-<!--                            </ng-template>-->
+                <ng-template monaTreeViewNodeTemplate let-item let-element="element">
+                    @if (item.text.startsWith('C')) {
+                        <span style="color: #F03193;">{{item?.text}}</span>
+                    } @else {
+                        <span style="color: #ffcc75;">{{item?.text}}</span>
+                    }
+                    <mona-contextmenu [target]="element" trigger="contextmenu">
+                        <mona-menu-item text="Print" (menuClick)="print(item)"></mona-menu-item>
+                        <mona-menu-item text="Noop"></mona-menu-item>
+                        <mona-menu-item text="Refresh" (menuClick)="updateTreeData()"></mona-menu-item>
+                    </mona-contextmenu>
+                </ng-template>
             </mona-tree-view>
         </mona-splitter-pane>
         <mona-splitter-pane>
@@ -449,17 +462,32 @@
                                     Chip I
                                 </mona-chip>
                                 <mona-drop-down-tree [data]="treeData"
-                                                     keyField="id"
-                                                     childrenField="items"
+                                                     children="items"
                                                      textField="text"
-                                                     [itemDisabled]="dropdownTreeDisabler"
+                                                     valueField="id"
                                                      monaDropDownTreeExpandable
                                                      monaDropDownTreeFilterable
+                                                     monaDropDownTreeDisable
+                                                     [disableBy]="'id'"
+                                                     [disabledKeys]="treeDisabledKeys"
                                                      [ngModel]="dropdownTreeSelectedValue"
                                                      (ngModelChange)="onDropdownTreeValueChange($event)"
                                                      [expandedKeys]="dropdownTreeExpandedKeys"
                                                      (expandedKeysChange)="onDropdownTreeExpandedKeysChange($event)"
-                                                     style="width: 220px;"></mona-drop-down-tree>
+                                                     style="width: 220px;">
+                                    <ng-template monaDropDownTreeNodeTemplate let-dataItem>
+                                        <span style="color: #00a86b;">{{dataItem.text}}</span>
+                                    </ng-template>
+                                    <ng-template monaDropDownTreeHeaderTemplate>
+                                        <div style="background: var(--mona-background-dark); border-bottom: 1px solid var(--mona-border-color-dark);">Header</div>
+                                    </ng-template>
+                                    <ng-template monaDropDownTreeFooterTemplate>
+                                        <div style="background: var(--mona-background-dark); border-top: 1px solid var(--mona-border-color-dark);">Footer</div>
+                                    </ng-template>
+                                    <ng-template monaDropDownTreeNoDataTemplate>
+                                        <div>No data.</div>
+                                    </ng-template>
+                                </mona-drop-down-tree>
                                 <mona-multi-select [data]="dropdownListDataItems" textField="text" valueField="value"
                                                    style="width: auto; min-width: 200px;"
                                                    monaDropDownGroupable groupBy="group"

@@ -1,25 +1,41 @@
-import { ConnectionPositionPair } from "@angular/cdk/overlay";
 import { CommonModule } from "@angular/common";
 import {
     Component,
     computed,
+    ContentChild,
+    DestroyRef,
+    effect,
     ElementRef,
     forwardRef,
     HostBinding,
+    inject,
+    Injector,
     Input,
+    OnInit,
     Signal,
     signal,
     TemplateRef,
     ViewChild,
     WritableSignal
 } from "@angular/core";
+import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { FaIconComponent } from "@fortawesome/angular-fontawesome";
 import { faChevronDown, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
-import { take } from "rxjs";
+import { Selector } from "@mirei/ts-collections";
+import { distinctUntilChanged, fromEvent, Observable, take } from "rxjs";
+import { v4 } from "uuid";
 import { AnimationState } from "../../../../animations/models/AnimationState";
 import { PopupAnimationService } from "../../../../animations/services/popup-animation.service";
 import { ButtonDirective } from "../../../../buttons/button/button.directive";
+import { FilterInputComponent } from "../../../../common/filter-input/components/filter-input/filter-input.component";
+import { FilterChangeEvent } from "../../../../common/filter-input/models/FilterChangeEvent";
+import { TreeComponent } from "../../../../common/tree/components/tree/tree.component";
+import { TreeNodeTemplateDirective } from "../../../../common/tree/directives/tree-node-template.directive";
+import { SelectableOptions } from "../../../../common/tree/models/SelectableOptions";
+import { TreeNode } from "../../../../common/tree/models/TreeNode";
+import { TreeService } from "../../../../common/tree/services/tree.service";
+import { PlaceholderComponent } from "../../../../layout/placeholder/placeholder.component";
 import { PopupRef } from "../../../../popup/models/PopupRef";
 import { PopupService } from "../../../../popup/services/popup.service";
 import { TreeViewComponent } from "../../../../tree-view/components/tree-view/tree-view.component";
@@ -27,10 +43,12 @@ import { TreeViewDisableDirective } from "../../../../tree-view/directives/tree-
 import { TreeViewExpandableDirective } from "../../../../tree-view/directives/tree-view-expandable.directive";
 import { TreeViewFilterableDirective } from "../../../../tree-view/directives/tree-view-filterable.directive";
 import { TreeViewSelectableDirective } from "../../../../tree-view/directives/tree-view-selectable.directive";
-import { NodeLookupItem } from "../../../../tree-view/models/NodeLookupItem";
-import { SelectableOptions } from "../../../../tree-view/models/SelectableOptions";
 import { Action } from "../../../../utils/Action";
 import { DropDownService } from "../../../services/drop-down.service";
+import { DropDownTreeFooterTemplateDirective } from "../../directives/drop-down-tree-footer-template.directive";
+import { DropDownTreeHeaderTemplateDirective } from "../../directives/drop-down-tree-header-template.directive";
+import { DropDownTreeNoDataTemplateDirective } from "../../directives/drop-down-tree-no-data-template.directive";
+import { DropDownTreeNodeTemplateDirective } from "../../directives/drop-down-tree-node-template.directive";
 import { DropDownTreeService } from "../../services/drop-down-tree.service";
 
 @Component({
@@ -39,47 +57,71 @@ import { DropDownTreeService } from "../../services/drop-down-tree.service";
     imports: [
         CommonModule,
         ButtonDirective,
-        TreeViewComponent,
         FaIconComponent,
-        TreeViewSelectableDirective,
-        TreeViewExpandableDirective,
+        TreeViewComponent,
         TreeViewDisableDirective,
-        TreeViewFilterableDirective
+        TreeViewSelectableDirective,
+        TreeViewFilterableDirective,
+        TreeViewExpandableDirective,
+        TreeComponent,
+        FilterInputComponent,
+        TreeNodeTemplateDirective,
+        PlaceholderComponent
     ],
     templateUrl: "./drop-down-tree.component.html",
     styleUrl: "./drop-down-tree.component.scss",
     providers: [
+        TreeService,
         DropDownTreeService,
         {
             provide: NG_VALUE_ACCESSOR,
             useExisting: forwardRef(() => DropDownTreeComponent),
             multi: true
         }
-    ]
+    ],
+    host: {
+        "[class.mona-disabled]": "disabled",
+        "[attr.tabindex]": "disabled ? null : 0"
+    }
 })
-export class DropDownTreeComponent implements ControlValueAccessor {
+export class DropDownTreeComponent<T> implements ControlValueAccessor, OnInit {
+    readonly #destroyRef: DestroyRef = inject(DestroyRef);
+    readonly #injector: Injector = inject(Injector);
+    readonly #popupUidClass: string = `mona-dropdown-popup-${v4()}`;
+    readonly #selectedNode: Signal<TreeNode<T> | null> = computed(() => {
+        return this.treeService.selectedNodes().firstOrDefault();
+    });
     #popupRef: PopupRef | null = null;
-    #selectedNode: WritableSignal<NodeLookupItem | null> = signal(null);
-    #propagateChange: any = () => {};
+    #propagateChange: Action<any> | null = null;
     #value: WritableSignal<any | null> = signal(null);
     protected readonly selectableOptions: SelectableOptions = {
         enabled: true,
         mode: "single",
+        toggleable: false,
         childrenOnly: false
     };
-    protected readonly selectedTreeKeys: WritableSignal<string[]> = signal([]);
     protected readonly text: Signal<string> = computed(() => {
-        return this.#value()?.[this.textField] ?? "";
+        const node = this.#selectedNode();
+        if (!node) {
+            return "";
+        }
+        return this.treeService.getNodeText(node);
     });
     public readonly clearIcon: IconDefinition = faTimes;
     public readonly dropdownIcon: IconDefinition = faChevronDown;
-    public disabler: WritableSignal<Action<unknown, boolean> | string | undefined> = signal(undefined);
+
+    @HostBinding("class.mona-dropdown")
+    public readonly hostClass: boolean = true;
 
     @Input()
-    public childrenField: string = "";
+    public set children(value: string | Selector<T, Iterable<T> | Observable<Iterable<T>>>) {
+        this.treeService.setChildrenSelector(value);
+    }
 
     @Input()
-    public data: Iterable<any> = [];
+    public set data(value: Iterable<T>) {
+        this.treeService.setData(value);
+    }
 
     @Input()
     public disabled: boolean = false;
@@ -87,54 +129,60 @@ export class DropDownTreeComponent implements ControlValueAccessor {
     @ViewChild("dropdownWrapper")
     public dropdownWrapper!: ElementRef<HTMLDivElement>;
 
-    @HostBinding("class.mona-dropdown")
-    public readonly hostClass: boolean = true;
+    @ContentChild(DropDownTreeFooterTemplateDirective, { read: TemplateRef })
+    public footerTemplate: TemplateRef<any> | null = null;
 
-    @Input()
-    public set itemDisabled(nodeDisabler: Action<unknown, boolean> | string) {
-        this.disabler.set(nodeDisabler);
-    }
+    @ContentChild(DropDownTreeHeaderTemplateDirective, { read: TemplateRef })
+    public headerTemplate: TemplateRef<any> | null = null;
 
-    @Input({ required: true })
-    public keyField: string = "";
+    @ContentChild(DropDownTreeNoDataTemplateDirective, { read: TemplateRef })
+    public noDataTemplate: TemplateRef<any> | null = null;
+
+    @ContentChild(DropDownTreeNodeTemplateDirective, { read: TemplateRef })
+    public nodeTemplate: TemplateRef<any> | null = null;
 
     @ViewChild("popupTemplate")
     public popupTemplate!: TemplateRef<any>;
 
     @Input()
-    public textField: string = "";
+    public set textField(value: string | null | undefined) {
+        this.treeService.setTextField(value ?? "");
+    }
+
+    @Input()
+    public set valueField(valueField: string | null | undefined) {
+        this.treeService.setSelectBy(valueField ?? null);
+    }
 
     public constructor(
-        protected readonly dropdownTreeService: DropDownTreeService,
         private readonly elementRef: ElementRef<HTMLElement>,
         private readonly popupAnimationService: PopupAnimationService,
-        private readonly popupService: PopupService
+        private readonly popupService: PopupService,
+        protected readonly treeService: TreeService<T>
     ) {}
 
     public close(): void {
         this.#popupRef?.close();
     }
 
-    public onExpandedKeysChange(expandedKeys: unknown[]): void {
-        this.dropdownTreeService.expandedKeys.update(set => set.clear().addAll(expandedKeys));
-        this.dropdownTreeService.expandedKeysChange.emit(expandedKeys);
+    public ngOnInit(): void {
+        this.treeService.setSelectableOptions(this.selectableOptions);
+        this.setEffects();
+        this.setSubscriptions();
+        this.setEventListeners();
     }
 
-    public onSelectedKeysChange(selectedKeys: string[]): void {
-        this.selectedTreeKeys.set(selectedKeys);
-    }
-
-    public onSelectionChange(node: NodeLookupItem): void {
-        this.#selectedNode.set(node);
-        this.#value.set(node.selected ? node.data : null);
-        this.#propagateChange(this.#value());
-        this.close();
+    public onFilterChange(event: FilterChangeEvent): void {
+        this.treeService.filterChange.emit(event);
+        if (!event.isDefaultPrevented()) {
+            this.treeService.filter$.next(event.filter);
+        }
     }
 
     public open(): void {
         this.dropdownWrapper.nativeElement.focus();
         if (this.#popupRef) {
-            this.#popupRef.close();
+            return;
         }
         this.#popupRef = this.popupService.create({
             anchor: this.dropdownWrapper,
@@ -142,15 +190,19 @@ export class DropDownTreeComponent implements ControlValueAccessor {
             hasBackdrop: false,
             withPush: false,
             width: this.elementRef.nativeElement.getBoundingClientRect().width,
-            popupClass: ["mona-dropdown-popup-content", "mona-dropdown-tree-popup-content"],
+            popupClass: ["mona-dropdown-popup-content", "mona-dropdown-tree-popup-content", this.#popupUidClass],
             closeOnOutsideClick: false,
             positions: DropDownService.getDefaultPositions()
         });
+        this.focusSelectedNode();
         this.popupAnimationService.setupDropdownOutsideClickCloseAnimation(this.#popupRef);
         this.popupAnimationService.animateDropdown(this.#popupRef, AnimationState.Show);
         this.#popupRef.closed.pipe(take(1)).subscribe(() => {
             this.#popupRef = null;
-            (this.elementRef.nativeElement.firstElementChild as HTMLElement)?.focus();
+            const popupElement = document.querySelector(`.${this.#popupUidClass}`);
+            if (DropDownService.shouldFocusAfterClose(this.elementRef.nativeElement, popupElement)) {
+                this.focus();
+            }
         });
     }
 
@@ -162,10 +214,112 @@ export class DropDownTreeComponent implements ControlValueAccessor {
 
     public writeValue(obj: any | null) {
         this.#value.set(obj);
-        if (obj == null) {
-            this.selectedTreeKeys.set([]);
-        } else {
-            this.selectedTreeKeys.set([obj[this.keyField]]);
+        if (obj != null) {
+            this.treeService.setSelectedDataItems([obj]);
         }
+    }
+
+    private focus(): void {
+        this.elementRef.nativeElement?.focus();
+    }
+
+    private focusSelectedNode(): void {
+        window.setTimeout(() => {
+            const popupElement = document.querySelector(`.${this.#popupUidClass}`);
+            if (!popupElement) {
+                return;
+            }
+            const firstElement = popupElement.querySelector(
+                ".mona-dropdown-popup-content ul:first-child li:first-child"
+            ) as HTMLElement;
+            const uid = this.#selectedNode()?.uid;
+            if (uid) {
+                const selectedElement = popupElement.querySelector(
+                    ".mona-dropdown-popup-content ul li[data-uid='" + uid + "']"
+                ) as HTMLElement;
+                if (selectedElement) {
+                    selectedElement?.scrollIntoView({
+                        behavior: "auto",
+                        block: "center"
+                    });
+                    selectedElement.focus();
+                    return;
+                } else {
+                    if (firstElement) {
+                        firstElement.focus();
+                    }
+                }
+            }
+            if (firstElement) {
+                firstElement.focus();
+            }
+        }, 200);
+    }
+
+    private handleEnterKey(): void {
+        if (this.#popupRef) {
+            this.close();
+            return;
+        }
+        this.open();
+    }
+
+    private handleKeyDown(event: KeyboardEvent): void {
+        if (event.key === "Enter") {
+            this.handleEnterKey();
+        }
+    }
+
+    private notifyValueChange(): void {
+        this.#propagateChange?.(this.#value());
+    }
+
+    private setEffects(): void {
+        effect(
+            () => {
+                const highlightedNode = this.treeService.navigatedNode();
+                window.setTimeout(() => {
+                    if (!highlightedNode) {
+                        return;
+                    }
+                    const popupElement = document.querySelector(`.${this.#popupUidClass}`);
+                    if (!popupElement) {
+                        return;
+                    }
+                    const nodeElement = popupElement.querySelector(
+                        `[data-uid="${highlightedNode.uid}"]`
+                    ) as HTMLElement;
+                    if (nodeElement) {
+                        nodeElement.scrollIntoView({
+                            behavior: "smooth",
+                            block: "nearest",
+                            inline: "center"
+                        });
+                    }
+                });
+            },
+            { injector: this.#injector }
+        );
+    }
+
+    private setEventListeners(): void {
+        fromEvent<KeyboardEvent>(this.elementRef.nativeElement, "keydown")
+            .pipe(takeUntilDestroyed(this.#destroyRef))
+            .subscribe((event: KeyboardEvent) => {
+                this.handleKeyDown(event);
+            });
+    }
+
+    private setSubscriptions(): void {
+        this.treeService.selectedKeys$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(() => this.close());
+        this.treeService.selectionChange$
+            .pipe(
+                distinctUntilChanged((n1, n2) => n1.data === n2.data),
+                takeUntilDestroyed(this.#destroyRef)
+            )
+            .subscribe(node => {
+                this.#value.set(node.data);
+                this.notifyValueChange();
+            });
     }
 }

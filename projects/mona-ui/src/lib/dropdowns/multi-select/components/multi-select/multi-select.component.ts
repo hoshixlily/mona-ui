@@ -78,7 +78,11 @@ import { MultiSelectTagTemplateDirective } from "../../directives/multi-select-t
         ListFooterTemplateDirective,
         ListHeaderTemplateDirective,
         ListNoDataTemplateDirective
-    ]
+    ],
+    host: {
+        "[class.mona-disabled]": "disabled",
+        "[attr.tabindex]": "disabled ? null : 0"
+    }
 })
 export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlValueAccessor {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
@@ -337,6 +341,7 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
             .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe((event: KeyboardEvent) => {
                 if (event.key === "Enter") {
+                    event.preventDefault();
                     this.handleEnterKey();
                 } else if (event.key === "Escape") {
                     this.close();
