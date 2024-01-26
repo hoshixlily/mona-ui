@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
+import { TreeService } from "../../services/tree.service";
 
 import { TreeNodeComponent } from "./tree-node.component";
 
@@ -8,7 +9,8 @@ describe("TreeNodeComponent", () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [TreeNodeComponent]
+            imports: [TreeNodeComponent],
+            providers: [TreeService]
         }).compileComponents();
 
         fixture = TestBed.createComponent(TreeNodeComponent);

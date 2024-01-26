@@ -60,6 +60,9 @@ import { NgClass } from "@angular/common";
     ],
     host: {
         "[class.mona-disabled]": "disabled",
+        "[attr.aria-disabled]": "disabled ? true : undefined",
+        "[attr.aria-readonly]": "readonly ? true : undefined",
+        "[attr.role]": "'grid'",
         "[attr.tabindex]": "disabled ? null : 0"
     }
 })

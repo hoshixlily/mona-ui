@@ -1,16 +1,18 @@
-import { TestBed } from '@angular/core/testing';
+import { TestBed } from "@angular/core/testing";
 
-import { TreeService } from './tree.service';
+import { TreeService } from "./tree.service";
 
-describe('TreeService', () => {
-  let service: TreeService;
+describe("TreeService", () => {
+    let service: TreeService<any>;
 
-  beforeEach(() => {
-    TestBed.configureTestingModule({});
-    service = TestBed.inject(TreeService);
-  });
+    beforeEach(() => {
+        TestBed.configureTestingModule({
+            providers: [TreeService]
+        });
+        service = TestBed.inject(TreeService);
+    });
 
-  it('should be created', () => {
-    expect(service).toBeTruthy();
-  });
+    it("should be created", () => {
+        expect(service).toBeTruthy();
+    });
 });

@@ -19,7 +19,9 @@ import { ButtonService } from "../services/button.service";
 @Directive({
     selector: "[monaButton]",
     host: {
-        "[attr.disabled]": "disabled ? '' : undefined"
+        "[attr.disabled]": "disabled ? '' : undefined",
+        "[attr.aria-disabled]": "disabled ? true : undefined",
+        "[attr.aria-selected]": "selected ? true : undefined"
     },
     standalone: true
 })

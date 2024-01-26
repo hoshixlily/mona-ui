@@ -79,6 +79,8 @@ import { DropDownListValueTemplateDirective } from "../../directives/drop-down-l
     ],
     host: {
         "[class.mona-disabled]": "disabled",
+        "[attr.aria-disabled]": "disabled ? true : undefined",
+        "[attr.aria-haspopup]": "true",
         "[attr.tabindex]": "disabled ? null : 0"
     }
 })

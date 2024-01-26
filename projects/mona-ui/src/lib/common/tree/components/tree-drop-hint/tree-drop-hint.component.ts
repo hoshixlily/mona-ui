@@ -10,7 +10,10 @@ import { TreeService } from "../../services/tree.service";
     standalone: true,
     imports: [FaIconComponent],
     templateUrl: "./tree-drop-hint.component.html",
-    styleUrl: "./tree-drop-hint.component.scss"
+    styleUrl: "./tree-drop-hint.component.scss",
+    host: {
+        "[class.mona-tree-drop-hint]": "true"
+    }
 })
 export class TreeDropHintComponent<T> {
     readonly #dropPositionChange: Signal<DropPositionChangeEvent<T> | null> = toSignal(
@@ -55,16 +58,10 @@ export class TreeDropHintComponent<T> {
         }
     });
 
-    @HostBinding("mona-tree-drop-hint")
-    public get dropHint(): boolean {
-        return true;
-    }
-
     public constructor(
         private readonly elementRef: ElementRef<HTMLElement>,
         private readonly treeService: TreeService<T>
     ) {
-        elementRef.nativeElement.classList.add("mona-tree-drop-hint");
         effect(() => {
             const styles = this.dropHintStyles();
             Object.assign(this.elementRef.nativeElement.style, styles);

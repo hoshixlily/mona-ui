@@ -1,14 +1,13 @@
 import { TestBed } from "@angular/core/testing";
+import { TreeService } from "../../../common/tree/services/tree.service";
 import { DropDownTreeExpandableDirective } from "./drop-down-tree-expandable.directive";
-import { DropDownTreeService } from "../services/drop-down-tree.service";
-import { ExpandableOptions } from "../../../tree-view/models/ExpandableOptions";
 
 describe("DropDownTreeExpandableDirective", () => {
-    let directive: DropDownTreeExpandableDirective;
-    let dropdownTreeService: DropDownTreeService;
+    let directive: DropDownTreeExpandableDirective<any>;
+    let dropdownTreeService: TreeService<any>;
 
     beforeEach(() => {
-        dropdownTreeService = TestBed.runInInjectionContext(() => new DropDownTreeService());
+        dropdownTreeService = TestBed.runInInjectionContext(() => new TreeService<any>());
         directive = TestBed.runInInjectionContext(() => new DropDownTreeExpandableDirective(dropdownTreeService));
     });
 
@@ -30,15 +29,14 @@ describe("DropDownTreeExpandableDirective", () => {
     });
 
     it("should set expandable options when options are provided", () => {
-        const options: ExpandableOptions = { enabled: true };
-        directive.options = options;
+        directive.options = { enabled: true };
         directive.ngOnInit();
-        expect(dropdownTreeService.expandableOptions.enabled).toEqual(true);
+        expect(dropdownTreeService.expandableOptions().enabled).toEqual(true);
     });
 
     it("should set default expandable options when options are empty string", () => {
         directive.options = "";
         directive.ngOnInit();
-        expect(dropdownTreeService.expandableOptions.enabled).toEqual(true);
+        expect(dropdownTreeService.expandableOptions().enabled).toEqual(true);
     });
 });

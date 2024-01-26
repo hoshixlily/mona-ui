@@ -1,4 +1,7 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
+import { TreeService } from "../../services/tree.service";
+import { SubTreeComponent } from "../sub-tree/sub-tree.component";
+import { TreeDropHintComponent } from "../tree-drop-hint/tree-drop-hint.component";
 
 import { TreeComponent } from "./tree.component";
 
@@ -8,7 +11,8 @@ describe("TreeComponent", () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [TreeComponent]
+            imports: [TreeComponent, SubTreeComponent, TreeDropHintComponent],
+            providers: [TreeService]
         }).compileComponents();
 
         fixture = TestBed.createComponent(TreeComponent);

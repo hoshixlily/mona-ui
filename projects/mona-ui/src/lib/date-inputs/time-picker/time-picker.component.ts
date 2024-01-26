@@ -49,6 +49,9 @@ import { TextBoxDirective } from "../../inputs/text-box/directives/text-box.dire
     imports: [TextBoxDirective, FormsModule, ButtonDirective, FontAwesomeModule, TimeSelectorComponent],
     host: {
         "[class.mona-disabled]": "disabled",
+        "[attr.aria-disabled]": "disabled ? true : undefined",
+        "[attr.aria-readonly]": "readonly ? true : undefined",
+        "[attr.role]": "'grid'",
         "[attr.tabindex]": "disabled ? null : 0"
     }
 })

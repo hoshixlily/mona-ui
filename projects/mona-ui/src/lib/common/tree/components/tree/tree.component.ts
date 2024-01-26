@@ -17,7 +17,6 @@ import {
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { asapScheduler, fromEvent, takeWhile, tap } from "rxjs";
-import { FilterInputComponent } from "../../../filter-input/components/filter-input/filter-input.component";
 import { TreeNodeTemplateDirective } from "../../directives/tree-node-template.directive";
 import { NodeCheckEvent } from "../../models/NodeCheckEvent";
 import { NodeClickEvent } from "../../models/NodeClickEvent";
@@ -35,14 +34,7 @@ import { TreeNodeComponent } from "../tree-node/tree-node.component";
 @Component({
     selector: "mona-tree",
     standalone: true,
-    imports: [
-        SubTreeComponent,
-        TreeNodeComponent,
-        NgTemplateOutlet,
-        NgStyle,
-        TreeDropHintComponent,
-        FilterInputComponent
-    ],
+    imports: [SubTreeComponent, TreeNodeComponent, NgTemplateOutlet, NgStyle, TreeDropHintComponent],
     templateUrl: "./tree.component.html",
     styleUrl: "./tree.component.scss",
     changeDetection: ChangeDetectionStrategy.OnPush,

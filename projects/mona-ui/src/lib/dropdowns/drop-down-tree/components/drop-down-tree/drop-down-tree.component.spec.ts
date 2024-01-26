@@ -5,8 +5,8 @@ import { TreeViewComponent } from "../../../../tree-view/components/tree-view/tr
 import { DropDownTreeComponent } from "./drop-down-tree.component";
 
 describe("DropDownTreeComponent", () => {
-    let component: DropDownTreeComponent;
-    let fixture: ComponentFixture<DropDownTreeComponent>;
+    let component: DropDownTreeComponent<any>;
+    let fixture: ComponentFixture<DropDownTreeComponent<any>>;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
