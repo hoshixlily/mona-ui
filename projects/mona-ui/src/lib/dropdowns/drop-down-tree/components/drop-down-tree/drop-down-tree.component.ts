@@ -81,6 +81,7 @@ import { DropDownTreeService } from "../../services/drop-down-tree.service";
     ],
     host: {
         "[class.mona-disabled]": "disabled",
+        "[class.mona-dropdown]": "true",
         "[attr.tabindex]": "disabled ? null : 0"
     }
 })
@@ -109,9 +110,6 @@ export class DropDownTreeComponent<T> implements ControlValueAccessor, OnInit {
     });
     public readonly clearIcon: IconDefinition = faTimes;
     public readonly dropdownIcon: IconDefinition = faChevronDown;
-
-    @HostBinding("class.mona-dropdown")
-    public readonly hostClass: boolean = true;
 
     @Input()
     public set children(value: string | Selector<T, Iterable<T> | Observable<Iterable<T>>>) {
@@ -199,6 +197,7 @@ export class DropDownTreeComponent<T> implements ControlValueAccessor, OnInit {
         this.popupAnimationService.animateDropdown(this.#popupRef, AnimationState.Show);
         this.#popupRef.closed.pipe(take(1)).subscribe(() => {
             this.#popupRef = null;
+            this.treeService.clearFilter();
             const popupElement = document.querySelector(`.${this.#popupUidClass}`);
             if (DropDownService.shouldFocusAfterClose(this.elementRef.nativeElement, popupElement)) {
                 this.focus();

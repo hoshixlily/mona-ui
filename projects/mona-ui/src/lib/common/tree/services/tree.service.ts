@@ -197,6 +197,10 @@ export class TreeService<T> {
         return flattenedNodes;
     }
 
+    public clearFilter(): void {
+        this.filter$.next("");
+    }
+
     public getNodeByUid(uid: string): TreeNode<T> | null {
         const nodeDictionary = this.nodeDictionary();
         return nodeDictionary.get(uid) ?? null;
