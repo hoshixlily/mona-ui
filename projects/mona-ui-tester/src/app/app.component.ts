@@ -131,6 +131,7 @@ import {
     PopoverShowEvent,
     PopoverShownEvent,
     PopoverTitleTemplateDirective,
+    Popup2Service,
     PopupRef,
     PopupService,
     ProgressBarComponent,
@@ -777,7 +778,8 @@ export class AppComponent implements OnInit {
         // protected readonly listService: ListService<{ text: string; value: number; group: string; active: boolean }>,
         private readonly cdr: ChangeDetectorRef,
         private readonly notificationService: NotificationService,
-        private readonly dialogService: DialogService
+        private readonly dialogService: DialogService,
+        protected readonly popup2Service: Popup2Service
         // protected readonly treeService: TreeService<TreeNodeDataItem>
     ) {}
 
@@ -1352,20 +1354,19 @@ export class AppComponent implements OnInit {
         // this.popupService.create(popupSettings);
     }
 
-    public openPopup2(event: MouseEvent): void {
-        // event.stopPropagation();
-        // const prevented = 5;
-        // const ref = this.popupService.create({
-        //     anchor: this.italicButtonRef,
-        //     content: TestComponentComponent,
-        //     popupClass: "popup-noselect",
-        //     hasBackdrop: true,
-        //     offset: { horizontal: 0, vertical: 1 },
-        //     preventClose: event => {
-        //         console.log(event);
-        //         return event.via === "backdropClick";
-        //     }
-        // });
+    public openPopup2(anchor: HTMLElement, content: TemplateRef<any>): void {
+        const popup2Ref = this.popup2Service.open({
+            anchor,
+            content,
+            closeOnOutsideClick: false,
+            closeOnEscape: true
+        });
+        // window.setTimeout(() => {
+        //     popup2Ref.close();
+        // }, 2000);
+        popup2Ref.closed.subscribe({
+            next: result => console.log(result)
+        });
     }
 
     public onTimePickerValueChange(value: Date | null): void {

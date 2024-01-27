@@ -458,7 +458,7 @@
                                         </mona-menu-item>
                                     </mona-menu-item>
                                 </mona-drop-down-button>
-                                <mona-chip [removable]="false">
+                                <mona-chip [disabled]="true" [removable]="true">
                                     Chip I
                                 </mona-chip>
                                 <mona-drop-down-tree [data]="treeData"
@@ -508,6 +508,14 @@
                                                 style="font-weight: bold; color: deepskyblue;">+{{dataItems.length - multiSelectTagCount}}</span> items</span>
                                     </ng-template>
                                 </mona-multi-select>
+                                <button monaButton #popup2Anchor
+                                        (click)="openPopup2(popup2Anchor, popup2Template)">
+                                    Popup 2 Anchor
+                                </button>
+                                <ng-template #popup2Template>
+<!--                                    <span style="color: red;">Popup 2 Anchor  Button Test</span>-->
+                                    <mona-list-view [items]="listViewDataItems|monaSlice:0:10" textField="text"></mona-list-view>
+                                </ng-template>
                             </div>
 
                             <div style="display: flex; align-items: center; margin-top: 40px;">

@@ -1833,3 +1833,21 @@ div.mona-tree-view-node-dropping {
         padding: 0 !important;
     }
 }
+
+
+
+
+
+/** Popup 2 */
+.mona-popup2-container {
+    position: absolute;
+    z-index: 10000;
+}
+
+.mona-popup2-content {
+    background-color: var(--mona-background);
+    color: var(--mona-text);
+    border: 1px solid var(--mona-border-color);
+    padding: 4px;
+    box-shadow: var(--mona-popup-shadow);
+}

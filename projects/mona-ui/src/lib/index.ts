@@ -13,6 +13,10 @@ export * from "./buttons/split-button/components/split-button/split-button.compo
 /** Common */
 export * from "./common/filter-input/models/FilterChangeEvent";
 
+export * from "./common/popup/models/Popup2Options";
+export * from "./common/popup/models/Popup2Ref";
+export * from "./common/popup/services/popup2.service";
+
 export * from "./common/tree/models/DisableOptions";
 export * from "./common/tree/models/NodeCheckEvent";
 export * from "./common/tree/models/NodeClickEvent";
