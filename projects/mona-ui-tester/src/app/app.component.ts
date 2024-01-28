@@ -1358,7 +1358,7 @@ export class AppComponent implements OnInit {
         const popup2Ref = this.popup2Service.open({
             anchor,
             content,
-            closeOnOutsideClick: false,
+            closeOnOutsideClick: true,
             closeOnEscape: true
         });
         // window.setTimeout(() => {
