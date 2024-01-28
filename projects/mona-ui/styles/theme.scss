@@ -629,6 +629,7 @@ div.mona-time-picker-popup {
     user-select: none;
     padding: 0 !important;
     overflow: hidden;
+    //box-shadow: var(--mona-popup-shadow);
 
     & mona-text-box.filter-box {
         & div.mona-text-box {
@@ -639,6 +640,16 @@ div.mona-time-picker-popup {
         }
     }
     @include scrollbars;
+}
+
+.mona-dropdown-popup2-content,
+.mona-dropdown-list-popup-content {
+    background-color: var(--mona-background);
+    border: 1px solid var(--mona-border-color);
+}
+
+div.mona-dropdown-list-popup-content {
+    //overflow: hidden;
 }
 
 .mona-dropdown-popup-content ul.mona-list {
@@ -1834,19 +1845,8 @@ div.mona-tree-view-node-dropping {
     }
 }
 
-
-
-
-
 /** Popup 2 */
 .mona-popup2-container {
     position: fixed;
     z-index: 10000;
-}
-
-.mona-popup2-content {
-    background-color: var(--mona-background);
-    color: var(--mona-text);
-    border: 1px solid var(--mona-border-color);
-    box-shadow: var(--mona-popup-shadow);
 }

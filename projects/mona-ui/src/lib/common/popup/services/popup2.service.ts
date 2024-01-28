@@ -5,10 +5,9 @@ import {
     EnvironmentInjector,
     inject,
     Injectable,
-    NgZone,
-    TemplateRef
+    NgZone
 } from "@angular/core";
-import { fromEvent, Observable, Subject, take, takeUntil } from "rxjs";
+import { asapScheduler, delay, fromEvent, Observable, Subject, take, takeUntil } from "rxjs";
 import { Popup2ContainerComponent } from "../components/popup2-container/popup2-container.component";
 import { Popup2Options } from "../models/Popup2Options";
 import { Popup2Ref } from "../models/Popup2Ref";
@@ -19,19 +18,16 @@ import { PopupCornerPosition } from "../models/PopupCornerPosition";
     providedIn: "root"
 })
 export class Popup2Service {
+    readonly #animationDuration: number = 200;
     readonly #appRef: ApplicationRef = inject(ApplicationRef);
     readonly #defaultPositions: PopupConnectPosition[] = [
-        // {
-        //     left: "start",
-        //     top: "end"
-        // },
         {
-            left: "end",
+            left: "start",
             top: "end"
         },
         {
             left: "start",
-            top: "end"
+            top: "start"
         }
     ];
     readonly #injector: EnvironmentInjector = inject(EnvironmentInjector);
@@ -42,12 +38,11 @@ export class Popup2Service {
     public open(options: Popup2Options): Popup2Ref {
         const push = options.push ?? false;
         const close$ = new Subject<void>();
-        const container = this.createPopupContainer();
-        const componentRef = this.createContainerComponentRef(options.content);
-        const componentContent = this.createContentElement(componentRef.location.nativeElement);
+        const container = this.createPopupContainer(options.classList);
+        const componentRef = this.createContainerComponentRef(options);
         const positions = options.positions ?? this.#defaultPositions;
+        const animationDelay = this.getAnimationDelay(options);
 
-        container.appendChild(componentContent);
         window.setTimeout(() => {
             this.attachPopupContainer(container, options.anchor);
             this.setPopupContainerPosition(container, options.anchor, positions, push);
@@ -55,12 +50,14 @@ export class Popup2Service {
         });
         this.#zone.runOutsideAngular(() => {
             window.requestAnimationFrame(() => {
-                this.setCloseOnOutsideClickSubscription(container, close$, options.closeOnOutsideClick);
-                this.setCloseOnEscapeSubscription(container, close$, options.closeOnEscape);
+                this.setCloseOnOutsideClickSubscription(container, close$, options.closeOnOutsideClick, animationDelay);
+                this.setCloseOnEscapeSubscription(container, close$, options.closeOnEscape, animationDelay);
                 this.setWindowScrollHandler(container, options.anchor, positions, close$, push);
             });
         });
-        close$.pipe(take(1)).subscribe(() => {
+        container.appendChild(componentRef.location.nativeElement);
+
+        close$.pipe(delay(0), take(1)).subscribe(() => {
             this.#appRef.detachView(componentRef.hostView);
             componentRef.destroy();
         });
@@ -68,7 +65,7 @@ export class Popup2Service {
         return new Popup2Ref({
             close$: close$,
             close: () => {
-                this.closePopupContainer(container);
+                this.closePopupContainer(container, animationDelay);
                 close$.next(undefined);
                 close$.complete();
             }
@@ -80,7 +77,20 @@ export class Popup2Service {
         if (options.width) {
             container.style.width = `${options.width}px`;
         }
-        container.style.maxWidth = `${window.innerWidth - containerRect.left}px`;
+        const containerPosition: PopupCornerPosition = {
+            top: containerRect.top,
+            left: containerRect.left
+        };
+        if (!this.isHorizontalPositionFitting(container, anchor, containerPosition)) {
+            container.style.maxWidth = `${window.innerWidth - containerRect.left}px`;
+        }
+        container.style.transform = "translate(-1px, 0)";
+        if (options.animate) {
+            const delay = this.getAnimationDelay(options);
+            window.setTimeout(() => {
+                container.style.boxShadow = "var(--mona-popup-shadow)";
+            }, delay);
+        }
     }
 
     private attachPopupContainer(container: HTMLElement, anchor: HTMLElement = document.body): void {
@@ -115,14 +125,17 @@ export class Popup2Service {
         connectPosition: PopupConnectPosition
     ): PopupCornerPosition {
         const anchorRect = anchor.getBoundingClientRect();
+        const anchorParentRect = anchor.offsetParent?.getBoundingClientRect() ?? document.body.getBoundingClientRect();
         const containerRect = container.getBoundingClientRect();
         const calculatedPosition = this.calculatePosition(anchor, connectPosition);
         if (connectPosition.left === "start") {
-            calculatedPosition.left = anchorRect.left - (containerRect.width - anchorRect.width);
+            calculatedPosition.left =
+                anchorRect.left - anchorParentRect.left - (containerRect.width - anchorRect.width);
         } else if (connectPosition.left === "center") {
-            calculatedPosition.left = anchorRect.left - containerRect.width / 2 + anchorRect.width / 2;
+            calculatedPosition.left =
+                anchorRect.left - anchorParentRect.left - containerRect.width + anchorRect.width / 2;
         } else if (connectPosition.left === "end") {
-            calculatedPosition.left = anchorRect.left - containerRect.width;
+            calculatedPosition.left = anchorRect.left - anchorParentRect.left - containerRect.width;
         }
         return calculatedPosition;
     }
@@ -133,52 +146,71 @@ export class Popup2Service {
         connectPosition: PopupConnectPosition
     ): PopupCornerPosition {
         const anchorRect = anchor.getBoundingClientRect();
+        const anchorParentRect = anchor.offsetParent?.getBoundingClientRect() ?? document.body.getBoundingClientRect();
         const containerRect = container.getBoundingClientRect();
         const calculatedPosition = this.calculatePosition(anchor, connectPosition);
         if (connectPosition.top === "start") {
-            calculatedPosition.top = anchorRect.top - (containerRect.height - anchorRect.height);
+            calculatedPosition.top = anchorRect.top - anchorParentRect.top - (containerRect.height - anchorRect.height);
         } else if (connectPosition.top === "center") {
-            calculatedPosition.top = anchorRect.top - containerRect.height / 2 + anchorRect.height / 2;
+            calculatedPosition.top =
+                anchorRect.top - anchorParentRect.top - containerRect.height + anchorRect.height / 2;
         } else if (connectPosition.top === "end") {
-            calculatedPosition.top = anchorRect.top - containerRect.height;
+            calculatedPosition.top = anchorRect.top - anchorParentRect.top - containerRect.height;
         }
         return calculatedPosition;
     }
 
-    private isHorizontalPositionFitting(container: HTMLElement, cornerPosition: PopupCornerPosition): boolean {
+    private getAnimationDelay(options: Popup2Options): number {
+        return typeof options.animate === "boolean"
+            ? this.#animationDuration
+            : options.animate?.delay ?? this.#animationDuration;
+    }
+
+    private isHorizontalPositionFitting(
+        container: HTMLElement,
+        anchor: HTMLElement,
+        cornerPosition: PopupCornerPosition
+    ): boolean {
         const rect = container.getBoundingClientRect();
-        return cornerPosition.left + rect.width <= window.innerWidth && cornerPosition.left >= 0;
+        const parentRect = anchor.offsetParent?.getBoundingClientRect() ?? document.body.getBoundingClientRect();
+        const left = cornerPosition.left + parentRect.left;
+        return left + rect.width <= window.innerWidth && left >= 0;
     }
 
-    private isVerticalPositionFitting(container: HTMLElement, cornerPosition: PopupCornerPosition): boolean {
+    private isVerticalPositionFitting(
+        container: HTMLElement,
+        anchor: HTMLElement,
+        cornerPosition: PopupCornerPosition
+    ): boolean {
         const rect = container.getBoundingClientRect();
-        return cornerPosition.top + rect.height <= window.innerHeight && cornerPosition.top >= 0;
+        const parentRect = anchor.offsetParent?.getBoundingClientRect() ?? document.body.getBoundingClientRect();
+        const top = cornerPosition.top + parentRect.top;
+        return top + rect.height <= window.innerHeight && top >= 0;
     }
 
-    private closePopupContainer(container: HTMLElement): void {
-        container.remove();
+    private closePopupContainer(container: HTMLElement, delay: number): void {
+        container.style.boxShadow = "none";
+        asapScheduler.schedule(() => {
+            container.remove();
+        }, delay);
     }
 
-    private createContainerComponentRef(content: TemplateRef<any>): ComponentRef<Popup2ContainerComponent> {
+    private createContainerComponentRef(options: Popup2Options): ComponentRef<Popup2ContainerComponent> {
         const componentRef = createComponent(Popup2ContainerComponent, {
             environmentInjector: this.#injector
         });
-        componentRef.instance.content = content;
+        componentRef.instance.content = options.content;
+        componentRef.instance.animate = options.animate ?? false;
+        componentRef.instance.animationDuration = this.#animationDuration;
         this.#appRef.attachView(componentRef.hostView);
         componentRef.changeDetectorRef.detectChanges();
         return componentRef;
     }
 
-    private createContentElement(componentContent: Element): HTMLElement {
-        const element = document.createElement("div");
-        element.classList.add("mona-popup2-content");
-        element.appendChild(componentContent);
-        return element;
-    }
-
-    private createPopupContainer(): HTMLElement {
+    private createPopupContainer(classList: string[] = []): HTMLElement {
         const container = document.createElement("div");
         container.classList.add("mona-popup2-container");
+        classList.forEach(className => container.classList.add(className));
         return container;
     }
 
@@ -204,12 +236,13 @@ export class Popup2Service {
     private setCloseOnEscapeSubscription(
         container: HTMLElement,
         close$: Subject<void>,
-        close: boolean | undefined
+        close: boolean | undefined,
+        delay: number
     ): void {
         const escapeKey$ = this.setEscapeKeyHandler(close$);
         if (close) {
             escapeKey$.pipe(take(1)).subscribe(() => {
-                this.closePopupContainer(container);
+                this.closePopupContainer(container, delay);
                 close$.next(undefined);
                 close$.complete();
             });
@@ -219,12 +252,13 @@ export class Popup2Service {
     private setCloseOnOutsideClickSubscription(
         container: HTMLElement,
         close$: Subject<void>,
-        close: boolean | undefined
+        close: boolean | undefined,
+        delay: number
     ): void {
         const outsideClick$ = this.setOutsideClickHandler(container, close$);
         if (close) {
             outsideClick$.pipe(take(1)).subscribe(() => {
-                this.closePopupContainer(container);
+                this.closePopupContainer(container, delay);
                 close$.next(undefined);
                 close$.complete();
             });
@@ -270,8 +304,8 @@ export class Popup2Service {
     ): void {
         for (const position of positions) {
             const calculatedPosition = this.calculatePosition(anchor, position);
-            const horizontallyFitting = this.isHorizontalPositionFitting(container, calculatedPosition);
-            const verticallyFitting = this.isVerticalPositionFitting(container, calculatedPosition);
+            const horizontallyFitting = this.isHorizontalPositionFitting(container, anchor, calculatedPosition);
+            const verticallyFitting = this.isVerticalPositionFitting(container, anchor, calculatedPosition);
             if (!push || (horizontallyFitting && verticallyFitting)) {
                 container.style.top = `${calculatedPosition.top}px`;
                 container.style.left = `${calculatedPosition.left}px`;
@@ -281,12 +315,16 @@ export class Popup2Service {
         }
         const position = positions[0];
         const calculatedPosition = this.calculatePosition(anchor, position);
-        const horizontallyFitting = this.isHorizontalPositionFitting(container, calculatedPosition);
-        const verticallyFitting = this.isVerticalPositionFitting(container, calculatedPosition);
+        const horizontallyFitting = this.isHorizontalPositionFitting(container, anchor, calculatedPosition);
+        const verticallyFitting = this.isVerticalPositionFitting(container, anchor, calculatedPosition);
         let horizontalPushedPosition: PopupCornerPosition | null;
         if (push && !horizontallyFitting) {
             horizontalPushedPosition = this.calculateHorizontalPushedPosition(anchor, container, position);
-            const pushedHorizontallyFitting = this.isHorizontalPositionFitting(container, horizontalPushedPosition);
+            const pushedHorizontallyFitting = this.isHorizontalPositionFitting(
+                container,
+                anchor,
+                horizontalPushedPosition
+            );
             if (!pushedHorizontallyFitting) {
                 horizontalPushedPosition = calculatedPosition;
             }
@@ -297,7 +335,7 @@ export class Popup2Service {
         let verticalPushedPosition: PopupCornerPosition | null;
         if (push && !verticallyFitting) {
             verticalPushedPosition = this.calculateVerticalPushedPosition(anchor, container, position);
-            const pushedVerticallyFitting = this.isVerticalPositionFitting(container, verticalPushedPosition);
+            const pushedVerticallyFitting = this.isVerticalPositionFitting(container, anchor, verticalPushedPosition);
             if (!pushedVerticallyFitting) {
                 verticalPushedPosition = calculatedPosition;
             }
