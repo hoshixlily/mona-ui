@@ -1840,7 +1840,7 @@ div.mona-tree-view-node-dropping {
 
 /** Popup 2 */
 .mona-popup2-container {
-    position: absolute;
+    position: fixed;
     z-index: 10000;
 }
 
@@ -1848,6 +1848,5 @@ div.mona-tree-view-node-dropping {
     background-color: var(--mona-background);
     color: var(--mona-text);
     border: 1px solid var(--mona-border-color);
-    padding: 4px;
     box-shadow: var(--mona-popup-shadow);
 }

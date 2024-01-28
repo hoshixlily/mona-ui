@@ -1,4 +1,5 @@
 import {
+    ApplicationRef,
     ComponentRef,
     createComponent,
     EnvironmentInjector,
@@ -18,18 +19,19 @@ import { PopupCornerPosition } from "../models/PopupCornerPosition";
     providedIn: "root"
 })
 export class Popup2Service {
+    readonly #appRef: ApplicationRef = inject(ApplicationRef);
     readonly #defaultPositions: PopupConnectPosition[] = [
+        // {
+        //     left: "start",
+        //     top: "end"
+        // },
         {
-            left: "start",
+            left: "end",
             top: "end"
         },
         {
-            left: "center",
-            top: "end"
-        },
-        {
             left: "start",
-            top: "start"
+            top: "end"
         }
     ];
     readonly #injector: EnvironmentInjector = inject(EnvironmentInjector);
@@ -38,21 +40,29 @@ export class Popup2Service {
     public constructor() {}
 
     public open(options: Popup2Options): Popup2Ref {
+        const push = options.push ?? false;
         const close$ = new Subject<void>();
         const container = this.createPopupContainer();
         const componentRef = this.createContainerComponentRef(options.content);
         const componentContent = this.createContentElement(componentRef.location.nativeElement);
+        const positions = options.positions ?? this.#defaultPositions;
 
         container.appendChild(componentContent);
-        this.attachPopupContainer(container, options.anchor);
-        this.setPopupContainerPosition(container, options.anchor);
-        container.style.visibility = "";
+        window.setTimeout(() => {
+            this.attachPopupContainer(container, options.anchor);
+            this.setPopupContainerPosition(container, options.anchor, positions, push);
+            this.applyContainerStyles(container, options.anchor, options);
+        });
         this.#zone.runOutsideAngular(() => {
             window.requestAnimationFrame(() => {
                 this.setCloseOnOutsideClickSubscription(container, close$, options.closeOnOutsideClick);
                 this.setCloseOnEscapeSubscription(container, close$, options.closeOnEscape);
-                this.setWindowScrollHandler(container, options.anchor, close$);
+                this.setWindowScrollHandler(container, options.anchor, positions, close$, push);
             });
+        });
+        close$.pipe(take(1)).subscribe(() => {
+            this.#appRef.detachView(componentRef.hostView);
+            componentRef.destroy();
         });
 
         return new Popup2Ref({
@@ -65,27 +75,36 @@ export class Popup2Service {
         });
     }
 
+    private applyContainerStyles(container: HTMLElement, anchor: HTMLElement, options: Popup2Options): void {
+        const containerRect = container.getBoundingClientRect();
+        if (options.width) {
+            container.style.width = `${options.width}px`;
+        }
+        container.style.maxWidth = `${window.innerWidth - containerRect.left}px`;
+    }
+
     private attachPopupContainer(container: HTMLElement, anchor: HTMLElement = document.body): void {
         anchor.insertAdjacentElement("afterend", container);
     }
 
     private calculatePosition(anchor: HTMLElement, connectPosition: PopupConnectPosition): PopupCornerPosition {
         const rect = anchor.getBoundingClientRect();
+        const parentRect = anchor.offsetParent?.getBoundingClientRect() ?? document.body.getBoundingClientRect();
         let top = 0;
         let left = 0;
         if (connectPosition.left === "start") {
-            left = rect.left;
+            left = rect.left - parentRect.left;
         } else if (connectPosition.left === "center") {
-            left = rect.left + rect.width / 2;
+            left = rect.left - parentRect.left + rect.width / 2;
         } else if (connectPosition.left === "end") {
-            left = rect.right;
+            left = rect.left - parentRect.left + rect.width;
         }
         if (connectPosition.top === "start") {
-            top = rect.top;
+            top = rect.top - parentRect.top;
         } else if (connectPosition.top === "center") {
-            top = rect.top + rect.height / 2;
+            top = rect.top - parentRect.top + rect.height / 2;
         } else if (connectPosition.top === "end") {
-            top = rect.bottom;
+            top = rect.top - parentRect.top + rect.height;
         }
         return { top, left };
     }
@@ -128,12 +147,12 @@ export class Popup2Service {
 
     private isHorizontalPositionFitting(container: HTMLElement, cornerPosition: PopupCornerPosition): boolean {
         const rect = container.getBoundingClientRect();
-        return cornerPosition.left + rect.width <= window.innerWidth;
+        return cornerPosition.left + rect.width <= window.innerWidth && cornerPosition.left >= 0;
     }
 
     private isVerticalPositionFitting(container: HTMLElement, cornerPosition: PopupCornerPosition): boolean {
         const rect = container.getBoundingClientRect();
-        return cornerPosition.top + rect.height <= window.innerHeight;
+        return cornerPosition.top + rect.height <= window.innerHeight && cornerPosition.top >= 0;
     }
 
     private closePopupContainer(container: HTMLElement): void {
@@ -145,6 +164,7 @@ export class Popup2Service {
             environmentInjector: this.#injector
         });
         componentRef.instance.content = content;
+        this.#appRef.attachView(componentRef.hostView);
         componentRef.changeDetectorRef.detectChanges();
         return componentRef;
     }
@@ -190,6 +210,8 @@ export class Popup2Service {
         if (close) {
             escapeKey$.pipe(take(1)).subscribe(() => {
                 this.closePopupContainer(container);
+                close$.next(undefined);
+                close$.complete();
             });
         }
     }
@@ -203,6 +225,8 @@ export class Popup2Service {
         if (close) {
             outsideClick$.pipe(take(1)).subscribe(() => {
                 this.closePopupContainer(container);
+                close$.next(undefined);
+                close$.complete();
             });
         }
     }
@@ -225,7 +249,8 @@ export class Popup2Service {
     private setOutsideClickHandler(container: HTMLElement, close$: Subject<void>): Observable<MouseEvent> {
         const event$: Subject<MouseEvent> = new Subject<MouseEvent>();
         const handler = (event: MouseEvent) => {
-            if (!container.contains(event.target as Node)) {
+            const target = event.target as Element;
+            if (!target.closest(".mona-popup2-container")) {
                 event$.next(event);
             }
         };
@@ -237,15 +262,20 @@ export class Popup2Service {
         return event$.asObservable();
     }
 
-    private setPopupContainerPosition(container: HTMLElement, anchor: HTMLElement): void {
-        const positions = this.#defaultPositions;
+    private setPopupContainerPosition(
+        container: HTMLElement,
+        anchor: HTMLElement,
+        positions: PopupConnectPosition[],
+        push: boolean
+    ): void {
         for (const position of positions) {
             const calculatedPosition = this.calculatePosition(anchor, position);
             const horizontallyFitting = this.isHorizontalPositionFitting(container, calculatedPosition);
             const verticallyFitting = this.isVerticalPositionFitting(container, calculatedPosition);
-            if (horizontallyFitting && verticallyFitting) {
+            if (!push || (horizontallyFitting && verticallyFitting)) {
                 container.style.top = `${calculatedPosition.top}px`;
                 container.style.left = `${calculatedPosition.left}px`;
+                console.log("position", calculatedPosition);
                 return;
             }
         }
@@ -253,8 +283,8 @@ export class Popup2Service {
         const calculatedPosition = this.calculatePosition(anchor, position);
         const horizontallyFitting = this.isHorizontalPositionFitting(container, calculatedPosition);
         const verticallyFitting = this.isVerticalPositionFitting(container, calculatedPosition);
-        let horizontalPushedPosition: PopupCornerPosition | null = null;
-        if (!horizontallyFitting) {
+        let horizontalPushedPosition: PopupCornerPosition | null;
+        if (push && !horizontallyFitting) {
             horizontalPushedPosition = this.calculateHorizontalPushedPosition(anchor, container, position);
             const pushedHorizontallyFitting = this.isHorizontalPositionFitting(container, horizontalPushedPosition);
             if (!pushedHorizontallyFitting) {
@@ -264,8 +294,8 @@ export class Popup2Service {
             horizontalPushedPosition = calculatedPosition;
         }
 
-        let verticalPushedPosition: PopupCornerPosition | null = null;
-        if (!verticallyFitting) {
+        let verticalPushedPosition: PopupCornerPosition | null;
+        if (push && !verticallyFitting) {
             verticalPushedPosition = this.calculateVerticalPushedPosition(anchor, container, position);
             const pushedVerticallyFitting = this.isVerticalPositionFitting(container, verticalPushedPosition);
             if (!pushedVerticallyFitting) {
@@ -278,7 +308,13 @@ export class Popup2Service {
         container.style.left = `${horizontalPushedPosition.left}px`;
     }
 
-    private setWindowScrollHandler(container: HTMLElement, anchor: HTMLElement, close$: Subject<void>): void {
+    private setWindowScrollHandler(
+        container: HTMLElement,
+        anchor: HTMLElement,
+        positions: PopupConnectPosition[],
+        close$: Subject<void>,
+        push: boolean
+    ): void {
         const scrollableElement = this.findClosestScrollableElement(anchor);
         if (scrollableElement === null) {
             return;
@@ -287,7 +323,7 @@ export class Popup2Service {
             .pipe(takeUntil(close$))
             .subscribe({
                 next: () => {
-                    this.setPopupContainerPosition(container, anchor);
+                    this.setPopupContainerPosition(container, anchor, positions, push);
                 }
             });
     }

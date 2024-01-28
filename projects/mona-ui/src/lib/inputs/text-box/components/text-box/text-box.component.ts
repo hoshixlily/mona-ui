@@ -9,7 +9,8 @@ import {
     Input,
     Output,
     QueryList,
-    TemplateRef
+    TemplateRef,
+    ViewChild
 } from "@angular/core";
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { FaIconComponent } from "@fortawesome/angular-fontawesome";
@@ -49,6 +50,9 @@ export class TextBoxComponent implements ControlValueAccessor {
     @Output()
     public inputBlur: EventEmitter<Event> = new EventEmitter<Event>();
 
+    @ViewChild("inputElement")
+    public inputElement: ElementRef<HTMLInputElement> | null = null;
+
     @Output()
     public inputFocus: EventEmitter<Event> = new EventEmitter<Event>();
 
@@ -66,9 +70,11 @@ export class TextBoxComponent implements ControlValueAccessor {
 
     public constructor(public readonly elementRef: ElementRef<HTMLDivElement>) {}
 
-    public onClearClick(): void {
+    public onClearClick(event: MouseEvent): void {
+        event.stopPropagation();
         this.value = "";
         this.propagateChange?.(this.value);
+        this.inputElement?.nativeElement.focus();
     }
 
     public onValueChange(value: string): void {
