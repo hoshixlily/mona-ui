@@ -1,3 +1,5 @@
+import { animate, state, style, transition, trigger } from "@angular/animations";
+import { CdkTrapFocus } from "@angular/cdk/a11y";
 import { NgClass, NgIf, NgTemplateOutlet } from "@angular/common";
 import {
     ChangeDetectionStrategy,
@@ -12,9 +14,11 @@ import {
     inject,
     Input,
     OnInit,
+    signal,
     Signal,
     TemplateRef,
-    ViewChild
+    ViewChild,
+    WritableSignal
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from "@angular/forms";
@@ -24,6 +28,7 @@ import { Predicate } from "@mirei/ts-collections";
 import { distinctUntilChanged, fromEvent, take, withLatestFrom } from "rxjs";
 import { v4 } from "uuid";
 import { AnimationState } from "../../../../animations/models/AnimationState";
+import { SlideVertical } from "../../../../animations/models/slide.animation";
 import { PopupAnimationService } from "../../../../animations/services/popup-animation.service";
 import { ButtonDirective } from "../../../../buttons/button/button.directive";
 import { ListComponent } from "../../../../common/list/components/list/list.component";
@@ -36,6 +41,8 @@ import { ListSelectableDirective } from "../../../../common/list/directives/list
 import { ListItem } from "../../../../common/list/models/ListItem";
 import { SelectableOptions } from "../../../../common/list/models/SelectableOptions";
 import { ListService } from "../../../../common/list/services/list.service";
+import { Popup2Ref } from "../../../../common/popup/models/Popup2Ref";
+import { Popup2Service } from "../../../../common/popup/services/popup2.service";
 import { PopupRef } from "../../../../popup/models/PopupRef";
 import { PopupService } from "../../../../popup/services/popup.service";
 import { Action } from "../../../../utils/Action";
@@ -75,7 +82,22 @@ import { DropDownListValueTemplateDirective } from "../../directives/drop-down-l
         ListSelectableDirective,
         ListFooterTemplateDirective,
         ListHeaderTemplateDirective,
-        ListNoDataTemplateDirective
+        ListNoDataTemplateDirective,
+        CdkTrapFocus
+    ],
+    animations: [
+        trigger("fadeAndShrink", [
+            state("true", style({ opacity: 1, height: "*" })),
+            state("void", style({ opacity: 0, height: "0" })),
+            transition("void => true", [
+                style({ opacity: 0, height: "0" }), // initial styles
+                animate("200ms ease-in-out", style({ opacity: 1, height: "*" })) // final styles
+            ]),
+            transition("true => void", [
+                style({ opacity: 1, height: "*" }), // initial styles
+                animate("200ms ease-in-out", style({ opacity: 0, height: "0" })) // final styles
+            ])
+        ])
     ],
     host: {
         "[class.mona-disabled]": "disabled",
@@ -87,12 +109,14 @@ import { DropDownListValueTemplateDirective } from "../../directives/drop-down-l
 export class DropDownListComponent<TData> implements OnInit, ControlValueAccessor {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     readonly #popupUidClass: string = `mona-dropdown-popup-${v4()}`;
-    #popupRef: PopupRef | null = null;
+    // #popupRef: PopupRef | null = null;
+    #popupRef: Popup2Ref | null = null;
     #propagateChange: Action<TData | null> | null = null;
     #value: TData | null = null;
 
     protected readonly clearIcon: IconDefinition = faTimes;
     protected readonly dropdownIcon: IconDefinition = faChevronDown;
+    protected readonly popupVisible: WritableSignal<boolean> = signal(false);
     protected readonly selectableOptions: SelectableOptions = {
         enabled: true,
         mode: "single",
@@ -173,7 +197,8 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
         private readonly elementRef: ElementRef<HTMLElement>,
         private readonly listService: ListService<TData>,
         private readonly popupAnimationService: PopupAnimationService,
-        private readonly popupService: PopupService
+        private readonly popupService: PopupService,
+        private readonly popup2Service: Popup2Service
     ) {}
 
     public clearValue(event: MouseEvent): void {
@@ -207,26 +232,38 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
         if (this.#popupRef) {
             return;
         }
-        this.#popupRef = this.popupService.create({
-            anchor: this.dropdownWrapper,
-            closeOnOutsideClick: false,
+        this.#popupRef = this.popup2Service.open({
+            anchor: this.dropdownWrapper.nativeElement,
+            animate: true,
+            classList: ["mona-dropdown-popup-content"],
+            closeOnOutsideClick: true,
             content: this.popupTemplate,
-            hasBackdrop: false,
-            withPush: false,
-            width: this.elementRef.nativeElement.getBoundingClientRect().width,
-            popupClass: ["mona-dropdown-popup-content", this.#popupUidClass],
-            positions: DropDownService.getDefaultPositions()
+            push: true,
+            positions: [{ left: "start", top: "end" }],
+            // hasBackdrop: false,
+            // withPush: false,
+            width: this.elementRef.nativeElement.getBoundingClientRect().width
+            // popupClass: ["mona-dropdown-popup-content", this.#popupUidClass],
+            // positions: DropDownService.getDefaultPositions()
         });
+        // window.setTimeout(() => this.popupVisible.set(true), 50);
         this.notifyValueChangeOnPopupClose();
-        this.popupAnimationService.setupDropdownOutsideClickCloseAnimation(this.#popupRef);
-        this.popupAnimationService.animateDropdown(this.#popupRef, AnimationState.Show);
+        // this.popupAnimationService.setupDropdownOutsideClickCloseAnimation(this.#popupRef);
+        // this.popupAnimationService.animateDropdown(this.#popupRef, AnimationState.Show);
         this.#popupRef.closed.pipe(take(1)).subscribe(() => {
             this.#popupRef = null;
-            const popupElement = document.querySelector(`.${this.#popupUidClass}`);
-            if (DropDownService.shouldFocusAfterClose(this.elementRef.nativeElement, popupElement)) {
+            // this.popupVisible.set(false);
+            this.listService.clearFilter();
+            // const popupElement = document.querySelector(`.${this.#popupUidClass}`);
+            // if (DropDownService.shouldFocusAfterClose(this.elementRef.nativeElement, popupElement)) {
+            //     this.focus();
+            // }
+            if (
+                this.elementRef.nativeElement.contains(document.activeElement) ||
+                document.activeElement === document.body
+            ) {
                 this.focus();
             }
-            this.listService.clearFilter();
         });
     }
 
@@ -324,18 +361,18 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
             .subscribe(event => {
                 this.handleKeyDown(event);
             });
-        fromEvent<FocusEvent>(this.elementRef.nativeElement, "focusout")
-            .pipe(takeUntilDestroyed(this.#destroyRef))
-            .subscribe(event => {
-                const target = event.relatedTarget as HTMLElement;
-                if (
-                    target &&
-                    (this.elementRef.nativeElement.contains(target) ||
-                        this.#popupRef?.overlayRef.overlayElement.contains(target))
-                ) {
-                    return;
-                }
-            });
+        // fromEvent<FocusEvent>(this.elementRef.nativeElement, "focusout")
+        //     .pipe(takeUntilDestroyed(this.#destroyRef))
+        //     .subscribe(event => {
+        //         const target = event.relatedTarget as HTMLElement;
+        //         if (
+        //             target &&
+        //             (this.elementRef.nativeElement.contains(target) ||
+        //                 this.#popupRef?.overlayRef.overlayElement.contains(target))
+        //         ) {
+        //             return;
+        //         }
+        //     });
     }
 
     private updateValue(value: TData | null): void {
