@@ -9,6 +9,7 @@ div.mona-multi-select-value {
     align-items: center;
     width: 100%;
     padding: 1px 2px;
+    cursor: pointer;
     & > div:first-child {
         display: flex;
         flex-direction: row;

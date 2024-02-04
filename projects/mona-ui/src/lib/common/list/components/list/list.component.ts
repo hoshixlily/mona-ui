@@ -5,6 +5,7 @@ import {
     AfterViewInit,
     ChangeDetectionStrategy,
     Component,
+    computed,
     ContentChild,
     DestroyRef,
     ElementRef,
@@ -14,6 +15,7 @@ import {
     OnInit,
     Output,
     QueryList,
+    Signal,
     signal,
     TemplateRef,
     ViewChildren,
@@ -57,9 +59,23 @@ export class ListComponent<TData> implements OnInit, AfterViewInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     #viewport: CdkVirtualScrollViewport | null = null;
 
-    protected listHeight: WritableSignal<string | undefined> = signal(undefined);
-    protected listMaxHeight: WritableSignal<string | undefined> = signal(undefined);
-    protected listWidth: WritableSignal<string | undefined> = signal(undefined);
+    protected readonly listHeight: WritableSignal<string | undefined> = signal(undefined);
+    protected readonly listMaxHeight: WritableSignal<string | undefined> = signal(undefined);
+    protected readonly listWidth: WritableSignal<string | undefined> = signal(undefined);
+    protected readonly viewportHeight: Signal<string | undefined> = computed(() => {
+        const listHeight = this.listHeight();
+        if (listHeight) {
+            return listHeight;
+        }
+        const items = this.listService.viewItems().size();
+        const headerItems = this.listService
+            .viewItems()
+            .where(i => !!i.header)
+            .count();
+        const itemHeight = this.listService.virtualScrollOptions().height;
+        const height = items * itemHeight + headerItems * 2;
+        return `${height}px`;
+    });
 
     @Input({ required: false })
     public set data(value: Iterable<TData>) {
