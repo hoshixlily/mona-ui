@@ -1,28 +1,34 @@
 <div class="mona-grid-cell" [attr.tabindex]="editing ? -1 : 0" cdkMonitorSubtreeFocus (cdkFocusChange)="onFocusChange($event)"
      [ngClass]="{'mona-grid-cell-editing': editing}" [attr.data-ruid]="row.uid" [attr.data-field]="column.field" [attr.data-col-index]="column.index">
-    <ng-container *ngIf="!editing">
-        <ng-container *ngIf="!column.cellTemplate">
+
+    @if (editing) {
+        <ng-container [ngTemplateOutlet]="cellEditTemplate"></ng-container>
+    } @else {
+        @if (column.cellTemplate) {
+            <ng-container [ngTemplateOutlet]="column.cellTemplate.templateRef"
+                          [ngTemplateOutletContext]="{$implicit: row, column}"></ng-container>
+        } @else {
             <span class="mona-grid-cell-text">{{row.data[column.field]}}</span>
-        </ng-container>
-        <ng-container [ngTemplateOutlet]="column.cellTemplate.templateRef"
-                      *ngIf="column.cellTemplate" [ngTemplateOutletContext]="{$implicit: row, column}"></ng-container>
-    </ng-container>
-    <ng-container [ngTemplateOutlet]="cellEditTemplate" *ngIf="editing"></ng-container>
+        }
+    }
+
 </div>
 
 <ng-template #cellEditTemplate>
     <form [formGroup]="editForm" class="mona-grid-cell-edit-form">
-        <ng-container *ngIf="column.dataType==='string'">
-            <mona-text-box [formControlName]="column.field"></mona-text-box>
-        </ng-container>
-        <ng-container *ngIf="column.dataType==='number'">
-            <mona-numeric-text-box [formControlName]="column.field" [decimals]="3"></mona-numeric-text-box>
-        </ng-container>
-        <ng-container *ngIf="column.dataType==='date'">
-            <mona-date-picker [formControlName]="column.field"></mona-date-picker>
-        </ng-container>
-        <ng-container *ngIf="column.dataType==='boolean'">
-            <input type="checkbox" [formControlName]="column.field" monaCheckBox />
-        </ng-container>
+        @switch (column.dataType) {
+            @case ("string") {
+                <mona-text-box [formControlName]="column.field"></mona-text-box>
+            }
+            @case ("number") {
+                <mona-numeric-text-box [formControlName]="column.field" [decimals]="3"></mona-numeric-text-box>
+            }
+            @case ("date") {
+                <mona-date-picker [formControlName]="column.field"></mona-date-picker>
+            }
+            @case ("boolean") {
+                <input type="checkbox" [formControlName]="column.field" monaCheckBox />
+            }
+        }
     </form>
 </ng-template>

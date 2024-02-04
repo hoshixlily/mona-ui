@@ -1,4 +1,4 @@
-import { Component, ContentChild, Input, OnInit } from "@angular/core";
+import { ChangeDetectionStrategy, Component, ContentChild, Input, OnInit } from "@angular/core";
 import { DataType } from "../../../models/DataType";
 import { GridCellTemplateDirective } from "../../directives/grid-cell-template.directive";
 import { GridColumnTitleTemplateDirective } from "../../directives/grid-column-title-template.directive";
@@ -8,7 +8,8 @@ import { Column } from "../../models/Column";
     selector: "mona-grid-column",
     template: "",
     styleUrls: [],
-    standalone: true
+    standalone: true,
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class GridColumnComponent implements OnInit {
     public column: Column = new Column();

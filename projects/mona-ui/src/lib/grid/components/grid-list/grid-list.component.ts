@@ -27,7 +27,7 @@ import { GridCellComponent } from "../grid-cell/grid-cell.component";
     selector: "mona-grid-list",
     templateUrl: "./grid-list.component.html",
     styleUrls: ["./grid-list.component.scss"],
-    changeDetection: ChangeDetectionStrategy.Default,
+    changeDetection: ChangeDetectionStrategy.OnPush,
     standalone: true,
     imports: [
         NgFor,

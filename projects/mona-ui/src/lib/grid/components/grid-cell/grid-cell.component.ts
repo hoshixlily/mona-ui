@@ -1,5 +1,5 @@
 import { A11yModule, FocusMonitor, FocusOrigin } from "@angular/cdk/a11y";
-import { NgClass, NgIf, NgTemplateOutlet } from "@angular/common";
+import { NgClass, NgTemplateOutlet } from "@angular/common";
 import {
     ChangeDetectionStrategy,
     ChangeDetectorRef,
@@ -31,7 +31,6 @@ import { GridService } from "../../services/grid.service";
     imports: [
         A11yModule,
         NgClass,
-        NgIf,
         NgTemplateOutlet,
         FormsModule,
         ReactiveFormsModule,
