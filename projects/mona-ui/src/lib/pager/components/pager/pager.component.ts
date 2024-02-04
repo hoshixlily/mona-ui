@@ -25,6 +25,7 @@ import {
     faEllipsis,
     IconDefinition
 } from "@fortawesome/free-solid-svg-icons";
+import { range } from "@mirei/ts-collections";
 import { ButtonDirective } from "../../../buttons/button/button.directive";
 import { DropDownListComponent } from "../../../dropdowns/drop-down-list/components/drop-down-list/drop-down-list.component";
 import { NumericTextBoxComponent } from "../../../inputs/numeric-text-box/components/numeric-text-box/numeric-text-box.component";
@@ -76,7 +77,9 @@ export class PagerComponent implements OnInit, AfterViewInit, OnDestroy {
     public page: Signal<number> = computed(() => Math.floor(this.#skip() / this.pagerPageSize()) + 1);
     public pageCount: Signal<number> = computed(() => Math.ceil(this.totalPages() / this.pagerPageSize()));
     public pageInputVisible: WritableSignal<boolean> = signal(true);
-    public pageList: WritableSignal<number[]> = signal([]);
+    public pageList: Signal<number[]> = computed(() => {
+        return range(1, this.pageCount()).toArray();
+    });
     public pageListVisible: WritableSignal<boolean> = signal(true);
     public pageSizeValueList: WritableSignal<number[]> = signal([]);
     public pagerInfo: Signal<string> = computed(() => {
