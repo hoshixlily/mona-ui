@@ -1,4 +1,4 @@
-import { NgClass, NgFor } from "@angular/common";
+import { NgClass } from "@angular/common";
 import {
     AfterViewInit,
     ChangeDetectionStrategy,
@@ -27,6 +27,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { range } from "@mirei/ts-collections";
 import { ButtonDirective } from "../../../buttons/button/button.directive";
+import { DropDownVirtualScrollDirective } from "../../../dropdowns/directives/drop-down-virtual-scroll.directive";
 import { DropDownListComponent } from "../../../dropdowns/drop-down-list/components/drop-down-list/drop-down-list.component";
 import { NumericTextBoxComponent } from "../../../inputs/numeric-text-box/components/numeric-text-box/numeric-text-box.component";
 import { SlicePipe } from "../../../pipes/slice.pipe";
@@ -45,11 +46,11 @@ import { PageSizeChangeEvent } from "../../models/PageSizeChangeEvent";
         ButtonDirective,
         FontAwesomeModule,
         NgClass,
-        NgFor,
         NumericTextBoxComponent,
         FormsModule,
         DropDownListComponent,
-        SlicePipe
+        SlicePipe,
+        DropDownVirtualScrollDirective
     ]
 })
 export class PagerComponent implements OnInit, AfterViewInit, OnDestroy {

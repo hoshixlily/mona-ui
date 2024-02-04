@@ -29,12 +29,11 @@
                     </li>
                 }
 
-                <!-- @for causes a slight delay in rendering the page list, so we use ngFor instead -->
-                <ng-container *ngFor="let pageItem of pages()|monaSlice:1:pages().length-1; let px = index;">
+                @for (pageItem of pages()|monaSlice:1:pages().length-1; track $index) {
                     <li [attr.data-page]="pageItem.page" [ngClass]="{'mona-pager-active': page()===pageItem.page}">
                         <button monaButton [flat]="true" [selected]="page()===pageItem.page" (click)="onPageClick(pageItem.page)">{{pageItem.text}}</button>
                     </li>
-                </ng-container>
+                }
 
                 @if (nextJumperVisible()) {
                     <li>
@@ -157,6 +156,7 @@
             @if (pageCount() !== 0) {
                 <li>
                     <mona-drop-down-list [data]="pageList()" [ngModel]="page()"
+                                         monaDropDownVirtualScroll
                                          (ngModelChange)="onPageClick($event)" style="width: 75px;"></mona-drop-down-list>
                 </li>
             }
