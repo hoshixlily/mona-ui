@@ -103,20 +103,31 @@ export * from "./grid/components/grid/grid.component";
 
 /** Inputs */
 export * from "./inputs/check-box/check-box.directive";
+
 export * from "./inputs/color-gradient/components/color-gradient/color-gradient.component";
+
 export * from "./inputs/color-palette/color-palette.component";
+
 export * from "./inputs/color-picker/color-picker.component";
+
 export * from "./inputs/numeric-text-box/directives/numeric-text-box-prefix-template.directive";
 export * from "./inputs/numeric-text-box/components/numeric-text-box/numeric-text-box.component";
+
 export * from "./inputs/radio-button/radio-button.directive";
+
 export * from "./inputs/range-slider/directives/range-slider-tick-value-template.directive";
 export * from "./inputs/range-slider/components/range-slider/range-slider.component";
+
 export * from "./inputs/slider/directives/slider-tick-value-template.directive";
 export * from "./inputs/slider/components/slider/slider.component";
+
 export * from "./inputs/switch/directives/switch-off-label-template.directive";
 export * from "./inputs/switch/directives/switch-on-label-template.directive";
 export * from "./inputs/switch/components/switch/switch.component";
+
 export * from "./inputs/text-area/text-area.directive";
+
+export * from "./inputs/text-box/models/InputType";
 export * from "./inputs/text-box/directives/text-box.directive";
 export * from "./inputs/text-box/directives/text-box-prefix-template.directive";
 export * from "./inputs/text-box/directives/text-box-suffix-template.directive";

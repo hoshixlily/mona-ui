@@ -5,14 +5,17 @@
         </span>
     </ng-container>
     <input [disabled]="disabled"
-           [readonly]="readonly"
-           [placeholder]="placeholder"
+           [readonly]="readonly()"
+           [placeholder]="placeholder()"
+           [type]="type()"
+           [class]="inputClass()"
+           [style]="inputStyle()"
            [ngModel]="value"
            (ngModelChange)="onValueChange($event)"
            (blur)="inputBlur.emit($event)"
            (focus)="inputFocus.emit($event)" monaTextBox />
 
-    @if (clearButton && value.length !== 0) {
+    @if (clearButton() && value.length !== 0) {
         <button monaButton [flat]="true" [tabindex]="-1" title="Clear" (click)="onClearClick()">
             <fa-icon [icon]="clearIcon"></fa-icon>
         </button>

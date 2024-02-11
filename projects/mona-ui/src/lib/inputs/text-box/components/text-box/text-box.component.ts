@@ -6,7 +6,9 @@ import {
     ElementRef,
     EventEmitter,
     forwardRef,
+    input,
     Input,
+    InputSignal,
     Output,
     QueryList,
     TemplateRef
@@ -19,6 +21,7 @@ import { Action } from "../../../../utils/Action";
 import { TextBoxPrefixTemplateDirective } from "../../directives/text-box-prefix-template.directive";
 import { TextBoxSuffixTemplateDirective } from "../../directives/text-box-suffix-template.directive";
 import { TextBoxDirective } from "../../directives/text-box.directive";
+import { InputType } from "../../models/InputType";
 
 @Component({
     selector: "mona-text-box",
@@ -39,9 +42,14 @@ export class TextBoxComponent implements ControlValueAccessor {
     private propagateChange: Action<string, any> | null = null;
     protected readonly clearIcon: IconDefinition = faTimes;
     public value: string = "";
-
-    @Input()
-    public clearButton: boolean = false;
+    public type: InputSignal<InputType> = input<InputType>("text");
+    public clearButton: InputSignal<boolean> = input<boolean>(false);
+    public inputClass: InputSignal<string | string[]> = input<string | string[]>("");
+    public inputStyle: InputSignal<string | Partial<CSSStyleDeclaration> | null | undefined> = input<
+        string | Partial<CSSStyleDeclaration | null | undefined>
+    >(undefined);
+    public placeholder: InputSignal<string> = input<string>("");
+    public readonly: InputSignal<boolean> = input<boolean>(false);
 
     @Input()
     public disabled: boolean = false;
@@ -52,14 +60,8 @@ export class TextBoxComponent implements ControlValueAccessor {
     @Output()
     public inputFocus: EventEmitter<Event> = new EventEmitter<Event>();
 
-    @Input()
-    public placeholder: string = "";
-
     @ContentChildren(TextBoxPrefixTemplateDirective, { read: TemplateRef })
     public prefixTemplateList: QueryList<TemplateRef<any>> = new QueryList<TemplateRef<any>>();
-
-    @Input()
-    public readonly: boolean = false;
 
     @ContentChildren(TextBoxSuffixTemplateDirective, { read: TemplateRef })
     public suffixTemplateList: QueryList<TemplateRef<any>> = new QueryList<TemplateRef<any>>();
