@@ -1,0 +1,16 @@
+<label class="mona-radio-button" [class.mona-disabled]="disabled()">
+    @if (labelPosition() === 'before') {
+        <span>{{ label() }}</span>
+    }
+    <input type="radio" [disabled]="disabled()"
+           [name]="name()"
+           [value]="value()"
+           [ngModel]="selectedValue()"
+           (blur)="inputBlur.emit($event)"
+           (click)="inputClick.emit($event)"
+           (focus)="inputFocus.emit($event)"
+           (ngModelChange)="onCheckedChange($event)" monaRadioButton #radioButton>
+    @if (labelPosition() === 'after') {
+        <span>{{ label() }}</span>
+    }
+</label>

@@ -102,7 +102,7 @@ export * from "./grid/components/grid-column/grid-column.component";
 export * from "./grid/components/grid/grid.component";
 
 /** Inputs */
-export * from "./inputs/check-box/check-box.directive";
+export * from "./inputs/check-box/directives/check-box.directive";
 export * from "./inputs/check-box/components/check-box/check-box.component";
 
 export * from "./inputs/color-gradient/components/color-gradient/color-gradient.component";
@@ -114,7 +114,8 @@ export * from "./inputs/color-picker/color-picker.component";
 export * from "./inputs/numeric-text-box/directives/numeric-text-box-prefix-template.directive";
 export * from "./inputs/numeric-text-box/components/numeric-text-box/numeric-text-box.component";
 
-export * from "./inputs/radio-button/radio-button.directive";
+export * from "./inputs/radio-button/directives/radio-button.directive";
+export * from "./inputs/radio-button/components/radio-button/radio-button.component";
 
 export * from "./inputs/range-slider/directives/range-slider-tick-value-template.directive";
 export * from "./inputs/range-slider/components/range-slider/range-slider.component";

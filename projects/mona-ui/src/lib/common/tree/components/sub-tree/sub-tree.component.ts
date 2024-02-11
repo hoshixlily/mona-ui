@@ -23,7 +23,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { ImmutableSet } from "@mirei/ts-collections";
 import { take } from "rxjs";
-import { CheckBoxDirective } from "../../../../inputs/check-box/check-box.directive";
+import { CheckBoxDirective } from "../../../../inputs/check-box/directives/check-box.directive";
 import { NodeDragEndEvent } from "../../models/NodeDragEndEvent";
 import { NodeDragEvent } from "../../models/NodeDragEvent";
 import { NodeDragStartEvent } from "../../models/NodeDragStartEvent";

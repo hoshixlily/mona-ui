@@ -14,7 +14,7 @@ import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { asyncScheduler, filter, fromEvent, map, Subject, take, takeUntil, tap, timer } from "rxjs";
 import { DatePickerComponent } from "../../../date-inputs/date-picker/date-picker.component";
-import { CheckBoxDirective } from "../../../inputs/check-box/check-box.directive";
+import { CheckBoxDirective } from "../../../inputs/check-box/directives/check-box.directive";
 import { NumericTextBoxComponent } from "../../../inputs/numeric-text-box/components/numeric-text-box/numeric-text-box.component";
 import { TextBoxComponent } from "../../../inputs/text-box/components/text-box/text-box.component";
 import { CellEditEvent } from "../../models/CellEditEvent";

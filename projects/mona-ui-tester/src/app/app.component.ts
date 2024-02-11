@@ -175,7 +175,8 @@ import {
     TreeViewNodeTemplateDirective,
     TreeViewSelectableDirective,
     WindowService,
-    CheckBoxComponent
+    CheckBoxComponent,
+    RadioButtonComponent
 } from "mona-ui";
 import { debounceTime, map, Observable, of, take, timer } from "rxjs";
 import { v4 } from "uuid";
@@ -279,6 +280,7 @@ interface TreeNodeDataItem {
         PopoverFooterTemplateDirective,
         PopoverTitleTemplateDirective,
         ProgressBarComponent,
+        RadioButtonComponent,
         RangeSliderComponent,
         RangeSliderTickValueTemplateDirective,
         ScrollViewComponent,
@@ -347,7 +349,7 @@ export class AppComponent implements OnInit {
     public calendarDisabledDates: WritableSignal<Date[]> = signal([]);
     public calendarMaxValue: WritableSignal<Date | null> = signal(null); // new Date(2022, 6, 15);
     public calendarMinValue: WritableSignal<Date | null> = signal(null); //new Date(2022, 6, 10);
-    public checkBoxChecked: WritableSignal<boolean> = signal(false);
+    public checkBoxChecked: WritableSignal<boolean> = signal(true);
     public calendarValue: Date | null = new Date(2023, 8, 16);
     public colorGradientColor: string = "#4d0f33";
     public colorPalette: string[] = [
@@ -591,6 +593,7 @@ export class AppComponent implements OnInit {
     public pagerPageSize: number = 10;
     public pagerSkip: number = 33;
     public progressLabelFormatter = (value: number) => `${value}/100`;
+    public radioButtonValue: WritableSignal<any> = signal(undefined);
     public rangedSliderValues: [number, number] = [12, 18];
     public scrollViewData: string[] = [
         "https://photos.smugmug.com/photos/i-qQv8THj/0/5a269061/O/i-qQv8THj.jpg",
@@ -1216,6 +1219,11 @@ export class AppComponent implements OnInit {
 
     public onPopupOpen(ref: PopupRef): void {
         // console.log("Popup opened: ", ref);
+    }
+
+    public onRadioButtonValueChange(value: string): void {
+        this.radioButtonValue.set(value);
+        console.log(value);
     }
 
     public onRangedSliderValueChange(value: [number, number]): void {

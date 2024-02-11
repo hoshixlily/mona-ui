@@ -1,6 +1,14 @@
 <label class="mona-check-box" [class.mona-disabled]="disabled()">
+    @if (labelPosition() === 'before') {
+        <span>{{label()}}</span>
+    }
     <input type="checkbox" [disabled]="disabled()" [indeterminate]="indeterminate()"
            [ngModel]="checked()"
+           (blur)="inputBlur.emit($event)"
+           (focus)="inputFocus.emit($event)"
+           (change)="inputChange.emit($event)"
            (ngModelChange)="onCheckedChange($event)" monaCheckBox #checkBox/>
-    <span>{{label()}}</span>
+    @if (labelPosition() === 'after') {
+        <span>{{label()}}</span>
+    }
 </label>

@@ -696,7 +696,8 @@
                                     <label for="checkbox2" style="margin-right: 10px;">Checkbox Label 1</label>
 
                                     <mona-check-box id="checkbox3" [label]="'Check Box Component'" [indeterminate]="false" [ngModel]="checkBoxChecked()"
-                                                    (ngModelChange)="onCheckboxCheck($event)"></mona-check-box>
+                                                    [disabled]="false" labelPosition="after"
+                                                    (ngModelChange)="onCheckboxCheck($event)" style="margin-top: 4px;"></mona-check-box>
                                 </div>
 
                                 <div>
@@ -709,41 +710,26 @@
 
                                     <input type="radio" monaRadioButton id="radioButton3" name="A" [disabled]="true"/>
                                     <label for="radioButton3">Radio Button Label 3</label>
+
+
+                                </div>
+                                <div style="display: flex; gap: 8px;">
+                                    <mona-radio-button label="Autumn" name="rc" value="Autumn"
+                                                       [ngModel]="radioButtonValue()"
+                                                       (inputFocus)="print($event)"
+                                                       (ngModelChange)="onRadioButtonValueChange($event)"></mona-radio-button>
+                                    <mona-radio-button label="Winter" name="rc" value="Winter"
+                                                       [ngModel]="radioButtonValue()"
+                                                       (ngModelChange)="onRadioButtonValueChange($event)"></mona-radio-button>
+                                    <mona-radio-button label="Spring" name="rc" value="Spring"
+                                                       [ngModel]="radioButtonValue()" [disabled]="true"
+                                                       (ngModelChange)="onRadioButtonValueChange($event)"></mona-radio-button>
+                                    <mona-radio-button label="Summer" name="rc" value="Summer"
+                                                       [ngModel]="radioButtonValue()"
+                                                       (ngModelChange)="onRadioButtonValueChange($event)"></mona-radio-button>
                                 </div>
                             </div>
-
-                            <div style="width: 250px;background: var(--mona-background); border: 1px solid var(--mona-border-color)">
-<!--                                <mona-list>-->
-<!--                                    <ng-template monaListItemTemplate let-item>-->
-<!--                                        @if (item.value % 2 === 0) {-->
-<!--                                            <span style="color: #ffcc75;">{{item.text}}</span>-->
-<!--                                        } @else {-->
-<!--                                            <span style="color: #ff3055;">{{item.text}}</span>-->
-<!--                                        }-->
-<!--                                    </ng-template>-->
-<!--                                    <ng-template monaListGroupHeaderTemplate let-group>-->
-<!--                                        <span style="color: #F0A970; font-weight: bold;">{{group}}</span>-->
-<!--                                    </ng-template>-->
-<!--                                    <ng-template monaListHeaderTemplate>-->
-<!--                                        <div style="background: var(&#45;&#45;mona-background-dark); color: coral; border-bottom: 1px solid var(&#45;&#45;mona-border-color-dark); padding: 2px 4px;">Header</div>-->
-<!--                                    </ng-template>-->
-<!--                                    <ng-template monaListFooterTemplate>-->
-<!--&lt;!&ndash;                                        <div style="display: flex; padding: 2px 4px; column-gap: 4px; border-top: 1px solid var(&#45;&#45;mona-border-color-dark); background: var(&#45;&#45;mona-background-dark);">&ndash;&gt;-->
-<!--&lt;!&ndash;                                            <button monaButton (click)="selectedListItem = listService.navigate('previous', 'highlight')">Up</button>&ndash;&gt;-->
-<!--&lt;!&ndash;                                            <button monaButton (click)="selectedListItem = listService.navigate('next', 'highlight')">Down</button>&ndash;&gt;-->
-<!--&lt;!&ndash;                                        </div>&ndash;&gt;-->
-<!--                                    </ng-template>-->
-<!--                                </mona-list>-->
-                                <span>
-<!--                                    <div style="display: flex; padding: 2px 4px; column-gap: 4px; border-top: 1px solid var(&#45;&#45;mona-border-color-dark); background: var(&#45;&#45;mona-background-dark);">-->
-<!--                                        <button monaButton (click)="selectedListItem = listService.navigate('previous', 'select')">Up</button>-->
-<!--                                        <button monaButton (click)="selectedListItem = listService.navigate('next', 'select')">Down</button>-->
-<!--                                    </div>-->
-<!--                                    Selected List Item: {{selectedListItem?.data?.text}}-->
-                                </span>
-                            </div>
                         </div>
-
                     </ng-template>
                 </mona-tab>
                 <!--                <mona-tab [title]="item"  *ngFor="let item of dropdownPrimitiveDataItems |slice:0:5; let ix=index;">-->

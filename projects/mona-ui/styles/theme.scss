@@ -832,7 +832,6 @@ input[type="checkbox"][monaCheckBox] {
     display: inline-block;
     place-content: center;
     cursor: pointer;
-    transition: background-color 0.15s ease-out, border-color 0.15s ease-out, color 0.15s ease-out, box-shadow 0.15s ease-out;
     margin-right: 4px;
     outline: none;
     &::before {
@@ -841,6 +840,7 @@ input[type="checkbox"][monaCheckBox] {
         width: 20px;
         height: 20px;
         display: inline-grid;
+        transition: background 0.20s ease-in-out, box-shadow 0.20s ease-in-out;
         background: var(--mona-background);
         box-shadow: inset 0 0 0 1px var(--mona-border-color);
         border-radius: var(--mona-border-radius);
@@ -854,7 +854,6 @@ input[type="checkbox"][monaCheckBox] {
         border-color: var(--mona-selected-border-color);
     }
     &:disabled {
-        cursor: not-allowed;
         pointer-events: none;
         opacity: 0.6;
     }
@@ -865,20 +864,10 @@ input[type="checkbox"][monaCheckBox] {
     &:focus, &:focus-within {
         box-shadow: var(--mona-focus-shadow);
     }
-
-    & + label {
-        display: inline-flex;
-        align-items: center;
-        cursor: pointer;
-        color: var(--mona-text);
-        user-select: none;
-    }
 }
 
 label.mona-check-box {
-    cursor: pointer;
     color: var(--mona-text);
-    user-select: none;
     @include font-medium;
 
     &.mona-disabled {
@@ -998,47 +987,45 @@ div.mona-alpha-slider {
 
 /** Radio Button */
 input[type="radio"][monaRadioButton] {
-    display: none;
-    & + label {
-        display: flex;
-        align-items: center;
-        cursor: pointer;
-        color: var(--mona-text);
-        user-select: none;
-        &:before {
-            content: " ";
-            background-color: var(--mona-background);
-            box-shadow: 0 0 0 1px var(--mona-border-color-dark) inset;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 20px;
-            height: 20px;
-            margin-right: 4px;
-            vertical-align: middle;
-            color: transparent;
-            transition: box-shadow 0.3s ease-out;
-        }
-    }
-    &:disabled + label {
-        cursor: default;
-        pointer-events: none;
-    }
-    &:disabled + label:before {
-        @include disabled;
-    }
-    &:checked + label:before {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    place-content: center;
+    cursor: pointer;
+    margin-right: 4px;
+    outline: none;
+    &::before {
         content: " ";
-        background-color: var(--mona-primary);
-        color: var(--mona-text-inverted);
-        border-width: 1px;
-        box-shadow: inset 0 0 0 1px var(--mona-primary), inset 0 0 0 3px var(--mona-background);
-        transition: box-shadow 0.3s ease-out, background-color 0.3s ease-out;
+        width: 20px;
+        height: 20px;
+        display: inline-grid;
+        place-content: center;
+        transition: background 0.20s ease-in-out, box-shadow 0.20s ease-in-out, border 0.20s ease-in-out;
+        background: var(--mona-background);
+        border: 1px solid var(--mona-border-color);
+        border-radius: 50%;
     }
-    &:checked:disabled + label:before {
-        @include disabled;
+    &:checked::before {
         background-color: var(--mona-primary);
+        box-shadow: 0 0 0 2px var(--mona-background) inset;
+    }
+    &:disabled {
+        pointer-events: none;
+        opacity: 0.6;
+    }
+    &:focus, &:focus-within {
+        filter: drop-shadow(0 0 2px var(--mona-focus-shadow-color));
+    }
+}
+
+label.mona-radio-button {
+    color: var(--mona-text);
+    @include font-medium;
+    line-height: 2;
+
+    &.mona-disabled {
+        @include disabled;
     }
 }
 

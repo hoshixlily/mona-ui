@@ -2,16 +2,18 @@ import {
     Component,
     effect,
     ElementRef,
+    EventEmitter,
     forwardRef,
     input,
     InputSignal,
+    Output,
     signal,
     ViewChild,
     WritableSignal
 } from "@angular/core";
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { Action } from "../../../../utils/Action";
-import { CheckBoxDirective } from "../../check-box.directive";
+import { CheckBoxDirective } from "../../directives/check-box.directive";
 
 @Component({
     selector: "mona-check-box",
@@ -33,6 +35,16 @@ export class CheckBoxComponent implements ControlValueAccessor {
     public disabled: InputSignal<boolean> = input<boolean>(false);
     public indeterminate: InputSignal<boolean> = input<boolean>(false);
     public label: InputSignal<string> = input<string>("");
+    public labelPosition: InputSignal<"before" | "after"> = input<"before" | "after">("after");
+
+    @Output()
+    public inputBlur: EventEmitter<FocusEvent> = new EventEmitter<FocusEvent>();
+
+    @Output()
+    public inputChange: EventEmitter<Event> = new EventEmitter<Event>();
+
+    @Output()
+    public inputFocus: EventEmitter<FocusEvent> = new EventEmitter<FocusEvent>();
 
     @ViewChild("checkBox")
     public checkBox: ElementRef<HTMLInputElement> | null = null;
