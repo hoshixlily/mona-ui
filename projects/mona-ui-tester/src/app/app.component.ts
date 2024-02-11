@@ -174,7 +174,8 @@ import {
     TreeViewFilterableDirective,
     TreeViewNodeTemplateDirective,
     TreeViewSelectableDirective,
-    WindowService
+    WindowService,
+    CheckBoxComponent
 } from "mona-ui";
 import { debounceTime, map, Observable, of, take, timer } from "rxjs";
 import { v4 } from "uuid";
@@ -205,6 +206,7 @@ interface TreeNodeDataItem {
         ButtonGroupComponent,
         ButtonDirective,
         CalendarComponent,
+        CheckBoxComponent,
         CircularProgressBarComponent,
         CircularProgressBarLabelTemplateDirective,
         ColorGradientComponent,
@@ -345,6 +347,7 @@ export class AppComponent implements OnInit {
     public calendarDisabledDates: WritableSignal<Date[]> = signal([]);
     public calendarMaxValue: WritableSignal<Date | null> = signal(null); // new Date(2022, 6, 15);
     public calendarMinValue: WritableSignal<Date | null> = signal(null); //new Date(2022, 6, 10);
+    public checkBoxChecked: WritableSignal<boolean> = signal(false);
     public calendarValue: Date | null = new Date(2023, 8, 16);
     public colorGradientColor: string = "#4d0f33";
     public colorPalette: string[] = [
@@ -1036,6 +1039,11 @@ export class AppComponent implements OnInit {
 
     public onButtonSelectedChange(selected: boolean): void {
         // console.log(`Button selected: ${selected}`);
+    }
+
+    public onCheckboxCheck(checked: boolean): void {
+        this.checkBoxChecked.set(checked);
+        console.log(`Checkbox checked: ${checked}`);
     }
 
     public onColorGradientValueChange(value: string): void {

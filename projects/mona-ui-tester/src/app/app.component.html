@@ -688,18 +688,28 @@
                                       style="width: 422px; margin-top: 10px;"></textarea>
 
                             <div>
-                                <input type="checkbox" monaCheckBox id="checkbox1" [indeterminate]="true"/>
-                                <label for="checkbox1" style="margin-right: 10px;">Checkbox Label 1</label>
+                                <div style="margin-bottom: 10px;">
+                                    <input type="checkbox" monaCheckBox id="checkbox1" [indeterminate]="true"/>
+                                    <label for="checkbox1" style="margin-right: 10px;">Checkbox Label 1</label>
 
-                                <input type="radio" monaRadioButton id="radioButton1" name="A" [checked]="true"
-                                       [disabled]="false"/>
-                                <label for="radioButton1">Radio Button Label 1</label>
+                                    <input type="checkbox" monaCheckBox id="checkbox2" [indeterminate]="false" [disabled]="true"/>
+                                    <label for="checkbox2" style="margin-right: 10px;">Checkbox Label 1</label>
 
-                                <input type="radio" monaRadioButton id="radioButton2" name="A"/>
-                                <label for="radioButton2">Radio Button Label 2</label>
+                                    <mona-check-box id="checkbox3" [label]="'Check Box Component'" [indeterminate]="false" [ngModel]="checkBoxChecked()"
+                                                    (ngModelChange)="onCheckboxCheck($event)"></mona-check-box>
+                                </div>
 
-                                <input type="radio" monaRadioButton id="radioButton3" name="A" [disabled]="true"/>
-                                <label for="radioButton3">Radio Button Label 3</label>
+                                <div>
+                                    <input type="radio" monaRadioButton id="radioButton1" name="A" [checked]="true"
+                                           [disabled]="false"/>
+                                    <label for="radioButton1">Radio Button Label 1</label>
+
+                                    <input type="radio" monaRadioButton id="radioButton2" name="A"/>
+                                    <label for="radioButton2">Radio Button Label 2</label>
+
+                                    <input type="radio" monaRadioButton id="radioButton3" name="A" [disabled]="true"/>
+                                    <label for="radioButton3">Radio Button Label 3</label>
+                                </div>
                             </div>
 
                             <div style="width: 250px;background: var(--mona-background); border: 1px solid var(--mona-border-color)">

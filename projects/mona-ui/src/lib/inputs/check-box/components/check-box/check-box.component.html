@@ -1,0 +1,6 @@
+<label class="mona-check-box" [class.mona-disabled]="disabled()">
+    <input type="checkbox" [disabled]="disabled()" [indeterminate]="indeterminate()"
+           [ngModel]="checked()"
+           (ngModelChange)="onCheckedChange($event)" monaCheckBox #checkBox/>
+    <span>{{label()}}</span>
+</label>
