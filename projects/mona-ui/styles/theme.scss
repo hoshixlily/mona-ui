@@ -336,18 +336,24 @@ div.mona-tree-node-dragging {
 }
 
 /** Button Group */
-mona-button-group .mona-button {
-    border-radius: 0;
-    &:not(:last-child) {
-        border-right: none;
-    }
-    &:first-child {
-        border-top-left-radius: var(--mona-border-radius);
-        border-bottom-left-radius: var(--mona-border-radius);
-    }
-    &:last-child {
-        border-top-right-radius: var(--mona-border-radius);
-        border-bottom-right-radius: var(--mona-border-radius);
+.mona-button-group {
+    display: flex;
+    & .mona-button {
+        border-radius: 0;
+
+        &:not(:last-child) {
+            border-right: none;
+        }
+
+        &:first-child {
+            border-top-left-radius: var(--mona-border-radius);
+            border-bottom-left-radius: var(--mona-border-radius);
+        }
+
+        &:last-child {
+            border-top-right-radius: var(--mona-border-radius);
+            border-bottom-right-radius: var(--mona-border-radius);
+        }
     }
 }
 

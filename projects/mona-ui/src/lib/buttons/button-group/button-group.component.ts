@@ -21,7 +21,10 @@ import { ButtonService } from "../services/button.service";
     styleUrls: ["./button-group.component.scss"],
     providers: [ButtonService],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true
+    standalone: true,
+    host: {
+        "[class.mona-button-group]": "true"
+    }
 })
 export class ButtonGroupComponent implements OnInit, AfterContentInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
