@@ -359,6 +359,12 @@ div.mona-tree-node-dragging {
 
 /** Chip */
 .mona-chip {
+    display: flex;
+    flex-wrap: nowrap;
+    cursor: pointer;
+    user-select: none;
+    outline: none;
+    height: 100%;
     background-color: var(--mona-background);
     color: var(--mona-text);
     border: 1px solid var(--mona-border-color);
