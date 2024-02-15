@@ -7,6 +7,7 @@ import { ButtonDirective } from "./button.directive";
 @Component({
     template: ` <button
         monaButton
+        [primary]="primary"
         [selected]="selected"
         [toggleable]="toggleable"
         (selectedChange)="selectedChange($event)">
@@ -16,6 +17,7 @@ import { ButtonDirective } from "./button.directive";
     imports: [ButtonDirective]
 })
 class TestButtonDirectiveComponent {
+    public primary: boolean = true;
     public selected: boolean = false;
     public toggleable: boolean = false;
 
@@ -70,7 +72,7 @@ describe("ButtonDirective", () => {
     });
 
     it("should have class primary", () => {
-        buttonHostComponent.buttonDirective.primary = true;
+        buttonHostComponent.primary = true;
         buttonHostFixture.detectChanges();
         const button = buttonHostFixture.debugElement.nativeElement.querySelector("button");
         expect(button).toHaveClass("mona-primary");
