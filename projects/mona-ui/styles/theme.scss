@@ -268,7 +268,7 @@ div.mona-tree-node-dragging {
 /** Buttons */
 
 /** Button */
-button[monaButton] {
+.mona-button {
     background-color: var(--mona-background);
     color: var(--mona-text);
     border: 1px solid var(--mona-border-color);
@@ -336,7 +336,7 @@ button[monaButton] {
 }
 
 /** Button Group */
-mona-button-group button[monaButton] {
+mona-button-group .mona-button {
     border-radius: 0;
     &:not(:last-child) {
         border-right: none;

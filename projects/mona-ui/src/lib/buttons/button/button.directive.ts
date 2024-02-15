@@ -7,7 +7,9 @@ import {
     Host,
     HostBinding,
     inject,
+    input,
     Input,
+    InputSignal,
     OnInit,
     Optional,
     Output
@@ -17,11 +19,14 @@ import { fromEvent, takeWhile } from "rxjs";
 import { ButtonService } from "../services/button.service";
 
 @Directive({
-    selector: "[monaButton]",
+    selector: "button[monaButton]",
     host: {
         "[attr.disabled]": "disabled ? '' : undefined",
         "[attr.aria-disabled]": "disabled ? true : undefined",
-        "[attr.aria-selected]": "selected ? true : undefined"
+        "[attr.aria-selected]": "selected ? true : undefined",
+        "[class.mona-button]": "true",
+        "[class.mona-flat]": "flat()",
+        "[class.mona-primary]": "primary()"
     },
     standalone: true
 })
@@ -42,13 +47,8 @@ export class ButtonDirective implements OnInit {
         return this.#disabled;
     }
 
-    @HostBinding("class.mona-flat")
-    @Input()
-    public flat: boolean = false;
-
-    @HostBinding("class.mona-primary")
-    @Input()
-    public primary: boolean = false;
+    public flat: InputSignal<boolean> = input(false);
+    public primary: InputSignal<boolean> = input(false);
 
     @HostBinding("class.mona-selected")
     @Input()
