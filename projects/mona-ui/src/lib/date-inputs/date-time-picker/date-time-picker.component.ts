@@ -206,6 +206,7 @@ export class DateTimePickerComponent implements OnInit, ControlValueAccessor {
             anchor: this.#hostElementRef.nativeElement,
             content: this.timePopupTemplateRef,
             width: this.#hostElementRef.nativeElement.getBoundingClientRect().width,
+            height: 250,
             popupClass: "mona-time-picker-popup",
             hasBackdrop: false,
             withPush: false,
