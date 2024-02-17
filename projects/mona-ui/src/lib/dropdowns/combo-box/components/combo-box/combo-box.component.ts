@@ -7,9 +7,10 @@ import {
     DestroyRef,
     ElementRef,
     forwardRef,
-    HostBinding,
     inject,
+    input,
     Input,
+    InputSignal,
     OnInit,
     Signal,
     signal,
@@ -92,16 +93,23 @@ import { ComboBoxNoDataTemplateDirective } from "../../directives/combo-box-no-d
         ListItemTemplateDirective
     ],
     host: {
-        "[class.mona-disabled]": "disabled"
+        "[class.mona-disabled]": "disabled",
+        "[class.mona-combo-box]": "true",
+        "[class.mona-dropdown]": "true"
     }
 })
 export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
+    readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
     readonly #popupUidClass: string = `mona-dropdown-popup-${v4()}`;
     #popupRef: PopupRef | null = null;
     #propagateChange: Action<TData | null> | null = null;
     #value: any;
 
+    protected readonly clearIcon: IconDefinition = faTimes;
+    protected readonly dropdownIcon: IconDefinition = faChevronDown;
+    protected readonly comboBoxValue$: Subject<string> = new Subject<string>();
+    protected readonly comboBoxValue: WritableSignal<string> = signal("");
     protected readonly selectableOptions: SelectableOptions = {
         enabled: true,
         mode: "single",
@@ -121,16 +129,12 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
         return this.listService.getItemText(listItem);
     });
 
-    public readonly clearIcon: IconDefinition = faTimes;
-    public readonly dropdownIcon: IconDefinition = faChevronDown;
-    public readonly comboBoxValue$: Subject<string> = new Subject<string>();
-    public comboBoxValue: WritableSignal<string> = signal("");
-
-    @HostBinding("class.mona-dropdown")
-    public readonly hostClass: boolean = true;
-
-    @Input()
-    public allowCustomValue: boolean = true;
+    public allowCustomValue: InputSignal<boolean> = input(false);
+    public placeholder: InputSignal<string> = input("");
+    public showClearButton: InputSignal<boolean> = input(false);
+    public valueNormalizer: InputSignal<Action<Observable<string>, Observable<any>>> = input(
+        (text$: Observable<string>) => text$.pipe(map(value => value))
+    );
 
     @Input()
     public set data(value: Iterable<TData>) {
@@ -139,9 +143,6 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
 
     @Input()
     public disabled: boolean = false;
-
-    @ViewChild("dropdownWrapper")
-    public dropdownWrapper!: ElementRef<HTMLDivElement>;
 
     @ContentChild(ComboBoxFooterTemplateDirective, { read: TemplateRef })
     public footerTemplate: TemplateRef<any> | null = null;
@@ -163,14 +164,8 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
     @ContentChild(ComboBoxNoDataTemplateDirective, { read: TemplateRef })
     public noDataTemplate: TemplateRef<any> | null = null;
 
-    @Input()
-    public placeholder?: string;
-
     @ViewChild("popupTemplate")
     public popupTemplate!: TemplateRef<any>;
-
-    @Input()
-    public showClearButton: boolean = false;
 
     @Input()
     public set textField(value: string | Selector<TData, string> | null | undefined) {
@@ -182,12 +177,7 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
         this.listService.setValueField(value ?? "");
     }
 
-    @Input()
-    public valueNormalizer: Action<Observable<string>, Observable<any>> = (text$: Observable<string>) =>
-        text$.pipe(map(value => value));
-
     public constructor(
-        private readonly elementRef: ElementRef<HTMLElement>,
         private readonly listService: ListService<TData>,
         private readonly popupAnimationService: PopupAnimationService,
         private readonly popupService: PopupService
@@ -230,19 +220,15 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
                 if (targetItem) {
                     this.listService.selectItem(targetItem);
                     this.updateValue(targetItem.data);
-                } else {
-                    if (this.allowCustomValue) {
-                        this.handleCustomValue();
-                    } else {
-                        this.comboBoxValue.set("");
-                    }
-                }
-            } else {
-                if (this.allowCustomValue) {
+                } else if (this.allowCustomValue()) {
                     this.handleCustomValue();
                 } else {
                     this.comboBoxValue.set("");
                 }
+            } else if (this.allowCustomValue()) {
+                this.handleCustomValue();
+            } else {
+                this.comboBoxValue.set("");
             }
             this.close();
         } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
@@ -264,12 +250,12 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
             return;
         }
         this.#popupRef = this.popupService.create({
-            anchor: this.dropdownWrapper,
+            anchor: this.#hostElementRef.nativeElement,
             content: this.popupTemplate,
             hasBackdrop: false,
             closeOnOutsideClick: false,
             withPush: false,
-            width: this.elementRef.nativeElement.getBoundingClientRect().width,
+            width: this.#hostElementRef.nativeElement.getBoundingClientRect().width,
             popupClass: ["mona-dropdown-popup-content", this.#popupUidClass],
             positions: DropDownService.getDefaultPositions()
         });
@@ -277,7 +263,7 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
         this.popupAnimationService.setupDropdownOutsideClickCloseAnimation(this.#popupRef);
         this.popupAnimationService.animateDropdown(this.#popupRef, AnimationState.Show);
         window.setTimeout(() => {
-            const input = this.elementRef.nativeElement.querySelector("input");
+            const input = this.#hostElementRef.nativeElement.querySelector("input");
             if (input) {
                 input.focus();
                 input.setSelectionRange(-1, -1);
@@ -287,7 +273,7 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
             this.#popupRef = null;
             this.listService.clearFilter();
             const popupElement = document.querySelector(`.${this.#popupUidClass}`);
-            if (DropDownService.shouldFocusAfterClose(this.elementRef.nativeElement, popupElement)) {
+            if (DropDownService.shouldFocusAfterClose(this.#hostElementRef.nativeElement, popupElement)) {
                 this.focus();
             }
         });
@@ -314,7 +300,7 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
     }
 
     private focus(): void {
-        this.elementRef.nativeElement?.focus();
+        this.#hostElementRef.nativeElement?.focus();
     }
 
     private handleArrowKeys(event: KeyboardEvent): void {
@@ -331,7 +317,7 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
     }
 
     private handleCustomValue(): void {
-        this.valueNormalizer(of(this.comboBoxValue()))
+        this.valueNormalizer()(of(this.comboBoxValue()))
             .pipe(take(1))
             .subscribe(normalizedValue => {
                 this.listService.addNewDataItems([normalizedValue]);
@@ -382,22 +368,22 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
     }
 
     private setEventListeners(): void {
-        fromEvent<FocusEvent>(this.elementRef.nativeElement, "focusout")
+        fromEvent<FocusEvent>(this.#hostElementRef.nativeElement, "focusout")
             .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe(event => {
                 const target = event.relatedTarget as HTMLElement;
                 if (
                     target &&
-                    (this.elementRef.nativeElement.contains(target) ||
+                    (this.#hostElementRef.nativeElement.contains(target) ||
                         this.#popupRef?.overlayRef.overlayElement.contains(target))
                 ) {
                     return;
                 }
             });
-        fromEvent<FocusEvent>(this.elementRef.nativeElement, "focusin")
+        fromEvent<FocusEvent>(this.#hostElementRef.nativeElement, "focusin")
             .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe(() => {
-                const input = this.elementRef.nativeElement.querySelector("input");
+                const input = this.#hostElementRef.nativeElement.querySelector("input");
                 if (input) {
                     input.focus();
                     input.setSelectionRange(-1, -1);

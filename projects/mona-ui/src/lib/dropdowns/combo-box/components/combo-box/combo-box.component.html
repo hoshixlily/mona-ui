@@ -1,18 +1,17 @@
-<div class="mona-combo-box" #dropdownWrapper>
-    <input monaTextBox class="mona-input-inner"
-           [disabled]="disabled"
-           [ngModel]="comboBoxValue()"
-           (ngModelChange)="comboBoxValue$.next($event)"
-           (keydown)="onKeydown($event)">
-    @if (showClearButton && selectedListItem()) {
-        <span class="mona-input-clear-icon" (click)="clearValue($event)">
-            <fa-icon [icon]="clearIcon"></fa-icon>
-        </span>
-    }
-    <button monaButton [tabindex]="-1" class="mona-input-button" (click)="open()">
-        <fa-icon [icon]="dropdownIcon"></fa-icon>
-    </button>
-</div>
+<input monaTextBox class="mona-input-inner"
+       [disabled]="disabled"
+       [placeholder]="placeholder()"
+       [ngModel]="comboBoxValue()"
+       (ngModelChange)="comboBoxValue$.next($event)"
+       (keydown)="onKeydown($event)">
+@if (showClearButton() && selectedListItem()) {
+    <span class="mona-input-clear-icon" (click)="clearValue($event)">
+        <fa-icon [icon]="clearIcon"></fa-icon>
+    </span>
+}
+<button monaButton [tabindex]="-1" class="mona-input-button" (click)="open()">
+    <fa-icon [icon]="dropdownIcon"></fa-icon>
+</button>
 
 <ng-template #popupTemplate>
     <div class="mona-dropdown-popup-list-wrapper">
