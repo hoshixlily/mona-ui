@@ -1,16 +1,16 @@
 import { NgClass, NgIf, NgTemplateOutlet } from "@angular/common";
 import {
     ChangeDetectionStrategy,
-    ChangeDetectorRef,
     Component,
     computed,
     ContentChild,
     DestroyRef,
     ElementRef,
     forwardRef,
-    HostBinding,
     inject,
+    input,
     Input,
+    InputSignal,
     OnInit,
     Signal,
     TemplateRef,
@@ -79,6 +79,8 @@ import { DropDownListValueTemplateDirective } from "../../directives/drop-down-l
     ],
     host: {
         "[class.mona-disabled]": "disabled",
+        "[class.mona-dropdown]": "true",
+        "[class.mona-dropdown-list]": "true",
         "[attr.aria-disabled]": "disabled ? true : undefined",
         "[attr.aria-haspopup]": "true",
         "[attr.tabindex]": "disabled ? null : 0"
@@ -86,6 +88,7 @@ import { DropDownListValueTemplateDirective } from "../../directives/drop-down-l
 })
 export class DropDownListComponent<TData> implements OnInit, ControlValueAccessor {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
+    readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
     readonly #popupUidClass: string = `mona-dropdown-popup-${v4()}`;
     #popupRef: PopupRef | null = null;
     #propagateChange: Action<TData | null> | null = null;
@@ -111,9 +114,8 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
         }
         return this.listService.getItemText(listItem);
     });
-
-    @HostBinding("class.mona-dropdown")
-    public readonly hostClass: boolean = true;
+    public placeholder: InputSignal<string> = input("");
+    public showClearButton: InputSignal<boolean> = input(false);
 
     @Input()
     public set data(value: Iterable<TData>) {
@@ -122,9 +124,6 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
 
     @Input()
     public disabled: boolean = false;
-
-    @ViewChild("dropdownWrapper")
-    public dropdownWrapper!: ElementRef<HTMLDivElement>;
 
     @ContentChild(DropDownListFooterTemplateDirective, { read: TemplateRef })
     public footerTemplate: TemplateRef<any> | null = null;
@@ -146,14 +145,8 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
     @ContentChild(DropDownListNoDataTemplateDirective, { read: TemplateRef })
     public noDataTemplate: TemplateRef<any> | null = null;
 
-    @Input()
-    public placeholder?: string;
-
     @ViewChild("popupTemplate")
     public popupTemplate!: TemplateRef<any>;
-
-    @Input()
-    public showClearButton: boolean = false;
 
     @Input()
     public set textField(textField: string | null | undefined) {
@@ -169,8 +162,6 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
     public valueTemplate: TemplateRef<any> | null = null;
 
     public constructor(
-        private readonly cdr: ChangeDetectorRef,
-        private readonly elementRef: ElementRef<HTMLElement>,
         private readonly listService: ListService<TData>,
         private readonly popupAnimationService: PopupAnimationService,
         private readonly popupService: PopupService
@@ -208,12 +199,12 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
             return;
         }
         this.#popupRef = this.popupService.create({
-            anchor: this.dropdownWrapper,
+            anchor: this.#hostElementRef.nativeElement,
             closeOnOutsideClick: false,
             content: this.popupTemplate,
             hasBackdrop: false,
             withPush: false,
-            width: this.elementRef.nativeElement.getBoundingClientRect().width,
+            width: this.#hostElementRef.nativeElement.getBoundingClientRect().width,
             popupClass: ["mona-dropdown-popup-content", this.#popupUidClass],
             positions: DropDownService.getDefaultPositions()
         });
@@ -223,7 +214,7 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
         this.#popupRef.closed.pipe(take(1)).subscribe(() => {
             this.#popupRef = null;
             const popupElement = document.querySelector(`.${this.#popupUidClass}`);
-            if (DropDownService.shouldFocusAfterClose(this.elementRef.nativeElement, popupElement)) {
+            if (DropDownService.shouldFocusAfterClose(this.#hostElementRef.nativeElement, popupElement)) {
                 this.focus();
             }
             this.listService.clearFilter();
@@ -244,7 +235,6 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
 
     public setValue(value: any): void {
         this.updateValue(value);
-        this.cdr.markForCheck();
     }
 
     public writeValue(obj: TData): void {
@@ -255,7 +245,7 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
     }
 
     private focus(): void {
-        this.elementRef.nativeElement?.focus();
+        this.#hostElementRef.nativeElement?.focus();
     }
 
     private handleArrowKeys(event: KeyboardEvent): void {
@@ -319,22 +309,30 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
     }
 
     private setEventListeners(): void {
-        fromEvent<KeyboardEvent>(this.elementRef.nativeElement, "keydown")
+        fromEvent<KeyboardEvent>(this.#hostElementRef.nativeElement, "keydown")
             .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe(event => {
                 this.handleKeyDown(event);
             });
-        fromEvent<FocusEvent>(this.elementRef.nativeElement, "focusout")
+        fromEvent<FocusEvent>(this.#hostElementRef.nativeElement, "focusout")
             .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe(event => {
                 const target = event.relatedTarget as HTMLElement;
                 if (
                     target &&
-                    (this.elementRef.nativeElement.contains(target) ||
+                    (this.#hostElementRef.nativeElement.contains(target) ||
                         this.#popupRef?.overlayRef.overlayElement.contains(target))
                 ) {
                     return;
                 }
+            });
+        fromEvent<MouseEvent>(this.#hostElementRef.nativeElement, "click")
+            .pipe(takeUntilDestroyed(this.#destroyRef))
+            .subscribe(() => {
+                if (this.disabled) {
+                    return;
+                }
+                this.open();
             });
     }
 
