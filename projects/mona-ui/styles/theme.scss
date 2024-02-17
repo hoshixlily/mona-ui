@@ -524,6 +524,7 @@ ul.mona-list mona-text-box.filter-box {
 
 /** Calendar */
 .mona-calendar {
+    display: block;
     background: var(--mona-background);
     color: var(--mona-text);
     border-radius: var(--mona-border-radius);

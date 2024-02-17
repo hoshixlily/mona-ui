@@ -1,137 +1,147 @@
-<div class="mona-calendar">
-    <div class="mona-calendar-header">
-        <div>
-            <button monaButton (click)="onNavigationClick('prev')">
-                <fa-icon [icon]="prevMonthIcon"></fa-icon>
-            </button>
-        </div>
-        <div>
-            @switch (calendarView) {
-                @case ('month') {
-                    <button monaButton (click)="onViewChangeClick('year')">{{navigatedDate|date:'MMMM yyyy':timezone}}</button>
-                }
-                @case ('year') {
-                    <button monaButton (click)="onViewChangeClick('decade')">{{navigatedDate|date:'yyyy':timezone}}</button>
-                }
-                @case ('decade') {
-                    <button monaButton>{{decadeYears[0]}} - {{decadeYears[decadeYears.length-1]}}</button>
-                }
-            }
-        </div>
-        <div>
-            <button monaButton (click)="onNavigationClick('next')">
-                <fa-icon [icon]="nextMonthIcon"></fa-icon>
-            </button>
-        </div>
+<div class="mona-calendar-header">
+    <div>
+        <button monaButton (click)="onNavigationClick('prev')">
+            <fa-icon [icon]="prevMonthIcon"></fa-icon>
+        </button>
     </div>
-    @if (calendarView==='month') {
-        <div class="mona-calendar-month-view" style="width: 100%;">
-            <table class="mona-calendar-month-view-table">
-                <thead>
-                <tr>
-                    <th>Mon</th>
-                    <th>Tue</th>
-                    <th>Wed</th>
-                    <th>Thu</th>
-                    <th>Fri</th>
-                    <th>Sat</th>
-                    <th>Sun</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td *ngFor="let entry of monthlyViewDict | monaSlice:0:7" (click)="onDayClick(entry.key)"
-                        [ngClass]="{'mona-calendar-other-month': entry.key|monaDateComparer:monthBounds.start:'<',
-                        'mona-selected':entry.key|monaDateComparer:value:'==',
-                        'mona-disabled': disabled||(entry.key|monaDateInclude:disabledDateList())||(minDate() !== null && (entry.key|monaDateComparer:minDate():'<'))||(maxDate() !== null && (entry.key|monaDateComparer:maxDate():'>'))}">
-                        <span>{{entry.value}}</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td *ngFor="let entry of monthlyViewDict | monaSlice:7:14" (click)="onDayClick(entry.key)"
-                        [ngClass]="{'mona-selected':entry.key|monaDateComparer:value:'==',
-                        'mona-disabled': disabled||(entry.key|monaDateInclude:disabledDateList())||(minDate() !== null && (entry.key|monaDateComparer:minDate():'<'))||(maxDate() !== null && (entry.key|monaDateComparer:maxDate():'>'))}">
-                        <span>{{entry.value}}</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td *ngFor="let entry of monthlyViewDict | monaSlice:14:21" (click)="onDayClick(entry.key)"
-                        [ngClass]="{'mona-selected':entry.key|monaDateComparer:value:'==',
-                        'mona-disabled': disabled||(entry.key|monaDateInclude:disabledDateList())||(minDate() !== null && (entry.key|monaDateComparer:minDate():'<'))||(maxDate() !== null && (entry.key|monaDateComparer:maxDate():'>'))}">
-                        <span>{{entry.value}}</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td *ngFor="let entry of monthlyViewDict | monaSlice:21:28" (click)="onDayClick(entry.key)"
-                        [ngClass]="{'mona-selected':entry.key|monaDateComparer:value:'==',
-                        'mona-disabled': disabled||(entry.key|monaDateInclude:disabledDateList())||(minDate() !== null && (entry.key|monaDateComparer:minDate():'<'))||(maxDate() !== null && (entry.key|monaDateComparer:maxDate():'>'))}">
-                        <span>{{entry.value}}</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td *ngFor="let entry of monthlyViewDict | monaSlice:28:35" (click)="onDayClick(entry.key)"
-                        [ngClass]="{'mona-calendar-other-month':entry.key|monaDateComparer:monthBounds.end:'>',
-                        'mona-selected':entry.key|monaDateComparer:value:'==',
-                        'mona-disabled': disabled||(entry.key|monaDateInclude:disabledDateList())||(minDate() !== null && (entry.key|monaDateComparer:minDate():'<'))||(maxDate() !== null && (entry.key|monaDateComparer:maxDate():'>'))}">
-                        <span>{{entry.value}}</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td *ngFor="let entry of monthlyViewDict | monaSlice:35:monthlyViewDict.length" (click)="onDayClick(entry.key)"
-                        [ngClass]="{'mona-calendar-other-month': entry.key|monaDateComparer:monthBounds.end:'>',
-                        'mona-selected':entry.key|monaDateComparer:value:'==',
-                        'mona-disabled': disabled||(entry.key|monaDateInclude:disabledDateList())||(minDate() !== null && (entry.key|monaDateComparer:minDate():'<'))||(maxDate() !== null && (entry.key|monaDateComparer:maxDate():'>'))}">
-                        <span>{{entry.value}}</span>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-    } @else if (calendarView==='year') {
-        <div class="mona-calendar-year-view">
-            <table class="mona-calendar-year-view-table">
-                <tr>
-                    <td (click)="onMonthClick(1)">Jan</td>
-                    <td (click)="onMonthClick(2)">Feb</td>
-                    <td (click)="onMonthClick(3)">Mar</td>
-                </tr>
-                <tr>
-                    <td (click)="onMonthClick(4)">Apr</td>
-                    <td (click)="onMonthClick(5)">May</td>
-                    <td (click)="onMonthClick(6)">Jun</td>
-                </tr>
-                <tr>
-                    <td (click)="onMonthClick(7)">Jul</td>
-                    <td (click)="onMonthClick(8)">Aug</td>
-                    <td (click)="onMonthClick(9)">Sep</td>
-                </tr>
-                <tr>
-                    <td (click)="onMonthClick(10)">Oct</td>
-                    <td (click)="onMonthClick(11)">Nov</td>
-                    <td (click)="onMonthClick(12)">Dec</td>
-                </tr>
-            </table>
-        </div>
-    } @else if (calendarView==='decade') {
-        <div class="mona-calendar-decade-view">
-            <table class="mona-calendar-decade-view-table">
-                <tr>
-                    <td (click)="onYearClick(decadeYears[0])">{{decadeYears[0]}}</td>
-                    <td (click)="onYearClick(decadeYears[1])">{{decadeYears[1]}}</td>
-                    <td (click)="onYearClick(decadeYears[2])">{{decadeYears[2]}}</td>
-                    <td (click)="onYearClick(decadeYears[3])">{{decadeYears[3]}}</td>
-                </tr>
-                <tr>
-                    <td (click)="onYearClick(decadeYears[4])">{{decadeYears[4]}}</td>
-                    <td (click)="onYearClick(decadeYears[5])">{{decadeYears[5]}}</td>
-                    <td (click)="onYearClick(decadeYears[6])">{{decadeYears[6]}}</td>
-                    <td (click)="onYearClick(decadeYears[7])">{{decadeYears[7]}}</td>
-                </tr>
-                <tr>
-                    <td (click)="onYearClick(decadeYears[8])">{{decadeYears[8]}}</td>
-                    <td (click)="onYearClick(decadeYears[9])">{{decadeYears[9]}}</td>
-                </tr>
-            </table>
-        </div>
-    }
+    <div>
+        @switch (calendarView()) {
+            @case ('month') {
+                <button monaButton (click)="onViewChangeClick('year')">{{navigatedDate|date:'MMMM yyyy':timezone}}</button>
+            }
+            @case ('year') {
+                <button monaButton (click)="onViewChangeClick('decade')">{{navigatedDate|date:'yyyy':timezone}}</button>
+            }
+            @case ('decade') {
+                <button monaButton>{{decadeYears[0]}} - {{decadeYears[decadeYears.length-1]}}</button>
+            }
+        }
+    </div>
+    <div>
+        <button monaButton (click)="onNavigationClick('next')">
+            <fa-icon [icon]="nextMonthIcon"></fa-icon>
+        </button>
+    </div>
 </div>
+@if (calendarView()==='month') {
+    <div class="mona-calendar-month-view" style="width: 100%;">
+        <table class="mona-calendar-month-view-table">
+            <thead>
+            <tr>
+                <th>Mon</th>
+                <th>Tue</th>
+                <th>Wed</th>
+                <th>Thu</th>
+                <th>Fri</th>
+                <th>Sat</th>
+                <th>Sun</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                @for (entry of monthlyViewDict | monaSlice:0:7; track entry.key) {
+                    <td (click)="onDayClick(entry.key)"
+                        [ngClass]="{'mona-calendar-other-month': entry.key|monaDateComparer:monthBounds.start:'<',
+                                    'mona-selected':entry.key|monaDateComparer:value:'==',
+                                    'mona-disabled': disabled||(entry.key|monaDateInclude:disabledDateList())||(min() !== null && (entry.key|monaDateComparer:min():'<'))||(max() !== null && (entry.key|monaDateComparer:max():'>'))}">
+                        <span>{{entry.value}}</span>
+                    </td>
+                }
+            </tr>
+            <tr>
+                @for (entry of monthlyViewDict | monaSlice:7:14; track entry.key) {
+                    <td (click)="onDayClick(entry.key)"
+                        [ngClass]="{'mona-selected':entry.key|monaDateComparer:value:'==',
+                                    'mona-disabled': disabled||(entry.key|monaDateInclude:disabledDateList())||(min() !== null && (entry.key|monaDateComparer:min():'<'))||(max() !== null && (entry.key|monaDateComparer:max():'>'))}">
+                        <span>{{entry.value}}</span>
+                    </td>
+                }
+            </tr>
+            <tr>
+                @for (entry of monthlyViewDict | monaSlice:14:21; track entry.key) {
+                    <td (click)="onDayClick(entry.key)"
+                        [ngClass]="{'mona-selected':entry.key|monaDateComparer:value:'==',
+                                    'mona-disabled': disabled||(entry.key|monaDateInclude:disabledDateList())||(min() !== null && (entry.key|monaDateComparer:min():'<'))||(max() !== null && (entry.key|monaDateComparer:max():'>'))}">
+                        <span>{{entry.value}}</span>
+                    </td>
+                }
+            </tr>
+            <tr>
+                @for (entry of monthlyViewDict | monaSlice:21:28; track entry.key) {
+                    <td (click)="onDayClick(entry.key)"
+                        [ngClass]="{'mona-selected':entry.key|monaDateComparer:value:'==',
+                                    'mona-disabled': disabled||(entry.key|monaDateInclude:disabledDateList())||(min() !== null && (entry.key|monaDateComparer:min():'<'))||(max() !== null && (entry.key|monaDateComparer:max():'>'))}">
+                        <span>{{entry.value}}</span>
+                    </td>
+                }
+            </tr>
+            <tr>
+                @for (entry of monthlyViewDict | monaSlice:28:35; track entry.key) {
+                    <td (click)="onDayClick(entry.key)"
+                        [ngClass]="{'mona-calendar-other-month':entry.key|monaDateComparer:monthBounds.end:'>',
+                                    'mona-selected':entry.key|monaDateComparer:value:'==',
+                                    'mona-disabled': disabled||(entry.key|monaDateInclude:disabledDateList())||(min() !== null && (entry.key|monaDateComparer:min():'<'))||(max() !== null && (entry.key|monaDateComparer:max():'>'))}">
+                        <span>{{entry.value}}</span>
+                    </td>
+                }
+            </tr>
+            <tr>
+                @for (entry of monthlyViewDict | monaSlice:35:monthlyViewDict.length; track entry.key) {
+                    <td (click)="onDayClick(entry.key)"
+                        [ngClass]="{'mona-calendar-other-month': entry.key|monaDateComparer:monthBounds.end:'>',
+                                'mona-selected':entry.key|monaDateComparer:value:'==',
+                                'mona-disabled': disabled||(entry.key|monaDateInclude:disabledDateList())||(min() !== null && (entry.key|monaDateComparer:min():'<'))||(max() !== null && (entry.key|monaDateComparer:max():'>'))}">
+                        <span>{{entry.value}}</span>
+                    </td>
+                }
+            </tr>
+            </tbody>
+        </table>
+    </div>
+} @else if (calendarView()==='year') {
+    <div class="mona-calendar-year-view">
+        <table class="mona-calendar-year-view-table">
+            <tr>
+                <td (click)="onMonthClick(1)">Jan</td>
+                <td (click)="onMonthClick(2)">Feb</td>
+                <td (click)="onMonthClick(3)">Mar</td>
+            </tr>
+            <tr>
+                <td (click)="onMonthClick(4)">Apr</td>
+                <td (click)="onMonthClick(5)">May</td>
+                <td (click)="onMonthClick(6)">Jun</td>
+            </tr>
+            <tr>
+                <td (click)="onMonthClick(7)">Jul</td>
+                <td (click)="onMonthClick(8)">Aug</td>
+                <td (click)="onMonthClick(9)">Sep</td>
+            </tr>
+            <tr>
+                <td (click)="onMonthClick(10)">Oct</td>
+                <td (click)="onMonthClick(11)">Nov</td>
+                <td (click)="onMonthClick(12)">Dec</td>
+            </tr>
+        </table>
+    </div>
+} @else if (calendarView()==='decade') {
+    <div class="mona-calendar-decade-view">
+        <table class="mona-calendar-decade-view-table">
+            <tr>
+                <td (click)="onYearClick(decadeYears[0])">{{decadeYears[0]}}</td>
+                <td (click)="onYearClick(decadeYears[1])">{{decadeYears[1]}}</td>
+                <td (click)="onYearClick(decadeYears[2])">{{decadeYears[2]}}</td>
+                <td (click)="onYearClick(decadeYears[3])">{{decadeYears[3]}}</td>
+            </tr>
+            <tr>
+                <td (click)="onYearClick(decadeYears[4])">{{decadeYears[4]}}</td>
+                <td (click)="onYearClick(decadeYears[5])">{{decadeYears[5]}}</td>
+                <td (click)="onYearClick(decadeYears[6])">{{decadeYears[6]}}</td>
+                <td (click)="onYearClick(decadeYears[7])">{{decadeYears[7]}}</td>
+            </tr>
+            <tr>
+                <td (click)="onYearClick(decadeYears[8])">{{decadeYears[8]}}</td>
+                <td (click)="onYearClick(decadeYears[9])">{{decadeYears[9]}}</td>
+            </tr>
+        </table>
+    </div>
+}

@@ -1,5 +1,15 @@
-import { DatePipe, NgClass, NgFor, NgIf } from "@angular/common";
-import { ChangeDetectionStrategy, Component, forwardRef, Input, OnInit, signal, WritableSignal } from "@angular/core";
+import { DatePipe, NgClass } from "@angular/common";
+import {
+    ChangeDetectionStrategy,
+    Component,
+    forwardRef,
+    input,
+    Input,
+    InputSignal,
+    OnInit,
+    signal,
+    WritableSignal
+} from "@angular/core";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { faChevronLeft, faChevronRight, IconDefinition } from "@fortawesome/free-solid-svg-icons";
@@ -25,30 +35,25 @@ import { CalendarView } from "../models/CalendarView";
         }
     ],
     standalone: true,
-    imports: [
-        ButtonDirective,
-        FontAwesomeModule,
-        NgIf,
-        NgFor,
-        NgClass,
-        DatePipe,
-        SlicePipe,
-        DateComparerPipe,
-        DateIncludePipe
-    ]
+    imports: [ButtonDirective, FontAwesomeModule, NgClass, DatePipe, SlicePipe, DateComparerPipe, DateIncludePipe],
+    host: {
+        "[class.mona-calendar]": "true",
+        "[class.mona-disabled]": "disabled"
+    }
 })
 export class CalendarComponent implements OnInit, ControlValueAccessor {
     #propagateChange: Action<Date | null> | null = null;
     #value: Date | null = null;
-    public readonly nextMonthIcon: IconDefinition = faChevronRight;
-    public readonly prevMonthIcon: IconDefinition = faChevronLeft;
-    public calendarView: CalendarView = "month";
-    public decadeYears: number[] = [];
-    public disabledDateList: WritableSignal<Date[]> = signal([]);
-    public maxDate: WritableSignal<Date | null> = signal(null);
-    public minDate: WritableSignal<Date | null> = signal(null);
-    public monthBounds: { start: Date; end: Date } = { start: new Date(), end: new Date() };
-    public monthlyViewDict: Dictionary<Date, number> = new Dictionary<Date, number>();
+    protected readonly nextMonthIcon: IconDefinition = faChevronRight;
+    protected readonly prevMonthIcon: IconDefinition = faChevronLeft;
+    protected calendarView: WritableSignal<CalendarView> = signal("month");
+    protected decadeYears: number[] = [];
+    protected disabledDateList: WritableSignal<Date[]> = signal([]);
+    protected monthBounds: { start: Date; end: Date } = { start: new Date(), end: new Date() };
+    protected monthlyViewDict: Dictionary<Date, number> = new Dictionary<Date, number>();
+
+    public max: InputSignal<Date | null> = input<Date | null>(null);
+    public min: InputSignal<Date | null> = input<Date | null>(null);
     public navigatedDate: Date = new Date();
 
     @Input()
@@ -58,18 +63,6 @@ export class CalendarComponent implements OnInit, ControlValueAccessor {
     public set disabledDates(value: Iterable<Date>) {
         this.disabledDateList.set(Array.from(value));
     }
-
-    @Input()
-    public set max(value: Date | null) {
-        this.maxDate.set(value);
-    }
-
-    @Input()
-    public set min(value: Date | null) {
-        this.minDate.set(value);
-    }
-
-    public constructor() {}
 
     public ngOnInit(): void {
         this.setDateValues();
@@ -100,14 +93,14 @@ export class CalendarComponent implements OnInit, ControlValueAccessor {
     public onMonthClick(month: number): void {
         this.navigatedDate = DateTime.fromJSDate(this.navigatedDate).set({ month }).toJSDate();
         this.prepareMonthlyViewDictionary(this.navigatedDate);
-        this.calendarView = "month";
+        this.calendarView.set("month");
     }
 
     public onNavigationClick(direction: "prev" | "next"): void {
         const date = DateTime.fromJSDate(this.navigatedDate);
         let unit: DurationObjectUnits;
 
-        switch (this.calendarView) {
+        switch (this.calendarView()) {
             case "month":
                 unit = { months: 1 };
                 break;
@@ -120,9 +113,9 @@ export class CalendarComponent implements OnInit, ControlValueAccessor {
         }
 
         this.navigatedDate = direction === "prev" ? date.minus(unit).toJSDate() : date.plus(unit).toJSDate();
-        if (this.calendarView === "month") {
+        if (this.calendarView() === "month") {
             this.prepareMonthlyViewDictionary(this.navigatedDate);
-        } else if (this.calendarView === "decade") {
+        } else if (this.calendarView() === "decade") {
             this.prepareDecadeYears();
         }
     }
@@ -131,12 +124,12 @@ export class CalendarComponent implements OnInit, ControlValueAccessor {
         if (view === "decade") {
             this.prepareDecadeYears();
         }
-        this.calendarView = view;
+        this.calendarView.set(view);
     }
 
     public onYearClick(year: number): void {
         this.navigatedDate = DateTime.fromJSDate(this.navigatedDate).set({ year }).toJSDate();
-        this.calendarView = "year";
+        this.calendarView.set("year");
     }
 
     public registerOnChange(fn: any): void {
