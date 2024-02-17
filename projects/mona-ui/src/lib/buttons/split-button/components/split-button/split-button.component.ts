@@ -10,7 +10,9 @@ import {
     ElementRef,
     EventEmitter,
     inject,
+    input,
     Input,
+    InputSignal,
     Output,
     QueryList,
     TemplateRef,
@@ -31,10 +33,16 @@ import { SplitButtonTextTemplateDirective } from "../../directives/split-button-
     templateUrl: "./split-button.component.html",
     styleUrls: ["./split-button.component.scss"],
     standalone: true,
-    imports: [ButtonDirective, NgIf, NgTemplateOutlet, FontAwesomeModule, ContextMenuComponent]
+    imports: [ButtonDirective, NgIf, NgTemplateOutlet, FontAwesomeModule, ContextMenuComponent],
+    host: {
+        "[class.mona-split-button]": "true",
+        "[class.mona-disabled]": "disabled",
+        "[attr.tabindex]": "tabindex()"
+    }
 })
 export class SplitButtonComponent implements AfterViewInit, AfterContentInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
+    readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
     public readonly menuIcon: IconDefinition = faChevronDown;
     public menuItems: MenuItem[] = [];
     public popupOffset: PopupOffset = {
@@ -42,6 +50,8 @@ export class SplitButtonComponent implements AfterViewInit, AfterContentInit {
         vertical: 0
     };
     public popupWidth: number = 0;
+    public tabindex: InputSignal<number | string> = input<number | string>(0);
+    public text: InputSignal<string> = input("");
 
     @Output()
     public buttonClick: EventEmitter<void> = new EventEmitter<void>();
@@ -58,14 +68,8 @@ export class SplitButtonComponent implements AfterViewInit, AfterContentInit {
     @ContentChildren(MenuItemComponent)
     public menuItemComponents: QueryList<MenuItemComponent> = new QueryList<MenuItemComponent>();
 
-    @Input()
-    public text: string = "";
-
     @ContentChild(SplitButtonTextTemplateDirective, { read: TemplateRef })
     public textTemplate: TemplateRef<any> | null = null;
-
-    @ViewChild("wrapperElementRef")
-    private readonly wrapperElementRef!: ElementRef<HTMLDivElement>;
 
     public constructor(private readonly cdr: ChangeDetectorRef) {}
 
@@ -78,7 +82,7 @@ export class SplitButtonComponent implements AfterViewInit, AfterContentInit {
 
     public ngAfterViewInit(): void {
         window.setTimeout(() => {
-            this.popupWidth = this.wrapperElementRef.nativeElement.getBoundingClientRect().width - 1;
+            this.popupWidth = this.#hostElementRef.nativeElement.getBoundingClientRect().width - 1;
             this.popupOffset.horizontal = -this.mainButtonElementRef.nativeElement.getBoundingClientRect().width - 1;
             this.contextMenuComponent.setPrecise(false);
             this.cdr.detectChanges();

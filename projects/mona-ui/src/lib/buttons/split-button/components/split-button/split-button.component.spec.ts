@@ -1,4 +1,4 @@
-import { CommonModule, NgIf } from "@angular/common";
+import { CommonModule } from "@angular/common";
 import { ApplicationRef, Component } from "@angular/core";
 import { ComponentFixture, fakeAsync, TestBed, tick } from "@angular/core/testing";
 import { BrowserModule, By } from "@angular/platform-browser";
@@ -17,7 +17,9 @@ import { SplitButtonComponent } from "./split-button.component";
                 <mona-menu-item text="Item 3.2" (menuClick)="onItemClick($event)"></mona-menu-item>
                 <mona-menu-item text="Item 3.3"></mona-menu-item>
             </mona-menu-item>
-            <mona-menu-item text="Item 4" *ngIf="menuVisible"></mona-menu-item>
+            @if (menuVisible) {
+                <mona-menu-item text="Item 4"></mona-menu-item>
+            }
         </mona-split-button>
     `,
     standalone: true,

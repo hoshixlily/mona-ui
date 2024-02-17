@@ -413,7 +413,9 @@ div.mona-tree-node-dragging {
 
 /** Split Button */
 .mona-split-button {
-    & [monaButton] {
+    display: flex;
+    align-items: center;
+    & .mona-button {
         &:first-child {
             border-right: none;
             border-top-right-radius: 0;
