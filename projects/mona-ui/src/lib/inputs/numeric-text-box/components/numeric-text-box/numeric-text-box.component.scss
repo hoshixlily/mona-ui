@@ -1,17 +1,4 @@
-:host {
-    display: flex;
-}
-
-div.mona-numeric-text-box {
-    display: flex;
-    width: 100%;
-    & > [monaTextBox] {
-        width: 100%;
-        border: none;
-    }
-}
-
-div.mona-numeric-text-box-spinners {
+.mona-numeric-text-box-spinners {
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;

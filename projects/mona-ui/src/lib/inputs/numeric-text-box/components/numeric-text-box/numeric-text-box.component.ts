@@ -1,3 +1,5 @@
+import { FocusMonitor, FocusOrigin } from "@angular/cdk/a11y";
+import { NgClass, NgTemplateOutlet } from "@angular/common";
 import {
     ChangeDetectionStrategy,
     Component,
@@ -8,7 +10,9 @@ import {
     EventEmitter,
     forwardRef,
     inject,
+    input,
     Input,
+    InputSignal,
     OnDestroy,
     OnInit,
     Output,
@@ -19,17 +23,15 @@ import {
     ViewChild,
     WritableSignal
 } from "@angular/core";
-import { delay, distinctUntilChanged, filter, interval, map, Subject, takeUntil } from "rxjs";
-import { FocusMonitor, FocusOrigin } from "@angular/cdk/a11y";
-import { Action } from "../../../../utils/Action";
-import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from "@angular/forms";
-import { faChevronDown, faChevronUp, IconDefinition } from "@fortawesome/free-solid-svg-icons";
-import { NumericTextBoxPrefixTemplateDirective } from "../../directives/numeric-text-box-prefix-template.directive";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { faChevronDown, faChevronUp, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { delay, distinctUntilChanged, filter, interval, map, Subject, takeUntil } from "rxjs";
 import { ButtonDirective } from "../../../../buttons/button/button.directive";
+import { Action } from "../../../../utils/Action";
 import { TextBoxDirective } from "../../../text-box/directives/text-box.directive";
-import { NgClass, NgFor, NgTemplateOutlet, NgIf } from "@angular/common";
+import { NumericTextBoxPrefixTemplateDirective } from "../../directives/numeric-text-box-prefix-template.directive";
 
 type Sign = "-" | "+";
 
@@ -46,32 +48,63 @@ type Sign = "-" | "+";
         }
     ],
     standalone: true,
-    imports: [NgClass, NgFor, NgTemplateOutlet, TextBoxDirective, FormsModule, NgIf, ButtonDirective, FontAwesomeModule]
+    imports: [NgClass, NgTemplateOutlet, TextBoxDirective, FormsModule, ButtonDirective, FontAwesomeModule],
+    host: {
+        "[class.mona-numeric-text-box]": "true",
+        "[class.mona-disabled]": "disabled"
+    }
 })
 export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueAccessor {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
+    readonly #focusMonitor: FocusMonitor = inject(FocusMonitor);
+    readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
     #propagateChange: Action<number | null> | null = null;
 
-    public readonly beforeInput$: Subject<InputEvent> = new Subject<InputEvent>();
-    public readonly decreaseIcon: IconDefinition = faChevronDown;
-    public readonly increaseIcon: IconDefinition = faChevronUp;
-    public readonly valueChange$: Subject<string> = new Subject<string>();
-    public focused: WritableSignal<boolean> = signal(false);
-    public formattedValue: Signal<string> = signal("");
-    public keydown$: Subject<KeyboardEvent> = new Subject<KeyboardEvent>();
-    public value: WritableSignal<number | null> = signal(null);
-    public spin$: Subject<Sign> = new Subject<Sign>();
-    public spinStop$: Subject<void> = new Subject<void>();
-    public wheel$: Subject<WheelEvent> = new Subject<WheelEvent>();
+    protected readonly beforeInput$: Subject<InputEvent> = new Subject<InputEvent>();
+    protected readonly decreaseIcon: IconDefinition = faChevronDown;
+    protected readonly increaseIcon: IconDefinition = faChevronUp;
+    protected readonly valueChange$: Subject<string> = new Subject<string>();
+    protected readonly focused: WritableSignal<boolean> = signal(false);
+    protected readonly formattedValue: Signal<string> = computed(() => {
+        const value = this.value();
+        const focused = this.focused();
+        const decimals = this.decimals();
+        const formatter = this.formatter();
+        if (value == null) {
+            return "";
+        }
+        if (focused && !this.readonly) {
+            return value?.toString() ?? "";
+        }
+        if (formatter) {
+            return formatter(value);
+        }
+        if (decimals > 0) {
+            return value?.toFixed(decimals) ?? "";
+        }
+        return value?.toString() ?? "";
+    });
+    protected readonly keydown$: Subject<KeyboardEvent> = new Subject<KeyboardEvent>();
+    protected readonly value: WritableSignal<number | null> = signal(null);
+    protected readonly spin$: Subject<Sign> = new Subject<Sign>();
+    protected readonly spinStop$: Subject<void> = new Subject<void>();
+    protected readonly wheel$: Subject<WheelEvent> = new Subject<WheelEvent>();
 
-    @Input()
-    public decimals: number = 0;
+    public decimals: InputSignal<number> = input(0);
+    public formatter: InputSignal<Action<number | null, string> | null> = input<Action<number | null, string> | null>(
+        null
+    );
+    public max: InputSignal<number | undefined> = input<number | undefined>(undefined);
+    public min: InputSignal<number | undefined> = input<number | undefined>(undefined);
+    public nullable: InputSignal<boolean> = input(true);
+    public readonly: InputSignal<boolean> = input(false);
+    public required: InputSignal<boolean> = input(false);
+    public spinners: InputSignal<boolean> = input(true);
+    public step: InputSignal<number> = input(1);
+    public tabindex: InputSignal<number> = input(0);
 
     @Input()
     public disabled: boolean = false;
-
-    @Input()
-    public formatter: Action<number | null, string> | null = null;
 
     @Output()
     public inputBlur: EventEmitter<Event> = new EventEmitter<Event>();
@@ -82,40 +115,11 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
     @Output()
     public inputFocusOut: EventEmitter<Event> = new EventEmitter<Event>();
 
-    @Input()
-    public max?: number;
-
-    @Input()
-    public min?: number;
-
-    @Input()
-    public nullable: boolean = true;
-
     @ContentChildren(NumericTextBoxPrefixTemplateDirective, { read: TemplateRef })
     public prefixTemplateList: QueryList<TemplateRef<any>> = new QueryList<TemplateRef<any>>();
 
-    @Input()
-    public readonly: boolean = false;
-
-    @Input()
-    public required: boolean = false;
-
-    @Input()
-    public spinners: boolean = true;
-
-    @Input()
-    public step: number = 1;
-
-    @Input()
-    public tabindex: number = 0;
-
     @ViewChild("valueTextBox")
     public valueTextBoxRef!: ElementRef<HTMLInputElement>;
-
-    public constructor(
-        private readonly elementRef: ElementRef<HTMLElement>,
-        private readonly focusMonitor: FocusMonitor
-    ) {}
 
     private static calculate(value: number, step: number, type: Sign): number {
         const precision = Math.max(
@@ -148,9 +152,10 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
         if (value == null) {
             this.valueChange$.next("0");
         } else {
-            let result = NumericTextBoxComponent.calculate(value, this.step, "-");
-            if (this.min != null && result < this.min) {
-                result = this.min;
+            let result = NumericTextBoxComponent.calculate(value, this.step(), "-");
+            const min = this.min();
+            if (min != null && result < min) {
+                result = min;
             }
             this.valueChange$.next(result.toString());
         }
@@ -162,9 +167,10 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
         if (value == null) {
             this.valueChange$.next("0");
         } else {
-            let result = NumericTextBoxComponent.calculate(value, this.step, "+");
-            if (this.max != null && result > this.max) {
-                result = this.max;
+            let result = NumericTextBoxComponent.calculate(value, this.step(), "+");
+            const max = this.max();
+            if (max != null && result > max) {
+                result = max;
             }
             this.valueChange$.next(result.toString());
         }
@@ -172,31 +178,13 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
     }
 
     public ngOnDestroy(): void {
-        this.focusMonitor.stopMonitoring(this.elementRef.nativeElement);
+        this.#focusMonitor.stopMonitoring(this.#hostElementRef.nativeElement);
     }
 
     public ngOnInit(): void {
-        this.formattedValue = computed(() => {
-            const value = this.value();
-            const focused = this.focused();
-            if (value == null) {
-                return "";
-            }
-            if (focused && !this.readonly) {
-                return value?.toString() ?? "";
-            }
-            if (this.formatter) {
-                return this.formatter(value);
-            }
-            if (this.decimals > 0) {
-                return value?.toFixed(this.decimals) ?? "";
-            }
-            return value?.toString() ?? "";
-        });
-
         this.setSubscriptions();
-        this.focusMonitor
-            .monitor(this.elementRef, true)
+        this.#focusMonitor
+            .monitor(this.#hostElementRef, true)
             .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe((focusOrigin: FocusOrigin) => {
                 this.focused.set(focusOrigin !== null);
@@ -218,7 +206,7 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
     }
 
     private focus(): void {
-        this.focusMonitor.focusVia(this.valueTextBoxRef, "keyboard");
+        this.#focusMonitor.focusVia(this.valueTextBoxRef, "keyboard");
     }
 
     private setSubscriptions(): void {
@@ -229,25 +217,27 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
                 filter(v => v == null || v === "" || NumericTextBoxComponent.isNumeric(v)),
                 map(v => {
                     if (v == null || v === "") {
-                        if (this.nullable) {
+                        if (this.nullable()) {
                             return null;
                         }
-                        if (this.min != null) {
-                            return this.min;
+                        if (this.min() != null) {
+                            return this.min();
                         }
                         return 0;
                     }
                     return parseFloat(v.toString());
                 })
             )
-            .subscribe((value: number | null) => {
+            .subscribe(value => {
                 const previousValue = this.value();
+                const max = this.max();
+                const min = this.min();
                 if (value == null) {
                     this.value.set(null);
-                } else if (this.min != null && value < this.min) {
-                    this.value.set(this.min);
-                } else if (this.max != null && value > this.max) {
-                    this.value.set(this.max);
+                } else if (min != null && value < min) {
+                    this.value.set(min);
+                } else if (max != null && value > max) {
+                    this.value.set(max);
                 } else {
                     this.value.set(value);
                 }
@@ -294,9 +284,9 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
         });
         this.inputFocus
             .pipe(takeUntilDestroyed(this.#destroyRef))
-            .subscribe(() => this.elementRef.nativeElement.focus());
+            .subscribe(() => this.#hostElementRef.nativeElement.focus());
 
-        this.beforeInput$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe((event: InputEvent) => {
+        this.beforeInput$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe((event: InputEvent): void => {
             const inputElement = event.target as HTMLInputElement;
 
             if (event.inputType.startsWith("delete")) {
@@ -316,7 +306,7 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
             if (insertedText == null || insertedText === "") {
                 return;
             }
-            if (!insertedText.match(/[0-9.\-]/)) {
+            if (!RegExp(/[0-9.-]/).exec(insertedText)) {
                 event.preventDefault();
                 return;
             }
@@ -337,7 +327,7 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
             }
 
             if (insertedText === ".") {
-                if (this.decimals === 0 || value.includes(".")) {
+                if (this.decimals() === 0 || value.includes(".")) {
                     event.preventDefault();
                     return;
                 }
@@ -361,16 +351,17 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
                 }
             }
 
-            if (this.min != null && parseFloat(newValue) < this.min) {
+            const max = this.max();
+            const min = this.min();
+            if (min != null && parseFloat(newValue) < min) {
                 event.preventDefault();
-                this.valueChange$.next(this.min.toString());
+                this.valueChange$.next(min.toString());
                 return;
             }
 
-            if (this.max != null && parseFloat(newValue) > this.max) {
+            if (max != null && parseFloat(newValue) > max) {
                 event.preventDefault();
-                this.valueChange$.next(this.max.toString());
-                return;
+                this.valueChange$.next(max.toString());
             }
         });
     }

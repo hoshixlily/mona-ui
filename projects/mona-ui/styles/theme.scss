@@ -1002,6 +1002,8 @@ label.mona-check-box {
 
 /** Numeric Text Box */
 .mona-numeric-text-box {
+    display: flex;
+    width: 100%;
     background-color: var(--mona-background);
     border: 1px solid var(--mona-border-color);
     border-radius: var(--mona-border-radius);
@@ -1011,6 +1013,10 @@ label.mona-check-box {
     }
     &:focus, &:focus-within {
         box-shadow: var(--mona-focus-shadow);
+    }
+    & [monaTextBox] {
+        width: 100%;
+        border: none;
     }
     & button[monaButton] {
         &:first-child {

@@ -1,23 +1,23 @@
-<div class="mona-numeric-text-box" [ngClass]="{'mona-disabled': disabled}">
-    <ng-container *ngFor="let prefixTemplate of prefixTemplateList">
-        <ng-container *ngTemplateOutlet="prefixTemplate"></ng-container>
-    </ng-container>
-    <input monaTextBox [disabled]="disabled"
-           [required]="required"
-           [type]="'text'"
-           inputmode="numeric"
-           [readonly]="readonly"
-           [tabIndex]="tabindex"
-           [ngModel]="formattedValue()"
-           (ngModelChange)="valueChange$.next($event)"
-           (keydown)="keydown$.next($event)"
-           (focus)="inputFocus.emit($event)"
-           (focusout)="inputFocusOut.emit($event)"
-           (blur)="inputBlur.emit($event)"
-           (beforeinput)="beforeInput$.next($event)"
-           (wheel)="wheel$.next($event)"
-           autocomplete="off" tabindex="0" class="mona-input-inner" #valueTextBox>
-    <div class="mona-numeric-text-box-spinners" *ngIf="spinners">
+@for (prefixTemplate of prefixTemplateList; track $index) {
+    <ng-container *ngTemplateOutlet="prefixTemplate"></ng-container>
+}
+<input monaTextBox [disabled]="disabled"
+       [required]="required()"
+       [type]="'text'"
+       inputmode="numeric"
+       [readonly]="readonly()"
+       [tabIndex]="tabindex()"
+       [ngModel]="formattedValue()"
+       (ngModelChange)="valueChange$.next($event)"
+       (keydown)="keydown$.next($event)"
+       (focus)="inputFocus.emit($event)"
+       (focusout)="inputFocusOut.emit($event)"
+       (blur)="inputBlur.emit($event)"
+       (beforeinput)="beforeInput$.next($event)"
+       (wheel)="wheel$.next($event)"
+       autocomplete="off" tabindex="0" class="mona-input-inner" #valueTextBox>
+@if (spinners()) {
+    <div class="mona-numeric-text-box-spinners">
         <button monaButton [disabled]="disabled" [tabindex]="-1"
                 (mousedown)="spin$.next('+')" (mouseup)="spinStop$.next()">
             <fa-icon [icon]="increaseIcon"></fa-icon>
@@ -27,4 +27,4 @@
             <fa-icon [icon]="decreaseIcon"></fa-icon>
         </button>
     </div>
-</div>
+}
