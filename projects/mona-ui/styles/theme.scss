@@ -963,7 +963,10 @@ label.mona-check-box {
 
 /** Color Palette */
 .mona-color-palette {
-    & > div.mona-color-cell {
+    display: grid;
+    grid-gap: 1px;
+    padding: 1px;
+    & > .mona-color-cell {
         &.mona-selected {
             box-shadow: 0 0 0 1px var(--mona-border-color) inset;
         }

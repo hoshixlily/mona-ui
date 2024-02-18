@@ -1,23 +1,20 @@
+import { NgClass } from "@angular/common";
 import {
     Component,
     computed,
     forwardRef,
     Host,
-    Input,
-    OnChanges,
-    OnInit,
+    input,
+    InputSignal,
     signal,
     Signal,
-    SimpleChange,
-    SimpleChanges,
     WritableSignal
 } from "@angular/core";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { Action } from "../../utils/Action";
+import { ColorScheme } from "../models/ColorScheme";
 import { PaletteType } from "../models/PaletteType";
 import { ColorService } from "../services/color.service";
-import { ColorScheme } from "../models/ColorScheme";
-import { NgFor, NgClass } from "@angular/common";
 
 @Component({
     selector: "mona-color-palette",
@@ -32,59 +29,48 @@ import { NgFor, NgClass } from "@angular/common";
         ColorService
     ],
     standalone: true,
-    imports: [NgFor, NgClass]
+    imports: [NgClass],
+    host: {
+        "[class.mona-color-palette]": "true",
+        "[style.grid-template-columns]": "'repeat('+colorScheme().columns+', minmax('+tileSize()+'px, 1fr))'",
+        "[style.grid-auto-rows]": "tileSize()+'px'"
+    }
 })
-export class ColorPaletteComponent implements OnInit, OnChanges, ControlValueAccessor {
+export class ColorPaletteComponent implements ControlValueAccessor {
     private propagateChange: Action<string | null> | null = null;
-    public colorScheme: WritableSignal<ColorScheme> = signal<ColorScheme>(ColorService.FlatColorScheme);
-    public paletteColumns: Signal<number> = signal<number>(10);
-    public selectedColor: string | null = null;
+    protected readonly colorScheme: Signal<ColorScheme> = computed(() => {
+        const palette = this.palette();
+        const columns = this.columns();
+        if (typeof palette === "string") {
+            return this.colorService.getColorScheme(palette as PaletteType);
+        } else {
+            const paletteArray = Array.from(palette);
+            if (paletteArray.length === 0) {
+                return ColorService.FlatColorScheme;
+            }
+        }
+        return {
+            colors: [...palette],
+            columns,
+            name: "custom"
+        };
+    });
+    protected readonly selectedColor: WritableSignal<string | null> = signal<string | null>(null);
 
-    @Input()
-    public columns: number = 10;
-
-    @Input()
-    public palette: PaletteType | Iterable<string> = [];
-
-    @Input()
-    public tileSize: number = 18;
+    public columns: InputSignal<number> = input(10);
+    public palette: InputSignal<PaletteType | Iterable<string>> = input<PaletteType | Iterable<string>>([]);
+    public tileSize: InputSignal<number> = input(18);
 
     public constructor(@Host() private readonly colorService: ColorService) {}
 
-    public ngOnChanges(changes: SimpleChanges): void {
-        const paletteChange = changes["palette"];
-        this.handlePaletteChange(paletteChange);
-    }
-
-    public ngOnInit(): void {
-        this.paletteColumns = computed(() => {
-            const scheme = this.colorScheme();
-            return scheme.columns;
-        });
-    }
-
     public onColorSelect(color: string): void {
-        if (this.selectedColor === color) {
-            this.selectedColor = null;
+        if (this.selectedColor() === color) {
+            this.selectedColor.set(null);
             this.propagateChange?.(null);
             return;
         }
-        this.selectedColor = color;
+        this.selectedColor.set(color);
         this.propagateChange?.(color);
-    }
-
-    private handlePaletteChange(paletteChange: SimpleChange): void {
-        if (paletteChange) {
-            if (typeof paletteChange.currentValue !== "string") {
-                this.colorScheme.set({
-                    colors: [...paletteChange.currentValue],
-                    columns: this.columns,
-                    name: "custom"
-                });
-            } else {
-                this.colorScheme.set(this.colorService.getColorScheme(paletteChange.currentValue as PaletteType));
-            }
-        }
     }
 
     public registerOnChange(fn: any): void {
@@ -96,6 +82,7 @@ export class ColorPaletteComponent implements OnInit, OnChanges, ControlValueAcc
     }
 
     public writeValue(obj: string | null): void {
-        this.selectedColor = this.colorScheme().colors.find(c => c === obj) ?? null;
+        const color = this.colorScheme().colors.find(c => c === obj) ?? null;
+        this.selectedColor.set(color);
     }
 }
