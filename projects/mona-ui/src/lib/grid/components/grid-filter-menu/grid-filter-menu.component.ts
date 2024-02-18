@@ -9,7 +9,8 @@ import {
     ElementRef,
     EventEmitter,
     inject,
-    Input,
+    input,
+    InputSignal,
     OnInit,
     Output
 } from "@angular/core";
@@ -32,27 +33,27 @@ import { GridService } from "../../services/grid.service";
     styleUrls: ["./grid-filter-menu.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone: true,
-    imports: [ButtonDirective, NgClass, FontAwesomeModule]
+    imports: [ButtonDirective, NgClass, FontAwesomeModule],
+    host: {
+        class: "mona-grid-filter-menu"
+    }
 })
 export class GridFilterMenuComponent implements OnInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
-    private popupRef?: PopupRef;
-    public readonly filterIcon: IconDefinition = faFilter;
+    readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
+    #popupRef?: PopupRef;
+    protected readonly filterIcon: IconDefinition = faFilter;
 
-    @Input()
-    public column!: Column;
+    public column: InputSignal<Column> = input.required<Column>();
+    public type: InputSignal<DataType> = input<DataType>("string");
 
     @Output()
     public apply: EventEmitter<ColumnFilterState> = new EventEmitter<ColumnFilterState>();
-
-    @Input()
-    public type: DataType = "string";
 
     public constructor(
         private readonly animationBuilder: AnimationBuilder,
         private readonly cdr: ChangeDetectorRef,
         private readonly popupService: PopupService,
-        private readonly elementRef: ElementRef,
         private readonly gridService: GridService
     ) {}
 
@@ -61,8 +62,8 @@ export class GridFilterMenuComponent implements OnInit {
     }
 
     public openPopup(): void {
-        this.popupRef = this.popupService.create({
-            anchor: this.elementRef.nativeElement,
+        this.#popupRef = this.popupService.create({
+            anchor: this.#hostElementRef.nativeElement,
             content: FilterMenuComponent,
             popupClass: "mona-grid-filter-menu-popup-content",
             closeOnBackdropClick: false,
@@ -77,19 +78,19 @@ export class GridFilterMenuComponent implements OnInit {
                 return false;
             }
         });
-        this.popupRef.overlayRef
+        this.#popupRef.overlayRef
             .backdropClick()
             .pipe(take(1))
             .subscribe(() => {
                 this.animateLeave();
-                this.popupRef?.closeWithDelay(100);
+                this.#popupRef?.closeWithDelay(100);
             });
 
         this.animateEnter();
-        const filterState = this.gridService.appliedFilters.get(this.column.field);
-        const componentRef = this.popupRef.component as ComponentRef<FilterMenuComponent>;
-        componentRef.instance.type.set(this.type);
-        componentRef.instance.field.set(this.column.field);
+        const filterState = this.gridService.appliedFilters.get(this.column().field);
+        const componentRef = this.#popupRef.component as ComponentRef<FilterMenuComponent>;
+        componentRef.instance.type.set(this.type());
+        componentRef.instance.field.set(this.column().field);
         if (filterState?.filterMenuValue) {
             componentRef.instance.value = filterState.filterMenuValue;
         }
@@ -100,34 +101,34 @@ export class GridFilterMenuComponent implements OnInit {
                 filterMenuValue: componentRef.instance.value
             };
             this.animateLeave();
-            this.popupRef?.closeWithDelay(100);
+            this.#popupRef?.closeWithDelay(100);
             this.apply.emit(filterState);
         });
     }
 
     private animateEnter(): void {
-        if (this.popupRef?.overlayRef?.overlayElement?.parentElement) {
-            this.popupRef.overlayRef.overlayElement.parentElement.style.overflow = "hidden";
+        if (this.#popupRef?.overlayRef?.overlayElement?.parentElement) {
+            this.#popupRef.overlayRef.overlayElement.parentElement.style.overflow = "hidden";
         }
         this.animationBuilder
             .build([
                 style({ transform: "translateY(-100%)", opacity: 1 }),
                 animate("0.15s ease-out", style({ transform: "translateY(0)", opacity: 1 }))
             ])
-            .create(this.popupRef?.overlayRef?.overlayElement)
+            .create(this.#popupRef?.overlayRef?.overlayElement)
             .play();
     }
 
     private animateLeave(): void {
-        if (this.popupRef?.overlayRef?.overlayElement?.parentElement) {
-            this.popupRef.overlayRef.overlayElement.parentElement.style.overflow = "hidden";
+        if (this.#popupRef?.overlayRef?.overlayElement?.parentElement) {
+            this.#popupRef.overlayRef.overlayElement.parentElement.style.overflow = "hidden";
         }
         this.animationBuilder
             .build([
                 style({ transform: "translateY(0)", opacity: 1 }),
                 animate("0.15s ease-out", style({ transform: "translateY(-100%)", opacity: 1 }))
             ])
-            .create(this.popupRef?.overlayRef?.overlayElement)
+            .create(this.#popupRef?.overlayRef?.overlayElement)
             .play();
     }
 

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ContentChild, Input, OnInit } from "@angular/core";
+import { ChangeDetectionStrategy, Component, ContentChild, Input } from "@angular/core";
 import { DataType } from "../../../models/DataType";
 import { GridCellTemplateDirective } from "../../directives/grid-cell-template.directive";
 import { GridColumnTitleTemplateDirective } from "../../directives/grid-column-title-template.directive";
@@ -11,7 +11,7 @@ import { Column } from "../../models/Column";
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class GridColumnComponent implements OnInit {
+export class GridColumnComponent {
     public column: Column = new Column();
 
     @ContentChild(GridCellTemplateDirective)
@@ -58,8 +58,4 @@ export class GridColumnComponent implements OnInit {
     public set width(value: number) {
         this.column.width = value;
     }
-
-    public constructor() {}
-
-    public ngOnInit(): void {}
 }

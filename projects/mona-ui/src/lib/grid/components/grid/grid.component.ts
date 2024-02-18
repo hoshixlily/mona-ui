@@ -11,7 +11,9 @@ import {
     ElementRef,
     EventEmitter,
     inject,
+    input,
     Input,
+    InputSignal,
     OnInit,
     Output,
     QueryList,
@@ -61,22 +63,33 @@ import { GridListComponent } from "../grid-list/grid-list.component";
         PagerComponent,
         GridFilterPipe,
         GridPagePipe
-    ]
+    ],
+    host: {
+        class: "mona-grid"
+    }
 })
 export class GridComponent implements OnInit, AfterViewInit, AfterContentInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
+    readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
     #filter: CompositeFilterDescriptor[] = [];
     #sort: SortDescriptor[] = [];
-    public readonly ascendingSortIcon: IconDefinition = faArrowUpLong;
-    public readonly descendingSortIcon: IconDefinition = faArrowDownLong;
-    public readonly headerMargin =
+    protected readonly ascendingSortIcon: IconDefinition = faArrowUpLong;
+    protected readonly descendingSortIcon: IconDefinition = faArrowDownLong;
+    protected readonly headerMargin =
         navigator.userAgent.toLowerCase().indexOf("firefox") > -1 ? "0 16px 0 0" : "0 12px 0 0";
-    public columnDragging: boolean = false;
-    public dragColumn?: Column;
-    public dropColumn?: Column;
-    public gridColumns: Column[] = [];
-    public groupPanelPlaceholderVisible: boolean = true;
-    public resizing: boolean = false;
+    protected columnDragging: boolean = false;
+    protected dragColumn?: Column;
+    protected dropColumn?: Column;
+    protected gridColumns: Column[] = [];
+    protected groupPanelPlaceholderVisible: boolean = true;
+    protected resizing: boolean = false;
+
+    public filterable: InputSignal<boolean> = input(false);
+    public groupable: InputSignal<boolean> = input(false);
+    public pageSizeValues: InputSignal<number[]> = input<number[]>([]);
+    public reorderable: InputSignal<boolean> = input(false);
+    public resizable: InputSignal<boolean> = input(false);
+    public responsivePager: InputSignal<boolean> = input(true);
 
     @Output()
     public cellEdit: EventEmitter<CellEditEvent> = new EventEmitter<CellEditEvent>();
@@ -101,9 +114,6 @@ export class GridComponent implements OnInit, AfterViewInit, AfterContentInit {
         return this.#filter;
     }
 
-    @Input()
-    public filterable: boolean = false;
-
     @Output()
     public filterChange: EventEmitter<CompositeFilterDescriptor[]> = new EventEmitter<CompositeFilterDescriptor[]>();
 
@@ -116,24 +126,9 @@ export class GridComponent implements OnInit, AfterViewInit, AfterContentInit {
     public groupColumnList?: CdkDropList;
 
     @Input()
-    public groupable: boolean = false;
-
-    @Input()
     public set pageSize(value: number) {
         this.gridService.pageState.take = value;
     }
-
-    @Input()
-    public pageSizeValues: number[] = [];
-
-    @Input()
-    public reorderable: boolean = false;
-
-    @Input()
-    public resizable: boolean = false;
-
-    @Input()
-    public responsivePager: boolean = true;
 
     @Input()
     public set sort(value: SortDescriptor[]) {
@@ -161,8 +156,7 @@ export class GridComponent implements OnInit, AfterViewInit, AfterContentInit {
 
     public constructor(
         public readonly gridService: GridService,
-        private readonly cdr: ChangeDetectorRef,
-        private readonly elementRef: ElementRef<HTMLElement>
+        private readonly cdr: ChangeDetectorRef
     ) {}
 
     public ngAfterContentInit(): void {
@@ -205,7 +199,7 @@ export class GridComponent implements OnInit, AfterViewInit, AfterContentInit {
     }
 
     public onColumnDrop(event: CdkDragDrop<Column>): void {
-        if (!this.dropColumn || !this.dragColumn || !this.columnDragging || this.resizing || !this.reorderable) {
+        if (!this.dropColumn || !this.dragColumn || !this.columnDragging || this.resizing || !this.reorderable()) {
             return;
         }
         const dropColumnIndex = this.gridService.columns.findIndex(c => c.field === this.dropColumn?.field);
@@ -219,7 +213,7 @@ export class GridComponent implements OnInit, AfterViewInit, AfterContentInit {
     }
 
     public onColumnDropForGrouping(event: CdkDragDrop<Column, void, Column>): void {
-        if (!this.groupable) {
+        if (!this.groupable()) {
             return;
         }
         const column = event.item.data;
@@ -251,11 +245,9 @@ export class GridComponent implements OnInit, AfterViewInit, AfterContentInit {
         if (allFilters.any()) {
             this.#filter = allFilters.toArray() as CompositeFilterDescriptor[];
             this.filterChange.emit(this.#filter);
-        } else {
-            if (this.#filter.length !== 0) {
-                this.#filter = [];
-                this.filterChange.emit(this.#filter);
-            }
+        } else if (this.#filter.length !== 0) {
+            this.#filter = [];
+            this.filterChange.emit(this.#filter);
         }
     }
 
@@ -281,17 +273,13 @@ export class GridComponent implements OnInit, AfterViewInit, AfterContentInit {
             column.sortDirection = "asc";
         } else if (column.sortDirection === "asc") {
             column.sortDirection = "desc";
+        } else if (this.gridService.groupColumns.map(c => c.field).includes(column.field)) {
+            column.sortDirection = "asc";
+        } else if (this.gridService.sortableOptions.allowUnsort) {
+            column.sortDirection = undefined;
+            column.sortIndex = undefined;
         } else {
-            if (this.gridService.groupColumns.map(c => c.field).includes(column.field)) {
-                column.sortDirection = "asc";
-            } else {
-                if (this.gridService.sortableOptions.allowUnsort) {
-                    column.sortDirection = undefined;
-                    column.sortIndex = undefined;
-                } else {
-                    column.sortDirection = "asc";
-                }
-            }
+            column.sortDirection = "asc";
         }
         this.applyColumnSort(column, column.sortDirection);
         this.#sort = this.gridService.appliedSorts
@@ -320,7 +308,7 @@ export class GridComponent implements OnInit, AfterViewInit, AfterContentInit {
             skip: event.skip,
             take: event.take
         };
-        const scrollableElement = this.elementRef.nativeElement.querySelector("div.mona-grid-list") as HTMLElement;
+        const scrollableElement = this.#hostElementRef.nativeElement.querySelector("div.mona-grid-list") as HTMLElement;
         if (scrollableElement) {
             scrollableElement.scrollTop = 0;
         }
@@ -374,7 +362,7 @@ export class GridComponent implements OnInit, AfterViewInit, AfterContentInit {
             const thList = this.gridService.gridHeaderElement?.querySelectorAll("th");
             for (const [cx, columnTh] of Array.from(thList).entries()) {
                 const gridCol = this.gridService.columns[cx];
-                gridCol.calculatedWidth = gridCol.width ?? columnTh.getBoundingClientRect().width;
+                gridCol.calculatedWidth.set(gridCol.width ?? columnTh.getBoundingClientRect().width);
             }
         }
     }

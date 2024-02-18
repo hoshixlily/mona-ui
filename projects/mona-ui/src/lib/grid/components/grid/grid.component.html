@@ -1,87 +1,89 @@
-<div class="mona-grid">
-    @if (groupable) {
-        <div class="mona-grid-group-panel" cdkDropList #groupColumnList="cdkDropList" cdkDropListOrientation="horizontal"
-             (cdkDropListDropped)="onColumnDropForGrouping($event)">
-            @if (gridService.groupColumns.length !== 0) {
-                @for (groupColumn of gridService.groupColumns; track groupColumn.field) {
-                    <mona-chip [removable]="true" (remove)="onGroupingColumnRemove($event, groupColumn)">
-                        <span>{{groupColumn.title}}</span>
-                    </mona-chip>
-                }
-            } @else if (groupPanelPlaceholderVisible) {
-                <span class="mona-grid-group-panel-placeholder">Drag a column header here to group</span>
+@if (groupable()) {
+    <div class="mona-grid-group-panel" cdkDropList #groupColumnList="cdkDropList" cdkDropListOrientation="horizontal"
+         (cdkDropListDropped)="onColumnDropForGrouping($event)">
+        @if (gridService.groupColumns.length !== 0) {
+            @for (groupColumn of gridService.groupColumns; track groupColumn.field) {
+                <mona-chip [removable]="true" (remove)="onGroupingColumnRemove($event, groupColumn)">
+                    <span>{{ groupColumn.title }}</span>
+                </mona-chip>
             }
-        </div>
-    }
-    <div class="mona-grid-header" [ngStyle]="{'margin': headerMargin}" #gridHeaderElement>
-        <div class="mona-grid-header-wrap">
-            <table>
-                <colgroup>
-                    @for (_ of gridService.groupColumns; track $index) {
-                        <col style="width: 34px;">
-                    }
-                    @for (column of gridService.columns; track $index) {
-                        <col [style.width.px]="column.calculatedWidth" [style.min-width.px]="column.minWidth">
-                    }
-                </colgroup>
-                <thead>
-                    <tr cdkDropList [cdkDropListConnectedTo]="groupable ? [groupColumnList!] : []" (cdkDropListDropped)="onColumnDrop($event)">
-                        @for (_ of gridService.groupColumns; track $index) {
-                            <td></td>
-                        }
-                        @for (column of gridService.columns; track $index) {
-                            <th cdkDrag [cdkDragData]="column" [cdkDragDisabled]="!reorderable && !groupable"
-                                (mouseenter)="onColumnMouseEnter($event, column)"
-                                (cdkDragEntered)="onColumnDragEnter($event, column)"
-                                (cdkDragStarted)="onColumnDragStart($event)">
-                                <div class="mona-grid-column-wrap">
-                                    @if (column.titleTemplate) {
-                                        <ng-container [ngTemplateOutlet]="column.titleTemplate.templateRef"></ng-container>
-                                    } @else {
-                                        <span class="mona-grid-column-title" (click)="onColumnSort(column)" [title]="column.title">{{column.title}}</span>
-                                    }
-
-                                    <div class="mona-grid-column-actions">
-                                        @if (gridService.sortableOptions.showIndices && column.sortIndex != null) {
-                                            <span>{{column.sortIndex}}</span>
-                                        }
-                                        @if (column.sortDirection === 'asc') {
-                                            <fa-icon [icon]="ascendingSortIcon"></fa-icon>
-                                        } @else if (column.sortDirection === 'desc') {
-                                            <fa-icon [icon]="descendingSortIcon"></fa-icon>
-                                        }
-                                        @if (filterable) {
-                                            <mona-grid-filter-menu [column]="column" [type]="column.dataType"
-                                                                   (apply)="onColumnFilter(column, $event)"></mona-grid-filter-menu>
-                                        }
-                                    </div>
-                                </div>
-                                @if (dropColumn === column && dragColumn && reorderable) {
-                                    <span class="mona-grid-column-drop-hint" [ngStyle]="{'right': dragColumn.index < dropColumn.index ? '-1px': null, 'left': dragColumn.index > dropColumn.index ? '-1px': null}"></span>
-                                }
-                                @if (resizable && !columnDragging) {
-                                    <div monaGridColumnResizeHandler [column]="column" class="mona-grid-column-resizer"
-                                         (resizeStart)="onColumnResizeStart()" (resizeEnd)="resizing=false;"></div>
-                                }
-                                <ng-template cdkDragPreview>
-                                    <div class="mona-grid-column-drag-preview">
-                                        <span class="mona-grid-column-title">{{column.title}}</span>
-                                    </div>
-                                </ng-template>
-                            </th>
-                        }
-                    </tr>
-                </thead>
-            </table>
-        </div>
+        } @else if (groupPanelPlaceholderVisible) {
+            <span class="mona-grid-group-panel-placeholder">Drag a column header here to group</span>
+        }
     </div>
+}
+<div class="mona-grid-header" [ngStyle]="{'margin': headerMargin}" #gridHeaderElement>
+    <div class="mona-grid-header-wrap">
+        <table>
+            <colgroup>
+                @for (_ of gridService.groupColumns; track $index) {
+                    <col style="width: 34px;">
+                }
+                @for (column of gridService.columns; track $index) {
+                    <col [style.width.px]="column.calculatedWidth()" [style.min-width.px]="column.minWidth">
+                }
+            </colgroup>
+            <thead>
+            <tr cdkDropList [cdkDropListConnectedTo]="groupable() ? [groupColumnList!] : []"
+                (cdkDropListDropped)="onColumnDrop($event)">
+                @for (_ of gridService.groupColumns; track $index) {
+                    <td></td>
+                }
+                @for (column of gridService.columns; track $index) {
+                    <th cdkDrag [cdkDragData]="column" [cdkDragDisabled]="!reorderable() && !groupable()"
+                        (mouseenter)="onColumnMouseEnter($event, column)"
+                        (cdkDragEntered)="onColumnDragEnter($event, column)"
+                        (cdkDragStarted)="onColumnDragStart($event)">
+                        <div class="mona-grid-column-wrap">
+                            @if (column.titleTemplate) {
+                                <ng-container [ngTemplateOutlet]="column.titleTemplate.templateRef"></ng-container>
+                            } @else {
+                                <span class="mona-grid-column-title" (click)="onColumnSort(column)"
+                                      [title]="column.title">{{ column.title }}</span>
+                            }
 
-    <ng-container *ngIf="(gridService.rows|gridFilter:gridService.appliedFilters:gridService.appliedSorts) as filteredData">
-        <ng-container *ngIf="filteredData|gridPage:gridService.pageState.skip:gridService.pageState.take as viewData">
-            <mona-grid-list [columns]="gridService.columns" [data]="viewData"></mona-grid-list>
-            <mona-pager [skip]="gridService.pageState.skip" [pageSize]="gridService.pageState.take" [total]="filteredData.length"
-                        [pageInput]="true" [pageSizeValues]="pageSizeValues" [responsive]="responsivePager"
-                        (pageSizeChange)="onPageSizeChange($event)" (pageChange)="onPageChange($event)"></mona-pager>
-        </ng-container>
-    </ng-container>
+                            <div class="mona-grid-column-actions">
+                                @if (gridService.sortableOptions.showIndices && column.sortIndex != null) {
+                                    <span>{{ column.sortIndex }}</span>
+                                }
+                                @if (column.sortDirection === 'asc') {
+                                    <fa-icon [icon]="ascendingSortIcon"></fa-icon>
+                                } @else if (column.sortDirection === 'desc') {
+                                    <fa-icon [icon]="descendingSortIcon"></fa-icon>
+                                }
+                                @if (filterable()) {
+                                    <mona-grid-filter-menu [column]="column" [type]="column.dataType"
+                                                           (apply)="onColumnFilter(column, $event)"></mona-grid-filter-menu>
+                                }
+                            </div>
+                        </div>
+                        @if (dropColumn === column && dragColumn && reorderable()) {
+                            <span class="mona-grid-column-drop-hint"
+                                  [ngStyle]="{'right': dragColumn.index < dropColumn.index ? '-1px': null, 'left': dragColumn.index > dropColumn.index ? '-1px': null}"></span>
+                        }
+                        @if (resizable() && !columnDragging) {
+                            <div monaGridColumnResizeHandler [column]="column" class="mona-grid-column-resizer"
+                                 (resizeStart)="onColumnResizeStart()" (resizeEnd)="resizing=false;"></div>
+                        }
+                        <ng-template cdkDragPreview>
+                            <div class="mona-grid-column-drag-preview">
+                                <span class="mona-grid-column-title">{{ column.title }}</span>
+                            </div>
+                        </ng-template>
+                    </th>
+                }
+            </tr>
+            </thead>
+        </table>
+    </div>
 </div>
+
+<ng-container *ngIf="(gridService.rows|gridFilter:gridService.appliedFilters:gridService.appliedSorts) as filteredData">
+    <ng-container *ngIf="filteredData|gridPage:gridService.pageState.skip:gridService.pageState.take as viewData">
+        <mona-grid-list [columns]="gridService.columns" [data]="viewData"></mona-grid-list>
+        <mona-pager [skip]="gridService.pageState.skip" [pageSize]="gridService.pageState.take"
+                    [total]="filteredData.length"
+                    [pageInput]="true" [pageSizeValues]="pageSizeValues()" [responsive]="responsivePager()"
+                    (pageSizeChange)="onPageSizeChange($event)" (pageChange)="onPageChange($event)"></mona-pager>
+    </ng-container>
+</ng-container>

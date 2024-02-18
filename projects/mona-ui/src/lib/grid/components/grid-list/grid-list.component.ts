@@ -6,7 +6,8 @@ import {
     DestroyRef,
     ElementRef,
     inject,
-    Input,
+    input,
+    InputSignal,
     OnInit
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
@@ -39,18 +40,18 @@ import { GridCellComponent } from "../grid-cell/grid-cell.component";
         NgTemplateOutlet,
         SlicePipe,
         GridGroupPipe
-    ]
+    ],
+    host: {
+        class: "mona-grid-list"
+    }
 })
 export class GridListComponent implements OnInit, AfterViewInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
-    public readonly collapseIcon: IconDefinition = faChevronDown;
-    public readonly expandIcon: IconDefinition = faChevronRight;
+    protected readonly collapseIcon: IconDefinition = faChevronDown;
+    protected readonly expandIcon: IconDefinition = faChevronRight;
 
-    @Input()
-    public columns: Column[] = [];
-
-    @Input()
-    public data: Row[] = [];
+    public columns: InputSignal<Column[]> = input<Column[]>([]);
+    public data: InputSignal<Row[]> = input<Row[]>([]);
 
     public constructor(
         public readonly gridService: GridService,
@@ -96,11 +97,9 @@ export class GridListComponent implements OnInit, AfterViewInit {
 
         if (rowIndex === -1) {
             this.selectRow(row);
-        } else {
-            if (event.ctrlKey || event.metaKey) {
-                this.gridService.selectedRows.splice(rowIndex, 1);
-                row.selected = false;
-            }
+        } else if (event.ctrlKey || event.metaKey) {
+            this.gridService.selectedRows.splice(rowIndex, 1);
+            row.selected = false;
         }
     }
 
@@ -128,16 +127,14 @@ export class GridListComponent implements OnInit, AfterViewInit {
                     new KeyValuePair<number, boolean>(this.gridService.pageState.page, group.collapsed)
                 ])
             );
-        } else {
-            if (state.containsKey(this.gridService.pageState.page)) {
-                const value = state.get(this.gridService.pageState.page);
-                if (value != null) {
-                    state.remove(this.gridService.pageState.page);
-                    state.add(this.gridService.pageState.page, !value);
-                }
-            } else {
-                state.add(this.gridService.pageState.page, group.collapsed);
+        } else if (state.containsKey(this.gridService.pageState.page)) {
+            const value = state.get(this.gridService.pageState.page);
+            if (value != null) {
+                state.remove(this.gridService.pageState.page);
+                state.add(this.gridService.pageState.page, !value);
             }
+        } else {
+            state.add(this.gridService.pageState.page, group.collapsed);
         }
     }
 

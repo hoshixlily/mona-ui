@@ -1,3 +1,4 @@
+import { signal, WritableSignal } from "@angular/core";
 import { DataType } from "../../models/DataType";
 import { GridCellTemplateDirective } from "../directives/grid-cell-template.directive";
 import { GridColumnTitleTemplateDirective } from "../directives/grid-column-title-template.directive";
@@ -6,7 +7,7 @@ export class Column {
     /**
      * Only used internally for column resizing
      */
-    public calculatedWidth?: number;
+    public calculatedWidth: WritableSignal<number | undefined> = signal(undefined);
     public cellTemplate?: GridCellTemplateDirective;
     public dataType: DataType = "string";
     public editable: boolean = true;

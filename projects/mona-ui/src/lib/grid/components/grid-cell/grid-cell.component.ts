@@ -7,7 +7,8 @@ import {
     DestroyRef,
     ElementRef,
     inject,
-    Input,
+    input,
+    InputSignal,
     OnInit
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
@@ -42,20 +43,17 @@ import { GridService } from "../../services/grid.service";
 })
 export class GridCellComponent implements OnInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
+    readonly #focusMonitor: FocusMonitor = inject(FocusMonitor);
+    readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
     private focused: boolean = false;
-    public editForm!: FormGroup;
-    public editing: boolean = false;
+    protected editForm!: FormGroup;
+    protected editing: boolean = false;
 
-    @Input({ required: true })
-    public column!: Column;
-
-    @Input({ required: true })
-    public row!: Row;
+    public column: InputSignal<Column> = input.required<Column>();
+    public row: InputSignal<Row> = input.required<Row>();
 
     public constructor(
         private readonly cdr: ChangeDetectorRef,
-        private readonly elementRef: ElementRef<HTMLElement>,
-        private readonly focusMonitor: FocusMonitor,
         private readonly gridService: GridService
     ) {}
 
@@ -65,13 +63,13 @@ export class GridCellComponent implements OnInit {
     }
 
     public initializeForm(): void {
-        const form = this.row.getEditForm(this.column.field);
+        const form = this.row().getEditForm(this.column().field);
         if (form) {
             this.editForm = form;
         } else {
             this.editForm = new FormGroup({});
-            this.editForm.addControl(this.column.field, new FormControl(this.row.data[this.column.field]));
-            this.row.setEditForm(this.column.field, this.editForm);
+            this.editForm.addControl(this.column().field, new FormControl(this.row().data[this.column().field]));
+            this.row().setEditForm(this.column().field, this.editForm);
         }
     }
 
@@ -85,13 +83,13 @@ export class GridCellComponent implements OnInit {
 
     private notifyCellEdit(): CellEditEvent {
         const event = new CellEditEvent({
-            field: this.column.field,
-            oldValue: this.row.data[this.column.field],
-            newValue: this.editForm.value[this.column.field],
-            rowData: this.row.data,
+            field: this.column().field,
+            oldValue: this.row().data[this.column().field],
+            newValue: this.editForm.value[this.column().field],
+            rowData: this.row().data,
             setNewValue: (value: any) => {
-                this.editForm.get(this.column.field)?.setValue(value);
-                this.row.data[this.column.field] = value;
+                this.editForm.get(this.column().field)?.setValue(value);
+                this.row().data[this.column().field] = value;
             }
         });
         if (event.oldValue !== event.newValue) {
@@ -101,16 +99,17 @@ export class GridCellComponent implements OnInit {
     }
 
     private focus(): void {
-        this.focusMonitor.focusVia(this.elementRef.nativeElement.firstElementChild as HTMLElement, "program");
+        this.#focusMonitor.focusVia(this.#hostElementRef.nativeElement.firstElementChild as HTMLElement, "program");
     }
 
     private focusCellInput(): void {
-        if (this.column.dataType === "string" || this.column.dataType === "number") {
-            this.elementRef.nativeElement.querySelector("input")?.focus();
-        } else if (this.column.dataType === "date") {
-            this.elementRef.nativeElement.querySelector("input")?.focus();
-        } else if (this.column.dataType === "boolean") {
-            this.elementRef.nativeElement.querySelector("input")?.focus();
+        if (
+            this.column().dataType === "string" ||
+            this.column().dataType === "number" ||
+            this.column().dataType === "date" ||
+            this.column().dataType === "boolean"
+        ) {
+            this.#hostElementRef.nativeElement.querySelector("input")?.focus();
         }
     }
 
@@ -118,10 +117,10 @@ export class GridCellComponent implements OnInit {
         if (this.editing) {
             return;
         }
-        const nextRowElement = document.querySelector(`tr[data-ruid='${this.row.uid}']`)?.nextElementSibling;
+        const nextRowElement = document.querySelector(`tr[data-ruid='${this.row().uid}']`)?.nextElementSibling;
         if (nextRowElement) {
             const cell = nextRowElement.querySelector(
-                `td .mona-grid-cell[data-field='${this.column.field}']`
+                `td .mona-grid-cell[data-field='${this.column().field}']`
             ) as HTMLElement;
             if (cell) {
                 cell.focus();
@@ -133,13 +132,13 @@ export class GridCellComponent implements OnInit {
         if (this.editing) {
             return;
         }
-        const row = document.querySelector(`tr[data-ruid='${this.row.uid}']`);
+        const row = document.querySelector(`tr[data-ruid='${this.row().uid}']`);
         if (!row) {
             return;
         }
-        if (this.column.index > 0) {
+        if (this.column().index > 0) {
             const cell = row.querySelector(
-                `td .mona-grid-cell[data-col-index='${this.column.index - 1}']`
+                `td .mona-grid-cell[data-col-index='${this.column().index - 1}']`
             ) as HTMLElement;
             if (cell) {
                 cell.focus();
@@ -159,13 +158,13 @@ export class GridCellComponent implements OnInit {
         if (this.editing) {
             return;
         }
-        const row = document.querySelector(`tr[data-ruid='${this.row.uid}']`);
+        const row = document.querySelector(`tr[data-ruid='${this.row().uid}']`);
         if (!row) {
             return;
         }
-        if (this.column.index < this.gridService.columns.length - 1) {
+        if (this.column().index < this.gridService.columns.length - 1) {
             const cell = row.querySelector(
-                `td .mona-grid-cell[data-col-index='${this.column.index + 1}']`
+                `td .mona-grid-cell[data-col-index='${this.column().index + 1}']`
             ) as HTMLElement;
             if (cell) {
                 cell.focus();
@@ -185,10 +184,10 @@ export class GridCellComponent implements OnInit {
         if (this.editing) {
             return;
         }
-        const previousRowElement = document.querySelector(`tr[data-ruid='${this.row.uid}']`)?.previousElementSibling;
+        const previousRowElement = document.querySelector(`tr[data-ruid='${this.row().uid}']`)?.previousElementSibling;
         if (previousRowElement) {
             const cell = previousRowElement.querySelector(
-                `td .mona-grid-cell[data-field='${this.column.field}']`
+                `td .mona-grid-cell[data-field='${this.column().field}']`
             ) as HTMLElement;
             if (cell) {
                 cell.focus();
@@ -260,14 +259,14 @@ export class GridCellComponent implements OnInit {
     }
 
     private handleFocusLoss(): void {
-        const duration = this.column.dataType === "date" ? 50 : 25;
+        const duration = this.column().dataType === "date" ? 50 : 25;
         timer(duration)
             .pipe(take(1))
             .subscribe(() => {
                 if (!this.gridEditable) {
                     return;
                 }
-                if (this.column.dataType !== "date") {
+                if (this.column().dataType !== "date") {
                     if (this.editing) {
                         this.editing = false;
                         this.updateCellValue();
@@ -281,7 +280,7 @@ export class GridCellComponent implements OnInit {
     }
 
     private setClickSubscription(): void {
-        fromEvent<MouseEvent>(this.elementRef.nativeElement, "click")
+        fromEvent<MouseEvent>(this.#hostElementRef.nativeElement, "click")
             .pipe(
                 takeUntilDestroyed(this.#destroyRef)
                 // tap(event => event.stopPropagation())
@@ -294,7 +293,7 @@ export class GridCellComponent implements OnInit {
     }
 
     private setDateValueChangeSubscription(): void {
-        this.editForm.controls[this.column.field].valueChanges
+        this.editForm.controls[this.column().field].valueChanges
             .pipe(
                 takeUntilDestroyed(this.#destroyRef),
                 map(value => {
@@ -308,7 +307,7 @@ export class GridCellComponent implements OnInit {
     }
 
     private setDoubleClickSubscription(): void {
-        fromEvent<MouseEvent>(this.elementRef.nativeElement, "dblclick")
+        fromEvent<MouseEvent>(this.#hostElementRef.nativeElement, "dblclick")
             .pipe(
                 takeUntilDestroyed(this.#destroyRef),
                 tap(event => event.stopPropagation())
@@ -327,7 +326,7 @@ export class GridCellComponent implements OnInit {
     }
 
     private setKeydownSubscription(): void {
-        fromEvent<KeyboardEvent>(this.elementRef.nativeElement, "keydown")
+        fromEvent<KeyboardEvent>(this.#hostElementRef.nativeElement, "keydown")
             .pipe(
                 takeUntilDestroyed(this.#destroyRef),
                 tap(event => event.stopPropagation()),
@@ -374,7 +373,7 @@ export class GridCellComponent implements OnInit {
         this.setDoubleClickSubscription();
         this.setClickSubscription();
         this.setKeydownSubscription();
-        if (this.column.dataType === "date") {
+        if (this.column().dataType === "date") {
             this.setDateValueChangeSubscription();
         }
     }
@@ -382,15 +381,17 @@ export class GridCellComponent implements OnInit {
     private updateCellValue(): void {
         const event = this.notifyCellEdit();
         if (!event.isDefaultPrevented()) {
-            this.row.data[this.column.field] = this.editForm.value[this.column.field];
+            this.row().data[this.column().field] = this.editForm.value[this.column().field];
             return;
         }
         this.editForm.patchValue({
-            [this.column.field]: this.row.data[this.column.field]
+            [this.column().field]: this.row().data[this.column().field]
         });
     }
 
     private get gridEditable(): boolean {
-        return !!this.gridService.editableOptions && !!this.gridService.editableOptions.enabled && this.column.editable;
+        return (
+            !!this.gridService.editableOptions && !!this.gridService.editableOptions.enabled && this.column().editable
+        );
     }
 }

@@ -42,15 +42,13 @@ export class GridColumnResizeHandlerDirective implements AfterViewInit {
 
     private onMouseDown(event: MouseEvent) {
         const element = this.elementRef.nativeElement;
-        const initialWidth = this.column.calculatedWidth ?? element.getBoundingClientRect().width;
+        const initialWidth = this.column.calculatedWidth() ?? element.getBoundingClientRect().width;
         const initialX = event.clientX;
         const oldSelectStart = document.onselectstart;
-        const oldDragStart = document.ondragstart;
         const headerTableElement = element.closest("table");
         const bodyTableElement = document.querySelector(".mona-grid-list-wrap > table") as HTMLTableElement;
 
         document.onselectstart = () => false;
-        // document.ondragstart = () => false;
 
         this.resizeStart.emit();
 
@@ -67,16 +65,17 @@ export class GridColumnResizeHandlerDirective implements AfterViewInit {
                 return;
             }
 
-            const oldWidth = this.column.calculatedWidth || element.getBoundingClientRect().width;
-            this.column.calculatedWidth = initialWidth + deltaX;
+            const oldWidth = this.column.calculatedWidth() ?? element.getBoundingClientRect().width;
+            this.column.calculatedWidth.set(initialWidth + deltaX);
+            const calculatedWidth = this.column.calculatedWidth() as number;
             if (headerTableElement) {
                 headerTableElement.style.width = `${
-                    headerTableElement.getBoundingClientRect().width + (this.column.calculatedWidth - oldWidth)
+                    headerTableElement.getBoundingClientRect().width + (calculatedWidth - oldWidth)
                 }px`;
             }
             if (bodyTableElement) {
                 bodyTableElement.style.width = `${
-                    bodyTableElement.getBoundingClientRect().width + (this.column.calculatedWidth - oldWidth)
+                    bodyTableElement.getBoundingClientRect().width + (calculatedWidth - oldWidth)
                 }px`;
             }
 
@@ -87,7 +86,6 @@ export class GridColumnResizeHandlerDirective implements AfterViewInit {
             document.removeEventListener("mousemove", onMouseMove);
             document.removeEventListener("mouseup", onMouseUp);
             document.onselectstart = oldSelectStart;
-            // document.ondragstart = oldDragStart;
             this.resizeEnd.emit();
         };
 
