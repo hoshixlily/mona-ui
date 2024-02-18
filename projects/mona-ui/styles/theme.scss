@@ -1138,24 +1138,27 @@ div.mona-range-slider-vertical {
 }
 
 /** Slider */
-div.mona-slider {
+.mona-slider {
+    position: relative;
+    display: flex;
+    user-select: none;
     &.mona-disabled {
         @include disabled;
     }
 }
 
-div.mona-slider-track {
+.mona-slider-track {
     border: 1px solid var(--mona-border-color);
     border-radius: var(--mona-border-radius);
     background-color: var(--mona-background);
 }
 
-div.mona-slider-selection {
+.mona-slider-selection {
     border: none;
     background-color: var(--mona-primary);
 }
 
-div.mona-slider-handle {
+.mona-slider-handle {
     background-color: var(--mona-primary);
     border: 1px solid var(--mona-primary-border-color);
     border-radius: var(--mona-border-radius);
@@ -1164,7 +1167,7 @@ div.mona-slider-handle {
     }
 }
 
-div.mona-slider-horizontal {
+.mona-slider-horizontal {
     & span.mona-slider-tick {
         &:first-child {
             border-left: 1px solid var(--mona-border-color);
@@ -1175,7 +1178,7 @@ div.mona-slider-horizontal {
     }
 }
 
-div.mona-slider-vertical {
+.mona-slider-vertical {
     & span.mona-slider-tick {
         &:first-child {
             border-left: none;

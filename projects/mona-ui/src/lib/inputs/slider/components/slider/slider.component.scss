@@ -1,18 +1,12 @@
 $track-thickness: 6px;
 
-div.mona-slider {
-    position: relative;
-    display: flex;
-    user-select: none;
-}
-
-div.mona-slider-track {
+.mona-slider-track {
     position: relative;
     z-index: 2;
     cursor: pointer;
 }
 
-div.mona-slider-selection {
+.mona-slider-selection {
     position: absolute;
     background: var(--mona-primary);
     &.mona-slider-dragging {
@@ -20,12 +14,12 @@ div.mona-slider-selection {
     }
 }
 
-div.mona-slider-tick-list {
+.mona-slider-tick-list {
     display: grid;
     position: absolute;
 }
 
-span.mona-slider-tick {
+.mona-slider-tick {
     display: flex;
     & > span {
         flex: 1;
@@ -33,7 +27,7 @@ span.mona-slider-tick {
     }
 }
 
-div.mona-slider-tick-label-list {
+.mona-slider-tick-label-list {
     position: absolute;
     width: 100%;
     height: 100%;
@@ -51,7 +45,7 @@ div.mona-slider-tick-label-list {
     }
 }
 
-span.mona-slider-tick-label {
+.mona-slider-tick-label {
     position: relative;
     align-items: center;
     justify-content: center;
@@ -61,7 +55,7 @@ span.mona-slider-tick-label {
     line-height: 1.667;
 }
 
-div.mona-slider-handle {
+.mona-slider-handle {
     background: var(--mona-primary);
     border: 1px solid var(--mona-border-color);
     height: calc($track-thickness * 3);
@@ -72,103 +66,105 @@ div.mona-slider-handle {
     outline: none;
 }
 
-div.mona-slider-horizontal {
-    width: 100%;
-    height: 60px;
-    align-items: center;
-
-    & div.mona-slider-track {
-        height: $track-thickness;
+:host {
+    &.mona-slider-horizontal {
         width: 100%;
-    }
-
-    & div.mona-slider-selection {
-        left: 0;
-        top: 0;
-        bottom: 0;
-        transition: width ease-out 0.3s;
-        &.mona-slider-dragging {
-            transition: none;
-        }
-    }
-
-    & div.mona-slider-handle {
-        transform: translateX(-50%);
-        transition: left ease-out 0.3s;
-        &.mona-slider-dragging {
-            transition: none;
-        }
-    }
-
-    & div.mona-slider-tick-list {
-        width: 100%;
-        height: calc($track-thickness * 3);
-        grid-auto-flow: column;
-        grid-auto-columns: minmax(0, 1fr);
+        height: 60px;
         align-items: center;
-    }
 
-    & span.mona-slider-tick {
-        height: 100%;
-    }
+        & .mona-slider-track {
+            height: $track-thickness;
+            width: 100%;
+        }
 
-    & div.mona-slider-tick-label-list {
-        flex-direction: row;
-    }
+        & .mona-slider-selection {
+            left: 0;
+            top: 0;
+            bottom: 0;
+            transition: width ease-out 0.3s;
+            &.mona-slider-dragging {
+                transition: none;
+            }
+        }
 
-    & span.mona-slider-tick-label {
-        width: 0;
-        height: calc($track-thickness * 3);
-    }
-}
+        & .mona-slider-handle {
+            transform: translateX(-50%);
+            transition: left ease-out 0.3s;
+            &.mona-slider-dragging {
+                transition: none;
+            }
+        }
 
-div.mona-slider-vertical {
-    height: 100%;
-    width: 60px;
-    justify-content: center;
+        & .mona-slider-tick-list {
+            width: 100%;
+            height: calc($track-thickness * 3);
+            grid-auto-flow: column;
+            grid-auto-columns: minmax(0, 1fr);
+            align-items: center;
+        }
 
-    & div.mona-slider-track {
-        width: $track-thickness;
-        height: 100%;
-    }
+        & .mona-slider-tick {
+            height: 100%;
+        }
 
-    & div.mona-slider-selection {
-        left: 0;
-        bottom: 0;
-        right: 0;
-        transition: height ease-out 0.3s;
-        &.mona-slider-dragging {
-            transition: none;
+        & .mona-slider-tick-label-list {
+            flex-direction: row;
+        }
+
+        & .mona-slider-tick-label {
+            width: 0;
+            height: calc($track-thickness * 3);
         }
     }
 
-    & div.mona-slider-handle {
-        transform: translateY(50%);
-        transition: bottom ease-out 0.3s;
-        &.mona-slider-dragging {
-            transition: none;
-        }
-    }
-
-    & div.mona-slider-tick-list {
-        width: calc($track-thickness * 3);
+    &.mona-slider-vertical {
         height: 100%;
-        grid-auto-flow: row;
-        grid-auto-columns: unset;
-        grid-auto-rows: minmax(0, 1fr);
-    }
+        width: 60px;
+        justify-content: center;
 
-    & span.mona-slider-tick {
-        flex-direction: column;
-    }
+        & .mona-slider-track {
+            width: $track-thickness;
+            height: 100%;
+        }
 
-    & div.mona-slider-tick-label-list {
-        flex-direction: column;
-    }
+        & .mona-slider-selection {
+            left: 0;
+            bottom: 0;
+            right: 0;
+            transition: height ease-out 0.3s;
+            &.mona-slider-dragging {
+                transition: none;
+            }
+        }
 
-    & span.mona-slider-tick-label {
-        height: 0;
-        width: calc($track-thickness * 3);
-    }
+        & .mona-slider-handle {
+            transform: translateY(50%);
+            transition: bottom ease-out 0.3s;
+            &.mona-slider-dragging {
+                transition: none;
+            }
+        }
 
+        & .mona-slider-tick-list {
+            width: calc($track-thickness * 3);
+            height: 100%;
+            grid-auto-flow: row;
+            grid-auto-columns: unset;
+            grid-auto-rows: minmax(0, 1fr);
+        }
+
+        & .mona-slider-tick {
+            flex-direction: column;
+        }
+
+        & .mona-slider-tick-label-list {
+            flex-direction: column;
+        }
+
+        & .mona-slider-tick-label {
+            height: 0;
+            width: calc($track-thickness * 3);
+        }
+
+    }
 }
