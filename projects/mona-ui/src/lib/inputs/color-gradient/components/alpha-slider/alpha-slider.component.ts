@@ -4,7 +4,9 @@ import {
     Component,
     ElementRef,
     forwardRef,
+    input,
     Input,
+    InputSignal,
     NgZone,
     ViewChild
 } from "@angular/core";
@@ -30,13 +32,15 @@ export class AlphaSliderComponent implements AfterViewInit, ControlValueAccessor
     #mouseMove: boolean = false;
     #propagateChange: (value: number) => void = () => {};
 
-    @Input()
-    public color: string = "#000000";
+    public color: InputSignal<string> = input<string>("#000000");
 
     @ViewChild("sliderHandle")
     public sliderHandle!: ElementRef<HTMLDivElement>;
 
-    public constructor(private readonly elementRef: ElementRef<HTMLDivElement>, private readonly zone: NgZone) {}
+    public constructor(
+        private readonly elementRef: ElementRef<HTMLDivElement>,
+        private readonly zone: NgZone
+    ) {}
 
     public ngAfterViewInit(): void {
         this.setSubscriptions();
@@ -52,7 +56,9 @@ export class AlphaSliderComponent implements AfterViewInit, ControlValueAccessor
         if (value == null || !this.sliderHandle) {
             return;
         }
-        this.setHandlePosition(this.getPositionFromAlpha(value));
+        window.setTimeout(() => {
+            this.setHandlePosition(this.getPositionFromAlpha(value));
+        });
     }
 
     private getAlphaFromPosition(position: number): number {

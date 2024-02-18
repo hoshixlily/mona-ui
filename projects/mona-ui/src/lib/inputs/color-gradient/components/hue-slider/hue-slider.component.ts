@@ -32,7 +32,10 @@ export class HueSliderComponent implements AfterViewInit, ControlValueAccessor {
     @ViewChild("sliderHandle")
     public sliderHandle!: ElementRef<HTMLDivElement>;
 
-    public constructor(private readonly elementRef: ElementRef<HTMLDivElement>, private readonly zone: NgZone) {}
+    public constructor(
+        private readonly elementRef: ElementRef<HTMLDivElement>,
+        private readonly zone: NgZone
+    ) {}
 
     public ngAfterViewInit(): void {
         this.setSubscriptions();
@@ -48,7 +51,9 @@ export class HueSliderComponent implements AfterViewInit, ControlValueAccessor {
         if (value == null || !this.sliderHandle) {
             return;
         }
-        this.setHandlePosition(this.getPositionFromHue(value));
+        window.setTimeout(() => {
+            this.setHandlePosition(this.getPositionFromHue(value));
+        });
     }
 
     private getHueFromPosition(position: number): number {

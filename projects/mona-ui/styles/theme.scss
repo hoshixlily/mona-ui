@@ -911,41 +911,46 @@ label.mona-check-box {
 }
 
 /** Color Gradient */
-div.mona-color-gradient-color-area {
+.mona-color-gradient {
+    display: flex;
+    flex-direction: column;
+    user-select: none;
+    padding: 10px;
+    row-gap: 8px;
     background: var(--mona-background-dark);
     border: 1px solid var(--mona-border-color);
     border-radius: var(--mona-border-radius);
 }
 
-div.mona-hsv-rectangle {
+.mona-hsv-rectangle {
     border: 1px solid var(--mona-border-color);
     border-radius: var(--mona-border-radius);
 }
 
-div.mona-color-gradient-preview {
+.mona-color-gradient-preview {
     border: 1px solid var(--mona-border-color);
     border-radius: var(--mona-border-radius);
 }
 
-span.mona-color-gradient-hex-input-prefix {
+.mona-color-gradient-hex-input-prefix {
     font-family: monospace;
     border-right: 1px solid var(--mona-border-color);
     background-color: var(--mona-background-darker);
 }
 
-span.mona-color-gradient-value-input-prefix {
+.mona-color-gradient-value-input-prefix {
     border-right: 1px solid var(--mona-border-color);
     background-color: var(--mona-background-darker);
     color: var(--mona-text);
     font-family: monospace;
 }
 
-div.mona-hue-slider {
+.mona-hue-slider {
     border: 1px solid var(--mona-border-color);
     border-radius: var(--mona-border-radius);
 }
 
-div.mona-alpha-slider {
+.mona-alpha-slider {
     border: 1px solid var(--mona-border-color);
     border-radius: var(--mona-border-radius);
     & .mona-alpha-slider-color {
