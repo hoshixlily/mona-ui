@@ -1,4 +1,4 @@
-import { NgClass, NgFor, NgIf, NgTemplateOutlet } from "@angular/common";
+import { NgClass, NgTemplateOutlet } from "@angular/common";
 import {
     ChangeDetectionStrategy,
     Component,
@@ -7,9 +7,10 @@ import {
     DestroyRef,
     ElementRef,
     forwardRef,
-    HostBinding,
     inject,
+    input,
     Input,
+    InputSignal,
     OnDestroy,
     OnInit,
     signal,
@@ -65,9 +66,7 @@ import { MultiSelectTagTemplateDirective } from "../../directives/multi-select-t
     standalone: true,
     imports: [
         NgClass,
-        NgFor,
         ChipComponent,
-        NgIf,
         NgTemplateOutlet,
         FontAwesomeModule,
         ButtonDirective,
@@ -81,15 +80,22 @@ import { MultiSelectTagTemplateDirective } from "../../directives/multi-select-t
     ],
     host: {
         "[class.mona-disabled]": "disabled",
+        "[class.mona-dropdown]": "true",
+        "[class.mona-multi-select]": "true",
         "[attr.tabindex]": "disabled ? null : 0"
     }
 })
 export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlValueAccessor {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
+    readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
     readonly #popupUidClass: string = `mona-dropdown-popup-${v4()}`;
+    #popupRef: PopupRef | null = null;
     #propagateChange: Action<TData[]> | null = null;
+    #resizeObserver: ResizeObserver | null = null;
     #value: TData[] = [];
 
+    protected readonly clearIcon: IconDefinition = faTimes;
+    protected readonly dropdownIcon: IconDefinition = faChevronDown;
     protected readonly selectedDataItems: Signal<ImmutableSet<TData>> = computed(() => {
         return this.selectedListItems()
             .select(i => i.data)
@@ -121,18 +127,15 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
     protected readonly visibleTagCount: Signal<number> = computed(() => {
         const tagCount = this.tagCount();
         const itemCount = this.selectedListItems().size();
-        return tagCount < 0 ? itemCount : tagCount === 0 ? 0 : tagCount;
+        if (tagCount < 0) {
+            return itemCount;
+        }
+        return tagCount;
     });
 
-    public readonly clearIcon: IconDefinition = faTimes;
-    public readonly dropdownIcon: IconDefinition = faChevronDown;
+    public readonly summaryTagTemplate: WritableSignal<TemplateRef<any> | null> = signal(null);
     public readonly tagCount: WritableSignal<number> = signal(-1);
-    private resizeObserver: ResizeObserver | null = null;
-    public popupRef: PopupRef | null = null;
-    public summaryTagTemplate: TemplateRef<any> | null = null;
-
-    @HostBinding("class.mona-dropdown")
-    public readonly hostClass: boolean = true;
+    public showClearButton: InputSignal<boolean> = input(true);
 
     @Input()
     public set data(value: Iterable<TData>) {
@@ -141,9 +144,6 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
 
     @Input()
     public disabled: boolean = false;
-
-    @ViewChild("dropdownWrapper")
-    public dropdownWrapper!: ElementRef<HTMLDivElement>;
 
     @ContentChild(MultiSelectFooterTemplateDirective, { read: TemplateRef })
     public footerTemplate: TemplateRef<any> | null = null;
@@ -165,14 +165,8 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
     @ContentChild(MultiSelectNoDataTemplateDirective, { read: TemplateRef })
     public noDataTemplate: TemplateRef<any> | null = null;
 
-    @Input()
-    public placeholder?: string;
-
     @ViewChild("popupTemplate")
     public popupTemplate!: TemplateRef<any>;
-
-    @Input()
-    public showClearButton: boolean = false;
 
     @ContentChild(MultiSelectTagTemplateDirective, { read: TemplateRef })
     public tagTemplate: TemplateRef<any> | null = null;
@@ -188,7 +182,6 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
     }
 
     public constructor(
-        private readonly elementRef: ElementRef<HTMLElement>,
         private readonly listService: ListService<TData>,
         private readonly popupAnimationService: PopupAnimationService,
         private readonly popupService: PopupService
@@ -202,12 +195,12 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
     }
 
     public close(): void {
-        this.popupRef?.close();
-        this.popupRef = null;
+        this.#popupRef?.close();
+        this.#popupRef = null;
     }
 
     public ngOnDestroy(): void {
-        this.resizeObserver?.disconnect();
+        this.#resizeObserver?.disconnect();
     }
 
     public ngOnInit(): void {
@@ -239,28 +232,28 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
     }
 
     public open(): void {
-        if (this.popupRef) {
+        if (this.#popupRef) {
             return;
         }
         this.focus();
-        this.popupRef = this.popupService.create({
-            anchor: this.dropdownWrapper,
+        this.#popupRef = this.popupService.create({
+            anchor: this.#hostElementRef.nativeElement,
             closeOnOutsideClick: false,
             content: this.popupTemplate,
             hasBackdrop: false,
             withPush: false,
-            width: this.elementRef.nativeElement.getBoundingClientRect().width,
+            width: this.#hostElementRef.nativeElement.getBoundingClientRect().width,
             popupClass: ["mona-dropdown-popup-content", this.#popupUidClass],
             positions: DropDownService.getDefaultPositions()
         });
-        this.popupAnimationService.setupDropdownOutsideClickCloseAnimation(this.popupRef);
-        this.popupAnimationService.animateDropdown(this.popupRef, AnimationState.Show);
-        this.popupRef.closed.pipe(take(1)).subscribe(() => {
-            this.popupRef = null;
+        this.popupAnimationService.setupDropdownOutsideClickCloseAnimation(this.#popupRef);
+        this.popupAnimationService.animateDropdown(this.#popupRef, AnimationState.Show);
+        this.#popupRef.closed.pipe(take(1)).subscribe(() => {
+            this.#popupRef = null;
             this.listService.highlightedItem.set(null);
             this.listService.clearFilter();
             const popupElement = document.querySelector(`.${this.#popupUidClass}`);
-            if (DropDownService.shouldFocusAfterClose(this.elementRef.nativeElement, popupElement)) {
+            if (DropDownService.shouldFocusAfterClose(this.#hostElementRef.nativeElement, popupElement)) {
                 this.focus();
             }
         });
@@ -284,7 +277,7 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
     }
 
     private focus(): void {
-        (this.elementRef.nativeElement.firstElementChild as HTMLElement)?.focus();
+        (this.#hostElementRef.nativeElement.firstElementChild as HTMLElement)?.focus();
     }
 
     private handleArrowKeys(event: KeyboardEvent): void {
@@ -296,7 +289,7 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
     }
 
     private handleEnterKey(): void {
-        if (!this.popupRef) {
+        if (!this.#popupRef) {
             this.open();
             return;
         }
@@ -327,17 +320,26 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
     }
 
     private setEventListeners(): void {
-        this.resizeObserver = new ResizeObserver(() => {
+        this.#resizeObserver = new ResizeObserver(() => {
             window.setTimeout(() => {
-                this.popupRef?.overlayRef.updatePosition();
-                this.popupRef?.overlayRef.updateSize({
-                    width: this.elementRef.nativeElement.getBoundingClientRect().width
+                this.#popupRef?.overlayRef.updatePosition();
+                this.#popupRef?.overlayRef.updateSize({
+                    width: this.#hostElementRef.nativeElement.getBoundingClientRect().width
                 });
             });
         });
-        this.resizeObserver.observe(this.elementRef.nativeElement);
+        this.#resizeObserver.observe(this.#hostElementRef.nativeElement);
 
-        fromEvent<KeyboardEvent>(this.elementRef.nativeElement, "keydown")
+        fromEvent<MouseEvent>(this.#hostElementRef.nativeElement, "click")
+            .pipe(takeUntilDestroyed(this.#destroyRef))
+            .subscribe(() => {
+                if (this.disabled) {
+                    return;
+                }
+                this.open();
+            });
+
+        fromEvent<KeyboardEvent>(this.#hostElementRef.nativeElement, "keydown")
             .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe((event: KeyboardEvent) => {
                 if (event.key === "Enter") {
@@ -350,15 +352,15 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
                     this.handleArrowKeys(event);
                 }
             });
-        fromEvent<FocusEvent>(this.elementRef.nativeElement, "focusout")
+        fromEvent<FocusEvent>(this.#hostElementRef.nativeElement, "focusout")
             .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe(event => {
                 const target = event.relatedTarget as HTMLElement;
                 if (
                     !(
                         target &&
-                        (this.elementRef.nativeElement.contains(target) ||
-                            this.popupRef?.overlayRef.overlayElement.contains(target))
+                        (this.#hostElementRef.nativeElement.contains(target) ||
+                            this.#popupRef?.overlayRef.overlayElement.contains(target))
                     )
                 ) {
                     this.close();

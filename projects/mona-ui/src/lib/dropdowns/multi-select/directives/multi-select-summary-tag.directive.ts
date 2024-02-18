@@ -18,6 +18,6 @@ export class MultiSelectSummaryTagDirective<TData> implements AfterContentInit {
     public constructor(private readonly host: MultiSelectComponent<TData>) {}
 
     public ngAfterContentInit(): void {
-        this.host.summaryTagTemplate = this.summaryTagTemplate;
+        this.host.summaryTagTemplate.set(this.summaryTagTemplate);
     }
 }
