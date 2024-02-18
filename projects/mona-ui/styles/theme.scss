@@ -901,13 +901,15 @@ input[type="checkbox"][monaCheckBox] {
     }
 }
 
-label.mona-check-box {
-    color: var(--mona-text);
-    @include font-medium;
-
+.mona-check-box {
     &.mona-disabled {
         @include disabled;
     }
+}
+
+.mona-check-box-label {
+    color: var(--mona-text);
+    @include font-medium;
 }
 
 /** Color Gradient */
