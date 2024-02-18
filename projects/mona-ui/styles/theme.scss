@@ -1081,29 +1081,32 @@ input[type="radio"][monaRadioButton] {
 }
 
 /** Range Slider */
-div.mona-range-slider {
+.mona-range-slider {
+    position: relative;
+    display: flex;
+    user-select: none;
     &.mona-disabled {
         @include disabled;
     }
 }
 
-div.mona-range-slider-track {
+.mona-range-slider-track {
     border: 1px solid var(--mona-border-color);
     border-radius: var(--mona-border-radius);
     background-color: var(--mona-background);
 }
 
-div.mona-range-slider-selection {
+.mona-range-slider-selection {
     border: none;
     background-color: var(--mona-primary);
 }
 
-span.mona-range-slider-tick-label {
+.mona-range-slider-tick-label {
     color: var(--mona-text);
     @include font-small;
 }
 
-div.mona-range-slider-handle {
+.mona-range-slider-handle {
     background-color: var(--mona-primary);
     border: 1px solid var(--mona-primary-border-color);
     border-radius: var(--mona-border-radius);
@@ -1113,8 +1116,8 @@ div.mona-range-slider-handle {
     }
 }
 
-div.mona-range-slider-horizontal {
-    & span.mona-range-slider-tick {
+.mona-range-slider-horizontal {
+    & .mona-range-slider-tick {
         &:first-child {
             border-left: 1px solid var(--mona-border-color);
         }
@@ -1124,8 +1127,8 @@ div.mona-range-slider-horizontal {
     }
 }
 
-div.mona-range-slider-vertical {
-    & span.mona-range-slider-tick {
+.mona-range-slider-vertical {
+    & .mona-range-slider-tick {
         &:first-child {
             border-left: none;
             border-top: 1px solid var(--mona-border-color);
