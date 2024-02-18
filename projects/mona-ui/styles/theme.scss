@@ -725,7 +725,6 @@ mona-filter-input.mona-popup-filter-input,
             }
         }
         & mona-chip {
-            //height: calc(100% - 2px);
             & div.mona-chip {
                 margin-top: 0.5px;
             }
@@ -737,7 +736,14 @@ mona-filter-input.mona-popup-filter-input,
 }
 
 /** Filters */
-div.mona-filter-menu-item {
+.mona-filter-menu {
+    width: 100%;
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
+    row-gap: 5px;
+}
+.mona-filter-menu-item {
     & mona-button-group {
         & button {
             flex: 1;

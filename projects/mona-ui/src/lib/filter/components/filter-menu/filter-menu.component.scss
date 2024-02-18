@@ -1,18 +1,11 @@
-div.mona-filter-menu {
-    width: 100%;
-    padding: 5px;
+
+.mona-filter-menu-item {
     display: flex;
     flex-direction: column;
     row-gap: 5px;
 }
 
-div.mona-filter-menu-item {
-    display: flex;
-    flex-direction: column;
-    row-gap: 5px;
-}
-
-div.mona-filter-menu-actions {
+.mona-filter-menu-actions {
     display: flex;
     flex-direction: row;
     align-items: center;
