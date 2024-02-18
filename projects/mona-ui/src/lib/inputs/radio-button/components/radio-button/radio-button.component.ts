@@ -1,4 +1,5 @@
 import {
+    ChangeDetectionStrategy,
     Component,
     ElementRef,
     EventEmitter,
@@ -26,7 +27,12 @@ import { RadioButtonDirective } from "../../directives/radio-button.directive";
             useExisting: forwardRef(() => RadioButtonComponent),
             multi: true
         }
-    ]
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    host: {
+        "[class.mona-radio-button]": "true",
+        "[class.mona-disabled]": "disabled()"
+    }
 })
 export class RadioButtonComponent implements ControlValueAccessor {
     #propagateChange: Action<any> | null = null;

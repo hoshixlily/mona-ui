@@ -1068,14 +1068,16 @@ input[type="radio"][monaRadioButton] {
     }
 }
 
-label.mona-radio-button {
-    color: var(--mona-text);
-    @include font-medium;
-    line-height: 2;
-
+.mona-radio-button {
     &.mona-disabled {
         @include disabled;
     }
+}
+
+.mona-radio-button-label {
+    color: var(--mona-text);
+    @include font-medium;
+    line-height: 2;
 }
 
 /** Range Slider */
