@@ -975,6 +975,8 @@ label.mona-check-box {
 
 /** Color Picker */
 .mona-color-picker {
+    display: flex;
+    align-items: center;
     border: 1px solid var(--mona-border-color);
     border-radius: var(--mona-border-radius);
     background: var(--mona-background);
@@ -989,13 +991,9 @@ label.mona-check-box {
 
 .mona-color-picker-popup {
     overflow: hidden;
-    & .mona-color-gradient-color-area {
-        border-color: transparent !important;
-    }
 }
 
 .mona-color-picker-popup-wrapper {
-    //background: var(--mona-background);
     padding: 2px;
 }
 

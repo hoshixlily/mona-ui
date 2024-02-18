@@ -1,19 +1,20 @@
-<div class="mona-color-picker mona-input-selector" [attr.tabindex]="0" (click)="open()" #colorPickerAnchor>
-    <div [style.background]="color" class="mona-input-selector-value">
-        <fa-icon [icon]="noColorIcon" *ngIf="!color"></fa-icon>
-    </div>
-    <div class="mona-input-selector-icon">
-        <button monaButton [flat]="true" [tabindex]="-1" class="mona-input-button">
-            <fa-icon [icon]="dropdownIcon"></fa-icon>
-        </button>
-    </div>
+<div [style.background]="color()" class="mona-input-selector-value">
+    @if (!color()) {
+        <fa-icon [icon]="noColorIcon"></fa-icon>
+    }
+</div>
+<div class="mona-input-selector-icon">
+    <button monaButton [flat]="true" [tabindex]="-1" class="mona-input-button">
+        <fa-icon [icon]="dropdownIcon"></fa-icon>
+    </button>
 </div>
 
 <ng-template #popupTemplate>
-    <mona-color-palette [palette]="palette" [columns]="columns" [ngModel]="color"
-                        (ngModelChange)="onColorPaletteValueChange($event)"
-                        *ngIf="view==='palette'"></mona-color-palette>
-    <mona-color-gradient [opacity]="opacity"
-                         [ngModel]="color" (ngModelChange)="onColorGradientValueChange($event)"
-        *ngIf="view==='gradient'"></mona-color-gradient>
+    @if (view() === 'palette') {
+        <mona-color-palette [palette]="palette()" [columns]="columns()" [ngModel]="color()"
+                            (ngModelChange)="onColorPaletteValueChange($event)"></mona-color-palette>
+    } @else if (view() === 'gradient') {
+        <mona-color-gradient [opacity]="opacity()"
+                             [ngModel]="color()" (ngModelChange)="onColorGradientValueChange($event)"></mona-color-gradient>
+    }
 </ng-template>
