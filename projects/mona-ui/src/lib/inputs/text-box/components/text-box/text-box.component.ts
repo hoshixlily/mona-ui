@@ -1,9 +1,8 @@
-import { NgFor, NgTemplateOutlet } from "@angular/common";
+import { NgTemplateOutlet } from "@angular/common";
 import {
     ChangeDetectionStrategy,
     Component,
     ContentChildren,
-    ElementRef,
     EventEmitter,
     forwardRef,
     input,
@@ -11,7 +10,9 @@ import {
     InputSignal,
     Output,
     QueryList,
-    TemplateRef
+    signal,
+    TemplateRef,
+    WritableSignal
 } from "@angular/core";
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { FaIconComponent } from "@fortawesome/angular-fontawesome";
@@ -36,23 +37,27 @@ import { InputType } from "../../models/InputType";
         }
     ],
     standalone: true,
-    imports: [NgFor, NgTemplateOutlet, TextBoxDirective, FormsModule, ButtonDirective, FaIconComponent]
+    imports: [NgTemplateOutlet, TextBoxDirective, FormsModule, ButtonDirective, FaIconComponent],
+    host: {
+        "[class.mona-text-box]": "true",
+        "[class.mona-disabled]": "disabled()",
+        "[class.mona-readonly]": "readonly()"
+    }
 })
 export class TextBoxComponent implements ControlValueAccessor {
-    private propagateChange: Action<string, any> | null = null;
+    #propagateChange: Action<string, any> | null = null;
     protected readonly clearIcon: IconDefinition = faTimes;
-    public value: string = "";
-    public type: InputSignal<InputType> = input<InputType>("text");
+
     public clearButton: InputSignal<boolean> = input<boolean>(false);
+    public disabled: InputSignal<boolean> = input<boolean>(false);
     public inputClass: InputSignal<string | string[]> = input<string | string[]>("");
     public inputStyle: InputSignal<string | Partial<CSSStyleDeclaration> | null | undefined> = input<
         string | Partial<CSSStyleDeclaration | null | undefined>
     >(undefined);
     public placeholder: InputSignal<string> = input<string>("");
     public readonly: InputSignal<boolean> = input<boolean>(false);
-
-    @Input()
-    public disabled: boolean = false;
+    public type: InputSignal<InputType> = input<InputType>("text");
+    public value: WritableSignal<string> = signal<string>("");
 
     @Output()
     public inputBlur: EventEmitter<Event> = new EventEmitter<Event>();
@@ -66,20 +71,18 @@ export class TextBoxComponent implements ControlValueAccessor {
     @ContentChildren(TextBoxSuffixTemplateDirective, { read: TemplateRef })
     public suffixTemplateList: QueryList<TemplateRef<any>> = new QueryList<TemplateRef<any>>();
 
-    public constructor(public readonly elementRef: ElementRef<HTMLDivElement>) {}
-
     public onClearClick(): void {
-        this.value = "";
-        this.propagateChange?.(this.value);
+        this.value.set("");
+        this.#propagateChange?.(this.value());
     }
 
     public onValueChange(value: string): void {
-        this.value = value;
-        this.propagateChange?.(value);
+        this.value.set(value);
+        this.#propagateChange?.(value);
     }
 
     public registerOnChange(fn: any): void {
-        this.propagateChange = fn;
+        this.#propagateChange = fn;
     }
 
     public registerOnTouched(fn: any): void {
@@ -88,7 +91,7 @@ export class TextBoxComponent implements ControlValueAccessor {
 
     public writeValue(obj: string): void {
         if (obj != null) {
-            this.value = obj;
+            this.value.set(obj);
         }
     }
 }

@@ -191,7 +191,7 @@ div.mona-list {
 }
 
 mona-filter-input.mona-list-filter-input {
-    & div.mona-text-box {
+    & .mona-text-box {
         background-color: var(--mona-background-lighter);
         & input {
             background-color: transparent;
@@ -1286,21 +1286,32 @@ input[monaTextBox].mona-input-inner {
 }
 
 .mona-text-box {
+    display: flex;
+    height: 100%;
+    width: 100%;
     background-color: var(--mona-background);
     border: 1px solid var(--mona-border-color);
     border-radius: var(--mona-border-radius);
     transition: box-shadow 0.15s ease-in-out;
-    height: 100%;
-    width: 100%;
     &:active, &:focus, &:focus-within {
         box-shadow: var(--mona-focus-shadow);
     }
-    & span.mona-text-box-prefix,
-    & span.mona-text-box-suffix {
+    & .mona-text-box-prefix,
+    & .mona-text-box-suffix {
         color: var(--mona-text);
         &.mona-disabled {
             @include disabled;
         }
+    }
+    & > [monaTextBox] {
+        border: none;
+        width: 100%;
+        &:active, &:focus, &:focus-within {
+            box-shadow: none;
+        }
+    }
+    &.mona-disabled {
+        @include disabled;
     }
 }
 
