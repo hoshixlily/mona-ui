@@ -1199,6 +1199,14 @@ ol.mona-stepper-step-list {
 
 /** Switch */
 .mona-switch {
+    position: relative;
+    width: 60px;
+    height: 30px;
+    display: flex;
+    padding: 2px;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
     background-color: var(--mona-background);
     border: 1px solid var(--mona-border-color);
     border-radius: var(--mona-border-radius);
