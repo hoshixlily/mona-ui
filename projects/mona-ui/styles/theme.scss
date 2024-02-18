@@ -148,7 +148,11 @@ input, textarea, button {
     color: var(--mona-text);
 }
 
-div.mona-list {
+.mona-list {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    outline: none;
     @include font-medium;
     & ul {
         @include scrollbars-thin;
