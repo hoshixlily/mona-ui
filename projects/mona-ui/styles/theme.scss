@@ -208,11 +208,14 @@ mona-filter-input.mona-list-filter-input {
     border-top: none !important;
 }
 
-div.mona-tree {
+.mona-tree {
+    position: relative;
+    user-select: none;
+    outline: none;
     @include font-medium;
 }
 
-div.mona-tree-node {
+.mona-tree-node {
     padding: 4px 8px;
     &:hover:not(.mona-disabled):not(.mona-selected) {
         background-color: var(--mona-background-hover-darker);
@@ -243,17 +246,17 @@ div.mona-tree-node {
     }
 }
 
-div.mona-tree-node-expander {
+.mona-tree-node-expander {
     &.mona-disabled {
         @include disabled;
     }
 }
 
-span.mona-tree-node-text {
+.mona-tree-node-text {
     color: var(--mona-text);
 }
 
-div.mona-tree-node-dragging {
+.mona-tree-node-dragging {
     background-color: var(--mona-background);
     border: 1px solid var(--mona-border-color);
     border-radius: var(--mona-border-radius);

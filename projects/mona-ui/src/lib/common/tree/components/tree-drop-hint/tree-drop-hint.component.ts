@@ -1,4 +1,4 @@
-import { Component, computed, effect, ElementRef, HostBinding, Signal } from "@angular/core";
+import { Component, computed, effect, ElementRef, inject, Signal } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
 import { FaIconComponent } from "@fortawesome/angular-fontawesome";
 import { faCaretRight, IconDefinition } from "@fortawesome/free-solid-svg-icons";
@@ -22,6 +22,7 @@ export class TreeDropHintComponent<T> {
             initialValue: null
         }
     );
+    readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
     protected readonly dropHintIcon: IconDefinition = faCaretRight;
     protected readonly dropHintStyles: Signal<Partial<CSSStyleDeclaration>> = computed(() => {
         const dropPositionData = this.#dropPositionChange();
@@ -32,7 +33,7 @@ export class TreeDropHintComponent<T> {
         if (!node) {
             return { display: "none" };
         }
-        const nodeElement = this.elementRef.nativeElement.parentElement?.querySelector(
+        const nodeElement = this.#hostElementRef.nativeElement.parentElement?.querySelector(
             `[data-uid="${node.uid}"] > div`
         );
         if (!nodeElement) {
@@ -58,13 +59,10 @@ export class TreeDropHintComponent<T> {
         }
     });
 
-    public constructor(
-        private readonly elementRef: ElementRef<HTMLElement>,
-        private readonly treeService: TreeService<T>
-    ) {
+    public constructor(private readonly treeService: TreeService<T>) {
         effect(() => {
             const styles = this.dropHintStyles();
-            Object.assign(this.elementRef.nativeElement.style, styles);
+            Object.assign(this.#hostElementRef.nativeElement.style, styles);
         });
     }
 }

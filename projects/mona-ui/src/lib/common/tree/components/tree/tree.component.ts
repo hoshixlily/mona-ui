@@ -38,11 +38,19 @@ import { TreeNodeComponent } from "../tree-node/tree-node.component";
     templateUrl: "./tree.component.html",
     styleUrl: "./tree.component.scss",
     changeDetection: ChangeDetectionStrategy.OnPush,
-    animations: [trigger("nodeExpandParent", [transition(":enter", [])])]
+    animations: [trigger("nodeExpandParent", [transition(":enter", [])])],
+    host: {
+        "[class.mona-tree]": "true",
+        "[attr.role]": "'tree'",
+        "[attr.tabindex]": "0"
+    }
 })
 export class TreeComponent<T> implements OnInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
+    readonly #focusMonitor: FocusMonitor = inject(FocusMonitor);
+    readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
     readonly #zone: NgZone = inject(NgZone);
+    protected readonly treeService: TreeService<T> = inject(TreeService);
 
     @Input()
     public set data(value: Iterable<T>) {
@@ -74,12 +82,6 @@ export class TreeComponent<T> implements OnInit {
 
     @Output()
     public nodeSelect: EventEmitter<NodeSelectEvent<T>> = new EventEmitter();
-
-    public constructor(
-        private readonly elementRef: ElementRef<HTMLElement>,
-        private readonly focusMonitor: FocusMonitor,
-        protected readonly treeService: TreeService<T>
-    ) {}
 
     public ngOnInit(): void {
         this.setSubscriptions();
@@ -123,7 +125,7 @@ export class TreeComponent<T> implements OnInit {
     }
 
     private isMouseOutsideTree(event: MouseEvent): boolean {
-        const rect = this.elementRef.nativeElement.getBoundingClientRect();
+        const rect = this.#hostElementRef.nativeElement.getBoundingClientRect();
         return event.clientY < rect.top || event.clientY > rect.bottom;
     }
 
@@ -153,8 +155,8 @@ export class TreeComponent<T> implements OnInit {
     }
 
     private setFocusSubscription(): void {
-        this.focusMonitor
-            .monitor(this.elementRef.nativeElement, true)
+        this.#focusMonitor
+            .monitor(this.#hostElementRef.nativeElement, true)
             .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe(origin => {
                 if (origin) {
@@ -167,7 +169,7 @@ export class TreeComponent<T> implements OnInit {
     }
 
     private setKeydownSubscription(): void {
-        fromEvent<KeyboardEvent>(this.elementRef.nativeElement, "keydown")
+        fromEvent<KeyboardEvent>(this.#hostElementRef.nativeElement, "keydown")
             .pipe(
                 tap(e => e.preventDefault()),
                 takeUntilDestroyed(this.#destroyRef)
