@@ -1351,6 +1351,20 @@ button[monaButton].mona-input-button {
 
 /** Layouts */
 
+/** Avatar */
+.mona-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    position: relative;
+    border-radius: var(--mona-border-radius);
+    & img {
+        width: 100%;
+        height: 100%;
+    }
+}
+
 /** Expansion Panel */
 
 mona-expansion-panel + mona-expansion-panel {

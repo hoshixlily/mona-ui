@@ -1,10 +1,8 @@
-<div class="mona-avatar" [ngStyle]="avatarStyles()">
-    @if (avatarImage()) {
-        <img [src]="avatarImage()" [ngStyle]="{'border-radius': avatarBorderRadius()}"
-             class="mona-avatar-image" alt=""/>
-    } @else if (!avatarImage() && avatarLabel()) {
-        <div class="mona-avatar-label" [ngStyle]="avatarLabelStyles()">{{avatarLabel()}}</div>
-    } @else if (!avatarImage() && !avatarLabel()) {
-        <ng-content></ng-content>
-    }
-</div>
+@if (image()) {
+    <img [src]="image()" [ngStyle]="{'border-radius': borderRadius()}"
+         class="mona-avatar-image" alt=""/>
+} @else if (!image() && label()) {
+    <div class="mona-avatar-label" [ngStyle]="avatarLabelStyles()">{{ label() }}</div>
+} @else if (!image() && !label()) {
+    <ng-content></ng-content>
+}
