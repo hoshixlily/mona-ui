@@ -1,13 +1,4 @@
-div.mona-expansion-panel {
-    background: var(--mona-background);
-    border: 1px solid var(--mona-border-color);
-    border-radius: var(--mona-border-radius);
-    &.collapsed {
-        border-bottom: none;
-    }
-}
-
-div.mona-expansion-panel-header {
+.mona-expansion-panel-header {
     width: 100%;
     display: flex;
     align-items: center;
@@ -20,11 +11,11 @@ div.mona-expansion-panel-header {
     user-select: none;
 }
 
-div.mona-expansion-panel-header-title {
+.mona-expansion-panel-header-title {
     padding: 4px;
 }
 
-div.mona-expansion-panel-content {
+.mona-expansion-panel-content {
     overflow: hidden;
     color: var(--mona-text);
 }

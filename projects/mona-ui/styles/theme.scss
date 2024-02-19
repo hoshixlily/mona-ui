@@ -1367,11 +1367,19 @@ button[monaButton].mona-input-button {
 
 /** Expansion Panel */
 
-mona-expansion-panel + mona-expansion-panel {
-    & .mona-expansion-panel {
-        border-top: none !important;
-        border-radius: 0 !important;
+.mona-expansion-panel {
+    display: block;
+    background: var(--mona-background);
+    border: 1px solid var(--mona-border-color);
+    border-radius: var(--mona-border-radius);
+    &.collapsed {
+        border-bottom: none;
     }
+}
+
+.mona-expansion-panel + .mona-expansion-panel {
+    border-top: none !important;
+    border-radius: 0 !important;
 }
 
 .mona-expansion-panel-header {
