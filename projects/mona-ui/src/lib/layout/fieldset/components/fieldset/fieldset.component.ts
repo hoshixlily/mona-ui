@@ -1,17 +1,20 @@
-import { Component, ContentChild, Input, TemplateRef } from "@angular/core";
+import { NgTemplateOutlet } from "@angular/common";
+import { ChangeDetectionStrategy, Component, ContentChild, input, InputSignal, TemplateRef } from "@angular/core";
 import { FieldsetLegendTemplateDirective } from "../../directives/fieldset-legend-template.directive";
-import { NgIf, NgTemplateOutlet } from "@angular/common";
 
 @Component({
     selector: "mona-fieldset",
     templateUrl: "./fieldset.component.html",
     styleUrls: ["./fieldset.component.scss"],
     standalone: true,
-    imports: [NgIf, NgTemplateOutlet]
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [NgTemplateOutlet],
+    host: {
+        class: "mona-fieldset"
+    }
 })
 export class FieldsetComponent {
-    @Input()
-    public legend: string = "";
+    public legend: InputSignal<string> = input("");
 
     @ContentChild(FieldsetLegendTemplateDirective, { read: TemplateRef })
     public legendTemplate: TemplateRef<any> | null = null;

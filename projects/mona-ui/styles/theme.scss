@@ -1387,14 +1387,16 @@ button[monaButton].mona-input-button {
 }
 
 /** Field Set */
-fieldset.mona-fieldset {
-    background-color: var(--mona-background);
-    border: 1px solid var(--mona-border-color);
-    border-radius: var(--mona-border-radius);
-    color: var(--mona-text);
+.mona-fieldset {
+    & fieldset {
+        background-color: var(--mona-background);
+        border: 1px solid var(--mona-border-color);
+        border-radius: var(--mona-border-radius);
+        color: var(--mona-text);
+    }
 }
 
-legend.mona-fieldset-legend {
+.mona-fieldset-legend {
     background-color: var(--mona-background-dark);
     border: 1px solid var(--mona-border-color);
     border-radius: var(--mona-border-radius);
