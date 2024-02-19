@@ -24,7 +24,7 @@ import {
     faSun,
     faTimes
 } from "@fortawesome/free-solid-svg-icons";
-import { Enumerable, ImmutableList, IndexableList } from "@mirei/ts-collections";
+import { Enumerable, ImmutableList, ImmutableSet, IndexableList } from "@mirei/ts-collections";
 import { DateTime } from "luxon";
 import {
     AutoCompleteComponent,
@@ -595,7 +595,7 @@ export class AppComponent implements OnInit {
     public progressLabelFormatter = (value: number) => `${value}/100`;
     public radioButtonValue: WritableSignal<any> = signal(undefined);
     public rangedSliderValues: [number, number] = [12, 18];
-    public scrollViewData: string[] = [
+    public scrollViewData: ImmutableSet<string> = ImmutableSet.create([
         "https://photos.smugmug.com/photos/i-MVxLrNn/0/CBrrvJV84VqpZBXMgN39mHXgmDWgLRVcjSPZtnd9F/O/i-MVxLrNn.jpg",
         "https://photos.smugmug.com/photos/i-CRB8Dqc/0/P8m7ZJJ3jFL9sHHHbsrczhxmVVbzkFVgNPxCsKmS/O/i-CRB8Dqc.jpg",
         "https://photos.smugmug.com/photos/i-8HfQH43/0/DQbGCs9m8w7ZFtRVV7C2snGnStrGv7sLkVdzq4XHD/O/i-8HfQH43.jpg",
@@ -607,7 +607,7 @@ export class AppComponent implements OnInit {
         "https://photos.smugmug.com/photos/i-tFWWgxZ/0/P97tdGMtSQLhb6WBwBr6TcCGnSnV5MxS73BDP6ND/O/i-tFWWgxZ.jpg",
         "https://photos.smugmug.com/photos/i-wcqdW6P/0/mBS27n36NDJRWtk8ZDhHFf5pzZDLnDfpqzFZ2zxN/O/i-wcqdW6P.jpg",
         "https://photos.smugmug.com/photos/i-344RwvF/0/D79WSZ4FKJdvJMqgZZrjphRffFKFBDZJBJkLpb7KM/O/i-344RwvF.png"
-    ];
+    ]);
     public selectedComboBoxDataItem: any = null;
     public selectedDropdownListDataItem: any;
     public selectedListItem: any;

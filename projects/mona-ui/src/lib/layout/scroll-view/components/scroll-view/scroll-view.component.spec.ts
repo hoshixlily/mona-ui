@@ -12,6 +12,10 @@ describe("ScrollViewComponent", () => {
         });
         fixture = TestBed.createComponent(ScrollViewComponent);
         component = fixture.componentInstance;
+
+        fixture.componentRef.setInput("width", 500);
+        fixture.componentRef.setInput("height", 375);
+
         fixture.detectChanges();
     });
 
