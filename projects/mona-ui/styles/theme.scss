@@ -1407,7 +1407,14 @@ button[monaButton].mona-input-button {
 
 /** Placeholder */
 .mona-placeholder {
-    & span.mona-placeholder-text {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    & .mona-placeholder-text {
+        font-weight: 600;
         color: var(--mona-text);
         filter: brightness(0.5);
     }

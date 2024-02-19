@@ -1,17 +1,4 @@
-:host {
-    width: 100%;
-    height: 100%;
-}
-
-div.mona-placeholder {
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    & > span {
-        text-transform: uppercase;
-        font-weight: 600;
-        user-select: none;
-    }
+.mona-placeholder-text {
+    text-transform: uppercase;
+    user-select: none;
 }

@@ -1,14 +1,15 @@
-import { ChangeDetectionStrategy, Component, Input } from "@angular/core";
+import { ChangeDetectionStrategy, Component, input, InputSignal } from "@angular/core";
 
 @Component({
     selector: "mona-placeholder",
     standalone: true,
-    imports: [],
     templateUrl: "./placeholder.component.html",
     styleUrl: "./placeholder.component.scss",
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    host: {
+        class: "mona-placeholder"
+    }
 })
 export class PlaceholderComponent {
-    @Input()
-    public text: string = "";
+    public text: InputSignal<string> = input("");
 }
