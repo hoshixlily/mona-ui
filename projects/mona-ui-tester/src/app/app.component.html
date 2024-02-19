@@ -514,7 +514,9 @@
                             </div>
 
                             <div style="display: flex; align-items: center; margin-top: 40px;">
-                                <mona-stepper orientation="horizontal" [steps]="stepperSteps" [step]="stepperStep" (stepChange)="onStepperStepChange($event)" [linear]="true" style="width: 600px;">
+                                <mona-stepper orientation="horizontal" [steps]="stepperSteps"
+                                              [step]="stepperStep" (stepChange)="onStepperStepChange($event)" [linear]="true"
+                                              style="width: 600px;">
                                     <ng-template monaStepperLabelTemplate let-step let-index="index" let-active="active">
                                         <span *ngIf="!active" style="color: snow; font-weight: bolder;">{{index+1}}. {{step.label}}</span>
                                         <span *ngIf="active" style="color: darkorange; font-weight: bolder;">{{index+1}}. {{step.label}}</span>

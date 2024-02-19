@@ -1202,11 +1202,21 @@ input[type="radio"][monaRadioButton] {
 }
 
 /** Stepper */
-div.mona-stepper-track {
+.mona-stepper {
+    position: relative;
+    width: auto;
+    display: grid;
+    outline: none;
+    &-vertical {
+        height: 100%;
+    }
+}
+
+.mona-stepper-track {
     border-radius: var(--mona-border-radius);
 }
 
-ol.mona-stepper-step-list {
+.mona-stepper-step-list {
     @include font-medium;
 }
 
