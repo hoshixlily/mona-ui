@@ -1,4 +1,4 @@
-import { NgClass, NgFor, NgIf, NgTemplateOutlet } from "@angular/common";
+import { NgClass, NgTemplateOutlet } from "@angular/common";
 import {
     AfterContentInit,
     AfterViewInit,
@@ -10,9 +10,9 @@ import {
     ElementRef,
     EventEmitter,
     inject,
-    Input,
+    input,
+    InputSignal,
     OnDestroy,
-    OnInit,
     Output,
     QueryList,
     signal,
@@ -35,28 +35,29 @@ import { TabComponent } from "../tab/tab.component";
     styleUrls: ["./tab-strip.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone: true,
-    imports: [NgIf, ButtonDirective, FontAwesomeModule, NgFor, NgClass, NgTemplateOutlet]
+    imports: [ButtonDirective, FontAwesomeModule, NgClass, NgTemplateOutlet],
+    host: {
+        class: "mona-tab-strip"
+    }
 })
-export class TabStripComponent implements OnInit, AfterContentInit, OnDestroy, AfterViewInit {
+export class TabStripComponent implements AfterContentInit, OnDestroy, AfterViewInit {
+    readonly #cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     #resizeObserver: ResizeObserver | null = null;
     #scroll$: Subject<void> = new Subject<void>();
-    public readonly scrollLeftIcon: IconDefinition = faChevronLeft;
-    public readonly scrollRightIcon: IconDefinition = faChevronRight;
-    public readonly tabCloseIcon: IconDefinition = faXmark;
-    public scrollsVisible: WritableSignal<boolean> = signal(false);
+    protected readonly scrollLeftIcon: IconDefinition = faChevronLeft;
+    protected readonly scrollRightIcon: IconDefinition = faChevronRight;
+    protected readonly tabCloseIcon: IconDefinition = faXmark;
+    protected readonly scrollsVisible: WritableSignal<boolean> = signal(false);
+
+    public closable: InputSignal<boolean> = input(false);
+    public keepTabContent: InputSignal<boolean> = input(false);
 
     @ViewChild("initialLoadAnchor", { read: ViewContainerRef })
     private initialLoadAnchor!: ViewContainerRef;
 
     @ViewChild("initialLoadContainer")
     private initialLoadContainer!: ElementRef<HTMLDivElement>;
-
-    @Input()
-    public closable: boolean = false;
-
-    @Input()
-    public keepTabContent: boolean = false;
 
     @Output()
     public tabClose: EventEmitter<TabCloseEvent> = new EventEmitter<TabCloseEvent>();
@@ -70,8 +71,6 @@ export class TabStripComponent implements OnInit, AfterContentInit, OnDestroy, A
     @ViewChild("tabListElement")
     public tabListElement!: ElementRef<HTMLUListElement>;
 
-    public constructor(private readonly cdr: ChangeDetectorRef) {}
-
     public ngAfterContentInit(): void {
         this.tabComponents.forEach((t, tx) => (t.index = tx));
         this.tabComponents.changes
@@ -79,6 +78,7 @@ export class TabStripComponent implements OnInit, AfterContentInit, OnDestroy, A
             .subscribe((tabs: QueryList<TabComponent>) => {
                 tabs.forEach((t, tx) => (t.index = tx));
                 this.updateScrollVisibility();
+                this.#cdr.detectChanges();
             });
     }
 
@@ -90,29 +90,28 @@ export class TabStripComponent implements OnInit, AfterContentInit, OnDestroy, A
                     return;
                 }
                 this.updateScrollVisibility();
+                this.#cdr.detectChanges();
             });
         });
         this.#resizeObserver.observe(this.tabListElement.nativeElement);
 
-        const selectedTab = this.tabComponents.find(t => t.selected);
+        const selectedTab = this.tabComponents.find(t => t.selected());
         if (selectedTab) {
             this.loadTabContent(selectedTab);
         }
-        this.cdr.detectChanges();
+        this.#cdr.detectChanges();
     }
 
     public ngOnDestroy(): void {
         this.#resizeObserver?.disconnect();
     }
 
-    public ngOnInit(): void {}
-
     public onTabClick(tab: TabComponent, tabListElement: HTMLUListElement): void {
-        if (tab.selected) {
+        if (tab.selected()) {
             return;
         }
-        this.tabComponents.forEach(t => (t.selected = false));
-        tab.selected = true;
+        this.tabComponents.forEach(t => t.selected.set(false));
+        tab.selected.set(true);
         window.setTimeout(() => {
             const listElement = tabListElement.querySelector("li.mona-tab-active");
             if (listElement) {
@@ -172,14 +171,14 @@ export class TabStripComponent implements OnInit, AfterContentInit, OnDestroy, A
 
     private loadTabContent(tab: TabComponent): void {
         if (this.tabContentVcr.length > 0) {
-            if (this.keepTabContent) {
+            if (this.keepTabContent()) {
                 this.tabContentVcr.detach(0);
             } else {
                 this.tabContentVcr.clear();
             }
         }
         if (tab.viewRef) {
-            if (this.keepTabContent) {
+            if (this.keepTabContent()) {
                 this.tabContentVcr.insert(tab.viewRef);
             } else {
                 tab.createView();

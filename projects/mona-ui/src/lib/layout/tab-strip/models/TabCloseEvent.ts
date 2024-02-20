@@ -6,6 +6,6 @@ export class TabCloseEvent {
 
     public constructor(index: number, tabComponent: TabComponent) {
         this.index = index;
-        this.selected = tabComponent.selected;
+        this.selected = tabComponent.selected();
     }
 }
