@@ -1111,10 +1111,10 @@ export class AppComponent implements OnInit {
     }
 
     public onListBoxActionClick(event: ListBoxActionClickEvent): void {
-        if (event.action === "moveDown" && event.selectedItem?.text === "Plum") {
-            event.preventDefault();
-            console.log(event);
-        }
+        // if (event.action === "moveDown" && event.selectedItem?.text === "Plum") {
+        //     event.preventDefault();
+        //     console.log(event);
+        // }
     }
 
     public onListViewScrollBottom(event: Event): void {

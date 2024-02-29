@@ -87,7 +87,7 @@
                                     </ng-template>
                                     <ng-template monaGridCellTemplate>
                                         <img
-                                            [ngSrc]="'https://photos.smugmug.com/photos/i-ZfvdSzh/0/Th/i-ZfvdSzh-Th.png'"
+                                            [ngSrc]="'https://photos.smugmug.com/photos/i-fgmzcP4/0/C6ZJkPgXPH4rvL4KZhPtGnr5p9kLTw5sZht8kpB2z/Th/i-fgmzcP4-Th.png'"
                                             [width]="60" [height]="60" style="border: 2px solid black;">
                                     </ng-template>
                                 </mona-grid-column>
@@ -596,15 +596,18 @@
                                 </mona-range-slider>
 
                                 <mona-list-box [items]="dropdownListDataItems" textField="text"
-                                               (selectionChange)="print($event)"
-                                               (actionClick)="onListBoxActionClick($event)"
+                                               (selectionChange)="print(['ListBox1', $event])"
+                                               (actionClick)="print(['ListBox1', $event])"
                                                [toolbar]="{position:'right'}"
                                                [connectedList]="listBox2">
                                     <ng-template monaListBoxItemTemplate let-item>
                                         <div style="color: #00a86b;">{{item.text}}</div>
                                     </ng-template>
                                 </mona-list-box>
-                                <mona-list-box [items]="listBox2Items" textField="text" [toolbar]="false" #listBox2></mona-list-box>
+                                <mona-list-box [items]="listBox2Items" textField="text" [toolbar]="false"
+                                               (selectionChange)="print(['ListBox1-Connected', $event])"
+                                               (actionClick)="print(['ListBox1-Connected', $event])"
+                                               #listBox2></mona-list-box>
 
                                 <mona-fieldset legend="Quote" style="width: 375px;">
                                     <ng-template monaFieldsetLegendTemplate>

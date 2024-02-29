@@ -2,11 +2,17 @@ import { NgTemplateOutlet } from "@angular/common";
 import {
     ChangeDetectionStrategy,
     Component,
+    computed,
     ContentChild,
+    effect,
     ElementRef,
     EventEmitter,
-    Input,
+    input,
+    InputSignal,
+    InputSignalWithTransform,
+    OnInit,
     Output,
+    Signal,
     signal,
     TemplateRef,
     WritableSignal
@@ -22,7 +28,7 @@ import {
     faTrash,
     IconDefinition
 } from "@fortawesome/free-solid-svg-icons";
-import { Collections, Enumerable, List } from "@mirei/ts-collections";
+import { Collections, Enumerable, ImmutableList, List } from "@mirei/ts-collections";
 import { ButtonDirective } from "../../../buttons/button/button.directive";
 import { ListViewComponent } from "../../../list-view/components/list-view/list-view.component";
 import { ListViewItemTemplateDirective } from "../../../list-view/directives/list-view-item-template.directive";
@@ -55,35 +61,72 @@ type ListBoxDirection = "horizontal" | "horizontal-reverse" | "vertical" | "vert
         ContainsPipe,
         ListViewNavigableDirective,
         ListViewNoDataTemplateDirective
-    ]
+    ],
+    host: {
+        class: "mona-list-box",
+        "[class.mona-list-box-horizontal]": "direction()==='horizontal'",
+        "[class.mona-list-box-vertical]": "direction()==='vertical'",
+        "[class.mona-list-box-horizontal-reverse]": "direction()==='horizontal-reverse'",
+        "[class.mona-list-box-vertical-reverse]": "direction()==='vertical-reverse'"
+    }
 })
-export class ListBoxComponent<T = any> {
-    public readonly moveDownIcon: IconDefinition = faAngleDown;
-    public readonly moveUpIcon: IconDefinition = faAngleUp;
-    public readonly removeIcon: IconDefinition = faTrash;
-    public readonly transferAllFromIcon: IconDefinition = faAnglesLeft;
-    public readonly transferAllToIcon: IconDefinition = faAnglesRight;
-    public readonly transferFromIcon: IconDefinition = faAngleLeft;
-    public readonly transferToIcon: IconDefinition = faAngleRight;
-    public direction: WritableSignal<ListBoxDirection> = signal("horizontal");
-    public listBoxItems: WritableSignal<List<T>> = signal(new List<T>());
-    public selectedItem: T | null = null;
-    public selectedItems: List<T> = new List<T>();
-    public toolbarOptions: ToolbarOptions | null = this.getDefaultToolbarOptions();
+export class ListBoxComponent<T = any> implements OnInit {
+    protected readonly activeListBox: Signal<ListBoxComponent<T> | null> = computed(() => {
+        const selectedItem = this.selectedItem();
+        if (selectedItem) {
+            return this;
+        }
+        const connectedList = this.connectedList();
+        if (connectedList?.selectedItem() != null) {
+            return connectedList;
+        }
+        return this;
+    });
+    protected readonly direction: Signal<ListBoxDirection> = computed(() => {
+        const position = this.toolbarOptions()?.position;
+        switch (position) {
+            case "right":
+                return "horizontal";
+            case "left":
+                return "horizontal-reverse";
+            case "top":
+                return "vertical-reverse";
+            case "bottom":
+                return "vertical";
+            default:
+                return "horizontal";
+        }
+    });
+    protected readonly moveDownIcon: IconDefinition = faAngleDown;
+    protected readonly moveUpIcon: IconDefinition = faAngleUp;
+    protected readonly removeIcon: IconDefinition = faTrash;
+    protected readonly transferAllFromIcon: IconDefinition = faAnglesLeft;
+    protected readonly transferAllToIcon: IconDefinition = faAnglesRight;
+    protected readonly transferFromIcon: IconDefinition = faAngleLeft;
+    protected readonly transferToIcon: IconDefinition = faAngleRight;
+    protected selectedItem: WritableSignal<T | null> = signal(null);
+    protected selectedItems: WritableSignal<ImmutableList<T>> = signal(ImmutableList.create());
+    protected toolbarOptions: Signal<ToolbarOptions | null> = computed(() => {
+        const toolbar = this.toolbar();
+        if (typeof toolbar === "boolean") {
+            return toolbar ? this.getDefaultToolbarOptions() : null;
+        }
+        return this.updateToolbarOptions(toolbar);
+    });
+
+    public readonly listBoxItems: WritableSignal<ImmutableList<T>> = signal(ImmutableList.create());
+    public connectedList: InputSignal<ListBoxComponent<T> | null> = input<ListBoxComponent<T> | null>(null);
+    public items: InputSignalWithTransform<List<T>, Iterable<T>> = input(new List(), {
+        transform: (items: Iterable<T>) => new List(items)
+    });
+    public textField: InputSignal<string> = input("");
+    public toolbar: InputSignal<boolean | Partial<ToolbarOptions>> = input<boolean | Partial<ToolbarOptions>>(true);
 
     @Output()
     public actionClick: EventEmitter<ListBoxActionClickEvent> = new EventEmitter<ListBoxActionClickEvent>();
 
-    @Input()
-    public connectedList: ListBoxComponent<T> | null = null;
-
     @ContentChild(ListBoxItemTemplateDirective, { read: TemplateRef })
     public itemTemplate: TemplateRef<ListBoxItemTemplateContext> | null = null;
-
-    @Input()
-    public set items(value: Iterable<T>) {
-        this.listBoxItems.set(new List<T>(value));
-    }
 
     @ContentChild(ListBoxNoDataTemplateDirective, { read: TemplateRef })
     public noDataTemplate: TemplateRef<any> | null = null;
@@ -91,109 +134,146 @@ export class ListBoxComponent<T = any> {
     @Output()
     public selectionChange: EventEmitter<ListBoxSelectionEvent> = new EventEmitter<ListBoxSelectionEvent>();
 
-    @Input()
-    public textField: string = "";
-
-    @Input()
-    public set toolbar(value: boolean | Partial<ToolbarOptions>) {
-        this.updateToolbarOptions(value);
+    public constructor(private readonly elementRef: ElementRef<HTMLElement>) {
+        effect(
+            () => {
+                const items = this.items();
+                this.listBoxItems.set(ImmutableList.create(items));
+            },
+            { allowSignalWrites: true }
+        );
     }
 
-    public constructor(private readonly elementRef: ElementRef<HTMLElement>) {}
+    public createAndEmitActionEvent(action: ToolbarAction, originalEvent: MouseEvent): boolean {
+        const event = new ListBoxActionClickEvent(action, this.selectedItem(), originalEvent);
+        this.actionClick.emit(event);
+        return event.isDefaultPrevented();
+    }
 
     public moveInto(items: Iterable<T>) {
         const itemsToAdd = Enumerable.from(items).where(item => !this.listBoxItems().contains(item));
-        this.listBoxItems.set(this.listBoxItems().concat(itemsToAdd).toList());
+        this.listBoxItems.update(list => list.concat(itemsToAdd).toImmutableList());
     }
 
-    public onMoveDownClick(): void {
-        if (this.selectedItem && !this.createAndEmitActionEvent("moveDown")) {
-            const index = this.listBoxItems().indexOf(this.selectedItem);
-            if (index < this.listBoxItems().length - 1) {
-                Collections.swap(this.listBoxItems(), index, index + 1);
-                this.listBoxItems.set(new List<T>(this.listBoxItems()));
-                this.scrollToSelectedItem();
+    public ngOnInit(): void {
+        if (this.connectedList()) {
+            this.connectedList()!.selectionChange.subscribe(() => {
+                this.selectedItems.update(list => list.clear());
+                this.selectedItem.set(null);
+            });
+        }
+    }
+
+    public onMoveDownClick(event: MouseEvent): void {
+        const activeListBox = this.getActiveListBox();
+        if (!activeListBox) {
+            return;
+        }
+        const selectedItem = activeListBox.selectedItem();
+        if (selectedItem && !activeListBox.createAndEmitActionEvent("moveDown", event)) {
+            const index = activeListBox.listBoxItems().indexOf(selectedItem);
+            if (index < activeListBox.listBoxItems().length - 1) {
+                const itemList = activeListBox.listBoxItems().toList();
+                Collections.swap(itemList, index, index + 1);
+                activeListBox.listBoxItems.update(list => list.clear().addAll(itemList));
+                activeListBox.scrollToSelectedItem();
             }
         }
     }
 
-    public onMoveUpClick(): void {
-        if (this.selectedItem && !this.createAndEmitActionEvent("moveUp")) {
-            const index = this.listBoxItems().indexOf(this.selectedItem);
+    public onMoveUpClick(event: MouseEvent): void {
+        const activeListBox = this.getActiveListBox();
+        if (!activeListBox) {
+            return;
+        }
+        const selectedItem = activeListBox.selectedItem();
+        if (selectedItem && !activeListBox.createAndEmitActionEvent("moveUp", event)) {
+            const index = activeListBox.listBoxItems().indexOf(selectedItem);
             if (index > 0) {
-                Collections.swap(this.listBoxItems(), index, index - 1);
-                this.listBoxItems.set(new List<T>(this.listBoxItems()));
-                this.scrollToSelectedItem();
+                const itemList = activeListBox.listBoxItems().toList();
+                Collections.swap(itemList, index, index - 1);
+                activeListBox.listBoxItems.update(list => list.clear().addAll(itemList));
+                activeListBox.scrollToSelectedItem();
             }
         }
     }
 
-    public onRemoveClick(): void {
-        if (this.selectedItem && !this.createAndEmitActionEvent("remove")) {
-            const index = this.listBoxItems().indexOf(this.selectedItem);
-            this.listBoxItems().removeAt(index);
-            this.listBoxItems.set(new List<T>(this.listBoxItems()));
-            this.selectedItems.remove(this.selectedItem);
-            this.selectedItem = null;
+    public onRemoveClick(event: MouseEvent): void {
+        const selectedItem = this.selectedItem();
+        if (selectedItem && !this.createAndEmitActionEvent("remove", event)) {
+            const index = this.listBoxItems().indexOf(selectedItem);
+            this.listBoxItems.update(list => list.removeAt(index));
+            this.selectedItems.update(list => list.remove(selectedItem));
+            this.selectedItem.set(null);
         }
     }
 
     public onSelectedItemChange(items: T[]): void {
-        const item = this.selectedItem;
-        this.selectedItems = new List<T>(items);
-        this.selectedItem = items[0];
-        this.selectionChange.emit({
+        const item = this.selectedItem();
+        this.selectedItems.update(list => list.clear().addAll(items));
+        this.selectedItem.set(items[0]);
+        this.connectedList()?.selectedItem.set(null);
+        this.connectedList()?.selectedItems.update(list => list.clear());
+        this.activeListBox()?.selectionChange.emit({
             previous: item ? { item, index: this.listBoxItems().indexOf(item) } : null,
-            current: { item: this.selectedItem, index: this.listBoxItems().indexOf(this.selectedItem) }
+            current: { item: items[0], index: item ? this.listBoxItems().indexOf(items[0]) : -1 }
         });
     }
 
-    public onTransferAllFromClick(): void {
-        if (this.connectedList && !this.createAndEmitActionEvent("transferAllFrom")) {
-            this.moveInto(this.connectedList.listBoxItems());
-            this.connectedList.listBoxItems.set(new List<T>());
-            this.connectedList.selectedItem = null;
-            this.connectedList.selectedItems = new List<T>();
+    public onTransferAllFromClick(event: MouseEvent): void {
+        const connectedList = this.connectedList();
+        if (connectedList && !this.createAndEmitActionEvent("transferAllFrom", event)) {
+            this.moveInto(connectedList.listBoxItems());
+            connectedList.listBoxItems.update(list => list.clear());
+            connectedList.selectedItem.set(null);
+            connectedList.selectedItems.update(list => list.clear());
         }
     }
 
-    public onTransferAllToClick(): void {
-        if (this.connectedList && !this.createAndEmitActionEvent("transferAllTo")) {
-            this.connectedList.moveInto(this.listBoxItems());
-            this.listBoxItems.set(new List<T>());
-            this.selectedItem = null;
-            this.selectedItems = new List<T>();
+    public onTransferAllToClick(event: MouseEvent): void {
+        const connectedList = this.connectedList();
+        if (connectedList && !this.createAndEmitActionEvent("transferAllTo", event)) {
+            connectedList.moveInto(this.listBoxItems());
+            this.listBoxItems.update(list => list.clear());
+            this.selectedItem.set(null);
+            this.selectedItems.update(list => list.clear());
         }
     }
 
-    public onTransferFromClick(): void {
-        if (this.connectedList && this.connectedList.selectedItem && !this.createAndEmitActionEvent("transferFrom")) {
-            this.moveInto([this.connectedList.selectedItem]);
-            this.connectedList.listBoxItems().remove(this.connectedList.selectedItem);
-            this.connectedList.listBoxItems.set(new List<T>(this.connectedList.listBoxItems()));
-            this.selectedItem = this.connectedList.selectedItem;
-            this.selectedItems = new List<T>([this.connectedList.selectedItem]);
-            this.connectedList.selectedItem = null;
-            this.connectedList.selectedItems = new List<T>();
+    public onTransferFromClick(event: MouseEvent): void {
+        const connectedList = this.connectedList();
+        const connectedSelectedItem = connectedList?.selectedItem();
+        if (connectedList && connectedSelectedItem && !this.createAndEmitActionEvent("transferFrom", event)) {
+            this.moveInto([connectedSelectedItem]);
+            connectedList.listBoxItems.update(list => list.remove(connectedSelectedItem));
+            this.selectedItem.set(connectedSelectedItem);
+            this.selectedItems.update(list => list.clear().add(connectedSelectedItem));
+            connectedList.selectedItem.set(null);
+            connectedList.selectedItems.update(list => list.clear());
         }
     }
 
-    public onTransferToClick(): void {
-        if (this.connectedList && this.selectedItem && !this.createAndEmitActionEvent("transferTo")) {
-            this.connectedList.moveInto([this.selectedItem]);
-            this.listBoxItems().remove(this.selectedItem);
-            this.listBoxItems.set(new List<T>(this.listBoxItems()));
-            this.connectedList.selectedItem = this.selectedItem;
-            this.connectedList.selectedItems = new List<T>([this.selectedItem]);
-            this.selectedItem = null;
-            this.selectedItems = new List<T>();
+    public onTransferToClick(event: MouseEvent): void {
+        const connectedList = this.connectedList();
+        const selectedItem = this.selectedItem();
+        if (connectedList && selectedItem && !this.createAndEmitActionEvent("transferTo", event)) {
+            connectedList.moveInto([selectedItem]);
+            this.listBoxItems.update(list => list.remove(selectedItem));
+            connectedList.selectedItem.set(selectedItem);
+            connectedList.selectedItems.update(list => list.clear().add(selectedItem));
+            this.selectedItem.set(null);
+            this.selectedItems.update(list => list.clear());
         }
     }
 
-    private createAndEmitActionEvent(action: ToolbarAction): boolean {
-        const event = new ListBoxActionClickEvent(action, this.selectedItem);
-        this.actionClick.emit(event);
-        return event.isDefaultPrevented();
+    private getActiveListBox(): ListBoxComponent<T> | null {
+        if (this.selectedItem() != null) {
+            return this;
+        }
+        if (this.connectedList() != null) {
+            return this.connectedList()!.getActiveListBox();
+        }
+        return null;
     }
 
     private getDefaultToolbarOptions(): ToolbarOptions {
@@ -210,34 +290,15 @@ export class ListBoxComponent<T = any> {
         }
     }
 
-    private updateDirection(): void {
-        if (this.toolbarOptions) {
-            switch (this.toolbarOptions.position) {
-                case "right":
-                    this.direction.set("horizontal");
-                    break;
-                case "left":
-                    this.direction.set("horizontal-reverse");
-                    break;
-                case "top":
-                    this.direction.set("vertical-reverse");
-                    break;
-                case "bottom":
-                    this.direction.set("vertical");
-                    break;
-            }
-        }
-    }
-
-    private updateToolbarOptions(options: boolean | Partial<ToolbarOptions>) {
+    private updateToolbarOptions(options: boolean | Partial<ToolbarOptions>): ToolbarOptions | null {
         if (typeof options === "boolean") {
-            this.toolbarOptions = options ? this.getDefaultToolbarOptions() : null;
+            return options ? this.getDefaultToolbarOptions() : null;
         } else if (options.actions && options.actions.length > 0 && options.position) {
-            this.toolbarOptions = options as Required<ToolbarOptions>;
+            return options as Required<ToolbarOptions>;
         } else if (options.actions && options.actions.length > 0 && !options.position) {
-            this.toolbarOptions = { ...options, position: "right" } as Required<ToolbarOptions>;
+            return { ...options, position: "right" } as Required<ToolbarOptions>;
         } else if ((!options.actions || options.actions.length === 0) && options.position) {
-            this.toolbarOptions = {
+            return {
                 ...options,
                 actions: [
                     "moveDown",
@@ -250,6 +311,6 @@ export class ListBoxComponent<T = any> {
                 ]
             } as Required<ToolbarOptions>;
         }
-        this.updateDirection();
+        return null;
     }
 }

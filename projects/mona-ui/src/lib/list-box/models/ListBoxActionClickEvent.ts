@@ -4,8 +4,8 @@ import { ToolbarAction } from "./ToolbarOptions";
 export class ListBoxActionClickEvent<T = any> extends PreventableEvent {
     readonly #action: ToolbarAction;
     readonly #selectedItem: T | null;
-    public constructor(action: ToolbarAction, selectedItem: T | null) {
-        super("listBoxActionClick");
+    public constructor(action: ToolbarAction, selectedItem: T | null, originalEvent?: Event) {
+        super("listBoxActionClick", originalEvent);
         this.#action = action;
         this.#selectedItem = selectedItem;
     }

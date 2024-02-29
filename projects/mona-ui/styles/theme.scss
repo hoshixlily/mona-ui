@@ -1525,25 +1525,32 @@ button[monaButton].mona-input-button {
 
 /** List Box */
 .mona-list-box {
+    display: flex;
+    width: 16em;
+    height: 250px;
     &.mona-list-box-horizontal {
+        flex-direction: row;
         & .mona-list-view {
             border-top-right-radius: 0;
             border-bottom-right-radius: 0;
         }
     }
     &.mona-list-box-vertical {
+        flex-direction: column;
         & .mona-list-view {
             border-bottom-left-radius: 0;
             border-bottom-right-radius: 0;
         }
     }
     &.mona-list-box-horizontal-reverse {
+        flex-direction: row-reverse;
         & .mona-list-view {
             border-top-left-radius: 0;
             border-bottom-left-radius: 0;
         }
     }
     &.mona-list-box-vertical-reverse {
+        flex-direction: column-reverse;
         & .mona-list-view {
             border-top-left-radius: 0;
             border-top-right-radius: 0;
