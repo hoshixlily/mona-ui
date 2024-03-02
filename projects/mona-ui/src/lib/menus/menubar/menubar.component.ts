@@ -1,4 +1,4 @@
-import { NgClass, NgFor, NgIf, NgTemplateOutlet } from "@angular/common";
+import { NgClass, NgTemplateOutlet } from "@angular/common";
 import {
     AfterContentInit,
     AfterViewInit,
@@ -25,9 +25,13 @@ import { ContextMenuOpenEvent } from "../models/ContextMenuOpenEvent";
     styleUrls: ["./menubar.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone: true,
-    imports: [NgFor, NgClass, NgIf, NgTemplateOutlet, ContextMenuComponent]
+    imports: [NgClass, NgTemplateOutlet, ContextMenuComponent],
+    host: {
+        class: "mona-menubar"
+    }
 })
 export class MenubarComponent implements AfterViewInit, AfterContentInit {
+    readonly #cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
 
     @ViewChildren(ContextMenuComponent)
@@ -37,11 +41,9 @@ export class MenubarComponent implements AfterViewInit, AfterContentInit {
     @ContentChildren(MenuComponent)
     public menuList: QueryList<MenuComponent> = new QueryList<MenuComponent>();
 
-    public constructor(private readonly cdr: ChangeDetectorRef) {}
-
     public ngAfterContentInit(): void {
-        this.menuList.changes.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(event => {
-            this.cdr.detectChanges();
+        this.menuList.changes.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(() => {
+            this.#cdr.detectChanges();
             this.currentContextMenu?.closeMenu();
             this.currentContextMenu = null;
         });
@@ -50,7 +52,7 @@ export class MenubarComponent implements AfterViewInit, AfterContentInit {
     public ngAfterViewInit(): void {
         window.setTimeout(() => {
             this.contextMenuComponents.forEach(c => c.setPrecise(false));
-            this.cdr.detectChanges();
+            this.#cdr.detectChanges();
         });
         const pairContext = () => {
             Enumerable.from(this.menuList)
@@ -62,7 +64,7 @@ export class MenubarComponent implements AfterViewInit, AfterContentInit {
         pairContext();
         this.contextMenuComponents.changes.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(() => {
             this.contextMenuComponents.forEach(c => c.setPrecise(false));
-            this.cdr.detectChanges();
+            this.#cdr.detectChanges();
             pairContext();
         });
     }
@@ -70,7 +72,7 @@ export class MenubarComponent implements AfterViewInit, AfterContentInit {
     public onContextMenuClose(event: ContextMenuCloseEvent): void {
         if (event.uid === this.currentContextMenu?.uid) {
             this.currentContextMenu = null;
-            this.cdr.detectChanges();
+            this.#cdr.detectChanges();
         }
     }
 
@@ -106,7 +108,7 @@ export class MenubarComponent implements AfterViewInit, AfterContentInit {
             }
         });
         this.currentContextMenu = this.contextMenuComponents.find(c => c.uid === event.uid) ?? null;
-        this.cdr.detectChanges();
+        this.#cdr.detectChanges();
     }
 
     public onMenuClick(ctx: ContextMenuComponent): void {
@@ -131,7 +133,7 @@ export class MenubarComponent implements AfterViewInit, AfterContentInit {
             this.currentContextMenu.closeMenu();
             this.currentContextMenu = ctx;
             this.currentContextMenu.openMenu();
-            this.cdr.detectChanges();
+            this.#cdr.detectChanges();
         }
     }
 
@@ -144,7 +146,7 @@ export class MenubarComponent implements AfterViewInit, AfterContentInit {
         }
         const list = new List(this.menuList.toArray());
         Collections.rotate(list, -index);
-        const next = list.skip(1).firstOrDefault(m => !m.disabled);
+        const next = list.skip(1).firstOrDefault(m => !m.disabled());
         if (next) {
             return this.menuList.toArray().findIndex(m => m === next);
         }
@@ -160,7 +162,7 @@ export class MenubarComponent implements AfterViewInit, AfterContentInit {
         }
         const list = new List(this.menuList.toArray());
         Collections.rotate(list, -index);
-        const next = list.reverse().firstOrDefault(m => !m.disabled);
+        const next = list.reverse().firstOrDefault(m => !m.disabled());
         if (next) {
             return this.menuList.toArray().findIndex(m => m === next);
         }

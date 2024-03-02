@@ -1,13 +1,18 @@
 import {
     AfterContentInit,
+    ChangeDetectionStrategy,
     Component,
+    computed,
     ContentChildren,
     DestroyRef,
     EventEmitter,
     inject,
+    input,
     Input,
+    InputSignal,
     Output,
     QueryList,
+    Signal,
     TemplateRef
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
@@ -19,38 +24,30 @@ import { MenuItem } from "../models/MenuItem";
     selector: "mona-menu-item",
     template: "",
     styleUrls: [],
-    standalone: true
+    standalone: true,
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MenuItemComponent implements AfterContentInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
-    private menuItem: MenuItem = {
-        disabled: false,
-        divider: false,
-        parent: null,
-        subMenuItems: [],
-        text: "",
-        visible: true
-    };
+    readonly #menuItem: Signal<MenuItem> = computed(() => {
+        return {
+            data: this.data(),
+            disabled: this.disabled(),
+            divider: this.divider(),
+            iconClass: this.iconClass(),
+            parent: null,
+            subMenuItems: [],
+            text: this.text(),
+            visible: this.visible()
+        };
+    });
 
-    @Input()
-    public set data(data: unknown) {
-        this.menuItem.data = data;
-    }
-
-    @Input()
-    public set disabled(disabled: boolean) {
-        this.menuItem.disabled = disabled;
-    }
-
-    @Input()
-    public set divider(divider: boolean) {
-        this.menuItem.divider = divider;
-    }
-
-    @Input()
-    public set iconClass(iconClass: string) {
-        this.menuItem.iconClass = iconClass;
-    }
+    public data: InputSignal<unknown> = input<unknown>({});
+    public disabled: InputSignal<boolean> = input<boolean>(false);
+    public divider: InputSignal<boolean> = input<boolean>(false);
+    public iconClass: InputSignal<string> = input<string>("");
+    public text: InputSignal<string> = input<string>("");
+    public visible: InputSignal<boolean> = input<boolean>(true);
 
     @ContentChildren(MenuItemIconTemplateDirective, { read: TemplateRef, descendants: false })
     public iconTemplate: QueryList<TemplateRef<any>> = new QueryList<TemplateRef<any>>();
@@ -61,20 +58,8 @@ export class MenuItemComponent implements AfterContentInit {
     @ContentChildren(MenuItemComponent)
     public submenuItems: QueryList<MenuItemComponent> = new QueryList<MenuItemComponent>();
 
-    @Input()
-    public set text(text: string) {
-        this.menuItem.text = text;
-    }
-
     @ContentChildren(MenuItemTextTemplateDirective, { read: TemplateRef, descendants: false })
     public textTemplate: QueryList<TemplateRef<any>> = new QueryList<TemplateRef<any>>();
-
-    @Input()
-    public set visible(visible: boolean) {
-        this.menuItem.visible = visible;
-    }
-
-    public constructor() {}
 
     public getMenuItem(): MenuItem {
         return this.getMenuItemWithDepth(0);
@@ -82,20 +67,20 @@ export class MenuItemComponent implements AfterContentInit {
 
     public ngAfterContentInit(): void {
         this.submenuItems.changes.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(() => {
-            this.menuItem.subMenuItems = this.submenuItems.map(si => si.getMenuItem());
+            this.#menuItem().subMenuItems = this.submenuItems.map(si => si.getMenuItem());
         });
     }
 
     private getMenuItemWithDepth(depth: number = 0): MenuItem {
-        this.menuItem.iconTemplate = this.iconTemplate.get(0);
-        this.menuItem.menuClick = (): void => this.menuClick.emit();
-        this.menuItem.subMenuItems = this.submenuItems.map(si => {
+        this.#menuItem().iconTemplate = this.iconTemplate.get(0);
+        this.#menuItem().menuClick = (): void => this.menuClick.emit();
+        this.#menuItem().subMenuItems = this.submenuItems.map(si => {
             const subMenuItem = si.getMenuItemWithDepth(depth + 1);
-            subMenuItem.parent = this.menuItem;
+            subMenuItem.parent = this.#menuItem();
             return subMenuItem;
         });
-        this.menuItem.depth = depth;
-        this.menuItem.textTemplate = this.textTemplate.get(0);
-        return this.menuItem;
+        this.#menuItem().depth = depth;
+        this.#menuItem().textTemplate = this.textTemplate.get(0);
+        return this.#menuItem();
     }
 }

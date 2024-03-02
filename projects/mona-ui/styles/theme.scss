@@ -1675,11 +1675,12 @@ ul.mona-contextmenu-list {
 }
 
 /** Menu Bar */
-ul.mona-menubar {
+.mona-menubar {
+    display: block;
     background: var(--mona-background);
     border-bottom: 1px solid var(--mona-border-color);
     @include font-medium;
-    & li {
+    & ul li {
         color: var(--mona-text);
         &.mona-active {
             background-color: var(--mona-primary);
