@@ -2,7 +2,7 @@
     <span class="divider"></span>
 } @else {
     <div class="mona-contextmenu-item">
-        @if (iconSpaceVisible) {
+        @if (iconSpaceVisible()) {
             <div class="mona-contextmenu-item-icon">
                 @if (menuItem.iconTemplate) {
                     <ng-container [ngTemplateOutlet]="menuItem.iconTemplate"
@@ -12,7 +12,7 @@
                 }
             </div>
         }
-        <div class="mona-contextmenu-item-text" [ngClass]="{'icon-visible': iconSpaceVisible}">
+        <div class="mona-contextmenu-item-text" [ngClass]="{'icon-visible': iconSpaceVisible()}">
             @if (menuItem.textTemplate) {
                 <ng-container [ngTemplateOutlet]="menuItem.textTemplate"
                               [ngTemplateOutletContext]="{$implicit: menuItem}"></ng-container>
@@ -21,7 +21,7 @@
             }
 
         </div>
-        @if (linkSpaceVisible) {
+        @if (linkSpaceVisible()) {
             <div class="mona-contextmenu-item-link">
                 @if (menuItem.subMenuItems && menuItem.subMenuItems.length !== 0) {
                     <span>

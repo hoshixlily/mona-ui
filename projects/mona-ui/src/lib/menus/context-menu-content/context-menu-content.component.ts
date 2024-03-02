@@ -7,10 +7,11 @@ import {
     Component,
     ElementRef,
     inject,
-    Inject,
     OnInit,
     QueryList,
-    ViewChildren
+    signal,
+    ViewChildren,
+    WritableSignal
 } from "@angular/core";
 import { any } from "@mirei/ts-collections";
 import { filter, fromEvent, Subject } from "rxjs";
@@ -33,16 +34,15 @@ import { ContextMenuService } from "../services/context-menu.service";
 export class ContextMenuContentComponent implements OnInit, AfterViewInit {
     readonly #animationService: AnimationService = inject(AnimationService);
     readonly #cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
+    readonly #contextMenuInjectorData: Partial<ContextMenuInjectorData> = { isRoot: false };
     readonly #contextMenuService: ContextMenuService = inject(ContextMenuService);
     readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
-    private contextMenuInjectorData: Partial<ContextMenuInjectorData> = { isRoot: false };
+    #currentMenuItem: MenuItem | null = null;
+    protected readonly iconSpaceVisible: WritableSignal<boolean> = signal(false);
+    protected readonly linkSpaceVisible: WritableSignal<boolean> = signal(false);
+    protected readonly menuPopupRef: WritableSignal<PopupRef | null> = signal(null);
     public readonly contextMenuData: ContextMenuInjectorData = inject<ContextMenuInjectorData>(PopupDataInjectionToken);
-    public activeItemIndex: number = -1;
-    public currentMenuItem: MenuItem | null = null;
-    public iconSpaceVisible: boolean = false;
     public keyManager!: ActiveDescendantKeyManager<ContextMenuItemComponent>;
-    public linkSpaceVisible: boolean = false;
-    public menuPopupRef: PopupRef | null = null;
 
     @ViewChildren(ContextMenuItemComponent)
     private contextMenuItemComponents: QueryList<ContextMenuItemComponent> = new QueryList<ContextMenuItemComponent>();
@@ -61,10 +61,9 @@ export class ContextMenuContentComponent implements OnInit, AfterViewInit {
     }
 
     public ngOnInit(): void {
-        this.iconSpaceVisible = any(this.contextMenuData.menuItems, mi => !!mi.iconClass || !!mi.iconTemplate);
-        this.linkSpaceVisible = any(
-            this.contextMenuData.menuItems,
-            mi => !!mi.subMenuItems && mi.subMenuItems.length > 0
+        this.iconSpaceVisible.set(any(this.contextMenuData.menuItems, mi => !!mi.iconClass || !!mi.iconTemplate));
+        this.linkSpaceVisible.set(
+            any(this.contextMenuData.menuItems, mi => !!mi.subMenuItems && mi.subMenuItems.length > 0)
         );
     }
 
@@ -77,10 +76,10 @@ export class ContextMenuContentComponent implements OnInit, AfterViewInit {
     }
 
     public onListItemMouseEnter(event: MouseEvent, menuItem: MenuItem): void {
-        this.currentMenuItem = menuItem;
-        this.menuPopupRef?.close();
-        if (this.currentMenuItem.subMenuItems && this.currentMenuItem.subMenuItems.length > 0) {
-            this.create(event.target as HTMLElement, this.currentMenuItem);
+        this.#currentMenuItem = menuItem;
+        this.menuPopupRef()?.close();
+        if (this.#currentMenuItem.subMenuItems && this.#currentMenuItem.subMenuItems.length > 0) {
+            this.create(event.target as HTMLElement, this.#currentMenuItem);
         }
     }
 
@@ -103,33 +102,34 @@ export class ContextMenuContentComponent implements OnInit, AfterViewInit {
     }
 
     private create(anchor: HTMLElement, menuItem: MenuItem, viaKeyboard?: boolean): void {
-        this.contextMenuInjectorData.menuItems = menuItem.subMenuItems;
-        this.contextMenuInjectorData.menuClick = this.contextMenuData.menuClick;
-        this.contextMenuInjectorData.navigate = this.contextMenuData.navigate;
+        this.#contextMenuInjectorData.menuItems = menuItem.subMenuItems;
+        this.#contextMenuInjectorData.menuClick = this.contextMenuData.menuClick;
+        this.#contextMenuInjectorData.navigate = this.contextMenuData.navigate;
         const popupClasses = this.contextMenuData.popupClass
             ? Array.isArray(this.contextMenuData.popupClass)
                 ? this.contextMenuData.popupClass
                 : [this.contextMenuData.popupClass]
             : [];
-        this.contextMenuInjectorData.popupClass = popupClasses;
-        this.menuPopupRef = this.#contextMenuService.open({
+        this.#contextMenuInjectorData.popupClass = popupClasses;
+        const popupRef = this.#contextMenuService.open({
             anchor,
             closeOnOutsideClick: true,
             content: ContextMenuContentComponent,
-            data: this.contextMenuInjectorData,
+            data: this.#contextMenuInjectorData,
             positions: this.#contextMenuService.defaultSubMenuPositions,
             popupClass: ["mona-contextmenu-content", ...popupClasses]
         });
-        this.contextMenuInjectorData.parentMenuRef = this.menuPopupRef;
-        this.contextMenuInjectorData.viaKeyboard = viaKeyboard;
-        this.contextMenuInjectorData.subMenuClose = new Subject<void>();
+        this.menuPopupRef.set(popupRef);
+        this.#contextMenuInjectorData.parentMenuRef = popupRef;
+        this.#contextMenuInjectorData.viaKeyboard = viaKeyboard;
+        this.#contextMenuInjectorData.subMenuClose = new Subject<void>();
         if (this.contextMenuData.parentMenuRef) {
             const subscription = this.contextMenuData.parentMenuRef.closed.subscribe(() => {
-                this.menuPopupRef?.close();
+                this.menuPopupRef()?.close();
                 subscription.unsubscribe();
             });
         }
-        this.contextMenuInjectorData.subMenuClose.subscribe(() => {
+        this.#contextMenuInjectorData.subMenuClose.subscribe(() => {
             this.focus();
         });
     }
@@ -163,7 +163,7 @@ export class ContextMenuContentComponent implements OnInit, AfterViewInit {
             this.keyManager.activeItem.menuItem.subMenuItems &&
             this.keyManager.activeItem.menuItem.subMenuItems.length > 0
         ) {
-            this.menuPopupRef?.close();
+            this.menuPopupRef()?.close();
             const previousItem = this.keyManager.activeItem;
             if (this.keyManager.activeItem) {
                 this.create(
@@ -228,7 +228,6 @@ export class ContextMenuContentComponent implements OnInit, AfterViewInit {
                 )
             )
             .subscribe(event => {
-                this.activeItemIndex = this.keyManager.activeItemIndex ?? -1;
                 switch (event.key) {
                     case "ArrowDown":
                     case "ArrowUp":

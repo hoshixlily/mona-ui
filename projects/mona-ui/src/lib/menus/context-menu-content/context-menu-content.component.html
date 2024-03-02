@@ -5,9 +5,9 @@
                 [ngClass]="{'mona-disabled': menuItem.disabled, 'divider': menuItem.divider, 'mona-focused': keyManager?.activeItem?.menuItem === menuItem}"
                 (mouseenter)="onListItemMouseEnter($event, menuItem)"
                 (click)="onListItemClick($event, menuItem)">
-                <mona-contextmenu-item [menuItem]="menuItem" [iconSpaceVisible]="iconSpaceVisible"
-                                       [linkSpaceVisible]="linkSpaceVisible"
-                                       [submenuPopupRef]="menuPopupRef" [attr.tabindex]="0">
+                <mona-contextmenu-item [menuItem]="menuItem" [iconSpaceVisible]="iconSpaceVisible()"
+                                       [linkSpaceVisible]="linkSpaceVisible()"
+                                       [submenuPopupRef]="menuPopupRef()" [attr.tabindex]="0">
                 </mona-contextmenu-item>
             </li>
         }
