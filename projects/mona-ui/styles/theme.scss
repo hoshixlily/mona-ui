@@ -1711,17 +1711,37 @@ ul.mona-contextmenu-list {
 
 
 /** Notification */
-div.mona-notification-container {
+.mona-notification-container {
+    position: absolute;
+    padding: 10px;
+    z-index: 40000;
+    overflow: hidden;
+    &.bottomleft {
+        bottom: 0;
+        left: 0;
+    }
+    &.bottomright {
+        bottom: 0;
+        right: 0;
+    }
+    &.topleft {
+        top: 0;
+        left: 0;
+    }
+    &.topright {
+        top: 0;
+        right: 0;
+    }
     @include font-medium;
 }
 
-div.mona-notification-icon {
+.mona-notification-icon {
     & fa-icon svg {
         font-size: 20px;
     }
 }
 
-div.mona-notification-progress {
+.mona-notification-progress {
     & .mona-progress-bar {
         border: none;
     }

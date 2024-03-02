@@ -1,3 +1,4 @@
+import { signal } from "@angular/core";
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { Subject } from "rxjs";
@@ -19,9 +20,9 @@ describe("NotificationComponent", () => {
         notificationData = {
             componentDestroy$: new Subject<string>(),
             options: {},
-            visible: true
+            visible: signal(true)
         };
-        component.data = notificationData;
+        fixture.componentRef.setInput("data", notificationData);
         fixture.detectChanges();
     });
 

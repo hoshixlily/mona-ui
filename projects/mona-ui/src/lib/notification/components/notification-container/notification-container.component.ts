@@ -1,5 +1,5 @@
-import { NgClass, NgFor } from "@angular/common";
-import { Component } from "@angular/core";
+import { NgClass } from "@angular/common";
+import { ChangeDetectionStrategy, Component, computed, Signal, signal, WritableSignal } from "@angular/core";
 import { NotificationData } from "../../models/NotificationData";
 import { NotificationPosition } from "../../models/NotificationPosition";
 import { NotificationComponent } from "../notification/notification.component";
@@ -9,15 +9,17 @@ import { NotificationComponent } from "../notification/notification.component";
     templateUrl: "./notification-container.component.html",
     styleUrls: ["./notification-container.component.scss"],
     standalone: true,
-    imports: [NgClass, NgFor, NotificationComponent]
+    imports: [NgClass, NotificationComponent],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    host: {
+        class: "mona-notification-container",
+        "[class]": "positionClass()"
+    }
 })
 export class NotificationContainerComponent {
-    public notificationDataList: NotificationData[] = [];
-    public position: NotificationPosition = "topright";
-
-    public constructor() {}
-
-    public trackByFn(index: number, item: NotificationData): string {
-        return item.options.id as string;
-    }
+    protected readonly positionClass: Signal<string> = computed(() => {
+        return this.position() as string;
+    });
+    public readonly notificationDataList: WritableSignal<NotificationData[]> = signal([]);
+    public readonly position: WritableSignal<NotificationPosition> = signal("topright");
 }

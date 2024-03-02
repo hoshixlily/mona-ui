@@ -1,5 +1,16 @@
-import { NgIf, NgStyle, NgTemplateOutlet } from "@angular/common";
-import { Component, Input, OnDestroy, OnInit, signal, WritableSignal } from "@angular/core";
+import { NgStyle, NgTemplateOutlet } from "@angular/common";
+import {
+    ChangeDetectionStrategy,
+    Component,
+    computed,
+    input,
+    InputSignal,
+    OnDestroy,
+    OnInit,
+    Signal,
+    signal,
+    WritableSignal
+} from "@angular/core";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import {
     faCheckCircle,
@@ -21,48 +32,53 @@ import { NotificationType } from "../../models/NotificationType";
     styleUrls: ["./notification.component.scss"],
     animations: [NotificationSlide, NotificationFade],
     standalone: true,
-    imports: [NgIf, FontAwesomeModule, NgTemplateOutlet, NgStyle, ProgressBarComponent]
+    imports: [FontAwesomeModule, NgTemplateOutlet, NgStyle, ProgressBarComponent],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    host: {
+        class: "mona-notification"
+    }
 })
 export class NotificationComponent implements OnInit, OnDestroy {
-    public readonly closeIcon: IconDefinition = faTimes;
-    public readonly errorIcon: IconDefinition = faTimesCircle;
-    public readonly infoIcon: IconDefinition = faInfoCircle;
-    public readonly successIcon: IconDefinition = faCheckCircle;
-    public readonly warningIcon: IconDefinition = faExclamationCircle;
-    public readonly progressValue: WritableSignal<number> = signal<number>(100);
-    public type: NotificationType = "info";
-
-    @Input({ required: true })
-    public data!: NotificationData;
+    protected readonly closeIcon: IconDefinition = faTimes;
+    protected readonly errorIcon: IconDefinition = faTimesCircle;
+    protected readonly infoIcon: IconDefinition = faInfoCircle;
+    protected readonly progressColor: Signal<string> = computed(() => {
+        const type = this.type();
+        const propertyName = `--mona-${type}`;
+        return getComputedStyle(document.documentElement).getPropertyValue(propertyName);
+    });
+    protected readonly progressValue: WritableSignal<number> = signal(100);
+    protected readonly successIcon: IconDefinition = faCheckCircle;
+    protected readonly type: WritableSignal<NotificationType> = signal("info");
+    protected readonly warningIcon: IconDefinition = faExclamationCircle;
+    public data: InputSignal<NotificationData> = input.required<NotificationData>();
 
     public close(): void {
-        this.data.visible = false;
-        this.data.componentDestroy$.next(this.data.options.id as string);
+        this.data().visible.set(false);
+        window.setTimeout(() => this.data().componentDestroy$.next(this.data().options.id as string), 300);
     }
 
     public ngOnDestroy(): void {
-        this.data.componentDestroy$.next(this.data.options.id as string);
+        this.data().componentDestroy$.next(this.data().options.id as string);
     }
 
     public ngOnInit(): void {
-        if (this.data.options?.duration) {
-            const progressInterval = this.data.options.duration / 100;
+        const duration = this.data().options.duration;
+        if (duration != null) {
+            const progressInterval = duration / 100;
             interval(progressInterval)
                 .pipe(takeWhile(() => this.progressValue() > 0))
                 .subscribe({
                     next: () => {
                         this.progressValue.set(this.progressValue() - 1);
                         if (this.progressValue() === 0) {
-                            asyncScheduler.schedule(() => this.close(), 350); // wait for animation
+                            asyncScheduler.schedule(() => {
+                                this.close();
+                            }, 300);
                         }
                     }
                 });
         }
-        this.type = this.data.options.type ?? "info";
-    }
-
-    public get progressColor(): string {
-        const propertyName = `--mona-${this.type}`;
-        return getComputedStyle(document.documentElement).getPropertyValue(propertyName);
+        this.type.set(this.data().options.type ?? "info");
     }
 }
