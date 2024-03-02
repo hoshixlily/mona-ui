@@ -771,14 +771,6 @@ mona-filter-input.mona-popup-filter-input,
     color: var(--mona-text);
     @include font-medium;
     border-radius: var(--mona-border-radius);
-    & mona-pager {
-        & .mona-pager {
-            border: none;
-            border-top: 1px solid var(--mona-border-color);
-            border-top-left-radius: 0;
-            border-top-right-radius: 0;
-        }
-    }
 }
 
 .mona-grid-list {
@@ -1749,6 +1741,8 @@ ul.mona-contextmenu-list {
 
 /** Pager */
 .mona-pager {
+    display: flex;
+    padding: 5px 10px;
     background: var(--mona-background);
     border: 1px solid var(--mona-border-color);
     border-radius: var(--mona-border-radius);

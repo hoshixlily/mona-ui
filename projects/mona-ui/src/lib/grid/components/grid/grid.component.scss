@@ -92,3 +92,10 @@ mona-grid-list {
     top: 0;
     bottom: 0;
 }
+
+mona-pager {
+    border: none;
+    border-top: 1px solid var(--mona-border-color);
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}

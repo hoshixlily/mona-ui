@@ -32,7 +32,7 @@ describe("PagerComponent", () => {
     });
 
     it("should have a default total pages of 0", () => {
-        expect(component.totalPages()).toEqual(0);
+        expect(component.total()).toEqual(0);
     });
 
     it("should render first and last page buttons if firstLast is true", () => {
@@ -121,8 +121,8 @@ describe("PagerComponent", () => {
 
         // skipped 50 pages, so we are on page 11
         // visiblePageCount is 7, so we should see pages 8-14
-        expect(middlePartFirstPage.textContent).toEqual("8");
-        expect(middlePartLastPage.textContent).toEqual("14");
+        expect(middlePartFirstPage.textContent?.trim()).toEqual("8");
+        expect(middlePartLastPage.textContent?.trim()).toEqual("14");
     });
     it("should go back visiblePages number of pages when the previous jump button is clicked", () => {
         setupBigPager(fixture, 100);
@@ -134,8 +134,8 @@ describe("PagerComponent", () => {
         let middlePartFirstPage = prevPage.nextElementSibling?.nextElementSibling?.nextElementSibling as HTMLLIElement;
         let middlePartLastPage = nextPage.previousElementSibling?.previousElementSibling
             ?.previousElementSibling as HTMLLIElement;
-        expect(middlePartFirstPage.textContent).toEqual("18");
-        expect(middlePartLastPage.textContent).toEqual("24");
+        expect(middlePartFirstPage.textContent?.trim()).toEqual("18");
+        expect(middlePartLastPage.textContent?.trim()).toEqual("24");
 
         const jumpBackButton = middlePartFirstPage.previousElementSibling?.firstElementChild as HTMLButtonElement;
         jumpBackButton.click();
@@ -145,8 +145,8 @@ describe("PagerComponent", () => {
         middlePartLastPage = nextPage.previousElementSibling?.previousElementSibling
             ?.previousElementSibling as HTMLLIElement;
 
-        expect(middlePartFirstPage.textContent).toEqual("11");
-        expect(middlePartLastPage.textContent).toEqual("17");
+        expect(middlePartFirstPage.textContent?.trim()).toEqual("11");
+        expect(middlePartLastPage.textContent?.trim()).toEqual("17");
     });
 
     it("should go forward visiblePages number of pages when the next jump button is clicked", () => {
@@ -159,8 +159,8 @@ describe("PagerComponent", () => {
         let middlePartFirstPage = prevPage.nextElementSibling?.nextElementSibling?.nextElementSibling as HTMLLIElement;
         let middlePartLastPage = nextPage.previousElementSibling?.previousElementSibling
             ?.previousElementSibling as HTMLLIElement;
-        expect(middlePartFirstPage.textContent).toEqual("18");
-        expect(middlePartLastPage.textContent).toEqual("24");
+        expect(middlePartFirstPage.textContent?.trim()).toEqual("18");
+        expect(middlePartLastPage.textContent?.trim()).toEqual("24");
 
         const jumpForwardButton = middlePartLastPage.nextElementSibling?.firstElementChild as HTMLButtonElement;
         jumpForwardButton.click();
@@ -170,8 +170,8 @@ describe("PagerComponent", () => {
         middlePartLastPage = nextPage.previousElementSibling?.previousElementSibling
             ?.previousElementSibling as HTMLLIElement;
 
-        expect(middlePartFirstPage.textContent).toEqual("25");
-        expect(middlePartLastPage.textContent).toEqual("31");
+        expect(middlePartFirstPage.textContent?.trim()).toEqual("25");
+        expect(middlePartLastPage.textContent?.trim()).toEqual("31");
     });
 
     it("should set the data of the dropdown list of page sizes", fakeAsync(() => {

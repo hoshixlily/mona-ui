@@ -1,13 +1,4 @@
-:host {
-    display: block;
-}
-
-div.mona-pager {
-    display: flex;
-    padding: 5px 10px;
-}
-
-ol.mona-pager-list {
+.mona-pager-list {
     display: flex;
     & li {
         list-style: none;
@@ -26,7 +17,7 @@ mona-drop-down-list {
     margin: 0 5px;
 }
 
-div.mona-pager-input {
+.mona-pager-input {
     display: flex;
     align-items: center;
     & mona-numeric-text-box {
@@ -38,7 +29,7 @@ div.mona-pager-input {
     }
 }
 
-div.mona-pager-info {
+.mona-pager-info {
     display: flex;
     align-items: center;
     justify-content: flex-end;
