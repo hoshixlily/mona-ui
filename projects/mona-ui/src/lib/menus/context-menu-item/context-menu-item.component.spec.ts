@@ -19,7 +19,7 @@ describe("ContextMenuItemComponent", () => {
         menuItem = {
             parent: null
         };
-        component.menuItem = menuItem;
+        fixture.componentRef.setInput("menuItem", menuItem);
         fixture.detectChanges();
     });
 

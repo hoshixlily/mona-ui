@@ -28,10 +28,8 @@ export class ContextMenuItemComponent implements OnDestroy, Highlightable {
     public readonly elementRef: ElementRef<HTMLElement> = inject(ElementRef);
     public iconSpaceVisible: InputSignal<boolean> = input(false);
     public linkSpaceVisible: InputSignal<boolean> = input(false);
+    public menuItem: InputSignal<MenuItem> = input.required<MenuItem>();
     public submenuPopupRef: InputSignal<PopupRef | null> = input<PopupRef | null>(null);
-
-    @Input()
-    public menuItem!: MenuItem;
 
     public ngOnDestroy(): void {
         this.submenuPopupRef()?.close();

@@ -1,29 +1,29 @@
-@if (menuItem.divider) {
+@if (menuItem().divider) {
     <span class="divider"></span>
 } @else {
     <div class="mona-contextmenu-item">
         @if (iconSpaceVisible()) {
             <div class="mona-contextmenu-item-icon">
-                @if (menuItem.iconTemplate) {
-                    <ng-container [ngTemplateOutlet]="menuItem.iconTemplate"
-                                  [ngTemplateOutletContext]="{$implicit: menuItem}"></ng-container>
-                } @else if (menuItem.iconClass && !menuItem.iconTemplate) {
-                    <span [ngClass]="menuItem.iconClass"></span>
+                @if (menuItem().iconTemplate) {
+                    <ng-container [ngTemplateOutlet]="menuItem().iconTemplate??null"
+                                  [ngTemplateOutletContext]="{$implicit: menuItem()}"></ng-container>
+                } @else if (menuItem().iconClass && !menuItem().iconTemplate) {
+                    <span [ngClass]="menuItem().iconClass"></span>
                 }
             </div>
         }
         <div class="mona-contextmenu-item-text" [ngClass]="{'icon-visible': iconSpaceVisible()}">
-            @if (menuItem.textTemplate) {
-                <ng-container [ngTemplateOutlet]="menuItem.textTemplate"
-                              [ngTemplateOutletContext]="{$implicit: menuItem}"></ng-container>
+            @if (menuItem().textTemplate) {
+                <ng-container [ngTemplateOutlet]="menuItem().textTemplate??null"
+                              [ngTemplateOutletContext]="{$implicit: menuItem()}"></ng-container>
             } @else {
-                <span>{{ menuItem.text }}</span>
+                <span>{{ menuItem().text }}</span>
             }
 
         </div>
         @if (linkSpaceVisible()) {
             <div class="mona-contextmenu-item-link">
-                @if (menuItem.subMenuItems && menuItem.subMenuItems.length !== 0) {
+                @if (menuItem().subMenuItems && menuItem().subMenuItems?.length !== 0) {
                     <span>
                         <fa-icon [icon]="linkIcon"></fa-icon>
                     </span>

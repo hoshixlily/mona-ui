@@ -2,7 +2,7 @@
     @for (menuItem of contextMenuData.menuItems; track menuItem) {
         @if (menuItem.visible ?? true) {
             <li class="mona-contextmenu-list-item"
-                [ngClass]="{'mona-disabled': menuItem.disabled, 'divider': menuItem.divider, 'mona-focused': keyManager?.activeItem?.menuItem === menuItem}"
+                [ngClass]="{'mona-disabled': menuItem.disabled, 'divider': menuItem.divider, 'mona-focused': keyManager?.activeItem?.menuItem() === menuItem}"
                 (mouseenter)="onListItemMouseEnter($event, menuItem)"
                 (click)="onListItemClick($event, menuItem)">
                 <mona-contextmenu-item [menuItem]="menuItem" [iconSpaceVisible]="iconSpaceVisible()"

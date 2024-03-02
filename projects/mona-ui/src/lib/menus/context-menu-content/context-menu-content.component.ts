@@ -51,7 +51,10 @@ export class ContextMenuContentComponent implements OnInit, AfterViewInit {
         this.animateEnter();
         this.keyManager = new ActiveDescendantKeyManager<ContextMenuItemComponent>(this.contextMenuItemComponents)
             .withWrap()
-            .skipPredicate(mi => !!mi.menuItem.disabled || !!mi.menuItem.divider);
+            .skipPredicate(mi => {
+                const menuItem = mi.menuItem();
+                return menuItem.disabled || !!menuItem.divider;
+            });
         this.setEventListeners();
         this.focus();
         if (!this.contextMenuData.isRoot && this.contextMenuData.viaKeyboard) {
@@ -144,13 +147,13 @@ export class ContextMenuContentComponent implements OnInit, AfterViewInit {
             this.contextMenuData.parentMenuRef?.close();
             this.contextMenuData.subMenuClose?.next();
             this.contextMenuData.navigate.emit({
-                previousItem: this.keyManager.activeItem?.menuItem ?? null,
-                currentItem: this.keyManager.activeItem?.menuItem.parent ?? null,
+                previousItem: this.keyManager.activeItem?.menuItem() ?? null,
+                currentItem: this.keyManager.activeItem?.menuItem().parent ?? null,
                 direction: "left"
             });
         } else {
             this.contextMenuData.navigate.emit({
-                previousItem: this.keyManager.activeItem?.menuItem ?? null,
+                previousItem: this.keyManager.activeItem?.menuItem() ?? null,
                 currentItem: null,
                 direction: "left"
             });
@@ -158,29 +161,23 @@ export class ContextMenuContentComponent implements OnInit, AfterViewInit {
     }
 
     private handleArrowRightKey(): void {
-        if (
-            this.keyManager.activeItem?.menuItem &&
-            this.keyManager.activeItem.menuItem.subMenuItems &&
-            this.keyManager.activeItem.menuItem.subMenuItems.length > 0
-        ) {
+        const menuItem = this.keyManager.activeItem?.menuItem();
+        if (menuItem?.subMenuItems && menuItem.subMenuItems.length > 0) {
             this.menuPopupRef()?.close();
             const previousItem = this.keyManager.activeItem;
             if (this.keyManager.activeItem) {
-                this.create(
-                    this.keyManager.activeItem.elementRef.nativeElement,
-                    this.keyManager.activeItem.menuItem,
-                    true
-                );
+                this.create(this.keyManager.activeItem.elementRef.nativeElement, menuItem, true);
             }
             this.contextMenuData.navigate.emit({
-                previousItem: previousItem?.menuItem ?? null,
+                previousItem: previousItem?.menuItem() ?? null,
                 currentItem:
-                    this.keyManager.activeItem?.menuItem.subMenuItems?.find(mi => !mi.disabled && !mi.divider) ?? null,
+                    this.keyManager.activeItem?.menuItem().subMenuItems?.find(mi => !mi.disabled && !mi.divider) ??
+                    null,
                 direction: "right"
             });
         } else {
             this.contextMenuData.navigate.emit({
-                previousItem: this.keyManager.activeItem?.menuItem ?? null,
+                previousItem: menuItem ?? null,
                 currentItem: null,
                 direction: "right"
             });
@@ -188,16 +185,14 @@ export class ContextMenuContentComponent implements OnInit, AfterViewInit {
     }
 
     private handleInputKeys(): void {
-        if (this.keyManager.activeItem?.menuItem) {
-            if (
-                this.keyManager.activeItem.menuItem.subMenuItems &&
-                this.keyManager.activeItem.menuItem.subMenuItems.length > 0
-            ) {
+        const menuItem = this.keyManager.activeItem?.menuItem();
+        if (menuItem) {
+            if (menuItem.subMenuItems && menuItem.subMenuItems.length > 0) {
                 return;
             }
             if (this.keyManager.activeItem) {
-                this.keyManager.activeItem.menuItem.menuClick?.();
-                this.contextMenuData.menuClick?.next(this.keyManager.activeItem.menuItem);
+                this.keyManager.activeItem.menuItem().menuClick?.();
+                this.contextMenuData.menuClick?.next(this.keyManager.activeItem.menuItem());
             }
         }
     }
@@ -207,8 +202,8 @@ export class ContextMenuContentComponent implements OnInit, AfterViewInit {
         this.keyManager.onKeydown(event);
         if (this.keyManager.activeItem !== previousItem) {
             this.contextMenuData.navigate.emit({
-                previousItem: previousItem?.menuItem ?? null,
-                currentItem: this.keyManager.activeItem?.menuItem ?? null,
+                previousItem: previousItem?.menuItem() ?? null,
+                currentItem: this.keyManager.activeItem?.menuItem() ?? null,
                 direction: event.key === "ArrowDown" ? "down" : "up"
             });
         }
