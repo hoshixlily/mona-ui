@@ -12,6 +12,7 @@ import {
     QueryList,
     ViewChildren
 } from "@angular/core";
+import { any } from "@mirei/ts-collections";
 import { filter, fromEvent, Subject } from "rxjs";
 import { AnimationService } from "../../animations/services/animation.service";
 import { PopupDataInjectionToken } from "../../popup/models/PopupInjectionToken";
@@ -60,9 +61,10 @@ export class ContextMenuContentComponent implements OnInit, AfterViewInit {
     }
 
     public ngOnInit(): void {
-        this.iconSpaceVisible = this.contextMenuData.menuItems.some(mi => mi.iconClass || mi.iconTemplate);
-        this.linkSpaceVisible = this.contextMenuData.menuItems.some(
-            mi => mi.subMenuItems && mi.subMenuItems.length > 0
+        this.iconSpaceVisible = any(this.contextMenuData.menuItems, mi => !!mi.iconClass || !!mi.iconTemplate);
+        this.linkSpaceVisible = any(
+            this.contextMenuData.menuItems,
+            mi => !!mi.subMenuItems && mi.subMenuItems.length > 0
         );
     }
 

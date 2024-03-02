@@ -7,7 +7,7 @@ import { ContextMenuNavigationEvent } from "./ContextMenuNavigationEvent";
 export interface ContextMenuInjectorData {
     isRoot?: boolean;
     menuClick?: Subject<MenuItem>;
-    menuItems: MenuItem[];
+    menuItems: Iterable<MenuItem>;
     navigate: EventEmitter<ContextMenuNavigationEvent>;
     parentMenuRef?: PopupRef;
     popupClass?: string | string[];
