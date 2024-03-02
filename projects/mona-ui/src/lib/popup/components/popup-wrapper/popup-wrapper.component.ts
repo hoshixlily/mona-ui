@@ -1,11 +1,10 @@
+import { NgClass, NgTemplateOutlet } from "@angular/common";
 import {
     AfterViewInit,
     ChangeDetectionStrategy,
     Component,
     ElementRef,
-    Host,
-    HostBinding,
-    Inject,
+    inject,
     OnInit,
     signal,
     TemplateRef,
@@ -13,7 +12,6 @@ import {
 } from "@angular/core";
 import { PopupSettingsInjectionToken } from "../../models/PopupInjectionToken";
 import { PopupSettings } from "../../models/PopupSettings";
-import { NgClass, NgTemplateOutlet } from "@angular/common";
 
 @Component({
     selector: "mona-popup-wrapper",
@@ -21,36 +19,30 @@ import { NgClass, NgTemplateOutlet } from "@angular/common";
     styleUrls: ["./popup-wrapper.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone: true,
-    imports: [NgClass, NgTemplateOutlet]
+    imports: [NgClass, NgTemplateOutlet],
+    host: {
+        class: "mona-popup-wrapper"
+    }
 })
 export class PopupWrapperComponent implements OnInit, AfterViewInit {
-    public templateRef: TemplateRef<any> | null = null;
+    readonly #popupSettings: PopupSettings = inject<PopupSettings>(PopupSettingsInjectionToken);
+    readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
+    public readonly templateRef: WritableSignal<TemplateRef<any> | null> = signal(null);
     public visible: WritableSignal<boolean> = signal(false);
     public wrapperClass: WritableSignal<string> = signal("");
 
-    @HostBinding("class.mona-popup-wrapper")
-    protected get hostClass(): boolean {
-        return true;
-    }
-
-    public constructor(
-        @Inject(PopupSettingsInjectionToken)
-        private readonly popupSettings: PopupSettings,
-        private readonly host: ElementRef<HTMLElement>
-    ) {}
-
     public ngAfterViewInit(): void {
         if (this.wrapperClass()) {
-            this.host.nativeElement.classList.add(this.wrapperClass());
+            this.#hostElementRef.nativeElement.classList.add(this.wrapperClass());
         }
     }
 
     public ngOnInit(): void {
-        if (this.popupSettings.popupWrapperClass != null) {
-            if (this.popupSettings.popupWrapperClass instanceof Array) {
-                this.wrapperClass.set(this.popupSettings.popupWrapperClass.join(" "));
+        if (this.#popupSettings.popupWrapperClass != null) {
+            if (this.#popupSettings.popupWrapperClass instanceof Array) {
+                this.wrapperClass.set(this.#popupSettings.popupWrapperClass.join(" "));
             } else {
-                this.wrapperClass.set(this.popupSettings.popupWrapperClass);
+                this.wrapperClass.set(this.#popupSettings.popupWrapperClass);
             }
         }
     }
