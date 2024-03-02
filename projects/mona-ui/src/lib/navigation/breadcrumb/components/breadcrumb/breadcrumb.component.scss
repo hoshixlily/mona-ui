@@ -1,4 +1,4 @@
-ol.mona-breadcrumb {
+.mona-breadcrumb-list {
     display: flex;
     overflow: hidden;
     list-style: none;
@@ -13,10 +13,10 @@ ol.mona-breadcrumb {
     }
 }
 
-li.mona-breadcrumb-item {
+.mona-breadcrumb-item {
     cursor: pointer;
 }
 
-span.mona-breadcrumb-separator-icon {
+.mona-breadcrumb-separator-icon {
     margin: 0 12px;
 }

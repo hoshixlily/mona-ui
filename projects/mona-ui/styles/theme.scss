@@ -1698,7 +1698,7 @@ ul.mona-contextmenu-list {
 /** Navigation */
 
 /** Breadcrumb */
-ol.mona-breadcrumb {
+.mona-breadcrumb {
     color: var(--mona-text);
     @include font-medium;
 }
