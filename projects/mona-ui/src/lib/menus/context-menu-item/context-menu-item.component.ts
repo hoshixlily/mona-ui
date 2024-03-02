@@ -1,6 +1,6 @@
 import { Highlightable } from "@angular/cdk/a11y";
-import { NgClass, NgIf, NgTemplateOutlet } from "@angular/common";
-import { Component, ElementRef, Input, OnDestroy, OnInit } from "@angular/core";
+import { NgClass, NgTemplateOutlet } from "@angular/common";
+import { Component, ElementRef, inject, Input, OnDestroy, OnInit } from "@angular/core";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { faChevronRight, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { PopupRef } from "../../popup/models/PopupRef";
@@ -11,10 +11,11 @@ import { MenuItem } from "../models/MenuItem";
     templateUrl: "./context-menu-item.component.html",
     styleUrls: ["./context-menu-item.component.scss"],
     standalone: true,
-    imports: [NgIf, NgClass, NgTemplateOutlet, FontAwesomeModule]
+    imports: [NgClass, NgTemplateOutlet, FontAwesomeModule]
 })
 export class ContextMenuItemComponent implements OnInit, OnDestroy, Highlightable {
-    public readonly linkIcon: IconDefinition = faChevronRight;
+    protected readonly linkIcon: IconDefinition = faChevronRight;
+    public readonly elementRef: ElementRef<HTMLElement> = inject(ElementRef);
 
     @Input()
     public iconSpaceVisible: boolean = false;
@@ -27,8 +28,6 @@ export class ContextMenuItemComponent implements OnInit, OnDestroy, Highlightabl
 
     @Input()
     public submenuPopupRef?: PopupRef | null;
-
-    public constructor(public readonly elementRef: ElementRef<HTMLElement>) {}
 
     public ngOnDestroy(): void {
         this.submenuPopupRef?.close();

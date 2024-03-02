@@ -28,11 +28,12 @@ import { ContextMenuService } from "../services/context-menu.service";
 
 @Component({
     selector: "mona-contextmenu",
-    templateUrl: "./context-menu.component.html",
-    styleUrls: ["./context-menu.component.scss"],
+    template: "",
+    styleUrls: [],
     standalone: true
 })
 export class ContextMenuComponent implements OnInit, AfterContentInit {
+    readonly #contextMenuService: ContextMenuService = inject(ContextMenuService);
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     private contextMenuInjectorData: Partial<ContextMenuInjectorData> = { isRoot: true };
     private contextMenuRef: PopupRef | null = null;
@@ -72,8 +73,6 @@ export class ContextMenuComponent implements OnInit, AfterContentInit {
 
     @Input()
     public width?: number | string;
-
-    public constructor(private readonly contextMenuService: ContextMenuService) {}
 
     public closeMenu(): void {
         this.contextMenuRef?.close();
@@ -116,7 +115,7 @@ export class ContextMenuComponent implements OnInit, AfterContentInit {
         } else {
             anchor = anchorElement;
         }
-        this.contextMenuRef = this.contextMenuService.open({
+        this.contextMenuRef = this.#contextMenuService.open({
             anchor,
             closeOnOutsideClick: true,
             content: ContextMenuContentComponent,

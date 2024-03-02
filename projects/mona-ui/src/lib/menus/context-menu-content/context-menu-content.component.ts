@@ -1,11 +1,12 @@
 import { ActiveDescendantKeyManager } from "@angular/cdk/a11y";
-import { NgClass, NgFor, NgIf } from "@angular/common";
+import { NgClass } from "@angular/common";
 import {
     AfterViewInit,
     ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
     ElementRef,
+    inject,
     Inject,
     OnInit,
     QueryList,
@@ -26,10 +27,15 @@ import { ContextMenuService } from "../services/context-menu.service";
     styleUrls: ["./context-menu-content.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone: true,
-    imports: [NgFor, NgIf, NgClass, ContextMenuItemComponent]
+    imports: [NgClass, ContextMenuItemComponent]
 })
 export class ContextMenuContentComponent implements OnInit, AfterViewInit {
+    readonly #animationService: AnimationService = inject(AnimationService);
+    readonly #cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
+    readonly #contextMenuService: ContextMenuService = inject(ContextMenuService);
+    readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
     private contextMenuInjectorData: Partial<ContextMenuInjectorData> = { isRoot: false };
+    public readonly contextMenuData: ContextMenuInjectorData = inject<ContextMenuInjectorData>(PopupDataInjectionToken);
     public activeItemIndex: number = -1;
     public currentMenuItem: MenuItem | null = null;
     public iconSpaceVisible: boolean = false;
@@ -40,14 +46,6 @@ export class ContextMenuContentComponent implements OnInit, AfterViewInit {
     @ViewChildren(ContextMenuItemComponent)
     private contextMenuItemComponents: QueryList<ContextMenuItemComponent> = new QueryList<ContextMenuItemComponent>();
 
-    public constructor(
-        private readonly animationService: AnimationService,
-        private readonly cdr: ChangeDetectorRef,
-        @Inject(PopupDataInjectionToken) public contextMenuData: ContextMenuInjectorData,
-        private readonly contextMenuService: ContextMenuService,
-        private readonly elementRef: ElementRef<HTMLElement>
-    ) {}
-
     public ngAfterViewInit(): void {
         this.animateEnter();
         this.keyManager = new ActiveDescendantKeyManager<ContextMenuItemComponent>(this.contextMenuItemComponents)
@@ -57,7 +55,7 @@ export class ContextMenuContentComponent implements OnInit, AfterViewInit {
         this.focus();
         if (!this.contextMenuData.isRoot && this.contextMenuData.viaKeyboard) {
             this.keyManager.setFirstItemActive();
-            this.cdr.detectChanges();
+            this.#cdr.detectChanges();
         }
     }
 
@@ -85,15 +83,15 @@ export class ContextMenuContentComponent implements OnInit, AfterViewInit {
     }
 
     private animateEnter(): void {
-        this.animationService.animate({
-            element: this.elementRef.nativeElement.firstElementChild as HTMLElement,
+        this.#animationService.animate({
+            element: this.#hostElementRef.nativeElement.firstElementChild as HTMLElement,
             duration: 150,
             startStyles: { transform: "translateY(-100%)", opacity: 1 },
             endStyles: { transform: "translateY(0)", opacity: 1 },
             timingFunction: "ease-out"
         });
-        this.animationService.animate({
-            element: this.elementRef.nativeElement.parentElement as HTMLElement,
+        this.#animationService.animate({
+            element: this.#hostElementRef.nativeElement.parentElement as HTMLElement,
             duration: 150,
             delay: 100,
             startStyles: { boxShadow: "none" },
@@ -112,12 +110,12 @@ export class ContextMenuContentComponent implements OnInit, AfterViewInit {
                 : [this.contextMenuData.popupClass]
             : [];
         this.contextMenuInjectorData.popupClass = popupClasses;
-        this.menuPopupRef = this.contextMenuService.open({
+        this.menuPopupRef = this.#contextMenuService.open({
             anchor,
             closeOnOutsideClick: true,
             content: ContextMenuContentComponent,
             data: this.contextMenuInjectorData,
-            positions: this.contextMenuService.defaultSubMenuPositions,
+            positions: this.#contextMenuService.defaultSubMenuPositions,
             popupClass: ["mona-contextmenu-content", ...popupClasses]
         });
         this.contextMenuInjectorData.parentMenuRef = this.menuPopupRef;
@@ -135,7 +133,7 @@ export class ContextMenuContentComponent implements OnInit, AfterViewInit {
     }
 
     private focus(): void {
-        const listElement = this.elementRef.nativeElement.querySelector("ul:first-child") as HTMLUListElement;
+        const listElement = this.#hostElementRef.nativeElement.querySelector("ul:first-child") as HTMLUListElement;
         listElement?.focus();
     }
 
@@ -215,7 +213,7 @@ export class ContextMenuContentComponent implements OnInit, AfterViewInit {
     }
 
     private setEventListeners(): void {
-        fromEvent<KeyboardEvent>(this.elementRef.nativeElement, "keydown")
+        fromEvent<KeyboardEvent>(this.#hostElementRef.nativeElement, "keydown")
             .pipe(
                 filter(
                     e =>
@@ -245,7 +243,7 @@ export class ContextMenuContentComponent implements OnInit, AfterViewInit {
                         this.handleArrowLeftKey();
                         break;
                 }
-                this.cdr.markForCheck();
+                this.#cdr.markForCheck();
             });
     }
 }
