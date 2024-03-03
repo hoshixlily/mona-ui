@@ -1,4 +1,4 @@
-import { NgClass, NgIf, NgTemplateOutlet } from "@angular/common";
+import { NgClass, NgTemplateOutlet } from "@angular/common";
 import {
     ChangeDetectionStrategy,
     Component,
@@ -64,7 +64,6 @@ import { DropDownListValueTemplateDirective } from "../../directives/drop-down-l
     standalone: true,
     imports: [
         NgClass,
-        NgIf,
         NgTemplateOutlet,
         FormsModule,
         FontAwesomeModule,

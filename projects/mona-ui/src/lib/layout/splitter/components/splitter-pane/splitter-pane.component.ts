@@ -1,14 +1,17 @@
 import {
     ChangeDetectionStrategy,
     Component,
+    effect,
     ElementRef,
     EventEmitter,
-    Input,
-    OnInit,
+    input,
+    InputSignal,
+    model,
+    ModelSignal,
     Output,
     signal,
     TemplateRef,
-    ViewChild,
+    viewChild,
     WritableSignal
 } from "@angular/core";
 import { v4 } from "uuid";
@@ -20,45 +23,37 @@ import { v4 } from "uuid";
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone: true
 })
-export class SplitterPaneComponent implements OnInit {
+export class SplitterPaneComponent {
+    public readonly paneSize: WritableSignal<string | undefined> = signal<string | undefined>(undefined);
+    public readonly templateRef = viewChild.required(TemplateRef);
     public readonly uid: string = v4();
-    public paneSize: WritableSignal<string | undefined> = signal<string | undefined>(undefined);
-    public isStatic = false;
+    public isStatic: WritableSignal<boolean> = signal(false);
 
-    @Input()
-    public collapsed: boolean = false;
-
-    @Output()
-    public collapsedChange: EventEmitter<boolean> = new EventEmitter<boolean>();
-
-    @Input()
-    public collapsible: boolean = false;
-
-    @Input()
-    public element!: HTMLDivElement;
-
-    @Input()
-    public resizable: boolean = true;
-
-    @Input()
-    public set size(size: string | number | undefined) {
-        this.paneSize.set(size == null ? undefined : typeof size === "string" ? size : `${size}px`);
-        this.isStatic = true;
-    }
+    public collapsed: ModelSignal<boolean> = model(false);
+    public collapsible: InputSignal<boolean> = input(false);
+    public resizable: InputSignal<boolean> = input(true);
+    public size: InputSignal<string | number | undefined> = input<string | number | undefined>(undefined);
 
     @Output()
     public sizeChange: EventEmitter<string | undefined> = new EventEmitter<string | undefined>();
 
-    @ViewChild(TemplateRef)
-    public templateRef: TemplateRef<never> | null = null;
-
-    public constructor(public readonly elementRef: ElementRef<HTMLElement>) {}
-
-    public ngOnInit(): void {}
+    public constructor(public readonly elementRef: ElementRef<HTMLElement>) {
+        effect(
+            () => {
+                const size = this.size();
+                if (size == null) {
+                    this.paneSize.set(undefined);
+                } else {
+                    this.paneSize.set(typeof size === "string" ? size : `${size}px`);
+                    this.isStatic.set(true);
+                }
+            },
+            { allowSignalWrites: true }
+        );
+    }
 
     public setCollapsed(collapsed: boolean): void {
-        this.collapsed = collapsed;
-        this.collapsedChange.emit(collapsed);
+        this.collapsed.set(collapsed);
     }
 
     public setSize(size: string | number | undefined): void {

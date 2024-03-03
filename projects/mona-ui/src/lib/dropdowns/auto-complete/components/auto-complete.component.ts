@@ -1,4 +1,4 @@
-import { NgClass, NgIf, NgTemplateOutlet } from "@angular/common";
+import { NgClass, NgTemplateOutlet } from "@angular/common";
 import {
     Component,
     ContentChild,
@@ -63,7 +63,6 @@ import { AutoCompleteNoDataTemplateDirective } from "../directives/auto-complete
         NgClass,
         TextBoxDirective,
         FormsModule,
-        NgIf,
         FontAwesomeModule,
         NgTemplateOutlet,
         ListComponent,

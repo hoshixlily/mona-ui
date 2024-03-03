@@ -1,13 +1,14 @@
-import { NgClass, NgIf } from "@angular/common";
+import { NgClass } from "@angular/common";
 import {
     ChangeDetectionStrategy,
     Component,
+    computed,
     ElementRef,
-    Input,
-    OnChanges,
+    inject,
+    input,
+    InputSignal,
     OnInit,
-    QueryList,
-    SimpleChanges
+    Signal
 } from "@angular/core";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import {
@@ -29,138 +30,129 @@ import { SplitterPaneComponent } from "../splitter-pane/splitter-pane.component"
     styleUrls: ["./splitter-resizer.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone: true,
-    imports: [NgClass, NgIf, FontAwesomeModule]
+    imports: [NgClass, FontAwesomeModule]
 })
-export class SplitterResizerComponent implements OnInit, OnChanges {
-    public readonly horizontalCollapseNextIcon: IconDefinition = faCaretRight;
-    public readonly horizontalCollapsePreviousIcon: IconDefinition = faCaretLeft;
-    public readonly horizontalResizeIcon: IconDefinition = faEllipsisV;
-    public readonly verticalCollapseNextIcon: IconDefinition = faCaretDown;
-    public readonly verticalCollapsePreviousIcon: IconDefinition = faCaretUp;
-    public readonly verticalResizeIcon: IconDefinition = faEllipsisH;
-    public resizing: boolean = false;
+export class SplitterResizerComponent implements OnInit {
+    readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
+    #resizing: boolean = false;
+    protected readonly horizontalCollapseNextIcon: IconDefinition = faCaretRight;
+    protected readonly horizontalCollapsePreviousIcon: IconDefinition = faCaretLeft;
+    protected readonly horizontalResizeIcon: IconDefinition = faEllipsisV;
+    protected readonly nextPane: Signal<SplitterPaneComponent | null> = computed(() => {
+        const previousPane = this.previousPane();
+        const panes = this.panes();
+        const index = panes.indexOf(previousPane);
+        return index === -1 ? null : panes[index + 1];
+    });
+    protected readonly verticalCollapseNextIcon: IconDefinition = faCaretDown;
+    protected readonly verticalCollapsePreviousIcon: IconDefinition = faCaretUp;
+    protected readonly verticalResizeIcon: IconDefinition = faEllipsisH;
 
-    public nextPane!: SplitterPaneComponent;
-
-    @Input()
-    public nextResizer: SplitterResizerComponent | null = null;
-
-    @Input()
-    public orientation: Orientation = "horizontal";
-
-    @Input()
-    public previousPane!: SplitterPaneComponent;
-
-    @Input()
-    public panes: QueryList<SplitterPaneComponent> = new QueryList<SplitterPaneComponent>();
-
-    @Input()
-    public previousResizer: SplitterResizerComponent | null = null;
-
-    public constructor(private readonly elementRef: ElementRef<HTMLElement>) {}
-
-    public ngOnChanges(changes: SimpleChanges): void {
-        if (changes && (changes["panes"] || changes["pane"])) {
-            const index = this.panes.toArray().indexOf(this.previousPane);
-            if (index !== -1) {
-                this.nextPane = this.panes.toArray()[index + 1];
-            }
-        }
-    }
+    public nextResizer: InputSignal<SplitterResizerComponent | null> = input<SplitterResizerComponent | null>(null);
+    public orientation: InputSignal<Orientation> = input<Orientation>("horizontal");
+    public panes: InputSignal<ReadonlyArray<SplitterPaneComponent>> = input<ReadonlyArray<SplitterPaneComponent>>([]);
+    public previousPane: InputSignal<SplitterPaneComponent> = input.required<SplitterPaneComponent>();
+    public previousResizer: InputSignal<SplitterResizerComponent | null> = input<SplitterResizerComponent | null>(null);
 
     public ngOnInit(): void {
         this.setSubscriptions();
     }
 
     public toggle(position: "previous" | "next"): void {
-        if (this.previousPane.collapsed && this.nextPane?.collapsed) {
+        const previousPane = this.previousPane();
+        const nextPane = this.nextPane();
+        if (previousPane.collapsed() && nextPane?.collapsed()) {
             return;
         }
         if (position === "previous") {
-            if (!this.previousPane.collapsed) {
-                if (!this.nextPane.collapsed) {
-                    this.previousPane.setCollapsed(true);
-                    if (!this.previousPane.isStatic && this.nextPane.isStatic) {
-                        this.nextPane.isStatic = false;
+            if (!previousPane.collapsed()) {
+                if (!nextPane?.collapsed()) {
+                    previousPane.setCollapsed(true);
+                    if (!previousPane.isStatic() && nextPane && nextPane?.isStatic()) {
+                        nextPane.isStatic.set(false);
                     }
                 } else {
-                    this.nextPane.setCollapsed(false);
-                    if (this.previousPane.uid === this.panes.first.uid && this.previousPane.paneSize() != null) {
-                        this.previousPane.isStatic = true;
+                    if (nextPane) {
+                        nextPane.setCollapsed(false);
+                    }
+                    if (previousPane.uid === this.panes()[0].uid && previousPane.paneSize() != null) {
+                        previousPane.isStatic.set(true);
                     }
                 }
-            } else if (this.nextPane.collapsed) {
-                this.nextPane.setCollapsed(false);
+            } else if (nextPane && nextPane.collapsed()) {
+                nextPane.setCollapsed(false);
             }
         } else {
-            if (!this.nextPane?.collapsed) {
-                if (!this.previousPane.collapsed) {
-                    this.nextPane.setCollapsed(true);
-                    if (!this.nextPane.isStatic && this.previousPane.isStatic) {
-                        this.previousPane.isStatic = false;
+            if (nextPane && !nextPane.collapsed()) {
+                if (!previousPane.collapsed()) {
+                    nextPane.setCollapsed(true);
+                    if (!nextPane.isStatic() && this.previousPane().isStatic()) {
+                        previousPane.isStatic.set(false);
                     }
                 } else {
-                    this.previousPane.setCollapsed(false);
-                    if (this.nextPane.uid === this.panes.last.uid && this.nextPane.paneSize() != null) {
-                        this.nextPane.isStatic = true;
+                    previousPane.setCollapsed(false);
+                    if (nextPane.uid === this.panes()[this.panes().length - 1].uid && nextPane.paneSize() != null) {
+                        nextPane.isStatic.set(true);
                     }
                 }
-            } else if (this.previousPane.collapsed) {
-                this.previousPane.setCollapsed(false);
+            } else if (previousPane.collapsed()) {
+                previousPane.setCollapsed(false);
             }
         }
     }
 
     private getPaneElements(): HTMLElement[] {
         return [
-            document.querySelector(`[data-pid='${this.previousPane.uid}']`) as HTMLElement,
-            document.querySelector(`[data-pid='${this.nextPane?.uid}']`) as HTMLElement
+            document.querySelector(`[data-pid='${this.previousPane().uid}']`) as HTMLElement,
+            document.querySelector(`[data-pid='${this.nextPane()?.uid}']`) as HTMLElement
         ];
     }
 
     private resize(event: MouseEvent): void {
         const [previousPaneElement, nextPaneElement] = this.getPaneElements();
         const rect = previousPaneElement.getBoundingClientRect();
-        if (this.orientation === "horizontal") {
+        if (this.orientation() === "horizontal") {
             const totalSize = rect.width + nextPaneElement.getBoundingClientRect().width;
             const size =
                 event.clientX - rect.left < 0
                     ? 0
                     : event.clientX - rect.left > totalSize
-                    ? totalSize
-                    : event.clientX - rect.left;
-            this.previousPane.setSize(`${size}px`);
-            this.nextPane.setSize(`${totalSize - size}px`);
+                      ? totalSize
+                      : event.clientX - rect.left;
+            this.previousPane().setSize(`${size}px`);
+            if (this.nextPane()) {
+                this.nextPane()?.setSize(`${totalSize - size}px`);
+            }
         } else {
             const totalSize = rect.height + nextPaneElement.getBoundingClientRect().height;
             const size =
                 event.clientY - rect.top < 0
                     ? 0
                     : event.clientY - rect.top > totalSize
-                    ? totalSize
-                    : event.clientY - rect.top;
-            this.previousPane.setSize(`${size}px`);
-            this.nextPane.setSize(`${totalSize - size}px`);
+                      ? totalSize
+                      : event.clientY - rect.top;
+            this.previousPane().setSize(`${size}px`);
+            this.nextPane()?.setSize(`${totalSize - size}px`);
         }
     }
 
     private setSubscriptions(): void {
-        fromEvent<MouseEvent>(this.elementRef.nativeElement, "mousedown").subscribe(event => {
-            this.resizing = true;
+        fromEvent<MouseEvent>(this.#hostElementRef.nativeElement, "mousedown").subscribe(() => {
+            this.#resizing = true;
             const mouseMoveSubscription = fromEvent<MouseEvent>(document, "mousemove").subscribe(event => {
                 event.stopPropagation();
                 event.preventDefault();
-                if (!this.previousPane.resizable || !this.nextPane.resizable) {
+                if (!this.previousPane().resizable() || !this.nextPane()?.resizable()) {
                     return;
                 }
-                if (!this.previousPane.collapsed && !this.nextPane.collapsed) {
+                if (!this.previousPane().collapsed() && !this.nextPane()?.collapsed()) {
                     this.resize(event);
                 }
             });
-            const mouseUpSubscription = fromEvent<MouseEvent>(document, "mouseup").subscribe(event => {
+            const mouseUpSubscription = fromEvent<MouseEvent>(document, "mouseup").subscribe(() => {
                 mouseMoveSubscription.unsubscribe();
                 mouseUpSubscription.unsubscribe();
-                this.resizing = false;
+                this.#resizing = false;
             });
         });
     }

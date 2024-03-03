@@ -1,4 +1,4 @@
-import { NgIf, NgTemplateOutlet } from "@angular/common";
+import { NgTemplateOutlet } from "@angular/common";
 import {
     AfterContentInit,
     AfterViewInit,
@@ -33,7 +33,7 @@ import { SplitButtonTextTemplateDirective } from "../../directives/split-button-
     templateUrl: "./split-button.component.html",
     styleUrls: ["./split-button.component.scss"],
     standalone: true,
-    imports: [ButtonDirective, NgIf, NgTemplateOutlet, FontAwesomeModule, ContextMenuComponent],
+    imports: [ButtonDirective, NgTemplateOutlet, FontAwesomeModule, ContextMenuComponent],
     host: {
         "[class.mona-split-button]": "true",
         "[class.mona-disabled]": "disabled",

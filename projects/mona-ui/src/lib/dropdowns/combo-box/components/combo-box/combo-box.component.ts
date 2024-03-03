@@ -1,4 +1,4 @@
-import { NgClass, NgIf, NgTemplateOutlet } from "@angular/common";
+import { NgClass, NgTemplateOutlet } from "@angular/common";
 import {
     ChangeDetectionStrategy,
     Component,
@@ -80,7 +80,6 @@ import { ComboBoxNoDataTemplateDirective } from "../../directives/combo-box-no-d
         NgClass,
         TextBoxDirective,
         FormsModule,
-        NgIf,
         FontAwesomeModule,
         ButtonDirective,
         NgTemplateOutlet,
