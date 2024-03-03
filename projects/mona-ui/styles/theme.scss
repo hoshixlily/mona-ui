@@ -1789,7 +1789,7 @@ ul.mona-contextmenu-list {
     }
 }
 
-div.mona-progress-bar-track {
+.mona-progress-bar-track {
     color: white; // TODO: replace with css variable
     &-next {
         background-color: var(--mona-background);
@@ -1804,7 +1804,7 @@ div.mona-progress-bar-track {
     }
 }
 
-div.mona-progress-bar-indeterminate {
+.mona-progress-bar-indeterminate {
     background: repeating-linear-gradient(135deg, var(--mona-background), var(--mona-background) 10px, var(--mona-background-dark) 10px, var(--mona-background-dark) 20px);
 }
 
@@ -1823,8 +1823,8 @@ div.mona-progress-bar-indeterminate {
 }
 
 /** Tooltips */
-div.mona-tooltip-arrow,
-div.mona-popover-arrow {
+.mona-tooltip-arrow,
+.mona-popover-arrow {
     width: 12px;
     height: 12px;
     box-sizing: border-box;
@@ -1878,11 +1878,11 @@ div.mona-popover-arrow {
     padding: 0 !important;
 }
 
-div.mona-popover-title {
+.mona-popover-title {
     border-bottom: 1px solid var(--mona-border-color-light);
 }
 
-div.mona-popover-footer {
+.mona-popover-footer {
     border-top: 1px solid var(--mona-border-color-light);
 }
 
@@ -1906,6 +1906,8 @@ div.mona-popover-footer {
 
 /** TreeView */
 .mona-tree-view {
+    display: flex;
+    flex-direction: column;
     @include font-medium;
 }
 .mona-tree-view-node {

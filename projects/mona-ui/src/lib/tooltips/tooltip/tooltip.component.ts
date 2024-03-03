@@ -42,9 +42,6 @@ export class TooltipComponent implements OnInit {
     public templateRef!: TemplateRef<any>;
 
     public ngOnInit(): void {
-        if (!this.target) {
-            throw new Error("Tooltip target is required.");
-        }
         this.setSubscriptions();
     }
 
