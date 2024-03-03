@@ -1761,8 +1761,6 @@ ul.mona-contextmenu-list {
 }
 
 .mona-popup-wrapper-host {
-    //background: var(--mona-background);
-    //border: 1px solid var(--mona-border-color);
     box-shadow: var(--mona-popup-shadow);
     transition: box-shadow 0.2s ease-out;
 }
@@ -1777,6 +1775,11 @@ ul.mona-contextmenu-list {
 
 /** Progress Bar */
 .mona-progress-bar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
     background-color: var(--mona-background);
     border: 1px solid var(--mona-border-color);
     border-radius: var(--mona-border-radius);
@@ -1806,6 +1809,10 @@ div.mona-progress-bar-indeterminate {
 }
 
 .mona-circular-progress-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
     & .mona-circular-progress-bar-label {
         color: var(--mona-text);
         user-select: none;

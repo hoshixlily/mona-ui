@@ -1,17 +1,4 @@
-:host {
-    display: flex;
-    width: 100%;
-}
-
-div.mona-progress-bar {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-}
-
-div.mona-progress-bar-track {
+.mona-progress-bar-track {
     font-size: 12px;
     font-weight: 400;
     display: flex;
@@ -28,23 +15,23 @@ div.mona-progress-bar-track {
     }
 }
 
-div.mona-progress-left {
+.mona-progress-left {
     justify-content: flex-start;
 }
 
-div.mona-progress-right {
+.mona-progress-right {
     justify-content: flex-end;
 }
 
-span.mona-progress-bar-label {
+.mona-progress-bar-label {
     padding: 0 4px;
 }
 
-div.mona-progress-bar-label-hidden {
+.mona-progress-bar-label-hidden {
     padding: 10px 0;
 }
 
-div.mona-progress-bar-indeterminate {
+.mona-progress-bar-indeterminate {
     background-size: 200% 200%;
     animation: indeterminate 16s linear infinite;
     animation-direction: reverse;

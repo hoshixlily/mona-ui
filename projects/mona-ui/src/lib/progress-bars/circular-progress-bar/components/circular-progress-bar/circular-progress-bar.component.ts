@@ -1,5 +1,16 @@
 import { NgClass, NgStyle, NgTemplateOutlet } from "@angular/common";
-import { Component, computed, ContentChild, Input, Signal, signal, WritableSignal } from "@angular/core";
+import {
+    ChangeDetectionStrategy,
+    Component,
+    computed,
+    ContentChild,
+    effect,
+    input,
+    InputSignal,
+    Signal,
+    signal,
+    WritableSignal
+} from "@angular/core";
 import { Action } from "../../../../utils/Action";
 import { CircularProgressBarLabelTemplateDirective } from "../../directives/circular-progress-bar-label-template.directive";
 
@@ -8,94 +19,76 @@ import { CircularProgressBarLabelTemplateDirective } from "../../directives/circ
     templateUrl: "./circular-progress-bar.component.html",
     styleUrls: ["./circular-progress-bar.component.scss"],
     standalone: true,
-    imports: [NgStyle, NgClass, NgTemplateOutlet]
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    imports: [NgStyle, NgClass, NgTemplateOutlet],
+    host: {
+        class: "mona-circular-progress-bar",
+        "[class.mon-disabled]": "disabled()",
+        "[style.width]": "pixelSize()",
+        "[style.height]": "pixelSize()"
+    }
 })
 export class CircularProgressBarComponent {
-    public center: Signal<{ x: Signal<number>; y: Signal<number> }> = computed(() => {
+    protected readonly center: Signal<{ x: Signal<number>; y: Signal<number> }> = computed(() => {
         return {
-            x: computed(() => this.circleSize() / 2),
-            y: computed(() => this.circleSize() / 2)
+            x: computed(() => this.size() / 2),
+            y: computed(() => this.size() / 2)
         };
     });
-    public circleSize: WritableSignal<number> = signal(100);
-    public circleThickness: WritableSignal<number> = signal(5);
-    public circumference: Signal<number> = computed(
-        () => 2 * Math.PI * (this.circleSize() / 2 - this.circleThickness())
+    protected readonly circumference: Signal<number> = computed(
+        () => 2 * Math.PI * (this.size() / 2 - this.thickness())
     );
-    public indeterminateProgress: WritableSignal<boolean> = signal(false);
-    public pixelSize: Signal<string> = computed(() => `${this.circleSize()}px`);
-    public progressColor: WritableSignal<string | Action<number, string>> = signal("var(--mona-primary)");
-    public progressValue: WritableSignal<number> = signal(0);
-    public radius: Signal<number> = computed(() => this.circleSize() / 2 - this.circleThickness());
-    public strokeColor: Signal<string> = computed(() => {
-        if (typeof this.progressColor() === "string") {
-            return this.progressColor() as string;
+    protected readonly pixelSize: Signal<string> = computed(() => `${this.size()}px`);
+    protected readonly progressValue: WritableSignal<number> = signal(0);
+    protected readonly radius: Signal<number> = computed(() => this.size() / 2 - this.thickness());
+    protected readonly strokeColor: Signal<string> = computed(() => {
+        if (typeof this.color() === "string") {
+            return this.color() as string;
         }
-        const colorize = this.progressColor() as Action<number, string>;
+        const colorize = this.color() as Action<number, string>;
         return colorize(this.progressValue());
     });
-    public strokeDashOffset: Signal<number> = computed(() => {
+    protected readonly strokeDashOffset: Signal<number> = computed(() => {
         const dashOffset = this.circumference() * (1 - this.progressValue() / 100);
-        return this.indeterminateProgress() ? this.circumference() / 1.42 : dashOffset;
+        return this.indeterminate() ? this.circumference() / 1.42 : dashOffset;
     });
 
     /**
      * Color of progress bar. Can be string or function that takes progress value and returns color.
-     * @param value Color of progress bar.
      */
-    @Input()
-    public set color(value: string | Action<number, string>) {
-        this.progressColor.set(value);
-    }
-
-    @Input()
-    public disabled: boolean = false;
-
-    @Input()
-    public set indeterminate(value: boolean) {
-        this.indeterminateProgress.set(value);
-    }
-
-    @ContentChild(CircularProgressBarLabelTemplateDirective)
-    public labelTemplateDirective: CircularProgressBarLabelTemplateDirective | null = null;
-
-    @Input()
-    public max: number = 100;
-
-    @Input()
-    public min: number = 0;
+    public color: InputSignal<string | Action<number, string>> = input<string | Action<number, string>>(
+        "var(--mona-primary)"
+    );
+    public disabled: InputSignal<boolean> = input(false);
+    public indeterminate: InputSignal<boolean> = input(false);
+    public max: InputSignal<number> = input(100);
+    public min: InputSignal<number> = input(0);
 
     /**
      * Progress value in percentage. Value must be between 0 and 100.
      * Do not use together with value input.
      * @param value Progress value in percentage.
      */
-    @Input()
-    public set progress(value: number) {
-        this.progressValue.set(value);
-    }
-
-    @Input()
-    public set size(value: number) {
-        this.circleSize.set(value);
-    }
-
-    @Input()
-    public set thickness(value: number) {
-        this.circleThickness.set(value);
-    }
+    public progress: InputSignal<number> = input(0);
+    public size: InputSignal<number> = input(100);
+    public thickness: InputSignal<number> = input(5);
 
     /**
      * Progress value in absolute value. Value must be between min and max.
      * Do not use together with progress input.
      * @param value Progress value in absolute value.
      */
-    @Input()
-    public set value(value: number) {
-        this.updateProgress(value);
+    public value: InputSignal<number> = input(0);
+
+    @ContentChild(CircularProgressBarLabelTemplateDirective)
+    public labelTemplateDirective: CircularProgressBarLabelTemplateDirective | null = null;
+
+    public constructor() {
+        effect(() => this.progressValue.set(this.progress()), { allowSignalWrites: true });
+        effect(() => this.updateProgress(this.value()), { allowSignalWrites: true });
     }
 
     private updateProgress(value: number): void {
-        this.progressValue.set(Math.round(((value - this.min) / (this.max - this.min)) * 100));
+        this.progressValue.set(Math.round(((value - this.min()) / (this.max() - this.min())) * 100));
     }
 }
