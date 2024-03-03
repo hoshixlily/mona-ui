@@ -7,7 +7,10 @@ import {
     ElementRef,
     EventEmitter,
     inject,
-    Input,
+    input,
+    InputSignal,
+    model,
+    ModelSignal,
     OnDestroy,
     Output,
     TemplateRef,
@@ -29,7 +32,23 @@ import { WindowService } from "../../services/window.service";
 })
 export class WindowComponent implements OnDestroy, AfterViewInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
-    private windowRef?: WindowRef;
+    readonly #windowService: WindowService = inject(WindowService);
+    #windowRef?: WindowRef;
+    public draggable: InputSignal<boolean> = input(true);
+    public focusedElement: InputSignal<HTMLElement | ElementRef<HTMLElement> | string | undefined> = input<
+        HTMLElement | ElementRef<HTMLElement> | string | undefined
+    >(undefined);
+    public height: ModelSignal<number | undefined> = model<number | undefined>(undefined);
+    public left: ModelSignal<number | undefined> = model<number | undefined>(undefined);
+    public maxHeight: InputSignal<number | undefined> = input<number | undefined>(undefined);
+    public maxWidth: InputSignal<number | undefined> = input<number | undefined>(undefined);
+    public minHeight: InputSignal<number | undefined> = input<number | undefined>(undefined);
+    public minWidth: InputSignal<number | undefined> = input<number | undefined>(undefined);
+    public modal: InputSignal<boolean | undefined> = input<boolean | undefined>(undefined);
+    public resizable: InputSignal<boolean | undefined> = input<boolean | undefined>(undefined);
+    public title: InputSignal<string | undefined> = input<string | undefined>(undefined);
+    public top: ModelSignal<number | undefined> = model<number | undefined>(undefined);
+    public width: ModelSignal<number | undefined> = model<number | undefined>(undefined);
 
     @Output()
     public close: EventEmitter<WindowCloseEvent> = new EventEmitter<WindowCloseEvent>();
@@ -40,118 +59,65 @@ export class WindowComponent implements OnDestroy, AfterViewInit {
     @Output()
     public dragStart: EventEmitter<void> = new EventEmitter<void>();
 
-    @Input()
-    public draggable?: boolean;
-
-    @Input()
-    public focusedElement?: HTMLElement | ElementRef<HTMLElement> | string;
-
-    @Input()
-    public height?: number;
-
-    @Output()
-    public heightChange: EventEmitter<number> = new EventEmitter<number>();
-
-    @Input()
-    public left?: number;
-
-    @Output()
-    public leftChange: EventEmitter<number> = new EventEmitter<number>();
-
-    @Input()
-    public maxHeight?: number;
-
-    @Input()
-    public maxWidth?: number;
-
-    @Input()
-    public minHeight?: number;
-
-    @Input()
-    public minWidth?: number;
-
-    @Input()
-    public modal?: boolean;
-
-    @Input()
-    public resizable?: boolean;
-
-    @Input()
-    public title?: string;
-
     @ContentChild(WindowTitleTemplateDirective)
     public titleTemplateDirective?: WindowTitleTemplateDirective;
-
-    @Input()
-    public top?: number;
-
-    @Output()
-    public topChange: EventEmitter<number> = new EventEmitter<number>();
-
-    @Input()
-    public width?: number;
-
-    @Output()
-    public widthChange: EventEmitter<number> = new EventEmitter<number>();
 
     @ViewChild("windowTemplate")
     public windowTemplate!: TemplateRef<any>;
 
-    public constructor(private readonly windowService: WindowService) {}
-
     public ngAfterViewInit(): void {
         asapScheduler.schedule(() => {
-            this.windowRef = this.windowService.open({
+            this.#windowRef = this.#windowService.open({
                 content: this.windowTemplate,
-                draggable: this.draggable,
-                focusedElement: this.focusedElement,
-                height: this.height,
-                left: this.left,
-                maxHeight: this.maxHeight,
-                maxWidth: this.maxWidth,
-                minHeight: this.minHeight,
-                minWidth: this.minWidth,
-                modal: this.modal,
-                resizable: this.resizable,
-                title: this.titleTemplateDirective?.templateRef ?? this.title,
-                top: this.top,
-                width: this.width
+                draggable: this.draggable(),
+                focusedElement: this.focusedElement(),
+                height: this.height(),
+                left: this.left(),
+                maxHeight: this.maxHeight(),
+                maxWidth: this.maxWidth(),
+                minHeight: this.minHeight(),
+                minWidth: this.minWidth(),
+                modal: this.modal(),
+                resizable: this.resizable(),
+                title: this.titleTemplateDirective?.templateRef ?? this.title(),
+                top: this.top(),
+                width: this.width()
             });
-            this.windowRef.resize$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(event => {
+            this.#windowRef.resize$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(event => {
                 if (event.width != null) {
-                    this.widthChange.emit(event.width);
+                    this.width.set(event.width);
                 }
                 if (event.height != null) {
-                    this.heightChange.emit(event.height);
+                    this.height.set(event.height);
                 }
                 if (event.left != null) {
-                    this.leftChange.emit(event.left);
+                    this.left.set(event.left);
                 }
                 if (event.top != null) {
-                    this.topChange.emit(event.top);
+                    this.top.set(event.top);
                 }
             });
-            this.windowRef.close$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(event => {
+            this.#windowRef.close$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(event => {
                 this.close.emit(event);
             });
-            this.windowRef.drag$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(event => {
+            this.#windowRef.drag$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(event => {
                 if (event.left != null) {
-                    this.leftChange.emit(event.left);
+                    this.left.set(event.left);
                 }
                 if (event.top != null) {
-                    this.topChange.emit(event.top);
+                    this.top.set(event.top);
                 }
             });
-            this.windowRef.dragEnd$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(() => {
+            this.#windowRef.dragEnd$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(() => {
                 this.dragEnd.emit();
             });
-            this.windowRef.dragStart$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(() => {
+            this.#windowRef.dragStart$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(() => {
                 this.dragStart.emit();
             });
         });
     }
 
     public ngOnDestroy(): void {
-        this.windowRef?.close();
+        this.#windowRef?.close();
     }
 }

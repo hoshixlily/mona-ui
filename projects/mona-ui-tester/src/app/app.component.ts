@@ -176,7 +176,8 @@ import {
     TreeViewSelectableDirective,
     WindowService,
     CheckBoxComponent,
-    RadioButtonComponent
+    RadioButtonComponent,
+    WindowComponent
 } from "mona-ui";
 import { debounceTime, map, Observable, of, take, timer } from "rxjs";
 import { v4 } from "uuid";
@@ -324,7 +325,8 @@ interface TreeNodeDataItem {
         DropDownTreeFooterTemplateDirective,
         DropDownTreeHeaderTemplateDirective,
         DropDownTreeNoDataTemplateDirective,
-        DropDownTreeNodeTemplateDirective
+        DropDownTreeNodeTemplateDirective,
+        WindowComponent
     ]
 })
 export class AppComponent implements OnInit {

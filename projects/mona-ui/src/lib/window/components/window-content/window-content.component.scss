@@ -3,7 +3,7 @@
     height: 100%;
 }
 
-div.mona-window-content-container {
+.mona-window-content-container {
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -12,13 +12,13 @@ div.mona-window-content-container {
     height: 100%;
 }
 
-div.mona-window-title-bar {
+.mona-window-title-bar {
     display: flex;
     align-items: center;
     justify-content: flex-start;
 }
 
-div.mona-window-title-container {
+.mona-window-title-container {
     flex: 1;
     padding: 4px 8px;
     height: 100%;
@@ -28,12 +28,12 @@ div.mona-window-title-container {
     user-select: none;
 }
 
-span.mona-window-title {
+.mona-window-title {
     font-weight: 600;
     color: var(--mona-text);
 }
 
-div.mona-window-title-bar-actions {
+.mona-window-title-bar-actions {
     display: flex;
     align-items: center;
     justify-content: space-evenly;
