@@ -160,7 +160,7 @@ export class GridListComponent implements OnInit, AfterViewInit {
 
     private synchronizeHorizontalScroll(): void {
         const headerElement = this.gridService.gridHeaderElement;
-        const gridElement = this.elementRef.nativeElement.querySelector(".mona-grid-list") as HTMLDivElement;
+        const gridElement = this.elementRef.nativeElement as HTMLElement;
         if (headerElement == null || gridElement == null) {
             return;
         }
