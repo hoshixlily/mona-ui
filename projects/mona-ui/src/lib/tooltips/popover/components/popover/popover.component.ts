@@ -1,34 +1,38 @@
+import { NgClass, NgTemplateOutlet } from "@angular/common";
 import {
     ChangeDetectionStrategy,
     Component,
     ContentChild,
     DestroyRef,
+    effect,
     ElementRef,
     EventEmitter,
     inject,
-    Input,
+    input,
+    InputSignal,
+    InputSignalWithTransform,
     OnInit,
     Output,
+    signal,
     TemplateRef,
-    ViewChild
+    ViewChild,
+    WritableSignal
 } from "@angular/core";
-import { Position } from "../../../../models/Position";
-import { AnimationService } from "../../../../animations/services/animation.service";
-import { PopupService } from "../../../../popup/services/popup.service";
-import { asapScheduler, filter, fromEvent, take, takeUntil } from "rxjs";
-import { DefaultTooltipPositionMap } from "../../../models/DefaultTooltipPositionMap";
-import { PopupRef } from "../../../../popup/models/PopupRef";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { asapScheduler, filter, fromEvent, take, takeUntil } from "rxjs";
 import { v4 } from "uuid";
-import { PopoverTrigger } from "../../models/PopoverTrigger";
-import { PopupAnimationService } from "../../../../animations/services/popup-animation.service";
 import { AnimationState } from "../../../../animations/models/AnimationState";
+import { PopupAnimationService } from "../../../../animations/services/popup-animation.service";
+import { Position } from "../../../../models/Position";
+import { PopupRef } from "../../../../popup/models/PopupRef";
+import { PopupService } from "../../../../popup/services/popup.service";
+import { DefaultTooltipPositionMap } from "../../../models/DefaultTooltipPositionMap";
 import { PopoverFooterTemplateDirective } from "../../directives/popover-footer-template.directive";
 import { PopoverTitleTemplateDirective } from "../../directives/popover-title-template.directive";
+import { PopoverHideEvent } from "../../models/PopoverHideEvent";
 import { PopoverShowEvent } from "../../models/PopoverShowEvent";
 import { PopoverShownEvent } from "../../models/PopoverShownEvent";
-import { PopoverHideEvent } from "../../models/PopoverHideEvent";
-import { NgIf, NgTemplateOutlet, NgClass } from "@angular/common";
+import { PopoverTrigger } from "../../models/PopoverTrigger";
 
 @Component({
     selector: "mona-popover",
@@ -37,13 +41,36 @@ import { NgIf, NgTemplateOutlet, NgClass } from "@angular/common";
     changeDetection: ChangeDetectionStrategy.OnPush,
     exportAs: "monaPopover",
     standalone: true,
-    imports: [NgIf, NgTemplateOutlet, NgClass]
+    imports: [NgTemplateOutlet, NgClass]
 })
 export class PopoverComponent implements OnInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
+    readonly #popupAnimationService: PopupAnimationService = inject(PopupAnimationService);
+    readonly #popupService: PopupService = inject(PopupService);
     #popupRef?: PopupRef;
-    #trigger: string = "click";
     public readonly uid: string = v4();
+    protected readonly popupPosition: WritableSignal<Position> = signal("top");
+
+    public position: InputSignal<Position> = input<Position>("top");
+    public target: InputSignal<Element | ElementRef> = input.required<Element | ElementRef>();
+    public title: InputSignal<string> = input<string>("");
+    public trigger: InputSignalWithTransform<string, PopoverTrigger> = input("click", {
+        transform: (value: PopoverTrigger) => {
+            let triggerString: string = "";
+            switch (value) {
+                case "click":
+                    triggerString = "click";
+                    break;
+                case "hover":
+                    triggerString = "mouseenter";
+                    break;
+                case "none":
+                    triggerString = "";
+                    break;
+            }
+            return triggerString;
+        }
+    });
 
     @ContentChild(PopoverFooterTemplateDirective, { read: TemplateRef })
     public footerTemplateRef: TemplateRef<any> | null = null;
@@ -54,52 +81,25 @@ export class PopoverComponent implements OnInit {
     @Output()
     public hidden: EventEmitter<void> = new EventEmitter<void>();
 
-    @Input()
-    public position: Position = "top";
-
     @Output()
     public show: EventEmitter<PopoverShowEvent> = new EventEmitter<PopoverShowEvent>();
 
     @Output()
     public shown: EventEmitter<PopoverShownEvent> = new EventEmitter<PopoverShownEvent>();
 
-    @Input()
-    public target!: Element | ElementRef;
-
     @ViewChild(TemplateRef)
     public templateRef!: TemplateRef<any>;
-
-    @Input()
-    public title?: string;
 
     @ContentChild(PopoverTitleTemplateDirective, { read: TemplateRef })
     public titleTemplateRef: TemplateRef<any> | null = null;
 
-    @Input()
-    public set trigger(value: PopoverTrigger) {
-        switch (value) {
-            case "click":
-                this.#trigger = "click";
-                break;
-            case "hover":
-                this.#trigger = "mouseenter";
-                break;
-            case "none":
-                this.#trigger = "";
-                break;
-        }
+    public constructor() {
+        effect(() => this.popupPosition.set(this.position()), { allowSignalWrites: true });
     }
-
-    public constructor(
-        private readonly animationService: AnimationService,
-        private readonly elementRef: ElementRef<HTMLElement>,
-        private readonly popupAnimationService: PopupAnimationService,
-        private readonly popupService: PopupService
-    ) {}
 
     public close(): void {
         if (this.#popupRef) {
-            this.popupAnimationService.animatePopover(this.#popupRef, AnimationState.Hide);
+            this.#popupAnimationService.animatePopover(this.#popupRef, AnimationState.Hide);
             this.#popupRef.closeWithDelay();
             this.#popupRef = undefined;
         }
@@ -130,21 +130,21 @@ export class PopoverComponent implements OnInit {
     private calculateTopAndLeft(): void {
         let popupTop = 0;
         let popupLeft = 0;
+        const target = this.target();
         const anchorWidth =
-            this.target instanceof Element
-                ? (this.target as HTMLElement).getBoundingClientRect().width
-                : (this.target.nativeElement as HTMLElement).getBoundingClientRect().width;
+            target instanceof Element
+                ? (target as HTMLElement).getBoundingClientRect().width
+                : (target.nativeElement as HTMLElement).getBoundingClientRect().width;
         const anchorHeight =
-            this.target instanceof Element
-                ? (this.target as HTMLElement).getBoundingClientRect().height
-                : (this.target.nativeElement as HTMLElement).getBoundingClientRect().height;
+            target instanceof Element
+                ? (target as HTMLElement).getBoundingClientRect().height
+                : (target.nativeElement as HTMLElement).getBoundingClientRect().height;
         const popupWidth = this.popoverElement?.getBoundingClientRect()?.width ?? 0;
         const popupHeight = this.popoverElement?.getBoundingClientRect()?.height ?? 0;
         if (!this.popoverOverlayElement) {
-            console.warn("Popover overlay element is not found.");
             return;
         }
-        switch (this.position) {
+        switch (this.popupPosition()) {
             case "top":
                 popupLeft = (anchorWidth - popupWidth) / 2;
                 this.popoverOverlayElement.style.transform = `translate3d(${popupLeft}px, -12px, 0)`;
@@ -177,14 +177,14 @@ export class PopoverComponent implements OnInit {
     }
 
     private openPopup(reposition: boolean = false): void {
-        this.#popupRef = this.popupService.create({
+        this.#popupRef = this.#popupService.create({
             content: this.templateRef,
             anchor: this.popoverTargetElement,
             disableAnimation: true,
             popupClass: "mona-popover-popup-content",
             popupWrapperClass: "mona-popover-popup-wrapper",
             hasBackdrop: false,
-            positions: DefaultTooltipPositionMap[this.position],
+            positions: DefaultTooltipPositionMap[this.popupPosition()],
             closeOnOutsideClick: false,
             closeOnEscape: false,
             withPush: true
@@ -192,16 +192,16 @@ export class PopoverComponent implements OnInit {
         this.#popupRef.overlayRef.addPanelClass("mona-invisible-tooltip");
 
         asapScheduler.schedule(() => {
-            this.setupPopoverOutsideClickCloseAnimation(this.#popupRef!, this.target);
+            this.setupPopoverOutsideClickCloseAnimation(this.#popupRef!, this.target());
             this.calculateTopAndLeft();
-            const shouldReposition = this.checkRepositionNecessity(this.position);
+            const shouldReposition = this.checkRepositionNecessity(this.popupPosition());
             if (!reposition && shouldReposition) {
                 this.#popupRef?.close();
                 this.switchPositionToOpposite();
                 this.openPopup(true);
                 return;
             }
-            if (this.#trigger) {
+            if (this.trigger()) {
                 const showEvent = new PopoverShowEvent(this.popoverTargetElement);
                 this.show.emit(showEvent);
                 if (showEvent.isDefaultPrevented()) {
@@ -209,7 +209,7 @@ export class PopoverComponent implements OnInit {
                     return;
                 }
             }
-            this.popupAnimationService.animatePopover(this.#popupRef!, AnimationState.Show);
+            this.#popupAnimationService.animatePopover(this.#popupRef!, AnimationState.Show);
             this.#popupRef?.overlayRef.removePanelClass("mona-invisible-tooltip");
             this.shown.emit(new PopoverShownEvent(this.popoverTargetElement, this.#popupRef!));
         }, 1); // Zero doesn't work here
@@ -258,8 +258,8 @@ export class PopoverComponent implements OnInit {
     }
 
     private setSubscriptions(): void {
-        if (this.#trigger) {
-            fromEvent<MouseEvent>(this.popoverTargetElement, this.#trigger)
+        if (this.trigger()) {
+            fromEvent<MouseEvent>(this.popoverTargetElement, this.trigger())
                 .pipe(
                     filter(() => !this.#popupRef),
                     takeUntilDestroyed(this.#destroyRef)
@@ -288,18 +288,18 @@ export class PopoverComponent implements OnInit {
     }
 
     private switchPositionToOpposite(): void {
-        switch (this.position) {
+        switch (this.popupPosition()) {
             case "top":
-                this.position = "bottom";
+                this.popupPosition.set("bottom");
                 break;
             case "bottom":
-                this.position = "top";
+                this.popupPosition.set("top");
                 break;
             case "right":
-                this.position = "left";
+                this.popupPosition.set("left");
                 break;
             case "left":
-                this.position = "right";
+                this.popupPosition.set("right");
                 break;
         }
     }
@@ -313,6 +313,7 @@ export class PopoverComponent implements OnInit {
     }
 
     private get popoverTargetElement(): HTMLElement {
-        return this.target instanceof ElementRef ? this.target.nativeElement : this.target;
+        const target = this.target();
+        return target instanceof ElementRef ? target.nativeElement : target;
     }
 }
