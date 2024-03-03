@@ -1,4 +1,4 @@
-$track-thickness: 6px;
+$track-thickness: 0.375rem;
 
 .mona-slider-track {
     position: relative;
@@ -51,7 +51,7 @@ $track-thickness: 6px;
     justify-content: center;
     display: flex;
     color: var(--mona-text);
-    font-size: 12px;
+    font-size: 0.75rem;
     line-height: 1.667;
 }
 
@@ -165,6 +165,5 @@ $track-thickness: 6px;
             height: 0;
             width: calc($track-thickness * 3);
         }
-
     }
 }

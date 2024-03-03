@@ -1,7 +1,6 @@
 import { NgClass, NgStyle, NgTemplateOutlet } from "@angular/common";
 import {
     ChangeDetectionStrategy,
-    ChangeDetectorRef,
     Component,
     computed,
     ContentChild,
@@ -43,6 +42,7 @@ import { Step, StepOptions } from "../../models/Step";
 })
 export class StepperComponent implements OnInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
+    readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
     readonly #trackItemSize: Signal<number> = computed(() => {
         const stepCount = this.steps().length;
         return stepCount !== 0 ? 100 / stepCount : 0;
@@ -113,11 +113,6 @@ export class StepperComponent implements OnInit {
     @Output()
     public stepChange: EventEmitter<number> = new EventEmitter<number>();
 
-    public constructor(
-        private readonly elementRef: ElementRef<HTMLElement>,
-        private readonly cdr: ChangeDetectorRef
-    ) {}
-
     public ngOnInit(): void {
         this.setSubscriptions();
         window.setTimeout(() => {
@@ -155,7 +150,7 @@ export class StepperComponent implements OnInit {
     }
 
     private setSubscriptions(): void {
-        fromEvent<KeyboardEvent>(this.elementRef.nativeElement, "keydown")
+        fromEvent<KeyboardEvent>(this.#hostElementRef.nativeElement, "keydown")
             .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe((event: KeyboardEvent) => {
                 if (!this.activeStep) {

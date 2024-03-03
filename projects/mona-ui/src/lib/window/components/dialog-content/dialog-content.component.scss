@@ -8,7 +8,7 @@
 .mona-dialog-content-inner {
     display: flex;
     flex: 1;
-    padding: 10px 10px 0;
+    padding: 0.5rem 0.5rem 0;
 }
 
 
@@ -20,16 +20,16 @@
 
 .mona-dialog-text-container {
     width: 100%;
-    padding-top: 12px;
+    padding-top: 0.75rem;
     display: flex;
     align-items: flex-start;
     justify-content: flex-start;
     font-weight: 500;
-    font-size: 12px;
+    font-size: 0.75rem;
     cursor: default;
     user-select: none;
-    margin-bottom: 5px;
-    padding-left: 2px;
+    margin-bottom: 0.25rem;
+    padding-left: 0.125rem;
     line-height: 1.42857;
 }
 
@@ -44,7 +44,7 @@
 .mona-dialog-icon-wrapper {
     display: flex;
     justify-content: center;
-    padding: 8px 16px;
+    padding: 0.5rem 1rem;
     & > div.mona-dialog-icon {
         display: flex;
         align-items: center;
@@ -52,8 +52,8 @@
         width: 55px;
         height: 55px;
         color: black;
-        font-size: 24px;
-        margin-top: 2px;
+        font-size: 2rem;
+        margin-top: 0.125rem;
         border: 2px solid var(--mona-border-color);
         &-success {
             background-color: var(--mona-success);
@@ -81,11 +81,11 @@
     align-items: center;
     flex-direction: row;
     justify-content: flex-end;
-    padding: 0 10px 10px 10px;
+    padding: 0 0.5rem 0.5rem 0.5rem;
 }
 
 .mona-dialog-action {
     &:not(:last-child) {
-        margin-right: 5px;
+        margin-right: 0.25rem;
     }
 }

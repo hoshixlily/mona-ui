@@ -2,7 +2,7 @@
 .mona-filter-menu-item {
     display: flex;
     flex-direction: column;
-    row-gap: 5px;
+    row-gap: 0.25rem;
 }
 
 .mona-filter-menu-actions {
@@ -10,7 +10,7 @@
     flex-direction: row;
     align-items: center;
     justify-content: center;
-    column-gap: 5px;
+    column-gap: 0.25rem;
     & > button {
         flex: 1;
     }

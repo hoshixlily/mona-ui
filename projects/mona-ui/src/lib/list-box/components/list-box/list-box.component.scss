@@ -8,13 +8,13 @@
     flex: 0 0 40px;
     display: flex;
     flex-direction: column;
-    row-gap: 4px;
+    row-gap: 0.25rem;
     column-gap: 0;
     justify-content: center;
     align-items: center;
     &-vertical, &-vertical-reverse {
         flex-direction: row;
-        column-gap: 4px;
+        column-gap: 0.25rem;
         row-gap: 0;
     }
     & button {

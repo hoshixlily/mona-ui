@@ -1,5 +1,5 @@
-$step-width: 32px;
-$step-height: 32px;
+$step-width: 2rem;
+$step-height: 2rem;
 
 .mona-stepper-horizontal {
     margin-top: calc($step-height / -2);
@@ -47,7 +47,7 @@ $step-height: 32px;
         & > li {
             & > div:first-child {
                 flex-direction: column;
-                row-gap: 5px;
+                row-gap: 0.25rem;
             }
         }
     }
@@ -56,11 +56,11 @@ $step-height: 32px;
         flex-direction: column;
         height: 100%;
         width: max-content;
-        left: calc(-1 * (calc(calc($step-width - 8px) / 2)));
+        left: calc(-1 * (calc(calc($step-width - 0.5rem) / 2)));
         & > li {
             & > div:first-child {
                 flex-direction: row;
-                column-gap: 5px;
+                column-gap: 0.25rem;
             }
         }
     }
@@ -78,8 +78,8 @@ $step-height: 32px;
     }
     &-horizontal {
         width: 100%;
-        height: 6px;
-        top: calc(calc($step-height - 8px) / 2);
+        height: 0.5rem;
+        top: calc(calc($step-height - 0.5rem) / 2);
         & > div {
             height: 100%;
             transition: width 250ms ease-in-out;
@@ -87,7 +87,7 @@ $step-height: 32px;
     }
     &-vertical {
         height: 100%;
-        width: 8px;
+        width: 0.5rem;
         & > div {
             width: 100%;
             transition: height 250ms ease-in-out;

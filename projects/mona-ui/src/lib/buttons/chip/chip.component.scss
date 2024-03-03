@@ -5,7 +5,7 @@
     justify-content: flex-start;
     flex-wrap: nowrap;
     white-space: nowrap;
-    padding: 4px 8px;
+    padding: 0.25rem 0.5rem;
 }
 
 .mona-chip-label {
@@ -14,7 +14,7 @@
 
 
 .mona-button {
-    padding: 0 7px;
+    padding: 0 0.5rem;
     background: var(--mona-background-dark) !important;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
@@ -22,7 +22,7 @@
 
 .mona-chip-remove-icon {
     font-weight: bold;
-    font-size: 14px;
+    font-size: 0.875em;
 }
 
 .mona-removable-chip {

@@ -1,6 +1,6 @@
 .mona-color-gradient-slider-area {
     display: flex;
-    column-gap: 12px;
+    column-gap: 0.5rem;
 }
 
 .mona-color-gradient-preview {
@@ -13,7 +13,7 @@
     display: flex;
     flex: 1;
     flex-direction: column;
-    row-gap: 8px;
+    row-gap: 0.5rem;
 }
 
 .mona-hsv-rectangle {
@@ -35,7 +35,7 @@
 .mona-color-gradient-numeric-inputs {
     display: flex;
     flex-direction: row;
-    column-gap: 12px;
+    column-gap: 0.5rem;
 }
 
 .mona-color-gradient-channel-switch {
@@ -49,13 +49,13 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    margin-left: 12px;
+    margin-left: 0.75rem;
 }
 
 .mona-color-gradient-inputs {
     display: flex;
     flex-direction: column;
-    row-gap: 8px;
+    row-gap: 0.5rem;
 }
 
 .mona-color-gradient-hex-input {
@@ -68,7 +68,7 @@
 .mona-color-gradient-hsv-inputs {
     display: flex;
     flex-direction: row;
-    column-gap: 4px;
+    column-gap: 0.25rem;
 }
 
 .mona-color-gradient-hex-input-prefix {
@@ -76,7 +76,7 @@
     align-items: center;
     justify-content: center;
     height: 100%;
-    padding: 0 8px;
+    padding: 0 0.5rem;
 }
 
 mona-numeric-text-box {

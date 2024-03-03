@@ -517,16 +517,16 @@
                                 <mona-stepper orientation="horizontal" [steps]="stepperSteps"
                                               [step]="stepperStep" (stepChange)="onStepperStepChange($event)" [linear]="true"
                                               style="width: 600px;">
-                                    <ng-template monaStepperLabelTemplate let-step let-index="index" let-active="active">
-                                        <span *ngIf="!active" style="color: snow; font-weight: bolder;">{{index+1}}. {{step.label}}</span>
-                                        <span *ngIf="active" style="color: darkorange; font-weight: bolder;">{{index+1}}. {{step.label}}</span>
-                                    </ng-template>
-                                    <ng-template monaStepperIndicatorTemplate let-step let-index="index">
-                                        <span style="color: snow; font-weight: bold;">{{step.label.substring(0,2).toUpperCase()}}</span>
-                                    </ng-template>
-                                    <ng-template monaStepperStepTemplate let-step let-index="index" let-active="active">
-                                        <fa-icon [icon]="starIcon" style="font-size: 24px; margin-top: 0px;" [ngStyle]="{'color': active?'darkorange':'#fafafa'}"></fa-icon>
-                                    </ng-template>
+<!--                                    <ng-template monaStepperLabelTemplate let-step let-index="index" let-active="active">-->
+<!--                                        <span *ngIf="!active" style="color: snow; font-weight: bolder;">{{index+1}}. {{step.label}}</span>-->
+<!--                                        <span *ngIf="active" style="color: darkorange; font-weight: bolder;">{{index+1}}. {{step.label}}</span>-->
+<!--                                    </ng-template>-->
+<!--                                    <ng-template monaStepperIndicatorTemplate let-step let-index="index">-->
+<!--                                        <span style="color: snow; font-weight: bold;">{{step.label.substring(0,2).toUpperCase()}}</span>-->
+<!--                                    </ng-template>-->
+<!--                                    <ng-template monaStepperStepTemplate let-step let-index="index" let-active="active">-->
+<!--                                        <fa-icon [icon]="starIcon" style="font-size: 24px; margin-top: 0px;" [ngStyle]="{'color': active?'darkorange':'#fafafa'}"></fa-icon>-->
+<!--                                    </ng-template>-->
                                 </mona-stepper>
                             </div>
 

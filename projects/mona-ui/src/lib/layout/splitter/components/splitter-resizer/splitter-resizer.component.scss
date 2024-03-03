@@ -9,7 +9,7 @@ div.mona-splitter-resizer {
         opacity: 0.6;
     }
     & > fa-icon {
-        margin: 5px;
+        margin: 0.25rem;
     }
 
     &.vertical {
@@ -20,10 +20,10 @@ div.mona-splitter-resizer {
         border-bottom: 1px solid var(--mona-border-color);
         background: var(--mona-background);
         & div.mona-splitter-collapse[data-pos='prev'] {
-            margin-top: 1px;
+            margin-top: 0.0625rem;
         }
         & div.mona-splitter-collapse[data-pos='next'] {
-            margin-bottom: 1px;
+            margin-bottom: 0.0625rem;
         }
     }
 
@@ -36,10 +36,10 @@ div.mona-splitter-resizer {
         background: var(--mona-background);
         flex-direction: column;
         & div.mona-splitter-collapse[data-pos='prev'] {
-            margin-left: 1px;
+            margin-left: 0.0625rem;
         }
         & div.mona-splitter-collapse[data-pos='next'] {
-            margin-right: 1px;
+            margin-right: 0.0625rem;
         }
     }
 
@@ -51,6 +51,6 @@ div.mona-splitter-collapse {
     align-items: center;
     justify-content: center;
     & fa-icon {
-        font-size: 8px;
+        font-size: 0.5em;
     }
 }
