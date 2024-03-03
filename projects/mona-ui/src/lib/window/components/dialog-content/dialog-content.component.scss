@@ -1,24 +1,24 @@
-div.wrapper {
+.mona-dialog-content {
     display: flex;
     flex-direction: column;
     width: 100%;
     height: 100%;
 }
 
-div.mona-dialog-content-inner {
+.mona-dialog-content-inner {
     display: flex;
     flex: 1;
     padding: 10px 10px 0;
 }
 
 
-div.mona-dialog-text-wrapper {
+.mona-dialog-text-wrapper {
     height: 100%;
     flex: 1;
     overflow: hidden;
 }
 
-div.mona-dialog-text-container {
+.mona-dialog-text-container {
     width: 100%;
     padding-top: 12px;
     display: flex;
@@ -33,7 +33,7 @@ div.mona-dialog-text-container {
     line-height: 1.42857;
 }
 
-div.mona-dialog-input-wrapper {
+.mona-dialog-input-wrapper {
     width: 100%;
     & mona-text-box,
     & mona-numeric-text-box {
@@ -41,7 +41,7 @@ div.mona-dialog-input-wrapper {
     }
 }
 
-div.mona-dialog-icon-wrapper {
+.mona-dialog-icon-wrapper {
     display: flex;
     justify-content: center;
     padding: 8px 16px;
@@ -76,7 +76,7 @@ div.mona-dialog-icon-wrapper {
     }
 }
 
-div.mona-dialog-actions {
+.mona-dialog-actions {
     display: flex;
     align-items: center;
     flex-direction: row;
@@ -84,7 +84,7 @@ div.mona-dialog-actions {
     padding: 0 10px 10px 10px;
 }
 
-button.mona-dialog-action {
+.mona-dialog-action {
     &:not(:last-child) {
         margin-right: 5px;
     }

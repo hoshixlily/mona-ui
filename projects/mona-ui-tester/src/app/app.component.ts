@@ -1413,7 +1413,7 @@ export class AppComponent implements OnInit {
         const dialogRef = this.dialogService.show({
             text: "Enter title: ",
             title: "Dialog",
-            type: "confirm",
+            type: "input",
             inputType: "string"
         });
         dialogRef.result.pipe(take(1)).subscribe({
