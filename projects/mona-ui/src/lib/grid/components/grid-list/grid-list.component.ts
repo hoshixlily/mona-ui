@@ -1,4 +1,4 @@
-import { NgClass, NgFor, NgIf, NgTemplateOutlet } from "@angular/common";
+import { NgClass, NgTemplateOutlet } from "@angular/common";
 import {
     AfterViewInit,
     ChangeDetectionStrategy,
@@ -31,8 +31,6 @@ import { GridCellComponent } from "../grid-cell/grid-cell.component";
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone: true,
     imports: [
-        NgFor,
-        NgIf,
         NgClass,
         GridCellComponent,
         ButtonDirective,

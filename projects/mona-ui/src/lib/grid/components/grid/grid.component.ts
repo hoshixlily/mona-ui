@@ -1,5 +1,5 @@
 import { CdkDrag, CdkDragDrop, CdkDragEnter, CdkDragPreview, CdkDragStart, CdkDropList } from "@angular/cdk/drag-drop";
-import { NgIf, NgStyle, NgTemplateOutlet } from "@angular/common";
+import { NgStyle, NgTemplateOutlet } from "@angular/common";
 import {
     AfterContentInit,
     AfterViewInit,
@@ -49,7 +49,6 @@ import { GridListComponent } from "../grid-list/grid-list.component";
     providers: [GridService],
     standalone: true,
     imports: [
-        NgIf,
         CdkDropList,
         ChipComponent,
         NgStyle,
