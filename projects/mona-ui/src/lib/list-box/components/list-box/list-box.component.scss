@@ -1,43 +1,20 @@
-:host {
-    width: 300px;
-    height: 250px;
-}
-
-div.mona-list-box {
-    display: flex;
-    width: 100%;
-    height: 100%;
-    &-horizontal {
-        flex-direction: row;
-    }
-    &-vertical {
-        flex-direction: column;
-    }
-    &-horizontal-reverse {
-        flex-direction: row-reverse;
-    }
-    &-vertical-reverse {
-        flex-direction: column-reverse;
-    }
-}
-
-div.mona-list-box-view {
+.mona-list-box-view {
     flex: 1;
     height: 100%;
     overflow: auto;
 }
 
-div.mona-list-box-toolbar {
+.mona-list-box-toolbar {
     flex: 0 0 40px;
     display: flex;
     flex-direction: column;
-    row-gap: 4px;
+    row-gap: 0.25rem;
     column-gap: 0;
     justify-content: center;
     align-items: center;
     &-vertical, &-vertical-reverse {
         flex-direction: row;
-        column-gap: 4px;
+        column-gap: 0.25rem;
         row-gap: 0;
     }
     & button {
@@ -54,7 +31,7 @@ mona-list-view {
     height: 100%;
 }
 
-div.mona-list-box-item {
+.mona-list-box-item {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;

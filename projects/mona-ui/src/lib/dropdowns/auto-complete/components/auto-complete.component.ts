@@ -1,13 +1,14 @@
-import { NgClass, NgIf, NgTemplateOutlet } from "@angular/common";
+import { NgClass, NgTemplateOutlet } from "@angular/common";
 import {
     Component,
     ContentChild,
     DestroyRef,
     ElementRef,
     forwardRef,
-    HostBinding,
     inject,
+    input,
     Input,
+    InputSignal,
     OnInit,
     signal,
     TemplateRef,
@@ -62,7 +63,6 @@ import { AutoCompleteNoDataTemplateDirective } from "../directives/auto-complete
         NgClass,
         TextBoxDirective,
         FormsModule,
-        NgIf,
         FontAwesomeModule,
         NgTemplateOutlet,
         ListComponent,
@@ -74,19 +74,22 @@ import { AutoCompleteNoDataTemplateDirective } from "../directives/auto-complete
         ListItemTemplateDirective
     ],
     host: {
-        "[class.mona-disabled]": "disabled"
+        "[class.mona-disabled]": "disabled",
+        "[class.mona-dropdown]": "true",
+        "[class.mona-auto-complete]": "true"
     }
 })
 export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccessor {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
+    readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
     readonly #popupUidClass: string = `mona-dropdown-popup-${v4()}`;
+    #popupRef: PopupRef | null = null;
     #propagateChange: Action<string | null> | null = null;
     #value: string = "";
 
-    public readonly autoCompleteValue$: Subject<string> = new Subject<string>();
-    public readonly clearIcon: IconDefinition = faTimes;
-    public autoCompleteValue: WritableSignal<string> = signal("");
-    public popupRef: PopupRef | null = null;
+    protected readonly autoCompleteValue$: Subject<string> = new Subject<string>();
+    protected readonly clearIcon: IconDefinition = faTimes;
+    protected autoCompleteValue: WritableSignal<string> = signal("");
 
     protected readonly selectableOptions: SelectableOptions = {
         enabled: true,
@@ -94,8 +97,8 @@ export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccesso
         toggleable: false
     };
 
-    @HostBinding("class.mona-dropdown")
-    public readonly hostClass: boolean = true;
+    public placeholder: InputSignal<string> = input("");
+    public showClearButton: InputSignal<boolean> = input(false);
 
     @Input()
     public set data(value: Iterable<TData>) {
@@ -104,9 +107,6 @@ export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccesso
 
     @Input()
     public disabled: boolean = false;
-
-    @ViewChild("dropdownWrapper")
-    public dropdownWrapper!: ElementRef<HTMLDivElement>;
 
     @ContentChild(AutoCompleteFooterTemplateDirective, { read: TemplateRef })
     public footerTemplate: TemplateRef<any> | null = null;
@@ -128,14 +128,8 @@ export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccesso
     @ContentChild(AutoCompleteNoDataTemplateDirective, { read: TemplateRef })
     public noDataTemplate: TemplateRef<any> | null = null;
 
-    @Input()
-    public placeholder?: string;
-
     @ViewChild("popupTemplate")
     public popupTemplate!: TemplateRef<any>;
-
-    @Input()
-    public showClearButton: boolean = false;
 
     @Input()
     public set textField(value: string | Selector<TData, string> | null | undefined) {
@@ -163,8 +157,8 @@ export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccesso
     }
 
     public close(): void {
-        this.popupRef?.close();
-        this.popupRef = null;
+        this.#popupRef?.close();
+        this.#popupRef = null;
     }
 
     public ngOnInit(): void {
@@ -194,8 +188,8 @@ export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccesso
     }
 
     public open(): void {
-        this.popupRef = this.popupService.create({
-            anchor: this.dropdownWrapper,
+        this.#popupRef = this.popupService.create({
+            anchor: this.#hostElementRef.nativeElement,
             content: this.popupTemplate,
             hasBackdrop: false,
             closeOnOutsideClick: false,
@@ -204,8 +198,8 @@ export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccesso
             popupClass: ["mona-dropdown-popup-content", this.#popupUidClass],
             positions: DropDownService.getDefaultPositions()
         });
-        this.popupAnimationService.setupDropdownOutsideClickCloseAnimation(this.popupRef);
-        this.popupAnimationService.animateDropdown(this.popupRef, AnimationState.Show);
+        this.popupAnimationService.setupDropdownOutsideClickCloseAnimation(this.#popupRef);
+        this.popupAnimationService.animateDropdown(this.#popupRef, AnimationState.Show);
         window.setTimeout(() => {
             const input = this.elementRef.nativeElement.querySelector("input");
             if (input) {
@@ -213,8 +207,8 @@ export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccesso
                 input.setSelectionRange(-1, -1);
             }
         });
-        this.popupRef.closed.pipe(take(1)).subscribe(() => {
-            this.popupRef = null;
+        this.#popupRef.closed.pipe(take(1)).subscribe(() => {
+            this.#popupRef = null;
             this.listService.clearSelections();
             this.listService.clearFilter();
             const popupElement = document.querySelector(`.${this.#popupUidClass}`);
@@ -311,7 +305,7 @@ export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccesso
                     !(
                         target &&
                         (this.elementRef.nativeElement.contains(target) ||
-                            this.popupRef?.overlayRef.overlayElement.contains(target))
+                            this.#popupRef?.overlayRef.overlayElement.contains(target))
                     )
                 ) {
                     return;
@@ -326,7 +320,7 @@ export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccesso
         this.autoCompleteValue$
             .pipe(
                 tap(() => {
-                    if (!this.popupRef) {
+                    if (!this.#popupRef) {
                         this.open();
                     }
                 }),

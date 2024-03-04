@@ -1,5 +1,13 @@
-import { NgFor, NgIf } from "@angular/common";
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import {
+    ChangeDetectionStrategy,
+    Component,
+    EventEmitter,
+    Input,
+    InputSignal,
+    model,
+    ModelSignal,
+    Output
+} from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { ButtonGroupComponent } from "../../../buttons/button-group/button-group.component";
 import { ButtonDirective } from "../../../buttons/button/button.directive";
@@ -24,6 +32,7 @@ import {
 } from "../../../query/filter/FilterDescriptor";
 import { FilterMenuConnectorItem } from "../../models/FilterMenuConnectorItem";
 import { FilterMenuDataItem } from "../../models/FilterMenuDataItem";
+import { FilterMenuDateOptions } from "../../models/FilterMenuDateOptions";
 import { FilterMenuValue } from "../../models/FilterMenuValue";
 import { OperatorFilterPipe } from "../../pipes/operator-filter.pipe";
 import { ValuelessOperatorPipe } from "../../pipes/valueless-operator.pipe";
@@ -35,7 +44,6 @@ import { ValuelessOperatorPipe } from "../../pipes/valueless-operator.pipe";
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone: true,
     imports: [
-        NgIf,
         DropDownListComponent,
         FormsModule,
         TextBoxComponent,
@@ -44,27 +52,29 @@ import { ValuelessOperatorPipe } from "../../pipes/valueless-operator.pipe";
         DateTimePickerComponent,
         TimePickerComponent,
         ButtonGroupComponent,
-        NgFor,
         ButtonDirective,
         ValuelessOperatorPipe,
         OperatorFilterPipe
-    ]
+    ],
+    host: {
+        "[class.mona-filter-menu]": "true"
+    }
 })
-export class FilterMenuComponent implements OnInit {
+export class FilterMenuComponent {
     private booleanFilterValues: [boolean | null, boolean | null] = [null, null];
-    public readonly booleanFilterMenuDataItems: FilterMenuDataItem[] = [
+    protected readonly booleanFilterMenuDataItems: FilterMenuDataItem[] = [
         { text: "Is true", value: "eq" },
         { text: "Is false", value: "neq" },
         { text: "Is null", value: "isnull" },
         { text: "Is not null", value: "isnotnull" }
     ];
 
-    public readonly connectorDataItems: FilterMenuConnectorItem[] = [
+    protected readonly connectorDataItems: FilterMenuConnectorItem[] = [
         { text: "AND", value: "and" },
         { text: "OR", value: "or" }
     ];
 
-    public readonly dateFilterMenuDataItems: FilterMenuDataItem[] = [
+    protected readonly dateFilterMenuDataItems: FilterMenuDataItem[] = [
         { text: "Is equal to", value: "eq" },
         { text: "Is not equal to", value: "neq" },
         { text: "Is after", value: "gt" },
@@ -76,7 +86,7 @@ export class FilterMenuComponent implements OnInit {
     ];
 
     // TODO: Add null and empty filter operators
-    public readonly numericFilterMenuDataItems: FilterMenuDataItem[] = [
+    protected readonly numericFilterMenuDataItems: FilterMenuDataItem[] = [
         { text: "Is equal to", value: "eq" },
         { text: "Is not equal to", value: "neq" },
         { text: "Is greater than", value: "gt" },
@@ -87,7 +97,7 @@ export class FilterMenuComponent implements OnInit {
         { text: "Is not null", value: "isnotnull" }
     ];
 
-    public readonly stringFilterMenuDataItems: FilterMenuDataItem[] = [
+    protected readonly stringFilterMenuDataItems: FilterMenuDataItem[] = [
         { text: "Contains", value: "contains" },
         { text: "Does not contain", value: "doesnotcontain" },
         { text: "Ends with", value: "endswith" },
@@ -102,26 +112,22 @@ export class FilterMenuComponent implements OnInit {
         { text: "Is not null or empty", value: "isnotnullorempty" }
     ];
 
-    public dateFilterValues: [Date | null, Date | null] = [null, null];
-    public numberFilterValues: [number | null, number | null] = [null, null];
-    public selectedConnectorItem: FilterMenuConnectorItem | null = null;
-    public selectedFilterMenuDataItemList: Array<FilterMenuDataItem | undefined> = [undefined, undefined];
-    public stringFilterValues: [string, string] = ["", ""];
+    protected dateFilterValues: [Date | null, Date | null] = [null, null];
+    protected numberFilterValues: [number | null, number | null] = [null, null];
+    protected selectedConnectorItem: FilterMenuConnectorItem | null = null;
+    protected selectedFilterMenuDataItemList: Array<FilterMenuDataItem | undefined> = [undefined, undefined];
+    protected stringFilterValues: [string, string] = ["", ""];
+
+    public dateOptions: InputSignal<FilterMenuDateOptions> = model<FilterMenuDateOptions>({
+        format: "dd/MM/yyyy",
+        type: "date"
+    });
+    public field: ModelSignal<string> = model("");
+    public operators: InputSignal<Iterable<FilterOperators>> = model<Iterable<FilterOperators>>([]);
+    public type: ModelSignal<DataType> = model<DataType>("string");
 
     @Output()
     public apply: EventEmitter<CompositeFilterDescriptor> = new EventEmitter<CompositeFilterDescriptor>();
-
-    @Input()
-    public dateOptions: { format: string; type: "date" | "time" | "datetime" } = {
-        format: "dd/MM/yyyy",
-        type: "date"
-    };
-
-    @Input()
-    public field: string = "";
-
-    @Input()
-    public operators: FilterOperators[] = [];
 
     @Input()
     public set value(value: FilterMenuValue) {
@@ -131,13 +137,6 @@ export class FilterMenuComponent implements OnInit {
     public get value(): FilterMenuValue {
         return this.getFilterValues();
     }
-
-    @Input()
-    public type: DataType = "string";
-
-    public constructor() {}
-
-    public ngOnInit(): void {}
 
     public onConnectorChange(item: FilterMenuConnectorItem): void {
         if (item.value === this.selectedConnectorItem?.value) {
@@ -150,12 +149,12 @@ export class FilterMenuComponent implements OnInit {
     private getBooleanDescriptor(operator: BooleanFilterOperators): BooleanFilterDescriptor | null {
         if (operator === "isnotnull" || operator === "isnull") {
             return {
-                field: this.field,
+                field: this.field(),
                 operator: operator
             };
         } else {
             return {
-                field: this.field,
+                field: this.field(),
                 operator: "eq",
                 value: operator === "eq"
             };
@@ -165,12 +164,12 @@ export class FilterMenuComponent implements OnInit {
     private getDateDescriptor(operator: DateFilterOperators, value: Date | null): DateFilterDescriptor | null {
         if (operator === "isnotnull" || operator === "isnull") {
             return {
-                field: this.field,
+                field: this.field(),
                 operator: operator
             };
         } else if (value != null) {
             return {
-                field: this.field,
+                field: this.field(),
                 operator: operator,
                 value: value
             };
@@ -184,12 +183,12 @@ export class FilterMenuComponent implements OnInit {
     ): NumericFilterDescriptor | null {
         if (operator === "isnotnull" || operator === "isnull") {
             return {
-                field: this.field,
+                field: this.field(),
                 operator: operator
             };
         } else if (value != null) {
             return {
-                field: this.field,
+                field: this.field(),
                 operator: operator,
                 value: value
             };
@@ -200,22 +199,22 @@ export class FilterMenuComponent implements OnInit {
     private getStringDescriptor(operator: StringFilterOperators, value: string): StringFilterDescriptor | null {
         if (operator === "isnotnull" || operator === "isnull") {
             return {
-                field: this.field,
+                field: this.field(),
                 operator: operator
             };
         } else if (operator === "isempty" || operator === "isnotempty") {
             return {
-                field: this.field,
+                field: this.field(),
                 operator: operator
             };
         } else if (operator === "isnullorempty" || operator === "isnotnullorempty") {
             return {
-                field: this.field,
+                field: this.field(),
                 operator: operator
             };
         } else if (value != null) {
             return {
-                field: this.field,
+                field: this.field(),
                 operator: operator,
                 value: value
             };
@@ -227,13 +226,13 @@ export class FilterMenuComponent implements OnInit {
         if (!this.selectedConnectorItem) {
             this.clearSecondFilterValues();
         }
-        if (this.type === "string") {
+        if (this.type() === "string") {
             this.applyStringFilters();
-        } else if (this.type === "number") {
+        } else if (this.type() === "number") {
             this.applyNumberFilters();
-        } else if (this.type === "date") {
+        } else if (this.type() === "date") {
             this.applyDateFilters();
-        } else if (this.type === "boolean") {
+        } else if (this.type() === "boolean") {
             this.applyBooleanFilters();
         }
     }
@@ -267,7 +266,7 @@ export class FilterMenuComponent implements OnInit {
             };
         };
 
-        switch (this.type) {
+        switch (this.type()) {
             case "string":
                 return filterValue(this.stringFilterValues);
             case "number":
@@ -395,7 +394,7 @@ export class FilterMenuComponent implements OnInit {
 
     private clearSecondFilterValues(): void {
         this.selectedFilterMenuDataItemList[1] = undefined;
-        switch (this.type) {
+        switch (this.type()) {
             case "string":
                 this.stringFilterValues[1] = "";
                 break;
@@ -418,7 +417,7 @@ export class FilterMenuComponent implements OnInit {
         let filterMenuDataItems: FilterMenuDataItem[];
         let filterValues: [TargetType, TargetType];
 
-        switch (this.type) {
+        switch (this.type()) {
             case "string":
                 filterMenuDataItems = this.stringFilterMenuDataItems;
                 filterValues = [values.value1 ?? "", values.value2 ?? ""];
@@ -430,7 +429,7 @@ export class FilterMenuComponent implements OnInit {
             case "date":
             case "boolean":
                 filterMenuDataItems =
-                    this.type === "date" ? this.dateFilterMenuDataItems : this.booleanFilterMenuDataItems;
+                    this.type() === "date" ? this.dateFilterMenuDataItems : this.booleanFilterMenuDataItems;
                 filterValues = [values.value1 ?? null, values.value2 ?? null];
                 break;
             default:
@@ -444,7 +443,7 @@ export class FilterMenuComponent implements OnInit {
             filterMenuDataItems.find(f => f.value === values.operator2) ?? undefined
         ];
 
-        switch (this.type) {
+        switch (this.type()) {
             case "string":
                 this.stringFilterValues = filterValues as [string, string];
                 break;
@@ -453,7 +452,7 @@ export class FilterMenuComponent implements OnInit {
                 break;
             case "date":
             case "boolean":
-                if (this.type === "date") {
+                if (this.type() === "date") {
                     this.dateFilterValues = filterValues as [Date, Date];
                 } else {
                     this.booleanFilterValues = filterValues as [boolean, boolean];
@@ -478,7 +477,7 @@ export class FilterMenuComponent implements OnInit {
         if (operator === "isnull" || operator === "isnotnull") {
             return true;
         }
-        switch (this.type) {
+        switch (this.type()) {
             case "string":
                 if (
                     operator === "isempty" ||
@@ -508,7 +507,7 @@ export class FilterMenuComponent implements OnInit {
         if (operator === "isnull" || operator === "isnotnull") {
             return true;
         }
-        switch (this.type) {
+        switch (this.type()) {
             case "string":
                 if (
                     operator === "isempty" ||

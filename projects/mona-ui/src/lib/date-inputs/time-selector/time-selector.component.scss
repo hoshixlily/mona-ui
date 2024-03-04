@@ -1,24 +1,13 @@
-:host {
-    width: 100%;
-    height: 100%;
-}
-
-div.mona-time-selector {
+ol {
+    flex: 1;
     display: flex;
-    width: 100%;
-    height: 250px;
-    overflow: hidden;
-    & ol {
-        flex: 1;
+    list-style: none;
+    flex-direction: column;
+    overflow: hidden auto;
+    & li {
         display: flex;
-        list-style: none;
-        flex-direction: column;
-        overflow: hidden auto;
-        & li {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 4px 0;
-        }
+        align-items: center;
+        justify-content: center;
+        padding: 0.25rem 0;
     }
 }

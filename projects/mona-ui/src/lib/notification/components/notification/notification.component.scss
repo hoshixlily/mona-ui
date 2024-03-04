@@ -1,23 +1,23 @@
-.mona-notification {
+.mona-notification-wrapper {
     width: 350px;
     min-height: 80px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    margin-bottom: 8px;
+    margin-bottom: 0.5rem;
     background-color: var(--mona-background);
     border: 1px solid var(--mona-border-color);
     color: var(--mona-text);
     box-shadow: var(--mona-popup-shadow);
 }
 
-div.mona-notification-inner {
+.mona-notification-inner {
     display: flex;
     flex: 1;
-    padding: 10px;
+    padding: 0.5rem;
 }
 
-div.mona-notification-line {
+.mona-notification-line {
     width: 2px;
     display: flex;
     &-success {
@@ -34,11 +34,11 @@ div.mona-notification-line {
     }
 }
 
-div.mona-notification-icon {
+.mona-notification-icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0 16px;
+    padding: 0 1rem;
     &-success {
         color: var(--mona-success);
     }
@@ -53,45 +53,45 @@ div.mona-notification-icon {
     }
 }
 
-div.mona-notification-actions {
+.mona-notification-actions {
     height: 100%;
     display: flex;
     align-items: center;
     & fa-icon {
         cursor: pointer;
-        margin-top: -4px;
+        margin-top: -0.25rem;
     }
 }
 
-div.mona-notification-content-wrapper {
+.mona-notification-content-wrapper {
     display: flex;
     flex-direction: column;
     flex: 1;
 }
 
-div.mona-notification-header {
+.mona-notification-header {
     width: 100%;
     display: flex;
     flex-direction: row;
     flex: 1;
     align-items: center;
-    font-size: 14px;
+    font-size: 0.875rem;
     font-weight: 600;
     user-select: none;
 }
 
-div.mona-notification-content {
+.mona-notification-content {
     display: flex;
     width: 100%;
     flex: 1;
     align-items: center;
 }
 
-div.mona-notification-text {
+.mona-notification-text {
     color: var(--mona-text);
 }
 
-div.mona-notification-progress {
+.mona-notification-progress {
     width: 100%;
     height: 1px;
 }

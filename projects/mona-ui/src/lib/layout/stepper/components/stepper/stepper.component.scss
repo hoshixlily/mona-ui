@@ -1,21 +1,11 @@
-$step-width: 32px;
-$step-height: 32px;
+$step-width: 2rem;
+$step-height: 2rem;
 
-div.mona-stepper {
-    position: relative;
-    width: auto;
-    display: grid;
-    outline: none;
-    &-vertical {
-        height: 100%;
-    }
-}
-
-div.mona-stepper-horizontal {
+.mona-stepper-horizontal {
     margin-top: calc($step-height / -2);
 }
 
-ol.mona-stepper-step-list {
+.mona-stepper-step-list {
     position: absolute;
     display: flex;
     list-style: none;
@@ -57,7 +47,7 @@ ol.mona-stepper-step-list {
         & > li {
             & > div:first-child {
                 flex-direction: column;
-                row-gap: 5px;
+                row-gap: 0.25rem;
             }
         }
     }
@@ -66,17 +56,17 @@ ol.mona-stepper-step-list {
         flex-direction: column;
         height: 100%;
         width: max-content;
-        left: calc(-1 * (calc(calc($step-width - 8px) / 2)));
+        left: calc(-1 * (calc(calc($step-width - 0.5rem) / 2)));
         & > li {
             & > div:first-child {
                 flex-direction: row;
-                column-gap: 5px;
+                column-gap: 0.25rem;
             }
         }
     }
 }
 
-div.mona-stepper-track {
+.mona-stepper-track {
     position: relative;
     display: grid;
     background-color: var(--mona-background);
@@ -88,8 +78,8 @@ div.mona-stepper-track {
     }
     &-horizontal {
         width: 100%;
-        height: 6px;
-        top: calc(calc($step-height - 8px) / 2);
+        height: 0.5rem;
+        top: calc(calc($step-height - 0.5rem) / 2);
         & > div {
             height: 100%;
             transition: width 250ms ease-in-out;
@@ -97,7 +87,7 @@ div.mona-stepper-track {
     }
     &-vertical {
         height: 100%;
-        width: 8px;
+        width: 0.5rem;
         & > div {
             width: 100%;
             transition: height 250ms ease-in-out;

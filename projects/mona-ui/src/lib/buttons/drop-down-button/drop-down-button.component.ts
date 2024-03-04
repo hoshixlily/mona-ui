@@ -1,4 +1,3 @@
-import { NgIf } from "@angular/common";
 import {
     AfterContentInit,
     AfterViewInit,
@@ -24,7 +23,10 @@ import { ButtonDirective } from "../button/button.directive";
     templateUrl: "./drop-down-button.component.html",
     styleUrls: ["./drop-down-button.component.scss"],
     standalone: true,
-    imports: [ButtonDirective, NgIf, ContextMenuComponent]
+    imports: [ButtonDirective, ContextMenuComponent],
+    host: {
+        "[class.mona-drop-down-button]": "true"
+    }
 })
 export class DropDownButtonComponent implements AfterViewInit, AfterContentInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);

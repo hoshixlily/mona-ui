@@ -1,4 +1,4 @@
-table.mona-calendar-month-view-table {
+.mona-calendar-month-view-table {
     width: 100%;
     border-collapse: collapse;
     & td, th {
@@ -10,7 +10,7 @@ table.mona-calendar-month-view-table {
         pointer-events: none;
         & th {
             text-transform: uppercase;
-            padding: 0 0 4px 0;
+            padding: 0 0 0.25rem 0;
             font-weight: 600;
             box-shadow: inset 0 -1px 0 var(--mona-text);
             color: var(--mona-text);
@@ -24,7 +24,7 @@ table.mona-calendar-month-view-table {
     }
     & tbody {
         td {
-            padding: 4px 0;
+            padding: 0.25rem 0;
             cursor: pointer;
             &.mona-calendar-other-month {
                 color: var(--mona-text);
@@ -32,12 +32,12 @@ table.mona-calendar-month-view-table {
             }
         }
         & tr:first-child td {
-            margin-top: 4px;
+            margin-top: 0.25rem;
         }
     }
 }
 
-table.mona-calendar-year-view-table {
+.mona-calendar-year-view-table {
     width: 100%;
     border-collapse: collapse;
     & td, th {
@@ -48,7 +48,7 @@ table.mona-calendar-year-view-table {
     }
 }
 
-table.mona-calendar-decade-view-table {
+.mona-calendar-decade-view-table {
     width: 100%;
     border-collapse: collapse;
     & td, th {
@@ -59,7 +59,7 @@ table.mona-calendar-decade-view-table {
     }
 }
 
-div.mona-calendar-header {
+.mona-calendar-header {
     display: flex;
     & > div:first-child, & > div:last-child {
         display: flex;
@@ -92,9 +92,9 @@ div.mona-calendar-header {
     }
 }
 
-div.mona-calendar-month-view,
-div.mona-calendar-year-view,
-div.mona-calendar-decade-view {
+.mona-calendar-month-view,
+.mona-calendar-year-view,
+.mona-calendar-decade-view {
     border-left: 1px solid var(--mona-border-color);
     border-right: 1px solid var(--mona-border-color);
     border-bottom: 1px solid var(--mona-border-color);

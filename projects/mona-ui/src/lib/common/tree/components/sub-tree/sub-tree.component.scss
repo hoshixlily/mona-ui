@@ -10,12 +10,12 @@ ul li {
     outline: none;
 }
 
-div.mona-tree-node-container {
+.mona-tree-node-container {
     display: flex;
     align-items: center;
 }
 
-div.mona-tree-node-expander {
+.mona-tree-node-expander {
     width: 24px;
     height: 100%;
     display: flex;
@@ -24,9 +24,9 @@ div.mona-tree-node-expander {
     cursor: pointer;
 
     color: var(--mona-text);
-    font-size: 14px;
+    font-size: 0.875rem;
 }
 
-div.mona-sub-tree-container {
-    margin-top: 1px;
+.mona-sub-tree-container {
+    margin-top: 0.0625rem;
 }

@@ -1,3 +1,4 @@
-<button monaButton [flat]="true" (click)="openPopup()" [ngClass]="{'mona-grid-filtered': column.filtered}">
+<button monaButton [flat]="true" (click)="openPopup()"
+        [ngClass]="{'mona-grid-filtered': column().filtered}">
     <fa-icon [icon]="filterIcon"></fa-icon>
 </button>

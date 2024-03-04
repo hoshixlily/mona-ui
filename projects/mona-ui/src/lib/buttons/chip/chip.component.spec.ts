@@ -29,13 +29,13 @@ describe("ChipComponent", () => {
 
     it("should have correct default properties", () => {
         expect(component.disabled).toBe(false);
-        expect(component.label).toBe("");
-        expect(component.removable).toBe(false);
-        expect(component.tabindex).toBe(0);
+        expect(component.label()).toBe("");
+        expect(component.removable()).toBe(false);
+        expect(component.tabindex()).toBe(0);
     });
 
     it("should emit remove event when the chip is removable and the close button is clicked", () => {
-        component.removable = true;
+        fixture.componentRef.setInput("removable", true);
         fixture.detectChanges();
 
         let removeSpy = spyOn(component.remove, "emit");
@@ -46,7 +46,7 @@ describe("ChipComponent", () => {
     });
 
     it("should not show remove button if chip is not removable", () => {
-        component.removable = false;
+        fixture.componentRef.setInput("removable", false);
         fixture.detectChanges();
         let removeButton = de.query(By.css(".mona-chip-remove"));
         expect(removeButton).toBeNull();

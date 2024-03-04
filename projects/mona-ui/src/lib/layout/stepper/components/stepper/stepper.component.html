@@ -1,30 +1,34 @@
-<div class="mona-stepper" [ngStyle]="gridTemplateColumns"
-     [ngClass]="{'mona-stepper-vertical': orientation==='vertical', 'mona-stepper-horizontal': orientation==='horizontal', 'mona-stepper-linear': linear}"
-     [attr.tabindex]="1">
-    <ol class="mona-stepper-step-list" [ngClass]="{'mona-stepper-step-list-horizontal': orientation==='horizontal', 'mona-stepper-step-list-vertical': orientation==='vertical'}">
-        <li *ngFor="let step of stepList"
-            [ngStyle]="trackItemStyles"
-            (click)="onStepClick(step)">
+<ol class="mona-stepper-step-list"
+    [ngClass]="{'mona-stepper-step-list-horizontal': orientation()==='horizontal',
+                'mona-stepper-step-list-vertical': orientation()==='vertical'}">
+    @for (step of steps(); track $index) {
+        <li [ngStyle]="trackItemStyles()" (click)="onStepClick(step)">
             <div>
-                <ng-container *ngIf="!stepTemplateDirective">
-                    <span [ngClass]="{'mona-stepper-step-active': step.active}">
-                        <ng-container *ngIf="!indicatorTemplateDirective">{{step.index}}</ng-container>
-                        <ng-container *ngIf="indicatorTemplateDirective" [ngTemplateOutlet]="indicatorTemplateDirective.templateRef"
-                                      [ngTemplateOutletContext]="{$implicit: step.options, index: step.index, active: step.active}"></ng-container>
-                    </span>
-                </ng-container>
-                <ng-container *ngIf="stepTemplateDirective">
+                @if (stepTemplateDirective) {
                     <ng-container [ngTemplateOutlet]="stepTemplateDirective.templateRef"
-                                  [ngTemplateOutletContext]="{$implicit: step.options, index: step.index, active: step.active}"></ng-container>
-                </ng-container>
-
-                <span *ngIf="!labelTemplateDirective">{{step.options.label}}</span>
-                <ng-container *ngIf="labelTemplateDirective" [ngTemplateOutlet]="labelTemplateDirective?.templateRef ?? null"
-                              [ngTemplateOutletContext]="{$implicit: step.options, index: step.index, active: step.active}"></ng-container>
+                                  [ngTemplateOutletContext]="{$implicit: step.options, index: step.index, active: step.active()}"></ng-container>
+                } @else {
+                    <span [ngClass]="{'mona-stepper-step-active': step.active()}">
+                        @if (indicatorTemplateDirective) {
+                            <ng-container [ngTemplateOutlet]="indicatorTemplateDirective.templateRef"
+                                          [ngTemplateOutletContext]="{$implicit: step.options, index: step.index, active: step.active()}"></ng-container>
+                        } @else {
+                            {{ step.index }}
+                        }
+                    </span>
+                }
+                @if (labelTemplateDirective) {
+                    <ng-container [ngTemplateOutlet]="labelTemplateDirective?.templateRef ?? null"
+                                  [ngTemplateOutletContext]="{$implicit: step.options, index: step.index, active: step.active()}"></ng-container>
+                } @else {
+                    <span>{{ step.options.label }}</span>
+                }
             </div>
         </li>
-    </ol>
-    <div class="mona-stepper-track" [ngStyle]="trackStyles" [ngClass]="{'mona-stepper-track-horizontal': orientation==='horizontal', 'mona-stepper-track-vertical': orientation==='vertical'}">
-        <div [ngStyle]="trackInnerStyles"></div>
-    </div>
+    }
+</ol>
+<div class="mona-stepper-track" [ngStyle]="trackStyles()"
+     [ngClass]="{'mona-stepper-track-horizontal': orientation()==='horizontal',
+                 'mona-stepper-track-vertical': orientation()==='vertical'}">
+    <div [ngStyle]="trackInnerStyles()"></div>
 </div>

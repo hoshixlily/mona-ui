@@ -22,7 +22,10 @@ export class PopupService {
     private readonly outsideEventsToClose = ["click", "mousedown", "dblclick", "contextmenu", "auxclick"];
     private readonly popupStateMap: Dictionary<string, PopupState> = new Dictionary<string, PopupState>();
 
-    public constructor(private readonly injector: Injector, private readonly overlay: Overlay) {}
+    public constructor(
+        private readonly injector: Injector,
+        private readonly overlay: Overlay
+    ) {}
 
     public create(settings: PopupSettings): PopupRef {
         const uid = v4();
@@ -73,7 +76,7 @@ export class PopupService {
             const portal = new ComponentPortal(PopupWrapperComponent, null, injector);
             popupReference.componentRef = overlayRef.attach(portal);
             const component = popupReference.componentRef.instance as PopupWrapperComponent;
-            component.templateRef = settings.content;
+            component.templateRef.set(settings.content);
             popupReference.componentRef.changeDetectorRef.detectChanges();
         } else {
             const portal = new ComponentPortal(settings.content, null, injector);

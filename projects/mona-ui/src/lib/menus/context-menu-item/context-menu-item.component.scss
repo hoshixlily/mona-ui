@@ -1,4 +1,4 @@
-div.mona-contextmenu-item {
+.mona-contextmenu-item {
     width: 100%;
     height: 100%;
     display: flex;
@@ -13,7 +13,7 @@ div.mona-contextmenu-item {
     }
 
     &-text {
-        padding: 0 10px;
+        padding: 0 0.5rem;
         flex: 1;
         white-space: nowrap;
         overflow: hidden;
@@ -36,20 +36,20 @@ div.mona-contextmenu-item {
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-left: -5px;
+            margin-left: -0.25rem;
         }
         & fa-icon {
-            font-size: 12px;
+            font-size: 0.75rem;
             line-height: 1.667;
         }
     }
 }
 
-span.divider {
+.divider {
     display: block;
     height: 1px;
     width: 100%;
-    margin: 4px 0;
+    margin: 0.25rem 0;
     color: var(--mona-border-color);
     border-top: 1px solid var(--mona-border-color);
 }

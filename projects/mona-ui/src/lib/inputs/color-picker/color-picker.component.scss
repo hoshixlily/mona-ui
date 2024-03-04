@@ -1,16 +1,17 @@
-$color-size: 22px;
-.mona-color-picker {
+.mona-input-selector-value,
+.mona-input-button {
     display: flex;
     align-items: center;
-    & > div {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    & > div:first-child {
-        display: flex;
-        width: $color-size;
-        height: $color-size;
-        margin-left: 4px;
-    }
+    justify-content: center;
+}
+
+.mona-input-selector-value {
+    display: flex;
+    width: 1.42857em;
+    height: 1.42857em;
+    margin-left: 0.25rem;
+}
+
+mona-color-gradient {
+    border: none;
 }

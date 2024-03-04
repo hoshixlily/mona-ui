@@ -1,36 +1,30 @@
-div.mona-chip {
-    display: flex;
-    cursor: pointer;
-    user-select: none;
-    outline: none;
-    height: 100%;
-}
-
-div.mona-chip-content {
+.mona-chip-content {
     flex: 1;
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    padding: 4px 8px;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    padding: 0.25rem 0.5rem;
 }
 
-span.mona-chip-label {
+.mona-chip-label {
     display: inline-flex;
 }
 
 
-button[monaButton] {
-    padding: 0 7px;
+.mona-button {
+    padding: 0 0.5rem;
     background: var(--mona-background-dark) !important;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
 }
 
-span.mona-chip-remove-icon {
+.mona-chip-remove-icon {
     font-weight: bold;
-    font-size: 14px;
+    font-size: 0.875em;
 }
 
-div.mona-removable-chip {
+.mona-removable-chip {
     border-right: 1px solid var(--mona-border-color);
 }

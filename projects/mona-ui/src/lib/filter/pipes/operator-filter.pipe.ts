@@ -7,14 +7,18 @@ import { FilterMenuDataItem } from "../models/FilterMenuDataItem";
     standalone: true
 })
 export class OperatorFilterPipe implements PipeTransform {
-    public transform(value: FilterMenuDataItem[], visibleOperators?: FilterOperators[]): FilterMenuDataItem[] {
-        if (!visibleOperators || visibleOperators.length === 0) {
+    public transform(value: FilterMenuDataItem[], visibleOperators?: Iterable<FilterOperators>): FilterMenuDataItem[] {
+        if (!visibleOperators) {
+            return value;
+        }
+        const operators = Array.from(visibleOperators);
+        if (!operators.length) {
             return value;
         }
         return value
-            .filter(item => visibleOperators.includes(item.value))
+            .filter(item => operators.includes(item.value))
             .sort((a, b) => {
-                return visibleOperators.indexOf(a.value) - visibleOperators.indexOf(b.value);
+                return operators.indexOf(a.value) - operators.indexOf(b.value);
             });
     }
 }

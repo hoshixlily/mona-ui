@@ -1,3 +1,4 @@
+import { ChangeDetectionStrategy, Component } from "@angular/core";
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { PopupAnimationService } from "../../../animations/services/popup-animation.service";
@@ -8,25 +9,32 @@ import { GridService } from "../../services/grid.service";
 
 import { GridFilterMenuComponent } from "./grid-filter-menu.component";
 
+@Component({
+    template: ` <mona-grid-filter-menu [column]="column"></mona-grid-filter-menu> `,
+    standalone: true,
+    imports: [GridFilterMenuComponent],
+    changeDetection: ChangeDetectionStrategy.OnPush
+})
+class GridFilterMenuComponentTest {
+    public column: Column = new Column();
+}
+
 describe("GridFilterMenuComponent", () => {
     let component: GridFilterMenuComponent;
+    let hostComponent: GridFilterMenuComponentTest;
     let fixture: ComponentFixture<GridFilterMenuComponent>;
-    let column: Column;
+    let hostFixture: ComponentFixture<GridFilterMenuComponentTest>;
 
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [GridFilterMenuComponent, ButtonDirective, FilterMenuComponent, BrowserAnimationsModule],
             providers: [PopupAnimationService, GridService]
         });
-        fixture = TestBed.createComponent(GridFilterMenuComponent);
-        component = fixture.componentInstance;
-        column = new Column();
-        column.field = "test";
-        component.column = column;
-        fixture.detectChanges();
+        hostFixture = TestBed.createComponent(GridFilterMenuComponentTest);
+        hostComponent = hostFixture.componentInstance;
     });
 
     it("should create", () => {
-        expect(component).toBeTruthy();
+        expect(hostComponent).toBeTruthy();
     });
 });

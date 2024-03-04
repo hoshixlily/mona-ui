@@ -1,3 +1,4 @@
+import { ChangeDetectionStrategy, Component } from "@angular/core";
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { Column } from "../../models/Column";
 import { Row } from "../../models/Row";
@@ -5,31 +6,36 @@ import { GridService } from "../../services/grid.service";
 
 import { GridCellComponent } from "./grid-cell.component";
 
+@Component({
+    template: ` <mona-grid-cell [column]="column" [row]="row"></mona-grid-cell> `,
+    standalone: true,
+    imports: [GridCellComponent],
+    changeDetection: ChangeDetectionStrategy.OnPush
+})
+class GridCellComponentTest {
+    public column: Column = new Column();
+    public row: Row = new Row({ test: "test" });
+}
+
 describe("GridCellComponent", () => {
     let component: GridCellComponent;
+    let hostComponent: GridCellComponentTest;
     let fixture: ComponentFixture<GridCellComponent>;
+    let hostFixture: ComponentFixture<GridCellComponentTest>;
     let column: Column;
     let row: Row;
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [GridCellComponent],
+            imports: [GridCellComponent, GridCellComponentTest],
             providers: [GridService]
         });
-        fixture = TestBed.createComponent(GridCellComponent);
-
-        component = fixture.componentInstance;
-        column = new Column();
-        column.field = "test";
-        row = new Row({ test: "test" });
-
-        component.column = column;
-        component.row = row;
-
-        fixture.detectChanges();
+        hostFixture = TestBed.createComponent(GridCellComponentTest);
+        hostComponent = hostFixture.componentInstance;
+        hostFixture.detectChanges();
     });
 
     it("should create", () => {
-        expect(component).toBeTruthy();
+        expect(hostComponent).toBeTruthy();
     });
 });

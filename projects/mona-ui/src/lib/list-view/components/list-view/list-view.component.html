@@ -1,47 +1,45 @@
-<div class="mona-list-view" [attr.tabindex]="-1">
-    <div class="mona-list-container">
-        <mona-list [data]="viewItems()" height="100%">
-            @if (footerTemplate) {
-                <ng-template monaListFooterTemplate>
-                    <ng-container [ngTemplateOutlet]="footerTemplate"></ng-container>
-                </ng-template>
-            }
-            @if (groupHeaderTemplate) {
-                <ng-template monaListGroupHeaderTemplate let-groupHeader>
-                    <ng-container [ngTemplateOutlet]="groupHeaderTemplate"
-                                  [ngTemplateOutletContext]="{$implicit: groupHeader}"></ng-container>
-                </ng-template>
-            }
-            @if (headerTemplate) {
-                <ng-template monaListHeaderTemplate>
-                    <ng-container [ngTemplateOutlet]="headerTemplate"></ng-container>
-                </ng-template>
-            }
-            @if (itemTemplate) {
-                <ng-template monaListItemTemplate let-dataItem>
-                    <ng-container [ngTemplateOutlet]="itemTemplate"
-                                  [ngTemplateOutletContext]="{$implicit: dataItem}"></ng-container>
-                </ng-template>
-            }
-            @if (noDataTemplate) {
-                <ng-template monaListNoDataTemplate>
-                    <ng-container [ngTemplateOutlet]="noDataTemplate"></ng-container>
-                </ng-template>
-            }
-        </mona-list>
-    </div>
-    @if (pagerSettings().enabled && !listService.virtualScrollOptions().enabled) {
-        <div class="mona-list-view-pager">
-            <mona-pager [firstLast]="pagerSettings().firstLast"
-                        [pageSizeValues]="pagerSettings().pageSizeValues"
-                        [visiblePages]="pagerSettings().visiblePages"
-                        [total]="itemCount()"
-                        [skip]="pageState.skip()"
-                        [responsive]="false"
-                        [pageSize]="pageState.take()"
-                        [previousNext]="pagerSettings().previousNext"
-                        (pageChange)="onPageChange($event)"
-                        (pageSizeChange)="onPageSizeChange($event)"></mona-pager>
-        </div>
-    }
+<div class="mona-list-container">
+    <mona-list [data]="viewItems()" [height]="height()" [width]="width()">
+        @if (footerTemplate) {
+            <ng-template monaListFooterTemplate>
+                <ng-container [ngTemplateOutlet]="footerTemplate"></ng-container>
+            </ng-template>
+        }
+        @if (groupHeaderTemplate) {
+            <ng-template monaListGroupHeaderTemplate let-groupHeader>
+                <ng-container [ngTemplateOutlet]="groupHeaderTemplate"
+                              [ngTemplateOutletContext]="{$implicit: groupHeader}"></ng-container>
+            </ng-template>
+        }
+        @if (headerTemplate) {
+            <ng-template monaListHeaderTemplate>
+                <ng-container [ngTemplateOutlet]="headerTemplate"></ng-container>
+            </ng-template>
+        }
+        @if (itemTemplate) {
+            <ng-template monaListItemTemplate let-dataItem>
+                <ng-container [ngTemplateOutlet]="itemTemplate"
+                              [ngTemplateOutletContext]="{$implicit: dataItem}"></ng-container>
+            </ng-template>
+        }
+        @if (noDataTemplate) {
+            <ng-template monaListNoDataTemplate>
+                <ng-container [ngTemplateOutlet]="noDataTemplate"></ng-container>
+            </ng-template>
+        }
+    </mona-list>
 </div>
+@if (pagerSettings().enabled && !listService.virtualScrollOptions().enabled) {
+    <div class="mona-list-view-pager">
+        <mona-pager [firstLast]="pagerSettings().firstLast"
+                    [pageSizeValues]="pagerSettings().pageSizeValues"
+                    [visiblePages]="pagerSettings().visiblePages"
+                    [total]="itemCount()"
+                    [skip]="pageState.skip()"
+                    [responsive]="false"
+                    [pageSize]="pageState.take()"
+                    [previousNext]="pagerSettings().previousNext"
+                    (pageChange)="onPageChange($event)"
+                    (pageSizeChange)="onPageSizeChange($event)"></mona-pager>
+    </div>
+}

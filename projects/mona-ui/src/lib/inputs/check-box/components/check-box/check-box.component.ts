@@ -1,4 +1,5 @@
 import {
+    ChangeDetectionStrategy,
     Component,
     effect,
     ElementRef,
@@ -27,7 +28,12 @@ import { CheckBoxDirective } from "../../directives/check-box.directive";
             useExisting: forwardRef(() => CheckBoxComponent),
             multi: true
         }
-    ]
+    ],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    host: {
+        "[class.mona-check-box]": "true",
+        "[class.mona-disabled]": "disabled()"
+    }
 })
 export class CheckBoxComponent implements ControlValueAccessor {
     #propagateChange: Action<boolean> | null = null;

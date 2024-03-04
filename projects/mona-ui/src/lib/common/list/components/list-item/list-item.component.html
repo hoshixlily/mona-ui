@@ -1,5 +1,5 @@
-@if (itemTemplate()) {
-    <ng-container [ngTemplateOutlet]="itemTemplate()"
+@if (template()) {
+    <ng-container [ngTemplateOutlet]="template()"
                   [ngTemplateOutletContext]="{$implicit: dataItem()}"></ng-container>
 } @else {
     <span>{{itemText()}}</span>

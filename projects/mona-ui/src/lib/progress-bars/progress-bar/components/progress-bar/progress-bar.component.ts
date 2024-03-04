@@ -1,20 +1,19 @@
+import { DecimalPipe, NgClass, NgStyle } from "@angular/common";
 import {
     AfterViewInit,
     ChangeDetectionStrategy,
-    ChangeDetectorRef,
     Component,
     computed,
-    ElementRef,
-    Input,
-    OnInit,
+    effect,
+    input,
+    InputSignal,
+    InputSignalWithTransform,
     Signal,
     signal,
     WritableSignal
 } from "@angular/core";
-import { asapScheduler } from "rxjs";
-import { LabelPosition } from "../../models/LabelPosition";
 import { Action } from "../../../../utils/Action";
-import { NgClass, NgStyle, NgIf, DecimalPipe } from "@angular/common";
+import { LabelPosition } from "../../models/LabelPosition";
 
 @Component({
     selector: "mona-progress-bar",
@@ -22,62 +21,79 @@ import { NgClass, NgStyle, NgIf, DecimalPipe } from "@angular/common";
     styleUrls: ["./progress-bar.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone: true,
-    imports: [NgClass, NgStyle, NgIf, DecimalPipe]
+    imports: [NgClass, NgStyle, DecimalPipe],
+    host: {
+        class: "mona-progress-bar",
+        "[class.mon-disabled]": "disabled()"
+    }
 })
-export class ProgressBarComponent implements OnInit, AfterViewInit {
+export class ProgressBarComponent implements AfterViewInit {
     readonly #color: WritableSignal<string> = signal("var(--mona-primary)");
-    readonly #labelFormat: WritableSignal<Action<number, string>> = signal((progress: number) => `${progress}%`);
-    public readonly formatted: WritableSignal<boolean> = signal(false);
-    public label: Signal<string> = signal("");
-    public progress: WritableSignal<number> = signal(0);
-    public progressStyles: Signal<Partial<CSSStyleDeclaration>> = signal({});
-    public rightClip: number = -1;
+    protected readonly formatted: WritableSignal<boolean> = signal(false);
+    protected readonly label: Signal<string> = computed(() => {
+        const progress = this.progress();
+        const labelFormat = this.labelFormat();
+        return labelFormat(progress);
+    });
+    protected readonly progress: WritableSignal<number> = signal(0);
+    protected readonly progressStyles: Signal<Partial<CSSStyleDeclaration>> = computed(() => {
+        const progress = this.progress();
+        const color = this.#color();
+        const progressColor = progress === 0 ? "transparent" : color;
+        return {
+            borderTopRightRadius:
+                progress === 100 ? "var(--mona-border-radius)" : "calc(var(--mona-border-radius) * 2)",
+            borderBottomRightRadius:
+                progress === 100 ? "var(--mona-border-radius)" : "calc(var(--mona-border-radius) * 2)",
+            backgroundColor: progressColor
+        } as Partial<CSSStyleDeclaration>;
+    });
+    protected readonly rightClip: WritableSignal<number> = signal(-1);
 
-    @Input()
-    public set color(color: string | Action<number, string>) {
-        if (typeof color === "string") {
-            this.#color.set(color);
-        } else {
-            this.#color.set(color(this.progress()));
+    public color: InputSignal<string | Action<number, string>> = input<string | Action<number, string>>(
+        "var(--mona-primary)"
+    );
+    public disabled: InputSignal<boolean> = input(false);
+    public indeterminate: InputSignal<boolean> = input(false);
+    public labelFormat: InputSignalWithTransform<Action<number, string>, Action<number, string> | string> = input(
+        (progress: number) => `${progress}%`,
+        {
+            transform: (labelFormat: string | Action<number, string>) => {
+                if (typeof labelFormat === "string") {
+                    return () => labelFormat;
+                }
+                return labelFormat;
+            }
         }
+    );
+    public labelPosition: InputSignal<LabelPosition> = input<LabelPosition>("center");
+    public labelStyles: InputSignal<Partial<CSSStyleDeclaration>> = input<Partial<CSSStyleDeclaration>>({});
+    public labelVisible: InputSignal<boolean> = input(true);
+    public max: InputSignal<number> = input(100);
+    public min: InputSignal<number> = input(0);
+    public value: InputSignal<number> = input(0);
+
+    public constructor() {
+        effect(
+            () => {
+                const color = this.color();
+                if (typeof color === "string") {
+                    this.#color.set(color);
+                } else {
+                    this.#color.set(color(this.progress()));
+                }
+            },
+            { allowSignalWrites: true }
+        );
+        effect(() => this.updateProgress(this.value()), { allowSignalWrites: true });
+        effect(
+            () => {
+                this.labelFormat();
+                this.formatted.set(true);
+            },
+            { allowSignalWrites: true }
+        );
     }
-
-    @Input()
-    public disabled: boolean = false;
-
-    @Input()
-    public indeterminate: boolean = false;
-
-    @Input()
-    public set labelFormat(labelFormat: string | Action<number, string>) {
-        if (typeof labelFormat === "string") {
-            this.#labelFormat.set(() => labelFormat);
-        } else {
-            this.#labelFormat.set(labelFormat);
-        }
-        this.formatted.set(true);
-    }
-
-    @Input()
-    public labelPosition: LabelPosition = "center";
-
-    @Input()
-    public labelStyles: Partial<CSSStyleDeclaration> = {};
-
-    @Input()
-    public labelVisible: boolean = true;
-
-    @Input()
-    public max: number = 100;
-
-    @Input()
-    public min: number = 0;
-
-    @Input()
-    public set value(value: number) {
-        this.updateProgress(value);
-    }
-    public constructor(private readonly elementRef: ElementRef<HTMLElement>, private readonly cdr: ChangeDetectorRef) {}
 
     public ngAfterViewInit(): void {
         window.setTimeout(() => {
@@ -85,48 +101,17 @@ export class ProgressBarComponent implements OnInit, AfterViewInit {
         });
     }
 
-    public ngOnInit(): void {
-        this.setComputedSignals();
-    }
-
-    private setComputedSignals(): void {
-        this.label = computed(() => {
-            const progress = this.progress();
-            const labelFormat = this.#labelFormat();
-            return labelFormat(progress);
-        });
-        this.progressStyles = computed(() => {
-            const progress = this.progress();
-            const color = this.#color();
-            const progressColor = progress === 0 ? "transparent" : color;
-            return {
-                borderTopRightRadius:
-                    progress === 100 ? "var(--mona-border-radius)" : "calc(var(--mona-border-radius) * 2)",
-                borderBottomRightRadius:
-                    progress === 100 ? "var(--mona-border-radius)" : "calc(var(--mona-border-radius) * 2)",
-                backgroundColor: progressColor
-            } as Partial<CSSStyleDeclaration>;
-        });
-    }
-
     private updateProgress(value: number): void {
         const oldProgress = this.progress();
-        this.progress.set(((value - this.min) / (this.max - this.min)) * 100);
+        this.progress.set(((value - this.min()) / (this.max() - this.min())) * 100);
         this.updateProgressStyle(oldProgress, this.progress());
     }
 
     private updateProgressStyle(oldProgress: number, newProgress: number): void {
         if (oldProgress !== 100 && newProgress === 100) {
-            asapScheduler.schedule(() => {
-                this.rightClip = 1;
-                this.cdr.detectChanges();
-            }, 350);
+            this.rightClip.set(1);
         } else {
-            this.rightClip = -1;
-            this.cdr.detectChanges();
-            asapScheduler.schedule(() => {
-                this.cdr.detectChanges();
-            });
+            this.rightClip.set(-1);
         }
     }
 }

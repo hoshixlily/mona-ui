@@ -1,11 +1,9 @@
-<div class="mona-dropdown-tree" (click)="open()" #dropdownWrapper>
-    <div class="mona-dropdown-value">
-        <span>{{text()}}</span>
-    </div>
-    <button monaButton [tabindex]="-1" class="mona-input-button">
-        <fa-icon [icon]="dropdownIcon"></fa-icon>
-    </button>
+<div class="mona-dropdown-value">
+    <span>{{text()}}</span>
 </div>
+<button monaButton [tabindex]="-1" class="mona-input-button">
+    <fa-icon [icon]="dropdownIcon"></fa-icon>
+</button>
 
 <ng-template #popupTemplate>
     <div class="mona-dropdown-tree-popup-wrapper">

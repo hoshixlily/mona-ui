@@ -1,32 +1,24 @@
-import { AfterContentInit, Component } from "@angular/core";
-import { DialogAction } from "../../models/DialogAction";
+import { NgClass } from "@angular/common";
+import { AfterContentInit, ChangeDetectionStrategy, Component, signal, WritableSignal } from "@angular/core";
+import { FormsModule } from "@angular/forms";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { faCheck, faExclamation, faInfo, faQuestion, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
-import { DialogType } from "../../models/DialogType";
 import { Subject, take } from "rxjs";
-import { DialogResult } from "../../models/DialogResult";
-import { DialogRef } from "../../models/DialogRef";
-import { DialogHandler } from "../../models/DialogHandler";
 import { ButtonDirective } from "../../../buttons/button/button.directive";
 import { NumericTextBoxComponent } from "../../../inputs/numeric-text-box/components/numeric-text-box/numeric-text-box.component";
-import { FormsModule } from "@angular/forms";
 import { TextBoxComponent } from "../../../inputs/text-box/components/text-box/text-box.component";
-import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { NgIf, NgFor, NgClass } from "@angular/common";
+import { DialogAction } from "../../models/DialogAction";
+import { DialogHandler } from "../../models/DialogHandler";
+import { DialogRef } from "../../models/DialogRef";
+import { DialogResult } from "../../models/DialogResult";
+import { DialogType } from "../../models/DialogType";
 
 @Component({
     templateUrl: "./dialog-content.component.html",
     styleUrls: ["./dialog-content.component.scss"],
     standalone: true,
-    imports: [
-        NgIf,
-        FontAwesomeModule,
-        TextBoxComponent,
-        FormsModule,
-        NumericTextBoxComponent,
-        NgFor,
-        ButtonDirective,
-        NgClass
-    ]
+    imports: [FontAwesomeModule, TextBoxComponent, FormsModule, NumericTextBoxComponent, ButtonDirective, NgClass],
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DialogContentComponent implements AfterContentInit {
     readonly #dialogResult$: Subject<DialogResult> = new Subject<DialogResult>();
@@ -34,20 +26,20 @@ export class DialogContentComponent implements AfterContentInit {
         result: this.#dialogResult$.asObservable(),
         close: () => {}
     };
-    public readonly confirmIcon: IconDefinition = faQuestion;
-    public readonly errorIcon: IconDefinition = faTimes;
-    public readonly infoIcon: IconDefinition = faInfo;
-    public readonly inputIcon: IconDefinition = faQuestion;
-    public readonly successIcon: IconDefinition = faCheck;
-    public readonly warningIcon: IconDefinition = faExclamation;
-    public actions: DialogAction[] = [];
+    protected readonly confirmIcon: IconDefinition = faQuestion;
+    protected readonly errorIcon: IconDefinition = faTimes;
+    protected readonly infoIcon: IconDefinition = faInfo;
+    protected readonly inputIcon: IconDefinition = faQuestion;
+    protected readonly successIcon: IconDefinition = faCheck;
+    protected readonly warningIcon: IconDefinition = faExclamation;
+
+    public readonly actions: WritableSignal<DialogAction[]> = signal([]);
+    public readonly inputType: WritableSignal<"string" | "number"> = signal("string");
+    public readonly text: WritableSignal<string> = signal("");
+    public readonly type: WritableSignal<DialogType> = signal("info");
+    public readonly valueNumber: WritableSignal<number | null> = signal(null);
+    public readonly valueString: WritableSignal<string> = signal("");
     public dialogHandler?: DialogHandler; // This is set by DialogService
-    public inputType: "string" | "number" = "string";
-    public text: string = "";
-    public title: string = "";
-    public type: DialogType = "info";
-    public valueNumber: number | null = null;
-    public valueString: string = "";
 
     public ngAfterContentInit(): void {
         this.#dialogRef.close = () => this.dialogHandler?.close();

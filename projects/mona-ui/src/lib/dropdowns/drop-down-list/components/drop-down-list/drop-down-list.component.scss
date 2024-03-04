@@ -1,14 +1,8 @@
-.mona-dropdown-list {
-    display: inherit;
-    width: 100%;
-    outline: none;
-}
-
-div.mona-dropdown-value {
+.mona-dropdown-value {
     display: flex;
     align-items: center;
     width: 100%;
-    padding: 0 8px;
+    padding: 0 0.5rem;
     cursor: pointer;
     user-select: none;
     overflow: hidden;

@@ -1,74 +1,75 @@
-<div class="mona-grid-list">
-    <div class="mona-grid-list-wrap">
-        <table>
-            <colgroup>
-                @for (_ of gridService.groupColumns; track $index) {
-                    <col style="width: 34px;">
-                }
-                @for (column of columns; track $index) {
-                    <col [style.width.px]="column.calculatedWidth" [style.min-width.px]="column.minWidth">
-                }
-            </colgroup>
-            <tbody>
-                    @if (gridService.groupColumns.length === 0) {
-                        @for (row of data; track row.uid) {
-                            <tr (click)="onGridRowClick($event, row)" [ngClass]="{'mona-selected': row.selected}"
-                                [attr.data-ruid]="row.uid" [attr.data-row-view-index]="$index">
-                                @for (column of columns; track $index) {
-                                    <td>
-                                        <mona-grid-cell [column]="column" [row]="row"></mona-grid-cell>
-                                    </td>
-                                }
-                            </tr>
+<div class="mona-grid-list-wrap">
+    <table>
+        <colgroup>
+            @for (_ of gridService.groupColumns; track $index) {
+                <col style="width: 34px;">
+            }
+            @for (column of columns(); track $index) {
+                <col [style.width.px]="column.calculatedWidth()" [style.min-width.px]="column.minWidth">
+            }
+        </colgroup>
+        <tbody>
+            @if (gridService.groupColumns.length === 0) {
+                @for (row of data(); track row.uid) {
+                    <tr (click)="onGridRowClick($event, row)" [ngClass]="{'mona-selected': row.selected}"
+                        [attr.data-ruid]="row.uid" [attr.data-row-view-index]="$index">
+                        @for (column of columns(); track $index) {
+                            <td>
+                                <mona-grid-cell [column]="column" [row]="row"></mona-grid-cell>
+                            </td>
                         }
-                    } @else {
-                        <ng-template #gridGroupTemplate let-groupData let-column="column" let-cx="cx" let-depth="depth">
-                            <ng-container *ngIf="groupData|gridGroup:column:gridService.pageState.page as groupItem">
-                                @for (subGroup of groupItem; track $index) {
-                                    <tr class="mona-grid-grouping-row">
-                                        @for (_ of gridService.groupColumns|monaSlice:0:cx; track $index) {
-                                            <td></td>
-                                        }
-                                        @if (subGroup.rows.length > 0) {
-                                            <td [colSpan]="columns.length + gridService.groupColumns.length">
-                                                <button monaButton [flat]="true" style="width: 34px;" (click)="onGroupExpandChange(subGroup)">
-                                                    @if (subGroup.collapsed) {
-                                                        <fa-icon [icon]="expandIcon"></fa-icon>
-                                                    } @else {
-                                                        <fa-icon [icon]="collapseIcon"></fa-icon>
-                                                    }
-                                                </button>
-                                                <span class="mona-grid-grouping-row-text">{{column.title}}: {{subGroup.rows[0].data[column.field]}}</span>
-                                            </td>
-                                        }
-                                    </tr>
-                                    @if (cx < gridService.groupColumns.length-1 && !subGroup.collapsed) {
-                                        <ng-container [ngTemplateOutlet]="gridGroupTemplate"
-                                                      [ngTemplateOutletContext]="{$implicit: subGroup.rows, column: gridService.groupColumns[cx+1], cx: cx+1, depth:depth+1}">
-                                        </ng-container>
+                    </tr>
+                }
+            } @else {
+                <ng-template #gridGroupTemplate let-groupData let-column="column" let-cx="cx" let-depth="depth">
+                        @if (groupData|gridGroup:column:gridService.pageState.page; as groupItem) {
+                            @for (subGroup of groupItem; track $index) {
+                                <tr class="mona-grid-grouping-row">
+                                    @for (_ of gridService.groupColumns|monaSlice:0:cx; track $index) {
+                                        <td></td>
                                     }
-                                    @if (depth===gridService.groupColumns.length-1 && !subGroup.collapsed) {
-                                        @for (row of subGroup.rows; track row.uid) {
-                                            <tr (click)="onGridRowClick($event, row)" [ngClass]="{'mona-selected': row.selected}"
-                                                [attr.data-ruid]="row.uid" [attr.data-row-view-index]="$index">
-                                                @for (_ of gridService.groupColumns; track $index) {
-                                                    <td></td>
+                                    @if (subGroup.rows.length > 0) {
+                                        <td [colSpan]="columns().length + gridService.groupColumns.length">
+                                            <button monaButton [flat]="true" style="width: 34px;"
+                                                    (click)="onGroupExpandChange(subGroup)">
+                                                @if (subGroup.collapsed) {
+                                                    <fa-icon [icon]="expandIcon"></fa-icon>
+                                                } @else {
+                                                    <fa-icon [icon]="collapseIcon"></fa-icon>
                                                 }
-                                                @for (column of columns; track $index) {
-                                                    <td>
-                                                        <mona-grid-cell [column]="column" [row]="row"></mona-grid-cell>
-                                                    </td>
-                                                }
-                                            </tr>
-                                        }
+                                            </button>
+                                            <span class="mona-grid-grouping-row-text">{{ column.title }}
+                                                : {{ subGroup.rows[0].data[column.field] }}</span>
+                                        </td>
+                                    }
+                                </tr>
+                                @if (cx < gridService.groupColumns.length - 1 && !subGroup.collapsed) {
+                                    <ng-container [ngTemplateOutlet]="gridGroupTemplate"
+                                                  [ngTemplateOutletContext]="{$implicit: subGroup.rows, column: gridService.groupColumns[cx+1], cx: cx+1, depth:depth+1}">
+                                    </ng-container>
+                                }
+                                @if (depth === gridService.groupColumns.length - 1 && !subGroup.collapsed) {
+                                    @for (row of subGroup.rows; track row.uid) {
+                                        <tr (click)="onGridRowClick($event, row)"
+                                            [ngClass]="{'mona-selected': row.selected}"
+                                            [attr.data-ruid]="row.uid" [attr.data-row-view-index]="$index">
+                                            @for (_ of gridService.groupColumns; track $index) {
+                                                <td></td>
+                                            }
+                                            @for (column of columns(); track $index) {
+                                                <td>
+                                                    <mona-grid-cell [column]="column" [row]="row"></mona-grid-cell>
+                                                </td>
+                                            }
+                                        </tr>
                                     }
                                 }
-                            </ng-container>
-                        </ng-template>
-                        <ng-container [ngTemplateOutlet]="gridGroupTemplate"
-                                      [ngTemplateOutletContext]="{$implicit: data, column: gridService.groupColumns[0], cx: 0, depth: 0}"></ng-container>
-                    }
-            </tbody>
-        </table>
-    </div>
+                            }
+                        }
+                </ng-template>
+                <ng-container [ngTemplateOutlet]="gridGroupTemplate"
+                              [ngTemplateOutletContext]="{$implicit: data(), column: gridService.groupColumns[0], cx: 0, depth: 0}"></ng-container>
+            }
+        </tbody>
+    </table>
 </div>

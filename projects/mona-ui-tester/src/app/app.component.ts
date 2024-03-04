@@ -24,7 +24,7 @@ import {
     faSun,
     faTimes
 } from "@fortawesome/free-solid-svg-icons";
-import { Enumerable, ImmutableList, IndexableList } from "@mirei/ts-collections";
+import { Enumerable, ImmutableList, ImmutableSet, IndexableList } from "@mirei/ts-collections";
 import { DateTime } from "luxon";
 import {
     AutoCompleteComponent,
@@ -176,7 +176,8 @@ import {
     TreeViewSelectableDirective,
     WindowService,
     CheckBoxComponent,
-    RadioButtonComponent
+    RadioButtonComponent,
+    WindowComponent
 } from "mona-ui";
 import { debounceTime, map, Observable, of, take, timer } from "rxjs";
 import { v4 } from "uuid";
@@ -324,7 +325,8 @@ interface TreeNodeDataItem {
         DropDownTreeFooterTemplateDirective,
         DropDownTreeHeaderTemplateDirective,
         DropDownTreeNoDataTemplateDirective,
-        DropDownTreeNodeTemplateDirective
+        DropDownTreeNodeTemplateDirective,
+        WindowComponent
     ]
 })
 export class AppComponent implements OnInit {
@@ -595,62 +597,19 @@ export class AppComponent implements OnInit {
     public progressLabelFormatter = (value: number) => `${value}/100`;
     public radioButtonValue: WritableSignal<any> = signal(undefined);
     public rangedSliderValues: [number, number] = [12, 18];
-    public scrollViewData: string[] = [
-        "https://photos.smugmug.com/photos/i-qQv8THj/0/5a269061/O/i-qQv8THj.jpg",
-        "https://photos.smugmug.com/photos/i-F8Wtj6x/0/e384c898/O/i-F8Wtj6x.jpg",
-        "https://photos.smugmug.com/photos/i-Lr7g2pR/0/95219439/O/i-Lr7g2pR.jpg",
-        "https://photos.smugmug.com/photos/i-Nvhp58k/0/777327be/O/i-Nvhp58k.jpg",
-        "https://photos.smugmug.com/photos/i-tKx2tKq/0/f79eab88/O/i-tKx2tKq.png",
-        "https://photos.smugmug.com/photos/i-VHNKL53/0/cbfcb2fb/O/i-VHNKL53.jpg",
-        // "https://photos.smugmug.com/photos/i-qQv8THj/0/5a269061/O/i-qQv8THj.jpg",
-        // "https://photos.smugmug.com/photos/i-F8Wtj6x/0/e384c898/O/i-F8Wtj6x.jpg",
-        // "https://photos.smugmug.com/photos/i-Lr7g2pR/0/95219439/O/i-Lr7g2pR.jpg",
-        // "https://photos.smugmug.com/photos/i-Nvhp58k/0/777327be/O/i-Nvhp58k.jpg",
-        // "https://photos.smugmug.com/photos/i-tKx2tKq/0/f79eab88/O/i-tKx2tKq.png",
-        // "https://photos.smugmug.com/photos/i-VHNKL53/0/cbfcb2fb/O/i-VHNKL53.jpg",
-        // "https://photos.smugmug.com/photos/i-qQv8THj/0/5a269061/O/i-qQv8THj.jpg",
-        // "https://photos.smugmug.com/photos/i-F8Wtj6x/0/e384c898/O/i-F8Wtj6x.jpg",
-        // "https://photos.smugmug.com/photos/i-Lr7g2pR/0/95219439/O/i-Lr7g2pR.jpg",
-        // "https://photos.smugmug.com/photos/i-Nvhp58k/0/777327be/O/i-Nvhp58k.jpg",
-        "https://photos.smugmug.com/photos/i-tKx2tKq/0/f79eab88/O/i-tKx2tKq.png",
-        "https://photos.smugmug.com/photos/i-VHNKL53/0/cbfcb2fb/O/i-VHNKL53.jpg",
-        "https://photos.smugmug.com/photos/i-qQv8THj/0/5a269061/O/i-qQv8THj.jpg",
-        "https://photos.smugmug.com/photos/i-F8Wtj6x/0/e384c898/O/i-F8Wtj6x.jpg",
-        "https://photos.smugmug.com/photos/i-Lr7g2pR/0/95219439/O/i-Lr7g2pR.jpg",
-        "https://photos.smugmug.com/photos/i-Nvhp58k/0/777327be/O/i-Nvhp58k.jpg",
-        "https://photos.smugmug.com/photos/i-tKx2tKq/0/f79eab88/O/i-tKx2tKq.png",
-        "https://photos.smugmug.com/photos/i-VHNKL53/0/cbfcb2fb/O/i-VHNKL53.jpg",
-        "https://photos.smugmug.com/photos/i-qQv8THj/0/5a269061/O/i-qQv8THj.jpg",
-        "https://photos.smugmug.com/photos/i-F8Wtj6x/0/e384c898/O/i-F8Wtj6x.jpg",
-        "https://photos.smugmug.com/photos/i-Lr7g2pR/0/95219439/O/i-Lr7g2pR.jpg",
-        "https://photos.smugmug.com/photos/i-Nvhp58k/0/777327be/O/i-Nvhp58k.jpg",
-        "https://photos.smugmug.com/photos/i-tKx2tKq/0/f79eab88/O/i-tKx2tKq.png",
-        "https://photos.smugmug.com/photos/i-VHNKL53/0/cbfcb2fb/O/i-VHNKL53.jpg",
-        "https://photos.smugmug.com/photos/i-qQv8THj/0/5a269061/O/i-qQv8THj.jpg",
-        "https://photos.smugmug.com/photos/i-F8Wtj6x/0/e384c898/O/i-F8Wtj6x.jpg",
-        "https://photos.smugmug.com/photos/i-Lr7g2pR/0/95219439/O/i-Lr7g2pR.jpg",
-        "https://photos.smugmug.com/photos/i-Nvhp58k/0/777327be/O/i-Nvhp58k.jpg",
-        "https://photos.smugmug.com/photos/i-tKx2tKq/0/f79eab88/O/i-tKx2tKq.png",
-        "https://photos.smugmug.com/photos/i-VHNKL53/0/cbfcb2fb/O/i-VHNKL53.jpg",
-        "https://photos.smugmug.com/photos/i-qQv8THj/0/5a269061/O/i-qQv8THj.jpg",
-        "https://photos.smugmug.com/photos/i-F8Wtj6x/0/e384c898/O/i-F8Wtj6x.jpg",
-        "https://photos.smugmug.com/photos/i-Lr7g2pR/0/95219439/O/i-Lr7g2pR.jpg",
-        "https://photos.smugmug.com/photos/i-Nvhp58k/0/777327be/O/i-Nvhp58k.jpg",
-        "https://photos.smugmug.com/photos/i-tKx2tKq/0/f79eab88/O/i-tKx2tKq.png",
-        "https://photos.smugmug.com/photos/i-VHNKL53/0/cbfcb2fb/O/i-VHNKL53.jpg",
-        "https://photos.smugmug.com/photos/i-qQv8THj/0/5a269061/O/i-qQv8THj.jpg",
-        "https://photos.smugmug.com/photos/i-F8Wtj6x/0/e384c898/O/i-F8Wtj6x.jpg",
-        "https://photos.smugmug.com/photos/i-Lr7g2pR/0/95219439/O/i-Lr7g2pR.jpg",
-        "https://photos.smugmug.com/photos/i-Nvhp58k/0/777327be/O/i-Nvhp58k.jpg",
-        "https://photos.smugmug.com/photos/i-tKx2tKq/0/f79eab88/O/i-tKx2tKq.png",
-        "https://photos.smugmug.com/photos/i-VHNKL53/0/cbfcb2fb/O/i-VHNKL53.jpg",
-        "https://photos.smugmug.com/photos/i-qQv8THj/0/5a269061/O/i-qQv8THj.jpg",
-        "https://photos.smugmug.com/photos/i-F8Wtj6x/0/e384c898/O/i-F8Wtj6x.jpg",
-        "https://photos.smugmug.com/photos/i-Lr7g2pR/0/95219439/O/i-Lr7g2pR.jpg",
-        "https://photos.smugmug.com/photos/i-Nvhp58k/0/777327be/O/i-Nvhp58k.jpg",
-        "https://photos.smugmug.com/photos/i-tKx2tKq/0/f79eab88/O/i-tKx2tKq.png",
-        "https://photos.smugmug.com/photos/i-VHNKL53/0/cbfcb2fb/O/i-VHNKL53.jpg"
-    ];
+    public scrollViewData: ImmutableSet<string> = ImmutableSet.create([
+        "https://photos.smugmug.com/photos/i-MVxLrNn/0/CBrrvJV84VqpZBXMgN39mHXgmDWgLRVcjSPZtnd9F/O/i-MVxLrNn.jpg",
+        "https://photos.smugmug.com/photos/i-CRB8Dqc/0/P8m7ZJJ3jFL9sHHHbsrczhxmVVbzkFVgNPxCsKmS/O/i-CRB8Dqc.jpg",
+        "https://photos.smugmug.com/photos/i-8HfQH43/0/DQbGCs9m8w7ZFtRVV7C2snGnStrGv7sLkVdzq4XHD/O/i-8HfQH43.jpg",
+        "https://photos.smugmug.com/photos/i-Q2qwD8V/0/FV3cC7LFRmCw9KpSkvLhKGNZ7s7mz5g45rjJ83fRq/O/i-Q2qwD8V.jpg",
+        "https://photos.smugmug.com/photos/i-4FHqHbw/0/FVv9trWGx5hPvmwSSQtC74XbpnkRbWfTD8kL3vB9C/O/i-4FHqHbw.jpg",
+        "https://photos.smugmug.com/photos/i-WdTGTMg/0/C7DHJwxbzW5qWcrvtXhz9GfXnVswJnq7qpT3HbMc3/O/i-WdTGTMg.jpg",
+        "https://photos.smugmug.com/photos/i-XZGtpZC/0/C9CcBbKZ8JWPXwsn3qrjkmxtvGn9KNr33Fr5MTszb/O/i-XZGtpZC.jpg",
+        "https://photos.smugmug.com/photos/i-DrRSngh/0/CT3xwsnHv5wZQ4wh9WHmP8F6jFr7Z3sHDD97t2k5J/O/i-DrRSngh.jpg",
+        "https://photos.smugmug.com/photos/i-tFWWgxZ/0/P97tdGMtSQLhb6WBwBr6TcCGnSnV5MxS73BDP6ND/O/i-tFWWgxZ.jpg",
+        "https://photos.smugmug.com/photos/i-wcqdW6P/0/mBS27n36NDJRWtk8ZDhHFf5pzZDLnDfpqzFZ2zxN/O/i-wcqdW6P.jpg",
+        "https://photos.smugmug.com/photos/i-344RwvF/0/D79WSZ4FKJdvJMqgZZrjphRffFKFBDZJBJkLpb7KM/O/i-344RwvF.png"
+    ]);
     public selectedComboBoxDataItem: any = null;
     public selectedDropdownListDataItem: any;
     public selectedListItem: any;
@@ -1154,10 +1113,10 @@ export class AppComponent implements OnInit {
     }
 
     public onListBoxActionClick(event: ListBoxActionClickEvent): void {
-        if (event.action === "moveDown" && event.selectedItem?.text === "Plum") {
-            event.preventDefault();
-            console.log(event);
-        }
+        // if (event.action === "moveDown" && event.selectedItem?.text === "Plum") {
+        //     event.preventDefault();
+        //     console.log(event);
+        // }
     }
 
     public onListViewScrollBottom(event: Event): void {
@@ -1456,7 +1415,7 @@ export class AppComponent implements OnInit {
         const dialogRef = this.dialogService.show({
             text: "Enter title: ",
             title: "Dialog",
-            type: "confirm",
+            type: "input",
             inputType: "string"
         });
         dialogRef.result.pipe(take(1)).subscribe({

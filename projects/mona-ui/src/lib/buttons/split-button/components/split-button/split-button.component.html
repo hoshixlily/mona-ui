@@ -1,14 +1,14 @@
-<div class="mona-split-button" #wrapperElementRef>
-    <button monaButton (click)="buttonClick.emit()" [disabled]="disabled" [tabindex]="0" #mainButton>
-        @if (textTemplate) {
-            <ng-container [ngTemplateOutlet]="textTemplate" *ngIf="textTemplate"></ng-container>
-        } @else {
-            <span class="mona-split-button-text">{{text}}</span>
-        }
-    </button>
-    <button monaButton [disabled]="disabled" [tabindex]="-1" #menuButton>
-        <fa-icon [icon]="menuIcon"></fa-icon>
-    </button>
-    <mona-contextmenu [target]="menuButton" trigger="click" [minWidth]="popupWidth" [offset]="popupOffset" popupClass="mona-split-button-popup"
-                      [menuItems]="menuItems" #contextMenuComponent ></mona-contextmenu>
-</div>
+<button monaButton (click)="buttonClick.emit()" [disabled]="disabled"
+        [tabindex]="tabindex()" #mainButton>
+    @if (textTemplate) {
+        <ng-container [ngTemplateOutlet]="textTemplate"></ng-container>
+    } @else {
+        <span class="mona-split-button-text">{{text()}}</span>
+    }
+</button>
+<button monaButton [disabled]="disabled" [tabindex]="-1" #menuButton>
+    <fa-icon [icon]="menuIcon"></fa-icon>
+</button>
+<mona-contextmenu [target]="menuButton" trigger="click" [minWidth]="popupWidth"
+                  [offset]="popupOffset" popupClass="mona-split-button-popup"
+                  [menuItems]="menuItems" #contextMenuComponent ></mona-contextmenu>

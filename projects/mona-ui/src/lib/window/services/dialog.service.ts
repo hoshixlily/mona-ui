@@ -1,4 +1,4 @@
-import { ApplicationRef, Injectable } from "@angular/core";
+import { inject, Injectable } from "@angular/core";
 import { Subject, take } from "rxjs";
 import { DialogContentComponent } from "../components/dialog-content/dialog-content.component";
 import { DialogAction } from "../models/DialogAction";
@@ -12,7 +12,7 @@ import { WindowService } from "./window.service";
     providedIn: "root"
 })
 export class DialogService {
-    public constructor(private readonly appRef: ApplicationRef, private readonly windowService: WindowService) {}
+    readonly #windowService: WindowService = inject(WindowService);
 
     private static getDefaultActions(type: DialogType | undefined): DialogAction[] {
         if (type === "confirm") {
@@ -45,7 +45,7 @@ export class DialogService {
     }
 
     public show(settings: DialogSettings): DialogRef {
-        const windowRef = this.windowService.open({
+        const windowRef = this.#windowService.open({
             content: DialogContentComponent,
             minHeight: 155,
             height: settings?.height,
@@ -64,15 +64,15 @@ export class DialogService {
         };
 
         const component = windowRef.component?.instance as DialogContentComponent;
-        component.actions = settings?.actions ?? DialogService.getDefaultActions(settings?.type);
-        component.inputType = settings?.inputType ?? "string";
-        component.text = settings?.text ?? "";
-        component.type = settings?.type ?? "info";
+        component.actions.set(settings?.actions ?? DialogService.getDefaultActions(settings?.type));
+        component.inputType.set(settings?.inputType ?? "string");
+        component.text.set(settings?.text ?? "");
+        component.type.set(settings?.type ?? "info");
 
-        if (component.inputType === "number") {
-            component.valueNumber = (settings?.value as number) ?? null;
+        if (component.inputType() === "number") {
+            component.valueNumber.set((settings?.value as number) ?? null);
         } else {
-            component.valueString = (settings?.value as string) ?? "";
+            component.valueString.set((settings?.value as string) ?? "");
         }
         component.dialogHandler = dialogHandler;
         windowRef.close$.pipe(take(1)).subscribe({

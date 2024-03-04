@@ -1,21 +1,5 @@
-:host {
-    display: inline-flex;
-}
-
-div.mona-text-box {
-    display: flex;
-    & > [monaTextBox] {
-        border: none;
-        //height: 100%;
-        width: 100%;
-        &:active, &:focus, &:focus-within {
-            box-shadow: none;
-        }
-    }
-}
-
-span.mona-text-box-prefix,
-span.mona-text-box-suffix {
+.mona-text-box-prefix,
+.mona-text-box-suffix {
     display: flex;
     align-items: center;
     justify-content: center;

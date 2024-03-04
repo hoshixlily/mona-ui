@@ -1,38 +1,36 @@
-<div class="mona-multi-select" (click)="open()" #dropdownWrapper>
-    <div class="mona-multi-select-value">
-        <div>
-            @for (pair of valueTextMap(); track pair.key) {
-                <mona-chip [tabindex]="-1" [removable]="true" (remove)="onSelectedItemRemove($event, pair.key)">
-                    @if (!tagTemplate) {
-                        <span class="mona-multi-select-label" *ngIf="!tagTemplate">{{pair.value}}</span>
-                    } @else {
-                        <ng-container [ngTemplateOutlet]="tagTemplate"
-                                      [ngTemplateOutletContext]="{$implicit: pair.key.data}"></ng-container>
-                    }
-                </mona-chip>
-            }
+<div class="mona-multi-select-value">
+    <div>
+        @for (pair of valueTextMap(); track pair.key) {
+            <mona-chip [tabindex]="-1" [removable]="true" (remove)="onSelectedItemRemove($event, pair.key)">
+                @if (!tagTemplate) {
+                    <span class="mona-multi-select-label">{{pair.value}}</span>
+                } @else {
+                    <ng-container [ngTemplateOutlet]="tagTemplate"
+                                  [ngTemplateOutletContext]="{$implicit: pair.key.data}"></ng-container>
+                }
+            </mona-chip>
+        }
 
-            @if (tagCount() >= 0 && selectedListItems().length > tagCount()) {
-                <mona-chip [tabindex]="-1" [removable]="true" (remove)="onSelectedItemGroupRemove($event)">
-                    @if (!summaryTagTemplate) {
-                        <span class="mona-multi-select-label">{{summaryTagText()}}</span>
-                    } @else {
-                        <ng-container [ngTemplateOutlet]="summaryTagTemplate"
-                                      [ngTemplateOutletContext]="{$implicit: selectedDataItems()}"></ng-container>
-                    }
-                </mona-chip>
-            }
-        </div>
+        @if (tagCount() >= 0 && selectedListItems().length > tagCount()) {
+            <mona-chip [tabindex]="-1" [removable]="true" (remove)="onSelectedItemGroupRemove($event)">
+                @if (!summaryTagTemplate) {
+                    <span class="mona-multi-select-label">{{summaryTagText()}}</span>
+                } @else {
+                    <ng-container [ngTemplateOutlet]="summaryTagTemplate()"
+                                  [ngTemplateOutletContext]="{$implicit: selectedDataItems()}"></ng-container>
+                }
+            </mona-chip>
+        }
     </div>
-    @if (showClearButton && selectedListItems().length !== 0) {
-        <span class="mona-input-clear-icon" (click)="clearValue($event)">
-            <fa-icon [icon]="clearIcon"></fa-icon>
-        </span>
-    }
-    <button monaButton [tabindex]="-1" class="mona-input-button" (click)="open()">
-        <fa-icon [icon]="dropdownIcon"></fa-icon>
-    </button>
 </div>
+@if (showClearButton() && selectedListItems().length !== 0) {
+    <span class="mona-input-clear-icon" (click)="clearValue($event)">
+        <fa-icon [icon]="clearIcon"></fa-icon>
+    </span>
+}
+<button monaButton [tabindex]="-1" class="mona-input-button" (click)="open()">
+    <fa-icon [icon]="dropdownIcon"></fa-icon>
+</button>
 
 <ng-template #popupTemplate>
     <div class="mona-dropdown-popup-list-wrapper">

@@ -1,41 +1,48 @@
-<div class="mona-slider"
-     [ngClass]="{'mona-slider-horizontal':orientation==='horizontal',
-                 'mona-slider-vertical':orientation==='vertical', 'mona-disabled': disabled}">
-    <div class="mona-slider-track">
-        <div class="mona-slider-selection"
-             [ngClass]="{'mona-slider-dragging': dragging()}"
-             [style.width.px]="orientation==='horizontal' ? handlePosition():undefined"
-             [style.height.px]="orientation==='vertical' ? handlePosition():undefined"
-        ></div>
-    </div>
-    <div class="mona-slider-tick-list" *ngIf="showTicks">
-        <ng-container *ngFor="let tick of ticks; let tx = index;">
-                <span class="mona-slider-tick" [ngClass]="{'mona-invisible': tx % tickStep !== 0}" *ngIf="tx !== 0">
+<div class="mona-slider-track">
+    <div class="mona-slider-selection"
+         [ngClass]="{'mona-slider-dragging': dragging()}"
+         [style.width.%]="orientation()==='horizontal' ? handlePosition():undefined"
+         [style.height.%]="orientation()==='vertical' ? handlePosition():undefined"
+    ></div>
+</div>
+@if (showTicks()) {
+    <div class="mona-slider-tick-list">
+        @for (tick of ticks(); track $index) {
+            @if ($index !== 0) {
+                <span class="mona-slider-tick" [ngClass]="{'mona-invisible': $index % tickStep() !== 0}">
                     <span [attr.data-value]="tick.value"></span>
                 </span>
-            <span class="mona-slider-tick" [ngClass]="{'mona-invisible': tx % tickStep !== 0}"
-                  *ngIf="tx !== ticks.length - 1">
+            }
+            @if ($index !== ticks().length - 1) {
+                <span class="mona-slider-tick" [ngClass]="{'mona-invisible': $index % tickStep() !== 0}">
                     <span [attr.data-value]="tick.value"></span>
                 </span>
-        </ng-container>
+            }
+        }
     </div>
+}
+@if (showTicks() && showLabels()) {
     <div class="mona-slider-tick-label-list"
-         [ngClass]="{'mona-slider-position-before': labelPosition==='before', 'mona-slider-position-after': labelPosition==='after'}"
-         *ngIf="showTicks && showLabels">
-        <ng-container *ngFor="let tick of ticks; let tx = index;">
-                <span class="mona-slider-tick-label" [ngClass]="{'mona-invisible': tx % labelStep !== 0}">
-                    <span *ngIf="!tickValueTemplate">{{tick.value}}</span>
-                    <span *ngIf="tickValueTemplate">
-                        <ng-container
+         [ngClass]="{'mona-slider-position-before': labelPosition()==='before',
+                     'mona-slider-position-after': labelPosition()==='after'}">
+        @for (tick of ticks(); track $index) {
+            <span class="mona-slider-tick-label" [ngClass]="{'mona-invisible': $index % labelStep() !== 0}">
+                @if (!tickValueTemplate) {
+                    <span>{{ tick.value }}</span>
+                } @else {
+                    <span>
+                    <ng-container
                             *ngTemplateOutlet="tickValueTemplate; context: {$implicit: tick.value}"></ng-container>
                     </span>
-                </span>
-        </ng-container>
+                }
+
+            </span>
+        }
     </div>
-    <div class="mona-slider-handle"
-         [ngClass]="{'mona-slider-dragging': dragging()}"
-         [style.left.px]="orientation==='horizontal' ? handlePosition() : undefined"
-         [style.bottom.px]="orientation==='vertical' ? handlePosition() : undefined"
-         [attr.tabindex]="disabled?-1:0"
-         #sliderHandle></div>
-</div>
+}
+<div class="mona-slider-handle"
+     [ngClass]="{'mona-slider-dragging': dragging()}"
+     [style.left.%]="orientation()==='horizontal' ? handlePosition() : undefined"
+     [style.bottom.%]="orientation()==='vertical' ? handlePosition() : undefined"
+     [attr.tabindex]="disabled()?-1:0"
+     #sliderHandle></div>

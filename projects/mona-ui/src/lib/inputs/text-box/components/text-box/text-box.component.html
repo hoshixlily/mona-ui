@@ -1,29 +1,27 @@
-<div class="mona-text-box">
-    <ng-container *ngFor="let prefixTemplate of prefixTemplateList">
-        <span class="mona-text-box-prefix">
-            <ng-container *ngTemplateOutlet="prefixTemplate"></ng-container>
-        </span>
-    </ng-container>
-    <input [disabled]="disabled"
-           [readonly]="readonly()"
-           [placeholder]="placeholder()"
-           [type]="type()"
-           [class]="inputClass()"
-           [style]="inputStyle()"
-           [ngModel]="value"
-           (ngModelChange)="onValueChange($event)"
-           (blur)="inputBlur.emit($event)"
-           (focus)="inputFocus.emit($event)" monaTextBox />
+@for (prefixTemplate of prefixTemplateList; track $index) {
+    <span class="mona-text-box-prefix">
+        <ng-container *ngTemplateOutlet="prefixTemplate"></ng-container>
+    </span>
+}
+<input [disabled]="disabled()"
+       [readonly]="readonly()"
+       [placeholder]="placeholder()"
+       [type]="type()"
+       [class]="inputClass()"
+       [style]="inputStyle()"
+       [ngModel]="value()"
+       (ngModelChange)="onValueChange($event)"
+       (blur)="inputBlur.emit($event)"
+       (focus)="inputFocus.emit($event)" monaTextBox />
 
-    @if (clearButton() && value.length !== 0) {
-        <button monaButton [flat]="true" [tabindex]="-1" title="Clear" (click)="onClearClick()">
-            <fa-icon [icon]="clearIcon"></fa-icon>
-        </button>
-    }
+@if (clearButton() && value().length !== 0) {
+    <button monaButton [flat]="true" [tabindex]="-1" title="Clear" (click)="onClearClick()">
+        <fa-icon [icon]="clearIcon"></fa-icon>
+    </button>
+}
 
-    <ng-container *ngFor="let suffixTemplate of suffixTemplateList">
-        <span class="mona-text-box-suffix">
-            <ng-container *ngTemplateOutlet="suffixTemplate"></ng-container>
-        </span>
-    </ng-container>
-</div>
+@for (suffixTemplate of suffixTemplateList; track $index) {
+    <span class="mona-text-box-suffix">
+        <ng-container *ngTemplateOutlet="suffixTemplate"></ng-container>
+    </span>
+}

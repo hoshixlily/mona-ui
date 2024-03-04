@@ -7,7 +7,6 @@ import {
     effect,
     ElementRef,
     forwardRef,
-    HostBinding,
     inject,
     Injector,
     Input,
@@ -82,11 +81,13 @@ import { DropDownTreeService } from "../../services/drop-down-tree.service";
     host: {
         "[class.mona-disabled]": "disabled",
         "[class.mona-dropdown]": "true",
+        "[class.mona-dropdown-tree]": "true",
         "[attr.tabindex]": "disabled ? null : 0"
     }
 })
 export class DropDownTreeComponent<T> implements ControlValueAccessor, OnInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
+    readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
     readonly #injector: Injector = inject(Injector);
     readonly #popupUidClass: string = `mona-dropdown-popup-${v4()}`;
     readonly #selectedNode: Signal<TreeNode<T> | null> = computed(() => {
@@ -95,6 +96,8 @@ export class DropDownTreeComponent<T> implements ControlValueAccessor, OnInit {
     #popupRef: PopupRef | null = null;
     #propagateChange: Action<any> | null = null;
     #value: WritableSignal<any | null> = signal(null);
+    protected readonly clearIcon: IconDefinition = faTimes;
+    protected readonly dropdownIcon: IconDefinition = faChevronDown;
     protected readonly selectableOptions: SelectableOptions = {
         enabled: true,
         mode: "single",
@@ -108,8 +111,6 @@ export class DropDownTreeComponent<T> implements ControlValueAccessor, OnInit {
         }
         return this.treeService.getNodeText(node);
     });
-    public readonly clearIcon: IconDefinition = faTimes;
-    public readonly dropdownIcon: IconDefinition = faChevronDown;
 
     @Input()
     public set children(value: string | Selector<T, Iterable<T> | Observable<Iterable<T>>>) {
@@ -123,9 +124,6 @@ export class DropDownTreeComponent<T> implements ControlValueAccessor, OnInit {
 
     @Input()
     public disabled: boolean = false;
-
-    @ViewChild("dropdownWrapper")
-    public dropdownWrapper!: ElementRef<HTMLDivElement>;
 
     @ContentChild(DropDownTreeFooterTemplateDirective, { read: TemplateRef })
     public footerTemplate: TemplateRef<any> | null = null;
@@ -153,7 +151,6 @@ export class DropDownTreeComponent<T> implements ControlValueAccessor, OnInit {
     }
 
     public constructor(
-        private readonly elementRef: ElementRef<HTMLElement>,
         private readonly popupAnimationService: PopupAnimationService,
         private readonly popupService: PopupService,
         protected readonly treeService: TreeService<T>
@@ -178,16 +175,16 @@ export class DropDownTreeComponent<T> implements ControlValueAccessor, OnInit {
     }
 
     public open(): void {
-        this.dropdownWrapper.nativeElement.focus();
+        this.#hostElementRef.nativeElement.focus();
         if (this.#popupRef) {
             return;
         }
         this.#popupRef = this.popupService.create({
-            anchor: this.dropdownWrapper,
+            anchor: this.#hostElementRef.nativeElement,
             content: this.popupTemplate,
             hasBackdrop: false,
             withPush: false,
-            width: this.elementRef.nativeElement.getBoundingClientRect().width,
+            width: this.#hostElementRef.nativeElement.getBoundingClientRect().width,
             popupClass: ["mona-dropdown-popup-content", "mona-dropdown-tree-popup-content", this.#popupUidClass],
             closeOnOutsideClick: false,
             positions: DropDownService.getDefaultPositions()
@@ -199,7 +196,7 @@ export class DropDownTreeComponent<T> implements ControlValueAccessor, OnInit {
             this.#popupRef = null;
             this.treeService.clearFilter();
             const popupElement = document.querySelector(`.${this.#popupUidClass}`);
-            if (DropDownService.shouldFocusAfterClose(this.elementRef.nativeElement, popupElement)) {
+            if (DropDownService.shouldFocusAfterClose(this.#hostElementRef.nativeElement, popupElement)) {
                 this.focus();
             }
         });
@@ -219,7 +216,7 @@ export class DropDownTreeComponent<T> implements ControlValueAccessor, OnInit {
     }
 
     private focus(): void {
-        this.elementRef.nativeElement?.focus();
+        this.#hostElementRef.nativeElement?.focus();
     }
 
     private focusSelectedNode(): void {
@@ -302,10 +299,18 @@ export class DropDownTreeComponent<T> implements ControlValueAccessor, OnInit {
     }
 
     private setEventListeners(): void {
-        fromEvent<KeyboardEvent>(this.elementRef.nativeElement, "keydown")
+        fromEvent<KeyboardEvent>(this.#hostElementRef.nativeElement, "keydown")
             .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe((event: KeyboardEvent) => {
                 this.handleKeyDown(event);
+            });
+        fromEvent<MouseEvent>(this.#hostElementRef.nativeElement, "click")
+            .pipe(takeUntilDestroyed(this.#destroyRef))
+            .subscribe(() => {
+                if (this.disabled) {
+                    return;
+                }
+                this.open();
             });
     }
 

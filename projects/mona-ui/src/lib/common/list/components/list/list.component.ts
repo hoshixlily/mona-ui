@@ -11,15 +11,15 @@ import {
     ElementRef,
     EventEmitter,
     inject,
+    input,
     Input,
+    InputSignal,
     OnInit,
     Output,
     QueryList,
     Signal,
-    signal,
     TemplateRef,
-    ViewChildren,
-    WritableSignal
+    ViewChildren
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { Selector } from "@mirei/ts-collections";
@@ -35,6 +35,7 @@ import { ListItemDirective } from "../../directives/list-item.directive";
 import { ListNoDataTemplateDirective } from "../../directives/list-no-data-template.directive";
 import { ListItem } from "../../models/ListItem";
 import { ListItemTemplateContext } from "../../models/ListItemTemplateContext";
+import { ListSizeInputType, ListSizeType } from "../../models/ListSizeType";
 import { ListService } from "../../services/list.service";
 import { ListItemComponent } from "../list-item/list-item.component";
 
@@ -53,16 +54,51 @@ import { ListItemComponent } from "../list-item/list-item.component";
     ],
     templateUrl: "./list.component.html",
     styleUrl: "./list.component.scss",
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    host: {
+        "[class.mona-list]": "true",
+        "[style.height]": "listHeight()",
+        "[style.max-height]": "listMaxHeight()",
+        "[style.width]": "listWidth()",
+        "[attr.tabindex]": "-1"
+    }
 })
 export class ListComponent<TData> implements OnInit, AfterViewInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
+    readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
     #viewport: CdkVirtualScrollViewport | null = null;
 
-    protected readonly listHeight: WritableSignal<string | undefined> = signal(undefined);
-    protected readonly listMaxHeight: WritableSignal<string | undefined> = signal(undefined);
-    protected readonly listWidth: WritableSignal<string | undefined> = signal(undefined);
-    protected readonly viewportHeight: Signal<string | undefined> = computed(() => {
+    protected readonly listHeight: Signal<string | undefined> = computed(() => {
+        const height = this.height();
+        if (height == null) {
+            return undefined;
+        }
+        if (typeof height === "number") {
+            return `${height}px`;
+        }
+        return height;
+    });
+    protected readonly listMaxHeight: Signal<ListSizeType> = computed(() => {
+        const maxHeight = this.maxHeight();
+        if (maxHeight == null) {
+            return undefined;
+        }
+        if (typeof maxHeight === "number") {
+            return `${maxHeight}px`;
+        }
+        return maxHeight;
+    });
+    protected readonly listWidth: Signal<ListSizeType> = computed(() => {
+        const width = this.width();
+        if (width == null) {
+            return undefined;
+        }
+        if (typeof width === "number") {
+            return `${width}px`;
+        }
+        return width;
+    });
+    protected readonly viewportHeight: Signal<ListSizeType> = computed(() => {
         const listHeight = this.listHeight();
         if (listHeight) {
             return listHeight;
@@ -76,6 +112,10 @@ export class ListComponent<TData> implements OnInit, AfterViewInit {
         const height = items * itemHeight + headerItems * 2;
         return `${height}px`;
     });
+
+    public height: InputSignal<ListSizeInputType> = input<ListSizeInputType>(undefined);
+    public maxHeight: InputSignal<ListSizeInputType> = input<ListSizeInputType>(undefined);
+    public width: InputSignal<ListSizeInputType> = input<ListSizeInputType>(undefined);
 
     @Input({ required: false })
     public set data(value: Iterable<TData>) {
@@ -91,33 +131,11 @@ export class ListComponent<TData> implements OnInit, AfterViewInit {
     @ContentChild(ListHeaderTemplateDirective, { read: TemplateRef })
     public headerTemplate: TemplateRef<any> | null = null;
 
-    @Input()
-    public set height(value: string | number | undefined) {
-        if (value == null) {
-            this.listHeight.set(undefined);
-        } else if (typeof value === "number") {
-            this.listHeight.set(`${value}px`);
-        } else {
-            this.listHeight.set(value);
-        }
-    }
-
     @Output()
     public itemSelect: EventEmitter<ListItem<TData>> = new EventEmitter<ListItem<TData>>();
 
     @ContentChild(ListItemTemplateDirective, { read: TemplateRef })
     public itemTemplate: TemplateRef<ListItemTemplateContext<TData>> | null = null;
-
-    @Input()
-    public set maxHeight(value: string | number | undefined) {
-        if (value == null) {
-            this.listMaxHeight.set(undefined);
-        } else if (typeof value === "number") {
-            this.listMaxHeight.set(`${value}px`);
-        } else {
-            this.listMaxHeight.set(value);
-        }
-    }
 
     @ContentChild(ListNoDataTemplateDirective, { read: TemplateRef })
     public noDataTemplate: TemplateRef<any> | null = null;
@@ -130,21 +148,7 @@ export class ListComponent<TData> implements OnInit, AfterViewInit {
     @ViewChildren(CdkVirtualScrollViewport)
     public virtualScrollViewport: QueryList<CdkVirtualScrollViewport> = new QueryList<CdkVirtualScrollViewport>();
 
-    @Input()
-    public set width(value: string | number | undefined) {
-        if (value == null) {
-            this.listWidth.set(undefined);
-        } else if (typeof value === "number") {
-            this.listWidth.set(`${value}px`);
-        } else {
-            this.listWidth.set(value);
-        }
-    }
-
-    public constructor(
-        private readonly elementRef: ElementRef<HTMLElement>,
-        protected readonly listService: ListService<TData>
-    ) {
+    public constructor(protected readonly listService: ListService<TData>) {
         afterNextRender(() => {
             window.setTimeout(() => {
                 const selectedItem = this.listService.selectedListItems().lastOrDefault();
@@ -190,19 +194,17 @@ export class ListComponent<TData> implements OnInit, AfterViewInit {
     }
 
     private scrollToItem(item: ListItem<TData>): void {
-        const element = this.elementRef.nativeElement.querySelector(`[data-uid="${item.uid}"]`);
+        const element = this.#hostElementRef.nativeElement.querySelector(`[data-uid="${item.uid}"]`);
         if (element) {
             element.scrollIntoView({ block: "center", behavior: "auto" });
-        } else {
-            if (this.listService.virtualScrollOptions().enabled) {
-                const index = this.listService.viewItems().toList().indexOf(item);
-                this.#viewport?.scrollToIndex(index, "auto");
-            }
+        } else if (this.listService.virtualScrollOptions().enabled) {
+            const index = this.listService.viewItems().toList().indexOf(item);
+            this.#viewport?.scrollToIndex(index, "auto");
         }
     }
 
     private setKeyboardEvents(): void {
-        fromEvent<KeyboardEvent>(this.elementRef.nativeElement, "keydown")
+        fromEvent<KeyboardEvent>(this.#hostElementRef.nativeElement, "keydown")
             .pipe(
                 takeUntilDestroyed(this.#destroyRef),
                 filter(event => event.key === "Enter" || event.key === "NumPadEnter")
@@ -220,7 +222,7 @@ export class ListComponent<TData> implements OnInit, AfterViewInit {
     }
 
     private setNavigationEvents(): void {
-        fromEvent<KeyboardEvent>(this.elementRef.nativeElement, "keydown")
+        fromEvent<KeyboardEvent>(this.#hostElementRef.nativeElement, "keydown")
             .pipe(
                 takeUntilDestroyed(this.#destroyRef),
                 filter(event => event.key === "ArrowDown" || event.key === "ArrowUp"),

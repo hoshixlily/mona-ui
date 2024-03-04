@@ -1,7 +1,5 @@
-<div class="mona-placeholder">
-    @if (text) {
-        <span class="mona-placeholder-text">{{ text }}</span>
-    } @else {
-        <ng-content></ng-content>
-    }
-</div>
+@if (text()) {
+    <span class="mona-placeholder-text">{{ text() }}</span>
+} @else {
+    <ng-content></ng-content>
+}

@@ -1,14 +1,8 @@
-div.mona-multi-select {
-    display: inherit;
-    width: 100%;
-    outline: none;
-}
-
-div.mona-multi-select-value {
+.mona-multi-select-value {
     display: flex;
     align-items: center;
     width: 100%;
-    padding: 1px 2px;
+    padding: 0.0625rem 0.125rem;
     cursor: pointer;
     & > div:first-child {
         display: flex;
@@ -19,7 +13,7 @@ div.mona-multi-select-value {
     }
     & mona-chip {
         &:not(:last-child) {
-            margin: 0 1px 0 0;
+            margin: 0 0.0625rem 0 0;
         }
     }
 }

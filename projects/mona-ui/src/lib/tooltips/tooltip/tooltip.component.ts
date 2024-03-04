@@ -5,7 +5,8 @@ import {
     DestroyRef,
     ElementRef,
     inject,
-    Input,
+    input,
+    InputSignal,
     OnInit,
     TemplateRef,
     ViewChild
@@ -28,60 +29,52 @@ import { DefaultTooltipPositionMap } from "../models/DefaultTooltipPositionMap";
     imports: [NgClass]
 })
 export class TooltipComponent implements OnInit {
+    readonly #animationService: AnimationService = inject(AnimationService);
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
+    readonly #popupService: PopupService = inject(PopupService);
     #popupRef?: PopupRef;
+
     public readonly uid: string = v4();
-
-    @Input()
-    public position: Position = "top";
-
-    @Input()
-    public target!: Element | ElementRef;
+    public position: InputSignal<Position> = input<Position>("top");
+    public target: InputSignal<Element | ElementRef> = input.required<Element | ElementRef>();
 
     @ViewChild(TemplateRef)
     public templateRef!: TemplateRef<any>;
 
-    public constructor(
-        private readonly animationService: AnimationService,
-        private readonly popupService: PopupService
-    ) {}
-
     public ngOnInit(): void {
-        if (!this.target) {
-            throw new Error("Tooltip target is required.");
-        }
         this.setSubscriptions();
     }
 
     private animateEnter(): void {
         if (this.tooltipOverlayElement) {
-            this.animationService.fadeIn(this.tooltipOverlayElement);
+            this.#animationService.fadeIn(this.tooltipOverlayElement);
         }
     }
 
     private animateLeave(): void {
         if (this.tooltipOverlayElement) {
-            this.animationService.fadeOut(this.tooltipOverlayElement);
+            this.#animationService.fadeOut(this.tooltipOverlayElement);
         }
     }
 
     private calculateTopAndLeft(): void {
         let popupTop = 0;
         let popupLeft = 0;
+        const target = this.target();
         const anchorWidth =
-            this.target instanceof Element
-                ? (this.target as HTMLElement).getBoundingClientRect().width
-                : (this.target.nativeElement as HTMLElement).getBoundingClientRect().width;
+            target instanceof Element
+                ? (target as HTMLElement).getBoundingClientRect().width
+                : (target.nativeElement as HTMLElement).getBoundingClientRect().width;
         const anchorHeight =
-            this.target instanceof Element
-                ? (this.target as HTMLElement).getBoundingClientRect().height
-                : (this.target.nativeElement as HTMLElement).getBoundingClientRect().height;
+            target instanceof Element
+                ? (target as HTMLElement).getBoundingClientRect().height
+                : (target.nativeElement as HTMLElement).getBoundingClientRect().height;
         const popupWidth = this.tooltipElement?.getBoundingClientRect()?.width ?? 0;
         const popupHeight = this.tooltipElement?.getBoundingClientRect()?.height ?? 0;
         if (!this.tooltipOverlayElement) {
             return;
         }
-        switch (this.position) {
+        switch (this.position()) {
             case "top":
                 popupLeft = (anchorWidth - popupWidth) / 2;
                 this.tooltipOverlayElement.style.transform = `translate3d(${popupLeft}px, -12px, 0)`;
@@ -102,14 +95,14 @@ export class TooltipComponent implements OnInit {
     }
 
     private createTooltipPopup(target: Element): void {
-        this.#popupRef = this.popupService.create({
+        this.#popupRef = this.#popupService.create({
             content: this.templateRef,
             anchor: target,
             disableAnimation: true,
             popupClass: "mona-tooltip-popup-content",
             popupWrapperClass: "mona-tooltip-popup-wrapper",
             hasBackdrop: false,
-            positions: DefaultTooltipPositionMap[this.position],
+            positions: DefaultTooltipPositionMap[this.position()],
             closeOnOutsideClick: true,
             withPush: false
         });
@@ -122,13 +115,14 @@ export class TooltipComponent implements OnInit {
     }
 
     private setSubscriptions(): void {
-        const target = this.target instanceof ElementRef ? this.target.nativeElement : this.target;
-        fromEvent<MouseEvent>(target, "mouseenter")
+        const target = this.target();
+        const tooltipTarget = target instanceof ElementRef ? target.nativeElement : target;
+        fromEvent<MouseEvent>(tooltipTarget, "mouseenter")
             .pipe(
                 filter(() => !this.#popupRef),
                 takeUntilDestroyed(this.#destroyRef),
                 tap(() => {
-                    fromEvent(target, "mouseleave")
+                    fromEvent(tooltipTarget, "mouseleave")
                         .pipe(take(1))
                         .subscribe(() => {
                             this.animateLeave();
@@ -138,7 +132,7 @@ export class TooltipComponent implements OnInit {
                 })
             )
             .subscribe(() => {
-                this.createTooltipPopup(target);
+                this.createTooltipPopup(tooltipTarget);
             });
     }
 

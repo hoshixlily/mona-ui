@@ -1,4 +1,4 @@
-ul.mona-menubar {
+.mona-menubar-list {
     width: 100%;
     list-style: none;
     display: flex;
@@ -10,6 +10,6 @@ ul.mona-menubar {
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 4px 10px;
+        padding: 0.25rem 0.5rem;
     }
 }

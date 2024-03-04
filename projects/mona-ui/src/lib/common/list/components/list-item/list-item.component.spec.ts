@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from "@angular/core/testing";
+import { ListItem } from "../../models/ListItem";
 import { ListService } from "../../services/list.service";
 
 import { ListItemComponent } from "./list-item.component";
@@ -15,6 +16,13 @@ describe("ListItemComponent", () => {
 
         fixture = TestBed.createComponent(ListItemComponent);
         component = fixture.componentInstance;
+        fixture.componentRef.setInput(
+            "item",
+            new ListItem<any>({
+                data: "test",
+                header: "test"
+            })
+        );
         fixture.detectChanges();
     });
 

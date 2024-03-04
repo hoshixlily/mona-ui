@@ -1,14 +1,13 @@
+import { NgStyle } from "@angular/common";
 import {
     ChangeDetectionStrategy,
     Component,
     computed,
-    Input,
-    OnInit,
-    Signal,
-    signal,
-    WritableSignal
+    input,
+    InputSignal,
+    InputSignalWithTransform,
+    Signal
 } from "@angular/core";
-import { NgStyle, NgIf } from "@angular/common";
 
 @Component({
     selector: "mona-avatar",
@@ -16,119 +15,73 @@ import { NgStyle, NgIf } from "@angular/common";
     styleUrls: ["./avatar.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone: true,
-    imports: [NgStyle, NgIf]
+    imports: [NgStyle],
+    host: {
+        class: "mona-avatar",
+        "[style]": "avatarStyles()"
+    }
 })
-export class AvatarComponent implements OnInit {
-    public avatarHeight: WritableSignal<string> = signal("64px");
-    public avatarWidth: WritableSignal<string> = signal("64px");
-    public avatarBorderColor: WritableSignal<string> = signal("var(--mona-border-color)");
-    public avatarBorderRadius: WritableSignal<string> = signal("0");
-    public avatarBorderWidth: WritableSignal<string> = signal("1px");
-    public avatarBackgroundColor: WritableSignal<string> = signal("var(--mona-primary)");
-    public avatarCustomStyles: WritableSignal<Partial<CSSStyleDeclaration>> = signal({});
-    public avatarImage: WritableSignal<string> = signal("");
-    public avatarLabel: WritableSignal<string> = signal("");
-    public avatarLabelColor: WritableSignal<string> = signal("var(--mona-text)");
-    public avatarLabelFontSize: WritableSignal<string> = signal("1rem");
-    public avatarLabelFontWeight: WritableSignal<string> = signal("700");
-    public avatarLabelStyles: Signal<Partial<CSSStyleDeclaration>> = signal({});
-    public avatarStyles: Signal<Partial<CSSStyleDeclaration>> = signal({});
+export class AvatarComponent {
+    protected readonly avatarLabelStyles: Signal<Partial<CSSStyleDeclaration>> = computed(() => {
+        return {
+            color: this.labelColor(),
+            fontSize: this.labelFontSize(),
+            fontWeight: this.labelFontWeight()
+        };
+    });
+    protected readonly avatarStyles: Signal<Partial<CSSStyleDeclaration>> = computed(() => {
+        const image = this.image();
+        const backgroundColor = image ? "transparent" : this.backgroundColor();
+        return {
+            borderColor: this.borderColor(),
+            borderWidth: this.borderWidth(),
+            borderStyle: "solid",
+            borderRadius: this.borderRadius(),
+            backgroundColor,
+            height: this.height(),
+            width: this.width(),
+            ...this.customStyles()
+        };
+    });
 
-    @Input()
-    public set backgroundColor(value: string) {
-        this.avatarBackgroundColor.set(value);
-    }
-
-    @Input()
-    public set borderColor(value: string) {
-        this.avatarBorderColor.set(value);
-    }
-
-    @Input()
-    public set borderRadius(value: string | number) {
-        if (typeof value === "number") {
-            this.avatarBorderRadius.set(`${value}px`);
-        } else {
-            this.avatarBorderRadius.set(value);
+    public backgroundColor: InputSignal<string> = input("var(--mona-primary)");
+    public borderColor: InputSignal<string> = input("var(--mona-border-color)");
+    public borderRadius: InputSignalWithTransform<string, string | number> = input("0", {
+        transform: value => {
+            if (typeof value === "number") {
+                return `${value}px`;
+            }
+            return value;
         }
-    }
-
-    @Input()
-    public set borderWidth(value: string | number) {
-        if (typeof value === "number") {
-            this.avatarBorderWidth.set(`${value}px`);
-        } else {
-            this.avatarBorderWidth.set(value);
+    });
+    public borderWidth: InputSignalWithTransform<string, string | number> = input("1px", {
+        transform: value => {
+            if (typeof value === "number") {
+                return `${value}px`;
+            }
+            return value;
         }
-    }
-
-    @Input()
-    public set customStyles(value: Partial<CSSStyleDeclaration>) {
-        this.avatarCustomStyles.set(value);
-    }
-
-    @Input()
-    public set height(value: string | number) {
-        if (typeof value === "number") {
-            this.avatarHeight.set(`${value}px`);
-        } else {
-            this.avatarHeight.set(value);
+    });
+    public customStyles: InputSignal<Partial<CSSStyleDeclaration>> = input({});
+    public height: InputSignalWithTransform<string, string | number> = input("64px", {
+        transform: value => {
+            if (typeof value === "string") {
+                return value;
+            }
+            return `${value}px`;
         }
-    }
-
-    @Input()
-    public set image(value: string) {
-        this.avatarImage.set(value);
-    }
-
-    @Input()
-    public set label(value: string) {
-        this.avatarLabel.set(value);
-    }
-
-    @Input()
-    public set labelColor(value: string) {
-        this.avatarLabelColor.set(value);
-    }
-
-    @Input()
-    public set labelFontSize(value: string) {
-        this.avatarLabelFontSize.set(value);
-    }
-
-    @Input()
-    public set labelFontWeight(value: string) {
-        this.avatarLabelFontWeight.set(value);
-    }
-
-    @Input()
-    public set width(value: string | number) {
-        if (typeof value === "number") {
-            this.avatarWidth.set(`${value}px`);
-        } else {
-            this.avatarWidth.set(value);
+    });
+    public image: InputSignal<string> = input("");
+    public label: InputSignal<string> = input("");
+    public labelColor: InputSignal<string> = input("var(--mona-text)");
+    public labelFontSize: InputSignal<string> = input("1rem");
+    public labelFontWeight: InputSignal<string> = input("700");
+    public width: InputSignalWithTransform<string, string | number> = input("64px", {
+        transform: value => {
+            if (typeof value === "string") {
+                return value;
+            }
+            return `${value}px`;
         }
-    }
-
-    public ngOnInit(): void {
-        this.avatarStyles = computed(() => {
-            return {
-                borderColor: this.avatarBorderColor(),
-                borderWidth: this.avatarBorderWidth(),
-                borderStyle: "solid",
-                borderRadius: this.avatarBorderRadius(),
-                backgroundColor: this.avatarBackgroundColor(),
-                height: this.avatarHeight(),
-                width: this.avatarWidth(),
-                ...this.avatarCustomStyles()
-            };
-        });
-        this.avatarLabelStyles = computed(() => {
-            return {
-                color: this.avatarLabelColor(),
-                fontSize: this.avatarLabelFontSize(),
-                fontWeight: this.avatarLabelFontWeight()
-            };
-        });
-    }
+    });
 }

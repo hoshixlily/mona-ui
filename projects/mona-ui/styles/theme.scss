@@ -30,12 +30,12 @@ input, textarea, button {
 }
 
 @mixin font-small {
-    font-size: 12px;
+    font-size: 0.75rem;
     line-height: 1.667;
 }
 
 @mixin font-medium {
-    font-size: 14px;
+    font-size: 0.875rem;
     line-height: 1.428571429;
 }
 
@@ -122,7 +122,7 @@ input, textarea, button {
     display: flex;
     align-items: center;
     white-space: nowrap;
-    padding: 4px 8px;
+    padding: 0.25rem 0.5rem;
     flex: 1;
     overflow: hidden;
     & > span {
@@ -148,7 +148,11 @@ input, textarea, button {
     color: var(--mona-text);
 }
 
-div.mona-list {
+.mona-list {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    outline: none;
     @include font-medium;
     & ul {
         @include scrollbars-thin;
@@ -191,7 +195,7 @@ div.mona-list {
 }
 
 mona-filter-input.mona-list-filter-input {
-    & div.mona-text-box {
+    & .mona-text-box {
         background-color: var(--mona-background-lighter);
         & input {
             background-color: transparent;
@@ -204,12 +208,15 @@ mona-filter-input.mona-list-filter-input {
     border-top: none !important;
 }
 
-div.mona-tree {
+.mona-tree {
+    position: relative;
+    user-select: none;
+    outline: none;
     @include font-medium;
 }
 
-div.mona-tree-node {
-    padding: 4px 8px;
+.mona-tree-node {
+    padding: 0.25rem 0.5rem;
     &:hover:not(.mona-disabled):not(.mona-selected) {
         background-color: var(--mona-background-hover-darker);
         &:not(.mona-highlighted) {
@@ -239,29 +246,29 @@ div.mona-tree-node {
     }
 }
 
-div.mona-tree-node-expander {
+.mona-tree-node-expander {
     &.mona-disabled {
         @include disabled;
     }
 }
 
-span.mona-tree-node-text {
+.mona-tree-node-text {
     color: var(--mona-text);
 }
 
-div.mona-tree-node-dragging {
+.mona-tree-node-dragging {
     background-color: var(--mona-background);
     border: 1px solid var(--mona-border-color);
     border-radius: var(--mona-border-radius);
     box-shadow: var(--mona-popup-shadow);
-    padding: 4px 8px;
+    padding: 0.25rem 0.5rem;
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--mona-text);
     top: 10px;
     & fa-icon {
-        margin-right: 4px;
+        margin-right: 0.25rem;
     }
 }
 
@@ -280,7 +287,7 @@ div.mona-tree-node-dragging {
     text-overflow: ellipsis;
 
     @include font-medium;
-    padding: 4px 8px;
+    padding: 0.25rem 0.5rem;
 
     transition: background-color 0.15s ease-out, border 0.15s ease-out, color 0.15s ease-out, box-shadow 0.15s ease-out;
 
@@ -336,23 +343,35 @@ div.mona-tree-node-dragging {
 }
 
 /** Button Group */
-mona-button-group .mona-button {
-    border-radius: 0;
-    &:not(:last-child) {
-        border-right: none;
-    }
-    &:first-child {
-        border-top-left-radius: var(--mona-border-radius);
-        border-bottom-left-radius: var(--mona-border-radius);
-    }
-    &:last-child {
-        border-top-right-radius: var(--mona-border-radius);
-        border-bottom-right-radius: var(--mona-border-radius);
+.mona-button-group {
+    display: flex;
+    & .mona-button {
+        border-radius: 0;
+
+        &:not(:last-child) {
+            border-right: none;
+        }
+
+        &:first-child {
+            border-top-left-radius: var(--mona-border-radius);
+            border-bottom-left-radius: var(--mona-border-radius);
+        }
+
+        &:last-child {
+            border-top-right-radius: var(--mona-border-radius);
+            border-bottom-right-radius: var(--mona-border-radius);
+        }
     }
 }
 
 /** Chip */
 .mona-chip {
+    display: flex;
+    flex-wrap: nowrap;
+    cursor: pointer;
+    user-select: none;
+    outline: none;
+    height: 100%;
     background-color: var(--mona-background);
     color: var(--mona-text);
     border: 1px solid var(--mona-border-color);
@@ -360,7 +379,7 @@ mona-button-group .mona-button {
     transition: box-shadow 0.15s ease-in;
 
     & .mona-chip-content {
-        font-size: 12px;
+        font-size: 0.75rem;
         line-height: 1;
     }
 
@@ -401,7 +420,9 @@ mona-button-group .mona-button {
 
 /** Split Button */
 .mona-split-button {
-    & [monaButton] {
+    display: flex;
+    align-items: center;
+    & .mona-button {
         &:first-child {
             border-right: none;
             border-top-right-radius: 0;
@@ -455,7 +476,7 @@ ul.mona-list mona-text-box.filter-box {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 0 8px;
+    padding: 0 0.5rem;
     cursor: pointer;
     color: var(--mona-text);
     @include font-small;
@@ -510,6 +531,7 @@ ul.mona-list mona-text-box.filter-box {
 
 /** Calendar */
 .mona-calendar {
+    display: block;
     background: var(--mona-background);
     color: var(--mona-text);
     border-radius: var(--mona-border-radius);
@@ -533,7 +555,7 @@ ul.mona-list mona-text-box.filter-box {
     }
 }
 
-table.mona-calendar-month-view-table {
+.mona-calendar-month-view-table {
     & thead {
         @include font-small;
     }
@@ -550,10 +572,10 @@ table.mona-calendar-month-view-table {
     & mona-text-box {
         width: 100%;
         & input[monaTextBox] {
-            padding: 4.5px 8px;
+            padding: 0.25rem 0.5rem;
         }
         & button[monaButton] {
-            padding: 0.25em 0.5em;
+            padding: 0.25rem 0.5rem;
         }
     }
 }
@@ -574,19 +596,23 @@ table.mona-calendar-month-view-table {
 }
 
 .mona-calendar-popup-wrapper {
-    padding: 8px;
+    padding: 0.5rem;
 }
 
 /** Time Selector */
-div.mona-time-selector {
+.mona-time-selector {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
     & mona-button-group {
         & button {
-            padding: 0 8px;
+            padding: 0 0.5rem;
         }
     }
     & ol {
         @include scrollbars;
-        font-size: 14px;
+        font-size: 0.875em;
         user-select: none;
         & li {
             cursor: pointer;
@@ -604,7 +630,7 @@ div.mona-time-selector {
     }
 }
 
-div.mona-time-picker-popup {
+.mona-time-picker-popup {
     padding: 0 !important;
     overflow: hidden;
 }
@@ -668,21 +694,21 @@ div.mona-time-picker-popup {
     display: flex;
     flex-direction: column;
     & div.mona-dropdown-tree-filter {
-        padding: 4px;
+        padding: 0.25rem;
         border-bottom: 1px solid var(--mona-border-color);
     }
     & div.mona-dropdown-tree-container {
         overflow: auto;
         max-height: 200px;
         width: 100%;
-        padding: 4px;
+        padding: 0.25rem;
         @include scrollbars;
     }
 }
 
 mona-filter-input.mona-popup-filter-input,
 .mona-dropdown-tree-popup-content mona-filter-input {
-    & div.mona-text-box {
+    & mona-text-box {
         background-color: var(--mona-background-lighter);
         & input {
             background-color: transparent;
@@ -692,6 +718,7 @@ mona-filter-input.mona-popup-filter-input,
 
 /** Multi Select */
 .mona-multi-select {
+    overflow: hidden;
     & .mona-input-selector {
         &:hover,
         &:active {
@@ -706,10 +733,7 @@ mona-filter-input.mona-popup-filter-input,
             }
         }
         & mona-chip {
-            //height: calc(100% - 2px);
-            & div.mona-chip {
-                margin-top: 0.5px;
-            }
+            margin-top: 0.0625rem;
         }
     }
     & .mona-input-selector-icon {
@@ -718,7 +742,14 @@ mona-filter-input.mona-popup-filter-input,
 }
 
 /** Filters */
-div.mona-filter-menu-item {
+.mona-filter-menu {
+    width: 100%;
+    padding: 0.25rem;
+    display: flex;
+    flex-direction: column;
+    row-gap: 0.5rem;
+}
+.mona-filter-menu-item {
     & mona-button-group {
         & button {
             flex: 1;
@@ -729,20 +760,22 @@ div.mona-filter-menu-item {
 
 /** Grid */
 .mona-grid {
+    position: relative;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--mona-background-dark);
+    border: 1px solid var(--mona-border-color);
     color: var(--mona-text);
     @include font-medium;
     border-radius: var(--mona-border-radius);
-    & mona-pager {
-        & .mona-pager {
-            border: none;
-            border-top: 1px solid var(--mona-border-color);
-            border-top-left-radius: 0;
-            border-top-right-radius: 0;
-        }
-    }
 }
 
 .mona-grid-list {
+    height: 100%;
+    overflow: auto scroll;
+    width: 100%;
     @include scrollbars-thick;
     & tr {
         &.mona-selected {
@@ -772,7 +805,7 @@ div.mona-filter-menu-item {
     }
 }
 
-button.mona-grid-filtered {
+.mona-grid-filtered {
     color: var(--mona-primary-light);
 }
 
@@ -798,23 +831,19 @@ button.mona-grid-filtered {
 
 .mona-grid-cell-editing {
     & mona-text-box {
-        & div.mona-text-box {
-            border: none;
-        }
+        border: none;
         & input {
-            padding-left: 10px;
-            padding-right: 10px;
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
             background: var(--mona-background-lighter);
         }
     }
 
     & mona-numeric-text-box {
-        & div.mona-numeric-text-box {
-            border: none;
-        }
+        border: none;
         & input {
-            padding-left: 10px;
-            padding-right: 10px;
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
             background: var(--mona-background-lighter);
         }
     }
@@ -832,7 +861,7 @@ input[type="checkbox"][monaCheckBox] {
     display: inline-block;
     place-content: center;
     cursor: pointer;
-    margin-right: 4px;
+    margin-right: 0.25rem;
     outline: none;
     &::before {
         content: "\2714";
@@ -844,7 +873,7 @@ input[type="checkbox"][monaCheckBox] {
         background: var(--mona-background);
         box-shadow: inset 0 0 0 1px var(--mona-border-color);
         border-radius: var(--mona-border-radius);
-        padding-bottom: 1px;
+        padding-bottom: 0.0625rem;
         place-content: center;
     }
     &:checked::before {
@@ -866,51 +895,58 @@ input[type="checkbox"][monaCheckBox] {
     }
 }
 
-label.mona-check-box {
-    color: var(--mona-text);
-    @include font-medium;
-
+.mona-check-box {
     &.mona-disabled {
         @include disabled;
     }
 }
 
+.mona-check-box-label {
+    color: var(--mona-text);
+    @include font-medium;
+}
+
 /** Color Gradient */
-div.mona-color-gradient-color-area {
+.mona-color-gradient {
+    display: flex;
+    flex-direction: column;
+    user-select: none;
+    padding: 0.5rem;
+    row-gap: 0.5rem;
     background: var(--mona-background-dark);
     border: 1px solid var(--mona-border-color);
     border-radius: var(--mona-border-radius);
 }
 
-div.mona-hsv-rectangle {
+.mona-hsv-rectangle {
     border: 1px solid var(--mona-border-color);
     border-radius: var(--mona-border-radius);
 }
 
-div.mona-color-gradient-preview {
+.mona-color-gradient-preview {
     border: 1px solid var(--mona-border-color);
     border-radius: var(--mona-border-radius);
 }
 
-span.mona-color-gradient-hex-input-prefix {
+.mona-color-gradient-hex-input-prefix {
     font-family: monospace;
     border-right: 1px solid var(--mona-border-color);
     background-color: var(--mona-background-darker);
 }
 
-span.mona-color-gradient-value-input-prefix {
+.mona-color-gradient-value-input-prefix {
     border-right: 1px solid var(--mona-border-color);
     background-color: var(--mona-background-darker);
     color: var(--mona-text);
     font-family: monospace;
 }
 
-div.mona-hue-slider {
+.mona-hue-slider {
     border: 1px solid var(--mona-border-color);
     border-radius: var(--mona-border-radius);
 }
 
-div.mona-alpha-slider {
+.mona-alpha-slider {
     border: 1px solid var(--mona-border-color);
     border-radius: var(--mona-border-radius);
     & .mona-alpha-slider-color {
@@ -923,7 +959,10 @@ div.mona-alpha-slider {
 
 /** Color Palette */
 .mona-color-palette {
-    & > div.mona-color-cell {
+    display: grid;
+    grid-gap: 1px;
+    padding: 0.0625rem;
+    & > .mona-color-cell {
         &.mona-selected {
             box-shadow: 0 0 0 1px var(--mona-border-color) inset;
         }
@@ -935,6 +974,8 @@ div.mona-alpha-slider {
 
 /** Color Picker */
 .mona-color-picker {
+    display: flex;
+    align-items: center;
     border: 1px solid var(--mona-border-color);
     border-radius: var(--mona-border-radius);
     background: var(--mona-background);
@@ -949,18 +990,16 @@ div.mona-alpha-slider {
 
 .mona-color-picker-popup {
     overflow: hidden;
-    & .mona-color-gradient-color-area {
-        border-color: transparent !important;
-    }
 }
 
 .mona-color-picker-popup-wrapper {
-    //background: var(--mona-background);
-    padding: 2px;
+    padding: 0.125rem;
 }
 
 /** Numeric Text Box */
 .mona-numeric-text-box {
+    display: flex;
+    width: 100%;
     background-color: var(--mona-background);
     border: 1px solid var(--mona-border-color);
     border-radius: var(--mona-border-radius);
@@ -970,6 +1009,10 @@ div.mona-alpha-slider {
     }
     &:focus, &:focus-within {
         box-shadow: var(--mona-focus-shadow);
+    }
+    & [monaTextBox] {
+        width: 100%;
+        border: none;
     }
     & button[monaButton] {
         &:first-child {
@@ -993,7 +1036,7 @@ input[type="radio"][monaRadioButton] {
     display: inline-block;
     place-content: center;
     cursor: pointer;
-    margin-right: 4px;
+    margin-right: 0.25rem;
     outline: none;
     &::before {
         content: " ";
@@ -1019,40 +1062,45 @@ input[type="radio"][monaRadioButton] {
     }
 }
 
-label.mona-radio-button {
+.mona-radio-button {
+    &.mona-disabled {
+        @include disabled;
+    }
+}
+
+.mona-radio-button-label {
     color: var(--mona-text);
     @include font-medium;
     line-height: 2;
-
-    &.mona-disabled {
-        @include disabled;
-    }
 }
 
 /** Range Slider */
-div.mona-range-slider {
+.mona-range-slider {
+    position: relative;
+    display: flex;
+    user-select: none;
     &.mona-disabled {
         @include disabled;
     }
 }
 
-div.mona-range-slider-track {
+.mona-range-slider-track {
     border: 1px solid var(--mona-border-color);
     border-radius: var(--mona-border-radius);
     background-color: var(--mona-background);
 }
 
-div.mona-range-slider-selection {
+.mona-range-slider-selection {
     border: none;
     background-color: var(--mona-primary);
 }
 
-span.mona-range-slider-tick-label {
+.mona-range-slider-tick-label {
     color: var(--mona-text);
     @include font-small;
 }
 
-div.mona-range-slider-handle {
+.mona-range-slider-handle {
     background-color: var(--mona-primary);
     border: 1px solid var(--mona-primary-border-color);
     border-radius: var(--mona-border-radius);
@@ -1062,8 +1110,8 @@ div.mona-range-slider-handle {
     }
 }
 
-div.mona-range-slider-horizontal {
-    & span.mona-range-slider-tick {
+.mona-range-slider-horizontal {
+    & .mona-range-slider-tick {
         &:first-child {
             border-left: 1px solid var(--mona-border-color);
         }
@@ -1073,8 +1121,8 @@ div.mona-range-slider-horizontal {
     }
 }
 
-div.mona-range-slider-vertical {
-    & span.mona-range-slider-tick {
+.mona-range-slider-vertical {
+    & .mona-range-slider-tick {
         &:first-child {
             border-left: none;
             border-top: 1px solid var(--mona-border-color);
@@ -1087,24 +1135,27 @@ div.mona-range-slider-vertical {
 }
 
 /** Slider */
-div.mona-slider {
+.mona-slider {
+    position: relative;
+    display: flex;
+    user-select: none;
     &.mona-disabled {
         @include disabled;
     }
 }
 
-div.mona-slider-track {
+.mona-slider-track {
     border: 1px solid var(--mona-border-color);
     border-radius: var(--mona-border-radius);
     background-color: var(--mona-background);
 }
 
-div.mona-slider-selection {
+.mona-slider-selection {
     border: none;
     background-color: var(--mona-primary);
 }
 
-div.mona-slider-handle {
+.mona-slider-handle {
     background-color: var(--mona-primary);
     border: 1px solid var(--mona-primary-border-color);
     border-radius: var(--mona-border-radius);
@@ -1113,7 +1164,7 @@ div.mona-slider-handle {
     }
 }
 
-div.mona-slider-horizontal {
+.mona-slider-horizontal {
     & span.mona-slider-tick {
         &:first-child {
             border-left: 1px solid var(--mona-border-color);
@@ -1124,7 +1175,7 @@ div.mona-slider-horizontal {
     }
 }
 
-div.mona-slider-vertical {
+.mona-slider-vertical {
     & span.mona-slider-tick {
         &:first-child {
             border-left: none;
@@ -1138,16 +1189,34 @@ div.mona-slider-vertical {
 }
 
 /** Stepper */
-div.mona-stepper-track {
+.mona-stepper {
+    position: relative;
+    width: auto;
+    display: grid;
+    outline: none;
+    &-vertical {
+        height: 100%;
+    }
+}
+
+.mona-stepper-track {
     border-radius: var(--mona-border-radius);
 }
 
-ol.mona-stepper-step-list {
+.mona-stepper-step-list {
     @include font-medium;
 }
 
 /** Switch */
 .mona-switch {
+    position: relative;
+    width: 60px;
+    height: 30px;
+    display: flex;
+    padding: 0.125rem;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
     background-color: var(--mona-background);
     border: 1px solid var(--mona-border-color);
     border-radius: var(--mona-border-radius);
@@ -1183,7 +1252,7 @@ ol.mona-stepper-step-list {
 
 /** Text Area */
 textarea[monaTextArea] {
-    padding: 4px;
+    padding: 0.25rem;
     background-color: var(--mona-background);
     color: var(--mona-text);
     border: 1px solid var(--mona-border-color);
@@ -1212,7 +1281,7 @@ input[monaTextBox] {
     background-color: var(--mona-background);
     color: var(--mona-text);
     transition: box-shadow 0.15s ease-in-out;
-    padding: 4px 8px;
+    padding: 0.25rem 0.5rem;
     @include font-medium;
 
     &:focus:not(:disabled),
@@ -1235,21 +1304,31 @@ input[monaTextBox].mona-input-inner {
 }
 
 .mona-text-box {
+    display: flex;
+    width: 100%;
     background-color: var(--mona-background);
     border: 1px solid var(--mona-border-color);
     border-radius: var(--mona-border-radius);
     transition: box-shadow 0.15s ease-in-out;
-    height: 100%;
-    width: 100%;
     &:active, &:focus, &:focus-within {
         box-shadow: var(--mona-focus-shadow);
     }
-    & span.mona-text-box-prefix,
-    & span.mona-text-box-suffix {
+    & .mona-text-box-prefix,
+    & .mona-text-box-suffix {
         color: var(--mona-text);
         &.mona-disabled {
             @include disabled;
         }
+    }
+    & > [monaTextBox] {
+        border: none;
+        width: 100%;
+        &:active, &:focus, &:focus-within {
+            box-shadow: none;
+        }
+    }
+    &.mona-disabled {
+        @include disabled;
     }
 }
 
@@ -1268,13 +1347,35 @@ button[monaButton].mona-input-button {
 
 /** Layouts */
 
+/** Avatar */
+.mona-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    position: relative;
+    border-radius: var(--mona-border-radius);
+    & img {
+        width: 100%;
+        height: 100%;
+    }
+}
+
 /** Expansion Panel */
 
-mona-expansion-panel + mona-expansion-panel {
-    & .mona-expansion-panel {
-        border-top: none !important;
-        border-radius: 0 !important;
+.mona-expansion-panel {
+    display: block;
+    background: var(--mona-background);
+    border: 1px solid var(--mona-border-color);
+    border-radius: var(--mona-border-radius);
+    &.collapsed {
+        border-bottom: none;
     }
+}
+
+.mona-expansion-panel + .mona-expansion-panel {
+    border-top: none !important;
+    border-radius: 0 !important;
 }
 
 .mona-expansion-panel-header {
@@ -1282,14 +1383,16 @@ mona-expansion-panel + mona-expansion-panel {
 }
 
 /** Field Set */
-fieldset.mona-fieldset {
-    background-color: var(--mona-background);
-    border: 1px solid var(--mona-border-color);
-    border-radius: var(--mona-border-radius);
-    color: var(--mona-text);
+.mona-fieldset {
+    & fieldset {
+        background-color: var(--mona-background);
+        border: 1px solid var(--mona-border-color);
+        border-radius: var(--mona-border-radius);
+        color: var(--mona-text);
+    }
 }
 
-legend.mona-fieldset-legend {
+.mona-fieldset-legend {
     background-color: var(--mona-background-dark);
     border: 1px solid var(--mona-border-color);
     border-radius: var(--mona-border-radius);
@@ -1300,21 +1403,36 @@ legend.mona-fieldset-legend {
 
 /** Placeholder */
 .mona-placeholder {
-    & span.mona-placeholder-text {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    & .mona-placeholder-text {
+        font-weight: 600;
         color: var(--mona-text);
         filter: brightness(0.5);
     }
 }
 
 /** Scroll View */
-div.mona-scroll-view-arrow {
+.mona-scroll-view {
+    display: block;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    outline: none;
+}
+
+.mona-scroll-view-arrow {
     & fa-icon {
         color: white;
         filter: drop-shadow(0 0 15px #000);
     }
 }
 
-div.mona-scroll-view-pager {
+.mona-scroll-view-pager {
     &-dark {
         border-top: 1px solid var(--mona-border-color);
         background-color: hsla(var(--mona-background-base), var(--mona-background-base-lightness), 60%);
@@ -1325,7 +1443,7 @@ div.mona-scroll-view-pager {
     }
 }
 
-ul.mona-scroll-view-pager-list {
+.mona-scroll-view-pager-list {
     & li {
         border: 1px solid var(--mona-border-color);
         background-color: white;
@@ -1335,7 +1453,7 @@ ul.mona-scroll-view-pager-list {
     }
 }
 
-div.mona-scroll-view-pager-arrow {
+.mona-scroll-view-pager-arrow {
     @include font-medium;
     & fa-icon {
         display: flex;
@@ -1346,18 +1464,35 @@ div.mona-scroll-view-pager-arrow {
     }
 }
 
+/** Splitter */
+.mona-splitter {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    position: relative;
+    flex-direction: row;
+    overflow: hidden;
+    &.mona-splitter-vertical {
+        flex-direction: column;
+    }
+}
+
 /** Tab Strip */
-div.mona-tab-strip {
+.mona-tab-strip {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
     border: 1px solid var(--mona-border-color);
 }
-div.mona-tab-strip-tabs {
+.mona-tab-strip-tabs {
     background: 1px solid var(--mona-background-dark);
     border-bottom: 1px solid var(--mona-border-color);
 }
-div.mona-tab-list-wrapper {
+.mona-tab-list-wrapper {
     background: var(--mona-background-dark);
 }
-ul.mona-tab-list {
+.mona-tab-list {
     @include font-medium;
     & li {
         color: var(--mona-text);
@@ -1374,7 +1509,7 @@ ul.mona-tab-list {
         }
     }
 }
-div.mona-tab-strip-scroll {
+.mona-tab-strip-scroll {
     background: var(--mona-background-dark);
     color: var(--mona-text);
     & button[monaButton] {
@@ -1389,25 +1524,32 @@ div.mona-tab-strip-scroll {
 
 /** List Box */
 .mona-list-box {
+    display: flex;
+    width: 16em;
+    height: 250px;
     &.mona-list-box-horizontal {
+        flex-direction: row;
         & .mona-list-view {
             border-top-right-radius: 0;
             border-bottom-right-radius: 0;
         }
     }
     &.mona-list-box-vertical {
+        flex-direction: column;
         & .mona-list-view {
             border-bottom-left-radius: 0;
             border-bottom-right-radius: 0;
         }
     }
     &.mona-list-box-horizontal-reverse {
+        flex-direction: row-reverse;
         & .mona-list-view {
             border-top-left-radius: 0;
             border-bottom-left-radius: 0;
         }
     }
     &.mona-list-box-vertical-reverse {
+        flex-direction: column-reverse;
         & .mona-list-view {
             border-top-left-radius: 0;
             border-top-right-radius: 0;
@@ -1435,7 +1577,6 @@ div.mona-tab-strip-scroll {
     }
     &-vertical-reverse {
         border-bottom-color: transparent;
-
         border-top-left-radius: var(--mona-border-radius);
         border-top-right-radius: var(--mona-border-radius);
     }
@@ -1443,6 +1584,12 @@ div.mona-tab-strip-scroll {
 
 /** List View */
 .mona-list-view {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    outline: none;
+    overflow: hidden;
     @include font-medium;
     color: var(--mona-text);
     background: var(--mona-background);
@@ -1488,9 +1635,6 @@ div.mona-tab-strip-scroll {
 .mona-contextmenu-content {
     user-select: none;
     overflow: hidden;
-    //padding: 4px 0 !important;
-    //background: var(--mona-background);
-    //border: 1px solid var(--mona-border-color);
 }
 
 .mona-contextmenu-item {
@@ -1508,7 +1652,7 @@ ul.mona-contextmenu-list {
     background-color: var(--mona-background);
     border: 1px solid var(--mona-border-color);
     border-radius: var(--mona-border-radius);
-    padding: 4px 0;
+    padding: 0.25rem 0;
 }
 
 .mona-contextmenu-list-item {
@@ -1526,11 +1670,12 @@ ul.mona-contextmenu-list {
 }
 
 /** Menu Bar */
-ul.mona-menubar {
+.mona-menubar {
+    display: block;
     background: var(--mona-background);
     border-bottom: 1px solid var(--mona-border-color);
     @include font-medium;
-    & li {
+    & ul li {
         color: var(--mona-text);
         &.mona-active {
             background-color: var(--mona-primary);
@@ -1548,7 +1693,7 @@ ul.mona-menubar {
 /** Navigation */
 
 /** Breadcrumb */
-ol.mona-breadcrumb {
+.mona-breadcrumb {
     color: var(--mona-text);
     @include font-medium;
 }
@@ -1561,17 +1706,37 @@ ol.mona-breadcrumb {
 
 
 /** Notification */
-div.mona-notification-container {
+.mona-notification-container {
+    position: absolute;
+    padding: 0.5rem;
+    z-index: 40000;
+    overflow: hidden;
+    &.bottomleft {
+        bottom: 0;
+        left: 0;
+    }
+    &.bottomright {
+        bottom: 0;
+        right: 0;
+    }
+    &.topleft {
+        top: 0;
+        left: 0;
+    }
+    &.topright {
+        top: 0;
+        right: 0;
+    }
     @include font-medium;
 }
 
-div.mona-notification-icon {
+.mona-notification-icon {
     & fa-icon svg {
-        font-size: 20px;
+        font-size: 1.25em;
     }
 }
 
-div.mona-notification-progress {
+.mona-notification-progress {
     & .mona-progress-bar {
         border: none;
     }
@@ -1579,6 +1744,8 @@ div.mona-notification-progress {
 
 /** Pager */
 .mona-pager {
+    display: flex;
+    padding: 0.25rem 0.5rem;
     background: var(--mona-background);
     border: 1px solid var(--mona-border-color);
     border-radius: var(--mona-border-radius);
@@ -1597,14 +1764,12 @@ div.mona-notification-progress {
 }
 
 .mona-popup-wrapper-host {
-    //background: var(--mona-background);
-    //border: 1px solid var(--mona-border-color);
     box-shadow: var(--mona-popup-shadow);
     transition: box-shadow 0.2s ease-out;
 }
 
 .mona-popup-wrapper {
-    transform-origin: 50% 0%;
+    transform-origin: 50% 0;
     background-color: var(--mona-background);
     border: 1px solid var(--mona-border-color);
     border-radius: var(--mona-border-radius);
@@ -1613,6 +1778,11 @@ div.mona-notification-progress {
 
 /** Progress Bar */
 .mona-progress-bar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
     background-color: var(--mona-background);
     border: 1px solid var(--mona-border-color);
     border-radius: var(--mona-border-radius);
@@ -1622,7 +1792,7 @@ div.mona-notification-progress {
     }
 }
 
-div.mona-progress-bar-track {
+.mona-progress-bar-track {
     color: white; // TODO: replace with css variable
     &-next {
         background-color: var(--mona-background);
@@ -1637,11 +1807,15 @@ div.mona-progress-bar-track {
     }
 }
 
-div.mona-progress-bar-indeterminate {
+.mona-progress-bar-indeterminate {
     background: repeating-linear-gradient(135deg, var(--mona-background), var(--mona-background) 10px, var(--mona-background-dark) 10px, var(--mona-background-dark) 20px);
 }
 
 .mona-circular-progress-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
     & .mona-circular-progress-bar-label {
         color: var(--mona-text);
         user-select: none;
@@ -1652,8 +1826,8 @@ div.mona-progress-bar-indeterminate {
 }
 
 /** Tooltips */
-div.mona-tooltip-arrow,
-div.mona-popover-arrow {
+.mona-tooltip-arrow,
+.mona-popover-arrow {
     width: 12px;
     height: 12px;
     box-sizing: border-box;
@@ -1707,11 +1881,11 @@ div.mona-popover-arrow {
     padding: 0 !important;
 }
 
-div.mona-popover-title {
+.mona-popover-title {
     border-bottom: 1px solid var(--mona-border-color-light);
 }
 
-div.mona-popover-footer {
+.mona-popover-footer {
     border-top: 1px solid var(--mona-border-color-light);
 }
 
@@ -1735,6 +1909,8 @@ div.mona-popover-footer {
 
 /** TreeView */
 .mona-tree-view {
+    display: flex;
+    flex-direction: column;
     @include font-medium;
 }
 .mona-tree-view-node {
@@ -1776,14 +1952,14 @@ div.mona-tree-view-node-dropping {
     border: 1px solid var(--mona-border-color);
     border-radius: var(--mona-border-radius);
     box-shadow: var(--mona-popup-shadow);
-    padding: 4px 8px;
+    padding: 0.25rem 0.5rem;
     display: flex;
     align-items: center;
     justify-content: center;
     color: var(--mona-text);
     top: 10px;
     & fa-icon {
-        margin-right: 4px;
+        margin-right: 0.25rem;
     }
 }
 

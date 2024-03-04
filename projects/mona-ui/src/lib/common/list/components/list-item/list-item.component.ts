@@ -3,11 +3,11 @@ import {
     ChangeDetectionStrategy,
     Component,
     computed,
-    Input,
-    signal,
+    inject,
+    input,
+    InputSignal,
     Signal,
-    TemplateRef,
-    WritableSignal
+    TemplateRef
 } from "@angular/core";
 import { ListItem } from "../../models/ListItem";
 import { ListItemTemplateContext } from "../../models/ListItemTemplateContext";
@@ -22,11 +22,9 @@ import { ListService } from "../../services/list.service";
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ListItemComponent<TData> {
-    readonly #item: WritableSignal<ListItem<TData> | null> = signal(null);
-    protected readonly dataItem: Signal<TData | null> = computed(() => this.#item()?.data ?? null);
-    protected readonly itemTemplate: WritableSignal<TemplateRef<ListItemTemplateContext<TData>> | null> = signal(null);
+    protected readonly dataItem: Signal<TData | null> = computed(() => this.item()?.data ?? null);
     protected readonly itemText: Signal<string> = computed(() => {
-        const item = this.#item();
+        const item = this.item();
         if (item == null) {
             return "";
         }
@@ -35,16 +33,10 @@ export class ListItemComponent<TData> {
         }
         return this.listService.getItemText(item);
     });
+    protected readonly listService: ListService<TData> = inject(ListService);
 
-    @Input({ required: true })
-    public set item(value: ListItem<TData>) {
-        this.#item.set(value);
-    }
-
-    @Input()
-    public set template(template: TemplateRef<ListItemTemplateContext<TData>> | null) {
-        this.itemTemplate.set(template);
-    }
-
-    public constructor(protected readonly listService: ListService<TData>) {}
+    public item: InputSignal<ListItem<TData>> = input.required();
+    public template: InputSignal<TemplateRef<ListItemTemplateContext<TData>> | null> = input<TemplateRef<
+        ListItemTemplateContext<TData>
+    > | null>(null);
 }

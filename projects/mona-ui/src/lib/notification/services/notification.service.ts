@@ -1,4 +1,4 @@
-import { ApplicationRef, ComponentRef, createComponent, Injectable } from "@angular/core";
+import { ApplicationRef, ComponentRef, createComponent, inject, Injectable, signal } from "@angular/core";
 import { Subject, Subscription, take } from "rxjs";
 import { v4 } from "uuid";
 import { NotificationContainerComponent } from "../components/notification-container/notification-container.component";
@@ -12,6 +12,7 @@ import { NotificationType } from "../models/NotificationType";
     providedIn: "root"
 })
 export class NotificationService {
+    readonly #appRef: ApplicationRef = inject(ApplicationRef);
     private notificationContainerMap: Map<NotificationPosition, NotificationContainerData> = new Map<
         NotificationPosition,
         NotificationContainerData
@@ -23,7 +24,7 @@ export class NotificationService {
         topright: null
     };
 
-    public constructor(private readonly appRef: ApplicationRef) {
+    public constructor() {
         this.initialize();
     }
 
@@ -44,14 +45,6 @@ export class NotificationService {
         const notificationData = this.getNotificationDataById(id);
         if (notificationData) {
             this.removeNotificationData(id, notificationData.options.position as NotificationPosition);
-        }
-    }
-
-    public closeAll(): void {
-        for (const notificationContainerData of this.notificationContainerMap.values()) {
-            for (const notificationData of notificationContainerData.notifications.values()) {
-                this.close(notificationData.options.id as string);
-            }
         }
     }
 
@@ -87,10 +80,10 @@ export class NotificationService {
     private createContainerComponent(): Subject<ComponentRef<NotificationContainerComponent>> {
         const containerSubject = new Subject<ComponentRef<NotificationContainerComponent>>();
         const notificationContainerComponent = createComponent(NotificationContainerComponent, {
-            environmentInjector: this.appRef.injector
+            environmentInjector: this.#appRef.injector
         });
         document.body.appendChild(notificationContainerComponent.location.nativeElement);
-        this.appRef.attachView(notificationContainerComponent.hostView);
+        this.#appRef.attachView(notificationContainerComponent.hostView);
         notificationContainerComponent.changeDetectorRef.detectChanges();
         window.setTimeout(() => {
             containerSubject.next(notificationContainerComponent);
@@ -110,11 +103,11 @@ export class NotificationService {
             notificationContainerData.notifications.set(options.id as string, {
                 options,
                 componentDestroy$,
-                visible: true
+                visible: signal(true)
             });
             if (notificationContainerData.componentRef) {
-                notificationContainerData.componentRef.instance.notificationDataList = Array.from(
-                    notificationContainerData.notifications.values()
+                notificationContainerData.componentRef.instance.notificationDataList.set(
+                    Array.from(notificationContainerData.notifications.values())
                 );
             }
         }
@@ -126,7 +119,7 @@ export class NotificationService {
     private createNotificationContainer(options: NotificationOptions): void {
         const position = options.position as NotificationPosition;
         this.notificationContainerSubscriptions[position] = this.createContainerComponent().subscribe(ncr => {
-            ncr.instance.position = options.position as NotificationPosition;
+            ncr.instance.position.set(options.position as NotificationPosition);
             const notificationContainerData = this.notificationContainerMap.get(
                 options.position as NotificationPosition
             ) as NotificationContainerData;
@@ -170,7 +163,7 @@ export class NotificationService {
         if (container) {
             const notificationData = container.notifications.get(id);
             if (notificationData) {
-                notificationData.visible = false;
+                notificationData.visible.set(false);
             }
             container.notifications.delete(id);
             if (container.notifications.size === 0) {
@@ -178,7 +171,7 @@ export class NotificationService {
                 this.notificationContainerSubscriptions[position] = null;
                 window.setTimeout(() => {
                     if (container.componentRef) {
-                        this.appRef.detachView(container.componentRef.hostView);
+                        this.#appRef.detachView(container.componentRef.hostView);
                         container.componentRef.destroy();
                     }
                 }, 200);

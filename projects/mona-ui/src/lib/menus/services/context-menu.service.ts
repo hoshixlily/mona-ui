@@ -1,5 +1,5 @@
 import { ConnectedPosition } from "@angular/cdk/overlay";
-import { Injectable } from "@angular/core";
+import { inject, Injectable } from "@angular/core";
 import { PopupRef } from "../../popup/models/PopupRef";
 import { PopupService } from "../../popup/services/popup.service";
 import { ContextMenuSettings } from "../models/ContextMenuSettings";
@@ -8,6 +8,7 @@ import { ContextMenuSettings } from "../models/ContextMenuSettings";
     providedIn: "root"
 })
 export class ContextMenuService {
+    readonly #popupService: PopupService = inject(PopupService);
     public readonly defaultSubMenuPositions: ConnectedPosition[] = [
         {
             originX: "end",
@@ -35,10 +36,8 @@ export class ContextMenuService {
         }
     ];
 
-    public constructor(public readonly popupService: PopupService) {}
-
     public open(settings: ContextMenuSettings): PopupRef {
-        return this.popupService.create({
+        return this.#popupService.create({
             ...settings,
             hasBackdrop: false
         });

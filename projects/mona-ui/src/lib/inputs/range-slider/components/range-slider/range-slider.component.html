@@ -1,49 +1,54 @@
-<div class="mona-range-slider" [ngClass]="{'mona-range-slider-horizontal':orientation==='horizontal',
-                 'mona-range-slider-vertical':orientation==='vertical', 'mona-disabled': disabled}">
-    <div class="mona-range-slider-track">
-        <div class="mona-range-slider-selection"
-             [ngClass]="{'mona-range-slider-dragging': dragging()}"
-             [style.left.px]="orientation==='horizontal'?trackSelectionStyleData().position:undefined"
-             [style.width.px]="orientation==='horizontal'?trackSelectionStyleData().size:undefined"
-             [style.bottom.px]="orientation==='vertical'?trackSelectionStyleData().position:undefined"
-             [style.height.px]="orientation==='vertical'?trackSelectionStyleData().size:undefined">
-        </div>
-    </div>
-    <div class="mona-range-slider-tick-list" *ngIf="showTicks">
-        <ng-container *ngFor="let tick of ticks; let tx = index;">
-            <span class="mona-range-slider-tick" [ngClass]="{'mona-invisible': tx % tickStep !== 0}"
-                  *ngIf="tx !== 0">
-                <span [attr.data-value]="tick.value"></span>
-            </span>
-            <span class="mona-range-slider-tick" [ngClass]="{'mona-invisible': tx % tickStep !== 0}"
-                  *ngIf="tx !== ticks.length - 1">
-                <span [attr.data-value]="tick.value"></span>
-            </span>
-        </ng-container>
-    </div>
-    <div class="mona-range-slider-tick-label-list"
-         [ngClass]="{'mona-slider-position-before': labelPosition==='before', 'mona-slider-position-after': labelPosition==='after'}"
-         *ngIf="showTicks && showLabels">
-        <ng-container *ngFor="let tick of ticks; let tx = index;">
-            <span class="mona-range-slider-tick-label" [ngClass]="{'mona-invisible': tx % labelStep !== 0}">
-                <span *ngIf="!tickValueTemplate">{{tick.value}}</span>
-                <span *ngIf="tickValueTemplate">
-                    <ng-container
-                        *ngTemplateOutlet="tickValueTemplate; context: {$implicit: tick.value}"></ng-container>
-                </span>
-            </span>
-        </ng-container>
-    </div>
-    <div class="mona-range-slider-handle mona-range-slider-handle-primary"
+<div class="mona-range-slider-track">
+    <div class="mona-range-slider-selection"
          [ngClass]="{'mona-range-slider-dragging': dragging()}"
-         [style.left.px]="orientation==='horizontal'?handlePosition()[0]:undefined"
-         [style.bottom.px]="orientation==='vertical'?handlePosition()[0]:undefined"
-         [attr.tabindex]="disabled?-1:0"
-         #primaryHandle></div>
-    <div class="mona-range-slider-handle mona-range-slider-handle-secondary"
-         [ngClass]="{'mona-range-slider-dragging': dragging()}"
-         [style.left.px]="orientation==='horizontal'?handlePosition()[1]:undefined"
-         [style.bottom.px]="orientation==='vertical'?handlePosition()[1]:undefined"
-         [attr.tabindex]="disabled?-1:0"
-         #secondaryHandle></div>
+         [style.left.%]="orientation()==='horizontal'?trackSelectionStyleData().position:undefined"
+         [style.width.%]="orientation()==='horizontal'?trackSelectionStyleData().size:undefined"
+         [style.bottom.%]="orientation()==='vertical'?trackSelectionStyleData().position:undefined"
+         [style.height.%]="orientation()==='vertical'?trackSelectionStyleData().size:undefined">
+    </div>
 </div>
+@if (showTicks()) {
+    <div class="mona-range-slider-tick-list">
+        @for (tick of ticks(); track $index) {
+            @if ($index !== 0) {
+                <span class="mona-range-slider-tick" [ngClass]="{'mona-invisible': $index % tickStep() !== 0}">
+                    <span [attr.data-value]="tick.value"></span>
+                </span>
+            }
+            @if ($index !== ticks().length - 1) {
+                <span class="mona-range-slider-tick" [ngClass]="{'mona-invisible': $index % tickStep() !== 0}">
+                    <span [attr.data-value]="tick.value"></span>
+                </span>
+            }
+        }
+    </div>
+}
+@if (showTicks() && showLabels()) {
+    <div class="mona-range-slider-tick-label-list"
+         [ngClass]="{'mona-slider-position-before': labelPosition()==='before', 'mona-slider-position-after': labelPosition()==='after'}">
+        @for (tick of ticks(); track $index) {
+            <span class="mona-range-slider-tick-label" [ngClass]="{'mona-invisible': $index % labelStep() !== 0}">
+                @if (!tickValueTemplate) {
+                    <span>{{ tick.value }}</span>
+                } @else {
+                    <span>
+                        <ng-container
+                                *ngTemplateOutlet="tickValueTemplate; context: {$implicit: tick.value}"></ng-container>
+                    </span>
+                }
+            </span>
+        }
+    </div>
+}
+<div class="mona-range-slider-handle mona-range-slider-handle-primary"
+     [ngClass]="{'mona-range-slider-dragging': dragging()}"
+     [style.left.%]="orientation()==='horizontal'?handlePosition()[0]:undefined"
+     [style.bottom.%]="orientation()==='vertical'?handlePosition()[0]:undefined"
+     [attr.tabindex]="disabled()?-1:0"
+     #primaryHandle></div>
+<div class="mona-range-slider-handle mona-range-slider-handle-secondary"
+     [ngClass]="{'mona-range-slider-dragging': dragging()}"
+     [style.left.%]="orientation()==='horizontal'?handlePosition()[1]:undefined"
+     [style.bottom.%]="orientation()==='vertical'?handlePosition()[1]:undefined"
+     [attr.tabindex]="disabled()?-1:0"
+     #secondaryHandle></div>

@@ -87,7 +87,7 @@
                                     </ng-template>
                                     <ng-template monaGridCellTemplate>
                                         <img
-                                            [ngSrc]="'https://photos.smugmug.com/photos/i-ZfvdSzh/0/Th/i-ZfvdSzh-Th.png'"
+                                            [ngSrc]="'https://photos.smugmug.com/photos/i-fgmzcP4/0/C6ZJkPgXPH4rvL4KZhPtGnr5p9kLTw5sZht8kpB2z/Th/i-fgmzcP4-Th.png'"
                                             [width]="60" [height]="60" style="border: 2px solid black;">
                                     </ng-template>
                                 </mona-grid-column>
@@ -125,7 +125,7 @@
                                     <mona-menu-item text="New"></mona-menu-item>
                                     <mona-menu-item text="Open"></mona-menu-item>
                                     <mona-menu-item text="Save"></mona-menu-item>
-                                    <mona-menu-item text="Save As"></mona-menu-item>
+                                    <mona-menu-item text="Save As" [disabled]="true"></mona-menu-item>
                                     <mona-menu-item text="Exit">
                                         <ng-template monaMenuItemTextTemplate>
                                             <span
@@ -364,8 +364,9 @@
                                     <mona-tooltip [target]="testButtonRef" position="bottom">
                                         <!--                                        <span style="font-weight: bold; font-size: 24px;">Test Button Tooltip</span>-->
                                         <img
-                                            src="https://photos.smugmug.com/Shared/Image/i-WG27Dmp/0/38cbf7f2/4K/colorful-liquid-flow-abstract-digital-art-uhdpaper.com-4K-8.1392-4K.jpg"
-                                            style="width: 480px; height: 270px;" alt="Tooltip Image"/>
+                                            ngSrc="https://photos.smugmug.com/photos/i-RjvHXNW/0/FMvsc5NMvkcgv4RQ76HqqrXkWHK36BshdjTpzTXbw/S/i-RjvHXNW-S.png"
+                                            [width]="205" [height]="300" priority
+                                            alt="Tooltip Image"/>
                                     </mona-tooltip>
                                 </button>
 
@@ -508,21 +509,24 @@
                                                 style="font-weight: bold; color: deepskyblue;">+{{dataItems.length - multiSelectTagCount}}</span> items</span>
                                     </ng-template>
                                 </mona-multi-select>
-                                <mona-text-box type="text" [inputClass]="['aa', 'bb']" [inputStyle]="{color: 'coral', fontWeight: 'bold'}"></mona-text-box>
+                                <mona-text-box type="text" [inputClass]="['aa', 'bb']" [inputStyle]="{color: 'coral', fontWeight: 'bold'}"
+                                               style="width: 200px;"></mona-text-box>
                             </div>
 
                             <div style="display: flex; align-items: center; margin-top: 40px;">
-                                <mona-stepper orientation="horizontal" [steps]="stepperSteps" [step]="stepperStep" (stepChange)="onStepperStepChange($event)" [linear]="true" style="width: 600px;">
-                                    <ng-template monaStepperLabelTemplate let-step let-index="index" let-active="active">
-                                        <span *ngIf="!active" style="color: snow; font-weight: bolder;">{{index+1}}. {{step.label}}</span>
-                                        <span *ngIf="active" style="color: darkorange; font-weight: bolder;">{{index+1}}. {{step.label}}</span>
-                                    </ng-template>
-                                    <ng-template monaStepperIndicatorTemplate let-step let-index="index">
-                                        <span style="color: snow; font-weight: bold;">{{step.label.substring(0,2).toUpperCase()}}</span>
-                                    </ng-template>
-                                    <ng-template monaStepperStepTemplate let-step let-index="index" let-active="active">
-                                        <fa-icon [icon]="starIcon" style="font-size: 24px; margin-top: 0px;" [ngStyle]="{'color': active?'darkorange':'#fafafa'}"></fa-icon>
-                                    </ng-template>
+                                <mona-stepper orientation="horizontal" [steps]="stepperSteps"
+                                              [step]="stepperStep" (stepChange)="onStepperStepChange($event)" [linear]="true"
+                                              style="width: 600px;">
+<!--                                    <ng-template monaStepperLabelTemplate let-step let-index="index" let-active="active">-->
+<!--                                        <span *ngIf="!active" style="color: snow; font-weight: bolder;">{{index+1}}. {{step.label}}</span>-->
+<!--                                        <span *ngIf="active" style="color: darkorange; font-weight: bolder;">{{index+1}}. {{step.label}}</span>-->
+<!--                                    </ng-template>-->
+<!--                                    <ng-template monaStepperIndicatorTemplate let-step let-index="index">-->
+<!--                                        <span style="color: snow; font-weight: bold;">{{step.label.substring(0,2).toUpperCase()}}</span>-->
+<!--                                    </ng-template>-->
+<!--                                    <ng-template monaStepperStepTemplate let-step let-index="index" let-active="active">-->
+<!--                                        <fa-icon [icon]="starIcon" style="font-size: 24px; margin-top: 0px;" [ngStyle]="{'color': active?'darkorange':'#fafafa'}"></fa-icon>-->
+<!--                                    </ng-template>-->
                                 </mona-stepper>
                             </div>
 
@@ -538,7 +542,7 @@
                                                  style="color: #fafd0f;"></fa-icon>
                                     </ng-template>
                                 </mona-slider>
-                                <mona-numeric-text-box [(ngModel)]="sliderValue" [min]="0" [max]="32"></mona-numeric-text-box>
+                                <mona-numeric-text-box [(ngModel)]="sliderValue" [min]="0" [max]="32" style="width: 170px;"></mona-numeric-text-box>
                             </div>
 
                             <div style="display: flex; align-items: center; justify-content: center;">
@@ -558,8 +562,8 @@
                                                  style="color: #fafd0f;"></fa-icon>
                                     </ng-template>
                                 </mona-range-slider>
-                                <mona-numeric-text-box [ngModel]="rangedSliderValues[0]" (ngModelChange)="rangedSliderValues=[+$event!, rangedSliderValues[1]]"></mona-numeric-text-box>
-                                <mona-numeric-text-box [ngModel]="rangedSliderValues[1]" (ngModelChange)="rangedSliderValues=[rangedSliderValues[0], +$event!]"></mona-numeric-text-box>
+                                <mona-numeric-text-box [ngModel]="rangedSliderValues[0]" (ngModelChange)="rangedSliderValues=[+$event!, rangedSliderValues[1]]" style="width: 170px;"></mona-numeric-text-box>
+                                <mona-numeric-text-box [ngModel]="rangedSliderValues[1]" (ngModelChange)="rangedSliderValues=[rangedSliderValues[0], +$event!]" style="width: 170px;"></mona-numeric-text-box>
                             </div>
 
                             <div style="display: flex; align-items: center; justify-content: center; margin-top: 40px;">
@@ -592,15 +596,18 @@
                                 </mona-range-slider>
 
                                 <mona-list-box [items]="dropdownListDataItems" textField="text"
-                                               (selectionChange)="print($event)"
-                                               (actionClick)="onListBoxActionClick($event)"
+                                               (selectionChange)="print(['ListBox1', $event])"
+                                               (actionClick)="print(['ListBox1', $event])"
                                                [toolbar]="{position:'right'}"
                                                [connectedList]="listBox2">
                                     <ng-template monaListBoxItemTemplate let-item>
                                         <div style="color: #00a86b;">{{item.text}}</div>
                                     </ng-template>
                                 </mona-list-box>
-                                <mona-list-box [items]="listBox2Items" textField="text" [toolbar]="false" #listBox2></mona-list-box>
+                                <mona-list-box [items]="listBox2Items" textField="text" [toolbar]="false"
+                                               (selectionChange)="print(['ListBox1-Connected', $event])"
+                                               (actionClick)="print(['ListBox1-Connected', $event])"
+                                               #listBox2></mona-list-box>
 
                                 <mona-fieldset legend="Quote" style="width: 375px;">
                                     <ng-template monaFieldsetLegendTemplate>
@@ -621,7 +628,7 @@
                                                 [selectedKeys]="listViewSelectedKeys" selectionKey="text"
                                                 (selectedKeysChange)="onListViewSelectionChange($event)"
                                                 [monaListViewNavigable]="{wrap: true}"
-                                                style="height: 350px; width: 350px;">
+                                                style="width: 350px;">
                                     <ng-template monaListViewHeaderTemplate>
                                         <div style="padding: 4px 8px; font-weight: 600; border-bottom: 1px solid var(--mona-border-color);">List of Products</div>
                                     </ng-template>
@@ -642,9 +649,9 @@
 
                             </div>
                             <div style="display: flex; align-items: center; justify-content: center;">
-                                <mona-avatar [borderRadius]="sliderValue"
-                                             [customStyles]="{filter: 'drop-shadow(0 0 0.75rem crimson)'}"
-                                             [image]="'https://photos.smugmug.com/photos/i-ZfvdSzh/0/Th/i-ZfvdSzh-Th.png'"></mona-avatar>
+                                <mona-avatar [borderRadius]="0"
+                                             [borderWidth]="0"
+                                             [image]="'https://photos.smugmug.com/photos/i-H9c2ksV/0/FZ3znsG8X4DRgBvxVnBQgGxCcHrfnK4FNTpQVHT68/S/i-H9c2ksV-S.png'"></mona-avatar>
                                 <mona-avatar [borderRadius]="'50%'" [label]="'HL'"></mona-avatar>
                                 <mona-avatar backgroundColor="transparent" [borderWidth]="0">
                                     <fa-icon [icon]="snowflakeIcon" style="color: #95c5cb;"></fa-icon>
@@ -765,7 +772,7 @@
                                         </mona-splitter-pane>
                                         <mona-splitter-pane [collapsible]="true">
                                             <div style="width: 100%; height: 100%; padding: 20px;">
-                                                <button monaButton>Open Dialog</button>
+                                                <mona-color-palette></mona-color-palette>
                                             </div>
                                         </mona-splitter-pane>
                                     </mona-splitter>
@@ -806,3 +813,5 @@
 <ng-template #popupContentTemplate2>
     <span style="color: deeppink;">Pink Text Popup Template</span>
 </ng-template>
+
+<!--<mona-window (leftChange)="print($event)"></mona-window>-->

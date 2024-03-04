@@ -1,16 +1,19 @@
 import { ActiveDescendantKeyManager } from "@angular/cdk/a11y";
-import { NgClass, NgFor, NgIf } from "@angular/common";
+import { NgClass } from "@angular/common";
 import {
     AfterViewInit,
     ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
     ElementRef,
-    Inject,
+    inject,
     OnInit,
     QueryList,
-    ViewChildren
+    signal,
+    ViewChildren,
+    WritableSignal
 } from "@angular/core";
+import { any } from "@mirei/ts-collections";
 import { filter, fromEvent, Subject } from "rxjs";
 import { AnimationService } from "../../animations/services/animation.service";
 import { PopupDataInjectionToken } from "../../popup/models/PopupInjectionToken";
@@ -26,45 +29,44 @@ import { ContextMenuService } from "../services/context-menu.service";
     styleUrls: ["./context-menu-content.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone: true,
-    imports: [NgFor, NgIf, NgClass, ContextMenuItemComponent]
+    imports: [NgClass, ContextMenuItemComponent]
 })
 export class ContextMenuContentComponent implements OnInit, AfterViewInit {
-    private contextMenuInjectorData: Partial<ContextMenuInjectorData> = { isRoot: false };
-    public activeItemIndex: number = -1;
-    public currentMenuItem: MenuItem | null = null;
-    public iconSpaceVisible: boolean = false;
+    readonly #animationService: AnimationService = inject(AnimationService);
+    readonly #cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
+    readonly #contextMenuInjectorData: Partial<ContextMenuInjectorData> = { isRoot: false };
+    readonly #contextMenuService: ContextMenuService = inject(ContextMenuService);
+    readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
+    #currentMenuItem: MenuItem | null = null;
+    protected readonly iconSpaceVisible: WritableSignal<boolean> = signal(false);
+    protected readonly linkSpaceVisible: WritableSignal<boolean> = signal(false);
+    protected readonly menuPopupRef: WritableSignal<PopupRef | null> = signal(null);
+    public readonly contextMenuData: ContextMenuInjectorData = inject<ContextMenuInjectorData>(PopupDataInjectionToken);
     public keyManager!: ActiveDescendantKeyManager<ContextMenuItemComponent>;
-    public linkSpaceVisible: boolean = false;
-    public menuPopupRef: PopupRef | null = null;
 
     @ViewChildren(ContextMenuItemComponent)
     private contextMenuItemComponents: QueryList<ContextMenuItemComponent> = new QueryList<ContextMenuItemComponent>();
-
-    public constructor(
-        private readonly animationService: AnimationService,
-        private readonly cdr: ChangeDetectorRef,
-        @Inject(PopupDataInjectionToken) public contextMenuData: ContextMenuInjectorData,
-        private readonly contextMenuService: ContextMenuService,
-        private readonly elementRef: ElementRef<HTMLElement>
-    ) {}
 
     public ngAfterViewInit(): void {
         this.animateEnter();
         this.keyManager = new ActiveDescendantKeyManager<ContextMenuItemComponent>(this.contextMenuItemComponents)
             .withWrap()
-            .skipPredicate(mi => !!mi.menuItem.disabled || !!mi.menuItem.divider);
+            .skipPredicate(mi => {
+                const menuItem = mi.menuItem();
+                return menuItem.disabled || !!menuItem.divider;
+            });
         this.setEventListeners();
         this.focus();
         if (!this.contextMenuData.isRoot && this.contextMenuData.viaKeyboard) {
             this.keyManager.setFirstItemActive();
-            this.cdr.detectChanges();
+            this.#cdr.detectChanges();
         }
     }
 
     public ngOnInit(): void {
-        this.iconSpaceVisible = this.contextMenuData.menuItems.some(mi => mi.iconClass || mi.iconTemplate);
-        this.linkSpaceVisible = this.contextMenuData.menuItems.some(
-            mi => mi.subMenuItems && mi.subMenuItems.length > 0
+        this.iconSpaceVisible.set(any(this.contextMenuData.menuItems, mi => !!mi.iconClass || !!mi.iconTemplate));
+        this.linkSpaceVisible.set(
+            any(this.contextMenuData.menuItems, mi => !!mi.subMenuItems && mi.subMenuItems.length > 0)
         );
     }
 
@@ -77,23 +79,23 @@ export class ContextMenuContentComponent implements OnInit, AfterViewInit {
     }
 
     public onListItemMouseEnter(event: MouseEvent, menuItem: MenuItem): void {
-        this.currentMenuItem = menuItem;
-        this.menuPopupRef?.close();
-        if (this.currentMenuItem.subMenuItems && this.currentMenuItem.subMenuItems.length > 0) {
-            this.create(event.target as HTMLElement, this.currentMenuItem);
+        this.#currentMenuItem = menuItem;
+        this.menuPopupRef()?.close();
+        if (this.#currentMenuItem.subMenuItems && this.#currentMenuItem.subMenuItems.length > 0) {
+            this.create(event.target as HTMLElement, this.#currentMenuItem);
         }
     }
 
     private animateEnter(): void {
-        this.animationService.animate({
-            element: this.elementRef.nativeElement.firstElementChild as HTMLElement,
+        this.#animationService.animate({
+            element: this.#hostElementRef.nativeElement.firstElementChild as HTMLElement,
             duration: 150,
             startStyles: { transform: "translateY(-100%)", opacity: 1 },
             endStyles: { transform: "translateY(0)", opacity: 1 },
             timingFunction: "ease-out"
         });
-        this.animationService.animate({
-            element: this.elementRef.nativeElement.parentElement as HTMLElement,
+        this.#animationService.animate({
+            element: this.#hostElementRef.nativeElement.parentElement as HTMLElement,
             duration: 150,
             delay: 100,
             startStyles: { boxShadow: "none" },
@@ -103,39 +105,40 @@ export class ContextMenuContentComponent implements OnInit, AfterViewInit {
     }
 
     private create(anchor: HTMLElement, menuItem: MenuItem, viaKeyboard?: boolean): void {
-        this.contextMenuInjectorData.menuItems = menuItem.subMenuItems;
-        this.contextMenuInjectorData.menuClick = this.contextMenuData.menuClick;
-        this.contextMenuInjectorData.navigate = this.contextMenuData.navigate;
+        this.#contextMenuInjectorData.menuItems = menuItem.subMenuItems;
+        this.#contextMenuInjectorData.menuClick = this.contextMenuData.menuClick;
+        this.#contextMenuInjectorData.navigate = this.contextMenuData.navigate;
         const popupClasses = this.contextMenuData.popupClass
             ? Array.isArray(this.contextMenuData.popupClass)
                 ? this.contextMenuData.popupClass
                 : [this.contextMenuData.popupClass]
             : [];
-        this.contextMenuInjectorData.popupClass = popupClasses;
-        this.menuPopupRef = this.contextMenuService.open({
+        this.#contextMenuInjectorData.popupClass = popupClasses;
+        const popupRef = this.#contextMenuService.open({
             anchor,
             closeOnOutsideClick: true,
             content: ContextMenuContentComponent,
-            data: this.contextMenuInjectorData,
-            positions: this.contextMenuService.defaultSubMenuPositions,
+            data: this.#contextMenuInjectorData,
+            positions: this.#contextMenuService.defaultSubMenuPositions,
             popupClass: ["mona-contextmenu-content", ...popupClasses]
         });
-        this.contextMenuInjectorData.parentMenuRef = this.menuPopupRef;
-        this.contextMenuInjectorData.viaKeyboard = viaKeyboard;
-        this.contextMenuInjectorData.subMenuClose = new Subject<void>();
+        this.menuPopupRef.set(popupRef);
+        this.#contextMenuInjectorData.parentMenuRef = popupRef;
+        this.#contextMenuInjectorData.viaKeyboard = viaKeyboard;
+        this.#contextMenuInjectorData.subMenuClose = new Subject<void>();
         if (this.contextMenuData.parentMenuRef) {
             const subscription = this.contextMenuData.parentMenuRef.closed.subscribe(() => {
-                this.menuPopupRef?.close();
+                this.menuPopupRef()?.close();
                 subscription.unsubscribe();
             });
         }
-        this.contextMenuInjectorData.subMenuClose.subscribe(() => {
+        this.#contextMenuInjectorData.subMenuClose.subscribe(() => {
             this.focus();
         });
     }
 
     private focus(): void {
-        const listElement = this.elementRef.nativeElement.querySelector("ul:first-child") as HTMLUListElement;
+        const listElement = this.#hostElementRef.nativeElement.querySelector("ul:first-child") as HTMLUListElement;
         listElement?.focus();
     }
 
@@ -144,13 +147,13 @@ export class ContextMenuContentComponent implements OnInit, AfterViewInit {
             this.contextMenuData.parentMenuRef?.close();
             this.contextMenuData.subMenuClose?.next();
             this.contextMenuData.navigate.emit({
-                previousItem: this.keyManager.activeItem?.menuItem ?? null,
-                currentItem: this.keyManager.activeItem?.menuItem.parent ?? null,
+                previousItem: this.keyManager.activeItem?.menuItem() ?? null,
+                currentItem: this.keyManager.activeItem?.menuItem().parent ?? null,
                 direction: "left"
             });
         } else {
             this.contextMenuData.navigate.emit({
-                previousItem: this.keyManager.activeItem?.menuItem ?? null,
+                previousItem: this.keyManager.activeItem?.menuItem() ?? null,
                 currentItem: null,
                 direction: "left"
             });
@@ -158,29 +161,23 @@ export class ContextMenuContentComponent implements OnInit, AfterViewInit {
     }
 
     private handleArrowRightKey(): void {
-        if (
-            this.keyManager.activeItem?.menuItem &&
-            this.keyManager.activeItem.menuItem.subMenuItems &&
-            this.keyManager.activeItem.menuItem.subMenuItems.length > 0
-        ) {
-            this.menuPopupRef?.close();
+        const menuItem = this.keyManager.activeItem?.menuItem();
+        if (menuItem?.subMenuItems && menuItem.subMenuItems.length > 0) {
+            this.menuPopupRef()?.close();
             const previousItem = this.keyManager.activeItem;
             if (this.keyManager.activeItem) {
-                this.create(
-                    this.keyManager.activeItem.elementRef.nativeElement,
-                    this.keyManager.activeItem.menuItem,
-                    true
-                );
+                this.create(this.keyManager.activeItem.elementRef.nativeElement, menuItem, true);
             }
             this.contextMenuData.navigate.emit({
-                previousItem: previousItem?.menuItem ?? null,
+                previousItem: previousItem?.menuItem() ?? null,
                 currentItem:
-                    this.keyManager.activeItem?.menuItem.subMenuItems?.find(mi => !mi.disabled && !mi.divider) ?? null,
+                    this.keyManager.activeItem?.menuItem().subMenuItems?.find(mi => !mi.disabled && !mi.divider) ??
+                    null,
                 direction: "right"
             });
         } else {
             this.contextMenuData.navigate.emit({
-                previousItem: this.keyManager.activeItem?.menuItem ?? null,
+                previousItem: menuItem ?? null,
                 currentItem: null,
                 direction: "right"
             });
@@ -188,16 +185,14 @@ export class ContextMenuContentComponent implements OnInit, AfterViewInit {
     }
 
     private handleInputKeys(): void {
-        if (this.keyManager.activeItem?.menuItem) {
-            if (
-                this.keyManager.activeItem.menuItem.subMenuItems &&
-                this.keyManager.activeItem.menuItem.subMenuItems.length > 0
-            ) {
+        const menuItem = this.keyManager.activeItem?.menuItem();
+        if (menuItem) {
+            if (menuItem.subMenuItems && menuItem.subMenuItems.length > 0) {
                 return;
             }
             if (this.keyManager.activeItem) {
-                this.keyManager.activeItem.menuItem.menuClick?.();
-                this.contextMenuData.menuClick?.next(this.keyManager.activeItem.menuItem);
+                this.keyManager.activeItem.menuItem().menuClick?.();
+                this.contextMenuData.menuClick?.next(this.keyManager.activeItem.menuItem());
             }
         }
     }
@@ -207,15 +202,15 @@ export class ContextMenuContentComponent implements OnInit, AfterViewInit {
         this.keyManager.onKeydown(event);
         if (this.keyManager.activeItem !== previousItem) {
             this.contextMenuData.navigate.emit({
-                previousItem: previousItem?.menuItem ?? null,
-                currentItem: this.keyManager.activeItem?.menuItem ?? null,
+                previousItem: previousItem?.menuItem() ?? null,
+                currentItem: this.keyManager.activeItem?.menuItem() ?? null,
                 direction: event.key === "ArrowDown" ? "down" : "up"
             });
         }
     }
 
     private setEventListeners(): void {
-        fromEvent<KeyboardEvent>(this.elementRef.nativeElement, "keydown")
+        fromEvent<KeyboardEvent>(this.#hostElementRef.nativeElement, "keydown")
             .pipe(
                 filter(
                     e =>
@@ -228,7 +223,6 @@ export class ContextMenuContentComponent implements OnInit, AfterViewInit {
                 )
             )
             .subscribe(event => {
-                this.activeItemIndex = this.keyManager.activeItemIndex ?? -1;
                 switch (event.key) {
                     case "ArrowDown":
                     case "ArrowUp":
@@ -245,7 +239,7 @@ export class ContextMenuContentComponent implements OnInit, AfterViewInit {
                         this.handleArrowLeftKey();
                         break;
                 }
-                this.cdr.markForCheck();
+                this.#cdr.markForCheck();
             });
     }
 }

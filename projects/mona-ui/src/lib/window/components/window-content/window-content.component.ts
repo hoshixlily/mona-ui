@@ -1,4 +1,4 @@
-import { NgIf, NgTemplateOutlet } from "@angular/common";
+import { NgTemplateOutlet } from "@angular/common";
 import {
     AfterViewInit,
     ApplicationRef,
@@ -9,7 +9,6 @@ import {
     DestroyRef,
     ElementRef,
     inject,
-    Inject,
     Injector,
     OnInit,
     signal,
@@ -40,7 +39,6 @@ import { WindowInjectorData } from "../../models/WindowInjectorData";
     standalone: true,
     imports: [
         WindowDragHandlerDirective,
-        NgIf,
         NgTemplateOutlet,
         ButtonDirective,
         FontAwesomeModule,
@@ -48,39 +46,37 @@ import { WindowInjectorData } from "../../models/WindowInjectorData";
     ]
 })
 export class WindowContentComponent implements OnInit, AfterViewInit {
-    private readonly destroyRef = inject(DestroyRef);
-    public readonly closeIcon: IconDefinition = faClose;
-    public readonly componentRef?: ComponentRef<any>;
-    public readonly contentType: "template" | "component" = "template";
-    public isVisible: WritableSignal<boolean> = signal(false);
+    readonly #animationService: AnimationService = inject(AnimationService);
+    readonly #appRef: ApplicationRef = inject(ApplicationRef);
+    readonly #destroyRef: DestroyRef = inject(DestroyRef);
+    readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
+    readonly #injector: Injector = inject(Injector);
+    readonly #viewContainerRef: ViewContainerRef = inject(ViewContainerRef);
+    protected readonly closeIcon: IconDefinition = faClose;
+    protected readonly componentRef?: ComponentRef<any>;
+    protected readonly contentType: WritableSignal<"template" | "component"> = signal("template");
+    protected readonly windowData: WindowInjectorData = inject<WindowInjectorData>(PopupDataInjectionToken);
 
     @ViewChild("componentAnchor", { read: ViewContainerRef })
     public componentAnchor!: ViewContainerRef;
 
-    public constructor(
-        private readonly animationService: AnimationService,
-        private readonly appRef: ApplicationRef,
-        private injector: Injector,
-        @Inject(PopupDataInjectionToken) public windowData: WindowInjectorData,
-        private readonly elementRef: ElementRef<HTMLElement>,
-        private readonly viewContainerRef: ViewContainerRef
-    ) {
-        if (windowData.content instanceof TemplateRef) {
-            this.contentType = "template";
+    public constructor() {
+        if (this.windowData.content instanceof TemplateRef) {
+            this.contentType.set("template");
         } else {
-            this.contentType = "component";
-            this.componentRef = createComponent(windowData.content as Type<any>, {
-                environmentInjector: this.appRef.injector,
-                elementInjector: this.injector
+            this.contentType.set("component");
+            this.componentRef = createComponent(this.windowData.content as Type<any>, {
+                environmentInjector: this.#appRef.injector,
+                elementInjector: this.#injector
             });
         }
     }
 
     public ngAfterViewInit(): void {
-        if (this.contentType === "component" && this.componentAnchor && this.componentRef) {
-            const index = this.viewContainerRef.indexOf(this.componentRef.hostView);
+        if (this.contentType() === "component" && this.componentAnchor && this.componentRef) {
+            const index = this.#viewContainerRef.indexOf(this.componentRef.hostView);
             if (index !== -1) {
-                this.viewContainerRef.detach(index);
+                this.#viewContainerRef.detach(index);
             }
             this.componentAnchor.insert(this.componentRef.hostView, 0);
             this.componentRef.changeDetectorRef.detectChanges();
@@ -90,7 +86,6 @@ export class WindowContentComponent implements OnInit, AfterViewInit {
 
     public ngOnInit(): void {
         this.setSubscriptions();
-        this.isVisible.set(true);
     }
 
     public onCloseClick(event: MouseEvent): void {
@@ -102,7 +97,7 @@ export class WindowContentComponent implements OnInit, AfterViewInit {
         if (this.windowData.preventClose && this.windowData.preventClose(closeEvent)) {
             return;
         }
-        this.animationService.scaleOut(this.windowData.windowReference.element);
+        this.#animationService.scaleOut(this.windowData.windowReference.element);
         this.windowData.windowReference.closeWithDelay(100, closeEvent);
     }
 
@@ -111,7 +106,7 @@ export class WindowContentComponent implements OnInit, AfterViewInit {
         if (element === undefined) {
             return;
         }
-        const windowElement = this.elementRef.nativeElement;
+        const windowElement = this.#hostElementRef.nativeElement;
         if (element instanceof ElementRef) {
             element.nativeElement.focus();
         } else if (element instanceof HTMLElement) {
@@ -129,7 +124,7 @@ export class WindowContentComponent implements OnInit, AfterViewInit {
             fromEvent<KeyboardEvent>(document, "keydown")
                 .pipe(
                     filter(event => event.key === "Escape"),
-                    takeUntilDestroyed(this.destroyRef)
+                    takeUntilDestroyed(this.#destroyRef)
                 )
                 .subscribe(event => {
                     this.closeWindow(event);

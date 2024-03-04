@@ -1,21 +1,34 @@
-<div class="mona-contextmenu-item" *ngIf="!menuItem.divider">
-    <div class="mona-contextmenu-item-icon" *ngIf="iconSpaceVisible">
-        <span [ngClass]="menuItem.iconClass" *ngIf="menuItem.iconClass && !menuItem.iconTemplate"></span>
-        <ng-container [ngTemplateOutlet]="menuItem?.iconTemplate ?? null" [ngTemplateOutletContext]="{$implicit: menuItem}"
-                      *ngIf="menuItem?.iconTemplate"></ng-container>
-    </div>
-    <div class="mona-contextmenu-item-text" [ngClass]="{'icon-visible': iconSpaceVisible}">
-        <span *ngIf="!menuItem?.textTemplate">{{menuItem.text}}</span>
-        <ng-container [ngTemplateOutlet]="menuItem?.textTemplate ?? null"
-                      [ngTemplateOutletContext]="{$implicit: menuItem}"
-                      *ngIf="menuItem?.textTemplate"></ng-container>
-    </div>
-    <div class="mona-contextmenu-item-link" *ngIf="linkSpaceVisible">
-        <span *ngIf="menuItem.subMenuItems && menuItem.subMenuItems.length !== 0">
-            <fa-icon [icon]="linkIcon"></fa-icon>
-        </span>
-    </div>
-</div>
+@if (menuItem().divider) {
+    <span class="divider"></span>
+} @else {
+    <div class="mona-contextmenu-item">
+        @if (iconSpaceVisible()) {
+            <div class="mona-contextmenu-item-icon">
+                @if (menuItem().iconTemplate) {
+                    <ng-container [ngTemplateOutlet]="menuItem().iconTemplate??null"
+                                  [ngTemplateOutletContext]="{$implicit: menuItem()}"></ng-container>
+                } @else if (menuItem().iconClass && !menuItem().iconTemplate) {
+                    <span [ngClass]="menuItem().iconClass"></span>
+                }
+            </div>
+        }
+        <div class="mona-contextmenu-item-text" [ngClass]="{'icon-visible': iconSpaceVisible()}">
+            @if (menuItem().textTemplate) {
+                <ng-container [ngTemplateOutlet]="menuItem().textTemplate??null"
+                              [ngTemplateOutletContext]="{$implicit: menuItem()}"></ng-container>
+            } @else {
+                <span>{{ menuItem().text }}</span>
+            }
 
-<span *ngIf="menuItem.divider" class="divider"></span>
-<!-- &rsaquo; -->
+        </div>
+        @if (linkSpaceVisible()) {
+            <div class="mona-contextmenu-item-link">
+                @if (menuItem().subMenuItems && menuItem().subMenuItems?.length !== 0) {
+                    <span>
+                        <fa-icon [icon]="linkIcon"></fa-icon>
+                    </span>
+                }
+            </div>
+        }
+    </div>
+}

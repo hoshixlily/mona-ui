@@ -10,7 +10,9 @@ import {
     ElementRef,
     EventEmitter,
     inject,
+    input,
     Input,
+    InputSignalWithTransform,
     Output,
     Signal,
     signal,
@@ -26,6 +28,7 @@ import { ListGroupHeaderTemplateDirective } from "../../../common/list/directive
 import { ListHeaderTemplateDirective } from "../../../common/list/directives/list-header-template.directive";
 import { ListItemTemplateDirective } from "../../../common/list/directives/list-item-template.directive";
 import { ListNoDataTemplateDirective } from "../../../common/list/directives/list-no-data-template.directive";
+import { ListSizeInputType, ListSizeType } from "../../../common/list/models/ListSizeType";
 import { ListService } from "../../../common/list/services/list.service";
 import { PagerComponent } from "../../../pager/components/pager/pager.component";
 import { PageChangeEvent } from "../../../pager/models/PageChangeEvent";
@@ -58,20 +61,33 @@ import { PageState } from "../../models/PageState";
         ListGroupHeaderTemplateDirective,
         ListItemTemplateDirective,
         ListNoDataTemplateDirective
-    ]
+    ],
+    host: {
+        class: "mona-list-view",
+        "[attr.tabindex]": "-1"
+    }
 })
 export class ListViewComponent<T = any> implements AfterViewInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
-    readonly #items: WritableSignal<ImmutableSet<any>> = signal(ImmutableSet.create());
+    readonly #hostElementRef: ElementRef<HTMLDivElement> = inject(ElementRef);
     readonly #scrollBottomEnabled: Signal<boolean> = computed(() => {
         const pageableOptions = this.pagerSettings();
         return !pageableOptions.enabled;
     });
 
-    protected readonly listHeight: WritableSignal<string | undefined> = signal(undefined);
-    protected readonly listWidth: WritableSignal<string | undefined> = signal(undefined);
+    protected readonly itemCount: Signal<number> = computed(() => this.items().size());
+    protected readonly pageState: PageState = { page: signal(1), skip: signal(0), take: signal(10) };
+    protected readonly pagerSettings: WritableSignal<PagerSettings> = signal({
+        enabled: false,
+        firstLast: false,
+        info: true,
+        pageSizeValues: true,
+        previousNext: false,
+        type: "numeric",
+        visiblePages: 5
+    });
     protected readonly viewItems: Signal<ImmutableSet<T>> = computed(() => {
-        const items = this.#items();
+        const items = this.items();
         const pageableOptions = this.pagerSettings();
         const skip = this.pageState.skip();
         const take = this.pageState.take();
@@ -81,17 +97,30 @@ export class ListViewComponent<T = any> implements AfterViewInit {
         return items.skip(skip).take(take).toImmutableSet();
     });
 
-    public itemCount: Signal<number> = computed(() => this.#items().size());
-    public page: WritableSignal<number> = signal(1);
-    public pageState: PageState = { page: signal(1), skip: signal(0), take: signal(10) };
-    public pagerSettings: WritableSignal<PagerSettings> = signal({
-        enabled: false,
-        firstLast: false,
-        info: true,
-        pageSizeValues: true,
-        previousNext: false,
-        type: "numeric",
-        visiblePages: 5
+    public height: InputSignalWithTransform<ListSizeType, ListSizeInputType> = input("100%", {
+        transform: value => {
+            if (value == null) {
+                return undefined;
+            } else if (typeof value === "number") {
+                return `${value}px`;
+            } else {
+                return value;
+            }
+        }
+    });
+    public items: InputSignalWithTransform<ImmutableSet<T>, Iterable<T>> = input(ImmutableSet.create(), {
+        transform: value => ImmutableSet.create(value)
+    });
+    public width: InputSignalWithTransform<ListSizeType, ListSizeInputType> = input("100%", {
+        transform: value => {
+            if (value == null) {
+                return undefined;
+            } else if (typeof value === "number") {
+                return `${value}px`;
+            } else {
+                return value;
+            }
+        }
     });
 
     @ContentChild(ListViewFooterTemplateDirective, { read: TemplateRef })
@@ -102,22 +131,6 @@ export class ListViewComponent<T = any> implements AfterViewInit {
 
     @ContentChild(ListViewHeaderTemplateDirective, { read: TemplateRef })
     public headerTemplate: TemplateRef<any> | null = null;
-
-    @Input()
-    public set height(value: string | number | undefined) {
-        if (value == null) {
-            this.listHeight.set(undefined);
-        } else if (typeof value === "number") {
-            this.listHeight.set(`${value}px`);
-        } else {
-            this.listHeight.set(value);
-        }
-    }
-
-    @Input()
-    public set items(value: Iterable<T>) {
-        this.#items.set(ImmutableSet.create(value));
-    }
 
     @ContentChild(ListViewItemTemplateDirective, { read: TemplateRef })
     public itemTemplate!: TemplateRef<ListViewItemTemplateContext>;
@@ -136,21 +149,7 @@ export class ListViewComponent<T = any> implements AfterViewInit {
         this.listService.setTextField(textField ?? "");
     }
 
-    @Input()
-    public set width(value: string | number | undefined) {
-        if (value == null) {
-            this.listWidth.set(undefined);
-        } else if (typeof value === "number") {
-            this.listWidth.set(`${value}px`);
-        } else {
-            this.listWidth.set(value);
-        }
-    }
-
-    public constructor(
-        private readonly elementRef: ElementRef<HTMLDivElement>,
-        protected readonly listService: ListService<T>
-    ) {}
+    public constructor(protected readonly listService: ListService<T>) {}
 
     public ngAfterViewInit(): void {
         this.setScrollBottomEvent();
@@ -173,8 +172,8 @@ export class ListViewComponent<T = any> implements AfterViewInit {
 
     private setScrollBottomEvent(): void {
         const element = this.listService.virtualScrollOptions().enabled
-            ? this.elementRef.nativeElement.querySelector(".cdk-virtual-scroll-viewport")
-            : this.elementRef.nativeElement.querySelector(".mona-list > ul");
+            ? this.#hostElementRef.nativeElement.querySelector(".cdk-virtual-scroll-viewport")
+            : this.#hostElementRef.nativeElement.querySelector(".mona-list > ul");
         if (!element) {
             return;
         }

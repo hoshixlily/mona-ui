@@ -1,13 +1,4 @@
-:host {
-    display: block;
-}
-
-div.mona-pager {
-    display: flex;
-    padding: 5px 10px;
-}
-
-ol.mona-pager-list {
+.mona-pager-list {
     display: flex;
     & li {
         list-style: none;
@@ -18,30 +9,30 @@ ol.mona-pager-list {
 }
 
 mona-numeric-text-box {
-    margin-left: 20px;
+    margin-left: 1rem;
     width: 50px;
 }
 
 mona-drop-down-list {
-    margin: 0 5px;
+    margin: 0 0.25rem;
 }
 
-div.mona-pager-input {
+.mona-pager-input {
     display: flex;
     align-items: center;
     & mona-numeric-text-box {
         width: 50px;
-        margin: 0 5px;
+        margin: 0 0.25rem;
     }
     & span {
-        margin: 0 5px;
+        margin: 0 0.25rem;
     }
 }
 
-div.mona-pager-info {
+.mona-pager-info {
     display: flex;
     align-items: center;
     justify-content: flex-end;
     flex: 1 1 0;
-    padding-left: 10px;
+    padding-left: 0.5rem;
 }
