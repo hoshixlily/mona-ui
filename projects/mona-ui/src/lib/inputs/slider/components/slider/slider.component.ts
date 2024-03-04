@@ -143,20 +143,31 @@ export class SliderComponent implements AfterViewInit, ControlValueAccessor {
         }
 
         const containerRect = this.#hostElementRef.nativeElement.getBoundingClientRect();
-        const handlePos =
-            direction === "horizontal" ? event.clientX - containerRect.left : containerRect.bottom - event.clientY;
+        let handlePos =
+            direction === "horizontal" ? event.clientX - containerRect.left : event.clientY - containerRect.top;
+        let normalizedHandlePos = 0;
+        if (direction === "horizontal") {
+            normalizedHandlePos = Math.max(0, Math.min((handlePos / containerRect.width) * 100, 100));
+        } else {
+            normalizedHandlePos = Math.max(0, Math.min(100 - (handlePos / containerRect.height) * 100, 100));
+        }
+
         const maxPos = direction === "horizontal" ? containerRect.width : containerRect.height;
-        if (handlePos >= 0 && handlePos <= maxPos && handlePos !== this.handlePosition()) {
-            const value = this.getValueFromPosition(handlePos);
+        if (
+            normalizedHandlePos >= 0 &&
+            normalizedHandlePos <= maxPos &&
+            normalizedHandlePos !== this.handlePosition()
+        ) {
+            const value = this.getValueFromPosition(normalizedHandlePos);
             if (!this.showTicks()) {
                 this.#zone.run(() => {
-                    this.handlePosition.set(handlePos);
+                    this.handlePosition.set(normalizedHandlePos);
                 });
             }
             if (value !== this.handleValue()) {
                 this.#zone.run(() => {
-                    if (this.showTicks() && this.handlePosition() !== handlePos) {
-                        this.handlePosition.set(handlePos);
+                    if (this.showTicks() && this.handlePosition() !== normalizedHandlePos) {
+                        this.handlePosition.set(normalizedHandlePos);
                     }
                     this.handleValue.set(value);
                     this.#propagateChange?.(value);

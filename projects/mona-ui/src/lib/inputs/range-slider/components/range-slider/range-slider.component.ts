@@ -144,11 +144,17 @@ export class RangeSliderComponent implements AfterViewInit, ControlValueAccessor
         const containerRect = this.#hostElementRef.nativeElement.getBoundingClientRect();
         const handlePos =
             orientation === "horizontal" ? event.clientX - containerRect.left : containerRect.bottom - event.clientY;
+        let normalizedHandlePos = 0;
+        if (orientation === "horizontal") {
+            normalizedHandlePos = Math.max(0, Math.min((handlePos / containerRect.width) * 100, 100));
+        } else {
+            normalizedHandlePos = Math.max(0, Math.min((handlePos / containerRect.height) * 100, 100));
+        }
         const maxPos = orientation === "horizontal" ? containerRect.width : containerRect.height;
-        if (handlePos < 0 || handlePos > maxPos) {
+        if (normalizedHandlePos < 0 || normalizedHandlePos > maxPos) {
             return;
         }
-        const value = this.getValueFromPosition(handlePos);
+        const value = this.getValueFromPosition(normalizedHandlePos);
         let currentValue: number;
         if (handleType === "primary") {
             currentValue = this.handleValue()[0];
@@ -158,14 +164,14 @@ export class RangeSliderComponent implements AfterViewInit, ControlValueAccessor
 
         if (!this.showTicks()) {
             this.#zone.run(() => {
-                this.setHandlePosition(handlePos, handleType);
+                this.setHandlePosition(normalizedHandlePos, handleType);
             });
         }
         const position = handleType === "primary" ? this.handlePosition()[0] : this.handlePosition()[1];
         if (currentValue !== value) {
             this.#zone.run(() => {
-                if (this.showTicks() && handlePos !== position) {
-                    this.setHandlePosition(handlePos, handleType);
+                if (this.showTicks() && normalizedHandlePos !== position) {
+                    this.setHandlePosition(normalizedHandlePos, handleType);
                 }
                 this.setHandleValue(value, handleType);
                 if (this.#propagateChange) {
