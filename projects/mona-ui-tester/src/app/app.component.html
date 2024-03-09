@@ -800,6 +800,11 @@
                         </div>
                     </ng-template>
                 </mona-tab>
+                <mona-tab title="Neo Splitter">
+                    <ng-template monaTabContentTemplate>
+                        <mona-neo-splitter></mona-neo-splitter>
+                    </ng-template>
+                </mona-tab>
                 <mona-tab *ngFor="let t of tabData" title="TAB TITLE: {{t.title}}" [closable]="true"></mona-tab>
             </mona-tab-strip>
         </mona-splitter-pane>
