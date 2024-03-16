@@ -802,7 +802,24 @@
                 </mona-tab>
                 <mona-tab title="Neo Splitter">
                     <ng-template monaTabContentTemplate>
-                        <mona-neo-splitter></mona-neo-splitter>
+                        <mona-neo-splitter>
+                            <mona-neo-splitter-pane [size]="200">
+                                <button monaButton>Pane 1</button>
+                            </mona-neo-splitter-pane>
+                            <mona-neo-splitter-pane [size]="400">
+                                <button monaButton>Pane 2</button>
+                            </mona-neo-splitter-pane>
+                            <mona-neo-splitter-pane>
+                                <mona-neo-splitter orientation="vertical">
+                                    <mona-neo-splitter-pane [size]="400">
+                                        <button monaButton>Vertical Splitter Pane 1</button>
+                                    </mona-neo-splitter-pane>
+                                    <mona-neo-splitter-pane >
+                                        <button monaButton>Vertical Splitter Pane 2</button>
+                                    </mona-neo-splitter-pane>
+                                </mona-neo-splitter>
+                            </mona-neo-splitter-pane>
+                        </mona-neo-splitter>
                     </ng-template>
                 </mona-tab>
                 <mona-tab *ngFor="let t of tabData" title="TAB TITLE: {{t.title}}" [closable]="true"></mona-tab>

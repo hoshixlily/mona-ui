@@ -115,6 +115,7 @@ import {
     MultiSelectSummaryTagTemplateDirective,
     MultiSelectTagTemplateDirective,
     NeoSplitterComponent,
+    NeoSplitterPaneComponent,
     NodeCheckEvent,
     NodeClickEvent,
     NodeDragEndEvent,
@@ -329,7 +330,8 @@ interface TreeNodeDataItem {
         DropDownTreeNodeTemplateDirective,
         WindowComponent,
 
-        NeoSplitterComponent
+        NeoSplitterComponent,
+        NeoSplitterPaneComponent
     ]
 })
 export class AppComponent implements OnInit {

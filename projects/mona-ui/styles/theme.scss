@@ -1486,28 +1486,45 @@ button[monaButton].mona-input-button {
 }
 
 .mona-neo-splitter-resizer {
-    background-color: var(--mona-background-dark);
+    background-color: var(--mona-background);
     color: var(--mona-text);
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
+    transition: background-color 0.15s ease-in;
     &-horizontal {
         cursor: col-resize;
-        width: 8px;
+        width: 4px;
         border-left: 1px solid var(--mona-border-color);
         border-right: 1px solid var(--mona-border-color);
         flex-direction: column;
     }
     &-vertical {
         cursor: row-resize;
-        height: 8px;
+        height: 4px;
         border-top: 1px solid var(--mona-border-color);
         border-bottom: 1px solid var(--mona-border-color);
+    }
+    &-resizing {
+        background-color: var(--mona-background-dark);
     }
     & button {
         z-index: 1;
     }
+}
+
+.mona-neo-splitter-resizer-handle {
+    background: var(--mona-background-lighter);
+}
+
+.mona-neo-splitter-resizer-horizontal .mona-neo-splitter-resizer-handle {
+    width: 100%;
+    height: 24px;
+}
+.mona-neo-splitter-resizer-vertical .mona-neo-splitter-resizer-handle {
+    width: 24px;
+    height: 100%;
 }
 
 /** Tab Strip */

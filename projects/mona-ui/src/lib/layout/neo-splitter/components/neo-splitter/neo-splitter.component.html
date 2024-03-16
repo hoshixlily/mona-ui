@@ -1,12 +1,12 @@
-@for (pane of paneList(); track $index) {
-    <div class="mona-neo-splitter-panel" [attr.data-pid]="pane.panelUid" [attr.data-px]="$index">
-        Panel {{ $index }} of {{ $count }}
+@for (pane of paneList(); track pane.uid) {
+    <div class="mona-neo-splitter-pane" [attr.data-pid]="pane.uid" [attr.data-px]="$index">
+        <ng-container [ngTemplateOutlet]="pane.template()"></ng-container>
     </div>
     @if ($index !== $count - 1) {
         <mona-neo-splitter-resizer
                 [nextPane]="paneList()[ $index + 1 ]"
                 [orientation]="orientation()"
-                [previousPane]="paneList()[ $index ]"
-        ></mona-neo-splitter-resizer>
+                [previousPane]="paneList()[ $index ]">
+        </mona-neo-splitter-resizer>
     }
 }

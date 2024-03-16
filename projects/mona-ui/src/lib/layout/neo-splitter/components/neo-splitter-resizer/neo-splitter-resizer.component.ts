@@ -1,21 +1,19 @@
 import {
     ChangeDetectionStrategy,
     Component,
-    computed,
-    DestroyRef,
     ElementRef,
     inject,
     input,
     InputSignal,
     OnInit,
-    Signal
+    signal,
+    WritableSignal
 } from "@angular/core";
 import { FaIconComponent } from "@fortawesome/angular-fontawesome";
-import { faEllipsisH, faEllipsisV, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { filter, fromEvent, skipUntil, takeUntil, tap } from "rxjs";
 import { ButtonDirective } from "../../../../buttons/button/button.directive";
 import { Orientation } from "../../../../models/Orientation";
-import { SplitterPane } from "../../models/SplitterPane";
+import { NeoSplitterPaneComponent } from "../neo-splitter-pane/neo-splitter-pane.component";
 
 @Component({
     selector: "mona-neo-splitter-resizer",
@@ -27,27 +25,20 @@ import { SplitterPane } from "../../models/SplitterPane";
     host: {
         class: "mona-neo-splitter-resizer",
         "[class.mona-neo-splitter-resizer-horizontal]": "orientation()==='horizontal'",
-        "[class.mona-neo-splitter-resizer-vertical]": "orientation()==='vertical'"
+        "[class.mona-neo-splitter-resizer-vertical]": "orientation()==='vertical'",
+        "[class.mona-neo-splitter-resizer-resizing]": "resizing()"
     }
 })
 export class NeoSplitterResizerComponent implements OnInit {
-    readonly #destroyRef: DestroyRef = inject(DestroyRef);
     readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
-    readonly #horizontalEllipsisIcon: IconDefinition = faEllipsisV;
-    readonly #verticalEllipsisIcon: IconDefinition = faEllipsisH;
-    protected readonly ellipsisIcon: Signal<IconDefinition> = computed(() => {
-        const orientation = this.orientation();
-        return orientation === "horizontal" ? this.#horizontalEllipsisIcon : this.#verticalEllipsisIcon;
-    });
-    public nextPane: InputSignal<SplitterPane> = input.required<SplitterPane>();
+    protected readonly resizing: WritableSignal<boolean> = signal(false);
+    public nextPane: InputSignal<NeoSplitterPaneComponent> = input.required<NeoSplitterPaneComponent>();
     public orientation: InputSignal<Orientation> = input.required<Orientation>();
-    public previousPane: InputSignal<SplitterPane> = input.required<SplitterPane>();
+    public previousPane: InputSignal<NeoSplitterPaneComponent> = input.required<NeoSplitterPaneComponent>();
 
     public ngOnInit(): void {
         this.setEvents();
     }
-
-    public toggle(pos: "previous" | "next", event: MouseEvent): void {}
 
     private getPaneElements(): [HTMLElement, HTMLElement] {
         const previousPane = this.#hostElementRef.nativeElement.previousElementSibling;
@@ -72,6 +63,7 @@ export class NeoSplitterResizerComponent implements OnInit {
                         tap(event => {
                             event.preventDefault();
                             this.#hostElementRef.nativeElement.setPointerCapture(event.pointerId);
+                            this.resizing.set(true);
                         })
                     )
                 ),
@@ -79,6 +71,7 @@ export class NeoSplitterResizerComponent implements OnInit {
                     fromEvent<PointerEvent>(this.#hostElementRef.nativeElement, "pointerup").pipe(
                         tap(event => {
                             this.#hostElementRef.nativeElement.releasePointerCapture(event.pointerId);
+                            this.resizing.set(false);
                             this.setEvents();
                         })
                     )
@@ -106,7 +99,9 @@ export class NeoSplitterResizerComponent implements OnInit {
 
     private updatePaneSizes(previousPaneSize: string, nextPaneSize: string): void {
         this.previousPane().size.set(previousPaneSize);
+        // if (this.nextPane().size() !== "1fr") {
         this.nextPane().size.set(nextPaneSize);
+        // }
     }
 
     private updateVerticalPaneSizes(event: PointerEvent): void {

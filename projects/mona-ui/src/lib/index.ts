@@ -168,6 +168,7 @@ export * from "./layout/splitter/components/splitter-pane/splitter-pane.componen
 
 /** Neo Splitter */
 export * from "./layout/neo-splitter/components/neo-splitter/neo-splitter.component";
+export * from "./layout/neo-splitter/components/neo-splitter-pane/neo-splitter-pane.component";
 
 /* Tab Strip */
 export * from "./layout/tab-strip/models/TabCloseEvent";

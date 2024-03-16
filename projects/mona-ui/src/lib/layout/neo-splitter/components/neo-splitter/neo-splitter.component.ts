@@ -1,14 +1,22 @@
-import { ChangeDetectionStrategy, Component, computed, Signal, signal, WritableSignal } from "@angular/core";
+import { NgTemplateOutlet } from "@angular/common";
+import {
+    ChangeDetectionStrategy,
+    Component,
+    computed,
+    contentChildren,
+    input,
+    InputSignal,
+    Signal
+} from "@angular/core";
 import { from, zip } from "@mirei/ts-collections";
-import { v4 } from "uuid";
 import { Orientation } from "../../../../models/Orientation";
-import { SplitterPane } from "../../models/SplitterPane";
+import { NeoSplitterPaneComponent } from "../neo-splitter-pane/neo-splitter-pane.component";
 import { NeoSplitterResizerComponent } from "../neo-splitter-resizer/neo-splitter-resizer.component";
 
 @Component({
     selector: "mona-neo-splitter",
     standalone: true,
-    imports: [NeoSplitterResizerComponent],
+    imports: [NeoSplitterResizerComponent, NgTemplateOutlet],
     templateUrl: "./neo-splitter.component.html",
     styleUrl: "./neo-splitter.component.scss",
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -21,8 +29,11 @@ import { NeoSplitterResizerComponent } from "../neo-splitter-resizer/neo-splitte
 export class NeoSplitterComponent {
     protected readonly resizerList: Signal<Iterable<{ size: string }>> = computed(() => {
         const panes = this.paneList();
+        if (panes.length === 0) {
+            return [];
+        }
         const resizerCount = from(panes).count() - 1;
-        const array = new Array(resizerCount).fill({ size: "8px" });
+        const array = new Array(resizerCount).fill({ size: "4px" });
         return [...array, { size: "" }];
     });
     protected readonly templateColumnStyles: Signal<string | undefined> = computed(() => {
@@ -40,29 +51,17 @@ export class NeoSplitterComponent {
         return this.getPaneSizeStyles();
     });
 
-    public orientation: WritableSignal<Orientation> = signal<Orientation>("horizontal");
-    public paneList: WritableSignal<SplitterPane[]> = signal([
-        {
-            panelUid: v4(),
-            size: signal("200px")
-        },
-        {
-            panelUid: v4(),
-            size: signal("350px")
-        },
-        {
-            panelUid: v4(),
-            size: signal("auto")
-        }
-    ]);
+    public orientation: InputSignal<Orientation> = input<Orientation>("horizontal");
+    public paneList = contentChildren(NeoSplitterPaneComponent);
 
     private getPaneSizeStyles(): string {
         const paneList = this.paneList();
         const resizerList = this.resizerList();
         return zip(paneList, resizerList)
             .select(([pane, resizer]) => {
-                const size = pane.size();
-                return `${size} ${resizer.size}`;
+                const size = pane.size() || "1fr";
+                const sizeString = typeof size === "number" ? `${size}px` : size;
+                return `${sizeString} ${resizer.size}`;
             })
             .aggregate((acc, size) => `${acc} ${size}`, "")
             .trim();
