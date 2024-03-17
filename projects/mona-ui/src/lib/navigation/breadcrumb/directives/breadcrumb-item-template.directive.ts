@@ -1,10 +1,7 @@
-import { Directive, TemplateRef } from "@angular/core";
-import { BreadcrumbItemTemplateContext } from "../models/BreadcrumbItemTemplateContext";
+import { Directive } from "@angular/core";
 
 @Directive({
     selector: "ng-template[monaBreadcrumbItemTemplate]",
     standalone: true
 })
-export class BreadcrumbItemTemplateDirective {
-    public constructor(public readonly template: TemplateRef<BreadcrumbItemTemplateContext>) {}
-}
+export class BreadcrumbItemTemplateDirective {}
