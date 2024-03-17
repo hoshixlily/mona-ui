@@ -1,10 +1,10 @@
 <ng-template>
     <div class="mona-popover" [attr.data-uid]="uid">
         <div class="mona-popover-content">
-            @if (title() || titleTemplateRef) {
+            @if (title() || titleTemplateRef()) {
                 <div class="mona-popover-title">
-                    @if (titleTemplateRef) {
-                        <ng-container [ngTemplateOutlet]="titleTemplateRef"></ng-container>
+                    @if (titleTemplateRef()) {
+                        <ng-container [ngTemplateOutlet]="titleTemplateRef()??null"></ng-container>
                     } @else {
                         <span>{{title()}}</span>
                     }
@@ -13,9 +13,9 @@
             <div class="mona-popover-body">
                 <ng-content></ng-content>
             </div>
-            @if (footerTemplateRef) {
+            @if (footerTemplateRef()) {
                 <div class="mona-popover-footer">
-                    <ng-container [ngTemplateOutlet]="footerTemplateRef"></ng-container>
+                    <ng-container [ngTemplateOutlet]="footerTemplateRef()??null"></ng-container>
                 </div>
             }
         </div>

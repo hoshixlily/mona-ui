@@ -8,8 +8,9 @@ import {
     input,
     InputSignal,
     OnInit,
+    Signal,
     TemplateRef,
-    ViewChild
+    viewChild
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { filter, fromEvent, take, tap } from "rxjs";
@@ -33,13 +34,10 @@ export class TooltipComponent implements OnInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     readonly #popupService: PopupService = inject(PopupService);
     #popupRef?: PopupRef;
-
-    public readonly uid: string = v4();
+    protected readonly templateRef: Signal<TemplateRef<any>> = viewChild.required(TemplateRef);
+    protected readonly uid: string = v4();
     public position: InputSignal<Position> = input<Position>("top");
     public target: InputSignal<Element | ElementRef> = input.required<Element | ElementRef>();
-
-    @ViewChild(TemplateRef)
-    public templateRef!: TemplateRef<any>;
 
     public ngOnInit(): void {
         this.setSubscriptions();
@@ -96,7 +94,7 @@ export class TooltipComponent implements OnInit {
 
     private createTooltipPopup(target: Element): void {
         this.#popupRef = this.#popupService.create({
-            content: this.templateRef,
+            content: this.templateRef(),
             anchor: target,
             disableAnimation: true,
             popupClass: "mona-tooltip-popup-content",

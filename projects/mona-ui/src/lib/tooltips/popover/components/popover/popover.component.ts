@@ -2,20 +2,21 @@ import { NgClass, NgTemplateOutlet } from "@angular/common";
 import {
     ChangeDetectionStrategy,
     Component,
-    ContentChild,
+    contentChild,
     DestroyRef,
     effect,
     ElementRef,
-    EventEmitter,
     inject,
     input,
     InputSignal,
     InputSignalWithTransform,
     OnInit,
-    Output,
+    output,
+    OutputEmitterRef,
+    Signal,
     signal,
     TemplateRef,
-    ViewChild,
+    viewChild,
     WritableSignal
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
@@ -49,8 +50,24 @@ export class PopoverComponent implements OnInit {
     readonly #popupService: PopupService = inject(PopupService);
     #popupRef?: PopupRef;
     public readonly uid: string = v4();
-    protected readonly popupPosition: WritableSignal<Position> = signal("top");
 
+    protected readonly footerTemplateRef: Signal<TemplateRef<any> | undefined> = contentChild(
+        PopoverFooterTemplateDirective,
+        { read: TemplateRef }
+    );
+    protected readonly popupPosition: WritableSignal<Position> = signal("top");
+    protected readonly templateRef: Signal<TemplateRef<any>> = viewChild.required(TemplateRef);
+    protected readonly titleTemplateRef: Signal<TemplateRef<any> | undefined> = contentChild(
+        PopoverTitleTemplateDirective,
+        {
+            read: TemplateRef
+        }
+    );
+
+    public readonly hide: OutputEmitterRef<PopoverHideEvent> = output();
+    public readonly hidden: OutputEmitterRef<void> = output();
+    public readonly show: OutputEmitterRef<PopoverShowEvent> = output();
+    public readonly shown: OutputEmitterRef<PopoverShownEvent> = output();
     public position: InputSignal<Position> = input<Position>("top");
     public target: InputSignal<Element | ElementRef> = input.required<Element | ElementRef>();
     public title: InputSignal<string> = input<string>("");
@@ -71,27 +88,6 @@ export class PopoverComponent implements OnInit {
             return triggerString;
         }
     });
-
-    @ContentChild(PopoverFooterTemplateDirective, { read: TemplateRef })
-    public footerTemplateRef: TemplateRef<any> | null = null;
-
-    @Output()
-    public hide: EventEmitter<PopoverHideEvent> = new EventEmitter<PopoverHideEvent>();
-
-    @Output()
-    public hidden: EventEmitter<void> = new EventEmitter<void>();
-
-    @Output()
-    public show: EventEmitter<PopoverShowEvent> = new EventEmitter<PopoverShowEvent>();
-
-    @Output()
-    public shown: EventEmitter<PopoverShownEvent> = new EventEmitter<PopoverShownEvent>();
-
-    @ViewChild(TemplateRef)
-    public templateRef!: TemplateRef<any>;
-
-    @ContentChild(PopoverTitleTemplateDirective, { read: TemplateRef })
-    public titleTemplateRef: TemplateRef<any> | null = null;
 
     public constructor() {
         effect(() => this.popupPosition.set(this.position()), { allowSignalWrites: true });
@@ -178,7 +174,7 @@ export class PopoverComponent implements OnInit {
 
     private openPopup(reposition: boolean = false): void {
         this.#popupRef = this.#popupService.create({
-            content: this.templateRef,
+            content: this.templateRef(),
             anchor: this.popoverTargetElement,
             disableAnimation: true,
             popupClass: "mona-popover-popup-content",
