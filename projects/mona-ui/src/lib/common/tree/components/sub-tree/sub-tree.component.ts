@@ -15,11 +15,9 @@ import {
     computed,
     inject,
     input,
-    Input,
     InputSignal,
-    Signal,
-    signal,
-    WritableSignal
+    InputSignalWithTransform,
+    Signal
 } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { FaIconComponent } from "@fortawesome/angular-fontawesome";
@@ -77,7 +75,6 @@ export class SubTreeComponent<T> {
     protected readonly dropInsideIcon: IconDefinition = faPlus;
     protected readonly dropNotAllowIcon: IconDefinition = faBan;
     protected readonly expandedIcon: IconDefinition = faCaretDown;
-    protected readonly nodeSet: WritableSignal<ImmutableSet<TreeNode<T>>> = signal(ImmutableSet.create());
     protected readonly paddingLeft: Signal<number> = computed(() => {
         const depth = this.depth();
         return depth === 0 ? 0 : 24;
@@ -85,12 +82,10 @@ export class SubTreeComponent<T> {
     protected readonly treeService: TreeService<T> = inject(TreeService);
 
     public depth: InputSignal<number> = input.required();
+    public nodes: InputSignalWithTransform<ImmutableSet<TreeNode<T>>, Iterable<TreeNode<T>>> = input.required({
+        transform: nodeIterable => ImmutableSet.create(nodeIterable)
+    });
     public parent: InputSignal<TreeNode<T> | null> = input.required();
-
-    @Input({ required: true })
-    public set nodes(nodes: Iterable<TreeNode<T>>) {
-        this.nodeSet.set(ImmutableSet.create(nodes));
-    }
 
     public onExpandStateChange(node: TreeNode<T>, expanded: boolean): void {
         this.treeService.setNodeExpand(node, expanded);

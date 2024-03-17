@@ -8,7 +8,8 @@ import {
     input,
     InputSignal,
     OnInit,
-    Signal
+    Signal,
+    TemplateRef
 } from "@angular/core";
 import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
 import { map, startWith, Subject, withLatestFrom } from "rxjs";
@@ -28,66 +29,70 @@ import { TreeService } from "../../services/tree.service";
 })
 export class TreeNodeComponent<T> implements OnInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
-    readonly #dragging: Signal<boolean> = toSignal(this.treeService.dragging$, {
+    readonly #treeService: TreeService<T> = inject(TreeService);
+    private readonly dragging: Signal<boolean> = toSignal(this.#treeService.dragging$, {
         initialValue: false
+    });
+    protected readonly nodeTemplate: Signal<TemplateRef<any> | null> = computed(() => {
+        return this.#treeService.nodeTemplate();
     });
     public readonly checkable: Signal<boolean> = computed(() => {
         const node = this.node();
         if (node === null) {
             return false;
         }
-        return this.treeService.isCheckable(node);
+        return this.#treeService.isCheckable(node);
     });
     public readonly checkboxCheck$: Subject<boolean> = new Subject<boolean>();
     public readonly checkboxClick$: Subject<MouseEvent> = new Subject<MouseEvent>();
     public readonly checked: Signal<boolean> = computed(() => {
         const node = this.node();
-        this.#dragging();
+        this.dragging();
         if (node === null) {
             return false;
         }
-        return this.treeService.isChecked(node);
+        return this.#treeService.isChecked(node);
     });
     public readonly disabled: Signal<boolean> = computed(() => {
         const node = this.node();
         if (node === null) {
             return false;
         }
-        return this.treeService.isDisabled(node);
+        return this.#treeService.isDisabled(node);
     });
     public readonly expanded: Signal<boolean> = computed(() => {
         const node = this.node();
         if (node === null) {
             return true;
         }
-        return this.treeService.isExpanded(node);
+        return this.#treeService.isExpanded(node);
     });
     public readonly indeterminate: Signal<boolean> = computed(() => {
         const node = this.node();
-        this.#dragging();
+        this.dragging();
         if (node === null) {
             return false;
         }
-        return this.treeService.isIndeterminate(node);
+        return this.#treeService.isIndeterminate(node);
     });
     public readonly navigated: Signal<boolean> = computed(() => {
         const node = this.node();
         if (node === null) {
             return false;
         }
-        return this.treeService.isNavigated(node);
+        return this.#treeService.isNavigated(node);
     });
     public readonly nodeText: Signal<string> = computed(() => {
         const node = this.node();
         if (node === null) {
             return "";
         }
-        return this.treeService.getNodeText(node);
+        return this.#treeService.getNodeText(node);
     });
     public readonly paddingLeft: Signal<number> = computed(() => {
         const node = this.node();
-        this.#dragging();
-        const expandable = this.treeService.expandableOptions().enabled;
+        this.dragging();
+        const expandable = this.#treeService.expandableOptions().enabled;
         if (node === null) {
             return 0;
         }
@@ -98,12 +103,10 @@ export class TreeNodeComponent<T> implements OnInit {
         if (node === null) {
             return false;
         }
-        return this.treeService.isSelected(node);
+        return this.#treeService.isSelected(node);
     });
 
     public node: InputSignal<TreeNode<T> | null> = input<TreeNode<T> | null>(null);
-
-    public constructor(protected readonly treeService: TreeService<T>) {}
 
     public ngOnInit(): void {
         this.setSubscriptions();
@@ -114,7 +117,7 @@ export class TreeNodeComponent<T> implements OnInit {
         if (node === null) {
             return;
         }
-        if (this.treeService.isDisabled(node)) {
+        if (this.#treeService.isDisabled(node)) {
             return;
         }
         if (event.type === "contextmenu") {
@@ -126,13 +129,13 @@ export class TreeNodeComponent<T> implements OnInit {
             return;
         }
         const nodeSelectEvent = new NodeSelectEvent(node, event);
-        this.treeService.nodeSelect$.next(nodeSelectEvent);
+        this.#treeService.nodeSelect$.next(nodeSelectEvent);
         if (nodeSelectEvent.isDefaultPrevented()) {
             return;
         }
-        this.treeService.setNodeSelect(node, !this.selected());
-        this.treeService.nodeSelectChange$.next({ node, selected: !this.selected() });
-        this.treeService.notifySelectionChange(node);
+        this.#treeService.setNodeSelect(node, !this.selected());
+        this.#treeService.nodeSelectChange$.next({ node, selected: !this.selected() });
+        this.#treeService.notifySelectionChange(node);
     }
 
     public onNodeContextMenu(event: MouseEvent): void {
@@ -140,16 +143,16 @@ export class TreeNodeComponent<T> implements OnInit {
         if (node === null) {
             return;
         }
-        if (this.treeService.isDisabled(node)) {
+        if (this.#treeService.isDisabled(node)) {
             return;
         }
-        this.treeService.navigatedNode.set(node);
+        this.#treeService.navigatedNode.set(node);
     }
 
     private notifyNodeClick(event: MouseEvent): NodeClickEvent<T> {
         const node = this.node() as TreeNode<T>;
         const nodeClickEvent = new NodeClickEvent(node, event);
-        this.treeService.nodeClick$.next(nodeClickEvent);
+        this.#treeService.nodeClick$.next(nodeClickEvent);
         return nodeClickEvent;
     }
 
@@ -160,11 +163,11 @@ export class TreeNodeComponent<T> implements OnInit {
                 map(event => {
                     const node = this.node() as TreeNode<T>;
                     const nodeCheckEvent = new NodeCheckEvent(node, event);
-                    this.treeService.nodeCheck$.next(nodeCheckEvent);
+                    this.#treeService.nodeCheck$.next(nodeCheckEvent);
                     return nodeCheckEvent;
                 }),
                 withLatestFrom(
-                    this.checkboxCheck$.pipe(startWith(this.treeService.isChecked(this.node() as TreeNode<T>)))
+                    this.checkboxCheck$.pipe(startWith(this.#treeService.isChecked(this.node() as TreeNode<T>)))
                 )
             )
             .subscribe(([event, checked]) => {
@@ -173,8 +176,8 @@ export class TreeNodeComponent<T> implements OnInit {
                     event.originalEvent?.preventDefault();
                     return;
                 }
-                this.treeService.setNodeCheck(node, !checked);
-                this.treeService.nodeCheckChange$.next({ node, checked: !checked });
+                this.#treeService.setNodeCheck(node, !checked);
+                this.#treeService.nodeCheckChange$.next({ node, checked: !checked });
             });
     }
 

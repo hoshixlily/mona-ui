@@ -4,10 +4,11 @@ import { TreeViewFilterableDirective } from "./tree-view-filterable.directive";
 
 describe("TreeFilterableDirective", () => {
     let directive: TreeViewFilterableDirective<any>;
-    let treeService: TreeService<any>;
     beforeEach(() => {
-        treeService = TestBed.runInInjectionContext(() => new TreeService());
-        directive = TestBed.runInInjectionContext(() => new TreeViewFilterableDirective(treeService));
+        TestBed.configureTestingModule({
+            providers: [TreeService]
+        });
+        directive = TestBed.runInInjectionContext(() => new TreeViewFilterableDirective());
     });
     it("should create an instance", () => {
         expect(directive).toBeTruthy();

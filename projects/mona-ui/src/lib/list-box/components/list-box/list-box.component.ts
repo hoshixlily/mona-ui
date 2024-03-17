@@ -3,18 +3,19 @@ import {
     ChangeDetectionStrategy,
     Component,
     computed,
-    ContentChild,
+    contentChild,
     effect,
     ElementRef,
-    EventEmitter,
     input,
     InputSignal,
     InputSignalWithTransform,
     OnInit,
-    Output,
+    output,
+    OutputEmitterRef,
     Signal,
     signal,
     TemplateRef,
+    untracked,
     WritableSignal
 } from "@angular/core";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
@@ -39,7 +40,6 @@ import { ContainsPipe } from "../../../pipes/contains.pipe";
 import { ListBoxItemTemplateDirective } from "../../directives/list-box-item-template.directive";
 import { ListBoxNoDataTemplateDirective } from "../../directives/list-box-no-data-template.directive";
 import { ListBoxActionClickEvent } from "../../models/ListBoxActionClickEvent";
-import { ListBoxItemTemplateContext } from "../../models/ListBoxItemTemplateContext";
 import { ListBoxSelectionEvent } from "../../models/ListBoxSelectionEvent";
 import { ToolbarAction, ToolbarOptions } from "../../models/ToolbarOptions";
 
@@ -97,8 +97,17 @@ export class ListBoxComponent<T = any> implements OnInit {
                 return "horizontal";
         }
     });
+    protected readonly itemTemplate: Signal<TemplateRef<any> | undefined> = contentChild(ListBoxItemTemplateDirective, {
+        read: TemplateRef
+    });
     protected readonly moveDownIcon: IconDefinition = faAngleDown;
     protected readonly moveUpIcon: IconDefinition = faAngleUp;
+    protected readonly noDataTemplate: Signal<TemplateRef<any> | undefined> = contentChild(
+        ListBoxNoDataTemplateDirective,
+        {
+            read: TemplateRef
+        }
+    );
     protected readonly removeIcon: IconDefinition = faTrash;
     protected readonly transferAllFromIcon: IconDefinition = faAnglesLeft;
     protected readonly transferAllToIcon: IconDefinition = faAnglesRight;
@@ -114,7 +123,9 @@ export class ListBoxComponent<T = any> implements OnInit {
         return this.updateToolbarOptions(toolbar);
     });
 
+    public readonly actionClick: OutputEmitterRef<ListBoxActionClickEvent> = output();
     public readonly listBoxItems: WritableSignal<ImmutableList<T>> = signal(ImmutableList.create());
+    public readonly selectionChange: OutputEmitterRef<ListBoxSelectionEvent> = output();
     public connectedList: InputSignal<ListBoxComponent<T> | null> = input<ListBoxComponent<T> | null>(null);
     public items: InputSignalWithTransform<List<T>, Iterable<T>> = input(new List(), {
         transform: (items: Iterable<T>) => new List(items)
@@ -122,26 +133,13 @@ export class ListBoxComponent<T = any> implements OnInit {
     public textField: InputSignal<string> = input("");
     public toolbar: InputSignal<boolean | Partial<ToolbarOptions>> = input<boolean | Partial<ToolbarOptions>>(true);
 
-    @Output()
-    public actionClick: EventEmitter<ListBoxActionClickEvent> = new EventEmitter<ListBoxActionClickEvent>();
-
-    @ContentChild(ListBoxItemTemplateDirective, { read: TemplateRef })
-    public itemTemplate: TemplateRef<ListBoxItemTemplateContext> | null = null;
-
-    @ContentChild(ListBoxNoDataTemplateDirective, { read: TemplateRef })
-    public noDataTemplate: TemplateRef<any> | null = null;
-
-    @Output()
-    public selectionChange: EventEmitter<ListBoxSelectionEvent> = new EventEmitter<ListBoxSelectionEvent>();
-
     public constructor(private readonly elementRef: ElementRef<HTMLElement>) {
-        effect(
-            () => {
-                const items = this.items();
+        effect(() => {
+            const items = this.items();
+            untracked(() => {
                 this.listBoxItems.set(ImmutableList.create(items));
-            },
-            { allowSignalWrites: true }
-        );
+            });
+        });
     }
 
     public createAndEmitActionEvent(action: ToolbarAction, originalEvent: MouseEvent): boolean {

@@ -16,6 +16,7 @@ describe("SubTreeComponent", () => {
         fixture = TestBed.createComponent(SubTreeComponent);
         component = fixture.componentInstance;
 
+        fixture.componentRef.setInput("nodes", []);
         fixture.componentRef.setInput("depth", 0);
         fixture.componentRef.setInput("parent", null);
 

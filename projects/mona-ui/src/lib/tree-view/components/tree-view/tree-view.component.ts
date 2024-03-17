@@ -1,5 +1,18 @@
 import { NgTemplateOutlet } from "@angular/common";
-import { ChangeDetectionStrategy, Component, ContentChild, inject, Input, TemplateRef } from "@angular/core";
+import {
+    ChangeDetectionStrategy,
+    Component,
+    contentChild,
+    ContentChild,
+    effect,
+    inject,
+    input,
+    Input,
+    InputSignal,
+    Signal,
+    TemplateRef,
+    untracked
+} from "@angular/core";
 import { Selector } from "@mirei/ts-collections";
 import { Observable } from "rxjs";
 import { FilterInputComponent } from "../../../common/filter-input/components/filter-input/filter-input.component";
@@ -22,29 +35,46 @@ import { TreeViewNodeTemplateDirective } from "../../directives/tree-view-node-t
     }
 })
 export class TreeViewComponent<T> {
+    protected readonly nodeTemplate: Signal<TemplateRef<any> | undefined> = contentChild(
+        TreeViewNodeTemplateDirective,
+        {
+            read: TemplateRef
+        }
+    );
     protected readonly treeService: TreeService<T> = inject(TreeService);
 
-    @Input()
-    public set animate(value: boolean) {
-        this.treeService.setAnimationEnabled(value);
-    }
+    public animate: InputSignal<boolean> = input(true);
+    public data: InputSignal<Iterable<T>> = input<Iterable<T>>([]);
+    public children: InputSignal<string | Selector<T, Iterable<T> | Observable<Iterable<T>>>> = input<
+        string | Selector<T, Iterable<T> | Observable<Iterable<T>>>
+    >("");
+    public textField: InputSignal<string | Selector<T, string>> = input<string | Selector<T, string>>("");
 
-    @Input()
-    public set data(value: Iterable<T>) {
-        this.treeService.setData(value);
-    }
-
-    @Input()
-    public set children(value: string | Selector<T, Iterable<T> | Observable<Iterable<T>>>) {
-        this.treeService.setChildrenSelector(value);
-    }
-
-    @ContentChild(TreeViewNodeTemplateDirective, { read: TemplateRef })
-    public nodeTemplate: TemplateRef<any> | null = null;
-
-    @Input()
-    public set textField(value: string | Selector<T, string>) {
-        this.treeService.setTextField(value);
+    public constructor() {
+        effect(() => {
+            const animate = this.animate();
+            untracked(() => {
+                this.treeService.setAnimationEnabled(animate);
+            });
+        });
+        effect(() => {
+            const children = this.children();
+            untracked(() => {
+                this.treeService.setChildrenSelector(children);
+            });
+        });
+        effect(() => {
+            const data = this.data();
+            untracked(() => {
+                this.treeService.setData(data);
+            });
+        });
+        effect(() => {
+            const textField = this.textField();
+            untracked(() => {
+                this.treeService.setTextField(textField);
+            });
+        });
     }
 
     public onFilterChange(event: FilterChangeEvent): void {

@@ -3,8 +3,8 @@
      [class.mona-highlighted]="navigated()"
      [class.mona-disabled]="disabled()"
      (click)="onNodeClick($event)" (contextmenu)="onNodeContextMenu($event)" #element>
-    @if (treeService.nodeTemplate()) {
-        <ng-container [ngTemplateOutlet]="treeService.nodeTemplate()"
+    @if (nodeTemplate()) {
+        <ng-container [ngTemplateOutlet]="nodeTemplate()"
                       [ngTemplateOutletContext]="{$implicit: node()?.data, element: element.parentElement}"></ng-container>
     } @else {
         <span class="mona-tree-node-text">{{nodeText()}}</span>

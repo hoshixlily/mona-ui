@@ -4,10 +4,11 @@ import { TreeViewExpandableDirective } from "./tree-view-expandable.directive";
 
 describe("TreeViewExpandableDirective", () => {
     let directive: TreeViewExpandableDirective<any>;
-    let treeService: TreeService<any>;
     beforeEach(() => {
-        treeService = TestBed.runInInjectionContext(() => new TreeService());
-        directive = TestBed.runInInjectionContext(() => new TreeViewExpandableDirective(treeService));
+        TestBed.configureTestingModule({
+            providers: [TreeService]
+        });
+        directive = TestBed.runInInjectionContext(() => new TreeViewExpandableDirective());
     });
     it("should create an instance", () => {
         expect(directive).toBeTruthy();

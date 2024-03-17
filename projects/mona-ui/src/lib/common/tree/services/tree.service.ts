@@ -2,13 +2,14 @@ import {
     computed,
     DestroyRef,
     effect,
-    EventEmitter,
     inject,
     Injectable,
-    Output,
+    output,
+    OutputEmitterRef,
     Signal,
     signal,
     TemplateRef,
+    untracked,
     WritableSignal
 } from "@angular/core";
 import { takeUntilDestroyed, toObservable, toSignal } from "@angular/core/rxjs-interop";
@@ -160,30 +161,29 @@ export class TreeService<T> {
         }
         return this.nodeSet();
     });
-    public checkedKeysChange: EventEmitter<Array<any>> = new EventEmitter<Array<any>>();
-    public expandedKeysChange: EventEmitter<Array<any>> = new EventEmitter<Array<any>>();
-    public filterChange: EventEmitter<FilterChangeEvent> = new EventEmitter<FilterChangeEvent>();
-    public nodeCheck: EventEmitter<NodeCheckEvent<T>> = new EventEmitter();
-    public nodeClick: EventEmitter<NodeClickEvent<T>> = new EventEmitter();
-    public nodeDrag: EventEmitter<NodeDragEvent<T>> = new EventEmitter();
-    public nodeDragEnd: EventEmitter<NodeDragEndEvent<T>> = new EventEmitter();
-    public nodeDragStart: EventEmitter<NodeDragStartEvent<T>> = new EventEmitter();
-    public nodeDrop: EventEmitter<NodeDropEvent<T>> = new EventEmitter();
-    public nodeSelect: EventEmitter<NodeSelectEvent<T>> = new EventEmitter();
-    public selectionChange: EventEmitter<NodeItem<T>> = new EventEmitter<NodeItem<T>>();
+    public checkedKeysChange: OutputEmitterRef<Array<any>> = output();
+    public expandedKeysChange: OutputEmitterRef<Array<any>> = output();
+    public filterChange: OutputEmitterRef<FilterChangeEvent> = output();
+    public nodeCheck: OutputEmitterRef<NodeCheckEvent<T>> = output();
+    public nodeClick: OutputEmitterRef<NodeClickEvent<T>> = output();
+    public nodeDrag: OutputEmitterRef<NodeDragEvent<T>> = output();
+    public nodeDragEnd: OutputEmitterRef<NodeDragEndEvent<T>> = output();
+    public nodeDragStart: OutputEmitterRef<NodeDragStartEvent<T>> = output();
+    public nodeDrop: OutputEmitterRef<NodeDropEvent<T>> = output();
+    public nodeSelect: OutputEmitterRef<NodeSelectEvent<T>> = output();
+    public selectionChange: OutputEmitterRef<NodeItem<T>> = output();
 
     public constructor() {
-        effect(
-            () => {
-                const flattenedNodes = TreeService.flatten(this.viewNodeSet());
-                const expandedKeys = flattenedNodes
-                    .where(n => !n.children.isEmpty())
-                    .select(n => this.getExpandKey(n))
-                    .toImmutableSet();
+        effect(() => {
+            const flattenedNodes = TreeService.flatten(this.viewNodeSet());
+            const expandedKeys = flattenedNodes
+                .where(n => !n.children.isEmpty())
+                .select(n => this.getExpandKey(n))
+                .toImmutableSet();
+            untracked(() => {
                 this.filteredExpandedKeys.set(expandedKeys);
-            },
-            { allowSignalWrites: true } // This is not recommended, need to find a better way...
-        );
+            });
+        });
     }
 
     public static flatten<T>(nodes: Iterable<TreeNode<T>>): List<TreeNode<T>> {

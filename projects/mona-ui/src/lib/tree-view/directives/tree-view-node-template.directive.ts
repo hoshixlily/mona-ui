@@ -4,6 +4,4 @@ import { Directive } from "@angular/core";
     selector: "ng-template[monaTreeViewNodeTemplate]",
     standalone: true
 })
-export class TreeViewNodeTemplateDirective {
-    public constructor() {}
-}
+export class TreeViewNodeTemplateDirective {}

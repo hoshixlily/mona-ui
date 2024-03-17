@@ -14,9 +14,9 @@
                (nodeDragStart)="treeService.nodeDragStart.emit($event)"
                (nodeDrop)="treeService.nodeDrop.emit($event)"
                (nodeSelect)="treeService.nodeSelect.emit($event)">
-        @if (nodeTemplate) {
+        @if (nodeTemplate()) {
             <ng-template monaTreeNodeTemplate let-dataItem let-element="element">
-                <ng-container [ngTemplateOutlet]="nodeTemplate"
+                <ng-container [ngTemplateOutlet]="nodeTemplate()??null"
                               [ngTemplateOutletContext]="{$implicit:dataItem, element}"></ng-container>
             </ng-template>
         }

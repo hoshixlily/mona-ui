@@ -4,26 +4,30 @@ import { NgStyle, NgTemplateOutlet } from "@angular/common";
 import {
     ChangeDetectionStrategy,
     Component,
-    ContentChild,
+    contentChild,
     DestroyRef,
+    effect,
     ElementRef,
-    EventEmitter,
     inject,
-    Input,
+    input,
+    InputSignal,
     NgZone,
     OnInit,
-    Output,
-    TemplateRef
+    output,
+    OutputEmitterRef,
+    Signal,
+    TemplateRef,
+    untracked
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { asapScheduler, fromEvent, takeWhile, tap } from "rxjs";
 import { TreeNodeTemplateDirective } from "../../directives/tree-node-template.directive";
 import { NodeCheckEvent } from "../../models/NodeCheckEvent";
 import { NodeClickEvent } from "../../models/NodeClickEvent";
+import { NodeDragEndEvent } from "../../models/NodeDragEndEvent";
 import { NodeDragEvent } from "../../models/NodeDragEvent";
 import { NodeDragStartEvent } from "../../models/NodeDragStartEvent";
 import { NodeDropEvent } from "../../models/NodeDropEvent";
-import { NodeItem } from "../../models/NodeItem";
 import { NodeSelectEvent } from "../../models/NodeSelectEvent";
 import { TreeNode } from "../../models/TreeNode";
 import { TreeService } from "../../services/tree.service";
@@ -50,41 +54,84 @@ export class TreeComponent<T> implements OnInit {
     readonly #focusMonitor: FocusMonitor = inject(FocusMonitor);
     readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
     readonly #zone: NgZone = inject(NgZone);
+
+    protected readonly nodeTemplate: Signal<TemplateRef<any> | undefined> = contentChild(TreeNodeTemplateDirective, {
+        read: TemplateRef
+    });
     protected readonly treeService: TreeService<T> = inject(TreeService);
 
-    @Input()
-    public set data(value: Iterable<T>) {
-        this.treeService.setData(value);
+    public readonly nodeCheck: OutputEmitterRef<NodeCheckEvent<T>> = output();
+    public readonly nodeClick: OutputEmitterRef<NodeClickEvent<T>> = output();
+    public readonly nodeDrag: OutputEmitterRef<NodeDragEvent<T>> = output();
+    public readonly nodeDragEnd: OutputEmitterRef<NodeDragEndEvent<T>> = output();
+    public readonly nodeDragStart: OutputEmitterRef<NodeDragStartEvent<T>> = output();
+    public readonly nodeDrop: OutputEmitterRef<NodeDropEvent<T>> = output();
+    public readonly nodeSelect: OutputEmitterRef<NodeSelectEvent<T>> = output();
+
+    public data: InputSignal<Iterable<T>> = input<Iterable<T>>([]);
+
+    public constructor() {
+        effect(() => {
+            const data = this.data();
+            untracked(() => {
+                this.treeService.setData(data);
+            });
+        });
+        effect(() => {
+            const nodeTemplate = this.nodeTemplate() ?? null;
+            untracked(() => {
+                this.treeService.nodeTemplate.set(nodeTemplate);
+            });
+        });
     }
-
-    @Output()
-    public nodeCheck: EventEmitter<NodeCheckEvent<T>> = new EventEmitter();
-
-    @Output()
-    public nodeClick: EventEmitter<NodeClickEvent<T>> = new EventEmitter();
-
-    @Output()
-    public nodeDrag: EventEmitter<NodeDragEvent<T>> = new EventEmitter();
-
-    @Output()
-    public nodeDragEnd: EventEmitter<NodeDragStartEvent<T>> = new EventEmitter();
-
-    @Output()
-    public nodeDragStart: EventEmitter<NodeDragStartEvent<T>> = new EventEmitter();
-
-    @Output()
-    public nodeDrop: EventEmitter<NodeDropEvent<T>> = new EventEmitter();
-
-    @ContentChild(TreeNodeTemplateDirective, { read: TemplateRef })
-    public set nodeTemplate(value: TemplateRef<NodeItem<T>>) {
-        this.treeService.nodeTemplate.set(value);
-    }
-
-    @Output()
-    public nodeSelect: EventEmitter<NodeSelectEvent<T>> = new EventEmitter();
 
     public ngOnInit(): void {
         this.setSubscriptions();
+    }
+
+    private handleArrowLeftKey(event: KeyboardEvent): void {
+        const navigatedNode = this.treeService.navigatedNode();
+        event.preventDefault();
+        if (!navigatedNode || !navigatedNode.nodeItem.hasChildren) {
+            return;
+        }
+        const expanded = this.treeService.isExpanded(navigatedNode);
+        const disabled = this.treeService.isDisabled(navigatedNode);
+        if (!disabled && expanded) {
+            this.treeService.setNodeExpand(navigatedNode, false);
+        }
+        this.treeService.navigatedNode.set(navigatedNode);
+    }
+
+    private handleArrowRightKey(event: KeyboardEvent): void {
+        const navigatedNode = this.treeService.navigatedNode();
+        event.preventDefault();
+        if (!navigatedNode || !navigatedNode.nodeItem.hasChildren) {
+            return;
+        }
+        const expanded = this.treeService.isExpanded(navigatedNode);
+        const disabled = this.treeService.isDisabled(navigatedNode);
+        if (!disabled && !expanded) {
+            this.treeService.setNodeExpand(navigatedNode, true);
+        }
+    }
+
+    private handleEnterKey(event: KeyboardEvent): void {
+        const navigatedNode = this.treeService.navigatedNode();
+        event.preventDefault();
+        if (!navigatedNode || this.treeService.isDisabled(navigatedNode)) {
+            return;
+        }
+        const nodeSelectEvent = new NodeSelectEvent(navigatedNode, event);
+        this.treeService.nodeSelect$.next(nodeSelectEvent);
+        if (!nodeSelectEvent.isDefaultPrevented()) {
+            this.treeService.setNodeSelect(navigatedNode, !this.treeService.isSelected(navigatedNode));
+            this.treeService.nodeSelectChange$.next({
+                node: navigatedNode,
+                selected: this.treeService.isSelected(navigatedNode)
+            });
+            this.treeService.notifySelectionChange(navigatedNode);
+        }
     }
 
     private handleMouseMove(): void {
@@ -122,6 +169,24 @@ export class TreeComponent<T> implements OnInit {
                     this.notifyDropPositionChange(event, nodeElement, node);
                 });
         });
+    }
+
+    private handleSpaceKey(event: KeyboardEvent): void {
+        const navigatedNode = this.treeService.navigatedNode();
+        event.preventDefault();
+        if (!navigatedNode || this.treeService.isDisabled(navigatedNode)) {
+            return;
+        }
+        const nodeCheckEvent = new NodeCheckEvent(navigatedNode, event);
+        this.treeService.nodeCheck$.next(nodeCheckEvent);
+        if (!nodeCheckEvent.isDefaultPrevented()) {
+            const newCheckState = !this.treeService.isChecked(navigatedNode);
+            this.treeService.setNodeCheck(navigatedNode, newCheckState);
+            this.treeService.nodeCheckChange$.next({
+                node: navigatedNode,
+                checked: newCheckState
+            });
+        }
     }
 
     private isMouseOutsideTree(event: MouseEvent): boolean {
@@ -175,7 +240,6 @@ export class TreeComponent<T> implements OnInit {
                 takeUntilDestroyed(this.#destroyRef)
             )
             .subscribe(event => {
-                const navigatedNode = this.treeService.navigatedNode();
                 if (event.key === "ArrowUp") {
                     event.preventDefault();
                     this.treeService.navigate("previous");
@@ -183,56 +247,13 @@ export class TreeComponent<T> implements OnInit {
                     event.preventDefault();
                     this.treeService.navigate("next");
                 } else if (event.key === "ArrowLeft") {
-                    event.preventDefault();
-                    if (!navigatedNode || !navigatedNode.nodeItem.hasChildren) {
-                        return;
-                    }
-                    const expanded = this.treeService.isExpanded(navigatedNode);
-                    const disabled = this.treeService.isDisabled(navigatedNode);
-                    if (!disabled && expanded) {
-                        this.treeService.setNodeExpand(navigatedNode, false);
-                    }
-                    this.treeService.navigatedNode.set(navigatedNode);
+                    this.handleArrowLeftKey(event);
                 } else if (event.key === "ArrowRight") {
-                    event.preventDefault();
-                    if (!navigatedNode || !navigatedNode.nodeItem.hasChildren) {
-                        return;
-                    }
-                    const expanded = this.treeService.isExpanded(navigatedNode);
-                    const disabled = this.treeService.isDisabled(navigatedNode);
-                    if (!disabled && !expanded) {
-                        this.treeService.setNodeExpand(navigatedNode, true);
-                    }
+                    this.handleArrowRightKey(event);
                 } else if (event.key === " ") {
-                    event.preventDefault();
-                    if (!navigatedNode || this.treeService.isDisabled(navigatedNode)) {
-                        return;
-                    }
-                    const nodeCheckEvent = new NodeCheckEvent(navigatedNode, event);
-                    this.treeService.nodeCheck$.next(nodeCheckEvent);
-                    if (!nodeCheckEvent.isDefaultPrevented()) {
-                        const newCheckState = !this.treeService.isChecked(navigatedNode);
-                        this.treeService.setNodeCheck(navigatedNode, newCheckState);
-                        this.treeService.nodeCheckChange$.next({
-                            node: navigatedNode,
-                            checked: newCheckState
-                        });
-                    }
+                    this.handleSpaceKey(event);
                 } else if (event.key === "Enter") {
-                    event.preventDefault();
-                    if (!navigatedNode || this.treeService.isDisabled(navigatedNode)) {
-                        return;
-                    }
-                    const nodeSelectEvent = new NodeSelectEvent(navigatedNode, event);
-                    this.treeService.nodeSelect$.next(nodeSelectEvent);
-                    if (!nodeSelectEvent.isDefaultPrevented()) {
-                        this.treeService.setNodeSelect(navigatedNode, !this.treeService.isSelected(navigatedNode));
-                        this.treeService.nodeSelectChange$.next({
-                            node: navigatedNode,
-                            selected: this.treeService.isSelected(navigatedNode)
-                        });
-                        this.treeService.notifySelectionChange(navigatedNode);
-                    }
+                    this.handleEnterKey(event);
                 }
             });
     }

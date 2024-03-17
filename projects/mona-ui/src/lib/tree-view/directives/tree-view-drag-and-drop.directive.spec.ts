@@ -4,10 +4,11 @@ import { TreeViewDragAndDropDirective } from "./tree-view-drag-and-drop.directiv
 
 describe("TreeViewDragAndDropDirective", () => {
     let directive: TreeViewDragAndDropDirective<any>;
-    let treeService: TreeService<any>;
     beforeEach(() => {
-        treeService = TestBed.runInInjectionContext(() => new TreeService());
-        directive = TestBed.runInInjectionContext(() => new TreeViewDragAndDropDirective(treeService));
+        TestBed.configureTestingModule({
+            providers: [TreeService]
+        });
+        directive = TestBed.runInInjectionContext(() => new TreeViewDragAndDropDirective());
     });
     it("should create an instance", () => {
         expect(directive).toBeTruthy();
