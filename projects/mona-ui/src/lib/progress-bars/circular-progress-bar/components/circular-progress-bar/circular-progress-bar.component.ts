@@ -3,12 +3,14 @@ import {
     ChangeDetectionStrategy,
     Component,
     computed,
+    contentChild,
     ContentChild,
     effect,
     input,
     InputSignal,
     Signal,
     signal,
+    TemplateRef,
     WritableSignal
 } from "@angular/core";
 import { Action } from "../../../../utils/Action";
@@ -37,6 +39,10 @@ export class CircularProgressBarComponent {
     });
     protected readonly circumference: Signal<number> = computed(
         () => 2 * Math.PI * (this.size() / 2 - this.thickness())
+    );
+    protected readonly labelTemplate: Signal<TemplateRef<any> | undefined> = contentChild(
+        CircularProgressBarLabelTemplateDirective,
+        { read: TemplateRef }
     );
     protected readonly pixelSize: Signal<string> = computed(() => `${this.size()}px`);
     protected readonly progressValue: WritableSignal<number> = signal(0);
@@ -79,9 +85,6 @@ export class CircularProgressBarComponent {
      * @param value Progress value in absolute value.
      */
     public value: InputSignal<number> = input(0);
-
-    @ContentChild(CircularProgressBarLabelTemplateDirective)
-    public labelTemplateDirective: CircularProgressBarLabelTemplateDirective | null = null;
 
     public constructor() {
         effect(() => this.progressValue.set(this.progress()), { allowSignalWrites: true });
