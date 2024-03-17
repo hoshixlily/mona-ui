@@ -3,15 +3,16 @@ import {
     AfterViewInit,
     ChangeDetectionStrategy,
     Component,
-    ContentChild,
+    contentChild,
     DestroyRef,
     ElementRef,
-    EventEmitter,
     inject,
     input,
     InputSignal,
     OnDestroy,
-    Output,
+    output,
+    OutputEmitterRef,
+    Signal,
     TemplateRef
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
@@ -23,8 +24,8 @@ import { PopupService } from "../../services/popup.service";
 
 @Component({
     selector: "mona-popup",
-    templateUrl: "./popup.component.html",
-    styleUrls: ["./popup.component.scss"],
+    template: ` <ng-content></ng-content> `,
+    styles: "",
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
     host: {
@@ -38,26 +39,20 @@ export class PopupComponent implements OnDestroy, AfterViewInit {
     #popupRef: PopupRef | null = null;
 
     public anchor: InputSignal<FlexibleConnectedPositionStrategyOrigin> = input.required();
+    public close: OutputEmitterRef<void> = output();
     public closeOnEscape: InputSignal<boolean> = input(true);
+    public contentTemplate: Signal<TemplateRef<any>> = contentChild.required(TemplateRef);
     public height: InputSignal<number | string | undefined> = input<number | string | undefined>(undefined);
     public maxHeight: InputSignal<number | string | undefined> = input<number | string | undefined>(undefined);
     public maxWidth: InputSignal<number | string | undefined> = input<number | string | undefined>(undefined);
     public minHeight: InputSignal<number | string | undefined> = input<number | string | undefined>(undefined);
     public minWidth: InputSignal<number | string | undefined> = input<number | string | undefined>(undefined);
     public offset: InputSignal<PopupOffset | undefined> = input<PopupOffset | undefined>(undefined);
+    public open: OutputEmitterRef<PopupRef> = output();
     public popupClass: InputSignal<string | string[]> = input<string | string[]>([]);
     public popupWrapperClass: InputSignal<string | string[]> = input<string | string[]>([]);
     public trigger: InputSignal<string> = input("click");
     public width: InputSignal<number | string | undefined> = input<number | string | undefined>(undefined);
-
-    @Output()
-    public close: EventEmitter<void> = new EventEmitter<void>();
-
-    @ContentChild(TemplateRef)
-    public contentTemplate!: TemplateRef<any>;
-
-    @Output()
-    public open: EventEmitter<PopupRef> = new EventEmitter<PopupRef>();
 
     public ngAfterViewInit(): void {
         window.setTimeout(() => {
@@ -99,7 +94,7 @@ export class PopupComponent implements OnDestroy, AfterViewInit {
                 const popupSettings: PopupSettings = {
                     anchor,
                     closeOnEscape: this.closeOnEscape(),
-                    content: this.contentTemplate,
+                    content: this.contentTemplate(),
                     hasBackdrop: false,
                     height: this.height(),
                     maxHeight: this.maxHeight(),

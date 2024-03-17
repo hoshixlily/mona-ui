@@ -19,21 +19,18 @@ import { PopupState } from "../models/PopupState";
 })
 export class PopupService {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
+    readonly #injector: Injector = inject(Injector);
+    readonly #overlay: Overlay = inject(Overlay);
     private readonly outsideEventsToClose = ["click", "mousedown", "dblclick", "contextmenu", "auxclick"];
     private readonly popupStateMap: Dictionary<string, PopupState> = new Dictionary<string, PopupState>();
-
-    public constructor(
-        private readonly injector: Injector,
-        private readonly overlay: Overlay
-    ) {}
 
     public create(settings: PopupSettings): PopupRef {
         const uid = v4();
         let positionStrategy: PositionStrategy;
         if (settings.positionStrategy === "global") {
-            positionStrategy = this.overlay.position().global();
+            positionStrategy = this.#overlay.position().global();
         } else {
-            positionStrategy = this.overlay
+            positionStrategy = this.#overlay
                 .position()
                 .flexibleConnectedTo(settings.anchor)
                 .withPositions(settings.positions ?? DefaultPositions)
@@ -46,7 +43,7 @@ export class PopupService {
             ? ["mona-popup-content"].concat(settings.popupClass)
             : "mona-popup-content";
 
-        const overlayRef = this.overlay.create({
+        const overlayRef = this.#overlay.create({
             positionStrategy,
             hasBackdrop: settings.hasBackdrop ?? true,
             height: settings.height,
@@ -63,7 +60,7 @@ export class PopupService {
         const popupReference = new PopupReference(overlayRef);
 
         const injector = Injector.create({
-            parent: this.injector,
+            parent: this.#injector,
             providers: [
                 { provide: PopupRef, useFactory: () => popupReference.popupRef },
                 { provide: PopupDataInjectionToken, useValue: settings.data },
