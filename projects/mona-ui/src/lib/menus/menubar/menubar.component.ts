@@ -1,17 +1,14 @@
 import { NgClass, NgTemplateOutlet } from "@angular/common";
 import {
-    AfterContentInit,
-    AfterViewInit,
     ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
-    ContentChildren,
-    DestroyRef,
+    contentChildren,
+    effect,
     inject,
-    QueryList,
-    ViewChildren
+    Signal,
+    viewChildren
 } from "@angular/core";
-import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { Collections, Enumerable, List } from "@mirei/ts-collections";
 import { ContextMenuComponent } from "../context-menu/context-menu.component";
 import { MenuComponent } from "../menu/menu.component";
@@ -30,40 +27,28 @@ import { ContextMenuOpenEvent } from "../models/ContextMenuOpenEvent";
         class: "mona-menubar"
     }
 })
-export class MenubarComponent implements AfterViewInit, AfterContentInit {
+export class MenubarComponent {
     readonly #cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
-    readonly #destroyRef: DestroyRef = inject(DestroyRef);
-
-    @ViewChildren(ContextMenuComponent)
-    public readonly contextMenuComponents: QueryList<ContextMenuComponent> = new QueryList<ContextMenuComponent>();
+    protected readonly contextMenuComponents: Signal<readonly ContextMenuComponent[]> =
+        viewChildren(ContextMenuComponent);
+    protected readonly menuList: Signal<readonly MenuComponent[]> = contentChildren(MenuComponent);
     public currentContextMenu: ContextMenuComponent | null = null;
 
-    @ContentChildren(MenuComponent)
-    public menuList: QueryList<MenuComponent> = new QueryList<MenuComponent>();
-
-    public ngAfterContentInit(): void {
-        this.menuList.changes.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(() => {
-            this.#cdr.detectChanges();
+    public constructor() {
+        effect(() => {
+            this.menuList();
             this.currentContextMenu?.closeMenu();
             this.currentContextMenu = null;
         });
-    }
-
-    public ngAfterViewInit(): void {
-        window.setTimeout(() => {
-            this.contextMenuComponents.forEach(c => c.setPrecise(false));
-            this.#cdr.detectChanges();
-        });
-        const pairContext = () => {
-            Enumerable.from(this.menuList)
-                .zip(Enumerable.from(this.contextMenuComponents))
-                .forEach(([menu, context]) => {
-                    menu.contextMenu = context;
-                });
-        };
-        pairContext();
-        this.contextMenuComponents.changes.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(() => {
-            this.contextMenuComponents.forEach(c => c.setPrecise(false));
+        effect(() => {
+            const pairContext = () => {
+                Enumerable.from(this.menuList())
+                    .zip(Enumerable.from(this.contextMenuComponents()))
+                    .forEach(([menu, context]) => {
+                        menu.contextMenu = context;
+                    });
+            };
+            this.contextMenuComponents().forEach(c => c.setPrecise(false));
             this.#cdr.detectChanges();
             pairContext();
         });
@@ -82,7 +67,7 @@ export class MenubarComponent implements AfterViewInit, AfterContentInit {
                 const index = this.findNextNonDisabledMenuIndex();
                 if (index >= 0) {
                     this.currentContextMenu?.closeMenu();
-                    this.currentContextMenu = this.menuList.toArray()[index].contextMenu;
+                    this.currentContextMenu = this.menuList()[index].contextMenu;
                     this.currentContextMenu?.openMenu();
                 }
             }
@@ -91,7 +76,7 @@ export class MenubarComponent implements AfterViewInit, AfterContentInit {
                 const index = this.findPreviousNonDisabledMenuIndex();
                 if (index >= 0) {
                     this.currentContextMenu?.closeMenu();
-                    this.currentContextMenu = this.menuList.toArray()[index].contextMenu;
+                    this.currentContextMenu = this.menuList()[index].contextMenu;
                     this.currentContextMenu?.openMenu();
                 }
             }
@@ -102,12 +87,12 @@ export class MenubarComponent implements AfterViewInit, AfterContentInit {
         if (this.currentContextMenu?.uid === event.uid) {
             return;
         }
-        this.contextMenuComponents.forEach(c => {
+        this.contextMenuComponents().forEach(c => {
             if (c.uid !== event.uid) {
                 c.closeMenu();
             }
         });
-        this.currentContextMenu = this.contextMenuComponents.find(c => c.uid === event.uid) ?? null;
+        this.currentContextMenu = this.contextMenuComponents().find(c => c.uid === event.uid) ?? null;
         this.#cdr.detectChanges();
     }
 
@@ -117,7 +102,7 @@ export class MenubarComponent implements AfterViewInit, AfterContentInit {
             this.currentContextMenu = null;
             return;
         }
-        this.contextMenuComponents.forEach(c => {
+        this.contextMenuComponents().forEach(c => {
             if (c !== ctx) {
                 c.closeMenu();
             }
@@ -138,33 +123,33 @@ export class MenubarComponent implements AfterViewInit, AfterContentInit {
     }
 
     private findNextNonDisabledMenuIndex(): number {
-        const index = Enumerable.from(this.menuList)
+        const index = Enumerable.from(this.menuList())
             .toArray()
             .findIndex(n => n.contextMenu === this.currentContextMenu);
         if (index < 0) {
             return -1;
         }
-        const list = new List(this.menuList.toArray());
+        const list = new List(this.menuList());
         Collections.rotate(list, -index);
         const next = list.skip(1).firstOrDefault(m => !m.disabled());
         if (next) {
-            return this.menuList.toArray().findIndex(m => m === next);
+            return this.menuList().findIndex(m => m === next);
         }
         return -1;
     }
 
     private findPreviousNonDisabledMenuIndex(): number {
-        const index = Enumerable.from(this.menuList)
+        const index = Enumerable.from(this.menuList())
             .toArray()
             .findIndex(n => n.contextMenu === this.currentContextMenu);
         if (index < 0) {
             return -1;
         }
-        const list = new List(this.menuList.toArray());
+        const list = new List(this.menuList());
         Collections.rotate(list, -index);
         const next = list.reverse().firstOrDefault(m => !m.disabled());
         if (next) {
-            return this.menuList.toArray().findIndex(m => m === next);
+            return this.menuList().findIndex(m => m === next);
         }
         return -1;
     }

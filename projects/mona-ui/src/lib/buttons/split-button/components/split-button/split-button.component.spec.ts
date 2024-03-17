@@ -40,11 +40,12 @@ describe("SplitButtonComponent", () => {
     let hostComponent: TestHostComponent;
     let fixture: ComponentFixture<SplitButtonComponent>;
     let hostFixture: ComponentFixture<TestHostComponent>;
+    let appRef: ApplicationRef;
 
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [SplitButtonComponent, TestHostComponent, BrowserAnimationsModule, CommonModule, BrowserModule],
-            providers: []
+            providers: [ApplicationRef]
         });
         fixture = TestBed.createComponent(SplitButtonComponent);
         hostFixture = TestBed.createComponent(TestHostComponent);
@@ -52,6 +53,7 @@ describe("SplitButtonComponent", () => {
         hostComponent = hostFixture.componentInstance;
         fixture.detectChanges();
         hostFixture.detectChanges();
+        appRef = TestBed.inject(ApplicationRef);
     });
 
     it("should create", () => {
@@ -80,7 +82,7 @@ describe("SplitButtonComponent", () => {
             .map(button => button.nativeElement) as HTMLButtonElement[];
         expect(buttons.length).toBe(2);
         buttons[1].click();
-        hostFixture.detectChanges();
+        appRef.tick();
         const menu = document.querySelector("ul.mona-contextmenu-list");
         expect(menu).not.toBeNull();
         const menuItems = menu?.querySelectorAll("li.mona-contextmenu-list-item");
@@ -96,17 +98,16 @@ describe("SplitButtonComponent", () => {
             .map(button => button.nativeElement) as HTMLButtonElement[];
         expect(buttons.length).toBe(2);
         buttons[1].click();
-        hostFixture.detectChanges();
+        appRef.tick();
         const menu = document.querySelector("ul.mona-contextmenu-list");
         expect(menu).not.toBeNull();
         const thirdMenuItem = menu?.querySelectorAll("li.mona-contextmenu-list-item")[2] as HTMLLIElement;
         thirdMenuItem.dispatchEvent(new MouseEvent("mouseenter"));
         tick();
         hostFixture.detectChanges();
-        tick();
+        appRef.tick();
         const subMenu = document.querySelectorAll("ul.mona-contextmenu-list")[1];
         expect(subMenu).not.toBeNull();
-
         const subMenuItems = subMenu?.querySelectorAll("li.mona-contextmenu-list-item");
         expect(subMenuItems?.length).toBe(3);
         expect(subMenuItems?.item(0)?.textContent).toBe("Item 3.1");
@@ -120,9 +121,7 @@ describe("SplitButtonComponent", () => {
             .map(button => button.nativeElement) as HTMLButtonElement[];
         expect(buttons.length).toBe(2);
         buttons[1].click();
-        tick();
-        hostFixture.detectChanges();
-        tick();
+        appRef.tick();
         const menu = document.querySelector("ul.mona-contextmenu-list");
         expect(menu).not.toBeNull();
         const menuItems = menu?.querySelectorAll("li.mona-contextmenu-list-item");
@@ -135,9 +134,7 @@ describe("SplitButtonComponent", () => {
         tick();
         hostFixture.detectChanges();
         buttons[1].click();
-        tick();
-        hostFixture.detectChanges();
-        tick();
+        appRef.tick();
         const menu2 = document.querySelector("ul.mona-contextmenu-list") as HTMLUListElement;
         expect(menu2).not.toBeNull();
         const menuItems2 = menu2.querySelectorAll("li.mona-contextmenu-list-item") as NodeListOf<HTMLLIElement>;

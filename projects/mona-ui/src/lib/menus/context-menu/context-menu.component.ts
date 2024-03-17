@@ -1,12 +1,11 @@
 import { Point } from "@angular/cdk/drag-drop";
 import {
-    AfterContentInit,
     ChangeDetectionStrategy,
     Component,
-    ContentChildren,
+    computed,
+    contentChildren,
     DestroyRef,
     ElementRef,
-    EventEmitter,
     inject,
     input,
     InputSignal,
@@ -14,11 +13,12 @@ import {
     model,
     ModelSignal,
     OnInit,
-    Output,
-    QueryList
+    output,
+    OutputEmitterRef,
+    Signal
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { any } from "@mirei/ts-collections";
+import { from } from "@mirei/ts-collections";
 import { fromEvent, mergeWith, Subject, take } from "rxjs";
 import { v4 } from "uuid";
 import { PopupOffset } from "../../popup/models/PopupOffset";
@@ -39,13 +39,30 @@ import { ContextMenuService } from "../services/context-menu.service";
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ContextMenuComponent implements OnInit, AfterContentInit {
+export class ContextMenuComponent implements OnInit {
     readonly #contextMenuInjectorData: Partial<ContextMenuInjectorData> = { isRoot: true };
     readonly #contextMenuService: ContextMenuService = inject(ContextMenuService);
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     readonly #menuClickNotifier: Subject<MenuItem> = new Subject<MenuItem>();
     #contextMenuRef: PopupRef | null = null;
     #precise: boolean = true;
+
+    protected readonly menuItemComponents: Signal<readonly MenuItemComponent[]> = contentChildren(MenuItemComponent);
+    protected readonly menuItemList: Signal<MenuItem[]> = computed(() => {
+        const menuItemComponents = this.menuItemComponents();
+        const menuItems = from(this.menuItems());
+        if (menuItems.any()) {
+            return menuItems.toArray();
+        }
+        if (menuItemComponents.length !== 0) {
+            return menuItemComponents.map(i => i.getMenuItem());
+        }
+        return [];
+    });
+
+    public readonly close: OutputEmitterRef<ContextMenuCloseEvent> = output();
+    public readonly navigate: OutputEmitterRef<ContextMenuNavigationEvent> = output();
+    public readonly open: OutputEmitterRef<ContextMenuOpenEvent> = output();
     public readonly uid: string = v4();
 
     public menuItems: ModelSignal<Iterable<MenuItem>> = model<Iterable<MenuItem>>([]);
@@ -77,27 +94,8 @@ export class ContextMenuComponent implements OnInit, AfterContentInit {
         }
     });
 
-    @Output()
-    public close: EventEmitter<ContextMenuCloseEvent> = new EventEmitter<ContextMenuCloseEvent>();
-
-    @ContentChildren(MenuItemComponent)
-    public menuItemComponents: QueryList<MenuItemComponent> = new QueryList<MenuItemComponent>();
-
-    @Output()
-    public navigate: EventEmitter<ContextMenuNavigationEvent> = new EventEmitter<ContextMenuNavigationEvent>();
-
-    @Output()
-    public open: EventEmitter<ContextMenuOpenEvent> = new EventEmitter<ContextMenuOpenEvent>();
-
     public closeMenu(): void {
         this.#contextMenuRef?.close();
-    }
-
-    public ngAfterContentInit(): void {
-        if (any(this.menuItems())) {
-            return;
-        }
-        this.menuItems.set(this.menuItemComponents.map(m => m.getMenuItem()) ?? []);
     }
 
     public ngOnInit(): void {
@@ -114,7 +112,7 @@ export class ContextMenuComponent implements OnInit, AfterContentInit {
 
     private create(event: MouseEvent): void {
         this.#contextMenuInjectorData.menuClick = this.#menuClickNotifier;
-        this.#contextMenuInjectorData.menuItems = this.menuItems();
+        this.#contextMenuInjectorData.menuItems = this.menuItemList();
         this.#contextMenuInjectorData.navigate = this.navigate;
         this.#contextMenuInjectorData.popupClass = this.popupClass();
 

@@ -825,15 +825,16 @@ export class AppComponent implements OnInit {
         this.selectedDropdownListDataItem = { text: "REPLACED WITH PAPRIKA", value: 13, group: "Fruit", active: true };
         this.selectedComboBoxDataItem = { text: "REPLACED WITH PAPRIKA", value: 13, group: "Fruit", active: true };
         let turn: number = 0;
-        window.setInterval(() => {
-            // this.contextMenuItemVisible = !this.contextMenuItemVisible;
-            // this.dropdownItemDisabler = (item: any): boolean => turn % item.value === 0;
-            // this.listService.setDisabledBy(this.dropdownItemDisabler);
-            // this.listService.setGroupSelector(i => i.text.charAt(turn % 4).toUpperCase());
-            // this.listService.setValueField(i => (turn % 2 === 0 ? i.value : i));
-            // this.listService.setGroupableOptions({ enabled: true, headerOrder: turn % 2 === 0 ? "asc" : "desc" });
-            turn++;
-        }, 3000);
+        // window.setInterval(() => {
+        // this.contextMenuItemVisible = !this.contextMenuItemVisible;
+        // console.log("contextMenuItemVisible", this.contextMenuItemVisible);
+        // this.dropdownItemDisabler = (item: any): boolean => turn % item.value === 0;
+        // this.listService.setDisabledBy(this.dropdownItemDisabler);
+        // this.listService.setGroupSelector(i => i.text.charAt(turn % 4).toUpperCase());
+        // this.listService.setValueField(i => (turn % 2 === 0 ? i.value : i));
+        // this.listService.setGroupableOptions({ enabled: true, headerOrder: turn % 2 === 0 ? "asc" : "desc" });
+        // turn++;
+        // }, 3000);
         this.selectedDropdownListDataItem = { ...this.dropdownListDataItems.get(14) };
         this.selectedPrimitiveComboBoxDataItem = this.dropdownPrimitiveDataItems[7];
 

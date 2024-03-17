@@ -1,14 +1,14 @@
-import { MenuItem } from "./MenuItem";
-import { PopupRef } from "../../popup/models/PopupRef";
+import { OutputEmitterRef } from "@angular/core";
 import { Subject } from "rxjs";
-import { EventEmitter } from "@angular/core";
+import { PopupRef } from "../../popup/models/PopupRef";
 import { ContextMenuNavigationEvent } from "./ContextMenuNavigationEvent";
+import { MenuItem } from "./MenuItem";
 
 export interface ContextMenuInjectorData {
     isRoot?: boolean;
     menuClick?: Subject<MenuItem>;
     menuItems: Iterable<MenuItem>;
-    navigate: EventEmitter<ContextMenuNavigationEvent>;
+    navigate: OutputEmitterRef<ContextMenuNavigationEvent>;
     parentMenuRef?: PopupRef;
     popupClass?: string | string[];
     subMenuClose?: Subject<void>;

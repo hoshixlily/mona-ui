@@ -1,6 +1,6 @@
 import { TemplateRef } from "@angular/core";
-import { ContextMenuItemTextTemplateContext } from "./ContextMenuItemTextTemplateContext";
 import { ContextMenuItemIconTemplateContext } from "./ContextMenuItemIconTemplateContext";
+import { ContextMenuItemTextTemplateContext } from "./ContextMenuItemTextTemplateContext";
 
 export interface MenuItem<T = unknown> {
     data?: T;

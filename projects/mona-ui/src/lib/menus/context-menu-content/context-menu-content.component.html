@@ -1,6 +1,6 @@
 <ul class="mona-contextmenu-list" tabindex="0">
-    @for (menuItem of contextMenuData.menuItems; track menuItem) {
-        @if (menuItem.visible ?? true) {
+    @for (menuItem of contextMenuData.menuItems; track $index) {
+        @if (menuItem.visible !== false) {
             <li class="mona-contextmenu-list-item"
                 [ngClass]="{'mona-disabled': menuItem.disabled, 'divider': menuItem.divider, 'mona-focused': keyManager?.activeItem?.menuItem() === menuItem}"
                 (mouseenter)="onListItemMouseEnter($event, menuItem)"

@@ -1,6 +1,8 @@
-import { Component } from "@angular/core";
+import { ApplicationRef, Component } from "@angular/core";
 import { ComponentFixture, fakeAsync, TestBed, tick } from "@angular/core/testing";
 import { NoopAnimationsModule } from "@angular/platform-browser/animations";
+import { ContextMenuContentComponent } from "../context-menu-content/context-menu-content.component";
+import { ContextMenuItemComponent } from "../context-menu-item/context-menu-item.component";
 import { MenuItemComponent } from "../menu-item/menu-item.component";
 import { MenuItem } from "../models/MenuItem";
 import { ContextMenuService } from "../services/context-menu.service";
@@ -56,15 +58,19 @@ describe("ContextMenuComponent", () => {
     let hostComponentWithMenuItems: ContextMenuComponentTestComponentWithMenuItems;
     let hostFixtureWithMenuItems: ComponentFixture<ContextMenuComponentTestComponentWithMenuItems>;
 
+    let appRef: ApplicationRef;
+
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [
                 ContextMenuComponent,
                 ContextMenuComponentTestComponent,
                 NoopAnimationsModule,
-                ContextMenuComponentTestComponentWithMenuItems
+                ContextMenuComponentTestComponentWithMenuItems,
+                ContextMenuContentComponent,
+                ContextMenuItemComponent
             ],
-            providers: [ContextMenuService]
+            providers: [ContextMenuService, ApplicationRef]
         });
         hostFixture = TestBed.createComponent(ContextMenuComponentTestComponent);
         hostComponent = hostFixture.componentInstance;
@@ -72,6 +78,7 @@ describe("ContextMenuComponent", () => {
         hostComponentWithMenuItems = hostFixtureWithMenuItems.componentInstance;
         hostFixture.detectChanges();
         hostFixtureWithMenuItems.detectChanges();
+        appRef = TestBed.inject(ApplicationRef);
     });
 
     afterEach(() => {
@@ -94,25 +101,19 @@ describe("ContextMenuComponent", () => {
     }));
     it("should show a menu with 3 items", fakeAsync(() => {
         const target = hostFixture.nativeElement.querySelector("button");
-        target.dispatchEvent(new MouseEvent("contextmenu", { bubbles: true }));
-        tick();
-        hostFixture.detectChanges();
-        tick();
+        target.dispatchEvent(new MouseEvent("contextmenu", { bubbles: true, cancelable: true }));
+        appRef.tick();
         const contextMenuList = document.querySelector("ul.mona-contextmenu-list") as HTMLUListElement;
         expect(contextMenuList.children.length).toBe(3);
     }));
     it("should show a submenu with 3 items", fakeAsync(() => {
         const target = hostFixture.nativeElement.querySelector("button");
         target.dispatchEvent(new MouseEvent("contextmenu", { bubbles: true }));
-        tick();
-        hostFixture.detectChanges();
-        tick();
+        appRef.tick();
         const contextMenuList = document.querySelector("ul.mona-contextmenu-list") as HTMLUListElement;
         const secondItem = contextMenuList.children[1] as HTMLLIElement;
         secondItem.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
-        tick();
-        hostFixture.detectChanges();
-        tick();
+        appRef.tick();
         const subMenuLists = document.querySelectorAll("ul.mona-contextmenu-list") as NodeListOf<HTMLUListElement>;
         expect(subMenuLists[1].children.length).toBe(3);
         expect(subMenuLists[1].children[0].textContent).toBe("Second Item 1");
@@ -122,13 +123,11 @@ describe("ContextMenuComponent", () => {
     it("should hide context menu on click outside", fakeAsync(() => {
         const target = hostFixture.nativeElement.querySelector("button");
         target.dispatchEvent(new MouseEvent("contextmenu", { bubbles: true }));
-        tick();
         hostFixture.detectChanges();
         tick();
         const contextMenuList = document.querySelector("ul.mona-contextmenu-list");
         expect(contextMenuList).not.toBeNull();
         document.body.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-        tick();
         hostFixture.detectChanges();
         tick();
         const contextMenuListAfterClick = document.querySelector("ul.mona-contextmenu-list");
@@ -137,13 +136,11 @@ describe("ContextMenuComponent", () => {
     it("should not close the context menu on click inside", fakeAsync(() => {
         const target = hostFixture.nativeElement.querySelector("button");
         target.dispatchEvent(new MouseEvent("contextmenu", { bubbles: true }));
-        tick();
         hostFixture.detectChanges();
         tick();
         const contextMenuList = document.querySelector("ul.mona-contextmenu-list");
         expect(contextMenuList).not.toBeNull();
         contextMenuList!.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-        tick();
         hostFixture.detectChanges();
         tick();
         const contextMenuListAfterClick = document.querySelector("ul.mona-contextmenu-list");
@@ -152,13 +149,11 @@ describe("ContextMenuComponent", () => {
     it("should hide context menu on escape key", fakeAsync(() => {
         const target = hostFixture.nativeElement.querySelector("button");
         target.dispatchEvent(new MouseEvent("contextmenu", { bubbles: true }));
-        tick();
         hostFixture.detectChanges();
         tick();
         const contextMenuList = document.querySelector("ul.mona-contextmenu-list");
         expect(contextMenuList).not.toBeNull();
         document.body.dispatchEvent(new KeyboardEvent("keydown", { bubbles: true, key: "Escape" }));
-        tick();
         hostFixture.detectChanges();
         tick();
         const contextMenuListAfterClick = document.querySelector("ul.mona-contextmenu-list");
@@ -167,24 +162,17 @@ describe("ContextMenuComponent", () => {
     it("should close the context menu on click on a menu item", fakeAsync(() => {
         const target = hostFixture.nativeElement.querySelector("button");
         target.dispatchEvent(new MouseEvent("contextmenu", { bubbles: true }));
-        tick();
-        hostFixture.detectChanges();
-        tick();
+        appRef.tick();
         const contextMenuList = document.querySelector("ul.mona-contextmenu-list") as HTMLUListElement;
         const firstItem = contextMenuList.children[0] as HTMLLIElement;
         firstItem.dispatchEvent(new MouseEvent("click", { bubbles: true }));
-        tick();
-        hostFixture.detectChanges();
-        tick();
         const contextMenuListAfterClick = document.querySelector("ul.mona-contextmenu-list");
         expect(contextMenuListAfterClick).toBeNull();
     }));
     it("should ignore the menu-item components if menuItems are provided", fakeAsync(() => {
         const target = hostFixtureWithMenuItems.nativeElement.querySelector("button");
         target.dispatchEvent(new MouseEvent("contextmenu", { bubbles: true }));
-        tick();
-        hostFixtureWithMenuItems.detectChanges();
-        tick();
+        appRef.tick();
         const contextMenuList = document.querySelector("ul.mona-contextmenu-list") as HTMLUListElement;
         expect(contextMenuList.children.length).toBe(2);
         expect(contextMenuList.children[0].textContent).toBe("First dynamic item");

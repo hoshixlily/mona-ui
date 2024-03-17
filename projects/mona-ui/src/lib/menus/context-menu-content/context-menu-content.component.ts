@@ -8,9 +8,9 @@ import {
     ElementRef,
     inject,
     OnInit,
-    QueryList,
+    Signal,
     signal,
-    ViewChildren,
+    viewChildren,
     WritableSignal
 } from "@angular/core";
 import { any } from "@mirei/ts-collections";
@@ -38,18 +38,19 @@ export class ContextMenuContentComponent implements OnInit, AfterViewInit {
     readonly #contextMenuService: ContextMenuService = inject(ContextMenuService);
     readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
     #currentMenuItem: MenuItem | null = null;
+    protected readonly contextMenuItemComponents: Signal<readonly ContextMenuItemComponent[]> =
+        viewChildren(ContextMenuItemComponent);
     protected readonly iconSpaceVisible: WritableSignal<boolean> = signal(false);
     protected readonly linkSpaceVisible: WritableSignal<boolean> = signal(false);
     protected readonly menuPopupRef: WritableSignal<PopupRef | null> = signal(null);
     public readonly contextMenuData: ContextMenuInjectorData = inject<ContextMenuInjectorData>(PopupDataInjectionToken);
     public keyManager!: ActiveDescendantKeyManager<ContextMenuItemComponent>;
 
-    @ViewChildren(ContextMenuItemComponent)
-    private contextMenuItemComponents: QueryList<ContextMenuItemComponent> = new QueryList<ContextMenuItemComponent>();
-
     public ngAfterViewInit(): void {
         this.animateEnter();
-        this.keyManager = new ActiveDescendantKeyManager<ContextMenuItemComponent>(this.contextMenuItemComponents)
+        this.keyManager = new ActiveDescendantKeyManager<ContextMenuItemComponent>(
+            this.contextMenuItemComponents() as ContextMenuItemComponent[]
+        )
             .withWrap()
             .skipPredicate(mi => {
                 const menuItem = mi.menuItem();

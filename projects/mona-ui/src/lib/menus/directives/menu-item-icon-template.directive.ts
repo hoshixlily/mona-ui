@@ -4,6 +4,4 @@ import { Directive } from "@angular/core";
     selector: "ng-template[monaMenuItemIconTemplate]",
     standalone: true
 })
-export class MenuItemIconTemplateDirective {
-    public constructor() {}
-}
+export class MenuItemIconTemplateDirective {}
