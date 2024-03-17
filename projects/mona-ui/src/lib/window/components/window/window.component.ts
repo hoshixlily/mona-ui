@@ -2,19 +2,20 @@ import {
     AfterViewInit,
     ChangeDetectionStrategy,
     Component,
-    ContentChild,
+    contentChild,
     DestroyRef,
     ElementRef,
-    EventEmitter,
     inject,
     input,
     InputSignal,
     model,
     ModelSignal,
     OnDestroy,
-    Output,
+    output,
+    OutputEmitterRef,
+    Signal,
     TemplateRef,
-    ViewChild
+    viewChild
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { asapScheduler } from "rxjs";
@@ -34,6 +35,9 @@ export class WindowComponent implements OnDestroy, AfterViewInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     readonly #windowService: WindowService = inject(WindowService);
     #windowRef?: WindowRef;
+    public close: OutputEmitterRef<WindowCloseEvent> = output();
+    public dragEnd: OutputEmitterRef<void> = output();
+    public dragStart: OutputEmitterRef<void> = output();
     public draggable: InputSignal<boolean> = input(true);
     public focusedElement: InputSignal<HTMLElement | ElementRef<HTMLElement> | string | undefined> = input<
         HTMLElement | ElementRef<HTMLElement> | string | undefined
@@ -47,28 +51,16 @@ export class WindowComponent implements OnDestroy, AfterViewInit {
     public modal: InputSignal<boolean | undefined> = input<boolean | undefined>(undefined);
     public resizable: InputSignal<boolean | undefined> = input<boolean | undefined>(undefined);
     public title: InputSignal<string | undefined> = input<string | undefined>(undefined);
+    public titleTemplateDirective: Signal<WindowTitleTemplateDirective | undefined> =
+        contentChild(WindowTitleTemplateDirective);
     public top: ModelSignal<number | undefined> = model<number | undefined>(undefined);
     public width: ModelSignal<number | undefined> = model<number | undefined>(undefined);
-
-    @Output()
-    public close: EventEmitter<WindowCloseEvent> = new EventEmitter<WindowCloseEvent>();
-
-    @Output()
-    public dragEnd: EventEmitter<void> = new EventEmitter<void>();
-
-    @Output()
-    public dragStart: EventEmitter<void> = new EventEmitter<void>();
-
-    @ContentChild(WindowTitleTemplateDirective)
-    public titleTemplateDirective?: WindowTitleTemplateDirective;
-
-    @ViewChild("windowTemplate")
-    public windowTemplate!: TemplateRef<any>;
+    public windowTemplate: Signal<TemplateRef<any>> = viewChild.required(TemplateRef);
 
     public ngAfterViewInit(): void {
         asapScheduler.schedule(() => {
             this.#windowRef = this.#windowService.open({
-                content: this.windowTemplate,
+                content: this.windowTemplate(),
                 draggable: this.draggable(),
                 focusedElement: this.focusedElement(),
                 height: this.height(),
@@ -79,7 +71,7 @@ export class WindowComponent implements OnDestroy, AfterViewInit {
                 minWidth: this.minWidth(),
                 modal: this.modal(),
                 resizable: this.resizable(),
-                title: this.titleTemplateDirective?.templateRef ?? this.title(),
+                title: this.titleTemplateDirective()?.templateRef ?? this.title(),
                 top: this.top(),
                 width: this.width()
             });

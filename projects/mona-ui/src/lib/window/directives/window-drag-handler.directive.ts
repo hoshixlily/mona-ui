@@ -1,4 +1,4 @@
-import { AfterViewInit, DestroyRef, Directive, ElementRef, inject, Input, NgZone } from "@angular/core";
+import { AfterViewInit, DestroyRef, Directive, ElementRef, inject, input, InputSignal, NgZone } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { fromEvent } from "rxjs";
 import { WindowReference } from "../models/WindowReference";
@@ -9,21 +9,20 @@ import { WindowReference } from "../models/WindowReference";
 })
 export class WindowDragHandlerDirective implements AfterViewInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
+    public draggable: InputSignal<boolean> = input(false);
+    public windowRef: InputSignal<WindowReference> = input.required<WindowReference>();
 
-    @Input()
-    public draggable?: boolean = false;
-
-    @Input()
-    public windowRef!: WindowReference;
-
-    public constructor(private readonly elementRef: ElementRef<HTMLElement>, private readonly zone: NgZone) {}
+    public constructor(
+        private readonly elementRef: ElementRef<HTMLElement>,
+        private readonly zone: NgZone
+    ) {}
 
     public ngAfterViewInit(): void {
         this.setEvents();
     }
 
     public onMouseDown(event: MouseEvent) {
-        if (!this.draggable) {
+        if (!this.draggable()) {
             return;
         }
 
@@ -37,7 +36,7 @@ export class WindowDragHandlerDirective implements AfterViewInit {
         const onMouseMove = (event: MouseEvent) => {
             if (!dragInitiated) {
                 dragInitiated = true;
-                this.windowRef.moveStart$$.next();
+                this.windowRef().moveStart$$.next();
             }
             if (
                 event.clientX < 0 ||
@@ -53,14 +52,14 @@ export class WindowDragHandlerDirective implements AfterViewInit {
             const left = initialLeft + deltaX;
             element.style.top = `${top}px`;
             element.style.left = `${left}px`;
-            this.windowRef.move$$.next({ top, left });
+            this.windowRef().move$$.next({ top, left });
         };
 
         const onMouseUp = () => {
             document.removeEventListener("mousemove", onMouseMove);
             document.removeEventListener("mouseup", onMouseUp);
             if (dragInitiated) {
-                this.windowRef.moveEnd$$.next();
+                this.windowRef().moveEnd$$.next();
                 dragInitiated = false;
             }
         };
