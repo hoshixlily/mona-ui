@@ -163,6 +163,8 @@ export * from "./layout/stepper/directives/stepper-step-template.directive";
 export * from "./layout/stepper/components/stepper/stepper.component";
 
 /** Splitter */
+
+/** Neo Splitter */
 export * from "./layout/splitter/components/splitter/splitter.component";
 export * from "./layout/splitter/components/splitter-pane/splitter-pane.component";
 

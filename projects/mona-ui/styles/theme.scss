@@ -1466,15 +1466,47 @@ button[monaButton].mona-input-button {
 
 /** Splitter */
 .mona-splitter {
+    display: grid;
     width: 100%;
     height: 100%;
-    display: flex;
-    position: relative;
-    flex-direction: row;
     overflow: hidden;
-    &.mona-splitter-vertical {
+}
+
+.mona-splitter-resizer {
+    background-color: var(--mona-background);
+    color: var(--mona-text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: background-color 0.15s ease-in;
+    &-horizontal {
+        width: 4px;
+        border-left: 1px solid var(--mona-border-color);
+        border-right: 1px solid var(--mona-border-color);
         flex-direction: column;
     }
+    &-vertical {
+        height: 4px;
+        border-top: 1px solid var(--mona-border-color);
+        border-bottom: 1px solid var(--mona-border-color);
+    }
+    &-resizing {
+        background-color: var(--mona-background-dark);
+    }
+}
+
+.mona-splitter-resizer-handle {
+    background: var(--mona-background-lighter);
+}
+
+.mona-splitter-resizer-horizontal .mona-splitter-resizer-handle {
+    width: 100%;
+    height: 24px;
+}
+.mona-splitter-resizer-vertical .mona-splitter-resizer-handle {
+    width: 24px;
+    height: 100%;
 }
 
 /** Tab Strip */

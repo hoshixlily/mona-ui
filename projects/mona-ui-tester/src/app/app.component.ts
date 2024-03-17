@@ -37,6 +37,7 @@ import {
     ButtonGroupComponent,
     CalendarComponent,
     CellEditEvent,
+    CheckBoxComponent,
     ChipComponent,
     CircularProgressBarComponent,
     CircularProgressBarLabelTemplateDirective,
@@ -113,6 +114,8 @@ import {
     MultiSelectSummaryTagDirective,
     MultiSelectSummaryTagTemplateDirective,
     MultiSelectTagTemplateDirective,
+    SplitterComponent,
+    SplitterPaneComponent,
     NodeCheckEvent,
     NodeClickEvent,
     NodeDragEndEvent,
@@ -135,6 +138,7 @@ import {
     PopupService,
     ProgressBarComponent,
     Query,
+    RadioButtonComponent,
     RangeSliderComponent,
     RangeSliderTickValueTemplateDirective,
     ScrollViewComponent,
@@ -145,8 +149,6 @@ import {
     SortDescriptor,
     SplitButtonComponent,
     SplitButtonTextTemplateDirective,
-    SplitterComponent,
-    SplitterPaneComponent,
     StepOptions,
     StepperComponent,
     StepperIndicatorTemplateDirective,
@@ -174,12 +176,10 @@ import {
     TreeViewFilterableDirective,
     TreeViewNodeTemplateDirective,
     TreeViewSelectableDirective,
-    WindowService,
-    CheckBoxComponent,
-    RadioButtonComponent,
-    WindowComponent
+    WindowComponent,
+    WindowService
 } from "mona-ui";
-import { debounceTime, map, Observable, of, take, timer } from "rxjs";
+import { map, Observable, of, take } from "rxjs";
 import { v4 } from "uuid";
 import { ListViewNoDataTemplateDirective } from "../../../mona-ui/src/lib/list-view/directives/list-view-no-data-template.directive";
 import { GridOrderData } from "./GridOrderData";
@@ -290,8 +290,6 @@ interface TreeNodeDataItem {
         SliderTickValueTemplateDirective,
         SplitButtonComponent,
         SplitButtonTextTemplateDirective,
-        SplitterComponent,
-        SplitterPaneComponent,
         StepperComponent,
         StepperIndicatorTemplateDirective,
         StepperLabelTemplateDirective,
@@ -326,7 +324,10 @@ interface TreeNodeDataItem {
         DropDownTreeHeaderTemplateDirective,
         DropDownTreeNoDataTemplateDirective,
         DropDownTreeNodeTemplateDirective,
-        WindowComponent
+        WindowComponent,
+
+        SplitterComponent,
+        SplitterPaneComponent
     ]
 })
 export class AppComponent implements OnInit {

@@ -1,4 +1,3 @@
-import { NgClass } from "@angular/common";
 import {
     ChangeDetectionStrategy,
     Component,
@@ -8,152 +7,117 @@ import {
     input,
     InputSignal,
     OnInit,
-    Signal
+    Signal,
+    signal,
+    WritableSignal
 } from "@angular/core";
-import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import {
-    faCaretDown,
-    faCaretLeft,
-    faCaretRight,
-    faCaretUp,
-    faEllipsisH,
-    faEllipsisV,
-    IconDefinition
-} from "@fortawesome/free-solid-svg-icons";
-import { fromEvent } from "rxjs";
+import { FaIconComponent } from "@fortawesome/angular-fontawesome";
+import { filter, fromEvent, skipUntil, takeUntil, tap } from "rxjs";
+import { ButtonDirective } from "../../../../buttons/button/button.directive";
 import { Orientation } from "../../../../models/Orientation";
 import { SplitterPaneComponent } from "../splitter-pane/splitter-pane.component";
 
 @Component({
     selector: "mona-splitter-resizer",
-    templateUrl: "./splitter-resizer.component.html",
-    styleUrls: ["./splitter-resizer.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush,
     standalone: true,
-    imports: [NgClass, FontAwesomeModule]
+    imports: [FaIconComponent, ButtonDirective],
+    template: `
+        @if (resizable()) {
+            <div class="mona-splitter-resizer-handle"></div>
+        }
+    `,
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    host: {
+        class: "mona-splitter-resizer",
+        "[class.mona-splitter-resizer-horizontal]": "orientation()==='horizontal'",
+        "[class.mona-splitter-resizer-vertical]": "orientation()==='vertical'",
+        "[class.mona-splitter-resizer-resizing]": "resizing()",
+        "[style.cursor]": "resizable() ? (orientation()==='horizontal' ? 'ew-resize' : 'ns-resize') : 'auto'"
+    }
 })
 export class SplitterResizerComponent implements OnInit {
     readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
-    #resizing: boolean = false;
-    protected readonly horizontalCollapseNextIcon: IconDefinition = faCaretRight;
-    protected readonly horizontalCollapsePreviousIcon: IconDefinition = faCaretLeft;
-    protected readonly horizontalResizeIcon: IconDefinition = faEllipsisV;
-    protected readonly nextPane: Signal<SplitterPaneComponent | null> = computed(() => {
-        const previousPane = this.previousPane();
-        const panes = this.panes();
-        const index = panes.indexOf(previousPane);
-        return index === -1 ? null : panes[index + 1];
+    protected readonly resizable: Signal<boolean> = computed(() => {
+        return this.previousPane().resizable() && this.nextPane().resizable();
     });
-    protected readonly verticalCollapseNextIcon: IconDefinition = faCaretDown;
-    protected readonly verticalCollapsePreviousIcon: IconDefinition = faCaretUp;
-    protected readonly verticalResizeIcon: IconDefinition = faEllipsisH;
-
-    public nextResizer: InputSignal<SplitterResizerComponent | null> = input<SplitterResizerComponent | null>(null);
-    public orientation: InputSignal<Orientation> = input<Orientation>("horizontal");
-    public panes: InputSignal<ReadonlyArray<SplitterPaneComponent>> = input<ReadonlyArray<SplitterPaneComponent>>([]);
+    protected readonly resizing: WritableSignal<boolean> = signal(false);
+    public nextPane: InputSignal<SplitterPaneComponent> = input.required<SplitterPaneComponent>();
+    public orientation: InputSignal<Orientation> = input.required<Orientation>();
     public previousPane: InputSignal<SplitterPaneComponent> = input.required<SplitterPaneComponent>();
-    public previousResizer: InputSignal<SplitterResizerComponent | null> = input<SplitterResizerComponent | null>(null);
 
     public ngOnInit(): void {
-        this.setSubscriptions();
+        this.setEvents();
     }
 
-    public toggle(position: "previous" | "next"): void {
-        const previousPane = this.previousPane();
-        const nextPane = this.nextPane();
-        if (previousPane.collapsed() && nextPane?.collapsed()) {
-            return;
+    private getPaneElements(): [HTMLElement, HTMLElement] {
+        const previousPane = this.#hostElementRef.nativeElement.previousElementSibling;
+        const nextPane = this.#hostElementRef.nativeElement.nextElementSibling;
+        if (previousPane === null || nextPane === null) {
+            throw new Error("The previous or next pane element is not found.");
         }
-        if (position === "previous") {
-            if (!previousPane.collapsed()) {
-                if (!nextPane?.collapsed()) {
-                    previousPane.setCollapsed(true);
-                    if (!previousPane.isStatic() && nextPane && nextPane?.isStatic()) {
-                        nextPane.isStatic.set(false);
-                    }
+        return [previousPane as HTMLDivElement, nextPane as HTMLDivElement];
+    }
+
+    private getPaneRectangles(): [DOMRect, DOMRect] {
+        const [previousPane, nextPane] = this.getPaneElements();
+        return [previousPane.getBoundingClientRect(), nextPane.getBoundingClientRect()];
+    }
+
+    private setEvents(): void {
+        fromEvent<PointerEvent>(document, "pointermove")
+            .pipe(
+                skipUntil(
+                    fromEvent<PointerEvent>(this.#hostElementRef.nativeElement, "pointerdown").pipe(
+                        filter(() => this.resizable()),
+                        tap(event => {
+                            event.preventDefault();
+                            this.#hostElementRef.nativeElement.setPointerCapture(event.pointerId);
+                            this.resizing.set(true);
+                        })
+                    )
+                ),
+                takeUntil(
+                    fromEvent<PointerEvent>(this.#hostElementRef.nativeElement, "pointerup").pipe(
+                        tap(event => {
+                            this.#hostElementRef.nativeElement.releasePointerCapture(event.pointerId);
+                            this.resizing.set(false);
+                            this.setEvents();
+                        })
+                    )
+                )
+            )
+            .subscribe(event => {
+                const orientation = this.orientation();
+                if (orientation === "horizontal") {
+                    this.updateHorizontalPaneSizes(event);
                 } else {
-                    if (nextPane) {
-                        nextPane.setCollapsed(false);
-                    }
-                    if (previousPane.uid === this.panes()[0].uid && previousPane.paneSize() != null) {
-                        previousPane.isStatic.set(true);
-                    }
-                }
-            } else if (nextPane && nextPane.collapsed()) {
-                nextPane.setCollapsed(false);
-            }
-        } else {
-            if (nextPane && !nextPane.collapsed()) {
-                if (!previousPane.collapsed()) {
-                    nextPane.setCollapsed(true);
-                    if (!nextPane.isStatic() && this.previousPane().isStatic()) {
-                        previousPane.isStatic.set(false);
-                    }
-                } else {
-                    previousPane.setCollapsed(false);
-                    if (nextPane.uid === this.panes()[this.panes().length - 1].uid && nextPane.paneSize() != null) {
-                        nextPane.isStatic.set(true);
-                    }
-                }
-            } else if (previousPane.collapsed()) {
-                previousPane.setCollapsed(false);
-            }
-        }
-    }
-
-    private getPaneElements(): HTMLElement[] {
-        return [
-            document.querySelector(`[data-pid='${this.previousPane().uid}']`) as HTMLElement,
-            document.querySelector(`[data-pid='${this.nextPane()?.uid}']`) as HTMLElement
-        ];
-    }
-
-    private resize(event: MouseEvent): void {
-        const [previousPaneElement, nextPaneElement] = this.getPaneElements();
-        const rect = previousPaneElement.getBoundingClientRect();
-        if (this.orientation() === "horizontal") {
-            const totalSize = rect.width + nextPaneElement.getBoundingClientRect().width;
-            const size =
-                event.clientX - rect.left < 0
-                    ? 0
-                    : event.clientX - rect.left > totalSize
-                      ? totalSize
-                      : event.clientX - rect.left;
-            this.previousPane().setSize(`${size}px`);
-            if (this.nextPane()) {
-                this.nextPane()?.setSize(`${totalSize - size}px`);
-            }
-        } else {
-            const totalSize = rect.height + nextPaneElement.getBoundingClientRect().height;
-            const size =
-                event.clientY - rect.top < 0
-                    ? 0
-                    : event.clientY - rect.top > totalSize
-                      ? totalSize
-                      : event.clientY - rect.top;
-            this.previousPane().setSize(`${size}px`);
-            this.nextPane()?.setSize(`${totalSize - size}px`);
-        }
-    }
-
-    private setSubscriptions(): void {
-        fromEvent<MouseEvent>(this.#hostElementRef.nativeElement, "mousedown").subscribe(() => {
-            this.#resizing = true;
-            const mouseMoveSubscription = fromEvent<MouseEvent>(document, "mousemove").subscribe(event => {
-                event.stopPropagation();
-                event.preventDefault();
-                if (!this.previousPane().resizable() || !this.nextPane()?.resizable()) {
-                    return;
-                }
-                if (!this.previousPane().collapsed() && !this.nextPane()?.collapsed()) {
-                    this.resize(event);
+                    this.updateVerticalPaneSizes(event);
                 }
             });
-            const mouseUpSubscription = fromEvent<MouseEvent>(document, "mouseup").subscribe(() => {
-                mouseMoveSubscription.unsubscribe();
-                mouseUpSubscription.unsubscribe();
-                this.#resizing = false;
-            });
-        });
+    }
+
+    private updateHorizontalPaneSizes(event: PointerEvent): void {
+        const [previousRect, nextRect] = this.getPaneRectangles();
+        const maxWidth = previousRect.width + nextRect.width;
+        const previousPaneWidth = Math.min(Math.max(event.clientX - previousRect.left, 0), maxWidth);
+        const nextPaneWidth = maxWidth - previousPaneWidth;
+        const previousPaneSize = `${previousPaneWidth}px`;
+        const nextPaneSize = `${nextPaneWidth}px`;
+        this.updatePaneSizes(previousPaneSize, nextPaneSize);
+    }
+
+    private updatePaneSizes(previousPaneSize: string, nextPaneSize: string): void {
+        this.previousPane().size.set(previousPaneSize);
+        this.nextPane().size.set(nextPaneSize);
+    }
+
+    private updateVerticalPaneSizes(event: PointerEvent): void {
+        const [previousRect, nextRect] = this.getPaneRectangles();
+        const maxHeight = previousRect.height + nextRect.height;
+        const previousPaneHeight = Math.min(Math.max(event.clientY - previousRect.top, 0), maxHeight);
+        const nextPaneHeight = maxHeight - previousPaneHeight;
+        const previousPaneSize = `${previousPaneHeight}px`;
+        const nextPaneSize = `${nextPaneHeight}px`;
+        this.updatePaneSizes(previousPaneSize, nextPaneSize);
     }
 }

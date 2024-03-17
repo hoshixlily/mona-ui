@@ -1,13 +1,12 @@
-@for (pane of paneList(); track $index) {
-    <div class="mona-splitter-pane" [attr.data-px]="$index" [attr.data-pid]="pane.uid"
-         [ngStyle]="{'order': $index*2, 'flex-basis': pane.paneSize()}"
-         [ngClass]="{'mona-splitter-static': pane.isStatic(), 'mona-splitter-hidden': pane.collapsed()}">
-        <ng-container [ngTemplateOutlet]="pane.templateRef()"></ng-container>
+@for (pane of paneList(); track pane.uid) {
+    <div class="mona-splitter-pane" [attr.data-pid]="pane.uid" [attr.data-px]="$index">
+        <ng-container [ngTemplateOutlet]="pane.template()"></ng-container>
     </div>
-    @if ($index !== paneList().length - 1) {
-        <mona-splitter-resizer [orientation]="orientation()" [previousResizer]="$index===0?null:resizerList()?.[$index]??null"
-                               [nextResizer]="$index===resizerCount()-1?null:resizerList()?.[$index+1]??null"
-                               [previousPane]="pane" [panes]="paneList()" [ngStyle]="{'order': $index*2+1}">
+    @if ($index !== $count - 1) {
+        <mona-splitter-resizer
+                [nextPane]="paneList()[ $index + 1 ]"
+                [orientation]="orientation()"
+                [previousPane]="paneList()[ $index ]">
         </mona-splitter-resizer>
     }
 }
