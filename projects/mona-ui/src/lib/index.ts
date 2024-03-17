@@ -163,12 +163,10 @@ export * from "./layout/stepper/directives/stepper-step-template.directive";
 export * from "./layout/stepper/components/stepper/stepper.component";
 
 /** Splitter */
-export * from "./layout/splitter/components/splitter/splitter.component";
-export * from "./layout/splitter/components/splitter-pane/splitter-pane.component";
 
 /** Neo Splitter */
-export * from "./layout/neo-splitter/components/neo-splitter/neo-splitter.component";
-export * from "./layout/neo-splitter/components/neo-splitter-pane/neo-splitter-pane.component";
+export * from "./layout/splitter/components/splitter/splitter.component";
+export * from "./layout/splitter/components/splitter-pane/splitter-pane.component";
 
 /* Tab Strip */
 export * from "./layout/tab-strip/models/TabCloseEvent";

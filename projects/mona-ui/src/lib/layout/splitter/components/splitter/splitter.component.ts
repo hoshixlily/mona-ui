@@ -1,66 +1,76 @@
-import { NgClass, NgStyle, NgTemplateOutlet } from "@angular/common";
+import { NgTemplateOutlet } from "@angular/common";
 import {
-    AfterContentInit,
     ChangeDetectionStrategy,
-    ChangeDetectorRef,
     Component,
     computed,
-    ContentChildren,
-    inject,
+    contentChildren,
     input,
     InputSignal,
-    QueryList,
-    signal,
-    Signal,
-    viewChildren,
-    WritableSignal
+    Signal
 } from "@angular/core";
+import { from, zip } from "@mirei/ts-collections";
 import { Orientation } from "../../../../models/Orientation";
 import { SplitterPaneComponent } from "../splitter-pane/splitter-pane.component";
 import { SplitterResizerComponent } from "../splitter-resizer/splitter-resizer.component";
 
 @Component({
     selector: "mona-splitter",
-    templateUrl: "./splitter.component.html",
-    styleUrls: ["./splitter.component.scss"],
-    changeDetection: ChangeDetectionStrategy.OnPush,
     standalone: true,
-    imports: [NgClass, NgStyle, NgTemplateOutlet, SplitterResizerComponent],
+    imports: [SplitterResizerComponent, NgTemplateOutlet],
+    templateUrl: "./splitter.component.html",
+    styleUrl: "./splitter.component.scss",
+    changeDetection: ChangeDetectionStrategy.OnPush,
     host: {
         class: "mona-splitter",
-        "[class.mona-splitter-horizontal]": "orientation() === 'horizontal'",
-        "[class.mona-splitter-vertical]": "orientation() === 'vertical'"
+        "[style.grid-template-columns]": "templateColumnStyles()",
+        "[style.grid-template-rows]": "templateRowStyles()"
     }
 })
-export class SplitterComponent implements AfterContentInit {
-    readonly #cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
-    protected readonly paneList: WritableSignal<SplitterPaneComponent[]> = signal<SplitterPaneComponent[]>([]);
-    protected readonly resizerCount: Signal<number> = computed(() => this.resizerList().length);
-    protected readonly resizerList = viewChildren(SplitterResizerComponent);
+export class SplitterComponent {
+    protected readonly autoSizedPane: Signal<SplitterPaneComponent | null> = computed(() => {
+        const panes = from(this.paneList());
+        if (!panes.any()) {
+            return null;
+        }
+        return panes.firstOrDefault(pane => pane.size() === "") ?? panes.last();
+    });
+    protected readonly resizerList: Signal<Iterable<{ size: string }>> = computed(() => {
+        const panes = this.paneList();
+        if (panes.length === 0) {
+            return [];
+        }
+        const resizerCount = from(panes).count() - 1;
+        const array = new Array(resizerCount).fill({ size: "4px" });
+        return [...array, { size: "" }];
+    });
+    protected readonly templateColumnStyles: Signal<string | undefined> = computed(() => {
+        const orientation = this.orientation();
+        if (orientation === "vertical") {
+            return undefined;
+        }
+        return this.getPaneSizeStyles();
+    });
+    protected readonly templateRowStyles: Signal<string | undefined> = computed(() => {
+        const orientation = this.orientation();
+        if (orientation === "horizontal") {
+            return undefined;
+        }
+        return this.getPaneSizeStyles();
+    });
+
     public orientation: InputSignal<Orientation> = input<Orientation>("horizontal");
+    public paneList = contentChildren(SplitterPaneComponent);
 
-    @ContentChildren(SplitterPaneComponent)
-    public paneComponents: QueryList<SplitterPaneComponent> = new QueryList<SplitterPaneComponent>();
-
-    public ngAfterContentInit(): void {
-        this.paneList.set(this.paneComponents.toArray());
-        this.paneComponents.changes.subscribe(() => {
-            this.paneList.set(this.paneComponents.toArray());
-        });
-
-        const staticPanes = this.paneList().filter(p => p.isStatic());
-        if (staticPanes.length === 0) {
-            const percentage = 100 / this.paneList.length;
-            this.paneList().forEach(p => {
-                p.setSize(`${percentage}%`);
-            });
-            return;
-        }
-        if (staticPanes.length === this.paneList.length) {
-            const lastPane = this.paneList()[this.paneList.length - 1];
-            lastPane.setSize(undefined);
-            lastPane.isStatic.set(false);
-        }
-        this.#cdr.detectChanges();
+    private getPaneSizeStyles(): string {
+        const paneList = this.paneList();
+        const resizerList = this.resizerList();
+        return zip(paneList, resizerList)
+            .select(([pane, resizer]) => {
+                const size = pane.uid === this.autoSizedPane()?.uid ? "1fr" : pane.size() || "1fr";
+                const sizeString = typeof size === "number" ? `${size}px` : size;
+                return `${sizeString} ${resizer.size}`;
+            })
+            .aggregate((acc, size) => `${acc} ${size}`, "")
+            .trim();
     }
 }

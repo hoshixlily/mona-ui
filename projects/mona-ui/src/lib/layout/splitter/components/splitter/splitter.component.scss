@@ -1,12 +1,3 @@
 .mona-splitter-pane {
-    flex: 1 1 auto;
     overflow: hidden;
-    &.mona-splitter-static {
-        flex-grow: 0;
-        flex-shrink: 0;
-    }
-    &.mona-splitter-hidden {
-        flex: 0 1 0 !important;
-        overflow: hidden !important;
-    }
 }

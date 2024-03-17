@@ -114,8 +114,8 @@ import {
     MultiSelectSummaryTagDirective,
     MultiSelectSummaryTagTemplateDirective,
     MultiSelectTagTemplateDirective,
-    NeoSplitterComponent,
-    NeoSplitterPaneComponent,
+    SplitterComponent,
+    SplitterPaneComponent,
     NodeCheckEvent,
     NodeClickEvent,
     NodeDragEndEvent,
@@ -149,8 +149,6 @@ import {
     SortDescriptor,
     SplitButtonComponent,
     SplitButtonTextTemplateDirective,
-    SplitterComponent,
-    SplitterPaneComponent,
     StepOptions,
     StepperComponent,
     StepperIndicatorTemplateDirective,
@@ -292,8 +290,6 @@ interface TreeNodeDataItem {
         SliderTickValueTemplateDirective,
         SplitButtonComponent,
         SplitButtonTextTemplateDirective,
-        SplitterComponent,
-        SplitterPaneComponent,
         StepperComponent,
         StepperIndicatorTemplateDirective,
         StepperLabelTemplateDirective,
@@ -330,8 +326,8 @@ interface TreeNodeDataItem {
         DropDownTreeNodeTemplateDirective,
         WindowComponent,
 
-        NeoSplitterComponent,
-        NeoSplitterPaneComponent
+        SplitterComponent,
+        SplitterPaneComponent
     ]
 })
 export class AppComponent implements OnInit {
