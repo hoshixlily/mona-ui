@@ -27,6 +27,13 @@ import { NeoSplitterResizerComponent } from "../neo-splitter-resizer/neo-splitte
     }
 })
 export class NeoSplitterComponent {
+    protected readonly autoSizedPane: Signal<NeoSplitterPaneComponent | null> = computed(() => {
+        const panes = from(this.paneList());
+        if (!panes.any()) {
+            return null;
+        }
+        return panes.firstOrDefault(pane => pane.size() === "") ?? panes.last();
+    });
     protected readonly resizerList: Signal<Iterable<{ size: string }>> = computed(() => {
         const panes = this.paneList();
         if (panes.length === 0) {
@@ -59,7 +66,7 @@ export class NeoSplitterComponent {
         const resizerList = this.resizerList();
         return zip(paneList, resizerList)
             .select(([pane, resizer]) => {
-                const size = pane.size() || "1fr";
+                const size = pane.uid === this.autoSizedPane()?.uid ? "1fr" : pane.size() || "1fr";
                 const sizeString = typeof size === "number" ? `${size}px` : size;
                 return `${sizeString} ${resizer.size}`;
             })

@@ -1509,9 +1509,6 @@ button[monaButton].mona-input-button {
     &-resizing {
         background-color: var(--mona-background-dark);
     }
-    & button {
-        z-index: 1;
-    }
 }
 
 .mona-neo-splitter-resizer-handle {

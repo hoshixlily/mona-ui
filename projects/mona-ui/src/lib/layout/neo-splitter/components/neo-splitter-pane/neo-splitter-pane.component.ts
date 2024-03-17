@@ -15,5 +15,5 @@ import { v4 } from "uuid";
 export class NeoSplitterPaneComponent {
     public readonly template: Signal<TemplateRef<any>> = viewChild.required(TemplateRef);
     public readonly uid: string = v4();
-    public size: ModelSignal<string | number> = model<string | number>("1fr");
+    public size: ModelSignal<string | number> = model<string | number>("");
 }
