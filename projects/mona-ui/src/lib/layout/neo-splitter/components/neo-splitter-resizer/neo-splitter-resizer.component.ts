@@ -19,8 +19,7 @@ import { NeoSplitterPaneComponent } from "../neo-splitter-pane/neo-splitter-pane
     selector: "mona-neo-splitter-resizer",
     standalone: true,
     imports: [FaIconComponent, ButtonDirective],
-    templateUrl: "./neo-splitter-resizer.component.html",
-    styleUrl: "./neo-splitter-resizer.component.scss",
+    template: ` <div class="mona-neo-splitter-resizer-handle"></div> `,
     changeDetection: ChangeDetectionStrategy.OnPush,
     host: {
         class: "mona-neo-splitter-resizer",
