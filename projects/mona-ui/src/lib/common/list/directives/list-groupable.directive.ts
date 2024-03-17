@@ -1,4 +1,4 @@
-import { Directive, Input, SkipSelf } from "@angular/core";
+import { Directive, effect, inject, input, Input, InputSignal, untracked } from "@angular/core";
 import { Selector } from "@mirei/ts-collections";
 import { GroupableOptions } from "../models/GroupableOptions";
 import { ListService } from "../services/list.service";
@@ -11,23 +11,36 @@ export class ListGroupableDirective<TData> {
     readonly #defaultOptions: GroupableOptions<TData, any> = {
         enabled: true
     };
-    @Input()
-    public set groupBy(value: string | Selector<TData, any> | null | undefined) {
-        this.listService.setGroupBy(value ?? "");
-    }
+    readonly #listService: ListService<TData> = inject(ListService);
 
-    @Input("monaListGroupable")
-    public set options(value: GroupableOptions<TData, any> | "") {
-        if (value === "") {
-            this.listService.setGroupableOptions(this.#defaultOptions);
-        } else {
-            this.listService.setGroupableOptions({
-                ...this.#defaultOptions,
-                ...value,
-                enabled: value.enabled ?? this.#defaultOptions.enabled
-            });
+    public groupBy: InputSignal<string | Selector<TData, any> | null | undefined> = input<
+        string | Selector<TData, any> | null | undefined
+    >();
+    public options: InputSignal<GroupableOptions<TData, any> | ""> = input<GroupableOptions<TData, any> | "">(
+        this.#defaultOptions,
+        {
+            alias: "monaListGroupable"
         }
-    }
+    );
 
-    public constructor(private readonly listService: ListService<TData>) {}
+    public constructor() {
+        effect(() => {
+            const options = this.options();
+            untracked(() => {
+                if (options === "") {
+                    this.#listService.setGroupableOptions(this.#defaultOptions);
+                } else {
+                    this.#listService.setGroupableOptions({
+                        ...this.#defaultOptions,
+                        ...options,
+                        enabled: options.enabled ?? this.#defaultOptions.enabled
+                    });
+                }
+            });
+        });
+        effect(() => {
+            const groupBy = this.groupBy();
+            untracked(() => this.#listService.setGroupBy(groupBy ?? ""));
+        });
+    }
 }

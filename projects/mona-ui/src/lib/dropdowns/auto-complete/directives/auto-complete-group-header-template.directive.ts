@@ -4,6 +4,4 @@ import { Directive } from "@angular/core";
     selector: "ng-template[monaAutoCompleteGroupHeaderTemplate]",
     standalone: true
 })
-export class AutoCompleteGroupHeaderTemplateDirective {
-    public constructor() {}
-}
+export class AutoCompleteGroupHeaderTemplateDirective {}

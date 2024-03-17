@@ -4,10 +4,11 @@ import { ListNavigableDirective } from "./list-navigable.directive";
 
 describe("ListNavigableDirective", () => {
     let directive: ListNavigableDirective<any>;
-    let listService: ListService<any>;
     beforeEach(() => {
-        listService = TestBed.runInInjectionContext(() => new ListService());
-        directive = TestBed.runInInjectionContext(() => new ListNavigableDirective(listService));
+        TestBed.configureTestingModule({
+            providers: [ListService]
+        });
+        directive = TestBed.runInInjectionContext(() => new ListNavigableDirective());
     });
     it("should create an instance", () => {
         expect(directive).toBeTruthy();

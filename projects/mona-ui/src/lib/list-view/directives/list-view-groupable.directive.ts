@@ -1,4 +1,4 @@
-import { Directive, Input } from "@angular/core";
+import { Directive, effect, inject, input, Input, InputSignal, untracked } from "@angular/core";
 import { Selector } from "@mirei/ts-collections";
 import { GroupableOptions } from "../../common/list/models/GroupableOptions";
 import { ListService } from "../../common/list/services/list.service";
@@ -11,24 +11,39 @@ export class ListViewGroupableDirective<T> {
     readonly #defaultOptions: GroupableOptions<T, any> = {
         enabled: true
     };
+    readonly #listService: ListService<T> = inject(ListService);
 
-    @Input()
-    public set groupBy(value: string | Selector<T, any> | null | undefined) {
-        this.listService.setGroupBy(value ?? "");
-    }
+    public groupBy: InputSignal<Selector<T, any> | string | null | undefined> = input<
+        Selector<T, any> | string | null | undefined
+    >("");
 
-    @Input("monaListViewGroupable")
-    public set options(value: GroupableOptions<T, any> | "") {
-        if (value === "") {
-            this.listService.setGroupableOptions(this.#defaultOptions);
-        } else {
-            this.listService.setGroupableOptions({
-                ...this.#defaultOptions,
-                ...value,
-                enabled: value.enabled ?? this.#defaultOptions.enabled
-            });
+    public options: InputSignal<GroupableOptions<T, any> | ""> = input<GroupableOptions<T, any> | "">(
+        this.#defaultOptions,
+        {
+            alias: "monaListViewGroupable"
         }
-    }
+    );
 
-    public constructor(private readonly listService: ListService<T>) {}
+    public constructor() {
+        effect(() => {
+            const groupBy = this.groupBy();
+            untracked(() => {
+                this.#listService.setGroupBy(groupBy ?? "");
+            });
+        });
+        effect(() => {
+            const options = this.options();
+            untracked(() => {
+                if (options === "") {
+                    this.#listService.setGroupableOptions(this.#defaultOptions);
+                } else {
+                    this.#listService.setGroupableOptions({
+                        ...this.#defaultOptions,
+                        ...options,
+                        enabled: options.enabled ?? this.#defaultOptions.enabled
+                    });
+                }
+            });
+        });
+    }
 }

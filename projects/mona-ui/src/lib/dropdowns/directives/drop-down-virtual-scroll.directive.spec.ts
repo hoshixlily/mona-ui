@@ -4,10 +4,11 @@ import { DropDownVirtualScrollDirective } from "./drop-down-virtual-scroll.direc
 
 describe("DropDownVirtualScrollDirective", () => {
     let directive: DropDownVirtualScrollDirective<any>;
-    let listService: ListService<any>;
     beforeEach(() => {
-        listService = TestBed.runInInjectionContext(() => new ListService());
-        directive = TestBed.runInInjectionContext(() => new DropDownVirtualScrollDirective(listService));
+        TestBed.configureTestingModule({
+            providers: [ListService]
+        });
+        directive = TestBed.runInInjectionContext(() => new DropDownVirtualScrollDirective());
     });
     it("should create an instance", () => {
         expect(directive).toBeTruthy();

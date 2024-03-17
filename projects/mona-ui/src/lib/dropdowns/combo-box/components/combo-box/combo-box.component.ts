@@ -3,19 +3,22 @@ import {
     ChangeDetectionStrategy,
     Component,
     computed,
-    ContentChild,
+    contentChild,
     DestroyRef,
+    effect,
     ElementRef,
     forwardRef,
     inject,
     input,
-    Input,
     InputSignal,
+    model,
+    ModelSignal,
     OnInit,
     Signal,
     signal,
     TemplateRef,
-    ViewChild,
+    untracked,
+    viewChild,
     WritableSignal
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
@@ -92,7 +95,7 @@ import { ComboBoxNoDataTemplateDirective } from "../../directives/combo-box-no-d
         ListItemTemplateDirective
     ],
     host: {
-        "[class.mona-disabled]": "disabled",
+        "[class.mona-disabled]": "disabled()",
         "[class.mona-combo-box]": "true",
         "[class.mona-dropdown]": "true"
     }
@@ -100,6 +103,9 @@ import { ComboBoxNoDataTemplateDirective } from "../../directives/combo-box-no-d
 export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
+    readonly #listService: ListService<TData> = inject(ListService);
+    readonly #popupAnimationService: PopupAnimationService = inject(PopupAnimationService);
+    readonly #popupService: PopupService = inject(PopupService);
     readonly #popupUidClass: string = `mona-dropdown-popup-${v4()}`;
     #popupRef: PopupRef | null = null;
     #propagateChange: Action<TData | null> | null = null;
@@ -109,6 +115,35 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
     protected readonly dropdownIcon: IconDefinition = faChevronDown;
     protected readonly comboBoxValue$: Subject<string> = new Subject<string>();
     protected readonly comboBoxValue: WritableSignal<string> = signal("");
+    protected readonly footerTemplate: Signal<TemplateRef<any> | undefined> = contentChild(
+        ComboBoxFooterTemplateDirective,
+        {
+            read: TemplateRef
+        }
+    );
+    protected readonly groupHeaderTemplate: Signal<TemplateRef<any> | undefined> = contentChild(
+        ComboBoxGroupHeaderTemplateDirective,
+        { read: TemplateRef }
+    );
+    protected readonly headerTemplate: Signal<TemplateRef<any> | undefined> = contentChild(
+        ComboBoxHeaderTemplateDirective,
+        {
+            read: TemplateRef
+        }
+    );
+    protected readonly itemTemplate: Signal<TemplateRef<any> | undefined> = contentChild(
+        ComboBoxItemTemplateDirective,
+        {
+            read: TemplateRef
+        }
+    );
+    protected readonly noDataTemplate: Signal<TemplateRef<any> | undefined> = contentChild(
+        ComboBoxNoDataTemplateDirective,
+        {
+            read: TemplateRef
+        }
+    );
+    protected readonly popupTemplate: Signal<TemplateRef<any>> = viewChild.required("popupTemplate");
     protected readonly selectableOptions: SelectableOptions = {
         enabled: true,
         mode: "single",
@@ -118,74 +153,65 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
         return this.selectedListItem()?.data ?? null;
     });
     protected readonly selectedListItem: Signal<ListItem<TData> | null> = computed(() => {
-        return this.listService.selectedListItems().firstOrDefault();
+        return this.#listService.selectedListItems().firstOrDefault();
     });
     protected readonly valueText: Signal<string> = computed(() => {
         const listItem = this.selectedListItem();
         if (!listItem) {
             return "";
         }
-        return this.listService.getItemText(listItem);
+        return this.#listService.getItemText(listItem);
     });
 
     public allowCustomValue: InputSignal<boolean> = input(false);
+    public data: InputSignal<Iterable<TData>> = input<Iterable<TData>>([]);
+    public disabled: ModelSignal<boolean> = model<boolean>(false);
+    public itemDisabled: InputSignal<string | Predicate<TData> | null | undefined> = input<
+        string | Predicate<TData> | null | undefined
+    >("");
     public placeholder: InputSignal<string> = input("");
     public showClearButton: InputSignal<boolean> = input(false);
+    public textField: InputSignal<string | Selector<TData, string> | null | undefined> = input<
+        string | Selector<TData, string> | null | undefined
+    >("");
+    public valueField: InputSignal<string | Selector<TData, any> | null | undefined> = input<
+        string | Selector<TData, any> | null | undefined
+    >("");
     public valueNormalizer: InputSignal<Action<Observable<string>, Observable<any>>> = input(
         (text$: Observable<string>) => text$.pipe(map(value => value))
     );
 
-    @Input()
-    public set data(value: Iterable<TData>) {
-        this.listService.setData(value);
+    public constructor() {
+        effect(() => {
+            const data = this.data();
+            untracked(() => {
+                this.#listService.setData(data);
+            });
+        });
+        effect(() => {
+            const itemDisabled = this.itemDisabled();
+            untracked(() => {
+                this.#listService.setDisabledBy(itemDisabled ?? "");
+            });
+        });
+        effect(() => {
+            const textField = this.textField();
+            untracked(() => {
+                this.#listService.setTextField(textField ?? "");
+            });
+        });
+        effect(() => {
+            const valueField = this.valueField();
+            untracked(() => {
+                this.#listService.setValueField(valueField ?? "");
+            });
+        });
     }
-
-    @Input()
-    public disabled: boolean = false;
-
-    @ContentChild(ComboBoxFooterTemplateDirective, { read: TemplateRef })
-    public footerTemplate: TemplateRef<any> | null = null;
-
-    @ContentChild(ComboBoxGroupHeaderTemplateDirective, { read: TemplateRef })
-    public groupHeaderTemplate: TemplateRef<any> | null = null;
-
-    @ContentChild(ComboBoxHeaderTemplateDirective, { read: TemplateRef })
-    public headerTemplate: TemplateRef<any> | null = null;
-
-    @Input()
-    public set itemDisabled(value: string | Predicate<TData> | null | undefined) {
-        this.listService.setDisabledBy(value ?? "");
-    }
-
-    @ContentChild(ComboBoxItemTemplateDirective, { read: TemplateRef })
-    public itemTemplate: TemplateRef<any> | null = null;
-
-    @ContentChild(ComboBoxNoDataTemplateDirective, { read: TemplateRef })
-    public noDataTemplate: TemplateRef<any> | null = null;
-
-    @ViewChild("popupTemplate")
-    public popupTemplate!: TemplateRef<any>;
-
-    @Input()
-    public set textField(value: string | Selector<TData, string> | null | undefined) {
-        this.listService.setTextField(value ?? "");
-    }
-
-    @Input()
-    public set valueField(value: string | Selector<TData, any> | null | undefined) {
-        this.listService.setValueField(value ?? "");
-    }
-
-    public constructor(
-        private readonly listService: ListService<TData>,
-        private readonly popupAnimationService: PopupAnimationService,
-        private readonly popupService: PopupService
-    ) {}
 
     public clearValue(event: MouseEvent): void {
         event.stopImmediatePropagation();
         this.updateValue(null);
-        this.listService.clearSelections();
+        this.#listService.clearSelections();
         this.#propagateChange?.(null);
         this.comboBoxValue.set("");
     }
@@ -211,13 +237,13 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
             if (item && this.comboBoxValue() === this.valueText()) {
                 this.updateValue(item);
             } else if (item && this.comboBoxValue() !== this.valueText()) {
-                const targetItem = this.listService
+                const targetItem = this.#listService
                     .viewItems()
                     .firstOrDefault(i =>
-                        this.listService.getItemText(i).toLowerCase().startsWith(this.comboBoxValue().toLowerCase())
+                        this.#listService.getItemText(i).toLowerCase().startsWith(this.comboBoxValue().toLowerCase())
                     );
                 if (targetItem) {
-                    this.listService.selectItem(targetItem);
+                    this.#listService.selectItem(targetItem);
                     this.updateValue(targetItem.data);
                 } else if (this.allowCustomValue()) {
                     this.handleCustomValue();
@@ -238,19 +264,14 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
         }
     }
 
-    public onSelectedKeysChange(keys: Array<any>): void {
-        const item = this.selectedDataItem();
-        this.updateValue(item);
-    }
-
     public open(): void {
         this.focus();
         if (this.#popupRef) {
             return;
         }
-        this.#popupRef = this.popupService.create({
+        this.#popupRef = this.#popupService.create({
             anchor: this.#hostElementRef.nativeElement,
-            content: this.popupTemplate,
+            content: this.popupTemplate(),
             hasBackdrop: false,
             closeOnOutsideClick: false,
             withPush: false,
@@ -259,8 +280,8 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
             positions: DropDownService.getDefaultPositions()
         });
         this.notifyValueChangeOnPopupClose();
-        this.popupAnimationService.setupDropdownOutsideClickCloseAnimation(this.#popupRef);
-        this.popupAnimationService.animateDropdown(this.#popupRef, AnimationState.Show);
+        this.#popupAnimationService.setupDropdownOutsideClickCloseAnimation(this.#popupRef);
+        this.#popupAnimationService.animateDropdown(this.#popupRef, AnimationState.Show);
         window.setTimeout(() => {
             const input = this.#hostElementRef.nativeElement.querySelector("input");
             if (input) {
@@ -270,7 +291,7 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
         });
         this.#popupRef.closed.pipe(take(1)).subscribe(() => {
             this.#popupRef = null;
-            this.listService.clearFilter();
+            this.#listService.clearFilter();
             const popupElement = document.querySelector(`.${this.#popupUidClass}`);
             if (DropDownService.shouldFocusAfterClose(this.#hostElementRef.nativeElement, popupElement)) {
                 this.focus();
@@ -287,13 +308,13 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
     }
 
     public setDisabledState(isDisabled: boolean): void {
-        this.disabled = isDisabled;
+        this.disabled.set(isDisabled);
     }
 
     public writeValue(obj: TData): void {
         this.updateValue(obj);
         if (obj != null) {
-            this.listService.setSelectedDataItems([obj]);
+            this.#listService.setSelectedDataItems([obj]);
             this.comboBoxValue.set(this.valueText());
         }
     }
@@ -305,7 +326,7 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
     private handleArrowKeys(event: KeyboardEvent): void {
         const previousItem = this.selectedListItem();
         const direction = event.key === "ArrowDown" ? "next" : "previous";
-        const listItem = this.listService.navigate(direction, "select");
+        const listItem = this.#listService.navigate(direction, "select");
         if (!listItem || previousItem === listItem) {
             return;
         }
@@ -319,30 +340,30 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
         this.valueNormalizer()(of(this.comboBoxValue()))
             .pipe(take(1))
             .subscribe(normalizedValue => {
-                this.listService.addNewDataItems([normalizedValue]);
-                const item = this.listService
+                this.#listService.addNewDataItems([normalizedValue]);
+                const item = this.#listService
                     .viewItems()
-                    .where(i => !i.header && !this.listService.isDisabled(i))
+                    .where(i => !i.header && !this.#listService.isDisabled(i))
                     .firstOrDefault(
-                        i => this.listService.getItemText(i).toLowerCase() === this.comboBoxValue().toLowerCase()
+                        i => this.#listService.getItemText(i).toLowerCase() === this.comboBoxValue().toLowerCase()
                     );
                 if (item) {
-                    this.listService.selectItem(item);
+                    this.#listService.selectItem(item);
                     this.updateValue(item.data);
                 }
             });
     }
 
     private initialize(): void {
-        this.listService.setNavigableOptions({ enabled: true, mode: "select" });
-        this.listService.setSelectableOptions(this.selectableOptions);
-        this.listService.filterInputVisible.set(false);
+        this.#listService.setNavigableOptions({ enabled: true, mode: "select" });
+        this.#listService.setSelectableOptions(this.selectableOptions);
+        this.#listService.filterInputVisible.set(false);
         this.comboBoxValue.set(this.valueText());
     }
 
     private notifyFilterChange(filter: string): FilterChangeEvent {
         const event = new FilterChangeEvent(filter);
-        this.listService.filterChange.emit(event);
+        this.#listService.filterChange.emit(event);
         return event;
     }
 
@@ -358,7 +379,7 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
             .pipe(
                 take(1),
                 withLatestFrom(
-                    this.listService.selectionChange$.pipe(distinctUntilChanged((s1, s2) => s1.data === s2.data))
+                    this.#listService.selectionChange$.pipe(distinctUntilChanged((s1, s2) => s1.data === s2.data))
                 )
             )
             .subscribe(() => {
@@ -391,8 +412,8 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
     }
 
     private setSubscriptions(): void {
-        const debounce = this.listService.filterableOptions().enabled
-            ? this.listService.filterableOptions().debounce
+        const debounce = this.#listService.filterableOptions().enabled
+            ? this.#listService.filterableOptions().debounce
             : 0;
         this.comboBoxValue$
             .pipe(
@@ -406,25 +427,29 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
                 distinctUntilChanged()
             )
             .subscribe(value => {
-                if (this.listService.filterableOptions().enabled) {
+                if (this.#listService.filterableOptions().enabled) {
                     const event = this.notifyFilterChange(value);
                     if (!event.isDefaultPrevented()) {
-                        this.listService.setFilter(value);
+                        this.#listService.setFilter(value);
                     }
                 }
-                const item = this.listService
+                const item = this.#listService
                     .viewItems()
-                    .where(i => !i.header && !this.listService.isDisabled(i))
+                    .where(i => !i.header && !this.#listService.isDisabled(i))
                     .firstOrDefault(i => {
-                        return this.listService.getItemText(i).toLowerCase().includes(value.toLowerCase());
+                        return this.#listService.getItemText(i).toLowerCase().includes(value.toLowerCase());
                     });
                 if (item) {
-                    this.listService.clearSelections();
-                    this.listService.highlightedItem.set(item);
-                    this.listService.scrollToItem$.next(item);
+                    this.#listService.clearSelections();
+                    this.#listService.highlightedItem.set(item);
+                    this.#listService.scrollToItem$.next(item);
                 }
                 this.comboBoxValue.set(value);
             });
+        this.#listService.selectedKeysChange.subscribe(() => {
+            const item = this.selectedDataItem();
+            this.updateValue(item);
+        });
     }
 
     private updateValue(value: TData | null) {

@@ -2,19 +2,23 @@ import { CommonModule } from "@angular/common";
 import {
     Component,
     computed,
-    ContentChild,
+    contentChild,
     DestroyRef,
     effect,
     ElementRef,
     forwardRef,
     inject,
     Injector,
-    Input,
+    input,
+    InputSignal,
+    model,
+    ModelSignal,
     OnInit,
     Signal,
     signal,
     TemplateRef,
-    ViewChild,
+    untracked,
+    viewChild,
     WritableSignal
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
@@ -79,25 +83,53 @@ import { DropDownTreeService } from "../../services/drop-down-tree.service";
         }
     ],
     host: {
-        "[class.mona-disabled]": "disabled",
+        "[class.mona-disabled]": "disabled()",
         "[class.mona-dropdown]": "true",
         "[class.mona-dropdown-tree]": "true",
-        "[attr.tabindex]": "disabled ? null : 0"
+        "[attr.tabindex]": "disabled() ? null : 0"
     }
 })
 export class DropDownTreeComponent<T> implements ControlValueAccessor, OnInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
     readonly #injector: Injector = inject(Injector);
+    readonly #popupAnimationService: PopupAnimationService = inject(PopupAnimationService);
+    readonly #popupService: PopupService = inject(PopupService);
     readonly #popupUidClass: string = `mona-dropdown-popup-${v4()}`;
     readonly #selectedNode: Signal<TreeNode<T> | null> = computed(() => {
         return this.treeService.selectedNodes().firstOrDefault();
     });
+
     #popupRef: PopupRef | null = null;
     #propagateChange: Action<any> | null = null;
     #value: WritableSignal<any | null> = signal(null);
     protected readonly clearIcon: IconDefinition = faTimes;
     protected readonly dropdownIcon: IconDefinition = faChevronDown;
+    protected readonly footerTemplate: Signal<TemplateRef<any> | undefined> = contentChild(
+        DropDownTreeFooterTemplateDirective,
+        {
+            read: TemplateRef
+        }
+    );
+    protected readonly headerTemplate: Signal<TemplateRef<any> | undefined> = contentChild(
+        DropDownTreeHeaderTemplateDirective,
+        {
+            read: TemplateRef
+        }
+    );
+    protected readonly noDataTemplate: Signal<TemplateRef<any> | undefined> = contentChild(
+        DropDownTreeNoDataTemplateDirective,
+        {
+            read: TemplateRef
+        }
+    );
+    protected readonly nodeTemplate: Signal<TemplateRef<any> | undefined> = contentChild(
+        DropDownTreeNodeTemplateDirective,
+        {
+            read: TemplateRef
+        }
+    );
+    protected readonly popupTemplate: Signal<TemplateRef<any>> = viewChild.required(TemplateRef);
     protected readonly selectableOptions: SelectableOptions = {
         enabled: true,
         mode: "single",
@@ -111,50 +143,42 @@ export class DropDownTreeComponent<T> implements ControlValueAccessor, OnInit {
         }
         return this.treeService.getNodeText(node);
     });
+    protected readonly treeService: TreeService<T> = inject(TreeService);
 
-    @Input()
-    public set children(value: string | Selector<T, Iterable<T> | Observable<Iterable<T>>>) {
-        this.treeService.setChildrenSelector(value);
+    public children: InputSignal<string | Selector<T, Iterable<T> | Observable<Iterable<T>>>> = input<
+        string | Selector<T, Iterable<T> | Observable<Iterable<T>>>
+    >("");
+    public data: InputSignal<Iterable<T>> = input<Iterable<T>>([]);
+    public disabled: ModelSignal<boolean> = model<boolean>(false);
+    public textField: InputSignal<string | null | undefined> = input<string | null | undefined>("");
+    public valueField: InputSignal<string | null | undefined> = input<string | null | undefined>(null);
+
+    public constructor() {
+        effect(() => {
+            const children = this.children();
+            untracked(() => {
+                this.treeService.setChildrenSelector(children);
+            });
+        });
+        effect(() => {
+            const data = this.data();
+            untracked(() => {
+                this.treeService.setData(data);
+            });
+        });
+        effect(() => {
+            const textField = this.textField();
+            untracked(() => {
+                this.treeService.setTextField(textField ?? "");
+            });
+        });
+        effect(() => {
+            const valueField = this.valueField();
+            untracked(() => {
+                this.treeService.setSelectBy(valueField ?? null);
+            });
+        });
     }
-
-    @Input()
-    public set data(value: Iterable<T>) {
-        this.treeService.setData(value);
-    }
-
-    @Input()
-    public disabled: boolean = false;
-
-    @ContentChild(DropDownTreeFooterTemplateDirective, { read: TemplateRef })
-    public footerTemplate: TemplateRef<any> | null = null;
-
-    @ContentChild(DropDownTreeHeaderTemplateDirective, { read: TemplateRef })
-    public headerTemplate: TemplateRef<any> | null = null;
-
-    @ContentChild(DropDownTreeNoDataTemplateDirective, { read: TemplateRef })
-    public noDataTemplate: TemplateRef<any> | null = null;
-
-    @ContentChild(DropDownTreeNodeTemplateDirective, { read: TemplateRef })
-    public nodeTemplate: TemplateRef<any> | null = null;
-
-    @ViewChild("popupTemplate")
-    public popupTemplate!: TemplateRef<any>;
-
-    @Input()
-    public set textField(value: string | null | undefined) {
-        this.treeService.setTextField(value ?? "");
-    }
-
-    @Input()
-    public set valueField(valueField: string | null | undefined) {
-        this.treeService.setSelectBy(valueField ?? null);
-    }
-
-    public constructor(
-        private readonly popupAnimationService: PopupAnimationService,
-        private readonly popupService: PopupService,
-        protected readonly treeService: TreeService<T>
-    ) {}
 
     public close(): void {
         this.#popupRef?.close();
@@ -179,9 +203,9 @@ export class DropDownTreeComponent<T> implements ControlValueAccessor, OnInit {
         if (this.#popupRef) {
             return;
         }
-        this.#popupRef = this.popupService.create({
+        this.#popupRef = this.#popupService.create({
             anchor: this.#hostElementRef.nativeElement,
-            content: this.popupTemplate,
+            content: this.popupTemplate(),
             hasBackdrop: false,
             withPush: false,
             width: this.#hostElementRef.nativeElement.getBoundingClientRect().width,
@@ -190,8 +214,8 @@ export class DropDownTreeComponent<T> implements ControlValueAccessor, OnInit {
             positions: DropDownService.getDefaultPositions()
         });
         this.focusSelectedNode();
-        this.popupAnimationService.setupDropdownOutsideClickCloseAnimation(this.#popupRef);
-        this.popupAnimationService.animateDropdown(this.#popupRef, AnimationState.Show);
+        this.#popupAnimationService.setupDropdownOutsideClickCloseAnimation(this.#popupRef);
+        this.#popupAnimationService.animateDropdown(this.#popupRef, AnimationState.Show);
         this.#popupRef.closed.pipe(take(1)).subscribe(() => {
             this.#popupRef = null;
             this.treeService.clearFilter();
@@ -207,6 +231,10 @@ export class DropDownTreeComponent<T> implements ControlValueAccessor, OnInit {
     }
 
     public registerOnTouched(fn: any): void {}
+
+    public setDisabledState(isDisabled: boolean): void {
+        this.disabled.set(isDisabled);
+    }
 
     public writeValue(obj: any | null) {
         this.#value.set(obj);
@@ -307,7 +335,7 @@ export class DropDownTreeComponent<T> implements ControlValueAccessor, OnInit {
         fromEvent<MouseEvent>(this.#hostElementRef.nativeElement, "click")
             .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe(() => {
-                if (this.disabled) {
+                if (this.disabled()) {
                     return;
                 }
                 this.open();

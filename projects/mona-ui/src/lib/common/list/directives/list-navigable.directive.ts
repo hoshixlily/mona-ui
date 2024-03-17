@@ -1,4 +1,4 @@
-import { Directive, Input } from "@angular/core";
+import { Directive, effect, inject, input, InputSignal, untracked } from "@angular/core";
 import { NavigableOptions } from "../models/NavigableOptions";
 import { ListService } from "../services/list.service";
 
@@ -12,17 +12,28 @@ export class ListNavigableDirective<TData> {
         mode: "select",
         wrap: false
     };
-    @Input("monaListNavigable")
-    public set options(value: Partial<NavigableOptions> | "") {
-        if (value === "") {
-            this.listService.setNavigableOptions(this.#defaultOptions);
-        } else {
-            this.listService.setNavigableOptions({
-                ...this.#defaultOptions,
-                ...value
-            });
-        }
-    }
+    readonly #listService: ListService<TData> = inject(ListService);
 
-    public constructor(private readonly listService: ListService<TData>) {}
+    public options: InputSignal<Partial<NavigableOptions> | ""> = input<Partial<NavigableOptions> | "">(
+        this.#defaultOptions,
+        {
+            alias: "monaListNavigable"
+        }
+    );
+
+    public constructor() {
+        effect(() => {
+            const options = this.options();
+            untracked(() => {
+                if (options === "") {
+                    this.#listService.setNavigableOptions(this.#defaultOptions);
+                } else {
+                    this.#listService.setNavigableOptions({
+                        ...this.#defaultOptions,
+                        ...options
+                    });
+                }
+            });
+        });
+    }
 }

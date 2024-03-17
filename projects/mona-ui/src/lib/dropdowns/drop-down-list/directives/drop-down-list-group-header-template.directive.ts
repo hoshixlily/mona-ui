@@ -4,6 +4,4 @@ import { Directive } from "@angular/core";
     selector: "ng-template[monaDropDownListGroupHeaderTemplate]",
     standalone: true
 })
-export class DropDownListGroupHeaderTemplateDirective {
-    public constructor() {}
-}
+export class DropDownListGroupHeaderTemplateDirective {}

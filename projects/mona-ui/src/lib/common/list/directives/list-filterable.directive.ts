@@ -1,4 +1,14 @@
-import { Directive, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import {
+    Directive,
+    effect,
+    inject,
+    input,
+    InputSignal,
+    OnInit,
+    output,
+    OutputEmitterRef,
+    untracked
+} from "@angular/core";
 import { FilterChangeEvent } from "../../filter-input/models/FilterChangeEvent";
 import { FilterableOptions } from "../../models/FilterableOptions";
 import { ListService } from "../services/list.service";
@@ -14,34 +24,47 @@ export class ListFilterableDirective<TData> implements OnInit {
         debounce: 0,
         caseSensitive: false
     };
-    @Input()
-    public set filter(value: string) {
-        this.listService.setFilter(value);
-    }
+    readonly #listService: ListService<TData> = inject(ListService);
 
-    @Output()
-    public filterChange: EventEmitter<FilterChangeEvent> = new EventEmitter<FilterChangeEvent>();
-
-    @Input()
-    public set filterPlaceholder(value: string) {
-        this.listService.setFilterPlaceholder(value);
-    }
-
-    @Input("monaListFilterable")
-    public set options(value: Partial<FilterableOptions> | "") {
-        if (value === "") {
-            this.listService.setFilterableOptions(this.#defaultOptions);
-        } else {
-            this.listService.setFilterableOptions({
-                ...this.#defaultOptions,
-                ...value
-            });
+    public filter: InputSignal<string> = input<string>("");
+    public filterChange: OutputEmitterRef<FilterChangeEvent> = output();
+    public filterPlaceholder: InputSignal<string> = input<string>("");
+    public options: InputSignal<Partial<FilterableOptions> | ""> = input<Partial<FilterableOptions> | "">(
+        this.#defaultOptions,
+        {
+            alias: "monaListFilterable"
         }
-    }
+    );
 
-    public constructor(private readonly listService: ListService<TData>) {}
+    public constructor() {
+        effect(() => {
+            const filter = this.filter();
+            untracked(() => {
+                this.#listService.setFilter(filter);
+            });
+        });
+        effect(() => {
+            const filterPlaceholder = this.filterPlaceholder();
+            untracked(() => {
+                this.#listService.setFilterPlaceholder(filterPlaceholder);
+            });
+        });
+        effect(() => {
+            const options = this.options();
+            untracked(() => {
+                if (options === "") {
+                    this.#listService.setFilterableOptions(this.#defaultOptions);
+                } else {
+                    this.#listService.setFilterableOptions({
+                        ...this.#defaultOptions,
+                        ...options
+                    });
+                }
+            });
+        });
+    }
 
     public ngOnInit(): void {
-        this.listService.filterChange = this.filterChange;
+        this.#listService.filterChange = this.filterChange;
     }
 }

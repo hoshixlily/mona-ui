@@ -1,4 +1,4 @@
-import { Directive, Input } from "@angular/core";
+import { Directive, effect, inject, input, InputSignal, untracked } from "@angular/core";
 import { VirtualScrollOptions } from "../models/VirtualScrollOptions";
 import { ListService } from "../services/list.service";
 
@@ -11,17 +11,28 @@ export class ListVirtualScrollDirective<T> {
         enabled: true,
         height: 28
     };
-    @Input("monaListVirtualScroll")
-    public set options(value: Partial<VirtualScrollOptions> | "") {
-        if (value === "") {
-            this.listService.setVirtualScrollOptions(this.#defaultOptions);
-        } else {
-            this.listService.setVirtualScrollOptions({
-                ...this.#defaultOptions,
-                ...value
-            });
-        }
-    }
+    readonly #listService: ListService<T> = inject(ListService);
 
-    public constructor(private readonly listService: ListService<T>) {}
+    public options: InputSignal<Partial<VirtualScrollOptions> | ""> = input<Partial<VirtualScrollOptions> | "">(
+        this.#defaultOptions,
+        {
+            alias: "monaListVirtualScroll"
+        }
+    );
+
+    public constructor() {
+        effect(() => {
+            const options = this.options();
+            untracked(() => {
+                if (options === "") {
+                    this.#listService.setVirtualScrollOptions(this.#defaultOptions);
+                } else {
+                    this.#listService.setVirtualScrollOptions({
+                        ...this.#defaultOptions,
+                        ...options
+                    });
+                }
+            });
+        });
+    }
 }

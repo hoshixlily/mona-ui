@@ -297,12 +297,12 @@
                                                      [itemDisabled]="dropdownItemDisabler"
                                                      (ngModelChange)="onDropDownValueChange($event)"
                                                      style="width: 200px; ">
-                                    <ng-template monaDropDownListItemTemplate let-dataItem>
-                                        <span style="color: #ffcc75;"
-                                              *ngIf="dataItem.value % 3 === 0">{{dataItem.text}}</span>
-                                        <span style="color: #F03193;"
-                                              *ngIf="dataItem.value % 3 !== 0">{{dataItem.text}}</span>
-                                    </ng-template>
+<!--                                    <ng-template monaDropDownListItemTemplate let-dataItem>-->
+<!--                                        <span style="color: #ffcc75;"-->
+<!--                                              *ngIf="dataItem.value % 3 === 0">{{dataItem.text}}</span>-->
+<!--                                        <span style="color: #F03193;"-->
+<!--                                              *ngIf="dataItem.value % 3 !== 0">{{dataItem.text}}</span>-->
+<!--                                    </ng-template>-->
                                     <ng-template monaDropDownListValueTemplate let-dataItem>
                                         <span style="color: darkorange; font-weight: 600;">{{dataItem?.text}}</span>
                                     </ng-template>
@@ -619,11 +619,11 @@
                                 </mona-fieldset>
 
                                 <mona-list-view [items]="listViewDataItems|monaSlice:0:listViewScrollBottomItemCount"
-                                                textField="text"
+                                                [textField]="listViewTextField"
                                                 [height]="350"
                                                 [monaListViewSelectable]="{enabled: true, mode: 'single', toggleable: true}"
                                                 [monaListViewVirtualScroll]="{enabled: true, height: 28}"
-                                                monaListViewGroupable [groupBy]="'group'"
+                                                monaListViewGroupable [groupBy]="listViewGroupBy"
                                                 (scrollBottom)="onListViewScrollBottom($event)"
                                                 [selectedKeys]="listViewSelectedKeys" selectionKey="text"
                                                 (selectedKeysChange)="onListViewSelectionChange($event)"
@@ -632,11 +632,11 @@
                                     <ng-template monaListViewHeaderTemplate>
                                         <div style="padding: 4px 8px; font-weight: 600; border-bottom: 1px solid var(--mona-border-color);">List of Products</div>
                                     </ng-template>
-                                    <ng-template monaListViewItemTemplate let-dataItem>
-                                        <div style="color: #32BEA6;">
-                                            {{dataItem.text}}
-                                        </div>
-                                    </ng-template>
+<!--                                    <ng-template monaListViewItemTemplate let-dataItem>-->
+<!--                                        <div style="color: #32BEA6;">-->
+<!--                                            {{dataItem.text}}-->
+<!--                                        </div>-->
+<!--                                    </ng-template>-->
                                     <ng-template monaListViewFooterTemplate>
                                         <div style="padding: 4px 8px; font-weight: 600; border-top: 1px solid var(--mona-border-color);">
                                             <span style="color: var(--mona-primary-light);">{{listViewDataItems.length}}</span> items | <span style="color: #FF3055;">{{listViewSelectedKeys.size}}</span> selected

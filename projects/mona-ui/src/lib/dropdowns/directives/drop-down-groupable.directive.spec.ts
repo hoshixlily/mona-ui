@@ -4,10 +4,11 @@ import { DropDownGroupableDirective } from "./drop-down-groupable.directive";
 
 describe("DropDownGroupableDirective", () => {
     let directive: DropDownGroupableDirective<any>;
-    let listService: ListService<any>;
     beforeEach(() => {
-        listService = TestBed.runInInjectionContext(() => new ListService());
-        directive = TestBed.runInInjectionContext(() => new DropDownGroupableDirective(listService));
+        TestBed.configureTestingModule({
+            providers: [ListService]
+        });
+        directive = TestBed.runInInjectionContext(() => new DropDownGroupableDirective());
     });
     it("should create an instance", () => {
         expect(directive).toBeTruthy();

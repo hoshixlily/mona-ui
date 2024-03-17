@@ -4,10 +4,11 @@ import { ListViewGroupableDirective } from "./list-view-groupable.directive";
 
 describe("ListViewGroupableDirective", () => {
     let directive: ListViewGroupableDirective<any>;
-    let listService: ListService<any>;
     beforeEach(() => {
-        listService = TestBed.runInInjectionContext(() => new ListService());
-        directive = TestBed.runInInjectionContext(() => new ListViewGroupableDirective(listService));
+        TestBed.configureTestingModule({
+            providers: [ListService]
+        });
+        directive = TestBed.runInInjectionContext(() => new ListViewGroupableDirective());
     });
     it("should create an instance", () => {
         expect(directive).toBeTruthy();

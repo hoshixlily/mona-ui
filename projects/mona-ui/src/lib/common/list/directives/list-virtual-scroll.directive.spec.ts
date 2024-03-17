@@ -4,10 +4,11 @@ import { ListVirtualScrollDirective } from "./list-virtual-scroll.directive";
 
 describe("ListVirtualScrollDirective", () => {
     let directive: ListVirtualScrollDirective<any>;
-    let listService: ListService<any>;
     beforeEach(() => {
-        listService = TestBed.runInInjectionContext(() => new ListService());
-        directive = TestBed.runInInjectionContext(() => new ListVirtualScrollDirective(listService));
+        TestBed.configureTestingModule({
+            providers: [ListService]
+        });
+        directive = TestBed.runInInjectionContext(() => new ListVirtualScrollDirective());
     });
     it("should create an instance", () => {
         expect(directive).toBeTruthy();

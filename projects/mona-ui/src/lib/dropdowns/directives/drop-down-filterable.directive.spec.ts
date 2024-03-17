@@ -4,10 +4,11 @@ import { DropDownFilterableDirective } from "./drop-down-filterable.directive";
 
 describe("DropDownFilterableDirective", () => {
     let directive: DropDownFilterableDirective<any>;
-    let listService: ListService<any>;
     beforeEach(() => {
-        listService = TestBed.runInInjectionContext(() => new ListService());
-        directive = TestBed.runInInjectionContext(() => new DropDownFilterableDirective(listService));
+        TestBed.configureTestingModule({
+            providers: [ListService]
+        });
+        directive = TestBed.runInInjectionContext(() => new DropDownFilterableDirective());
     });
     it("should create an instance", () => {
         expect(directive).toBeTruthy();

@@ -4,10 +4,11 @@ import { ListSelectableDirective } from "./list-selectable.directive";
 
 describe("ListSelectableDirective", () => {
     let directive: ListSelectableDirective<any>;
-    let listService: ListService<any>;
     beforeEach(() => {
-        listService = TestBed.runInInjectionContext(() => new ListService());
-        directive = TestBed.runInInjectionContext(() => new ListSelectableDirective(listService));
+        TestBed.configureTestingModule({
+            providers: [ListService]
+        });
+        directive = TestBed.runInInjectionContext(() => new ListSelectableDirective());
     });
     it("should create an instance", () => {
         expect(directive).toBeTruthy();

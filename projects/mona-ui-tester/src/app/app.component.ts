@@ -24,7 +24,7 @@ import {
     faSun,
     faTimes
 } from "@fortawesome/free-solid-svg-icons";
-import { Enumerable, ImmutableList, ImmutableSet, IndexableList } from "@mirei/ts-collections";
+import { Enumerable, ImmutableList, ImmutableSet, List, Selector } from "@mirei/ts-collections";
 import { DateTime } from "luxon";
 import {
     AutoCompleteComponent,
@@ -73,6 +73,7 @@ import {
     DropDownTreeHeaderTemplateDirective,
     DropDownTreeNoDataTemplateDirective,
     DropDownTreeNodeTemplateDirective,
+    DropDownVirtualScrollDirective,
     ExpansionPanelActionsTemplateDirective,
     ExpansionPanelComponent,
     ExpansionPanelTitleTemplateDirective,
@@ -114,8 +115,6 @@ import {
     MultiSelectSummaryTagDirective,
     MultiSelectSummaryTagTemplateDirective,
     MultiSelectTagTemplateDirective,
-    SplitterComponent,
-    SplitterPaneComponent,
     NodeCheckEvent,
     NodeClickEvent,
     NodeDragEndEvent,
@@ -149,6 +148,8 @@ import {
     SortDescriptor,
     SplitButtonComponent,
     SplitButtonTextTemplateDirective,
+    SplitterComponent,
+    SplitterPaneComponent,
     StepOptions,
     StepperComponent,
     StepperIndicatorTemplateDirective,
@@ -227,6 +228,7 @@ interface TreeNodeDataItem {
         DropDownButtonComponent,
         DropDownFilterableDirective,
         DropDownGroupableDirective,
+        DropDownVirtualScrollDirective,
         DropDownListComponent,
         DropDownListFooterTemplateDirective,
         DropDownListGroupHeaderTemplateDirective,
@@ -340,7 +342,7 @@ export class AppComponent implements OnInit {
     public readonly snowflakeIcon: IconDefinition = faSnowflake;
     public readonly starIcon: IconDefinition = faStar;
     public readonly sunIcon: IconDefinition = faSun;
-    public autoCompleteValue: string = "Yakizakana";
+    public autoCompleteValue: any = null;
     public breadcrumbItems: BreadcrumbItem[] = [
         { text: "Home", title: "Home" },
         { text: "Products", title: "Products" },
@@ -581,10 +583,12 @@ export class AppComponent implements OnInit {
         allowUnsort: true,
         showIndices: true
     };
-    public listBox2Items: IndexableList<any> = new IndexableList([] as any[]);
-    public listViewDataItems: IndexableList<any> = new IndexableList();
+    public listBox2Items: List<any> = new List([] as any[]);
+    public listViewDataItems: List<any> = new List();
+    public listViewGroupBy: string | Selector<any, any> | null = "group";
     public listViewScrollBottomItemCount: number = 20;
     public listViewSelectedKeys: Set<string> = new Set([]);
+    public listViewTextField: string = "text";
     public menuBarMenuVisible: boolean = false;
     public multiSelectTagCount: number = 2;
     public numericTextBoxValue: number | null = 10;
@@ -840,6 +844,8 @@ export class AppComponent implements OnInit {
 
         this.dropdownPartialPrimitiveDataItems = this.dropdownPrimitiveDataItems.slice();
 
+        this.autoCompleteValue = this.dropdownListDataItems.get(7);
+
         this.filterData();
 
         // window.setInterval(() => {
@@ -851,9 +857,11 @@ export class AppComponent implements OnInit {
         //     );
         // }, 3000);
 
-        // window.setInterval(() => {
-        //     this.updateTreeData();
-        // }, 2000);
+        window.setInterval(() => {
+            // this.updateTreeData();
+            // this.listViewTextField = this.listViewTextField === "text" ? "value" : "text";
+            // this.listViewGroupBy = this.listViewGroupBy === "group" ? (item: any) => item.value % 6 : "group";
+        }, 2000);
 
         // window.setInterval(() => {
         //     this.calendarMinValue.set(this.calendarMinValue() != null ? null : new Date(2023, 8, 11));
@@ -900,7 +908,7 @@ export class AppComponent implements OnInit {
         for (let vx = 1; vx <= 3000; ++vx) {
             listViewItems.push({ text: `Item ${vx}`, value: vx, group: vx % 3 === 0 ? "Group 1" : "Group 2" });
         }
-        this.listViewDataItems = new IndexableList(listViewItems);
+        this.listViewDataItems = new List(listViewItems);
         this.listViewSelectedKeys = new Set([
             "Item 3",
             "Item 5",
@@ -991,7 +999,7 @@ export class AppComponent implements OnInit {
         console.log(event);
     }
 
-    public onAutoCompleteValueChange(value: string): void {
+    public onAutoCompleteValueChange(value: any): void {
         this.autoCompleteValue = value;
         console.log("AutoComplete value changed: ", value);
     }

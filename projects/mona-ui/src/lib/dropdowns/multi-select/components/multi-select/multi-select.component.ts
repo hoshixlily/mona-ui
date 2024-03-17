@@ -3,20 +3,23 @@ import {
     ChangeDetectionStrategy,
     Component,
     computed,
-    ContentChild,
+    contentChild,
     DestroyRef,
+    effect,
     ElementRef,
     forwardRef,
     inject,
     input,
-    Input,
     InputSignal,
+    model,
+    ModelSignal,
     OnDestroy,
     OnInit,
     signal,
     Signal,
     TemplateRef,
-    ViewChild,
+    untracked,
+    viewChild,
     WritableSignal
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
@@ -79,15 +82,18 @@ import { MultiSelectTagTemplateDirective } from "../../directives/multi-select-t
         ListNoDataTemplateDirective
     ],
     host: {
-        "[class.mona-disabled]": "disabled",
+        "[class.mona-disabled]": "disabled()",
         "[class.mona-dropdown]": "true",
         "[class.mona-multi-select]": "true",
-        "[attr.tabindex]": "disabled ? null : 0"
+        "[attr.tabindex]": "disabled() ? null : 0"
     }
 })
 export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlValueAccessor {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
+    readonly #listService: ListService<TData> = inject(ListService);
+    readonly #popupAnimationService: PopupAnimationService = inject(PopupAnimationService);
+    readonly #popupService: PopupService = inject(PopupService);
     readonly #popupUidClass: string = `mona-dropdown-popup-${v4()}`;
     #popupRef: PopupRef | null = null;
     #propagateChange: Action<TData[]> | null = null;
@@ -96,13 +102,38 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
 
     protected readonly clearIcon: IconDefinition = faTimes;
     protected readonly dropdownIcon: IconDefinition = faChevronDown;
+    protected readonly footerTemplate: Signal<TemplateRef<any> | undefined> = contentChild(
+        MultiSelectFooterTemplateDirective,
+        { read: TemplateRef }
+    );
+    protected readonly groupHeaderTemplate: Signal<TemplateRef<any> | undefined> = contentChild(
+        MultiSelectGroupHeaderTemplateDirective,
+        { read: TemplateRef }
+    );
+    protected readonly headerTemplate: Signal<TemplateRef<any> | undefined> = contentChild(
+        MultiSelectHeaderTemplateDirective,
+        { read: TemplateRef }
+    );
+    protected readonly itemTemplate: Signal<TemplateRef<any> | undefined> = contentChild(
+        MultiSelectItemTemplateDirective,
+        { read: TemplateRef }
+    );
+    protected readonly noDataTemplate: Signal<TemplateRef<any> | undefined> = contentChild(
+        MultiSelectNoDataTemplateDirective,
+        { read: TemplateRef }
+    );
+    protected readonly popupTemplate: Signal<TemplateRef<any>> = viewChild.required("popupTemplate");
+    protected readonly tagTemplate: Signal<TemplateRef<any> | undefined> = contentChild(
+        MultiSelectTagTemplateDirective,
+        { read: TemplateRef }
+    );
     protected readonly selectedDataItems: Signal<ImmutableSet<TData>> = computed(() => {
         return this.selectedListItems()
             .select(i => i.data)
             .toImmutableSet();
     });
     protected readonly selectedListItems: Signal<ImmutableSet<ListItem<TData>>> = computed(() => {
-        return this.listService.selectedListItems();
+        return this.#listService.selectedListItems();
     });
     protected readonly summaryTagText: Signal<string> = computed(() => {
         const tagCount = this.tagCount();
@@ -121,7 +152,7 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
             .take(tagCount)
             .toImmutableDictionary(
                 i => i,
-                i => this.listService.getItemText(i)
+                i => this.#listService.getItemText(i)
             );
     });
     protected readonly visibleTagCount: Signal<number> = computed(() => {
@@ -135,62 +166,47 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
 
     public readonly summaryTagTemplate: WritableSignal<TemplateRef<any> | null> = signal(null);
     public readonly tagCount: WritableSignal<number> = signal(-1);
+
+    public data: InputSignal<Iterable<TData>> = input<Iterable<any>>([]);
+    public disabled: ModelSignal<boolean> = model<boolean>(false);
+    public itemDisabled: InputSignal<string | Predicate<TData> | null | undefined> = input<
+        string | Predicate<TData> | null | undefined
+    >(null);
     public showClearButton: InputSignal<boolean> = input(true);
+    public textField: InputSignal<string | null | undefined> = input<string | null | undefined>(null);
+    public valueField: InputSignal<string | null | undefined> = input<string | null | undefined>(null);
 
-    @Input()
-    public set data(value: Iterable<TData>) {
-        this.listService.setData(value);
+    public constructor() {
+        effect(() => {
+            const data = this.data();
+            untracked(() => {
+                this.#listService.setData(data);
+            });
+        });
+        effect(() => {
+            const itemDisabled = this.itemDisabled();
+            untracked(() => {
+                this.#listService.setDisabledBy(itemDisabled ?? "");
+            });
+        });
+        effect(() => {
+            const textField = this.textField();
+            untracked(() => {
+                this.#listService.setTextField(textField ?? "");
+            });
+        });
+        effect(() => {
+            const valueField = this.valueField();
+            untracked(() => {
+                this.#listService.setValueField(valueField ?? "");
+            });
+        });
     }
-
-    @Input()
-    public disabled: boolean = false;
-
-    @ContentChild(MultiSelectFooterTemplateDirective, { read: TemplateRef })
-    public footerTemplate: TemplateRef<any> | null = null;
-
-    @ContentChild(MultiSelectGroupHeaderTemplateDirective, { read: TemplateRef })
-    public groupHeaderTemplate: TemplateRef<any> | null = null;
-
-    @ContentChild(MultiSelectHeaderTemplateDirective, { read: TemplateRef })
-    public headerTemplate: TemplateRef<any> | null = null;
-
-    @Input()
-    public set itemDisabled(value: string | Predicate<TData> | null | undefined) {
-        this.listService.setDisabledBy(value ?? "");
-    }
-
-    @ContentChild(MultiSelectItemTemplateDirective, { read: TemplateRef })
-    public itemTemplate: TemplateRef<any> | null = null;
-
-    @ContentChild(MultiSelectNoDataTemplateDirective, { read: TemplateRef })
-    public noDataTemplate: TemplateRef<any> | null = null;
-
-    @ViewChild("popupTemplate")
-    public popupTemplate!: TemplateRef<any>;
-
-    @ContentChild(MultiSelectTagTemplateDirective, { read: TemplateRef })
-    public tagTemplate: TemplateRef<any> | null = null;
-
-    @Input()
-    public set textField(textField: string | null | undefined) {
-        this.listService.setTextField(textField ?? "");
-    }
-
-    @Input()
-    public set valueField(valueField: string | null | undefined) {
-        this.listService.setValueField(valueField ?? "");
-    }
-
-    public constructor(
-        private readonly listService: ListService<TData>,
-        private readonly popupAnimationService: PopupAnimationService,
-        private readonly popupService: PopupService
-    ) {}
 
     public clearValue(event: MouseEvent): void {
         event.stopImmediatePropagation();
         this.updateValue([]);
-        this.listService.clearSelections();
+        this.#listService.clearSelections();
         this.notifyValueChange();
     }
 
@@ -215,7 +231,7 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
 
     public onSelectedItemRemove(event: Event, listItem: ListItem<TData>): void {
         event.stopImmediatePropagation();
-        this.listService.deselectItems([listItem]);
+        this.#listService.deselectItems([listItem]);
         this.updateValue(this.selectedDataItems().toArray());
         this.notifyValueChange();
     }
@@ -226,7 +242,7 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
         const removedItems = this.selectedListItems()
             .takeLast(selectedItemCount - this.visibleTagCount())
             .toArray();
-        this.listService.deselectItems(removedItems);
+        this.#listService.deselectItems(removedItems);
         this.updateValue(this.selectedDataItems().toArray());
         this.notifyValueChange();
     }
@@ -236,22 +252,22 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
             return;
         }
         this.focus();
-        this.#popupRef = this.popupService.create({
+        this.#popupRef = this.#popupService.create({
             anchor: this.#hostElementRef.nativeElement,
             closeOnOutsideClick: false,
-            content: this.popupTemplate,
+            content: this.popupTemplate(),
             hasBackdrop: false,
             withPush: false,
             width: this.#hostElementRef.nativeElement.getBoundingClientRect().width,
             popupClass: ["mona-dropdown-popup-content", this.#popupUidClass],
             positions: DropDownService.getDefaultPositions()
         });
-        this.popupAnimationService.setupDropdownOutsideClickCloseAnimation(this.#popupRef);
-        this.popupAnimationService.animateDropdown(this.#popupRef, AnimationState.Show);
+        this.#popupAnimationService.setupDropdownOutsideClickCloseAnimation(this.#popupRef);
+        this.#popupAnimationService.animateDropdown(this.#popupRef, AnimationState.Show);
         this.#popupRef.closed.pipe(take(1)).subscribe(() => {
             this.#popupRef = null;
-            this.listService.highlightedItem.set(null);
-            this.listService.clearFilter();
+            this.#listService.highlightedItem.set(null);
+            this.#listService.clearFilter();
             const popupElement = document.querySelector(`.${this.#popupUidClass}`);
             if (DropDownService.shouldFocusAfterClose(this.#hostElementRef.nativeElement, popupElement)) {
                 this.focus();
@@ -266,13 +282,13 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
     public registerOnTouched(fn: any): void {}
 
     public setDisabledState(isDisabled: boolean): void {
-        this.disabled = isDisabled;
+        this.disabled.set(isDisabled);
     }
 
     public writeValue(data: any[]): void {
         this.updateValue(data ?? []);
         if (data != null) {
-            this.listService.setSelectedDataItems(data);
+            this.#listService.setSelectedDataItems(data);
         }
     }
 
@@ -282,9 +298,9 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
 
     private handleArrowKeys(event: KeyboardEvent): void {
         if (event.key === "ArrowDown") {
-            this.listService.navigate("next", "highlight");
+            this.#listService.navigate("next", "highlight");
         } else if (event.key === "ArrowUp") {
-            this.listService.navigate("previous", "highlight");
+            this.#listService.navigate("previous", "highlight");
         }
     }
 
@@ -293,23 +309,23 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
             this.open();
             return;
         }
-        const highlightedItem = this.listService.highlightedItem();
+        const highlightedItem = this.#listService.highlightedItem();
         if (!highlightedItem) {
             return;
         }
-        const selected = this.listService.isSelected(highlightedItem);
+        const selected = this.#listService.isSelected(highlightedItem);
         if (selected) {
-            this.listService.deselectItems([highlightedItem]);
+            this.#listService.deselectItems([highlightedItem]);
         } else {
-            this.listService.selectItem(highlightedItem);
+            this.#listService.selectItem(highlightedItem);
         }
         this.updateValue(this.selectedDataItems().toArray());
         this.notifyValueChange();
     }
 
     private initialize(): void {
-        this.listService.setNavigableOptions({ enabled: true, mode: "highlight", wrap: true });
-        this.listService.setSelectableOptions({
+        this.#listService.setNavigableOptions({ enabled: true, mode: "highlight", wrap: true });
+        this.#listService.setSelectableOptions({
             enabled: true,
             mode: "multiple"
         });
@@ -333,7 +349,7 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
         fromEvent<MouseEvent>(this.#hostElementRef.nativeElement, "click")
             .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe(() => {
-                if (this.disabled) {
+                if (this.disabled()) {
                     return;
                 }
                 this.open();

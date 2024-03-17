@@ -4,6 +4,4 @@ import { Directive } from "@angular/core";
     selector: "ng-template[monaComboBoxFooterTemplate]",
     standalone: true
 })
-export class ComboBoxFooterTemplateDirective {
-    public constructor() {}
-}
+export class ComboBoxFooterTemplateDirective {}

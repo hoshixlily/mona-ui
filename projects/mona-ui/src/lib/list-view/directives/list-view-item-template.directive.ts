@@ -1,10 +1,7 @@
-import { Directive, TemplateRef } from "@angular/core";
-import { ListViewItemTemplateContext } from "../models/ListViewItemTemplateContext";
+import { Directive } from "@angular/core";
 
 @Directive({
     selector: "ng-template[monaListViewItemTemplate]",
     standalone: true
 })
-export class ListViewItemTemplateDirective {
-    public constructor(public readonly templateRef: TemplateRef<ListViewItemTemplateContext>) {}
-}
+export class ListViewItemTemplateDirective {}

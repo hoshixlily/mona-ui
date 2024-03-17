@@ -1,5 +1,16 @@
-import { Directive, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { ImmutableSet, Selector } from "@mirei/ts-collections";
+import {
+    Directive,
+    effect,
+    inject,
+    input,
+    Input,
+    InputSignal,
+    OnInit,
+    output,
+    OutputEmitterRef,
+    untracked
+} from "@angular/core";
+import { Selector } from "@mirei/ts-collections";
 import { SelectableOptions } from "../models/SelectableOptions";
 import { ListService } from "../services/list.service";
 
@@ -13,34 +24,45 @@ export class ListSelectableDirective<T> implements OnInit {
         enabled: true,
         toggleable: false
     };
-    @Input("monaListSelectable")
-    public set options(value: Partial<SelectableOptions> | "") {
-        if (value === "") {
-            this.listService.setSelectableOptions(this.#defaultOptions);
-        } else {
-            this.listService.setSelectableOptions({
-                ...this.#defaultOptions,
-                ...value
-            });
+    readonly #listService: ListService<T> = inject(ListService);
+
+    public readonly selectedKeysChange: OutputEmitterRef<any[]> = output();
+    public options: InputSignal<Partial<SelectableOptions> | ""> = input<Partial<SelectableOptions> | "">(
+        this.#defaultOptions,
+        {
+            alias: "monaListSelectable"
         }
+    );
+    public selectBy: InputSignal<string | Selector<T, any> | null | undefined> = input<
+        string | Selector<T, any> | null | undefined
+    >("");
+    public selectedKeys: InputSignal<Iterable<any> | null | undefined> = input<Iterable<any> | null | undefined>([]);
+
+    public constructor() {
+        effect(() => {
+            const options = this.options();
+            untracked(() => {
+                if (options === "") {
+                    this.#listService.setSelectableOptions(this.#defaultOptions);
+                } else {
+                    this.#listService.setSelectableOptions({
+                        ...this.#defaultOptions,
+                        ...options
+                    });
+                }
+            });
+        });
+        effect(() => {
+            const selectBy = this.selectBy();
+            untracked(() => this.#listService.setValueField(selectBy ?? ""));
+        });
+        effect(() => {
+            const selectedKeys = this.selectedKeys();
+            untracked(() => this.#listService.setSelectedKeys(selectedKeys ?? []));
+        });
     }
-
-    @Input()
-    public set selectBy(value: string | Selector<T, any> | null | undefined) {
-        this.listService.setValueField(value ?? "");
-    }
-
-    @Input()
-    public set selectedKeys(value: Iterable<any> | null | undefined) {
-        this.listService.setSelectedKeys(value ?? []);
-    }
-
-    @Output()
-    public selectedKeysChange: EventEmitter<Array<any>> = new EventEmitter<Array<any>>();
-
-    public constructor(private readonly listService: ListService<T>) {}
 
     public ngOnInit(): void {
-        this.listService.selectedKeysChange = this.selectedKeysChange;
+        this.#listService.selectedKeysChange = this.selectedKeysChange;
     }
 }

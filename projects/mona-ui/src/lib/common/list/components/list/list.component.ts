@@ -2,24 +2,23 @@ import { CdkFixedSizeVirtualScroll, CdkVirtualForOf, CdkVirtualScrollViewport } 
 import { NgTemplateOutlet } from "@angular/common";
 import {
     afterNextRender,
-    AfterViewInit,
     ChangeDetectionStrategy,
     Component,
     computed,
-    ContentChild,
+    contentChild,
     DestroyRef,
+    effect,
     ElementRef,
-    EventEmitter,
     inject,
     input,
-    Input,
     InputSignal,
     OnInit,
-    Output,
-    QueryList,
+    output,
+    OutputEmitterRef,
     Signal,
     TemplateRef,
-    ViewChildren
+    untracked,
+    viewChild
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { Selector } from "@mirei/ts-collections";
@@ -63,11 +62,34 @@ import { ListItemComponent } from "../list-item/list-item.component";
         "[attr.tabindex]": "-1"
     }
 })
-export class ListComponent<TData> implements OnInit, AfterViewInit {
+export class ListComponent<TData> implements OnInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
-    #viewport: CdkVirtualScrollViewport | null = null;
 
+    protected readonly footerTemplate: Signal<TemplateRef<any> | undefined> = contentChild(
+        ListFooterTemplateDirective,
+        {
+            read: TemplateRef
+        }
+    );
+    protected readonly groupHeaderTemplate: Signal<TemplateRef<ListItemTemplateContext<string>> | undefined> =
+        contentChild(ListGroupHeaderTemplateDirective, { read: TemplateRef });
+    protected readonly headerTemplate: Signal<TemplateRef<any> | undefined> = contentChild(
+        ListHeaderTemplateDirective,
+        {
+            read: TemplateRef
+        }
+    );
+    protected readonly itemTemplate: Signal<TemplateRef<ListItemTemplateContext<TData>> | undefined> = contentChild(
+        ListItemTemplateDirective,
+        { read: TemplateRef }
+    );
+    protected readonly noDataTemplate: Signal<TemplateRef<any> | undefined> = contentChild(
+        ListNoDataTemplateDirective,
+        {
+            read: TemplateRef
+        }
+    );
     protected readonly listHeight: Signal<string | undefined> = computed(() => {
         const height = this.height();
         if (height == null) {
@@ -88,6 +110,7 @@ export class ListComponent<TData> implements OnInit, AfterViewInit {
         }
         return maxHeight;
     });
+    protected readonly listService: ListService<TData> = inject(ListService);
     protected readonly listWidth: Signal<ListSizeType> = computed(() => {
         const width = this.width();
         if (width == null) {
@@ -112,43 +135,19 @@ export class ListComponent<TData> implements OnInit, AfterViewInit {
         const height = items * itemHeight + headerItems * 2;
         return `${height}px`;
     });
+    protected readonly virtualScrollViewport: Signal<CdkVirtualScrollViewport | undefined> =
+        viewChild(CdkVirtualScrollViewport);
 
+    public readonly itemSelect: OutputEmitterRef<ListItem<TData>> = output();
+    public data: InputSignal<Iterable<TData>> = input<Iterable<TData>>([]);
     public height: InputSignal<ListSizeInputType> = input<ListSizeInputType>(undefined);
     public maxHeight: InputSignal<ListSizeInputType> = input<ListSizeInputType>(undefined);
+    public textField: InputSignal<Selector<TData, string> | string | null | undefined> = input<
+        Selector<TData, string> | string | null | undefined
+    >("");
     public width: InputSignal<ListSizeInputType> = input<ListSizeInputType>(undefined);
 
-    @Input({ required: false })
-    public set data(value: Iterable<TData>) {
-        this.listService.setData(value);
-    }
-
-    @ContentChild(ListFooterTemplateDirective, { read: TemplateRef })
-    public footerTemplate: TemplateRef<any> | null = null;
-
-    @ContentChild(ListGroupHeaderTemplateDirective, { read: TemplateRef })
-    public groupHeaderTemplate: TemplateRef<ListItemTemplateContext<string>> | null = null;
-
-    @ContentChild(ListHeaderTemplateDirective, { read: TemplateRef })
-    public headerTemplate: TemplateRef<any> | null = null;
-
-    @Output()
-    public itemSelect: EventEmitter<ListItem<TData>> = new EventEmitter<ListItem<TData>>();
-
-    @ContentChild(ListItemTemplateDirective, { read: TemplateRef })
-    public itemTemplate: TemplateRef<ListItemTemplateContext<TData>> | null = null;
-
-    @ContentChild(ListNoDataTemplateDirective, { read: TemplateRef })
-    public noDataTemplate: TemplateRef<any> | null = null;
-
-    @Input()
-    public set textField(textField: string | Selector<TData, string> | null | undefined) {
-        this.listService.setTextField(textField ?? "");
-    }
-
-    @ViewChildren(CdkVirtualScrollViewport)
-    public virtualScrollViewport: QueryList<CdkVirtualScrollViewport> = new QueryList<CdkVirtualScrollViewport>();
-
-    public constructor(protected readonly listService: ListService<TData>) {
+    public constructor() {
         afterNextRender(() => {
             window.setTimeout(() => {
                 const selectedItem = this.listService.selectedListItems().lastOrDefault();
@@ -157,12 +156,17 @@ export class ListComponent<TData> implements OnInit, AfterViewInit {
                 }
             });
         });
-    }
-
-    public ngAfterViewInit(): void {
-        this.#viewport = this.virtualScrollViewport.first;
-        this.virtualScrollViewport.changes.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(viewport => {
-            this.#viewport = viewport.first;
+        effect(() => {
+            const data = this.data();
+            untracked(() => {
+                this.listService.setData(data);
+            });
+        });
+        effect(() => {
+            const textField = this.textField();
+            untracked(() => {
+                this.listService.setTextField(textField ?? "");
+            });
         });
     }
 
@@ -199,7 +203,7 @@ export class ListComponent<TData> implements OnInit, AfterViewInit {
             element.scrollIntoView({ block: "center", behavior: "auto" });
         } else if (this.listService.virtualScrollOptions().enabled) {
             const index = this.listService.viewItems().toList().indexOf(item);
-            this.#viewport?.scrollToIndex(index, "auto");
+            this.virtualScrollViewport()?.scrollToIndex(index, "auto");
         }
     }
 
