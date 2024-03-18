@@ -9,13 +9,14 @@ import {
     forwardRef,
     inject,
     input,
-    Input,
     InputSignal,
+    model,
+    ModelSignal,
     OnInit,
     Signal,
     signal,
     TemplateRef,
-    ViewChild,
+    viewChild,
     WritableSignal
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
@@ -60,21 +61,25 @@ import { TimeSelectorComponent } from "../time-selector/time-selector.component"
     host: {
         "[class.mona-dropdown]": "true",
         "[class.mona-date-time-picker]": "true",
-        "[class.mona-disabled]": "disabled",
-        "[attr.aria-disabled]": "disabled ? true : undefined",
+        "[class.mona-disabled]": "disabled()",
+        "[attr.aria-disabled]": "disabled() ? true : undefined",
         "[attr.aria-readonly]": "readonly() ? true : undefined",
         "[attr.role]": "'grid'",
-        "[attr.tabindex]": "disabled ? null : 0"
+        "[attr.tabindex]": "disabled() ? null : 0"
     }
 })
 export class DateTimePickerComponent implements OnInit, ControlValueAccessor {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
+    readonly #focusMonitor: FocusMonitor = inject(FocusMonitor);
     readonly #hostElementRef: ElementRef = inject(ElementRef);
+    readonly #popupAnimationService: PopupAnimationService = inject(PopupAnimationService);
+    readonly #popupService: PopupService = inject(PopupService);
     readonly #value: WritableSignal<Date | null> = signal(null);
     #popupRef: PopupRef | null = null;
     #propagateChange: Action<Date | null> | null = null;
     protected readonly currentDateString: WritableSignal<string> = signal("");
     protected readonly dateIcon: IconDefinition = faCalendar;
+    protected readonly datePopupTemplate: Signal<TemplateRef<any>> = viewChild.required("datePopupTemplate");
     protected readonly navigatedDate: WritableSignal<Date> = signal(new Date());
     protected readonly timeIcon: IconDefinition = faClock;
     protected readonly timePickerMax: Signal<Date | null> = computed(() => {
@@ -103,7 +108,9 @@ export class DateTimePickerComponent implements OnInit, ControlValueAccessor {
         }
         return null;
     });
+    protected readonly timePopupTemplate: Signal<TemplateRef<any>> = viewChild.required("timePopupTemplate");
 
+    public disabled: ModelSignal<boolean> = model(false);
     public disabledDates: InputSignal<Iterable<Date>> = input<Iterable<Date>>([]);
     public format: InputSignal<string> = input("dd/MM/yyyy HH:mm");
     public hourFormat: InputSignal<"12" | "24"> = input<"12" | "24">("24");
@@ -111,21 +118,6 @@ export class DateTimePickerComponent implements OnInit, ControlValueAccessor {
     public min: InputSignal<Date | null> = input<Date | null>(null);
     public readonly: InputSignal<boolean> = input(false);
     public showSeconds: InputSignal<boolean> = input(false);
-
-    @ViewChild("datePopupTemplate")
-    public datePopupTemplateRef?: TemplateRef<any>;
-
-    @Input()
-    public disabled: boolean = false;
-
-    @ViewChild("timePopupTemplate")
-    public timePopupTemplateRef?: TemplateRef<any>;
-
-    public constructor(
-        private readonly focusMonitor: FocusMonitor,
-        private readonly popupAnimationService: PopupAnimationService,
-        private readonly popupService: PopupService
-    ) {}
 
     public ngOnInit(): void {
         this.setDateValues();
@@ -139,7 +131,7 @@ export class DateTimePickerComponent implements OnInit, ControlValueAccessor {
             this.navigatedDate.set(inRangeDate);
         }
         if (this.#popupRef) {
-            this.popupAnimationService.animateDropdown(this.#popupRef, AnimationState.Hide);
+            this.#popupAnimationService.animateDropdown(this.#popupRef, AnimationState.Hide);
             this.#popupRef.closeWithDelay();
         }
     }
@@ -171,14 +163,14 @@ export class DateTimePickerComponent implements OnInit, ControlValueAccessor {
     }
 
     public onDateInputButtonClick(): void {
-        if (!this.datePopupTemplateRef || this.readonly()) {
+        if (!this.datePopupTemplate() || this.readonly()) {
             return;
         }
 
         const input = this.#hostElementRef.nativeElement.querySelector("input") as HTMLElement;
-        this.#popupRef = this.popupService.create({
+        this.#popupRef = this.#popupService.create({
             anchor: this.#hostElementRef.nativeElement,
-            content: this.datePopupTemplateRef,
+            content: this.datePopupTemplate(),
             width: this.#hostElementRef.nativeElement.getBoundingClientRect().width,
             minWidth: 200,
             popupClass: "mona-date-input-popup",
@@ -190,7 +182,7 @@ export class DateTimePickerComponent implements OnInit, ControlValueAccessor {
         });
         this.setAnimations(this.#popupRef, AnimationState.Show);
         this.#popupRef.closed.pipe(take(1)).subscribe(() => {
-            this.focusMonitor.focusVia(input, "program");
+            this.#focusMonitor.focusVia(input, "program");
         });
     }
 
@@ -199,12 +191,12 @@ export class DateTimePickerComponent implements OnInit, ControlValueAccessor {
     }
 
     public onTimeInputButtonClick(): void {
-        if (!this.timePopupTemplateRef || this.readonly()) {
+        if (!this.timePopupTemplate() || this.readonly()) {
             return;
         }
-        this.#popupRef = this.popupService.create({
+        this.#popupRef = this.#popupService.create({
             anchor: this.#hostElementRef.nativeElement,
-            content: this.timePopupTemplateRef,
+            content: this.timePopupTemplate(),
             width: this.#hostElementRef.nativeElement.getBoundingClientRect().width,
             height: 250,
             popupClass: "mona-time-picker-popup",
@@ -216,7 +208,7 @@ export class DateTimePickerComponent implements OnInit, ControlValueAccessor {
         this.setAnimations(this.#popupRef, AnimationState.Show);
         const input = this.#hostElementRef.nativeElement.querySelector("input") as HTMLElement;
         this.#popupRef.closed.pipe(take(1)).subscribe(() => {
-            this.focusMonitor.focusVia(input, "program");
+            this.#focusMonitor.focusVia(input, "program");
         });
     }
 
@@ -235,7 +227,7 @@ export class DateTimePickerComponent implements OnInit, ControlValueAccessor {
     public registerOnTouched(fn: any): void {}
 
     public setDisabledState(isDisabled: boolean): void {
-        this.disabled = isDisabled;
+        this.disabled.set(isDisabled);
     }
 
     public writeValue(date: Date | null | undefined): void {
@@ -255,8 +247,8 @@ export class DateTimePickerComponent implements OnInit, ControlValueAccessor {
     }
 
     private setAnimations(popupRef: PopupRef, state: AnimationState): void {
-        this.popupAnimationService.setupDropdownOutsideClickCloseAnimation(popupRef);
-        this.popupAnimationService.animateDropdown(popupRef, state);
+        this.#popupAnimationService.setupDropdownOutsideClickCloseAnimation(popupRef);
+        this.#popupAnimationService.animateDropdown(popupRef, state);
     }
 
     private setCurrentDate(date: Date | null): void {

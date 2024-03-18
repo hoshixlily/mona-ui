@@ -63,7 +63,6 @@ describe("CalendarComponent", () => {
 
     it("should set the current date to the date passed in", () => {
         const date = DateTime.fromJSDate(setCalendarDateOfHost(hostFixture) as Date);
-
         const calendarDate = DateTime.fromJSDate(hostComponent.date as Date);
         expect(date.hasSame(calendarDate, "day")).toBeTrue();
         expect(date.hasSame(calendarDate, "month")).toBeTrue();

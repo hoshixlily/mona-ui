@@ -3,6 +3,7 @@ import {
     ChangeDetectionStrategy,
     Component,
     DestroyRef,
+    effect,
     ElementRef,
     EventEmitter,
     inject,
@@ -11,8 +12,11 @@ import {
     Input,
     InputSignal,
     OnInit,
+    output,
     Output,
+    OutputEmitterRef,
     signal,
+    untracked,
     WritableSignal
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
@@ -43,16 +47,18 @@ export class FilterInputComponent implements OnInit {
     protected readonly filterIcon = faSearch;
     protected readonly filterText: WritableSignal<string> = signal("");
 
+    public readonly filterChange: OutputEmitterRef<FilterChangeEvent> = output();
+
     public debounce: InputSignal<number> = input(0);
+    public filter: InputSignal<string> = input("");
     public placeholder: InputSignal<string> = input("");
 
-    @Input()
-    public set filter(value: string) {
-        this.filterText.set(value);
+    public constructor() {
+        effect(() => {
+            const filter = this.filter();
+            untracked(() => this.filterText.set(filter));
+        });
     }
-
-    @Output()
-    public filterChange: EventEmitter<FilterChangeEvent> = new EventEmitter<FilterChangeEvent>();
 
     public ngOnInit(): void {
         this.setSubscriptions();
