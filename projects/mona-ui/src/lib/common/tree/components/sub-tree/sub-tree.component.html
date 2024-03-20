@@ -12,14 +12,18 @@
             (cdkDragEnded)="onNodeDragEnd($event)"
             (cdkDragMoved)="onNodeDragMove($event, node)">
             <div class="mona-tree-node-container">
-                @if (treeService.expandableOptions().enabled && node.children.length > 0) {
+                @if (treeService.expandableOptions().enabled && nodeComponent.expandable()) {
                     <div class="mona-tree-node-expander"
                          [class.mona-disabled]="nodeComponent.disabled()"
-                         (click)="onExpandStateChange(node, !nodeComponent.expanded())">
-                        @if (nodeComponent.expanded()) {
-                            <fa-icon [icon]="expandedIcon"></fa-icon>
+                         (click)="onExpandStateChange(node)">
+                        @if (!node.loading()) {
+                            @if (nodeComponent.expanded()) {
+                                <fa-icon [icon]="expandedIcon"></fa-icon>
+                            } @else {
+                                <fa-icon [icon]="collapsedIcon"></fa-icon>
+                            }
                         } @else {
-                            <fa-icon [icon]="collapsedIcon"></fa-icon>
+                            <fa-icon [icon]="loadingIcon" animation="spin"></fa-icon>
                         }
                     </div>
                 }
@@ -33,13 +37,13 @@
                            (ngModelChange)="nodeComponent.checkboxCheck$.next($event)" monaCheckBox />
                     <label for="mona-tree-node-checkbox-{{node.uid}}"></label>
                 }
-                <mona-tree-node [node]="node" #nodeComponent></mona-tree-node>
+                <mona-tree-node [node]="node" [depth]="depth()" #nodeComponent></mona-tree-node>
             </div>
-            @if (node.children.length > 0 && nodeComponent.expanded()) {
+            @if (node.children().length > 0 && nodeComponent.expanded()) {
                 <div class="mona-sub-tree-container"
                      [@nodeExpand]="nodeComponent.expanded()"
                      [@.disabled]="!treeService.animationEnabled() || treeService.filterText().length !== 0">
-                    <mona-sub-tree [nodes]="node.children"
+                    <mona-sub-tree [nodes]="node.children()"
                                    [depth]="depth()+1"
                                    [parent]="node"
                     ></mona-sub-tree>

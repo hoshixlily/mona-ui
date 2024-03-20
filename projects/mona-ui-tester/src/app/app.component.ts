@@ -179,7 +179,7 @@ import {
     WindowComponent,
     WindowService
 } from "mona-ui";
-import { map, Observable, of, take } from "rxjs";
+import { delay, map, Observable, of, take } from "rxjs";
 import { v4 } from "uuid";
 import { ListViewNoDataTemplateDirective } from "../../../mona-ui/src/lib/list-view/directives/list-view-no-data-template.directive";
 import { GridOrderData } from "./GridOrderData";
@@ -700,6 +700,11 @@ export class AppComponent implements OnInit {
                         { text: "Maple", id: "1-4-5", items: [] },
                         { text: "Cedar", id: "1-4-6", items: [] }
                     ]
+                },
+                {
+                    text: "Empty",
+                    id: "1-5",
+                    items: []
                 }
             ]
         }
@@ -711,12 +716,16 @@ export class AppComponent implements OnInit {
     public dropdownTreeExpandedKeys: string[] = ["1", "1-4"];
     public dropdownTreeSelectedValue = this.treeData[0].items![1].items![0];
 
-    public treeChildren = (item: TreeNodeDataItem) => of(item.items ?? []);
-    public treeDisabledKeys: string[] = ["1-1-1", "1-1-4", "1-4"];
-    public treeExpandedKeys: string[] = ["1", "1-1", "1-2", "1-3", "1-4"];
-    public treeSelectedKeys: string[] = [
-        /*"1-2-1", "1-2-2", "1-2-3", "1-2-4"*/
-    ];
+    // public treeChildren = (item: TreeNodeDataItem) => {
+    //     return of(item.items ?? []).pipe(delay(this.generateRandomNumber(1000, 4000)));
+    // };
+    public treeChildren = "items";
+    public treeDisabledKeys: string[] = ["1-1-1", "1-1-4", "1-5"];
+    public treeExpandedKeys: string[] = ["1", "1-3"];
+
+    // item has TreeNode<T> type
+    public treeHasChildren = (item: any) => item.items != null && item.items.length > 0;
+    public treeSelectedKeys: string[] = ["1-3-3"];
 
     public windowHeight: number = 333;
     public windowLeft: number = 444;

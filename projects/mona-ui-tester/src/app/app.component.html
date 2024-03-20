@@ -22,16 +22,22 @@
 <!--            </mona-tree>-->
             <mona-tree-view [data]="treeData"
                             [children]="treeChildren"
+                            [hasChildren]="treeHasChildren"
                             textField="text" monaTreeViewCheckable
                             [checkedKeys]="treeCheckedKeys"
                             (checkedKeysChange)="onTreeCheckedKeysChange($event)"
+                            monaTreeViewDisable
+                            disableBy="id"
+                            [disabledKeys]="treeDisabledKeys"
                             monaTreeViewExpandable
                             monaTreeViewFilterable
                             monaTreeViewDragAndDrop
                             (nodeDrop)="print($event)"
+                            expandBy="id"
                             [expandedKeys]="treeExpandedKeys"
                             (expandedKeysChange)="onTreeExpandedKeysChange($event)"
-                            [monaTreeViewSelectable]="{ enabled: true, mode: 'multiple', childrenOnly: false }"
+                            [monaTreeViewSelectable]="{ enabled: true, mode: 'single', childrenOnly: false }"
+                            selectBy="id"
                             [selectedKeys]="treeSelectedKeys"
                             (selectedKeysChange)="onTreeSelectedKeysChange($event)"
             >

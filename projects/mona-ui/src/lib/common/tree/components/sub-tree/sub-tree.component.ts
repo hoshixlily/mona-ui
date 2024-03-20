@@ -11,6 +11,7 @@ import {
 import { AsyncPipe, NgStyle } from "@angular/common";
 import {
     ChangeDetectionStrategy,
+    ChangeDetectorRef,
     Component,
     computed,
     inject,
@@ -25,6 +26,7 @@ import { FormsModule } from "@angular/forms";
 import { FaIconComponent } from "@fortawesome/angular-fontawesome";
 import {
     faArrowDown,
+    faArrowsRotate,
     faArrowUp,
     faBan,
     faCaretDown,
@@ -77,6 +79,7 @@ export class SubTreeComponent<T> {
     protected readonly dropInsideIcon: IconDefinition = faPlus;
     protected readonly dropNotAllowIcon: IconDefinition = faBan;
     protected readonly expandedIcon: IconDefinition = faCaretDown;
+    protected readonly loadingIcon: IconDefinition = faArrowsRotate;
     protected readonly nodeSet: WritableSignal<ImmutableSet<TreeNode<T>>> = signal(ImmutableSet.create());
     protected readonly paddingLeft: Signal<number> = computed(() => {
         const depth = this.depth();
@@ -92,9 +95,13 @@ export class SubTreeComponent<T> {
         this.nodeSet.set(ImmutableSet.create(nodes));
     }
 
-    public onExpandStateChange(node: TreeNode<T>, expanded: boolean): void {
-        this.treeService.setNodeExpand(node, expanded);
-        this.treeService.nodeExpand$.next({ node, expanded });
+    public onExpandStateChange(node: TreeNode<T>): void {
+        const expanded = this.treeService.isExpanded(node);
+        if (!node.loaded() && !expanded) {
+            this.treeService.loadNodeChildren(node);
+        }
+        this.treeService.setNodeExpand(node, !expanded);
+        this.treeService.nodeExpand$.next({ node, expanded: !expanded });
     }
 
     public onNodeDragEnd(event: CdkDragEnd<TreeNode<T>>): void {

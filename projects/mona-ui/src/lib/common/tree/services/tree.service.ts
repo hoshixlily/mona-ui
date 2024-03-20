@@ -5,7 +5,6 @@ import {
     EventEmitter,
     inject,
     Injectable,
-    Output,
     Signal,
     signal,
     TemplateRef,
@@ -18,6 +17,7 @@ import {
     ImmutableDictionary,
     ImmutableSet,
     List,
+    Predicate,
     Selector,
     sequenceEqual
 } from "@mirei/ts-collections";
@@ -57,6 +57,7 @@ export class TreeService<T> {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     private readonly data: WritableSignal<ImmutableSet<T>> = signal(ImmutableSet.create());
     private readonly filteredExpandedKeys: WritableSignal<ImmutableSet<any>> = signal(ImmutableSet.create());
+    private readonly hasChildrenPredicate: WritableSignal<Predicate<any> | null> = signal(null);
     private readonly navigableNodes: Signal<ImmutableSet<TreeNode<T>>> = computed(() => {
         const flattenedNodes = TreeService.flatten(this.viewNodeSet());
         return flattenedNodes
@@ -177,7 +178,7 @@ export class TreeService<T> {
             () => {
                 const flattenedNodes = TreeService.flatten(this.viewNodeSet());
                 const expandedKeys = flattenedNodes
-                    .where(n => !n.children.isEmpty())
+                    .where(n => !n.children().isEmpty())
                     .select(n => this.getExpandKey(n))
                     .toImmutableSet();
                 this.filteredExpandedKeys.set(expandedKeys);
@@ -190,8 +191,8 @@ export class TreeService<T> {
         const flattenedNodes = new List<TreeNode<T>>();
         for (const node of nodes) {
             flattenedNodes.add(node);
-            if (!node.children.isEmpty()) {
-                flattenedNodes.addAll(TreeService.flatten(node.children));
+            if (!node.children().isEmpty()) {
+                flattenedNodes.addAll(TreeService.flatten(node.children()));
             }
         }
         return flattenedNodes;
@@ -217,12 +218,23 @@ export class TreeService<T> {
         return textField(node.data);
     }
 
+    public hasChildren(node: TreeNode<T> | null): boolean {
+        if (node === null) {
+            return false;
+        }
+        const hasChildrenPredicate = this.hasChildrenPredicate();
+        if (hasChildrenPredicate) {
+            return hasChildrenPredicate(node.data);
+        }
+        return !node.children().isEmpty();
+    }
+
     public isCheckable(node: TreeNode<T>): boolean {
         const checkableOptions = this.checkableOptions();
         if (!checkableOptions.enabled) {
             return false;
         }
-        return !(checkableOptions.childrenOnly && !node.children.isEmpty());
+        return !(checkableOptions.childrenOnly && !node.children().isEmpty());
     }
 
     public isChecked(node: TreeNode<T>): boolean {
@@ -236,11 +248,12 @@ export class TreeService<T> {
 
     public isDisabled(node: TreeNode<T>): boolean {
         const disableOptions = this.disableOptions();
+        const disabledKeys = this.disabledKeys();
         if (!disableOptions.enabled) {
             return false;
         }
         const key = this.getDisableKey(node);
-        const disabled = this.disabledKeys().contains(key);
+        const disabled = disabledKeys.contains(key);
         if (!disableOptions.disableChildren) {
             return disabled;
         }
@@ -250,14 +263,15 @@ export class TreeService<T> {
 
     public isExpanded(node: TreeNode<T>): boolean {
         const expandableOptions = this.expandableOptions();
+        const expandedKeys = this.expandedKeys();
         if (!expandableOptions.enabled) {
             return true;
         }
-        if (node.children.isEmpty()) {
+        if (node.children().isEmpty()) {
             return false;
         }
         const key = this.getExpandKey(node);
-        return this.expandedKeys().contains(key);
+        return expandedKeys.contains(key);
     }
 
     public isIndeterminate(node: TreeNode<T>): boolean {
@@ -265,7 +279,7 @@ export class TreeService<T> {
         if (!checkableOptions.enabled || !checkableOptions.checkParents) {
             return false;
         }
-        if (node.children.isEmpty()) {
+        if (node.children().isEmpty()) {
             return false;
         }
         const childNodes = this.getChildNodes(node);
@@ -282,15 +296,37 @@ export class TreeService<T> {
 
     public isSelected(node: TreeNode<T>): boolean {
         const selectableOptions = this.selectableOptions();
+        const selectedKeys = this.selectedKeys();
         if (!selectableOptions.enabled) {
             return false;
         }
         const key = this.getSelectKey(node);
-        return this.selectedKeys().contains(key);
+        return selectedKeys.contains(key);
     }
 
     public isTreeFiltered(): boolean {
         return this.filterText() !== "";
+    }
+
+    public loadNodeChildren(node: TreeNode<T>): void {
+        const childrenSelector = this.children();
+        if (typeof childrenSelector !== "function") {
+            return;
+        }
+        const children = childrenSelector(node.data);
+        if (!(children instanceof Observable)) {
+            return;
+        }
+        node.loading.set(true);
+        children.pipe(take(1)).subscribe(c => {
+            for (const child of c) {
+                const childNode = new TreeNode(child);
+                childNode.parent = node;
+                node.children.update(list => list.add(childNode));
+            }
+            node.loading.set(false);
+            node.loaded.set(true);
+        });
     }
 
     public moveNode(sourceNode: TreeNode<T>, targetNode: TreeNode<T>, position: DropPosition): void {
@@ -408,6 +444,10 @@ export class TreeService<T> {
         this.filterableOptions.update(o => ({ ...o, ...options }));
     }
 
+    public setHasChildrenPredicate(predicate: Predicate<any>): void {
+        this.hasChildrenPredicate.set(predicate);
+    }
+
     public setNodeCheck(node: TreeNode<T>, checked: boolean): void {
         const checkableOptions = this.checkableOptions();
         if (!checkableOptions.enabled) {
@@ -481,7 +521,7 @@ export class TreeService<T> {
             return;
         }
         const childrenOnly = selectableOptions.childrenOnly;
-        if (childrenOnly && !node.children.isEmpty()) {
+        if (childrenOnly && !node.children().isEmpty()) {
             return;
         }
         const key = this.getSelectKey(node);
@@ -542,38 +582,39 @@ export class TreeService<T> {
     }
 
     private createNodes(data: Iterable<T>): ImmutableSet<TreeNode<T>> {
-        const nodes: List<TreeNode<any>> = new List();
-        this.createNodesRecursively(data, nodes, null);
+        const nodes = this.createNodesRecursively(data, null) ?? new List<TreeNode<T>>();
         return ImmutableSet.create(nodes);
     }
 
-    private createNodesRecursively(root: Iterable<T>, childNodes: List<TreeNode<T>>, parent: TreeNode<T> | null): void {
+    private createNodesRecursively(root: Iterable<T>, parent: TreeNode<T> | null): List<TreeNode<T>> | null {
         const rootList = new List(root);
-        if (rootList.isEmpty()) {
-            return;
+        const children = this.children();
+        if (rootList.isEmpty() || !children) {
+            return null;
         }
+        const nodes = new List<TreeNode<T>>();
         for (const dataItem of rootList) {
             const node = new TreeNode(dataItem);
             node.parent = parent;
 
-            const children = this.children();
             if (typeof children === "string") {
                 const subNodes = (dataItem as any)[children];
                 if (subNodes) {
-                    this.createNodesRecursively(subNodes, node.children, node);
+                    const childNodes = this.createNodesRecursively(subNodes, node);
+                    node.children.update(list => list.clear().addAll(childNodes ?? []));
+                    node.loaded.set(true);
                 }
             } else {
                 const result = children(dataItem);
-                if (result instanceof Observable) {
-                    result.pipe(take(1)).subscribe(subNodes => {
-                        this.createNodesRecursively(subNodes, node.children, node);
-                    });
-                } else {
-                    this.createNodesRecursively(result, node.children, node);
+                if (!(result instanceof Observable)) {
+                    const childNodes = this.createNodesRecursively(result, node);
+                    node.children.update(list => list.clear().addAll(childNodes ?? []));
+                    node.loaded.set(true);
                 }
             }
-            childNodes.add(node);
+            nodes.add(node);
         }
+        return nodes;
     }
 
     private filterTree(nodes: Iterable<TreeNode<T>>, filterText: string): ImmutableSet<TreeNode<T>> {
@@ -583,11 +624,11 @@ export class TreeService<T> {
                 const nodeText = this.getNodeText(node);
                 if (this.isFiltered(nodeText, filterText)) {
                     result.add(node);
-                } else if (!node.children.isEmpty()) {
-                    const newNodes = this.filterTree(node.children, filterText);
+                } else if (!node.children().isEmpty()) {
+                    const newNodes = this.filterTree(node.children(), filterText);
                     if (!newNodes.isEmpty()) {
                         const clonedNode = node.clone();
-                        clonedNode.children = newNodes.toList();
+                        clonedNode.children.update(list => list.clear().addAll(newNodes));
                         result.add(clonedNode);
                     }
                 }
@@ -713,15 +754,22 @@ export class TreeService<T> {
 
     private moveNodeAfter(sourceNode: TreeNode<T>, targetNode: TreeNode<T>): void {
         if (sourceNode.parent) {
-            sourceNode.parent.children = sourceNode.parent.children.where(n => n !== sourceNode).toList();
+            sourceNode.parent.children.update(list => {
+                const sourceNodeParent = sourceNode.parent as TreeNode<T>;
+                return list.clear().addAll(sourceNodeParent.children().where(n => n !== sourceNode));
+            });
         }
         if (targetNode.parent) {
-            const index = targetNode.parent.children.indexOf(targetNode);
+            const index = targetNode.parent.children().indexOf(targetNode);
             if (index === -1) {
                 return;
             }
-            targetNode.parent.children.addAt(sourceNode, index + 1);
-            targetNode.parent.children = targetNode.parent.children.toList();
+            targetNode.parent.children.update(list => {
+                const tempList = list.toList();
+                tempList.addAt(sourceNode, index + 1);
+                return tempList.toImmutableList();
+            });
+
             if (!sourceNode.parent) {
                 this.nodeSet.update(nodes => nodes.remove(sourceNode));
             }
@@ -745,15 +793,21 @@ export class TreeService<T> {
 
     private moveNodeBefore(sourceNode: TreeNode<T>, targetNode: TreeNode<T>): void {
         if (sourceNode.parent) {
-            sourceNode.parent.children = sourceNode.parent.children.where(n => n !== sourceNode).toList();
+            sourceNode.parent.children.update(list => {
+                const sourceNodeParent = sourceNode.parent as TreeNode<T>;
+                return list.clear().addAll(sourceNodeParent.children().where(n => n !== sourceNode));
+            });
         }
         if (targetNode.parent) {
-            const index = targetNode.parent.children.indexOf(targetNode);
+            const index = targetNode.parent.children().indexOf(targetNode);
             if (index === -1) {
                 return;
             }
-            targetNode.parent.children.addAt(sourceNode, index);
-            targetNode.parent.children = targetNode.parent.children.toList();
+            targetNode.parent.children.update(list => {
+                const tempList = list.toList();
+                tempList.addAt(sourceNode, index);
+                return tempList.toImmutableList();
+            });
             if (!sourceNode.parent) {
                 this.nodeSet.update(nodes => nodes.remove(sourceNode));
             }
@@ -780,13 +834,15 @@ export class TreeService<T> {
             return;
         }
         if (sourceNode.parent) {
-            sourceNode.parent.children = sourceNode.parent.children.where(n => n !== sourceNode).toList();
+            sourceNode.parent.children.update(list => {
+                const sourceNodeParent = sourceNode.parent as TreeNode<T>;
+                return list.clear().addAll(sourceNodeParent.children().where(n => n !== sourceNode));
+            });
         } else {
             this.nodeSet.update(nodes => nodes.remove(sourceNode));
         }
-        targetNode.children = targetNode.children.append(sourceNode).toList();
+        targetNode.children.update(list => list.add(sourceNode));
         sourceNode.parent = targetNode;
-        this.setNodeExpand(targetNode, true);
         this.nodeSet.update(n => n.toImmutableSet());
     }
 
@@ -825,7 +881,7 @@ export class TreeService<T> {
             let index = 0;
             for (const node of nodes) {
                 node.index = parent == null ? String(index++) : `${parent.index}.${index++}`;
-                updateRecursively(node.children, node);
+                updateRecursively(node.children(), node);
             }
         };
         updateRecursively(this.nodeSet(), null);

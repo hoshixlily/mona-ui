@@ -55,6 +55,21 @@ export class TreeNodeComponent<T> implements OnInit {
         }
         return this.treeService.isDisabled(node);
     });
+    public readonly expandable: Signal<boolean> = computed(() => {
+        const node = this.node();
+        const expandableOptions = this.treeService.expandableOptions();
+        const childrenSelector = this.treeService.children();
+        if (node === null) {
+            return false;
+        }
+        if (!expandableOptions.enabled) {
+            return false;
+        }
+        if (typeof childrenSelector === "function") {
+            return this.treeService.hasChildren(node);
+        }
+        return node.children().length > 0;
+    });
     public readonly expanded: Signal<boolean> = computed(() => {
         const node = this.node();
         if (node === null) {
@@ -86,12 +101,17 @@ export class TreeNodeComponent<T> implements OnInit {
     });
     public readonly paddingLeft: Signal<number> = computed(() => {
         const node = this.node();
+        const depth = this.depth();
         this.#dragging();
-        const expandable = this.treeService.expandableOptions().enabled;
-        if (node === null) {
+        if (node === null || depth === 0) {
             return 0;
         }
-        return expandable ? (node.children.length > 0 ? 0 : 24) : 0;
+        let padding = 0;
+        const hasChildren = this.treeService.hasChildren(node);
+        if (!hasChildren) {
+            padding += 24;
+        }
+        return padding;
     });
     public readonly selected: Signal<boolean> = computed(() => {
         const node = this.node();
@@ -101,6 +121,7 @@ export class TreeNodeComponent<T> implements OnInit {
         return this.treeService.isSelected(node);
     });
 
+    public depth: InputSignal<number> = input(0);
     public node: InputSignal<TreeNode<T> | null> = input<TreeNode<T> | null>(null);
 
     public constructor(protected readonly treeService: TreeService<T>) {}
