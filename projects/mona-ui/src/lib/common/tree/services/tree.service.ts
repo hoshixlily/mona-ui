@@ -8,6 +8,7 @@ import {
     Signal,
     signal,
     TemplateRef,
+    untracked,
     WritableSignal
 } from "@angular/core";
 import { takeUntilDestroyed, toObservable, toSignal } from "@angular/core/rxjs-interop";
@@ -15,6 +16,7 @@ import {
     aggregate,
     from,
     ImmutableDictionary,
+    ImmutableList,
     ImmutableSet,
     List,
     Predicate,
@@ -34,6 +36,7 @@ import {
 import { FilterChangeEvent } from "../../filter-input/models/FilterChangeEvent";
 import { FilterableOptions } from "../../models/FilterableOptions";
 import { CheckableOptions } from "../models/CheckableOptions";
+import { DataStructure } from "../models/DataStructure";
 import { DisableOptions } from "../models/DisableOptions";
 import { DraggableOptions } from "../models/DraggableOptions";
 import { DropPosition, DropPositionChangeEvent } from "../models/DropPositionChangeEvent";
@@ -57,6 +60,8 @@ export class TreeService<T> {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     private readonly data: WritableSignal<ImmutableSet<T>> = signal(ImmutableSet.create());
     private readonly filteredExpandedKeys: WritableSignal<ImmutableSet<any>> = signal(ImmutableSet.create());
+    private readonly flatIdField: WritableSignal<string> = signal("");
+    private readonly flatParentIdField: WritableSignal<string> = signal("");
     private readonly hasChildrenPredicate: WritableSignal<Predicate<any> | null> = signal(null);
     private readonly navigableNodes: Signal<ImmutableSet<TreeNode<T>>> = computed(() => {
         const flattenedNodes = TreeService.flatten(this.viewNodeSet());
@@ -70,6 +75,7 @@ export class TreeService<T> {
         const nodes = this.nodeSet();
         return this.createNodeDictionary(nodes);
     });
+    private readonly structure: WritableSignal<DataStructure> = signal("hierarchical");
     private readonly unfilteredExpandedKeys: WritableSignal<ImmutableSet<any>> = signal(ImmutableSet.create());
     public readonly animationEnabled: WritableSignal<boolean> = signal(true);
     public readonly checkBy: WritableSignal<string | Selector<T, any> | null> = signal(null);
@@ -401,6 +407,10 @@ export class TreeService<T> {
         this.updateNodeIndices();
     }
 
+    public setDataStructure(structure: DataStructure): void {
+        this.structure.set(structure);
+    }
+
     public setDisableBy(selector: string | Selector<T, any> | null): void {
         this.disableBy.set(selector);
     }
@@ -442,6 +452,14 @@ export class TreeService<T> {
 
     public setFilterableOptions(options: Partial<FilterableOptions>): void {
         this.filterableOptions.update(o => ({ ...o, ...options }));
+    }
+
+    public setFlatIdField(field: string): void {
+        this.flatIdField.set(field);
+    }
+
+    public setFlatParentIdField(field: string): void {
+        this.flatParentIdField.set(field);
     }
 
     public setHasChildrenPredicate(predicate: Predicate<any>): void {
@@ -574,19 +592,23 @@ export class TreeService<T> {
         this.textField.set(selector);
     }
 
-    private createNodeDictionary(nodes: Iterable<TreeNode<T>>): ImmutableDictionary<string, TreeNode<T>> {
-        return TreeService.flatten(nodes).toImmutableDictionary(
-            n => n.uid,
-            n => n
-        );
+    private createFlatNodes(data: Iterable<T>, parentId: string | null): ImmutableList<TreeNode<T>> {
+        const flatIdField = this.flatIdField();
+        const flatParentIdField = this.flatParentIdField();
+        const nodes = new List<TreeNode<T>>();
+        for (const item of data) {
+            const dataItem = item as any;
+            if (dataItem[flatParentIdField] === parentId) {
+                const node = new TreeNode(item);
+                node.children.set(this.createFlatNodes(data, dataItem[flatIdField]));
+                node.children().forEach(n => (n.parent = node));
+                nodes.add(node);
+            }
+        }
+        return nodes.toImmutableList();
     }
 
-    private createNodes(data: Iterable<T>): ImmutableSet<TreeNode<T>> {
-        const nodes = this.createNodesRecursively(data, null) ?? new List<TreeNode<T>>();
-        return ImmutableSet.create(nodes);
-    }
-
-    private createNodesRecursively(root: Iterable<T>, parent: TreeNode<T> | null): List<TreeNode<T>> | null {
+    private createHierarchicalNodes(root: Iterable<T>, parent: TreeNode<T> | null): List<TreeNode<T>> | null {
         const rootList = new List(root);
         const children = this.children();
         if (rootList.isEmpty() || !children) {
@@ -600,14 +622,14 @@ export class TreeService<T> {
             if (typeof children === "string") {
                 const subNodes = (dataItem as any)[children];
                 if (subNodes) {
-                    const childNodes = this.createNodesRecursively(subNodes, node);
+                    const childNodes = this.createHierarchicalNodes(subNodes, node);
                     node.children.update(list => list.clear().addAll(childNodes ?? []));
                     node.loaded.set(true);
                 }
             } else {
                 const result = children(dataItem);
                 if (!(result instanceof Observable)) {
-                    const childNodes = this.createNodesRecursively(result, node);
+                    const childNodes = this.createHierarchicalNodes(result, node);
                     node.children.update(list => list.clear().addAll(childNodes ?? []));
                     node.loaded.set(true);
                 }
@@ -617,25 +639,44 @@ export class TreeService<T> {
         return nodes;
     }
 
+    private createNodeDictionary(nodes: Iterable<TreeNode<T>>): ImmutableDictionary<string, TreeNode<T>> {
+        return TreeService.flatten(nodes).toImmutableDictionary(
+            n => n.uid,
+            n => n
+        );
+    }
+
+    private createNodes(data: Iterable<T>): ImmutableSet<TreeNode<T>> {
+        const structure = this.structure();
+        if (structure === "flat") {
+            return this.createFlatNodes(data, null).toImmutableSet();
+        }
+        const nodes = this.createHierarchicalNodes(data, null) ?? new List<TreeNode<T>>();
+        return ImmutableSet.create(nodes);
+    }
+
     private filterTree(nodes: Iterable<TreeNode<T>>, filterText: string): ImmutableSet<TreeNode<T>> {
-        return aggregate(
-            nodes,
-            (result, node) => {
-                const nodeText = this.getNodeText(node);
-                if (this.isFiltered(nodeText, filterText)) {
-                    result.add(node);
-                } else if (!node.children().isEmpty()) {
-                    const newNodes = this.filterTree(node.children(), filterText);
-                    if (!newNodes.isEmpty()) {
-                        const clonedNode = node.clone();
-                        clonedNode.children.update(list => list.clear().addAll(newNodes));
-                        result.add(clonedNode);
+        const nodeList = untracked(() => {
+            return aggregate(
+                nodes,
+                (result, node) => {
+                    const nodeText = this.getNodeText(node);
+                    if (this.isFiltered(nodeText, filterText)) {
+                        result.add(node);
+                    } else if (!node.children().isEmpty()) {
+                        const newNodes = this.filterTree(node.children(), filterText);
+                        if (!newNodes.isEmpty()) {
+                            const clonedNode = node.clone();
+                            clonedNode.children.update(list => list.clear().addAll(newNodes));
+                            result.add(clonedNode);
+                        }
                     }
-                }
-                return result;
-            },
-            new List<TreeNode<T>>()
-        ).toImmutableSet();
+                    return result;
+                },
+                new List<TreeNode<T>>()
+            );
+        });
+        return nodeList.toImmutableSet();
     }
 
     public getCheckKey(node: TreeNode<T>): any {

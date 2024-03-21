@@ -11,14 +11,11 @@ import {
 import { AsyncPipe, NgStyle } from "@angular/common";
 import {
     ChangeDetectionStrategy,
-    ChangeDetectorRef,
     Component,
-    computed,
     inject,
     input,
     Input,
     InputSignal,
-    Signal,
     signal,
     WritableSignal
 } from "@angular/core";
@@ -81,10 +78,6 @@ export class SubTreeComponent<T> {
     protected readonly expandedIcon: IconDefinition = faCaretDown;
     protected readonly loadingIcon: IconDefinition = faArrowsRotate;
     protected readonly nodeSet: WritableSignal<ImmutableSet<TreeNode<T>>> = signal(ImmutableSet.create());
-    protected readonly paddingLeft: Signal<number> = computed(() => {
-        const depth = this.depth();
-        return depth === 0 ? 0 : 24;
-    });
     protected readonly treeService: TreeService<T> = inject(TreeService);
 
     public depth: InputSignal<number> = input.required();

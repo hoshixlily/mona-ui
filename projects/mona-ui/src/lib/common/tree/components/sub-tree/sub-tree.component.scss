@@ -8,6 +8,7 @@ ul li {
     overflow: hidden;
     position: relative;
     outline: none;
+    padding-left: 24px;
 }
 
 .mona-tree-node-container {
@@ -16,15 +17,15 @@ ul li {
 }
 
 .mona-tree-node-expander {
-    width: 24px;
+    min-width: 24px;
     height: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-
     color: var(--mona-text);
     font-size: 0.875rem;
+    margin-left: -24px;
 }
 
 .mona-sub-tree-container {

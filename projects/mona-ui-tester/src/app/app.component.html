@@ -41,18 +41,18 @@
                             [selectedKeys]="treeSelectedKeys"
                             (selectedKeysChange)="onTreeSelectedKeysChange($event)"
             >
-                <ng-template monaTreeViewNodeTemplate let-item let-element="element">
-                    @if (item.text.startsWith('C')) {
-                        <span style="color: #F03193;">{{item?.text}}</span>
-                    } @else {
-                        <span style="color: #ffcc75;">{{item?.text}}</span>
-                    }
-                    <mona-contextmenu [target]="element" trigger="contextmenu">
-                        <mona-menu-item text="Print" (menuClick)="print(item)"></mona-menu-item>
-                        <mona-menu-item text="Noop"></mona-menu-item>
-                        <mona-menu-item text="Refresh" (menuClick)="updateTreeData()"></mona-menu-item>
-                    </mona-contextmenu>
-                </ng-template>
+<!--                <ng-template monaTreeViewNodeTemplate let-item let-element="element">-->
+<!--                    @if (item.text.startsWith('C')) {-->
+<!--                        <span style="color: #F03193;">{{item?.text}}</span>-->
+<!--                    } @else {-->
+<!--                        <span style="color: #ffcc75;">{{item?.text}}</span>-->
+<!--                    }-->
+<!--                    <mona-contextmenu [target]="element" trigger="contextmenu">-->
+<!--                        <mona-menu-item text="Print" (menuClick)="print(item)"></mona-menu-item>-->
+<!--                        <mona-menu-item text="Noop"></mona-menu-item>-->
+<!--                        <mona-menu-item text="Refresh" (menuClick)="updateTreeData()"></mona-menu-item>-->
+<!--                    </mona-contextmenu>-->
+<!--                </ng-template>-->
             </mona-tree-view>
         </mona-splitter-pane>
         <mona-splitter-pane>
@@ -481,7 +481,7 @@
                                                      (ngModelChange)="onDropdownTreeValueChange($event)"
                                                      [expandedKeys]="dropdownTreeExpandedKeys"
                                                      (expandedKeysChange)="onDropdownTreeExpandedKeysChange($event)"
-                                                     style="width: 220px;">
+                                                     style="width: 220px;" *ngIf="false">
                                     <ng-template monaDropDownTreeNodeTemplate let-dataItem>
                                         <span style="color: #00a86b;">{{dataItem.text}}</span>
                                     </ng-template>

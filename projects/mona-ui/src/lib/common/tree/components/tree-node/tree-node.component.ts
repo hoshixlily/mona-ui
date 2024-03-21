@@ -99,20 +99,6 @@ export class TreeNodeComponent<T> implements OnInit {
         }
         return this.treeService.getNodeText(node);
     });
-    public readonly paddingLeft: Signal<number> = computed(() => {
-        const node = this.node();
-        const depth = this.depth();
-        this.#dragging();
-        if (node === null || depth === 0) {
-            return 0;
-        }
-        let padding = 0;
-        const hasChildren = this.treeService.hasChildren(node);
-        if (!hasChildren) {
-            padding += 24;
-        }
-        return padding;
-    });
     public readonly selected: Signal<boolean> = computed(() => {
         const node = this.node();
         if (node === null) {

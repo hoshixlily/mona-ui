@@ -654,6 +654,7 @@ export class AppComponent implements OnInit {
     public toggleableButtonSelected: boolean = true;
     public treeCheckedKeys: string[] = [];
 
+    public treeAnimation: boolean = true;
     public treeData: TreeNodeDataItem[] = [
         {
             text: "Root",
@@ -712,14 +713,30 @@ export class AppComponent implements OnInit {
     public treeDataRandom: any[] = this.generateRandomTreeData(50);
     public treeFilter: WritableSignal<string> = signal("Apple");
 
+    public treeFlatData = [
+        { id: 1, parentId: null, text: "Documents" },
+        { id: 2, parentId: 1, text: "Work" },
+        { id: 3, parentId: 1, text: "Personal" },
+        { id: 4, parentId: 2, text: "Reports" },
+        { id: 5, parentId: 2, text: "Presentations" },
+        { id: 6, parentId: 3, text: "Finances" },
+        { id: 7, parentId: 3, text: "Travel" },
+        { id: 8, parentId: 4, text: "Quarterly Report" },
+        { id: 9, parentId: 4, text: "Sales Report" },
+        { id: 10, parentId: 5, text: "Meeting Presentation" },
+        { id: 11, parentId: 5, text: "Product Launch Presentation" },
+        { id: 12, parentId: null, text: "People" },
+        { id: 13, parentId: null, text: "People2" }
+    ];
+
     public dropdownTreeDisabler: (item: any) => boolean = (item: any) => item.text.toLowerCase().startsWith("c");
     public dropdownTreeExpandedKeys: string[] = ["1", "1-4"];
     public dropdownTreeSelectedValue = this.treeData[0].items![1].items![0];
 
-    // public treeChildren = (item: TreeNodeDataItem) => {
-    //     return of(item.items ?? []).pipe(delay(this.generateRandomNumber(1000, 4000)));
-    // };
-    public treeChildren = "items";
+    public treeChildren = (item: TreeNodeDataItem) => {
+        return of(item.items ?? []).pipe(delay(this.generateRandomNumber(1000, 4000)));
+    };
+    // public treeChildren = "items";
     public treeDisabledKeys: string[] = ["1-1-1", "1-1-4", "1-5"];
     public treeExpandedKeys: string[] = ["1", "1-3"];
 
@@ -834,15 +851,17 @@ export class AppComponent implements OnInit {
         this.selectedDropdownListDataItem = { text: "REPLACED WITH PAPRIKA", value: 13, group: "Fruit", active: true };
         this.selectedComboBoxDataItem = { text: "REPLACED WITH PAPRIKA", value: 13, group: "Fruit", active: true };
         let turn: number = 0;
-        window.setInterval(() => {
-            // this.contextMenuItemVisible = !this.contextMenuItemVisible;
-            // this.dropdownItemDisabler = (item: any): boolean => turn % item.value === 0;
-            // this.listService.setDisabledBy(this.dropdownItemDisabler);
-            // this.listService.setGroupSelector(i => i.text.charAt(turn % 4).toUpperCase());
-            // this.listService.setValueField(i => (turn % 2 === 0 ? i.value : i));
-            // this.listService.setGroupableOptions({ enabled: true, headerOrder: turn % 2 === 0 ? "asc" : "desc" });
-            turn++;
-        }, 3000);
+        // window.setInterval(() => {
+        // this.treeAnimation = !this.treeAnimation;
+        // this.contextMenuItemVisible = !this.contextMenuItemVisible;
+        // this.dropdownItemDisabler = (item: any): boolean => turn % item.value === 0;
+        // this.listService.setDisabledBy(this.dropdownItemDisabler);
+        // this.listService.setGroupSelector(i => i.text.charAt(turn % 4).toUpperCase());
+        // this.listService.setValueField(i => (turn % 2 === 0 ? i.value : i));
+        // this.listService.setGroupableOptions({ enabled: true, headerOrder: turn % 2 === 0 ? "asc" : "desc" });
+        // turn++;
+        // this.treeFlatData = [...this.treeFlatData, { id: 999, parentId: null, text: "DYNAMIC" }];
+        // }, 3000);
         this.selectedDropdownListDataItem = { ...this.dropdownListDataItems.get(14) };
         this.selectedPrimitiveComboBoxDataItem = this.dropdownPrimitiveDataItems[7];
 
