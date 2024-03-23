@@ -12,9 +12,13 @@ import {
     InputSignal,
     InputSignalWithTransform,
     OnDestroy,
+    output,
     Output,
+    OutputEmitterRef,
     Signal,
     signal,
+    untracked,
+    viewChild,
     ViewChild,
     WritableSignal
 } from "@angular/core";
@@ -88,6 +92,8 @@ export class PagerComponent implements AfterViewInit, OnDestroy {
         return range(1, this.pageCount()).toArray();
     });
     protected readonly pageListVisible: WritableSignal<boolean> = signal(true);
+    protected readonly pageSizeDropdownList: Signal<DropDownListComponent<number> | undefined> =
+        viewChild("pageSizeDropdownList");
     protected readonly pagerInfo: Signal<string> = computed(() => {
         const start = (this.page() - 1) * this.pagerPageSize() + 1;
         const end = Math.min(this.page() * this.pagerPageSize(), this.total());
@@ -101,6 +107,8 @@ export class PagerComponent implements AfterViewInit, OnDestroy {
     );
 
     public readonly page: Signal<number> = computed(() => Math.floor(this.#skip() / this.pagerPageSize()) + 1);
+    public readonly pageChange: OutputEmitterRef<PageChangeEvent> = output();
+    public readonly pageSizeChange: OutputEmitterRef<PageSizeChangeEvent> = output();
     public readonly pagerPageSize: WritableSignal<number> = signal(10);
     public firstLast: InputSignal<boolean> = input(true);
     public pageInput: InputSignal<boolean> = input(false);
@@ -123,24 +131,18 @@ export class PagerComponent implements AfterViewInit, OnDestroy {
     public type: InputSignal<PagerType> = input<PagerType>("numeric");
     public visiblePages: InputSignal<number> = input(5);
 
-    @Output()
-    public pageChange: EventEmitter<PageChangeEvent> = new EventEmitter<PageChangeEvent>();
-
-    @Output()
-    public pageSizeChange: EventEmitter<PageSizeChangeEvent> = new EventEmitter<PageSizeChangeEvent>();
-
-    @ViewChild("pageSizeDropdownList")
-    public pageSizeDropdownList?: DropDownListComponent<number>;
-
     public constructor() {
-        effect(
-            () => {
-                this.pagerPageSize.set(this.pageSize());
-                this.#previousPageSize = this.pageSize();
-                this.#skip.set(this.skip());
-            },
-            { allowSignalWrites: true }
-        );
+        effect(() => {
+            const pageSize = this.pageSize();
+            untracked(() => {
+                this.pagerPageSize.set(pageSize);
+                this.#previousPageSize = pageSize;
+            });
+        });
+        effect(() => {
+            const skip = this.skip();
+            untracked(() => this.#skip.set(skip));
+        });
     }
 
     public ngAfterViewInit(): void {
@@ -200,22 +202,23 @@ export class PagerComponent implements AfterViewInit, OnDestroy {
             return;
         }
         const event = new PageSizeChangeEvent(value, this.pagerPageSize());
-        if (this.pageSizeDropdownList) {
-            this.pageSizeDropdownList.setValue(this.#previousPageSize);
+        const pageSizeDropdownList = this.pageSizeDropdownList();
+        if (pageSizeDropdownList) {
+            pageSizeDropdownList.setValue(this.#previousPageSize);
         }
 
         this.pageSizeChange.emit(event);
         if (event.isDefaultPrevented()) {
             this.pagerPageSize.set(this.#previousPageSize);
-            if (this.pageSizeDropdownList) {
-                this.pageSizeDropdownList.setValue(this.#previousPageSize);
+            if (pageSizeDropdownList) {
+                pageSizeDropdownList.setValue(this.#previousPageSize);
             }
             return;
         }
         this.#previousPageSize = value;
         this.pagerPageSize.set(value);
-        if (this.pageSizeDropdownList) {
-            this.pageSizeDropdownList.setValue(value);
+        if (pageSizeDropdownList) {
+            pageSizeDropdownList.setValue(value);
         }
         this.setPage(1);
     }

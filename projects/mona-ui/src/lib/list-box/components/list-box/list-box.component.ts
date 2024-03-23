@@ -7,6 +7,7 @@ import {
     effect,
     ElementRef,
     EventEmitter,
+    inject,
     input,
     InputSignal,
     InputSignalWithTransform,
@@ -15,6 +16,7 @@ import {
     Signal,
     signal,
     TemplateRef,
+    untracked,
     WritableSignal
 } from "@angular/core";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
@@ -71,6 +73,7 @@ type ListBoxDirection = "horizontal" | "horizontal-reverse" | "vertical" | "vert
     }
 })
 export class ListBoxComponent<T = any> implements OnInit {
+    readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
     protected readonly activeListBox: Signal<ListBoxComponent<T> | null> = computed(() => {
         const selectedItem = this.selectedItem();
         if (selectedItem) {
@@ -134,14 +137,11 @@ export class ListBoxComponent<T = any> implements OnInit {
     @Output()
     public selectionChange: EventEmitter<ListBoxSelectionEvent> = new EventEmitter<ListBoxSelectionEvent>();
 
-    public constructor(private readonly elementRef: ElementRef<HTMLElement>) {
-        effect(
-            () => {
-                const items = this.items();
-                this.listBoxItems.set(ImmutableList.create(items));
-            },
-            { allowSignalWrites: true }
-        );
+    public constructor() {
+        effect(() => {
+            const items = this.items();
+            untracked(() => this.listBoxItems.set(ImmutableList.create(items)));
+        });
     }
 
     public createAndEmitActionEvent(action: ToolbarAction, originalEvent: MouseEvent): boolean {
@@ -284,7 +284,7 @@ export class ListBoxComponent<T = any> implements OnInit {
     }
 
     private scrollToSelectedItem(): void {
-        const selectedItemElement = this.elementRef.nativeElement.querySelector(".mona-selected");
+        const selectedItemElement = this.#hostElementRef.nativeElement.querySelector(".mona-selected");
         if (selectedItemElement) {
             selectedItemElement.scrollIntoView({ behavior: "auto", block: "center" });
         }

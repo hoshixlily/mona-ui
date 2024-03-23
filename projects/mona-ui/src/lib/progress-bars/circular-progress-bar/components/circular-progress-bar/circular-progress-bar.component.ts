@@ -3,12 +3,14 @@ import {
     ChangeDetectionStrategy,
     Component,
     computed,
-    ContentChild,
+    contentChild,
     effect,
     input,
     InputSignal,
     Signal,
     signal,
+    TemplateRef,
+    untracked,
     WritableSignal
 } from "@angular/core";
 import { Action } from "../../../../utils/Action";
@@ -38,6 +40,9 @@ export class CircularProgressBarComponent {
     protected readonly circumference: Signal<number> = computed(
         () => 2 * Math.PI * (this.size() / 2 - this.thickness())
     );
+    protected readonly labelTemplate = contentChild(CircularProgressBarLabelTemplateDirective, {
+        read: TemplateRef
+    });
     protected readonly pixelSize: Signal<string> = computed(() => `${this.size()}px`);
     protected readonly progressValue: WritableSignal<number> = signal(0);
     protected readonly radius: Signal<number> = computed(() => this.size() / 2 - this.thickness());
@@ -80,12 +85,15 @@ export class CircularProgressBarComponent {
      */
     public value: InputSignal<number> = input(0);
 
-    @ContentChild(CircularProgressBarLabelTemplateDirective)
-    public labelTemplateDirective: CircularProgressBarLabelTemplateDirective | null = null;
-
     public constructor() {
-        effect(() => this.progressValue.set(this.progress()), { allowSignalWrites: true });
-        effect(() => this.updateProgress(this.value()), { allowSignalWrites: true });
+        effect(() => {
+            const progress = this.progress();
+            untracked(() => this.progressValue.set(progress));
+        });
+        effect(() => {
+            const value = this.value();
+            untracked(() => this.updateProgress(value));
+        });
     }
 
     private updateProgress(value: number): void {

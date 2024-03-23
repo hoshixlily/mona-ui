@@ -4,6 +4,4 @@ import { Directive } from "@angular/core";
     selector: "ng-template[monaPopoverFooterTemplate]",
     standalone: true
 })
-export class PopoverFooterTemplateDirective {
-    public constructor() {}
-}
+export class PopoverFooterTemplateDirective {}

@@ -10,6 +10,7 @@ import {
     InputSignalWithTransform,
     Signal,
     signal,
+    untracked,
     WritableSignal
 } from "@angular/core";
 import { Action } from "../../../../utils/Action";
@@ -74,25 +75,21 @@ export class ProgressBarComponent implements AfterViewInit {
     public value: InputSignal<number> = input(0);
 
     public constructor() {
-        effect(
-            () => {
-                const color = this.color();
-                if (typeof color === "string") {
-                    this.#color.set(color);
-                } else {
-                    this.#color.set(color(this.progress()));
-                }
-            },
-            { allowSignalWrites: true }
-        );
-        effect(() => this.updateProgress(this.value()), { allowSignalWrites: true });
-        effect(
-            () => {
-                this.labelFormat();
-                this.formatted.set(true);
-            },
-            { allowSignalWrites: true }
-        );
+        effect(() => {
+            const color = this.color();
+            const progress = this.progress();
+            untracked(() => {
+                this.#color.set(typeof color === "string" ? color : color(progress));
+            });
+        });
+        effect(() => {
+            const value = this.value();
+            untracked(() => this.updateProgress(value));
+        });
+        effect(() => {
+            this.labelFormat();
+            untracked(() => this.formatted.set(true));
+        });
     }
 
     public ngAfterViewInit(): void {

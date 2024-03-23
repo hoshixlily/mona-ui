@@ -115,6 +115,15 @@ export class TreeViewComponent<T> {
         }
     }
 
+    private setAnimationEffect(): void {
+        effect(() => {
+            const animate = this.animate();
+            untracked(() => {
+                this.treeService.setAnimationEnabled(animate);
+            });
+        });
+    }
+
     private setDataStructureFields(): void {
         effect(() => {
             const mode = this.mode();
@@ -153,15 +162,6 @@ export class TreeViewComponent<T> {
         untracked(() => {
             this.treeService.setChildrenSelector(childrenSelector);
             this.treeService.setHasChildrenPredicate(hasChildren);
-        });
-    }
-
-    private setAnimationEffect(): void {
-        effect(() => {
-            const animate = this.animate();
-            untracked(() => {
-                this.treeService.setAnimationEnabled(animate);
-            });
         });
     }
 }

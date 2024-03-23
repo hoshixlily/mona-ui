@@ -6,8 +6,8 @@
 </svg>
 @if (!indeterminate()) {
     <div class="mona-circular-progress-bar-label">
-        @if (labelTemplateDirective) {
-            <ng-container [ngTemplateOutlet]="labelTemplateDirective.templateRef"
+        @if (labelTemplate()) {
+            <ng-container [ngTemplateOutlet]="labelTemplate()??null"
                           [ngTemplateOutletContext]="{$implicit: progressValue()}"></ng-container>
         } @else {
             {{ progressValue() }}%

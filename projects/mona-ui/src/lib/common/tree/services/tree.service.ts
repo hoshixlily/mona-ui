@@ -180,17 +180,17 @@ export class TreeService<T> {
     public selectionChange: EventEmitter<NodeItem<T>> = new EventEmitter<NodeItem<T>>();
 
     public constructor() {
-        effect(
-            () => {
-                const flattenedNodes = TreeService.flatten(this.viewNodeSet());
+        effect(() => {
+            const viewNodes = this.viewNodeSet();
+            untracked(() => {
+                const flattenedNodes = TreeService.flatten(viewNodes);
                 const expandedKeys = flattenedNodes
                     .where(n => !n.children().isEmpty())
                     .select(n => this.getExpandKey(n))
                     .toImmutableSet();
                 this.filteredExpandedKeys.set(expandedKeys);
-            },
-            { allowSignalWrites: true } // This is not recommended, need to find a better way...
-        );
+            });
+        });
     }
 
     public static flatten<T>(nodes: Iterable<TreeNode<T>>): List<TreeNode<T>> {
