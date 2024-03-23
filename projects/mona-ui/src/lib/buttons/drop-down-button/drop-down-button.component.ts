@@ -1,18 +1,18 @@
 import {
-    AfterContentInit,
     AfterViewInit,
     Component,
-    ContentChildren,
+    computed,
+    contentChildren,
     DestroyRef,
     ElementRef,
     inject,
-    Input,
-    QueryList,
+    input,
+    InputSignal,
+    Signal,
     signal,
-    ViewChild,
+    viewChild,
     WritableSignal
 } from "@angular/core";
-import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ContextMenuComponent } from "../../menus/context-menu/context-menu.component";
 import { MenuItemComponent } from "../../menus/menu-item/menu-item.component";
 import { MenuItem } from "../../menus/models/MenuItem";
@@ -28,23 +28,21 @@ import { ButtonDirective } from "../button/button.directive";
         "[class.mona-drop-down-button]": "true"
     }
 })
-export class DropDownButtonComponent implements AfterViewInit, AfterContentInit {
+export class DropDownButtonComponent implements AfterViewInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     #resizeObserver: ResizeObserver | null = null;
-    public menuItems: MenuItem[] = [];
+
+    protected readonly buttonElement: Signal<ElementRef<HTMLButtonElement>> = viewChild.required("dropdownButton", {
+        read: ElementRef
+    });
+    protected readonly contextMenuComponent: Signal<ContextMenuComponent> = viewChild.required("contextMenuComponent");
+    protected readonly menuItemComponents: Signal<readonly MenuItemComponent[]> = contentChildren(MenuItemComponent);
+    protected readonly menuItems: Signal<readonly MenuItem[]> = computed(() =>
+        this.menuItemComponents().map(m => m.getMenuItem())
+    );
+
+    public disabled: InputSignal<boolean> = input(false);
     public popupWidth: WritableSignal<number> = signal(0);
-
-    @ViewChild("contextMenuComponent")
-    private readonly contextMenuComponent!: ContextMenuComponent;
-
-    @Input()
-    public disabled: boolean = false;
-
-    @ViewChild("dropdownButton", { read: ElementRef })
-    public buttonElement!: ElementRef<HTMLButtonElement>;
-
-    @ContentChildren(MenuItemComponent)
-    public menuItemComponents: QueryList<MenuItemComponent> = new QueryList<MenuItemComponent>();
 
     public constructor() {
         this.#destroyRef.onDestroy(() => {
@@ -52,21 +50,14 @@ export class DropDownButtonComponent implements AfterViewInit, AfterContentInit 
         });
     }
 
-    public ngAfterContentInit(): void {
-        this.menuItems = this.menuItemComponents.map(m => m.getMenuItem());
-        this.menuItemComponents.changes.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(() => {
-            this.menuItems = this.menuItemComponents.map(m => m.getMenuItem());
-        });
-    }
-
     public ngAfterViewInit(): void {
         window.setTimeout(() => {
-            this.contextMenuComponent.setPrecise(false);
-            this.popupWidth.set(this.buttonElement.nativeElement.offsetWidth);
+            this.contextMenuComponent().setPrecise(false);
+            this.popupWidth.set(this.buttonElement().nativeElement.offsetWidth);
         });
         this.#resizeObserver = new ResizeObserver(() => {
-            this.popupWidth.set(this.buttonElement.nativeElement.offsetWidth);
+            this.popupWidth.set(this.buttonElement().nativeElement.offsetWidth);
         });
-        this.#resizeObserver.observe(this.buttonElement.nativeElement);
+        this.#resizeObserver.observe(this.buttonElement().nativeElement);
     }
 }

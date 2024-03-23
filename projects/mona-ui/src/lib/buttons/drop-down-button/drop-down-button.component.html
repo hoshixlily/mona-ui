@@ -1,9 +1,9 @@
-<button monaButton [disabled]="disabled" #dropdownButton>
+<button monaButton [disabled]="disabled()" #dropdownButton>
     <ng-content></ng-content>
 </button>
 
-@if (!disabled) {
-    <mona-contextmenu [target]="dropdownButton" [menuItems]="menuItems" [width]="popupWidth()"
+@if (!disabled()) {
+    <mona-contextmenu [target]="dropdownButton" [menuItems]="menuItems()" [width]="popupWidth()"
                       trigger="click" popupClass="mona-dropdown-button-popup"
                       #contextMenuComponent></mona-contextmenu>
 }

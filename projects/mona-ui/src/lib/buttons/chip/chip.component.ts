@@ -1,5 +1,5 @@
 import { NgClass } from "@angular/common";
-import { Component, EventEmitter, input, Input, InputSignal, OnInit, Output } from "@angular/core";
+import { Component, input, InputSignal, output, OutputEmitterRef } from "@angular/core";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { ButtonDirective } from "../button/button.directive";
@@ -12,22 +12,16 @@ import { ButtonDirective } from "../button/button.directive";
     imports: [NgClass, ButtonDirective, FontAwesomeModule],
     host: {
         "[class.mona-chip]": "true",
-        "[class.mona-disabled]": "disabled",
-        "[attr.tabindex]": "disabled ? -1 : tabindex",
-        "[attr.aria-disabled]": "disabled ? true : undefined"
+        "[class.mona-disabled]": "disabled()",
+        "[attr.tabindex]": "disabled() ? -1 : tabindex()",
+        "[attr.aria-disabled]": "disabled() ? true : undefined"
     }
 })
 export class ChipComponent {
     protected readonly closeIcon: IconDefinition = faTimes;
-
-    @Input()
-    public disabled: boolean = false;
-
+    public disabled: InputSignal<boolean> = input(false);
     public label: InputSignal<string> = input("");
     public removable: InputSignal<boolean> = input(false);
-
-    @Output()
-    public remove: EventEmitter<Event> = new EventEmitter<Event>();
-
+    public remove: OutputEmitterRef<Event> = output();
     public tabindex: InputSignal<number | string> = input<number | string>(0);
 }

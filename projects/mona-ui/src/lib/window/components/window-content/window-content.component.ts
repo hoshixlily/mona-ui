@@ -11,9 +11,11 @@ import {
     inject,
     Injector,
     OnInit,
+    Signal,
     signal,
     TemplateRef,
     Type,
+    viewChild,
     ViewChild,
     ViewContainerRef,
     WritableSignal
@@ -53,12 +55,12 @@ export class WindowContentComponent implements OnInit, AfterViewInit {
     readonly #injector: Injector = inject(Injector);
     readonly #viewContainerRef: ViewContainerRef = inject(ViewContainerRef);
     protected readonly closeIcon: IconDefinition = faClose;
+    protected readonly componentAnchor: Signal<ViewContainerRef> = viewChild.required("componentAnchor", {
+        read: ViewContainerRef
+    });
     protected readonly componentRef?: ComponentRef<any>;
     protected readonly contentType: WritableSignal<"template" | "component"> = signal("template");
     protected readonly windowData: WindowInjectorData = inject<WindowInjectorData>(PopupDataInjectionToken);
-
-    @ViewChild("componentAnchor", { read: ViewContainerRef })
-    public componentAnchor!: ViewContainerRef;
 
     public constructor() {
         if (this.windowData.content instanceof TemplateRef) {
@@ -73,12 +75,12 @@ export class WindowContentComponent implements OnInit, AfterViewInit {
     }
 
     public ngAfterViewInit(): void {
-        if (this.contentType() === "component" && this.componentAnchor && this.componentRef) {
+        if (this.contentType() === "component" && this.componentAnchor() && this.componentRef) {
             const index = this.#viewContainerRef.indexOf(this.componentRef.hostView);
             if (index !== -1) {
                 this.#viewContainerRef.detach(index);
             }
-            this.componentAnchor.insert(this.componentRef.hostView, 0);
+            this.componentAnchor().insert(this.componentRef.hostView, 0);
             this.componentRef.changeDetectorRef.detectChanges();
         }
         this.focusElement();

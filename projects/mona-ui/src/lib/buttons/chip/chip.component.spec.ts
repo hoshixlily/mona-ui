@@ -28,7 +28,7 @@ describe("ChipComponent", () => {
     });
 
     it("should have correct default properties", () => {
-        expect(component.disabled).toBe(false);
+        expect(component.disabled()).toBe(false);
         expect(component.label()).toBe("");
         expect(component.removable()).toBe(false);
         expect(component.tabindex()).toBe(0);
