@@ -1,5 +1,5 @@
 import { NgClass } from "@angular/common";
-import { Component, input, InputSignal, output, OutputEmitterRef } from "@angular/core";
+import { ChangeDetectionStrategy, Component, input, InputSignal, output, OutputEmitterRef } from "@angular/core";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { ButtonDirective } from "../button/button.directive";
@@ -10,6 +10,7 @@ import { ButtonDirective } from "../button/button.directive";
     styleUrls: ["./chip.component.scss"],
     standalone: true,
     imports: [NgClass, ButtonDirective, FontAwesomeModule],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     host: {
         "[class.mona-chip]": "true",
         "[class.mona-disabled]": "disabled()",

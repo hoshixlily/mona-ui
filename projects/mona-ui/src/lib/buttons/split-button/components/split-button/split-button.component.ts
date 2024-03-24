@@ -1,24 +1,21 @@
 import { NgTemplateOutlet } from "@angular/common";
 import {
-    AfterContentInit,
-    AfterViewInit,
-    ChangeDetectorRef,
     Component,
-    ContentChild,
-    ContentChildren,
-    DestroyRef,
+    computed,
+    contentChild,
+    contentChildren,
+    effect,
     ElementRef,
-    EventEmitter,
     inject,
     input,
-    Input,
     InputSignal,
-    Output,
-    QueryList,
+    output,
+    OutputEmitterRef,
+    Signal,
     TemplateRef,
-    ViewChild
+    untracked,
+    viewChild
 } from "@angular/core";
-import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { faChevronDown, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { ContextMenuComponent } from "../../../../menus/context-menu/context-menu.component";
@@ -36,15 +33,23 @@ import { SplitButtonTextTemplateDirective } from "../../directives/split-button-
     imports: [ButtonDirective, NgTemplateOutlet, FontAwesomeModule, ContextMenuComponent],
     host: {
         "[class.mona-split-button]": "true",
-        "[class.mona-disabled]": "disabled",
+        "[class.mona-disabled]": "disabled()",
         "[attr.tabindex]": "tabindex()"
     }
 })
-export class SplitButtonComponent implements AfterViewInit, AfterContentInit {
-    readonly #destroyRef: DestroyRef = inject(DestroyRef);
+export class SplitButtonComponent {
     readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
-    public readonly menuIcon: IconDefinition = faChevronDown;
-    public menuItems: MenuItem[] = [];
+    protected readonly buttonClick: OutputEmitterRef<MouseEvent> = output();
+    protected readonly contextMenuComponent: Signal<ContextMenuComponent> = viewChild.required("contextMenuComponent");
+    protected readonly mainButtonElementRef = viewChild.required<ElementRef>("mainButton");
+    protected readonly menuIcon: IconDefinition = faChevronDown;
+    protected readonly menuItemComponents: Signal<readonly MenuItemComponent[]> = contentChildren(MenuItemComponent);
+    protected readonly menuItems: Signal<readonly MenuItem[]> = computed(() =>
+        this.menuItemComponents().map(m => m.getMenuItem())
+    );
+    protected readonly textTemplate = contentChild(SplitButtonTextTemplateDirective, { read: TemplateRef });
+
+    public disabled: InputSignal<boolean> = input(false);
     public popupOffset: PopupOffset = {
         horizontal: -1,
         vertical: 0
@@ -53,39 +58,23 @@ export class SplitButtonComponent implements AfterViewInit, AfterContentInit {
     public tabindex: InputSignal<number | string> = input<number | string>(0);
     public text: InputSignal<string> = input("");
 
-    @Output()
-    public buttonClick: EventEmitter<void> = new EventEmitter<void>();
-
-    @ViewChild("contextMenuComponent")
-    private readonly contextMenuComponent!: ContextMenuComponent;
-
-    @Input()
-    public disabled: boolean = false;
-
-    @ViewChild("mainButton")
-    private readonly mainButtonElementRef!: ElementRef<HTMLButtonElement>;
-
-    @ContentChildren(MenuItemComponent)
-    public menuItemComponents: QueryList<MenuItemComponent> = new QueryList<MenuItemComponent>();
-
-    @ContentChild(SplitButtonTextTemplateDirective, { read: TemplateRef })
-    public textTemplate: TemplateRef<any> | null = null;
-
-    public constructor(private readonly cdr: ChangeDetectorRef) {}
-
-    public ngAfterContentInit(): void {
-        this.menuItems = this.menuItemComponents.map(m => m.getMenuItem());
-        this.menuItemComponents.changes.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(() => {
-            this.menuItems = this.menuItemComponents.map(m => m.getMenuItem());
+    public constructor() {
+        effect(() => {
+            const contextMenuComponent = this.contextMenuComponent();
+            untracked(() => {
+                if (contextMenuComponent) {
+                    contextMenuComponent.setPrecise(false);
+                }
+            });
         });
-    }
-
-    public ngAfterViewInit(): void {
-        window.setTimeout(() => {
-            this.popupWidth = this.#hostElementRef.nativeElement.getBoundingClientRect().width - 1;
-            this.popupOffset.horizontal = -this.mainButtonElementRef.nativeElement.getBoundingClientRect().width - 1;
-            this.contextMenuComponent.setPrecise(false);
-            this.cdr.detectChanges();
+        effect(() => {
+            const mainButtonElement = this.mainButtonElementRef().nativeElement;
+            untracked(() => {
+                if (mainButtonElement) {
+                    this.popupWidth = this.#hostElementRef.nativeElement.getBoundingClientRect().width - 1;
+                    this.popupOffset.horizontal = -mainButtonElement.getBoundingClientRect().width;
+                }
+            });
         });
     }
 }

@@ -3,13 +3,14 @@ import {
     Component,
     effect,
     ElementRef,
-    EventEmitter,
     forwardRef,
     input,
     InputSignal,
-    Output,
+    output,
+    OutputEmitterRef,
+    Signal,
     signal,
-    ViewChild,
+    viewChild,
     WritableSignal
 } from "@angular/core";
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from "@angular/forms";
@@ -37,28 +38,22 @@ import { CheckBoxDirective } from "../../directives/check-box.directive";
 })
 export class CheckBoxComponent implements ControlValueAccessor {
     #propagateChange: Action<boolean> | null = null;
+
+    protected readonly checkBox: Signal<ElementRef<HTMLInputElement>> = viewChild.required("checkBox");
     protected readonly checked: WritableSignal<boolean> = signal<boolean>(false);
+    protected readonly inputBlur: OutputEmitterRef<FocusEvent> = output();
+    protected readonly inputChange: OutputEmitterRef<Event> = output();
+    protected readonly inputFocus: OutputEmitterRef<FocusEvent> = output();
+
     public disabled: InputSignal<boolean> = input<boolean>(false);
     public indeterminate: InputSignal<boolean> = input<boolean>(false);
     public label: InputSignal<string> = input<string>("");
     public labelPosition: InputSignal<"before" | "after"> = input<"before" | "after">("after");
 
-    @Output()
-    public inputBlur: EventEmitter<FocusEvent> = new EventEmitter<FocusEvent>();
-
-    @Output()
-    public inputChange: EventEmitter<Event> = new EventEmitter<Event>();
-
-    @Output()
-    public inputFocus: EventEmitter<FocusEvent> = new EventEmitter<FocusEvent>();
-
-    @ViewChild("checkBox")
-    public checkBox: ElementRef<HTMLInputElement> | null = null;
-
     public constructor() {
         effect(() => {
             const indeterminate = this.indeterminate();
-            this.checkBox?.nativeElement?.setAttribute("indeterminate", indeterminate ? "true" : "false");
+            this.checkBox().nativeElement.setAttribute("indeterminate", indeterminate ? "true" : "false");
         });
     }
 

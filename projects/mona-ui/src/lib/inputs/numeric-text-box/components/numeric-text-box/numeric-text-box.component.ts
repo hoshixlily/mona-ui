@@ -4,23 +4,21 @@ import {
     ChangeDetectionStrategy,
     Component,
     computed,
-    ContentChildren,
+    contentChildren,
     DestroyRef,
     ElementRef,
-    EventEmitter,
     forwardRef,
     inject,
     input,
-    Input,
     InputSignal,
     OnDestroy,
     OnInit,
-    Output,
-    QueryList,
+    output,
+    OutputEmitterRef,
     Signal,
     signal,
     TemplateRef,
-    ViewChild,
+    viewChild,
     WritableSignal
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
@@ -51,7 +49,7 @@ type Sign = "-" | "+";
     imports: [NgClass, NgTemplateOutlet, TextBoxDirective, FormsModule, ButtonDirective, FontAwesomeModule],
     host: {
         "[class.mona-numeric-text-box]": "true",
-        "[class.mona-disabled]": "disabled"
+        "[class.mona-disabled]": "disabled()"
     }
 })
 export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueAccessor {
@@ -63,7 +61,6 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
     protected readonly beforeInput$: Subject<InputEvent> = new Subject<InputEvent>();
     protected readonly decreaseIcon: IconDefinition = faChevronDown;
     protected readonly increaseIcon: IconDefinition = faChevronUp;
-    protected readonly valueChange$: Subject<string> = new Subject<string>();
     protected readonly focused: WritableSignal<boolean> = signal(false);
     protected readonly formattedValue: Signal<string> = computed(() => {
         const value = this.value();
@@ -73,7 +70,7 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
         if (value == null) {
             return "";
         }
-        if (focused && !this.readonly) {
+        if (focused && !this.readonly()) {
             return value?.toString() ?? "";
         }
         if (formatter) {
@@ -85,12 +82,22 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
         return value?.toString() ?? "";
     });
     protected readonly keydown$: Subject<KeyboardEvent> = new Subject<KeyboardEvent>();
-    protected readonly value: WritableSignal<number | null> = signal(null);
     protected readonly spin$: Subject<Sign> = new Subject<Sign>();
     protected readonly spinStop$: Subject<void> = new Subject<void>();
+    protected readonly prefixTemplateList = contentChildren(NumericTextBoxPrefixTemplateDirective, {
+        read: TemplateRef
+    });
+    protected readonly value: WritableSignal<number | null> = signal(null);
+    protected readonly valueChange$: Subject<string> = new Subject<string>();
+    protected readonly valueTextBoxRef: Signal<ElementRef<HTMLInputElement>> = viewChild.required("valueTextBox");
     protected readonly wheel$: Subject<WheelEvent> = new Subject<WheelEvent>();
 
+    public readonly inputBlur: OutputEmitterRef<Event> = output();
+    public readonly inputFocus: OutputEmitterRef<Event> = output();
+    public readonly inputFocusOut: OutputEmitterRef<Event> = output();
+
     public decimals: InputSignal<number> = input(0);
+    public disabled: InputSignal<boolean> = input(false);
     public formatter: InputSignal<Action<number | null, string> | null> = input<Action<number | null, string> | null>(
         null
     );
@@ -102,24 +109,6 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
     public spinners: InputSignal<boolean> = input(true);
     public step: InputSignal<number> = input(1);
     public tabindex: InputSignal<number> = input(0);
-
-    @Input()
-    public disabled: boolean = false;
-
-    @Output()
-    public inputBlur: EventEmitter<Event> = new EventEmitter<Event>();
-
-    @Output()
-    public inputFocus: EventEmitter<Event> = new EventEmitter<Event>();
-
-    @Output()
-    public inputFocusOut: EventEmitter<Event> = new EventEmitter<Event>();
-
-    @ContentChildren(NumericTextBoxPrefixTemplateDirective, { read: TemplateRef })
-    public prefixTemplateList: QueryList<TemplateRef<any>> = new QueryList<TemplateRef<any>>();
-
-    @ViewChild("valueTextBox")
-    public valueTextBoxRef!: ElementRef<HTMLInputElement>;
 
     private static calculate(value: number, step: number, type: Sign): number {
         const precision = Math.max(
@@ -206,86 +195,10 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
     }
 
     private focus(): void {
-        this.#focusMonitor.focusVia(this.valueTextBoxRef, "keyboard");
+        this.#focusMonitor.focusVia(this.valueTextBoxRef(), "keyboard");
     }
 
-    private setSubscriptions(): void {
-        this.valueChange$
-            .pipe(
-                takeUntilDestroyed(this.#destroyRef),
-                distinctUntilChanged(),
-                filter(v => v == null || v === "" || NumericTextBoxComponent.isNumeric(v)),
-                map(v => {
-                    if (v == null || v === "") {
-                        if (this.nullable()) {
-                            return null;
-                        }
-                        if (this.min() != null) {
-                            return this.min();
-                        }
-                        return 0;
-                    }
-                    return parseFloat(v.toString());
-                })
-            )
-            .subscribe(value => {
-                const previousValue = this.value();
-                const max = this.max();
-                const min = this.min();
-                if (value == null) {
-                    this.value.set(null);
-                } else if (min != null && value < min) {
-                    this.value.set(min);
-                } else if (max != null && value > max) {
-                    this.value.set(max);
-                } else {
-                    this.value.set(value);
-                }
-                if (previousValue !== this.value()) {
-                    this.#propagateChange?.(this.value());
-                }
-            });
-        this.keydown$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe((event: KeyboardEvent) => {
-            if (event.key === "ArrowUp") {
-                event.preventDefault();
-                this.increase();
-                return;
-            }
-
-            if (event.key === "ArrowDown") {
-                event.preventDefault();
-                this.decrease();
-                return;
-            }
-        });
-        this.spin$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe((sign: Sign) => {
-            if (sign === "-") {
-                this.decrease();
-            } else {
-                this.increase();
-            }
-            interval(100)
-                .pipe(delay(300), takeUntil(this.spinStop$))
-                .subscribe(() => {
-                    if (sign === "-") {
-                        this.decrease();
-                    } else {
-                        this.increase();
-                    }
-                });
-        });
-        this.wheel$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe((event: WheelEvent) => {
-            event.preventDefault();
-            if (event.deltaY < 0) {
-                this.increase();
-            } else {
-                this.decrease();
-            }
-        });
-        this.inputFocus
-            .pipe(takeUntilDestroyed(this.#destroyRef))
-            .subscribe(() => this.#hostElementRef.nativeElement.focus());
-
+    private setBeforeInputSubscription(): void {
         this.beforeInput$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe((event: InputEvent): void => {
             const inputElement = event.target as HTMLInputElement;
 
@@ -362,6 +275,103 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
             if (max != null && parseFloat(newValue) > max) {
                 event.preventDefault();
                 this.valueChange$.next(max.toString());
+            }
+        });
+    }
+
+    private setInputFocusSubscription(): void {
+        this.inputFocus.subscribe(() => this.#hostElementRef.nativeElement.focus());
+    }
+
+    private setKeydownSubscription(): void {
+        this.keydown$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe((event: KeyboardEvent) => {
+            if (event.key === "ArrowUp") {
+                event.preventDefault();
+                this.increase();
+                return;
+            }
+
+            if (event.key === "ArrowDown") {
+                event.preventDefault();
+                this.decrease();
+                return;
+            }
+        });
+    }
+
+    private setSpinSubscription(): void {
+        this.spin$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe((sign: Sign) => {
+            if (sign === "-") {
+                this.decrease();
+            } else {
+                this.increase();
+            }
+            interval(100)
+                .pipe(delay(300), takeUntil(this.spinStop$))
+                .subscribe(() => {
+                    if (sign === "-") {
+                        this.decrease();
+                    } else {
+                        this.increase();
+                    }
+                });
+        });
+    }
+
+    private setSubscriptions(): void {
+        this.setValueChangeSubscription();
+        this.setKeydownSubscription();
+        this.setSpinSubscription();
+        this.setWheelSubscription();
+        this.setInputFocusSubscription();
+        this.setBeforeInputSubscription();
+    }
+
+    private setValueChangeSubscription(): void {
+        this.valueChange$
+            .pipe(
+                takeUntilDestroyed(this.#destroyRef),
+                distinctUntilChanged(),
+                filter(v => v == null || v === "" || NumericTextBoxComponent.isNumeric(v)),
+                map(v => {
+                    if (v == null || v === "") {
+                        if (this.nullable()) {
+                            return null;
+                        }
+                        if (this.min() != null) {
+                            return this.min();
+                        }
+                        return 0;
+                    }
+                    return parseFloat(v.toString());
+                })
+            )
+            .subscribe(value => {
+                const previousValue = this.value();
+                const max = this.max();
+                const min = this.min();
+                if (value == null) {
+                    this.value.set(null);
+                } else if (min != null && value < min) {
+                    this.value.set(min);
+                } else if (max != null && value > max) {
+                    this.value.set(max);
+                } else {
+                    this.value.set(value);
+                }
+                if (previousValue !== this.value()) {
+                    this.#propagateChange?.(this.value());
+                }
+            });
+    }
+
+    private setWheelSubscription(): void {
+        this.wheel$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe((event: WheelEvent) => {
+            event.preventDefault();
+            if (event.deltaY < 0) {
+                this.increase();
+            } else {
+                this.decrease();
             }
         });
     }

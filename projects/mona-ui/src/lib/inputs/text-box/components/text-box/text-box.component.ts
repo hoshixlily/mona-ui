@@ -2,13 +2,16 @@ import { NgTemplateOutlet } from "@angular/common";
 import {
     ChangeDetectionStrategy,
     Component,
+    contentChildren,
     ContentChildren,
     EventEmitter,
     forwardRef,
     input,
     Input,
     InputSignal,
+    output,
     Output,
+    OutputEmitterRef,
     QueryList,
     signal,
     TemplateRef,
@@ -46,7 +49,13 @@ import { InputType } from "../../models/InputType";
 })
 export class TextBoxComponent implements ControlValueAccessor {
     #propagateChange: Action<string, any> | null = null;
+
     protected readonly clearIcon: IconDefinition = faTimes;
+    protected readonly prefixTemplateList = contentChildren(TextBoxPrefixTemplateDirective, { read: TemplateRef });
+    protected readonly suffixTemplateList = contentChildren(TextBoxSuffixTemplateDirective, { read: TemplateRef });
+
+    public readonly inputBlur: OutputEmitterRef<Event> = output();
+    public readonly inputFocus: OutputEmitterRef<Event> = output();
 
     public clearButton: InputSignal<boolean> = input<boolean>(false);
     public disabled: InputSignal<boolean> = input<boolean>(false);
@@ -58,18 +67,6 @@ export class TextBoxComponent implements ControlValueAccessor {
     public readonly: InputSignal<boolean> = input<boolean>(false);
     public type: InputSignal<InputType> = input<InputType>("text");
     public value: WritableSignal<string> = signal<string>("");
-
-    @Output()
-    public inputBlur: EventEmitter<Event> = new EventEmitter<Event>();
-
-    @Output()
-    public inputFocus: EventEmitter<Event> = new EventEmitter<Event>();
-
-    @ContentChildren(TextBoxPrefixTemplateDirective, { read: TemplateRef })
-    public prefixTemplateList: QueryList<TemplateRef<any>> = new QueryList<TemplateRef<any>>();
-
-    @ContentChildren(TextBoxSuffixTemplateDirective, { read: TemplateRef })
-    public suffixTemplateList: QueryList<TemplateRef<any>> = new QueryList<TemplateRef<any>>();
 
     public onClearClick(): void {
         this.value.set("");

@@ -1,4 +1,4 @@
-@for (prefixTemplate of prefixTemplateList; track $index) {
+@for (prefixTemplate of prefixTemplateList(); track $index) {
     <span class="mona-text-box-prefix">
         <ng-container *ngTemplateOutlet="prefixTemplate"></ng-container>
     </span>
@@ -20,7 +20,7 @@
     </button>
 }
 
-@for (suffixTemplate of suffixTemplateList; track $index) {
+@for (suffixTemplate of suffixTemplateList(); track $index) {
     <span class="mona-text-box-suffix">
         <ng-container *ngTemplateOutlet="suffixTemplate"></ng-container>
     </span>

@@ -4,6 +4,4 @@ import { Directive } from "@angular/core";
     selector: "input[type='checkbox'][monaCheckBox]",
     standalone: true
 })
-export class CheckBoxDirective {
-    public constructor() {}
-}
+export class CheckBoxDirective {}

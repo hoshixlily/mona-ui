@@ -33,7 +33,7 @@
                 } @else {
                     <span>
                         <ng-container
-                                *ngTemplateOutlet="tickValueTemplate; context: {$implicit: tick.value}"></ng-container>
+                                *ngTemplateOutlet="tickValueTemplate()??null; context: {$implicit: tick.value}"></ng-container>
                     </span>
                 }
             </span>

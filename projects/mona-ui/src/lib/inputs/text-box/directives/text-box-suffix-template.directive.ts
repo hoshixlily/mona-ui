@@ -4,6 +4,4 @@ import { Directive } from "@angular/core";
     selector: "ng-template[monaTextBoxSuffixTemplate]",
     standalone: true
 })
-export class TextBoxSuffixTemplateDirective {
-    public constructor() {}
-}
+export class TextBoxSuffixTemplateDirective {}

@@ -4,6 +4,4 @@ import { Directive } from "@angular/core";
     selector: "textarea[monaTextArea]",
     standalone: true
 })
-export class TextAreaDirective {
-    public constructor() {}
-}
+export class TextAreaDirective {}

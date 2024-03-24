@@ -3,7 +3,9 @@ import { ApplicationRef, Component } from "@angular/core";
 import { ComponentFixture, fakeAsync, TestBed, tick } from "@angular/core/testing";
 import { BrowserModule, By } from "@angular/platform-browser";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
+import { ContextMenuComponent } from "../../../../menus/context-menu/context-menu.component";
 import { MenuItemComponent } from "../../../../menus/menu-item/menu-item.component";
+import { ButtonDirective } from "../../../button/button.directive";
 
 import { SplitButtonComponent } from "./split-button.component";
 
@@ -40,16 +42,26 @@ describe("SplitButtonComponent", () => {
     let hostComponent: TestHostComponent;
     let fixture: ComponentFixture<SplitButtonComponent>;
     let hostFixture: ComponentFixture<TestHostComponent>;
+    let appRef: ApplicationRef;
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [SplitButtonComponent, TestHostComponent, BrowserAnimationsModule, CommonModule, BrowserModule],
-            providers: []
+            imports: [
+                SplitButtonComponent,
+                TestHostComponent,
+                BrowserAnimationsModule,
+                CommonModule,
+                BrowserModule,
+                ContextMenuComponent,
+                ButtonDirective
+            ],
+            providers: [ApplicationRef]
         });
         fixture = TestBed.createComponent(SplitButtonComponent);
         hostFixture = TestBed.createComponent(TestHostComponent);
         component = fixture.componentInstance;
         hostComponent = hostFixture.componentInstance;
+        appRef = TestBed.inject(ApplicationRef);
         fixture.detectChanges();
         hostFixture.detectChanges();
     });
@@ -80,7 +92,7 @@ describe("SplitButtonComponent", () => {
             .map(button => button.nativeElement) as HTMLButtonElement[];
         expect(buttons.length).toBe(2);
         buttons[1].click();
-        hostFixture.detectChanges();
+        appRef.tick();
         const menu = document.querySelector("ul.mona-contextmenu-list");
         expect(menu).not.toBeNull();
         const menuItems = menu?.querySelectorAll("li.mona-contextmenu-list-item");
@@ -96,14 +108,12 @@ describe("SplitButtonComponent", () => {
             .map(button => button.nativeElement) as HTMLButtonElement[];
         expect(buttons.length).toBe(2);
         buttons[1].click();
-        hostFixture.detectChanges();
+        appRef.tick();
         const menu = document.querySelector("ul.mona-contextmenu-list");
         expect(menu).not.toBeNull();
         const thirdMenuItem = menu?.querySelectorAll("li.mona-contextmenu-list-item")[2] as HTMLLIElement;
         thirdMenuItem.dispatchEvent(new MouseEvent("mouseenter"));
-        tick();
-        hostFixture.detectChanges();
-        tick();
+        appRef.tick();
         const subMenu = document.querySelectorAll("ul.mona-contextmenu-list")[1];
         expect(subMenu).not.toBeNull();
 
@@ -120,9 +130,7 @@ describe("SplitButtonComponent", () => {
             .map(button => button.nativeElement) as HTMLButtonElement[];
         expect(buttons.length).toBe(2);
         buttons[1].click();
-        tick();
-        hostFixture.detectChanges();
-        tick();
+        appRef.tick();
         const menu = document.querySelector("ul.mona-contextmenu-list");
         expect(menu).not.toBeNull();
         const menuItems = menu?.querySelectorAll("li.mona-contextmenu-list-item");
@@ -135,9 +143,7 @@ describe("SplitButtonComponent", () => {
         tick();
         hostFixture.detectChanges();
         buttons[1].click();
-        tick();
-        hostFixture.detectChanges();
-        tick();
+        appRef.tick();
         const menu2 = document.querySelector("ul.mona-contextmenu-list") as HTMLUListElement;
         expect(menu2).not.toBeNull();
         const menuItems2 = menu2.querySelectorAll("li.mona-contextmenu-list-item") as NodeListOf<HTMLLIElement>;

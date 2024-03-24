@@ -1,14 +1,14 @@
-<button monaButton (click)="buttonClick.emit()" [disabled]="disabled"
+<button monaButton (click)="buttonClick.emit($event)" [disabled]="disabled()"
         [tabindex]="tabindex()" #mainButton>
-    @if (textTemplate) {
-        <ng-container [ngTemplateOutlet]="textTemplate"></ng-container>
+    @if (textTemplate()) {
+        <ng-container [ngTemplateOutlet]="textTemplate()??null"></ng-container>
     } @else {
         <span class="mona-split-button-text">{{text()}}</span>
     }
 </button>
-<button monaButton [disabled]="disabled" [tabindex]="-1" #menuButton>
+<button monaButton [disabled]="disabled()" [tabindex]="-1" #menuButton>
     <fa-icon [icon]="menuIcon"></fa-icon>
 </button>
 <mona-contextmenu [target]="menuButton" trigger="click" [minWidth]="popupWidth"
                   [offset]="popupOffset" popupClass="mona-split-button-popup"
-                  [menuItems]="menuItems" #contextMenuComponent ></mona-contextmenu>
+                  [menuItems]="menuItems()" #contextMenuComponent ></mona-contextmenu>

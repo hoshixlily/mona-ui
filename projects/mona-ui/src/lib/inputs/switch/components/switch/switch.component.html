@@ -1,20 +1,20 @@
 <span class="mona-switch-label mona-switch-on">
-    @if (active() && !onLabelTemplate) {
+    @if (active() && !onLabelTemplate()) {
         <span @fadeInOut>{{labelOn()}}</span>
     }
-    @if (active() && onLabelTemplate) {
+    @if (active() && onLabelTemplate()) {
         <span @fadeInOut>
-            <ng-template [ngTemplateOutlet]="onLabelTemplate"></ng-template>
+            <ng-template [ngTemplateOutlet]="onLabelTemplate()??null"></ng-template>
         </span>
     }
 </span>
 <span class="mona-switch-label mona-switch-off">
-    @if (!active() && !offLabelTemplate) {
+    @if (!active() && !offLabelTemplate()) {
         <span @fadeInOut>{{labelOff()}}</span>
     }
-    @if (!active() && offLabelTemplate) {
+    @if (!active() && offLabelTemplate()) {
         <span @fadeInOut>
-            <ng-template [ngTemplateOutlet]="offLabelTemplate"></ng-template>
+            <ng-template [ngTemplateOutlet]="offLabelTemplate()??null"></ng-template>
         </span>
     }
 </span>

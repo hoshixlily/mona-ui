@@ -4,7 +4,7 @@ import {
     ChangeDetectionStrategy,
     Component,
     computed,
-    ContentChild,
+    contentChild,
     DestroyRef,
     ElementRef,
     forwardRef,
@@ -15,7 +15,7 @@ import {
     Signal,
     signal,
     TemplateRef,
-    ViewChild,
+    viewChild,
     WritableSignal
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
@@ -60,6 +60,9 @@ export class RangeSliderComponent implements AfterViewInit, ControlValueAccessor
     protected readonly dragging: WritableSignal<boolean> = signal(false);
     protected readonly handlePosition: WritableSignal<[number, number]> = signal([0, 0]);
     protected readonly handleValue: WritableSignal<[number, number]> = signal([0, 0]);
+    protected readonly primaryHandle: Signal<ElementRef<HTMLDivElement>> = viewChild.required("primaryHandle");
+    protected readonly secondaryHandle: Signal<ElementRef<HTMLDivElement>> = viewChild.required("secondaryHandle");
+    protected readonly tickValueTemplate = contentChild(RangeSliderTickValueTemplateDirective, { read: TemplateRef });
     protected readonly trackSelectionStyleData: Signal<{ size: number; position: number }> = computed(() => {
         const handlePosition = this.handlePosition();
         return {
@@ -96,15 +99,6 @@ export class RangeSliderComponent implements AfterViewInit, ControlValueAccessor
     public showTicks: InputSignal<boolean> = input(false);
     public step: InputSignal<number> = input(1);
     public tickStep: InputSignal<number> = input(1);
-
-    @ViewChild("primaryHandle")
-    public primaryHandle!: ElementRef<HTMLDivElement>;
-
-    @ViewChild("secondaryHandle")
-    public secondaryHandle!: ElementRef<HTMLDivElement>;
-
-    @ContentChild(RangeSliderTickValueTemplateDirective, { read: TemplateRef })
-    public tickValueTemplate?: TemplateRef<any>;
 
     public ngAfterViewInit() {
         this.setSubscriptions();
@@ -232,8 +226,8 @@ export class RangeSliderComponent implements AfterViewInit, ControlValueAccessor
     }
 
     private getClosestHandlerDataToMouse(event: MouseEvent): SliderHandleData {
-        const primaryHandlerRect = this.primaryHandle.nativeElement.getBoundingClientRect();
-        const secondaryHandlerRect = this.secondaryHandle.nativeElement.getBoundingClientRect();
+        const primaryHandlerRect = this.primaryHandle().nativeElement.getBoundingClientRect();
+        const secondaryHandlerRect = this.secondaryHandle().nativeElement.getBoundingClientRect();
         const primaryDistance = Math.sqrt(
             Math.pow(primaryHandlerRect.left - event.clientX, 2) + Math.pow(primaryHandlerRect.top - event.clientY, 2)
         );
@@ -243,11 +237,11 @@ export class RangeSliderComponent implements AfterViewInit, ControlValueAccessor
         );
         return primaryDistance < secondaryDistance
             ? {
-                  element: this.primaryHandle.nativeElement,
+                  element: this.primaryHandle().nativeElement,
                   type: "primary"
               }
             : {
-                  element: this.secondaryHandle.nativeElement,
+                  element: this.secondaryHandle().nativeElement,
                   type: "secondary"
               };
     }
@@ -263,10 +257,10 @@ export class RangeSliderComponent implements AfterViewInit, ControlValueAccessor
     private setKeyboardSubscriptions(): void {
         this.#zone.runOutsideAngular(() => {
             merge(
-                fromEvent<KeyboardEvent>(this.primaryHandle.nativeElement, "keydown").pipe(
+                fromEvent<KeyboardEvent>(this.primaryHandle().nativeElement, "keydown").pipe(
                     map(event => ({ event, type: "primary" }))
                 ),
-                fromEvent<KeyboardEvent>(this.secondaryHandle.nativeElement, "keydown").pipe(
+                fromEvent<KeyboardEvent>(this.secondaryHandle().nativeElement, "keydown").pipe(
                     map(event => ({ event, type: "secondary" }))
                 )
             )
@@ -305,10 +299,10 @@ export class RangeSliderComponent implements AfterViewInit, ControlValueAccessor
     private setSubscriptions(): void {
         this.#zone.runOutsideAngular(() => {
             merge(
-                fromEvent<MouseEvent>(this.primaryHandle.nativeElement, "mousedown").pipe(
+                fromEvent<MouseEvent>(this.primaryHandle().nativeElement, "mousedown").pipe(
                     map(event => ({ event, type: "primary" }))
                 ),
-                fromEvent<MouseEvent>(this.secondaryHandle.nativeElement, "mousedown").pipe(
+                fromEvent<MouseEvent>(this.secondaryHandle().nativeElement, "mousedown").pipe(
                     map(event => ({ event, type: "secondary" }))
                 )
             )

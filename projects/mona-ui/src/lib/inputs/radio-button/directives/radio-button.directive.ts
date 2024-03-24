@@ -4,6 +4,4 @@ import { Directive } from "@angular/core";
     selector: "input[type='radio'][monaRadioButton]",
     standalone: true
 })
-export class RadioButtonDirective {
-    public constructor() {}
-}
+export class RadioButtonDirective {}

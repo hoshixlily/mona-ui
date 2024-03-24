@@ -2,13 +2,14 @@ import {
     ChangeDetectionStrategy,
     Component,
     ElementRef,
-    EventEmitter,
     forwardRef,
     input,
     InputSignal,
-    Output,
+    output,
+    OutputEmitterRef,
+    Signal,
     signal,
-    ViewChild,
+    viewChild,
     WritableSignal
 } from "@angular/core";
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from "@angular/forms";
@@ -36,24 +37,18 @@ import { RadioButtonDirective } from "../../directives/radio-button.directive";
 })
 export class RadioButtonComponent implements ControlValueAccessor {
     #propagateChange: Action<any> | null = null;
+
     protected readonly selectedValue: WritableSignal<any> = signal<any>(undefined);
+
+    public readonly inputBlur: OutputEmitterRef<FocusEvent> = output();
+    public readonly inputClick: OutputEmitterRef<MouseEvent> = output();
+    public readonly inputFocus: OutputEmitterRef<FocusEvent> = output();
+
     public disabled: InputSignal<boolean> = input<boolean>(false);
     public label: InputSignal<string> = input<string>("");
     public labelPosition: InputSignal<"before" | "after"> = input<"before" | "after">("after");
     public name: InputSignal<string> = input<string>("");
     public value: InputSignal<any> = input<any>(undefined);
-
-    @Output()
-    public inputBlur: EventEmitter<FocusEvent> = new EventEmitter<FocusEvent>();
-
-    @Output()
-    public inputClick: EventEmitter<MouseEvent> = new EventEmitter<MouseEvent>();
-
-    @Output()
-    public inputFocus: EventEmitter<FocusEvent> = new EventEmitter<FocusEvent>();
-
-    @ViewChild("radioButton")
-    public radioButton: ElementRef<HTMLInputElement> | null = null;
 
     public onCheckedChange(checked: boolean): void {
         this.selectedValue.set(checked);

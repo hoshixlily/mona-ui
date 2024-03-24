@@ -1,7 +1,7 @@
-@for (prefixTemplate of prefixTemplateList; track $index) {
+@for (prefixTemplate of prefixTemplateList(); track $index) {
     <ng-container *ngTemplateOutlet="prefixTemplate"></ng-container>
 }
-<input monaTextBox [disabled]="disabled"
+<input monaTextBox [disabled]="disabled()"
        [required]="required()"
        [type]="'text'"
        inputmode="numeric"
@@ -18,11 +18,11 @@
        autocomplete="off" tabindex="0" class="mona-input-inner" #valueTextBox>
 @if (spinners()) {
     <div class="mona-numeric-text-box-spinners">
-        <button monaButton [disabled]="disabled" [tabindex]="-1"
+        <button monaButton [disabled]="disabled()" [tabindex]="-1"
                 (mousedown)="spin$.next('+')" (mouseup)="spinStop$.next()">
             <fa-icon [icon]="increaseIcon"></fa-icon>
         </button>
-        <button monaButton [disabled]="disabled" [tabindex]="-1"
+        <button monaButton [disabled]="disabled()" [tabindex]="-1"
                 (mousedown)="spin$.next('-')" (mouseup)="spinStop$.next()">
             <fa-icon [icon]="decreaseIcon"></fa-icon>
         </button>

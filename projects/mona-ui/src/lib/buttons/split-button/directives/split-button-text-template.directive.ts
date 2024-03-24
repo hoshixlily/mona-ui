@@ -4,6 +4,4 @@ import { Directive } from "@angular/core";
     selector: "ng-template[monaSplitButtonTextTemplate]",
     standalone: true
 })
-export class SplitButtonTextTemplateDirective {
-    public constructor() {}
-}
+export class SplitButtonTextTemplateDirective {}

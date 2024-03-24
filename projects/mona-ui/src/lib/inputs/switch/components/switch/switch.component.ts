@@ -2,6 +2,7 @@ import { NgClass, NgTemplateOutlet } from "@angular/common";
 import {
     ChangeDetectionStrategy,
     Component,
+    contentChild,
     ContentChild,
     DestroyRef,
     ElementRef,
@@ -48,17 +49,14 @@ export class SwitchComponent implements OnInit, ControlValueAccessor {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
     #propagateChange: Action<boolean> | null = null;
+
     protected readonly active: WritableSignal<boolean> = signal(false);
+    protected readonly offLabelTemplate = contentChild(SwitchOffLabelTemplateDirective, { read: TemplateRef });
+    protected readonly onLabelTemplate = contentChild(SwitchOnLabelTemplateDirective, { read: TemplateRef });
 
     public disabled: InputSignal<boolean> = input(false);
     public labelOff: InputSignal<string> = input("OFF");
     public labelOn: InputSignal<string> = input("ON");
-
-    @ContentChild(SwitchOffLabelTemplateDirective, { read: TemplateRef })
-    public offLabelTemplate: TemplateRef<never> | null = null;
-
-    @ContentChild(SwitchOnLabelTemplateDirective, { read: TemplateRef })
-    public onLabelTemplate: TemplateRef<never> | null = null;
 
     public ngOnInit(): void {
         this.setEventListeners();

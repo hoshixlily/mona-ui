@@ -4,6 +4,4 @@ import { Directive } from "@angular/core";
     selector: "input[monaTextBox]",
     standalone: true
 })
-export class TextBoxDirective {
-    public constructor() {}
-}
+export class TextBoxDirective {}

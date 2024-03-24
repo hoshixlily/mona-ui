@@ -4,7 +4,7 @@ import {
     ChangeDetectionStrategy,
     Component,
     computed,
-    ContentChild,
+    contentChild,
     DestroyRef,
     ElementRef,
     forwardRef,
@@ -15,7 +15,7 @@ import {
     Signal,
     signal,
     TemplateRef,
-    ViewChild,
+    viewChild,
     WritableSignal
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
@@ -57,6 +57,8 @@ export class SliderComponent implements AfterViewInit, ControlValueAccessor {
     protected readonly dragging: WritableSignal<boolean> = signal(false);
     protected readonly handlePosition: WritableSignal<number> = signal(0);
     protected readonly handleValue: WritableSignal<number> = signal(0);
+    protected readonly sliderHandle: Signal<ElementRef<HTMLDivElement>> = viewChild.required("sliderHandle");
+    protected readonly tickValueTemplate = contentChild(SliderTickValueTemplateDirective, { read: TemplateRef });
     protected readonly ticks: Signal<SliderTick[]> = computed(() => {
         const min = this.min();
         const max = this.max();
@@ -85,12 +87,6 @@ export class SliderComponent implements AfterViewInit, ControlValueAccessor {
     public showTicks: InputSignal<boolean> = input(false);
     public step: InputSignal<number> = input(1);
     public tickStep: InputSignal<number> = input(1);
-
-    @ViewChild("sliderHandle")
-    public sliderHandle!: ElementRef<HTMLDivElement>;
-
-    @ContentChild(SliderTickValueTemplateDirective, { read: TemplateRef })
-    public tickValueTemplate?: TemplateRef<any>;
 
     public ngAfterViewInit(): void {
         this.setSubscription();
@@ -178,7 +174,7 @@ export class SliderComponent implements AfterViewInit, ControlValueAccessor {
 
     private setSubscription(): void {
         this.#zone.runOutsideAngular(() => {
-            fromEvent<MouseEvent>(this.sliderHandle.nativeElement, "mousedown")
+            fromEvent<MouseEvent>(this.sliderHandle().nativeElement, "mousedown")
                 .pipe(
                     takeUntilDestroyed(this.#destroyRef),
                     filter(() => !this.disabled())
@@ -216,7 +212,7 @@ export class SliderComponent implements AfterViewInit, ControlValueAccessor {
                     this.handleHandleMove(event, this.orientation());
                 });
 
-            fromEvent<KeyboardEvent>(this.sliderHandle.nativeElement, "keydown")
+            fromEvent<KeyboardEvent>(this.sliderHandle().nativeElement, "keydown")
                 .pipe(
                     filter(
                         (event: KeyboardEvent) =>

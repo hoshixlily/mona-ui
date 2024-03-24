@@ -27,12 +27,12 @@
                      'mona-slider-position-after': labelPosition()==='after'}">
         @for (tick of ticks(); track $index) {
             <span class="mona-slider-tick-label" [ngClass]="{'mona-invisible': $index % labelStep() !== 0}">
-                @if (!tickValueTemplate) {
+                @if (!tickValueTemplate()) {
                     <span>{{ tick.value }}</span>
                 } @else {
                     <span>
                     <ng-container
-                            *ngTemplateOutlet="tickValueTemplate; context: {$implicit: tick.value}"></ng-container>
+                            *ngTemplateOutlet="tickValueTemplate()??null; context: {$implicit: tick.value}"></ng-container>
                     </span>
                 }
 
