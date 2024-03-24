@@ -1,15 +1,12 @@
 import {
     ChangeDetectionStrategy,
     Component,
-    ElementRef,
     forwardRef,
     input,
     InputSignal,
     output,
     OutputEmitterRef,
-    Signal,
     signal,
-    viewChild,
     WritableSignal
 } from "@angular/core";
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from "@angular/forms";
