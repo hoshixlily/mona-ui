@@ -4,6 +4,4 @@ import { Directive } from "@angular/core";
     selector: "ng-template[monaExpansionPanelActionsTemplate]",
     standalone: true
 })
-export class ExpansionPanelActionsTemplateDirective {
-    public constructor() {}
-}
+export class ExpansionPanelActionsTemplateDirective {}

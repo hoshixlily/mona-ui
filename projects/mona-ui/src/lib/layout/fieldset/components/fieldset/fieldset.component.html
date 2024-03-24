@@ -1,7 +1,7 @@
 <fieldset>
     <legend class="mona-fieldset-legend">
-        @if (legendTemplate) {
-            <ng-container *ngTemplateOutlet="legendTemplate"></ng-container>
+        @if (legendTemplate()) {
+            <ng-container *ngTemplateOutlet="legendTemplate()??null"></ng-container>
         } @else {
             <span>{{ legend() }}</span>
         }

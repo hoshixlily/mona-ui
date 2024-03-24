@@ -4,6 +4,4 @@ import { Directive } from "@angular/core";
     selector: "ng-template[monaFieldsetLegendTemplate]",
     standalone: true
 })
-export class FieldsetLegendTemplateDirective {
-    public constructor() {}
-}
+export class FieldsetLegendTemplateDirective {}

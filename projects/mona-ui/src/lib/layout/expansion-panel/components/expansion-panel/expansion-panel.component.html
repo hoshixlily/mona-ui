@@ -1,14 +1,14 @@
 <div class="mona-expansion-panel-header" (click)="expanded.set(!expanded());">
     <div class="mona-expansion-panel-header-title">
-        @if (titleTemplate) {
-            <ng-container [ngTemplateOutlet]="titleTemplate"></ng-container>
+        @if (titleTemplate()) {
+            <ng-container [ngTemplateOutlet]="titleTemplate()??null"></ng-container>
         } @else {
             {{ title() }}
         }
     </div>
     <div class="mona-expansion-panel-header-actions">
-        @if (actionsTemplate) {
-            <ng-container [ngTemplateOutlet]="actionsTemplate"></ng-container>
+        @if (actionsTemplate()) {
+            <ng-container [ngTemplateOutlet]="actionsTemplate()??null"></ng-container>
         } @else {
             @if (expanded()) {
                 <fa-icon [icon]="collapseIcon"></fa-icon>

@@ -3,19 +3,19 @@ import {
     AfterViewInit,
     ChangeDetectionStrategy,
     Component,
-    ContentChild,
+    contentChild,
     DestroyRef,
     ElementRef,
-    EventEmitter,
     inject,
     input,
     InputSignal,
     OnDestroy,
-    Output,
+    output,
+    OutputEmitterRef,
     TemplateRef
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { fromEvent } from "rxjs";
+import { fromEvent, take } from "rxjs";
 import { PopupOffset } from "../../models/PopupOffset";
 import { PopupRef } from "../../models/PopupRef";
 import { PopupSettings } from "../../models/PopupSettings";
@@ -37,6 +37,11 @@ export class PopupComponent implements OnDestroy, AfterViewInit {
     #popupOpened: boolean = false;
     #popupRef: PopupRef | null = null;
 
+    protected readonly contentTemplate = contentChild.required(TemplateRef);
+
+    public readonly close: OutputEmitterRef<void> = output();
+    public readonly open: OutputEmitterRef<PopupRef> = output();
+
     public anchor: InputSignal<FlexibleConnectedPositionStrategyOrigin> = input.required();
     public closeOnEscape: InputSignal<boolean> = input(true);
     public height: InputSignal<number | string | undefined> = input<number | string | undefined>(undefined);
@@ -50,15 +55,6 @@ export class PopupComponent implements OnDestroy, AfterViewInit {
     public trigger: InputSignal<string> = input("click");
     public width: InputSignal<number | string | undefined> = input<number | string | undefined>(undefined);
 
-    @Output()
-    public close: EventEmitter<void> = new EventEmitter<void>();
-
-    @ContentChild(TemplateRef)
-    public contentTemplate!: TemplateRef<any>;
-
-    @Output()
-    public open: EventEmitter<PopupRef> = new EventEmitter<PopupRef>();
-
     public ngAfterViewInit(): void {
         window.setTimeout(() => {
             this.setEventListeners();
@@ -67,6 +63,22 @@ export class PopupComponent implements OnDestroy, AfterViewInit {
 
     public ngOnDestroy(): void {
         this.#popupRef?.close();
+    }
+
+    private getPopupWidth(): string | number | undefined {
+        const width = this.width();
+        if (width != null) {
+            return width;
+        }
+
+        const anchor = this.anchor();
+        if (anchor instanceof HTMLElement) {
+            return anchor.getBoundingClientRect().width;
+        }
+        if (anchor instanceof ElementRef) {
+            return anchor.nativeElement.getBoundingClientRect().width;
+        }
+        return undefined;
     }
 
     private setEventListeners(): void {
@@ -81,13 +93,7 @@ export class PopupComponent implements OnDestroy, AfterViewInit {
             target = document.body;
             pointAnchor = true;
         }
-        const width =
-            this.width() ??
-            (anchor instanceof HTMLElement
-                ? anchor.getBoundingClientRect().width
-                : anchor instanceof ElementRef
-                  ? anchor.nativeElement.getBoundingClientRect().width
-                  : undefined);
+        const width = this.getPopupWidth();
         fromEvent<MouseEvent>(target, this.trigger())
             .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe(event => {
@@ -99,7 +105,7 @@ export class PopupComponent implements OnDestroy, AfterViewInit {
                 const popupSettings: PopupSettings = {
                     anchor,
                     closeOnEscape: this.closeOnEscape(),
-                    content: this.contentTemplate,
+                    content: this.contentTemplate(),
                     hasBackdrop: false,
                     height: this.height(),
                     maxHeight: this.maxHeight(),
@@ -112,10 +118,9 @@ export class PopupComponent implements OnDestroy, AfterViewInit {
                     width
                 };
                 this.#popupRef = this.#popupService.create(popupSettings);
-                const subscription = this.#popupRef.closed.subscribe(result => {
+                this.#popupRef.closed.pipe(take(1)).subscribe(result => {
                     this.#popupRef = null;
                     this.close.emit();
-                    subscription.unsubscribe();
                     if (result instanceof PointerEvent && result.type === this.trigger()) {
                         this.#popupOpened =
                             target instanceof HTMLElement && target.contains(result.target as HTMLElement);

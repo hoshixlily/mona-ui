@@ -2,7 +2,7 @@ import { NgClass, NgTemplateOutlet } from "@angular/common";
 import {
     ChangeDetectionStrategy,
     Component,
-    ContentChild,
+    contentChild,
     input,
     InputSignal,
     model,
@@ -29,15 +29,11 @@ import { ExpansionPanelTitleTemplateDirective } from "../../directives/expansion
     }
 })
 export class ExpansionPanelComponent {
+    protected readonly actionsTemplate = contentChild(ExpansionPanelActionsTemplateDirective, { read: TemplateRef });
     protected readonly collapseIcon: IconDefinition = faMinus;
     protected readonly expandIcon: IconDefinition = faPlus;
+    protected readonly titleTemplate = contentChild(ExpansionPanelTitleTemplateDirective, { read: TemplateRef });
 
     public expanded: ModelSignal<boolean> = model(false);
     public title: InputSignal<string> = input("");
-
-    @ContentChild(ExpansionPanelActionsTemplateDirective, { read: TemplateRef })
-    public actionsTemplate: TemplateRef<any> | null = null;
-
-    @ContentChild(ExpansionPanelTitleTemplateDirective, { read: TemplateRef })
-    public titleTemplate: TemplateRef<any> | null = null;
 }

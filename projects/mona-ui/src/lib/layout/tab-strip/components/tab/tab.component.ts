@@ -2,13 +2,14 @@ import {
     AfterViewInit,
     ChangeDetectionStrategy,
     Component,
-    ContentChild,
+    contentChild,
     EmbeddedViewRef,
     inject,
     input,
     InputSignal,
     model,
     ModelSignal,
+    Signal,
     TemplateRef,
     ViewContainerRef
 } from "@angular/core";
@@ -25,6 +26,16 @@ import { TabTitleTemplateDirective } from "../../directives/tab-title-template.d
 export class TabComponent implements AfterViewInit {
     readonly #vcr: ViewContainerRef = inject(ViewContainerRef);
     #viewRef?: EmbeddedViewRef<any>;
+
+    protected readonly contentTemplate: Signal<TemplateRef<any> | undefined> = contentChild(
+        TabContentTemplateDirective,
+        { read: TemplateRef }
+    );
+
+    public readonly titleTemplate: Signal<TemplateRef<any> | undefined> = contentChild(TabTitleTemplateDirective, {
+        read: TemplateRef
+    });
+
     public readonly uid: string = v4();
     public closable: InputSignal<boolean | undefined> = input<boolean | undefined>(undefined);
     public disabled: InputSignal<boolean> = input(false);
@@ -32,15 +43,10 @@ export class TabComponent implements AfterViewInit {
     public selected: ModelSignal<boolean> = model(false);
     public title: InputSignal<string> = input("");
 
-    @ContentChild(TabContentTemplateDirective, { read: TemplateRef })
-    public contentTemplate: TemplateRef<any> | null = null;
-
-    @ContentChild(TabTitleTemplateDirective, { read: TemplateRef })
-    public titleTemplate: TemplateRef<any> | null = null;
-
     public createView(): void {
-        if (this.contentTemplate) {
-            this.#viewRef = this.#vcr.createEmbeddedView(this.contentTemplate);
+        const contentTemplate = this.contentTemplate();
+        if (contentTemplate) {
+            this.#viewRef = this.#vcr.createEmbeddedView(contentTemplate);
         }
     }
 

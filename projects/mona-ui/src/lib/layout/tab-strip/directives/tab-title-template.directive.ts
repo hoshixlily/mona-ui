@@ -4,6 +4,4 @@ import { Directive } from "@angular/core";
     selector: "ng-template[monaTabTitleTemplate]",
     standalone: true
 })
-export class TabTitleTemplateDirective {
-    public constructor() {}
-}
+export class TabTitleTemplateDirective {}

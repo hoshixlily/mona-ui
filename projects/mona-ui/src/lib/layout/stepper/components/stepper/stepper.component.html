@@ -4,21 +4,21 @@
     @for (step of steps(); track $index) {
         <li [ngStyle]="trackItemStyles()" (click)="onStepClick(step)">
             <div>
-                @if (stepTemplateDirective) {
-                    <ng-container [ngTemplateOutlet]="stepTemplateDirective.templateRef"
+                @if (stepTemplate()) {
+                    <ng-container [ngTemplateOutlet]="stepTemplate()??null"
                                   [ngTemplateOutletContext]="{$implicit: step.options, index: step.index, active: step.active()}"></ng-container>
                 } @else {
                     <span [ngClass]="{'mona-stepper-step-active': step.active()}">
-                        @if (indicatorTemplateDirective) {
-                            <ng-container [ngTemplateOutlet]="indicatorTemplateDirective.templateRef"
+                        @if (indicatorTemplate()) {
+                            <ng-container [ngTemplateOutlet]="indicatorTemplate()??null"
                                           [ngTemplateOutletContext]="{$implicit: step.options, index: step.index, active: step.active()}"></ng-container>
                         } @else {
                             {{ step.index }}
                         }
                     </span>
                 }
-                @if (labelTemplateDirective) {
-                    <ng-container [ngTemplateOutlet]="labelTemplateDirective?.templateRef ?? null"
+                @if (labelTemplate()) {
+                    <ng-container [ngTemplateOutlet]="labelTemplate() ?? null"
                                   [ngTemplateOutletContext]="{$implicit: step.options, index: step.index, active: step.active()}"></ng-container>
                 } @else {
                     <span>{{ step.options.label }}</span>

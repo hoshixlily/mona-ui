@@ -5,7 +5,7 @@ import {
     ChangeDetectionStrategy,
     Component,
     computed,
-    ContentChild,
+    contentChild,
     DestroyRef,
     ElementRef,
     inject,
@@ -18,7 +18,7 @@ import {
     Signal,
     signal,
     TemplateRef,
-    ViewChild,
+    viewChild,
     WritableSignal
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
@@ -61,9 +61,12 @@ export class ScrollViewComponent implements OnDestroy, AfterViewInit {
     #resizeObserver: ResizeObserver | null = null;
     #scroll$: Subject<void> = new Subject<void>();
 
+    protected readonly contentTemplate: Signal<TemplateRef<any> | undefined> = contentChild(TemplateRef);
     protected readonly itemCount: Signal<number> = computed(() => this.data().length);
     protected readonly leftArrow: IconDefinition = faChevronLeft;
     protected readonly pagerArrowVisible: WritableSignal<boolean> = signal(false);
+    protected readonly pagerListElementRef: Signal<ElementRef<HTMLUListElement> | undefined> =
+        viewChild("pageListElement");
     protected readonly pagerPosition: WritableSignal<string> = signal("0");
     protected readonly rightArrow: IconDefinition = faChevronRight;
     protected lastDirection: ScrollDirection | "none" = "none";
@@ -83,12 +86,6 @@ export class ScrollViewComponent implements OnDestroy, AfterViewInit {
     public width: InputSignalWithTransform<string, number | string> = input.required({
         transform: value => (typeof value === "number" ? `${value}px` : value)
     });
-
-    @ContentChild(TemplateRef)
-    public contentTemplate: TemplateRef<any> | null = null;
-
-    @ViewChild("pagerListElement")
-    public pagerListElementRef?: ElementRef<HTMLUListElement>;
 
     public ngAfterViewInit(): void {
         this.setPagerListResizeObserver();
@@ -181,8 +178,9 @@ export class ScrollViewComponent implements OnDestroy, AfterViewInit {
 
     private setPagerListResizeObserver(): void {
         asyncScheduler.schedule(() => {
-            if (this.pagerListElementRef) {
-                const element = this.pagerListElementRef.nativeElement;
+            const pagerListElementRef = this.pagerListElementRef();
+            if (pagerListElementRef) {
+                const element = pagerListElementRef.nativeElement;
                 this.pagerArrowVisible.set(element.scrollWidth > element.clientWidth);
                 this.#resizeObserver = new ResizeObserver(() => {
                     const scrollWidth = element.scrollWidth;

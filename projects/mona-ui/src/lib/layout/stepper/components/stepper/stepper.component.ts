@@ -3,10 +3,9 @@ import {
     ChangeDetectionStrategy,
     Component,
     computed,
-    ContentChild,
+    contentChild,
     DestroyRef,
     ElementRef,
-    EventEmitter,
     inject,
     input,
     InputSignal,
@@ -14,8 +13,10 @@ import {
     model,
     ModelSignal,
     OnInit,
-    Output,
-    Signal
+    output,
+    OutputEmitterRef,
+    Signal,
+    TemplateRef
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { fromEvent } from "rxjs";
@@ -23,6 +24,7 @@ import { StepperIndicatorTemplateDirective } from "../../directives/stepper-indi
 import { StepperLabelTemplateDirective } from "../../directives/stepper-label-template.directive";
 import { StepperStepTemplateDirective } from "../../directives/stepper-step-template.directive";
 import { Step, StepOptions } from "../../models/Step";
+import { StepperTemplateContext } from "../../models/StepperTemplateContext";
 
 @Component({
     selector: "mona-stepper",
@@ -51,6 +53,7 @@ export class StepperComponent implements OnInit {
         const step = this.activeStep();
         return step ? `${(100 / (this.steps().length - 1)) * step.index}%` : "0%";
     });
+
     protected readonly activeStep: Signal<Step> = computed(() => {
         const step = this.step();
         return this.steps()[step];
@@ -63,6 +66,20 @@ export class StepperComponent implements OnInit {
             gridTemplateRows: orientation === "vertical" ? `repeat(${stepCount * 2}, 1fr)` : undefined
         };
     });
+    protected readonly indicatorTemplate: Signal<TemplateRef<StepperTemplateContext> | undefined> = contentChild(
+        StepperIndicatorTemplateDirective,
+        { read: TemplateRef }
+    );
+    protected readonly labelTemplate: Signal<TemplateRef<StepperTemplateContext> | undefined> = contentChild(
+        StepperLabelTemplateDirective,
+        { read: TemplateRef }
+    );
+    protected readonly stepTemplate: Signal<TemplateRef<StepperTemplateContext> | undefined> = contentChild(
+        StepperStepTemplateDirective,
+        {
+            read: TemplateRef
+        }
+    );
     protected readonly trackInnerStyles: Signal<Partial<CSSStyleDeclaration>> = computed(() => {
         const orientation = this.orientation();
         const length = this.#trackLength();
@@ -70,7 +87,6 @@ export class StepperComponent implements OnInit {
             [orientation === "horizontal" ? "width" : "height"]: length
         };
     });
-
     protected readonly trackItemStyles: Signal<Partial<CSSStyleDeclaration>> = computed(() => {
         const orientation = this.orientation();
         const itemSize = this.#trackItemSize();
@@ -78,7 +94,6 @@ export class StepperComponent implements OnInit {
             [orientation === "horizontal" ? "maxWidth" : "maxHeight"]: `${itemSize}%`
         };
     });
-
     protected readonly trackStyles: Signal<Partial<CSSStyleDeclaration>> = computed(() => {
         const orientation = this.orientation();
         const step = this.activeStep();
@@ -87,6 +102,8 @@ export class StepperComponent implements OnInit {
         const gridRow = orientation === "vertical" && step != null ? `2/${stepCount * 2}` : undefined;
         return { gridColumn, gridRow };
     });
+
+    public readonly stepChange: OutputEmitterRef<number> = output();
 
     public linear: InputSignal<boolean> = input(false);
     public orientation: InputSignal<"horizontal" | "vertical"> = input<"horizontal" | "vertical">("horizontal");
@@ -100,18 +117,6 @@ export class StepperComponent implements OnInit {
             });
         }
     });
-
-    @ContentChild(StepperIndicatorTemplateDirective)
-    public indicatorTemplateDirective: StepperIndicatorTemplateDirective | null = null;
-
-    @ContentChild(StepperLabelTemplateDirective)
-    public labelTemplateDirective: StepperLabelTemplateDirective | null = null;
-
-    @ContentChild(StepperStepTemplateDirective)
-    public stepTemplateDirective: StepperStepTemplateDirective | null = null;
-
-    @Output()
-    public stepChange: EventEmitter<number> = new EventEmitter<number>();
 
     public ngOnInit(): void {
         this.setSubscriptions();
