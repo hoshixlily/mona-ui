@@ -1,5 +1,5 @@
 import { Directive, EventEmitter, Input, OnInit, Output } from "@angular/core";
-import { ImmutableSet, Selector } from "@mirei/ts-collections";
+import { Selector } from "@mirei/ts-collections";
 import { SelectableOptions } from "../models/SelectableOptions";
 import { ListService } from "../services/list.service";
 
@@ -13,6 +13,7 @@ export class ListSelectableDirective<T> implements OnInit {
         enabled: true,
         toggleable: false
     };
+
     @Input("monaListSelectable")
     public set options(value: Partial<SelectableOptions> | "") {
         if (value === "") {

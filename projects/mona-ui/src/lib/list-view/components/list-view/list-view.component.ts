@@ -5,18 +5,20 @@ import {
     ChangeDetectionStrategy,
     Component,
     computed,
-    ContentChild,
+    contentChild,
     DestroyRef,
+    effect,
     ElementRef,
-    EventEmitter,
     inject,
     input,
-    Input,
+    InputSignal,
     InputSignalWithTransform,
-    Output,
+    output,
+    OutputEmitterRef,
     Signal,
     signal,
     TemplateRef,
+    untracked,
     WritableSignal
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
@@ -38,7 +40,6 @@ import { ListViewGroupHeaderTemplateDirective } from "../../directives/list-view
 import { ListViewHeaderTemplateDirective } from "../../directives/list-view-header-template.directive";
 import { ListViewItemTemplateDirective } from "../../directives/list-view-item-template.directive";
 import { ListViewNoDataTemplateDirective } from "../../directives/list-view-no-data-template.directive";
-import { ListViewItemTemplateContext } from "../../models/ListViewItemTemplateContext";
 import { PagerSettings } from "../../models/PagerSettings";
 import { PageState } from "../../models/PageState";
 
@@ -75,7 +76,13 @@ export class ListViewComponent<T = any> implements AfterViewInit {
         return !pageableOptions.enabled;
     });
 
+    protected readonly footerTemplate = contentChild(ListViewFooterTemplateDirective, { read: TemplateRef });
+    protected readonly groupHeaderTemplate = contentChild(ListViewGroupHeaderTemplateDirective, { read: TemplateRef });
+    protected readonly headerTemplate = contentChild(ListViewHeaderTemplateDirective, { read: TemplateRef });
     protected readonly itemCount: Signal<number> = computed(() => this.items().size());
+    protected readonly itemTemplate = contentChild(ListViewItemTemplateDirective, { read: TemplateRef });
+    protected readonly listService: ListService<T> = inject(ListService);
+    protected readonly noDataTemplate = contentChild(ListViewNoDataTemplateDirective, { read: TemplateRef });
     protected readonly pageState: PageState = { page: signal(1), skip: signal(0), take: signal(10) };
     protected readonly pagerSettings: WritableSignal<PagerSettings> = signal({
         enabled: false,
@@ -97,6 +104,8 @@ export class ListViewComponent<T = any> implements AfterViewInit {
         return items.skip(skip).take(take).toImmutableSet();
     });
 
+    public readonly scrollBottom: OutputEmitterRef<Event> = output();
+
     public height: InputSignalWithTransform<ListSizeType, ListSizeInputType> = input("100%", {
         transform: value => {
             if (value == null) {
@@ -111,6 +120,9 @@ export class ListViewComponent<T = any> implements AfterViewInit {
     public items: InputSignalWithTransform<ImmutableSet<T>, Iterable<T>> = input(ImmutableSet.create(), {
         transform: value => ImmutableSet.create(value)
     });
+    public textField: InputSignal<string | Selector<T, string> | null | undefined> = input<
+        string | Selector<T, string> | null | undefined
+    >("");
     public width: InputSignalWithTransform<ListSizeType, ListSizeInputType> = input("100%", {
         transform: value => {
             if (value == null) {
@@ -123,33 +135,12 @@ export class ListViewComponent<T = any> implements AfterViewInit {
         }
     });
 
-    @ContentChild(ListViewFooterTemplateDirective, { read: TemplateRef })
-    public footerTemplate: TemplateRef<any> | null = null;
-
-    @ContentChild(ListViewGroupHeaderTemplateDirective, { read: TemplateRef })
-    public groupHeaderTemplate: TemplateRef<any> | null = null;
-
-    @ContentChild(ListViewHeaderTemplateDirective, { read: TemplateRef })
-    public headerTemplate: TemplateRef<any> | null = null;
-
-    @ContentChild(ListViewItemTemplateDirective, { read: TemplateRef })
-    public itemTemplate!: TemplateRef<ListViewItemTemplateContext>;
-
-    @ContentChild(ListViewNoDataTemplateDirective, { read: TemplateRef })
-    public noDataTemplate: TemplateRef<any> | null = null;
-
-    @Input()
-    public pageSize: number = 5;
-
-    @Output()
-    public scrollBottom: EventEmitter<Event> = new EventEmitter<Event>();
-
-    @Input()
-    public set textField(textField: string | Selector<T, string> | null | undefined) {
-        this.listService.setTextField(textField ?? "");
+    public constructor() {
+        effect(() => {
+            const textField = this.textField();
+            untracked(() => this.listService.setTextField(textField ?? ""));
+        });
     }
-
-    public constructor(protected readonly listService: ListService<T>) {}
 
     public ngAfterViewInit(): void {
         this.setScrollBottomEvent();
