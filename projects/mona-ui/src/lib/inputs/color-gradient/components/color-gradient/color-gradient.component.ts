@@ -13,7 +13,7 @@ import {
     NgZone,
     Signal,
     signal,
-    ViewChild,
+    viewChild,
     WritableSignal
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
@@ -28,7 +28,6 @@ import { ColorMode } from "../../../models/ColorMode";
 import { HSV, HSVSignal, RGB, RGBA, RGBSignal } from "../../../models/ColorSpaces";
 import { NumericTextBoxComponent } from "../../../numeric-text-box/components/numeric-text-box/numeric-text-box.component";
 import { NumericTextBoxPrefixTemplateDirective } from "../../../numeric-text-box/directives/numeric-text-box-prefix-template.directive";
-import { SliderComponent } from "../../../slider/components/slider/slider.component";
 import { TextBoxComponent } from "../../../text-box/components/text-box/text-box.component";
 import { TextBoxPrefixTemplateDirective } from "../../../text-box/directives/text-box-prefix-template.directive";
 import { TextBoxSuffixTemplateDirective } from "../../../text-box/directives/text-box-suffix-template.directive";
@@ -101,8 +100,10 @@ export class ColorGradientComponent implements AfterViewInit, ControlValueAccess
         const rgb = this.hsv2rgb(hsv.h(), 100, 100);
         return `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
     });
+    protected readonly hsvPointer: Signal<ElementRef<HTMLDivElement>> = viewChild.required("hsvPointer");
     protected readonly hsvPointerLeft: WritableSignal<number> = signal(0);
     protected readonly hsvPointerTop: WritableSignal<number> = signal(0);
+    protected readonly hsvRectangle: Signal<ElementRef<HTMLDivElement>> = viewChild.required("hsvRectangle");
     protected readonly hueValue$: Subject<number> = new Subject<number>();
     protected readonly rgb: WritableSignal<RGBSignal> = signal<RGBSignal>({
         r: signal(255),
@@ -116,15 +117,6 @@ export class ColorGradientComponent implements AfterViewInit, ControlValueAccess
     protected readonly switchIcon: IconDefinition = faSort;
 
     public opacity: InputSignal<boolean> = input<boolean>(true);
-
-    @ViewChild("hueSliderElement")
-    public hueSlider!: SliderComponent;
-
-    @ViewChild("hsvPointer")
-    public hsvPointer!: ElementRef<HTMLDivElement>;
-
-    @ViewChild("hsvRectangle")
-    public hsvRectangle!: ElementRef<HTMLDivElement>;
 
     public ngAfterViewInit() {
         this.setSubscriptions();
@@ -237,26 +229,26 @@ export class ColorGradientComponent implements AfterViewInit, ControlValueAccess
     }
 
     private getSaturationFromPosition(): number {
-        const minVal = this.hsvPointer.nativeElement.offsetLeft + this.hsvPointer.nativeElement.offsetWidth / 2;
-        const maxVal = this.hsvRectangle.nativeElement.offsetWidth;
+        const minVal = this.hsvPointer().nativeElement.offsetLeft + this.hsvPointer().nativeElement.offsetWidth / 2;
+        const maxVal = this.hsvRectangle().nativeElement.offsetWidth;
         return Math.round((minVal / maxVal) * 100);
     }
 
     private getPositionFromSaturation(saturation: number): number {
-        const maxVal = this.hsvRectangle.nativeElement.offsetWidth;
+        const maxVal = this.hsvRectangle().nativeElement.offsetWidth;
         const minVal = (saturation / 100) * maxVal;
-        return minVal - this.hsvPointer.nativeElement.offsetWidth / 2;
+        return minVal - this.hsvPointer().nativeElement.offsetWidth / 2;
     }
 
     private getPositionFromValue(value: number): number {
-        const maxVal = this.hsvRectangle.nativeElement.offsetHeight;
+        const maxVal = this.hsvRectangle().nativeElement.offsetHeight;
         const minVal = ((100 - value) / 100) * maxVal;
-        return minVal - this.hsvPointer.nativeElement.offsetHeight / 2;
+        return minVal - this.hsvPointer().nativeElement.offsetHeight / 2;
     }
 
     private getValueFromPosition(): number {
-        const minVal = this.hsvPointer.nativeElement.offsetTop + this.hsvPointer.nativeElement.offsetHeight / 2;
-        const maxVal = this.hsvRectangle.nativeElement.offsetHeight;
+        const minVal = this.hsvPointer().nativeElement.offsetTop + this.hsvPointer().nativeElement.offsetHeight / 2;
+        const maxVal = this.hsvRectangle().nativeElement.offsetHeight;
         return Math.round(Math.abs(100 - (minVal / maxVal) * 100));
     }
 
@@ -401,7 +393,7 @@ export class ColorGradientComponent implements AfterViewInit, ControlValueAccess
                     }
                 });
         });
-        fromEvent<MouseEvent>(this.hsvPointer.nativeElement, "mousedown")
+        fromEvent<MouseEvent>(this.hsvPointer().nativeElement, "mousedown")
             .pipe(
                 takeUntilDestroyed(this.#destroyRef),
                 tap(() => (this.#pointerMouseDown = true)),
@@ -416,7 +408,7 @@ export class ColorGradientComponent implements AfterViewInit, ControlValueAccess
                 )
             )
             .subscribe();
-        fromEvent<MouseEvent>(this.hsvRectangle.nativeElement, "click")
+        fromEvent<MouseEvent>(this.hsvRectangle().nativeElement, "click")
             .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe((event: MouseEvent) => {
                 if (!this.#pointerMouseMove) {
@@ -442,8 +434,8 @@ export class ColorGradientComponent implements AfterViewInit, ControlValueAccess
     }
 
     private updateHsvRectPointerPosition(event: MouseEvent): void {
-        const containerRect = this.hsvRectangle.nativeElement.getBoundingClientRect();
-        const pointerRect = this.hsvPointer.nativeElement.getBoundingClientRect();
+        const containerRect = this.hsvRectangle().nativeElement.getBoundingClientRect();
+        const pointerRect = this.hsvPointer().nativeElement.getBoundingClientRect();
         const left = event.clientX - containerRect.left - pointerRect.width / 2;
         const top = event.clientY - containerRect.top - pointerRect.height / 2;
 

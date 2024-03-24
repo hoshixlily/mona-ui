@@ -4,6 +4,4 @@ import { Directive } from "@angular/core";
     selector: "ng-template[monaSwitchOffLabelTemplate]",
     standalone: true
 })
-export class SwitchOffLabelTemplateDirective {
-    public constructor() {}
-}
+export class SwitchOffLabelTemplateDirective {}

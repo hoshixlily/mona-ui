@@ -4,6 +4,4 @@ import { Directive } from "@angular/core";
     selector: "ng-template[monaRangeSliderTickValueTemplate]",
     standalone: true
 })
-export class RangeSliderTickValueTemplateDirective {
-    public constructor() {}
-}
+export class RangeSliderTickValueTemplateDirective {}

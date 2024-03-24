@@ -7,9 +7,10 @@ import {
     input,
     InputSignal,
     OnInit,
+    Signal,
     signal,
     TemplateRef,
-    ViewChild,
+    viewChild,
     WritableSignal
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
@@ -50,11 +51,16 @@ import { PaletteType } from "../models/PaletteType";
 export class ColorPickerComponent implements OnInit, ControlValueAccessor {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
+    readonly #popupAnimationService: PopupAnimationService = inject(PopupAnimationService);
+    readonly #popupService: PopupService = inject(PopupService);
+
     #popupRef: PopupRef | null = null;
     #propagateChange: Action<string | null> | null = null;
+
+    protected readonly color: WritableSignal<string | null> = signal<string | null>(null);
     protected readonly noColorIcon: IconDefinition = faTimes;
     protected readonly dropdownIcon: IconDefinition = faChevronDown;
-    protected readonly color: WritableSignal<string | null> = signal<string | null>(null);
+    protected readonly popupTemplate: Signal<TemplateRef<any>> = viewChild.required("popupTemplate");
 
     /**
      * The number of columns to display in the color palette.
@@ -73,14 +79,6 @@ export class ColorPickerComponent implements OnInit, ControlValueAccessor {
     public palette: InputSignal<string[] | PaletteType> = input<string[] | PaletteType>("flat");
     public view: InputSignal<ColorPickerView> = input<ColorPickerView>("gradient");
 
-    @ViewChild("popupTemplate")
-    public popupTemplateRef!: TemplateRef<any>;
-
-    public constructor(
-        private readonly popupAnimationService: PopupAnimationService,
-        private readonly popupService: PopupService
-    ) {}
-
     public ngOnInit(): void {
         this.setEventListeners();
     }
@@ -96,16 +94,16 @@ export class ColorPickerComponent implements OnInit, ControlValueAccessor {
     }
 
     public open(): void {
-        this.#popupRef = this.popupService.create({
+        this.#popupRef = this.#popupService.create({
             anchor: this.#hostElementRef.nativeElement,
-            content: this.popupTemplateRef,
+            content: this.popupTemplate(),
             popupClass: "mona-color-picker-popup",
             width: "auto",
             hasBackdrop: false,
             closeOnOutsideClick: false
         });
-        this.popupAnimationService.setupDropdownOutsideClickCloseAnimation(this.#popupRef);
-        this.popupAnimationService.animateDropdown(this.#popupRef, AnimationState.Show);
+        this.#popupAnimationService.setupDropdownOutsideClickCloseAnimation(this.#popupRef);
+        this.#popupAnimationService.animateDropdown(this.#popupRef, AnimationState.Show);
     }
 
     public registerOnChange(fn: any): void {

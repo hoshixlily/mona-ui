@@ -4,11 +4,12 @@ import {
     Component,
     ElementRef,
     forwardRef,
+    inject,
     input,
-    Input,
     InputSignal,
     NgZone,
-    ViewChild
+    Signal,
+    viewChild
 } from "@angular/core";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { delay, fromEvent } from "rxjs";
@@ -28,19 +29,15 @@ import { delay, fromEvent } from "rxjs";
     standalone: true
 })
 export class AlphaSliderComponent implements AfterViewInit, ControlValueAccessor {
+    readonly #hostElementRef: ElementRef<HTMLDivElement> = inject(ElementRef);
+    readonly #zone: NgZone = inject(NgZone);
     #mouseDown: boolean = false;
     #mouseMove: boolean = false;
     #propagateChange: (value: number) => void = () => {};
 
+    protected readonly sliderHandle: Signal<ElementRef<HTMLDivElement>> = viewChild.required("sliderHandle");
+
     public color: InputSignal<string> = input<string>("#000000");
-
-    @ViewChild("sliderHandle")
-    public sliderHandle!: ElementRef<HTMLDivElement>;
-
-    public constructor(
-        private readonly elementRef: ElementRef<HTMLDivElement>,
-        private readonly zone: NgZone
-    ) {}
 
     public ngAfterViewInit(): void {
         this.setSubscriptions();
@@ -53,7 +50,7 @@ export class AlphaSliderComponent implements AfterViewInit, ControlValueAccessor
     public registerOnTouched(fn: any): void {}
 
     public writeValue(value: number): void {
-        if (value == null || !this.sliderHandle) {
+        if (value == null || !this.sliderHandle()) {
             return;
         }
         window.setTimeout(() => {
@@ -62,15 +59,15 @@ export class AlphaSliderComponent implements AfterViewInit, ControlValueAccessor
     }
 
     private getAlphaFromPosition(position: number): number {
-        const containerRect = this.elementRef.nativeElement.getBoundingClientRect();
-        const handleRect = this.sliderHandle.nativeElement.getBoundingClientRect();
+        const containerRect = this.#hostElementRef.nativeElement.getBoundingClientRect();
+        const handleRect = this.sliderHandle().nativeElement.getBoundingClientRect();
         const value = (position - handleRect.width / 2) / containerRect.width;
         return Math.max(0, Math.min(255, Math.round(value * 255)));
     }
 
     private getPositionFromAlpha(alpha: number): number {
-        const containerRect = this.elementRef.nativeElement.getBoundingClientRect();
-        const handleRect = this.sliderHandle.nativeElement.getBoundingClientRect();
+        const containerRect = this.#hostElementRef.nativeElement.getBoundingClientRect();
+        const handleRect = this.sliderHandle().nativeElement.getBoundingClientRect();
         const value = alpha / 255;
         if (value === 0) {
             return handleRect.width / 2;
@@ -82,13 +79,13 @@ export class AlphaSliderComponent implements AfterViewInit, ControlValueAccessor
     }
 
     private setHandlePosition(position: number): void {
-        const handleElement = this.sliderHandle.nativeElement;
+        const handleElement = this.sliderHandle().nativeElement;
         handleElement.style.left = `${position}px`;
     }
 
     private setSubscriptions(): void {
-        this.zone.runOutsideAngular(() => {
-            fromEvent<MouseEvent>(this.sliderHandle.nativeElement, "mousedown").subscribe(() => {
+        this.#zone.runOutsideAngular(() => {
+            fromEvent<MouseEvent>(this.sliderHandle().nativeElement, "mousedown").subscribe(() => {
                 this.#mouseDown = true;
                 fromEvent<MouseEvent>(document, "mouseup")
                     .pipe(delay(10))
@@ -100,12 +97,12 @@ export class AlphaSliderComponent implements AfterViewInit, ControlValueAccessor
             fromEvent<MouseEvent>(document, "mousemove").subscribe((event: MouseEvent) => {
                 if (this.#mouseDown) {
                     this.#mouseMove = true;
-                    const containerRect = this.elementRef.nativeElement.getBoundingClientRect();
-                    const handleElement = this.sliderHandle.nativeElement;
+                    const containerRect = this.#hostElementRef.nativeElement.getBoundingClientRect();
+                    const handleElement = this.sliderHandle().nativeElement;
                     const handleRect = handleElement.getBoundingClientRect();
                     const handlePos = event.clientX - containerRect.left + handleRect.width / 2;
                     if (handlePos >= handleRect.width / 2 && handlePos <= containerRect.width + handleRect.width / 2) {
-                        this.zone.run(() => {
+                        this.#zone.run(() => {
                             this.setHandlePosition(handlePos);
                             const alpha = this.getAlphaFromPosition(handlePos);
                             this.#propagateChange(alpha);
@@ -113,14 +110,14 @@ export class AlphaSliderComponent implements AfterViewInit, ControlValueAccessor
                     }
                 }
             });
-            fromEvent<MouseEvent>(this.elementRef.nativeElement, "click").subscribe((event: MouseEvent) => {
+            fromEvent<MouseEvent>(this.#hostElementRef.nativeElement, "click").subscribe((event: MouseEvent) => {
                 if (this.#mouseMove) {
                     return;
                 }
-                const handleElement = this.sliderHandle.nativeElement;
+                const handleElement = this.sliderHandle().nativeElement;
                 const left = event.offsetX + handleElement.clientWidth / 2;
                 const alpha = this.getAlphaFromPosition(left);
-                this.zone.run(() => {
+                this.#zone.run(() => {
                     this.#propagateChange(alpha);
                     this.setHandlePosition(left);
                 });
