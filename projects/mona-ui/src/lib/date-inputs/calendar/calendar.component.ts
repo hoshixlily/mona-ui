@@ -4,8 +4,10 @@ import {
     Component,
     forwardRef,
     input,
-    Input,
     InputSignal,
+    InputSignalWithTransform,
+    model,
+    ModelSignal,
     OnInit,
     signal,
     WritableSignal
@@ -38,31 +40,27 @@ import { CalendarView } from "../models/CalendarView";
     imports: [ButtonDirective, FontAwesomeModule, NgClass, DatePipe, SlicePipe, DateComparerPipe, DateIncludePipe],
     host: {
         "[class.mona-calendar]": "true",
-        "[class.mona-disabled]": "disabled"
+        "[class.mona-disabled]": "disabled()"
     }
 })
 export class CalendarComponent implements OnInit, ControlValueAccessor {
     #propagateChange: Action<Date | null> | null = null;
     #value: Date | null = null;
+    protected readonly calendarView: WritableSignal<CalendarView> = signal("month");
     protected readonly nextMonthIcon: IconDefinition = faChevronRight;
     protected readonly prevMonthIcon: IconDefinition = faChevronLeft;
-    protected calendarView: WritableSignal<CalendarView> = signal("month");
+    protected readonly timezone = DateTime.local().zoneName ?? undefined;
     protected decadeYears: number[] = [];
-    protected disabledDateList: WritableSignal<Date[]> = signal([]);
     protected monthBounds: { start: Date; end: Date } = { start: new Date(), end: new Date() };
     protected monthlyViewDict: Dictionary<Date, number> = new Dictionary<Date, number>();
 
+    public disabled: ModelSignal<boolean> = model(false);
+    public disabledDates: InputSignalWithTransform<Date[], Iterable<Date>> = input([], {
+        transform: (value: Iterable<Date>) => Array.from(value)
+    });
     public max: InputSignal<Date | null> = input<Date | null>(null);
     public min: InputSignal<Date | null> = input<Date | null>(null);
     public navigatedDate: Date = new Date();
-
-    @Input()
-    public disabled: boolean = false;
-
-    @Input()
-    public set disabledDates(value: Iterable<Date>) {
-        this.disabledDateList.set(Array.from(value));
-    }
 
     public ngOnInit(): void {
         this.setDateValues();
@@ -139,7 +137,7 @@ export class CalendarComponent implements OnInit, ControlValueAccessor {
     public registerOnTouched(fn: any): void {}
 
     public setDisabledState(isDisabled: boolean): void {
-        this.disabled = isDisabled;
+        this.disabled.set(isDisabled);
     }
 
     public writeValue(date: Date | null | undefined): void {
@@ -182,10 +180,6 @@ export class CalendarComponent implements OnInit, ControlValueAccessor {
 
     private setDateValues(): void {
         this.navigatedDate = this.value ?? DateTime.now().toJSDate();
-    }
-
-    public get timezone(): string | undefined {
-        return DateTime.local().zoneName ?? undefined;
     }
 
     public get value(): Date | null {

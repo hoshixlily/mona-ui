@@ -1,37 +1,39 @@
+import { FocusMonitor } from "@angular/cdk/a11y";
 import {
     ChangeDetectionStrategy,
     Component,
     DestroyRef,
+    effect,
     ElementRef,
     forwardRef,
     inject,
     input,
-    Input,
     InputSignal,
-    OnChanges,
+    model,
+    ModelSignal,
     OnInit,
+    Signal,
     signal,
-    SimpleChanges,
     TemplateRef,
-    ViewChild,
+    untracked,
+    viewChild,
     WritableSignal
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from "@angular/forms";
+import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { faClock, IconDefinition } from "@fortawesome/free-solid-svg-icons";
-import { FocusMonitor } from "@angular/cdk/a11y";
-import { DropDownService } from "../../dropdowns/services/drop-down.service";
-import { PopupService } from "../../popup/services/popup.service";
 import { DateTime } from "luxon";
 import { fromEvent, take } from "rxjs";
-import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from "@angular/forms";
-import { Action } from "../../utils/Action";
-import { PopupRef } from "../../popup/models/PopupRef";
-import { PopupAnimationService } from "../../animations/services/popup-animation.service";
 import { AnimationState } from "../../animations/models/AnimationState";
-import { TimeSelectorComponent } from "../time-selector/time-selector.component";
-import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { PopupAnimationService } from "../../animations/services/popup-animation.service";
 import { ButtonDirective } from "../../buttons/button/button.directive";
+import { DropDownService } from "../../dropdowns/services/drop-down.service";
 import { TextBoxDirective } from "../../inputs/text-box/directives/text-box.directive";
+import { PopupRef } from "../../popup/models/PopupRef";
+import { PopupService } from "../../popup/services/popup.service";
+import { Action } from "../../utils/Action";
+import { TimeSelectorComponent } from "../time-selector/time-selector.component";
 
 @Component({
     selector: "mona-time-picker",
@@ -50,23 +52,30 @@ import { TextBoxDirective } from "../../inputs/text-box/directives/text-box.dire
     host: {
         "[class.mona-dropdown]": "true",
         "[class.mona-time-picker]": "true",
-        "[class.mona-disabled]": "disabled",
-        "[attr.aria-disabled]": "disabled ? true : undefined",
-        "[attr.aria-readonly]": "readonly ? true : undefined",
+        "[class.mona-disabled]": "disabled()",
+        "[attr.aria-disabled]": "disabled() ? true : undefined",
+        "[attr.aria-readonly]": "readonly() ? true : undefined",
         "[attr.role]": "'grid'",
-        "[attr.tabindex]": "disabled ? null : 0"
+        "[attr.tabindex]": "disabled() ? null : 0"
     }
 })
-export class TimePickerComponent implements OnInit, OnChanges, ControlValueAccessor {
+export class TimePickerComponent implements OnInit, ControlValueAccessor {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
+    readonly #focusMonitor: FocusMonitor = inject(FocusMonitor);
     readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
+    readonly #popupAnimationService: PopupAnimationService = inject(PopupAnimationService);
+    readonly #popupService: PopupService = inject(PopupService);
     #propagateChange: Action<Date | null> | null = null;
+
     private popupRef: PopupRef | null = null;
+
     protected readonly currentDateString: WritableSignal<string> = signal("");
     protected readonly navigatedDate: WritableSignal<Date> = signal(new Date());
     protected readonly timeIcon: IconDefinition = faClock;
+    protected readonly timePopupTemplateRef: Signal<TemplateRef<any>> = viewChild.required("timePopupTemplate");
     protected readonly value: WritableSignal<Date | null> = signal(null);
 
+    public disabled: ModelSignal<boolean> = model(false);
     public format: InputSignal<string> = input(" HH:mm");
     public hourFormat: InputSignal<"12" | "24"> = input<"12" | "24">("24");
     public max: InputSignal<Date | null> = input<Date | null>(null);
@@ -74,23 +83,17 @@ export class TimePickerComponent implements OnInit, OnChanges, ControlValueAcces
     public readonly: InputSignal<boolean> = input(false);
     public showSeconds: InputSignal<boolean> = input(false);
 
-    @Input()
-    public disabled: boolean = false;
-
-    @ViewChild("timePopupTemplate")
-    public timePopupTemplateRef?: TemplateRef<any>;
-
-    public constructor(
-        private readonly focusMonitor: FocusMonitor,
-        private readonly popupAnimationService: PopupAnimationService,
-        private readonly popupService: PopupService
-    ) {}
-
-    public ngOnChanges(changes: SimpleChanges): void {
-        const value = this.value();
-        if (changes["hourFormat"] && value) {
-            this.currentDateString.set(DateTime.fromJSDate(value).toFormat(this.format()));
-        }
+    public constructor() {
+        effect(() => {
+            this.hourFormat();
+            untracked(() => {
+                const value = this.value();
+                if (value) {
+                    const dateString = DateTime.fromJSDate(value).toFormat(this.format());
+                    this.currentDateString.set(dateString);
+                }
+            });
+        });
     }
 
     public ngOnInit(): void {
@@ -125,12 +128,12 @@ export class TimePickerComponent implements OnInit, OnChanges, ControlValueAcces
     }
 
     public onTimeInputButtonClick(): void {
-        if (!this.timePopupTemplateRef || this.readonly() || this.popupRef) {
+        if (!this.timePopupTemplateRef() || this.readonly() || this.popupRef) {
             return;
         }
-        this.popupRef = this.popupService.create({
+        this.popupRef = this.#popupService.create({
             anchor: this.#hostElementRef.nativeElement,
-            content: this.timePopupTemplateRef,
+            content: this.timePopupTemplateRef(),
             width: this.#hostElementRef.nativeElement.getBoundingClientRect().width,
             height: 250,
             popupClass: "mona-time-picker-popup",
@@ -138,11 +141,11 @@ export class TimePickerComponent implements OnInit, OnChanges, ControlValueAcces
             closeOnOutsideClick: false,
             positions: DropDownService.getDefaultPositions()
         });
-        this.popupAnimationService.setupDropdownOutsideClickCloseAnimation(this.popupRef);
-        this.popupAnimationService.animateDropdown(this.popupRef, AnimationState.Show);
+        this.#popupAnimationService.setupDropdownOutsideClickCloseAnimation(this.popupRef);
+        this.#popupAnimationService.animateDropdown(this.popupRef, AnimationState.Show);
         this.popupRef.closed.pipe(take(1)).subscribe(() => {
             this.popupRef = null;
-            this.focusMonitor.focusVia(
+            this.#focusMonitor.focusVia(
                 this.#hostElementRef.nativeElement.querySelector("input") as HTMLElement,
                 "program"
             );
@@ -160,7 +163,7 @@ export class TimePickerComponent implements OnInit, OnChanges, ControlValueAcces
     public registerOnTouched(fn: any): void {}
 
     public setDisabledState(isDisabled: boolean): void {
-        this.disabled = isDisabled;
+        this.disabled.set(isDisabled);
     }
 
     public writeValue(date: Date | null | undefined): void {

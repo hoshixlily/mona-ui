@@ -3,8 +3,9 @@
         <li class="mona-breadcrumb-item" [title]="item.title"
             [ngClass]="{'mona-disabled': item.disabled}" (click)="onItemClick(item)">
 
-            @if (itemTemplate) {
-                <ng-container [ngTemplateOutlet]="itemTemplate.template" [ngTemplateOutletContext]="{$implicit: item}"></ng-container>
+            @if (itemTemplate()) {
+                <ng-container [ngTemplateOutlet]="itemTemplate()??null"
+                              [ngTemplateOutletContext]="{$implicit: item}"></ng-container>
             } @else {
                 <span class="mona-breadcrumb-item-text">{{ item.text }}</span>
             }
@@ -12,8 +13,8 @@
 
         @if ($index < items().length - 1) {
             <li class="mona-breadcrumb-separator">
-                @if (separatorTemplate) {
-                    <ng-container [ngTemplateOutlet]="separatorTemplate.template"
+                @if (separatorTemplate()) {
+                    <ng-container [ngTemplateOutlet]="separatorTemplate()??null"
                                   [ngTemplateOutletContext]="{$implicit: item}"></ng-container>
                 } @else {
                     <fa-icon [icon]="separator"></fa-icon>

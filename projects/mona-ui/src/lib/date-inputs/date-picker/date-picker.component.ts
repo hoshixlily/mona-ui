@@ -1,3 +1,5 @@
+import { FocusMonitor } from "@angular/cdk/a11y";
+import { NgClass } from "@angular/common";
 import {
     ChangeDetectionStrategy,
     Component,
@@ -6,31 +8,31 @@ import {
     forwardRef,
     inject,
     input,
-    Input,
     InputSignal,
+    model,
+    ModelSignal,
     OnInit,
+    Signal,
     signal,
     TemplateRef,
-    ViewChild,
+    viewChild,
     WritableSignal
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { DropDownService } from "../../dropdowns/services/drop-down.service";
-import { PopupService } from "../../popup/services/popup.service";
-import { FocusMonitor } from "@angular/cdk/a11y";
-import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from "@angular/forms";
-import { DateTime } from "luxon";
-import { Action } from "../../utils/Action";
-import { PopupRef } from "../../popup/models/PopupRef";
-import { faCalendar, IconDefinition } from "@fortawesome/free-solid-svg-icons";
-import { fromEvent, take } from "rxjs";
-import { PopupAnimationService } from "../../animations/services/popup-animation.service";
-import { AnimationState } from "../../animations/models/AnimationState";
-import { CalendarComponent } from "../calendar/calendar.component";
+import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
+import { faCalendar, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { DateTime } from "luxon";
+import { fromEvent, take } from "rxjs";
+import { AnimationState } from "../../animations/models/AnimationState";
+import { PopupAnimationService } from "../../animations/services/popup-animation.service";
 import { ButtonDirective } from "../../buttons/button/button.directive";
+import { DropDownService } from "../../dropdowns/services/drop-down.service";
 import { TextBoxDirective } from "../../inputs/text-box/directives/text-box.directive";
-import { NgClass } from "@angular/common";
+import { PopupRef } from "../../popup/models/PopupRef";
+import { PopupService } from "../../popup/services/popup.service";
+import { Action } from "../../utils/Action";
+import { CalendarComponent } from "../calendar/calendar.component";
 
 @Component({
     selector: "mona-date-picker",
@@ -49,42 +51,35 @@ import { NgClass } from "@angular/common";
     host: {
         "[class.mona-dropdown]": "true",
         "[class.mona-date-picker]": "true",
-        "[class.mona-disabled]": "disabled",
-        "[attr.aria-disabled]": "disabled ? true : undefined",
+        "[class.mona-disabled]": "disabled()",
+        "[attr.aria-disabled]": "disabled() ? true : undefined",
         "[attr.aria-readonly]": "readonly() ? true : undefined",
         "[attr.role]": "'grid'",
-        "[attr.tabindex]": "disabled ? null : 0"
+        "[attr.tabindex]": "disabled() ? null : 0"
     }
 })
 export class DatePickerComponent implements OnInit, ControlValueAccessor {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
+    readonly #focusMonitor: FocusMonitor = inject(FocusMonitor);
     readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
+    readonly #popupAnimationService: PopupAnimationService = inject(PopupAnimationService);
+    readonly #popupService: PopupService = inject(PopupService);
     #propagateChange: Action<Date | null> | null = null;
 
     private popupRef: PopupRef | null = null;
 
     protected readonly dateIcon: IconDefinition = faCalendar;
+    protected readonly datePopupTemplateRef: Signal<TemplateRef<any>> = viewChild.required("datePopupTemplate");
     protected readonly currentDateString: WritableSignal<string> = signal("");
     protected readonly navigatedDate: WritableSignal<Date> = signal(new Date());
+
     public readonly value: WritableSignal<Date | null> = signal(null);
+    public disabled: ModelSignal<boolean> = model(false);
     public disabledDates: InputSignal<Iterable<Date>> = input<Iterable<Date>>([]);
     public format: InputSignal<string> = input("dd/MM/yyyy");
     public max: InputSignal<Date | null> = input<Date | null>(null);
     public min: InputSignal<Date | null> = input<Date | null>(null);
     public readonly: InputSignal<boolean> = input(false);
-
-    @ViewChild("datePopupTemplate")
-    public datePopupTemplateRef?: TemplateRef<any>;
-
-    @Input()
-    public disabled: boolean = false;
-
-    public constructor(
-        private readonly elementRef: ElementRef<HTMLElement>,
-        private readonly focusMonitor: FocusMonitor,
-        private readonly popupAnimationService: PopupAnimationService,
-        private readonly popupService: PopupService
-    ) {}
 
     public ngOnInit(): void {
         this.setDateValues();
@@ -135,11 +130,11 @@ export class DatePickerComponent implements OnInit, ControlValueAccessor {
         if (!this.datePopupTemplateRef || this.readonly() || this.popupRef) {
             return;
         }
-        const input = this.elementRef.nativeElement.querySelector("input") as HTMLElement;
-        this.popupRef = this.popupService.create({
+        const input = this.#hostElementRef.nativeElement.querySelector("input") as HTMLElement;
+        this.popupRef = this.#popupService.create({
             anchor: this.#hostElementRef.nativeElement,
-            content: this.datePopupTemplateRef,
-            width: this.elementRef.nativeElement.getBoundingClientRect().width,
+            content: this.datePopupTemplateRef(),
+            width: this.#hostElementRef.nativeElement.getBoundingClientRect().width,
             minWidth: 200,
             popupClass: "mona-date-input-popup",
             popupWrapperClass: "mona-calendar-popup-wrapper",
@@ -148,11 +143,11 @@ export class DatePickerComponent implements OnInit, ControlValueAccessor {
             closeOnOutsideClick: false,
             positions: DropDownService.getDefaultPositions()
         });
-        this.popupAnimationService.setupDropdownOutsideClickCloseAnimation(this.popupRef);
-        this.popupAnimationService.animateDropdown(this.popupRef, AnimationState.Show);
+        this.#popupAnimationService.setupDropdownOutsideClickCloseAnimation(this.popupRef);
+        this.#popupAnimationService.animateDropdown(this.popupRef, AnimationState.Show);
         this.popupRef.closed.pipe(take(1)).subscribe(() => {
             this.popupRef = null;
-            this.focusMonitor.focusVia(input, "program");
+            this.#focusMonitor.focusVia(input, "program");
         });
     }
 
@@ -167,7 +162,7 @@ export class DatePickerComponent implements OnInit, ControlValueAccessor {
     public registerOnTouched(fn: any): void {}
 
     public setDisabledState(isDisabled: boolean): void {
-        this.disabled = isDisabled;
+        this.disabled.set(isDisabled);
     }
 
     public writeValue(date: Date | null | undefined): void {
@@ -180,7 +175,7 @@ export class DatePickerComponent implements OnInit, ControlValueAccessor {
         if (!this.popupRef) {
             return;
         }
-        this.popupAnimationService.animateDropdown(this.popupRef, AnimationState.Hide);
+        this.#popupAnimationService.animateDropdown(this.popupRef, AnimationState.Hide);
     }
 
     private dateStringEquals(date1: Date | null, date2: Date | null): boolean {
@@ -207,10 +202,10 @@ export class DatePickerComponent implements OnInit, ControlValueAccessor {
     }
 
     private setSubscriptions(): void {
-        fromEvent<FocusEvent>(this.elementRef.nativeElement, "focusin")
+        fromEvent<FocusEvent>(this.#hostElementRef.nativeElement, "focusin")
             .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe(() => {
-                const input = this.elementRef.nativeElement.querySelector("input");
+                const input = this.#hostElementRef.nativeElement.querySelector("input");
                 if (input) {
                     input.focus();
                     input.setSelectionRange(-1, -1);

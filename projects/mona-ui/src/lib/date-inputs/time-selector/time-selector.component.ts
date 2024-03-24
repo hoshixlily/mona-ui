@@ -8,12 +8,13 @@ import {
     forwardRef,
     inject,
     input,
-    Input,
     InputSignal,
+    model,
+    ModelSignal,
     OnInit,
     Signal,
     signal,
-    ViewChild,
+    viewChild,
     WritableSignal
 } from "@angular/core";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
@@ -41,7 +42,7 @@ import { TimeLimiterPipe } from "../pipes/time-limiter.pipe";
     imports: [NgClass, DecimalPipe, HourSelectorPipe, TimeLimiterPipe],
     host: {
         "[class.mona-time-selector]": "true",
-        "[class.mona-disabled]": "disabled"
+        "[class.mona-disabled]": "disabled()"
     }
 })
 export class TimeSelectorComponent implements OnInit, AfterViewInit, ControlValueAccessor {
@@ -60,35 +61,33 @@ export class TimeSelectorComponent implements OnInit, AfterViewInit, ControlValu
         }
         return hour % 12 || 12;
     });
+    protected readonly hoursListElement: Signal<ElementRef<HTMLOListElement>> = viewChild.required("hoursListElement");
     protected readonly minute: Signal<number> = computed(() => this.navigatedDate().getMinutes());
+    protected readonly minutes: TimeUnit[] = Enumerable.range(0, 60)
+        .select<TimeUnit>(m => ({ value: m, viewValue: m }))
+        .toArray();
+    protected readonly minutesListElement: Signal<ElementRef<HTMLOListElement>> =
+        viewChild.required("minutesListElement");
     protected readonly navigatedDate: WritableSignal<Date> = signal(new Date());
     protected readonly pmMeridiemVisible: Signal<boolean> = computed(() => {
         const max = this.max();
         return !(max && max.getHours() < 12);
     });
     protected readonly second: Signal<number> = computed(() => this.navigatedDate().getSeconds());
+    protected readonly seconds: TimeUnit[] = Enumerable.range(0, 60)
+        .select<TimeUnit>(s => ({ value: s, viewValue: s }))
+        .toArray();
+    protected readonly secondsListElement: Signal<ElementRef<HTMLOListElement>> =
+        viewChild.required("secondsListElement");
     protected hours: TimeUnit[] = [];
     protected meridiem: Meridiem = "AM";
-    protected minutes: TimeUnit[] = [];
-    protected seconds: TimeUnit[] = [];
 
+    public disabled: ModelSignal<boolean> = model(false);
     public hourFormat: InputSignal<"12" | "24"> = input<"12" | "24">("24");
     public max: InputSignal<Date | null> = input<Date | null>(null);
     public min: InputSignal<Date | null> = input<Date | null>(null);
     public readonly: InputSignal<boolean> = input(false);
     public showSeconds: InputSignal<boolean> = input(false);
-
-    @Input()
-    public disabled: boolean = false;
-
-    @ViewChild("hoursListElement")
-    public hoursListElement!: ElementRef<HTMLOListElement>;
-
-    @ViewChild("minutesListElement")
-    public minutesListElement!: ElementRef<HTMLOListElement>;
-
-    @ViewChild("secondsListElement")
-    public secondsListElement!: ElementRef<HTMLOListElement>;
 
     public ngAfterViewInit(): void {
         window.setTimeout(() => {
@@ -101,12 +100,6 @@ export class TimeSelectorComponent implements OnInit, AfterViewInit, ControlValu
 
     public ngOnInit(): void {
         this.setDateValues();
-        this.minutes = Enumerable.range(0, 60)
-            .select<TimeUnit>(m => ({ value: m, viewValue: m }))
-            .toArray();
-        this.seconds = Enumerable.range(0, 60)
-            .select<TimeUnit>(s => ({ value: s, viewValue: s }))
-            .toArray();
         if (this.#value) {
             this.navigatedDate.set(this.#value);
         }
@@ -118,12 +111,12 @@ export class TimeSelectorComponent implements OnInit, AfterViewInit, ControlValu
         const minuteData = this.updateMinuteToFitInMaxAndMin();
         const secondData = this.updateSecondToFitInMaxAndMin();
         this.setCurrentDate(this.navigatedDate());
-        this.scrollList(this.hoursListElement.nativeElement, value);
+        this.scrollList(this.hoursListElement().nativeElement, value);
         if (minuteData) {
-            this.scrollList(this.minutesListElement.nativeElement, minuteData.value);
+            this.scrollList(this.minutesListElement().nativeElement, minuteData.value);
         }
         if (secondData) {
-            this.scrollList(this.secondsListElement.nativeElement, secondData.value);
+            this.scrollList(this.secondsListElement().nativeElement, secondData.value);
         }
     }
 
@@ -145,13 +138,13 @@ export class TimeSelectorComponent implements OnInit, AfterViewInit, ControlValu
         const secondData = this.updateSecondToFitInMaxAndMin();
         this.setCurrentDate(this.navigatedDate());
         if (hourData) {
-            this.scrollList(this.hoursListElement.nativeElement, hourData.value);
+            this.scrollList(this.hoursListElement().nativeElement, hourData.value);
         }
         if (minuteData) {
-            this.scrollList(this.minutesListElement.nativeElement, minuteData.value);
+            this.scrollList(this.minutesListElement().nativeElement, minuteData.value);
         }
         if (secondData) {
-            this.scrollList(this.secondsListElement.nativeElement, secondData.value);
+            this.scrollList(this.secondsListElement().nativeElement, secondData.value);
         }
     }
 
@@ -159,16 +152,16 @@ export class TimeSelectorComponent implements OnInit, AfterViewInit, ControlValu
         this.navigatedDate.set(DateTime.fromJSDate(this.navigatedDate()).set({ minute: value }).toJSDate());
         const secondData = this.updateSecondToFitInMaxAndMin();
         this.setCurrentDate(this.navigatedDate());
-        this.scrollList(this.minutesListElement.nativeElement, value);
+        this.scrollList(this.minutesListElement().nativeElement, value);
         if (secondData) {
-            this.scrollList(this.secondsListElement.nativeElement, secondData.value);
+            this.scrollList(this.secondsListElement().nativeElement, secondData.value);
         }
     }
 
     public onSecondChange(value: number): void {
         this.navigatedDate.set(DateTime.fromJSDate(this.navigatedDate()).set({ second: value }).toJSDate());
         this.setCurrentDate(this.navigatedDate());
-        this.scrollList(this.secondsListElement.nativeElement, value);
+        this.scrollList(this.secondsListElement().nativeElement, value);
     }
 
     public registerOnChange(fn: any): void {
@@ -178,7 +171,7 @@ export class TimeSelectorComponent implements OnInit, AfterViewInit, ControlValu
     public registerOnTouched(fn: any): void {}
 
     public setDisabledState(isDisabled: boolean): void {
-        this.disabled = isDisabled;
+        this.disabled.set(isDisabled);
     }
 
     public writeValue(date: Date | null | undefined): void {
