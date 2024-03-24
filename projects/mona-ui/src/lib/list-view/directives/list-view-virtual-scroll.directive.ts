@@ -1,4 +1,4 @@
-import { Directive, Input } from "@angular/core";
+import { Directive, effect, inject, input, Input, untracked } from "@angular/core";
 import { VirtualScrollOptions } from "../../common/list/models/VirtualScrollOptions";
 import { ListService } from "../../common/list/services/list.service";
 
@@ -7,13 +7,15 @@ import { ListService } from "../../common/list/services/list.service";
     standalone: true
 })
 export class ListViewVirtualScrollDirective<T> {
-    @Input({
-        alias: "monaListViewVirtualScroll",
-        required: true
-    })
-    public set options(value: VirtualScrollOptions) {
-        this.listService.setVirtualScrollOptions(value);
-    }
+    readonly #listService: ListService<T> = inject(ListService);
+    public options = input.required<VirtualScrollOptions>({
+        alias: "monaListViewVirtualScroll"
+    });
 
-    public constructor(private readonly listService: ListService<T>) {}
+    public constructor() {
+        effect(() => {
+            const options = this.options();
+            untracked(() => this.#listService.setVirtualScrollOptions(options));
+        });
+    }
 }

@@ -1,4 +1,13 @@
-import { computed, EventEmitter, Injectable, Signal, signal, WritableSignal } from "@angular/core";
+import {
+    computed,
+    EventEmitter,
+    Injectable,
+    output,
+    OutputEmitterRef,
+    Signal,
+    signal,
+    WritableSignal
+} from "@angular/core";
 import { toObservable } from "@angular/core/rxjs-interop";
 import { from, IEnumerable, ImmutableList, ImmutableSet, Predicate, Selector } from "@mirei/ts-collections";
 import { Observable, ReplaySubject, Subject } from "rxjs";
@@ -99,7 +108,7 @@ export class ListService<TData> {
         height: 28
     });
     public filterChange: EventEmitter<FilterChangeEvent> = new EventEmitter<FilterChangeEvent>();
-    public selectedKeysChange: EventEmitter<Array<any>> = new EventEmitter<Array<any>>();
+    public selectedKeysChange: OutputEmitterRef<Array<any>> = output();
 
     public addNewDataItems(dataItems: Iterable<TData>): void {
         this.data.update(list => list.addAll(dataItems));

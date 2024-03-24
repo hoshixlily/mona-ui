@@ -417,7 +417,7 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
                 }
                 this.comboBoxValue.set(value);
             });
-        this.#listService.selectedKeysChange.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(keys => {
+        this.#listService.selectedKeysChange.subscribe(keys => {
             const item = this.selectedDataItem();
             this.updateValue(item);
         });

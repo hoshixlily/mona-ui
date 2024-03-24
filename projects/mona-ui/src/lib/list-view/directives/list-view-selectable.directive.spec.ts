@@ -4,10 +4,11 @@ import { ListViewSelectableDirective } from "./list-view-selectable.directive";
 
 describe("ListViewSelectableDirective", () => {
     let directive: ListViewSelectableDirective<any>;
-    let listService: ListService<any>;
     beforeEach(() => {
-        listService = TestBed.runInInjectionContext(() => new ListService());
-        directive = TestBed.runInInjectionContext(() => new ListViewSelectableDirective(listService));
+        TestBed.configureTestingModule({
+            providers: [ListService]
+        });
+        directive = TestBed.runInInjectionContext(() => new ListViewSelectableDirective());
     });
     it("should create an instance", () => {
         expect(directive).toBeTruthy();

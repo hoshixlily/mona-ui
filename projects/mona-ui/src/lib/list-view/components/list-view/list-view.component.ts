@@ -143,7 +143,9 @@ export class ListViewComponent<T = any> implements AfterViewInit {
     }
 
     public ngAfterViewInit(): void {
-        this.setScrollBottomEvent();
+        window.setTimeout(() => {
+            this.setScrollBottomEvent();
+        });
     }
 
     public onPageChange(event: PageChangeEvent): void {
@@ -162,9 +164,13 @@ export class ListViewComponent<T = any> implements AfterViewInit {
     }
 
     private setScrollBottomEvent(): void {
-        const element = this.listService.virtualScrollOptions().enabled
-            ? this.#hostElementRef.nativeElement.querySelector(".cdk-virtual-scroll-viewport")
-            : this.#hostElementRef.nativeElement.querySelector(".mona-list > ul");
+        let element: HTMLElement | null;
+        const virtualScrollEnabled = this.listService.virtualScrollOptions().enabled;
+        if (virtualScrollEnabled) {
+            element = this.#hostElementRef.nativeElement.querySelector(".cdk-virtual-scroll-viewport");
+        } else {
+            element = this.#hostElementRef.nativeElement.querySelector(".mona-list > ul");
+        }
         if (!element) {
             return;
         }

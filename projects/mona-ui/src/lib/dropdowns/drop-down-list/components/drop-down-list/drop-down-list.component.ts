@@ -329,7 +329,7 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
     }
 
     private setSubscriptions(): void {
-        this.#listService.selectedKeysChange.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(keys => {
+        this.#listService.selectedKeysChange.subscribe(keys => {
             const item = this.selectedDataItem();
             this.updateValue(item);
         });

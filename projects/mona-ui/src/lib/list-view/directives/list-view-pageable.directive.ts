@@ -1,4 +1,4 @@
-import { Directive, Input } from "@angular/core";
+import { Directive, effect, inject, input, untracked } from "@angular/core";
 import { ListViewComponent } from "../components/list-view/list-view.component";
 import { PagerSettings } from "../models/PagerSettings";
 
@@ -16,18 +16,25 @@ export class ListViewPageableDirective {
         pageSizeValues: [5, 10, 20, 25, 50, 100],
         visiblePages: 5
     };
+    readonly #host: ListViewComponent = inject(ListViewComponent);
 
-    @Input("monaListViewPageable")
-    public set options(value: Partial<PagerSettings> | "") {
-        if (value === "") {
-            this.host.setPagerSettings(this.#defaultOptions);
-        } else {
-            this.host.setPagerSettings({
-                ...this.#defaultOptions,
-                ...value
+    public options = input<Partial<PagerSettings> | "">("", {
+        alias: "monaListViewPageable"
+    });
+
+    public constructor() {
+        effect(() => {
+            const options = this.options();
+            untracked(() => {
+                if (options === "") {
+                    this.#host.setPagerSettings(this.#defaultOptions);
+                } else {
+                    this.#host.setPagerSettings({
+                        ...this.#defaultOptions,
+                        ...options
+                    });
+                }
             });
-        }
+        });
     }
-
-    public constructor(private readonly host: ListViewComponent) {}
 }
