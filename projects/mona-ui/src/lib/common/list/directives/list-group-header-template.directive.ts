@@ -4,6 +4,4 @@ import { Directive } from "@angular/core";
     selector: "ng-template[monaListGroupHeaderTemplate]",
     standalone: true
 })
-export class ListGroupHeaderTemplateDirective {
-    public constructor() {}
-}
+export class ListGroupHeaderTemplateDirective {}

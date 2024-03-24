@@ -4,6 +4,4 @@ import { Directive } from "@angular/core";
     selector: "ng-template[monaListItemTemplate]",
     standalone: true
 })
-export class ListItemTemplateDirective {
-    public constructor() {}
-}
+export class ListItemTemplateDirective {}

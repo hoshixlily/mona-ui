@@ -4,6 +4,4 @@ import { Directive } from "@angular/core";
     selector: "ng-template[monaDropDownListNoDataTemplate]",
     standalone: true
 })
-export class DropDownListNoDataTemplateDirective {
-    public constructor() {}
-}
+export class DropDownListNoDataTemplateDirective {}

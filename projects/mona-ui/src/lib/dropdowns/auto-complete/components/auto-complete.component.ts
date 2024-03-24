@@ -31,7 +31,6 @@ import { ListGroupHeaderTemplateDirective } from "../../../common/list/directive
 import { ListHeaderTemplateDirective } from "../../../common/list/directives/list-header-template.directive";
 import { ListItemTemplateDirective } from "../../../common/list/directives/list-item-template.directive";
 import { ListNoDataTemplateDirective } from "../../../common/list/directives/list-no-data-template.directive";
-import { ListSelectableDirective } from "../../../common/list/directives/list-selectable.directive";
 import { ListItem } from "../../../common/list/models/ListItem";
 import { SelectableOptions } from "../../../common/list/models/SelectableOptions";
 import { ListService } from "../../../common/list/services/list.service";
@@ -66,7 +65,6 @@ import { AutoCompleteNoDataTemplateDirective } from "../directives/auto-complete
         FontAwesomeModule,
         NgTemplateOutlet,
         ListComponent,
-        ListSelectableDirective,
         ListGroupHeaderTemplateDirective,
         ListFooterTemplateDirective,
         ListHeaderTemplateDirective,
@@ -82,6 +80,9 @@ import { AutoCompleteNoDataTemplateDirective } from "../directives/auto-complete
 export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccessor {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
+    readonly #listService: ListService<TData> = inject(ListService);
+    readonly #popupAnimationService: PopupAnimationService = inject(PopupAnimationService);
+    readonly #popupService: PopupService = inject(PopupService);
     readonly #popupUidClass: string = `mona-dropdown-popup-${v4()}`;
     #popupRef: PopupRef | null = null;
     #propagateChange: Action<string | null> | null = null;
@@ -102,7 +103,7 @@ export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccesso
 
     @Input()
     public set data(value: Iterable<TData>) {
-        this.listService.setData(value);
+        this.#listService.setData(value);
     }
 
     @Input()
@@ -119,7 +120,7 @@ export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccesso
 
     @Input()
     public set itemDisabled(value: string | Predicate<TData> | null | undefined) {
-        this.listService.setDisabledBy(value ?? "");
+        this.#listService.setDisabledBy(value ?? "");
     }
 
     @ContentChild(AutoCompleteItemTemplateDirective, { read: TemplateRef })
@@ -133,26 +134,21 @@ export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccesso
 
     @Input()
     public set textField(value: string | Selector<TData, string> | null | undefined) {
-        this.listService.setTextField(value ?? "");
+        this.#listService.setTextField(value ?? "");
     }
 
     @Input()
     public set valueField(value: string | Selector<TData, any> | null | undefined) {
-        this.listService.setValueField(value ?? "");
+        this.#listService.setValueField(value ?? "");
     }
 
-    public constructor(
-        private readonly elementRef: ElementRef<HTMLElement>,
-        private readonly listService: ListService<TData>,
-        private readonly popupAnimationService: PopupAnimationService,
-        private readonly popupService: PopupService
-    ) {}
+    public constructor() {}
 
     public clearValue(event: MouseEvent): void {
         event.stopImmediatePropagation();
         this.updateValue("");
         this.autoCompleteValue.set("");
-        this.listService.clearSelections();
+        this.#listService.clearSelections();
         this.#propagateChange?.(null);
     }
 
@@ -169,7 +165,7 @@ export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccesso
     }
 
     public onItemSelect(item: ListItem<TData>): void {
-        const itemText = this.listService.getItemText(item);
+        const itemText = this.#listService.getItemText(item);
         this.updateValue(itemText);
         this.autoCompleteValue.set(itemText);
         this.notifyValueChange();
@@ -188,20 +184,20 @@ export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccesso
     }
 
     public open(): void {
-        this.#popupRef = this.popupService.create({
+        this.#popupRef = this.#popupService.create({
             anchor: this.#hostElementRef.nativeElement,
             content: this.popupTemplate,
             hasBackdrop: false,
             closeOnOutsideClick: false,
             withPush: false,
-            width: this.elementRef.nativeElement.getBoundingClientRect().width,
+            width: this.#hostElementRef.nativeElement.getBoundingClientRect().width,
             popupClass: ["mona-dropdown-popup-content", this.#popupUidClass],
             positions: DropDownService.getDefaultPositions()
         });
-        this.popupAnimationService.setupDropdownOutsideClickCloseAnimation(this.#popupRef);
-        this.popupAnimationService.animateDropdown(this.#popupRef, AnimationState.Show);
+        this.#popupAnimationService.setupDropdownOutsideClickCloseAnimation(this.#popupRef);
+        this.#popupAnimationService.animateDropdown(this.#popupRef, AnimationState.Show);
         window.setTimeout(() => {
-            const input = this.elementRef.nativeElement.querySelector("input");
+            const input = this.#hostElementRef.nativeElement.querySelector("input");
             if (input) {
                 input.focus();
                 input.setSelectionRange(-1, -1);
@@ -209,13 +205,13 @@ export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccesso
         });
         this.#popupRef.closed.pipe(take(1)).subscribe(() => {
             this.#popupRef = null;
-            this.listService.clearSelections();
-            this.listService.clearFilter();
+            this.#listService.clearSelections();
+            this.#listService.clearFilter();
             const popupElement = document.querySelector(`.${this.#popupUidClass}`);
-            if (DropDownService.shouldFocusAfterClose(this.elementRef.nativeElement, popupElement)) {
+            if (DropDownService.shouldFocusAfterClose(this.#hostElementRef.nativeElement, popupElement)) {
                 this.focus();
             }
-            const input = this.elementRef.nativeElement.querySelector("input");
+            const input = this.#hostElementRef.nativeElement.querySelector("input");
             if (input) {
                 input.focus();
             }
@@ -237,26 +233,26 @@ export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccesso
     }
 
     private focus(): void {
-        this.elementRef.nativeElement?.focus();
+        this.#hostElementRef.nativeElement?.focus();
     }
 
     private getItemStartsWith(value: string): ListItem<TData> | null {
-        return this.listService
+        return this.#listService
             .viewItems()
-            .where(i => !i.header && !this.listService.isDisabled(i))
+            .where(i => !i.header && !this.#listService.isDisabled(i))
             .firstOrDefault(i => {
-                return this.listService.getItemText(i).toLowerCase().startsWith(value.toLowerCase());
+                return this.#listService.getItemText(i).toLowerCase().startsWith(value.toLowerCase());
             });
     }
 
     private handleArrowKeys(event: KeyboardEvent): void {
         const direction = event.key === "ArrowDown" ? "next" : "previous";
-        this.listService.navigate(direction, "highlight");
+        this.#listService.navigate(direction, "highlight");
     }
 
     private handleEnterKey(): void {
-        const highlightedItem = this.listService.highlightedItem();
-        const highlightedItemText = highlightedItem ? this.listService.getItemText(highlightedItem) : "";
+        const highlightedItem = this.#listService.highlightedItem();
+        const highlightedItemText = highlightedItem ? this.#listService.getItemText(highlightedItem) : "";
         const autoCompleteValue = this.autoCompleteValue();
         if (highlightedItemText && autoCompleteValue) {
             this.autoCompleteValue.set(highlightedItemText);
@@ -272,14 +268,14 @@ export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccesso
     }
 
     private initialize(): void {
-        this.listService.setNavigableOptions({ enabled: true, mode: "highlight" });
-        this.listService.setSelectableOptions(this.selectableOptions);
-        this.listService.filterInputVisible.set(false);
+        this.#listService.setNavigableOptions({ enabled: true, mode: "highlight" });
+        this.#listService.setSelectableOptions(this.selectableOptions);
+        this.#listService.filterInputVisible.set(false);
     }
 
     private notifyFilterChange(filter: string): FilterChangeEvent {
         const event = new FilterChangeEvent(filter);
-        this.listService.filterChange.emit(event);
+        this.#listService.filterChange.emit(event);
         return event;
     }
 
@@ -288,23 +284,23 @@ export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccesso
     }
 
     private setEventListeners(): void {
-        fromEvent<FocusEvent>(this.elementRef.nativeElement, "focusin")
+        fromEvent<FocusEvent>(this.#hostElementRef.nativeElement, "focusin")
             .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe(() => {
-                const input = this.elementRef.nativeElement.querySelector("input");
+                const input = this.#hostElementRef.nativeElement.querySelector("input");
                 if (input) {
                     input.focus();
                     input.setSelectionRange(-1, -1);
                 }
             });
-        fromEvent<FocusEvent>(this.elementRef.nativeElement, "focusout")
+        fromEvent<FocusEvent>(this.#hostElementRef.nativeElement, "focusout")
             .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe(event => {
                 const target = event.relatedTarget as HTMLElement;
                 if (
                     !(
                         target &&
-                        (this.elementRef.nativeElement.contains(target) ||
+                        (this.#hostElementRef.nativeElement.contains(target) ||
                             this.#popupRef?.overlayRef.overlayElement.contains(target))
                     )
                 ) {
@@ -314,8 +310,8 @@ export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccesso
     }
 
     private setSubscriptions(): void {
-        const debounce = this.listService.filterableOptions().enabled
-            ? this.listService.filterableOptions().debounce
+        const debounce = this.#listService.filterableOptions().enabled
+            ? this.#listService.filterableOptions().debounce
             : 0;
         this.autoCompleteValue$
             .pipe(
@@ -333,20 +329,20 @@ export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccesso
                     this.close();
                     return;
                 }
-                if (this.listService.filterableOptions().enabled) {
+                if (this.#listService.filterableOptions().enabled) {
                     const event = this.notifyFilterChange(value);
                     if (!event.isDefaultPrevented()) {
-                        this.listService.setFilter(value);
+                        this.#listService.setFilter(value);
                     }
                 }
                 const item = this.getItemStartsWith(value);
                 if (item) {
-                    this.listService.clearSelections();
-                    this.listService.highlightedItem.set(item);
-                    this.listService.scrollToItem$.next(item);
+                    this.#listService.clearSelections();
+                    this.#listService.highlightedItem.set(item);
+                    this.#listService.scrollToItem$.next(item);
                 } else {
-                    this.listService.clearSelections();
-                    this.listService.highlightedItem.set(null);
+                    this.#listService.clearSelections();
+                    this.#listService.highlightedItem.set(null);
                 }
                 this.autoCompleteValue.set(value);
             });

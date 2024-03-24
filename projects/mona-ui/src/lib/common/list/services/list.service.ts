@@ -101,8 +101,6 @@ export class ListService<TData> {
     public filterChange: EventEmitter<FilterChangeEvent> = new EventEmitter<FilterChangeEvent>();
     public selectedKeysChange: EventEmitter<Array<any>> = new EventEmitter<Array<any>>();
 
-    public constructor() {}
-
     public addNewDataItems(dataItems: Iterable<TData>): void {
         this.data.update(list => list.addAll(dataItems));
     }

@@ -89,6 +89,8 @@ export class DropDownTreeComponent<T> implements ControlValueAccessor, OnInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
     readonly #injector: Injector = inject(Injector);
+    readonly #popupAnimationService: PopupAnimationService = inject(PopupAnimationService);
+    readonly #popupService: PopupService = inject(PopupService);
     readonly #popupUidClass: string = `mona-dropdown-popup-${v4()}`;
     readonly #selectedNode: Signal<TreeNode<T> | null> = computed(() => {
         return this.treeService.selectedNodes().firstOrDefault();
@@ -111,6 +113,7 @@ export class DropDownTreeComponent<T> implements ControlValueAccessor, OnInit {
         }
         return this.treeService.getNodeText(node);
     });
+    protected readonly treeService: TreeService<T> = inject(TreeService);
 
     @Input()
     public set children(value: string | Selector<T, Iterable<T> | Observable<Iterable<T>>>) {
@@ -150,11 +153,7 @@ export class DropDownTreeComponent<T> implements ControlValueAccessor, OnInit {
         this.treeService.setSelectBy(valueField ?? null);
     }
 
-    public constructor(
-        private readonly popupAnimationService: PopupAnimationService,
-        private readonly popupService: PopupService,
-        protected readonly treeService: TreeService<T>
-    ) {}
+    public constructor() {}
 
     public close(): void {
         this.#popupRef?.close();
@@ -179,7 +178,7 @@ export class DropDownTreeComponent<T> implements ControlValueAccessor, OnInit {
         if (this.#popupRef) {
             return;
         }
-        this.#popupRef = this.popupService.create({
+        this.#popupRef = this.#popupService.create({
             anchor: this.#hostElementRef.nativeElement,
             content: this.popupTemplate,
             hasBackdrop: false,
@@ -190,8 +189,8 @@ export class DropDownTreeComponent<T> implements ControlValueAccessor, OnInit {
             positions: DropDownService.getDefaultPositions()
         });
         this.focusSelectedNode();
-        this.popupAnimationService.setupDropdownOutsideClickCloseAnimation(this.#popupRef);
-        this.popupAnimationService.animateDropdown(this.#popupRef, AnimationState.Show);
+        this.#popupAnimationService.setupDropdownOutsideClickCloseAnimation(this.#popupRef);
+        this.#popupAnimationService.animateDropdown(this.#popupRef, AnimationState.Show);
         this.#popupRef.closed.pipe(take(1)).subscribe(() => {
             this.#popupRef = null;
             this.treeService.clearFilter();
