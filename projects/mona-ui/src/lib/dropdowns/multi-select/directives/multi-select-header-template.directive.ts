@@ -4,6 +4,4 @@ import { Directive } from "@angular/core";
     selector: "ng-template[monaMultiSelectHeaderTemplate]",
     standalone: true
 })
-export class MultiSelectHeaderTemplateDirective {
-    public constructor() {}
-}
+export class MultiSelectHeaderTemplateDirective {}

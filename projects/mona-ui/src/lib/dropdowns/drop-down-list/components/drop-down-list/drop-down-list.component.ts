@@ -3,25 +3,27 @@ import {
     ChangeDetectionStrategy,
     Component,
     computed,
-    ContentChild,
+    contentChild,
     DestroyRef,
+    effect,
     ElementRef,
     forwardRef,
     inject,
     input,
-    Input,
     InputSignal,
+    model,
     OnInit,
     Signal,
     TemplateRef,
-    ViewChild
+    untracked,
+    viewChild
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { faChevronDown, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { Predicate } from "@mirei/ts-collections";
-import { distinctUntilChanged, fromEvent, take, withLatestFrom } from "rxjs";
+import { asyncScheduler, distinctUntilChanged, fromEvent, take, withLatestFrom } from "rxjs";
 import { v4 } from "uuid";
 import { AnimationState } from "../../../../animations/models/AnimationState";
 import { PopupAnimationService } from "../../../../animations/services/popup-animation.service";
@@ -75,12 +77,12 @@ import { DropDownListValueTemplateDirective } from "../../directives/drop-down-l
         ListNoDataTemplateDirective
     ],
     host: {
-        "[class.mona-disabled]": "disabled",
+        "[class.mona-disabled]": "disabled()",
         "[class.mona-dropdown]": "true",
         "[class.mona-dropdown-list]": "true",
-        "[attr.aria-disabled]": "disabled ? true : undefined",
+        "[attr.aria-disabled]": "disabled() ? true : undefined",
         "[attr.aria-haspopup]": "true",
-        "[attr.tabindex]": "disabled ? null : 0"
+        "[attr.tabindex]": "disabled() ? null : 0"
     }
 })
 export class DropDownListComponent<TData> implements OnInit, ControlValueAccessor {
@@ -96,6 +98,14 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
 
     protected readonly clearIcon: IconDefinition = faTimes;
     protected readonly dropdownIcon: IconDefinition = faChevronDown;
+    protected readonly footerTemplate = contentChild(DropDownListFooterTemplateDirective, { read: TemplateRef });
+    protected readonly groupHeaderTemplate = contentChild(DropDownListGroupHeaderTemplateDirective, {
+        read: TemplateRef
+    });
+    protected readonly headerTemplate = contentChild(DropDownListHeaderTemplateDirective, { read: TemplateRef });
+    protected readonly itemTemplate = contentChild(DropDownListItemTemplateDirective, { read: TemplateRef });
+    protected readonly noDataTemplate = contentChild(DropDownListNoDataTemplateDirective, { read: TemplateRef });
+    protected readonly popupTemplate = viewChild.required<TemplateRef<any>>("popupTemplate");
     protected readonly selectableOptions: SelectableOptions = {
         enabled: true,
         mode: "single",
@@ -107,6 +117,7 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
     protected readonly selectedListItem: Signal<ListItem<TData> | null> = computed(() => {
         return this.#listService.selectedListItems().firstOrDefault();
     });
+    protected readonly valueTemplate = contentChild(DropDownListValueTemplateDirective, { read: TemplateRef });
     protected readonly valueText: Signal<string> = computed(() => {
         const listItem = this.selectedListItem();
         if (!listItem) {
@@ -114,54 +125,38 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
         }
         return this.#listService.getItemText(listItem);
     });
+
+    public data = input<Iterable<TData>>([]);
+    public disabled = model(false);
+    public itemDisabled = input<string | Predicate<TData> | null | undefined>("");
     public placeholder: InputSignal<string> = input("");
     public showClearButton: InputSignal<boolean> = input(false);
+    public textField = input<string | null | undefined>("");
+    public valueField = input<string | null | undefined>("");
 
-    @Input()
-    public set data(value: Iterable<TData>) {
-        this.#listService.setData(value);
+    public constructor() {
+        effect(() => {
+            const textField = this.textField() ?? "";
+            untracked(() => this.#listService.setTextField(textField));
+        });
+        effect(() => {
+            const valueField = this.valueField() ?? "";
+            untracked(() => {
+                this.#listService.setValueField(valueField);
+                if (this.#value != null) {
+                    this.#listService.setSelectedDataItems([this.#value]);
+                }
+            });
+        });
+        effect(() => {
+            const itemDisabled = this.itemDisabled() ?? "";
+            untracked(() => this.#listService.setDisabledBy(itemDisabled));
+        });
+        effect(() => {
+            const data = this.data();
+            untracked(() => this.#listService.setData(data));
+        });
     }
-
-    @Input()
-    public disabled: boolean = false;
-
-    @ContentChild(DropDownListFooterTemplateDirective, { read: TemplateRef })
-    public footerTemplate: TemplateRef<any> | null = null;
-
-    @ContentChild(DropDownListGroupHeaderTemplateDirective, { read: TemplateRef })
-    public groupHeaderTemplate: TemplateRef<any> | null = null;
-
-    @ContentChild(DropDownListHeaderTemplateDirective, { read: TemplateRef })
-    public headerTemplate: TemplateRef<any> | null = null;
-
-    @Input()
-    public set itemDisabled(value: string | Predicate<TData> | null | undefined) {
-        this.#listService.setDisabledBy(value ?? "");
-    }
-
-    @ContentChild(DropDownListItemTemplateDirective, { read: TemplateRef })
-    public itemTemplate: TemplateRef<any> | null = null;
-
-    @ContentChild(DropDownListNoDataTemplateDirective, { read: TemplateRef })
-    public noDataTemplate: TemplateRef<any> | null = null;
-
-    @ViewChild("popupTemplate")
-    public popupTemplate!: TemplateRef<any>;
-
-    @Input()
-    public set textField(textField: string | null | undefined) {
-        this.#listService.setTextField(textField ?? "");
-    }
-
-    @Input()
-    public set valueField(valueField: string | null | undefined) {
-        this.#listService.setValueField(valueField ?? "");
-    }
-
-    @ContentChild(DropDownListValueTemplateDirective, { read: TemplateRef })
-    public valueTemplate: TemplateRef<any> | null = null;
-
-    public constructor() {}
 
     public clearValue(event: MouseEvent): void {
         event.stopImmediatePropagation();
@@ -193,7 +188,7 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
         this.#popupRef = this.#popupService.create({
             anchor: this.#hostElementRef.nativeElement,
             closeOnOutsideClick: false,
-            content: this.popupTemplate,
+            content: this.popupTemplate(),
             hasBackdrop: false,
             withPush: false,
             width: this.#hostElementRef.nativeElement.getBoundingClientRect().width,
@@ -222,7 +217,7 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
     }
 
     public setDisabledState(isDisabled: boolean): void {
-        this.disabled = isDisabled;
+        this.disabled.set(isDisabled);
     }
 
     public setValue(value: any): void {
@@ -321,7 +316,7 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
         fromEvent<MouseEvent>(this.#hostElementRef.nativeElement, "click")
             .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe(() => {
-                if (this.disabled) {
+                if (this.disabled()) {
                     return;
                 }
                 this.open();

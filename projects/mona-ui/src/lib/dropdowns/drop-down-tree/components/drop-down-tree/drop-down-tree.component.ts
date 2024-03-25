@@ -50,7 +50,6 @@ import { DropDownTreeFooterTemplateDirective } from "../../directives/drop-down-
 import { DropDownTreeHeaderTemplateDirective } from "../../directives/drop-down-tree-header-template.directive";
 import { DropDownTreeNoDataTemplateDirective } from "../../directives/drop-down-tree-no-data-template.directive";
 import { DropDownTreeNodeTemplateDirective } from "../../directives/drop-down-tree-node-template.directive";
-import { DropDownTreeService } from "../../services/drop-down-tree.service";
 
 @Component({
     selector: "mona-drop-down-tree",
@@ -73,7 +72,6 @@ import { DropDownTreeService } from "../../services/drop-down-tree.service";
     styleUrl: "./drop-down-tree.component.scss",
     providers: [
         TreeService,
-        DropDownTreeService,
         {
             provide: NG_VALUE_ACCESSOR,
             useExisting: forwardRef(() => DropDownTreeComponent),

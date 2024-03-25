@@ -36,7 +36,5 @@ export class ListItemComponent<TData> {
     protected readonly listService: ListService<TData> = inject(ListService);
 
     public item: InputSignal<ListItem<TData>> = input.required();
-    public template: InputSignal<TemplateRef<ListItemTemplateContext<TData>> | null> = input<TemplateRef<
-        ListItemTemplateContext<TData>
-    > | null>(null);
+    public template = input<TemplateRef<ListItemTemplateContext<TData>> | null>(null);
 }

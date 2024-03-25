@@ -1,4 +1,4 @@
-import { AfterContentInit, ContentChild, Directive, Input, TemplateRef } from "@angular/core";
+import { contentChild, Directive, effect, inject, input, TemplateRef, untracked } from "@angular/core";
 import { MultiSelectComponent } from "../components/multi-select/multi-select.component";
 import { MultiSelectSummaryTagTemplateDirective } from "./multi-select-summary-tag-template.directive";
 
@@ -6,18 +6,19 @@ import { MultiSelectSummaryTagTemplateDirective } from "./multi-select-summary-t
     selector: "mona-multi-select[monaMultiSelectSummaryTag]",
     standalone: true
 })
-export class MultiSelectSummaryTagDirective<TData> implements AfterContentInit {
-    @ContentChild(MultiSelectSummaryTagTemplateDirective, { read: TemplateRef })
-    public summaryTagTemplate: TemplateRef<any> | null = null;
+export class MultiSelectSummaryTagDirective<TData> {
+    readonly #host: MultiSelectComponent<TData> = inject(MultiSelectComponent);
+    protected readonly summaryTagTemplate = contentChild(MultiSelectSummaryTagTemplateDirective, { read: TemplateRef });
+    public tagCount = input(-1, { alias: "monaMultiSelectSummaryTag" });
 
-    @Input("monaMultiSelectSummaryTag")
-    public set tagCount(value: number) {
-        this.host.tagCount.set(value);
-    }
-
-    public constructor(private readonly host: MultiSelectComponent<TData>) {}
-
-    public ngAfterContentInit(): void {
-        this.host.summaryTagTemplate.set(this.summaryTagTemplate);
+    public constructor() {
+        effect(() => {
+            const tagCount = this.tagCount();
+            untracked(() => this.#host.tagCount.set(tagCount));
+        });
+        effect(() => {
+            const tagTemplate = this.summaryTagTemplate();
+            untracked(() => this.#host.summaryTagTemplate.set(tagTemplate ?? null));
+        });
     }
 }

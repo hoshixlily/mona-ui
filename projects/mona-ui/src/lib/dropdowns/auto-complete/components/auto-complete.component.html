@@ -1,5 +1,5 @@
 <input monaTextBox class="mona-input-inner"
-       [disabled]="disabled"
+       [disabled]="disabled()"
        [placeholder]="placeholder()"
        [ngModel]="autoCompleteValue()"
        (ngModelChange)="autoCompleteValue$.next($event)"
@@ -13,31 +13,31 @@
 <ng-template #popupTemplate>
     <div class="mona-dropdown-popup-list-wrapper">
         <mona-list [maxHeight]="200" (itemSelect)="onItemSelect($event)">
-            @if (footerTemplate) {
+            @if (footerTemplate()) {
                 <ng-template monaListFooterTemplate>
-                    <ng-container [ngTemplateOutlet]="footerTemplate"></ng-container>
+                    <ng-container [ngTemplateOutlet]="footerTemplate()??null"></ng-container>
                 </ng-template>
             }
-            @if (groupHeaderTemplate) {
+            @if (groupHeaderTemplate()) {
                 <ng-template monaListGroupHeaderTemplate let-group>
-                    <ng-container [ngTemplateOutlet]="groupHeaderTemplate"
+                    <ng-container [ngTemplateOutlet]="groupHeaderTemplate()??null"
                                   [ngTemplateOutletContext]="{$implicit: group}"></ng-container>
                 </ng-template>
             }
-            @if (headerTemplate) {
+            @if (headerTemplate()) {
                 <ng-template monaListHeaderTemplate>
-                    <ng-container [ngTemplateOutlet]="headerTemplate"></ng-container>
+                    <ng-container [ngTemplateOutlet]="headerTemplate()??null"></ng-container>
                 </ng-template>
             }
-            @if (itemTemplate) {
+            @if (itemTemplate()) {
                 <ng-template monaListItemTemplate let-dataItem>
-                    <ng-container [ngTemplateOutlet]="itemTemplate"
+                    <ng-container [ngTemplateOutlet]="itemTemplate()??null"
                                   [ngTemplateOutletContext]="{$implicit: dataItem}"></ng-container>
                 </ng-template>
             }
-            @if (noDataTemplate) {
+            @if (noDataTemplate()) {
                 <ng-template monaListNoDataTemplate>
-                    <ng-container [ngTemplateOutlet]="noDataTemplate"></ng-container>
+                    <ng-container [ngTemplateOutlet]="noDataTemplate()??null"></ng-container>
                 </ng-template>
             }
         </mona-list>

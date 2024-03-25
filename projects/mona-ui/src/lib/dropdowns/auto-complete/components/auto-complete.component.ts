@@ -1,17 +1,22 @@
 import { NgClass, NgTemplateOutlet } from "@angular/common";
 import {
     Component,
+    contentChild,
     ContentChild,
     DestroyRef,
+    effect,
     ElementRef,
     forwardRef,
     inject,
     input,
     Input,
     InputSignal,
+    model,
     OnInit,
     signal,
     TemplateRef,
+    untracked,
+    viewChild,
     ViewChild,
     WritableSignal
 } from "@angular/core";
@@ -72,7 +77,7 @@ import { AutoCompleteNoDataTemplateDirective } from "../directives/auto-complete
         ListItemTemplateDirective
     ],
     host: {
-        "[class.mona-disabled]": "disabled",
+        "[class.mona-disabled]": "disabled()",
         "[class.mona-dropdown]": "true",
         "[class.mona-auto-complete]": "true"
     }
@@ -88,9 +93,17 @@ export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccesso
     #propagateChange: Action<string | null> | null = null;
     #value: string = "";
 
+    protected readonly autoCompleteValue: WritableSignal<string> = signal("");
     protected readonly autoCompleteValue$: Subject<string> = new Subject<string>();
     protected readonly clearIcon: IconDefinition = faTimes;
-    protected autoCompleteValue: WritableSignal<string> = signal("");
+    protected readonly footerTemplate = contentChild(AutoCompleteFooterTemplateDirective, { read: TemplateRef });
+    protected readonly groupHeaderTemplate = contentChild(AutoCompleteGroupHeaderTemplateDirective, {
+        read: TemplateRef
+    });
+    protected readonly headerTemplate = contentChild(AutoCompleteHeaderTemplateDirective, { read: TemplateRef });
+    protected readonly itemTemplate = contentChild(AutoCompleteItemTemplateDirective, { read: TemplateRef });
+    protected readonly noDataTemplate = contentChild(AutoCompleteNoDataTemplateDirective, { read: TemplateRef });
+    protected readonly popupTemplate = viewChild.required<TemplateRef<any>>("popupTemplate");
 
     protected readonly selectableOptions: SelectableOptions = {
         enabled: true,
@@ -98,51 +111,32 @@ export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccesso
         toggleable: false
     };
 
+    public data = input<Iterable<TData>>([]);
+    public disabled = model(false);
+    public itemDisabled = input<string | Predicate<TData> | null | undefined>("");
     public placeholder: InputSignal<string> = input("");
     public showClearButton: InputSignal<boolean> = input(false);
+    public textField = input<string | Selector<TData, string> | null | undefined>("");
+    public valueField = input<string | Selector<TData, any> | null | undefined>("");
 
-    @Input()
-    public set data(value: Iterable<TData>) {
-        this.#listService.setData(value);
+    public constructor() {
+        effect(() => {
+            const textField = this.textField();
+            untracked(() => this.#listService.setTextField(textField ?? ""));
+        });
+        effect(() => {
+            const itemDisabled = this.itemDisabled();
+            untracked(() => this.#listService.setDisabledBy(itemDisabled ?? ""));
+        });
+        effect(() => {
+            const valueField = this.valueField();
+            untracked(() => this.#listService.setValueField(valueField ?? ""));
+        });
+        effect(() => {
+            const data = this.data();
+            untracked(() => this.#listService.setData(data));
+        });
     }
-
-    @Input()
-    public disabled: boolean = false;
-
-    @ContentChild(AutoCompleteFooterTemplateDirective, { read: TemplateRef })
-    public footerTemplate: TemplateRef<any> | null = null;
-
-    @ContentChild(AutoCompleteGroupHeaderTemplateDirective, { read: TemplateRef })
-    public groupHeaderTemplate: TemplateRef<any> | null = null;
-
-    @ContentChild(AutoCompleteHeaderTemplateDirective, { read: TemplateRef })
-    public headerTemplate: TemplateRef<any> | null = null;
-
-    @Input()
-    public set itemDisabled(value: string | Predicate<TData> | null | undefined) {
-        this.#listService.setDisabledBy(value ?? "");
-    }
-
-    @ContentChild(AutoCompleteItemTemplateDirective, { read: TemplateRef })
-    public itemTemplate: TemplateRef<any> | null = null;
-
-    @ContentChild(AutoCompleteNoDataTemplateDirective, { read: TemplateRef })
-    public noDataTemplate: TemplateRef<any> | null = null;
-
-    @ViewChild("popupTemplate")
-    public popupTemplate!: TemplateRef<any>;
-
-    @Input()
-    public set textField(value: string | Selector<TData, string> | null | undefined) {
-        this.#listService.setTextField(value ?? "");
-    }
-
-    @Input()
-    public set valueField(value: string | Selector<TData, any> | null | undefined) {
-        this.#listService.setValueField(value ?? "");
-    }
-
-    public constructor() {}
 
     public clearValue(event: MouseEvent): void {
         event.stopImmediatePropagation();
@@ -186,7 +180,7 @@ export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccesso
     public open(): void {
         this.#popupRef = this.#popupService.create({
             anchor: this.#hostElementRef.nativeElement,
-            content: this.popupTemplate,
+            content: this.popupTemplate(),
             hasBackdrop: false,
             closeOnOutsideClick: false,
             withPush: false,
@@ -225,7 +219,7 @@ export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccesso
     public registerOnTouched(fn: any): void {}
 
     public setDisabledState(isDisabled: boolean): void {
-        this.disabled = isDisabled;
+        this.disabled.set(isDisabled);
     }
 
     public writeValue(data: any): void {

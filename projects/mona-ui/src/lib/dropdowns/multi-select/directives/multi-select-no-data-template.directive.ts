@@ -4,6 +4,4 @@ import { Directive } from "@angular/core";
     selector: "ng-template[monaMultiSelectNoDataTemplate]",
     standalone: true
 })
-export class MultiSelectNoDataTemplateDirective {
-    public constructor() {}
-}
+export class MultiSelectNoDataTemplateDirective {}

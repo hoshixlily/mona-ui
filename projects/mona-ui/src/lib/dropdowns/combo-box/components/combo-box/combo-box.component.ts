@@ -3,19 +3,21 @@ import {
     ChangeDetectionStrategy,
     Component,
     computed,
-    ContentChild,
+    contentChild,
     DestroyRef,
+    effect,
     ElementRef,
     forwardRef,
     inject,
     input,
-    Input,
     InputSignal,
+    model,
     OnInit,
     Signal,
     signal,
     TemplateRef,
-    ViewChild,
+    untracked,
+    viewChild,
     WritableSignal
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
@@ -90,7 +92,7 @@ import { ComboBoxNoDataTemplateDirective } from "../../directives/combo-box-no-d
         ListItemTemplateDirective
     ],
     host: {
-        "[class.mona-disabled]": "disabled",
+        "[class.mona-disabled]": "disabled()",
         "[class.mona-combo-box]": "true",
         "[class.mona-dropdown]": "true"
     }
@@ -110,6 +112,12 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
     protected readonly dropdownIcon: IconDefinition = faChevronDown;
     protected readonly comboBoxValue$: Subject<string> = new Subject<string>();
     protected readonly comboBoxValue: WritableSignal<string> = signal("");
+    protected readonly footerTemplate = contentChild(ComboBoxFooterTemplateDirective, { read: TemplateRef });
+    protected readonly groupHeaderTemplate = contentChild(ComboBoxGroupHeaderTemplateDirective, { read: TemplateRef });
+    protected readonly headerTemplate = contentChild(ComboBoxHeaderTemplateDirective, { read: TemplateRef });
+    protected readonly itemTemplate = contentChild(ComboBoxItemTemplateDirective, { read: TemplateRef });
+    protected readonly noDataTemplate = contentChild(ComboBoxNoDataTemplateDirective, { read: TemplateRef });
+    protected readonly popupTemplate = viewChild.required<TemplateRef<any>>("popupTemplate");
     protected readonly selectableOptions: SelectableOptions = {
         enabled: true,
         mode: "single",
@@ -130,54 +138,40 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
     });
 
     public allowCustomValue: InputSignal<boolean> = input(false);
+    public data = input<Iterable<TData>>([]);
+    public disabled = model(false);
+    public itemDisabled = input<string | Predicate<TData> | null | undefined>("");
     public placeholder: InputSignal<string> = input("");
     public showClearButton: InputSignal<boolean> = input(false);
+    public textField = input<string | Selector<TData, string> | null | undefined>("");
+    public valueField = input<string | Selector<TData, any> | null | undefined>("");
     public valueNormalizer: InputSignal<Action<Observable<string>, Observable<any>>> = input(
         (text$: Observable<string>) => text$.pipe(map(value => value))
     );
 
-    @Input()
-    public set data(value: Iterable<TData>) {
-        this.#listService.setData(value);
+    public constructor() {
+        effect(() => {
+            const itemDisabled = this.itemDisabled();
+            untracked(() => this.#listService.setDisabledBy(itemDisabled ?? ""));
+        });
+        effect(() => {
+            const textField = this.textField();
+            untracked(() => this.#listService.setTextField(textField ?? ""));
+        });
+        effect(() => {
+            const valueField = this.valueField();
+            untracked(() => {
+                this.#listService.setValueField(valueField ?? "");
+                if (this.#value != null) {
+                    this.#listService.setSelectedDataItems([this.#value]);
+                }
+            });
+        });
+        effect(() => {
+            const data = this.data();
+            untracked(() => this.#listService.setData(data));
+        });
     }
-
-    @Input()
-    public disabled: boolean = false;
-
-    @ContentChild(ComboBoxFooterTemplateDirective, { read: TemplateRef })
-    public footerTemplate: TemplateRef<any> | null = null;
-
-    @ContentChild(ComboBoxGroupHeaderTemplateDirective, { read: TemplateRef })
-    public groupHeaderTemplate: TemplateRef<any> | null = null;
-
-    @ContentChild(ComboBoxHeaderTemplateDirective, { read: TemplateRef })
-    public headerTemplate: TemplateRef<any> | null = null;
-
-    @Input()
-    public set itemDisabled(value: string | Predicate<TData> | null | undefined) {
-        this.#listService.setDisabledBy(value ?? "");
-    }
-
-    @ContentChild(ComboBoxItemTemplateDirective, { read: TemplateRef })
-    public itemTemplate: TemplateRef<any> | null = null;
-
-    @ContentChild(ComboBoxNoDataTemplateDirective, { read: TemplateRef })
-    public noDataTemplate: TemplateRef<any> | null = null;
-
-    @ViewChild("popupTemplate")
-    public popupTemplate!: TemplateRef<any>;
-
-    @Input()
-    public set textField(value: string | Selector<TData, string> | null | undefined) {
-        this.#listService.setTextField(value ?? "");
-    }
-
-    @Input()
-    public set valueField(value: string | Selector<TData, any> | null | undefined) {
-        this.#listService.setValueField(value ?? "");
-    }
-
-    public constructor() {}
 
     public clearValue(event: MouseEvent): void {
         event.stopImmediatePropagation();
@@ -242,7 +236,7 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
         }
         this.#popupRef = this.#popupService.create({
             anchor: this.#hostElementRef.nativeElement,
-            content: this.popupTemplate,
+            content: this.popupTemplate(),
             hasBackdrop: false,
             closeOnOutsideClick: false,
             withPush: false,
@@ -279,7 +273,7 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
     }
 
     public setDisabledState(isDisabled: boolean): void {
-        this.disabled = isDisabled;
+        this.disabled.set(isDisabled);
     }
 
     public writeValue(obj: TData): void {
