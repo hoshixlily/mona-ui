@@ -10,7 +10,7 @@
     }
     <div class="mona-tab-list-wrapper">
         <ul class="mona-tab-list" #tabListElement>
-            @for (tab of tabComponents; track tab.uid) {
+            @for (tab of tabComponents(); track tab.uid) {
                 <li [ngClass]="{'mona-tab-active': tab.selected(), 'mona-disabled': tab.disabled()}"
                     (click)="onTabClick(tab, tabListElement)">
                     <div class="mona-tab-title">

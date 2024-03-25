@@ -1,6 +1,6 @@
 <ul class="mona-sub-tree"
     cdkDropList [cdkDropListSortingDisabled]="true" (cdkDropListDropped)="onNodeDrop($event)">
-    @for (node of nodeSet(); track node.uid) {
+    @for (node of nodes(); track node.uid) {
         <li
             [attr.data-uid]="node.uid"
             [tabindex]="0"

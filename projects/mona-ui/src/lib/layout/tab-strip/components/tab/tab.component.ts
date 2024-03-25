@@ -9,7 +9,6 @@ import {
     InputSignal,
     model,
     ModelSignal,
-    Signal,
     TemplateRef,
     ViewContainerRef
 } from "@angular/core";
@@ -27,15 +26,9 @@ export class TabComponent implements AfterViewInit {
     readonly #vcr: ViewContainerRef = inject(ViewContainerRef);
     #viewRef?: EmbeddedViewRef<any>;
 
-    protected readonly contentTemplate: Signal<TemplateRef<any> | undefined> = contentChild(
-        TabContentTemplateDirective,
-        { read: TemplateRef }
-    );
+    protected readonly contentTemplate = contentChild(TabContentTemplateDirective, { read: TemplateRef });
 
-    public readonly titleTemplate: Signal<TemplateRef<any> | undefined> = contentChild(TabTitleTemplateDirective, {
-        read: TemplateRef
-    });
-
+    public readonly titleTemplate = contentChild(TabTitleTemplateDirective, { read: TemplateRef });
     public readonly uid: string = v4();
     public closable: InputSignal<boolean | undefined> = input<boolean | undefined>(undefined);
     public disabled: InputSignal<boolean> = input(false);

@@ -1,12 +1,12 @@
 import {
     ChangeDetectionStrategy,
     Component,
-    EventEmitter,
-    Input,
+    effect,
     InputSignal,
     model,
     ModelSignal,
-    Output
+    output,
+    OutputEmitterRef
 } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { ButtonGroupComponent } from "../../../buttons/button-group/button-group.component";
@@ -118,6 +118,8 @@ export class FilterMenuComponent {
     protected selectedFilterMenuDataItemList: Array<FilterMenuDataItem | undefined> = [undefined, undefined];
     protected stringFilterValues: [string, string] = ["", ""];
 
+    public readonly apply: OutputEmitterRef<CompositeFilterDescriptor> = output();
+
     public dateOptions: InputSignal<FilterMenuDateOptions> = model<FilterMenuDateOptions>({
         format: "dd/MM/yyyy",
         type: "date"
@@ -125,17 +127,15 @@ export class FilterMenuComponent {
     public field: ModelSignal<string> = model("");
     public operators: InputSignal<Iterable<FilterOperators>> = model<Iterable<FilterOperators>>([]);
     public type: ModelSignal<DataType> = model<DataType>("string");
+    public value = model<FilterMenuValue>();
 
-    @Output()
-    public apply: EventEmitter<CompositeFilterDescriptor> = new EventEmitter<CompositeFilterDescriptor>();
-
-    @Input()
-    public set value(value: FilterMenuValue) {
-        this.setFilterValues(value);
-    }
-
-    public get value(): FilterMenuValue {
-        return this.getFilterValues();
+    public constructor() {
+        effect(() => {
+            const value = this.value();
+            if (value) {
+                this.setFilterValues(value);
+            }
+        });
     }
 
     public onConnectorChange(item: FilterMenuConnectorItem): void {

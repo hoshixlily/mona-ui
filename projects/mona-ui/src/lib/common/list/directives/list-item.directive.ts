@@ -1,4 +1,4 @@
-import { Directive, effect, ElementRef, Input, Renderer2, signal, WritableSignal } from "@angular/core";
+import { Directive, effect, ElementRef, inject, input, Renderer2 } from "@angular/core";
 import { ListItem } from "../models/ListItem";
 import { ListService } from "../services/list.service";
 
@@ -7,20 +7,15 @@ import { ListService } from "../services/list.service";
     standalone: true
 })
 export class ListItemDirective<TData> {
-    readonly #item: WritableSignal<ListItem<TData> | null> = signal(null);
+    readonly #host: ElementRef<HTMLLIElement> = inject(ElementRef);
+    readonly #listService: ListService<TData> = inject(ListService);
+    readonly #renderer: Renderer2 = inject(Renderer2);
 
-    @Input({ required: true })
-    public set item(value: ListItem<TData>) {
-        this.#item.set(value);
-    }
+    public item = input.required<ListItem<TData>>();
 
-    public constructor(
-        private readonly host: ElementRef<HTMLLIElement>,
-        private readonly listService: ListService<TData>,
-        private readonly renderer: Renderer2
-    ) {
+    public constructor() {
         effect(() => {
-            const item = this.#item();
+            const item = this.item();
             this.updateDisabled(item);
             this.updateHighlighted(item);
             this.updateSelected(item);
@@ -28,29 +23,29 @@ export class ListItemDirective<TData> {
     }
 
     private updateDisabled(item: ListItem<TData> | null): void {
-        const disabled = item ? this.listService.isDisabled(item) : false;
+        const disabled = item ? this.#listService.isDisabled(item) : false;
         if (disabled) {
-            this.renderer.addClass(this.host.nativeElement, "mona-disabled");
+            this.#renderer.addClass(this.#host.nativeElement, "mona-disabled");
         } else {
-            this.renderer.removeClass(this.host.nativeElement, "mona-disabled");
+            this.#renderer.removeClass(this.#host.nativeElement, "mona-disabled");
         }
     }
 
     private updateHighlighted(item: ListItem<TData> | null): void {
-        const highlighted = item ? this.listService.isHighlighted(item) : false;
+        const highlighted = item ? this.#listService.isHighlighted(item) : false;
         if (highlighted) {
-            this.renderer.addClass(this.host.nativeElement, "mona-highlighted");
+            this.#renderer.addClass(this.#host.nativeElement, "mona-highlighted");
         } else {
-            this.renderer.removeClass(this.host.nativeElement, "mona-highlighted");
+            this.#renderer.removeClass(this.#host.nativeElement, "mona-highlighted");
         }
     }
 
     private updateSelected(item: ListItem<TData> | null): void {
-        const selected = item ? this.listService.isSelected(item) : false;
+        const selected = item ? this.#listService.isSelected(item) : false;
         if (selected) {
-            this.renderer.addClass(this.host.nativeElement, "mona-selected");
+            this.#renderer.addClass(this.#host.nativeElement, "mona-selected");
         } else {
-            this.renderer.removeClass(this.host.nativeElement, "mona-selected");
+            this.#renderer.removeClass(this.#host.nativeElement, "mona-selected");
         }
     }
 }

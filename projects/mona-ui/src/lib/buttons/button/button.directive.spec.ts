@@ -9,6 +9,7 @@ import { ButtonDirective } from "./button.directive";
         monaButton
         [primary]="primary"
         [selected]="selected"
+        [tabindex]="tabIndex"
         [toggleable]="toggleable"
         (selectedChange)="selectedChange($event)">
         TEST BUTTON
@@ -19,6 +20,7 @@ import { ButtonDirective } from "./button.directive";
 class TestButtonDirectiveComponent {
     public primary: boolean = true;
     public selected: boolean = false;
+    public tabIndex: number = 0;
     public toggleable: boolean = false;
 
     @ViewChild(ButtonDirective)
@@ -65,7 +67,7 @@ describe("ButtonDirective", () => {
     });
 
     it("should have class disabled", () => {
-        buttonHostComponent.buttonDirective.disabled = true;
+        buttonHostComponent.buttonDirective.disabled.set(true);
         buttonHostFixture.detectChanges();
         const button = buttonHostFixture.debugElement.nativeElement.querySelector("button");
         expect(button).toHaveClass("mona-disabled");
@@ -104,7 +106,7 @@ describe("ButtonDirective", () => {
     }));
 
     it("should have tabindex -1", () => {
-        buttonHostComponent.buttonDirective.tabindex = -1;
+        buttonHostFixture.componentRef.instance.tabIndex = -1;
         buttonHostFixture.detectChanges();
         const button = buttonHostFixture.debugElement.nativeElement.querySelector("button");
         const tabindex = button.getAttribute("tabindex");
@@ -112,7 +114,7 @@ describe("ButtonDirective", () => {
     });
 
     it("should have tabindex 0", () => {
-        buttonHostComponent.buttonDirective.tabindex = 0;
+        buttonHostFixture.componentRef.instance.tabIndex = 0;
         buttonHostFixture.detectChanges();
         const button = buttonHostFixture.debugElement.nativeElement.querySelector("button");
         const tabindex = button.getAttribute("tabindex");
@@ -120,7 +122,7 @@ describe("ButtonDirective", () => {
     });
 
     it("should have tabindex 1", () => {
-        buttonHostComponent.buttonDirective.tabindex = 1;
+        buttonHostFixture.componentRef.instance.tabIndex = 1;
         buttonHostFixture.detectChanges();
         const button = buttonHostFixture.debugElement.nativeElement.querySelector("button");
         const tabindex = button.getAttribute("tabindex");
@@ -162,9 +164,15 @@ describe("ButtonDirective", () => {
         buttonHostComponent.toggleable = true;
         buttonHostFixture.detectChanges();
         const button = buttonHostFixture.debugElement.query(By.css("button")).nativeElement as HTMLButtonElement;
+
         button.click();
+        buttonHostFixture.detectChanges();
+
         expect(button).toHaveClass("mona-selected");
+
         button.click();
+        buttonHostFixture.detectChanges();
+
         expect(button).not.toHaveClass("mona-selected");
     });
 });

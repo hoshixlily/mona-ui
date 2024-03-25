@@ -1,13 +1,13 @@
 import {
-    AfterContentInit,
     ChangeDetectionStrategy,
     Component,
-    ContentChildren,
+    contentChildren,
     DestroyRef,
+    effect,
     inject,
-    Input,
+    model,
     OnInit,
-    QueryList
+    untracked
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { Enumerable } from "@mirei/ts-collections";
@@ -26,70 +26,50 @@ import { ButtonService } from "../services/button.service";
         "[class.mona-button-group]": "true"
     }
 })
-export class ButtonGroupComponent implements OnInit, AfterContentInit {
+export class ButtonGroupComponent implements OnInit {
+    readonly #buttonService: ButtonService = inject(ButtonService);
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
-    #disabled: boolean = false;
-    #selection: SelectionMode = "multiple";
 
-    @ContentChildren(ButtonDirective)
-    private buttons: QueryList<ButtonDirective> = new QueryList<ButtonDirective>();
+    protected readonly buttons = contentChildren(ButtonDirective);
 
-    @Input()
-    public set disabled(disabled: boolean) {
-        this.#disabled = disabled;
-        this.notifyDisableStateChanged();
-    }
+    public disabled = model<boolean>(false);
+    public selection = model<SelectionMode>("multiple");
 
-    public get disabled(): boolean {
-        return this.#disabled;
-    }
-
-    @Input()
-    public set selection(selection: SelectionMode) {
-        this.#selection = selection;
-    }
-
-    public get selection(): SelectionMode {
-        return this.#selection;
-    }
-
-    public constructor(private readonly buttonService: ButtonService) {}
-
-    public ngAfterContentInit(): void {
-        this.notifyDisableStateChanged();
+    public constructor() {
+        effect(() => {
+            const disabled = this.disabled();
+            const buttons = this.buttons();
+            untracked(() => {
+                buttons.forEach(b => b.disabled.set(disabled));
+            });
+        });
     }
 
     public ngOnInit(): void {
-        this.notifySelectionStateChange();
+        this.setSubscriptions();
     }
 
-    private notifyDisableStateChanged(): void {
-        this.buttons.forEach(b => (b.disabled = this.disabled));
-    }
-
-    private notifySelectionStateChange(): void {
-        this.buttonService.buttonClick$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(button => {
-            if (this.#selection === "single") {
-                const selectedButton = Enumerable.from(this.buttons).firstOrDefault(b => b.selected);
+    private setSubscriptions(): void {
+        this.#buttonService.buttonClick$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(button => {
+            if (this.selection() === "single") {
+                const selectedButton = Enumerable.from(this.buttons()).firstOrDefault(b => b.selected());
                 if (selectedButton === button) {
                     return;
                 }
-                this.buttons.forEach(b => {
-                    this.buttonService.buttonSelect$.next([b, b === button ? !b.selected : false]);
+                this.buttons().forEach(b => {
+                    this.#buttonService.buttonSelect$.next([b, b === button ? !b.selected() : false]);
                 });
             } else {
-                this.buttonService.buttonSelect$.next([button, !button.selected]);
+                this.#buttonService.buttonSelect$.next([button, !button.selected()]);
             }
         });
-        this.buttonService.buttonSelected$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(button => {
-            if (this.#selection === "single") {
-                if (button.selected) {
-                    this.buttons.forEach(b => {
-                        if (b !== button) {
-                            this.buttonService.buttonSelect$.next([b, false]);
-                        }
-                    });
-                }
+        this.#buttonService.buttonSelected$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(button => {
+            if (this.selection() === "single" && button.selected()) {
+                this.buttons().forEach(b => {
+                    if (b !== button) {
+                        this.#buttonService.buttonSelect$.next([b, false]);
+                    }
+                });
             }
         });
     }

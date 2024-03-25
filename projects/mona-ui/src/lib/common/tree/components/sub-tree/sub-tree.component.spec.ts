@@ -17,6 +17,7 @@ describe("SubTreeComponent", () => {
         component = fixture.componentInstance;
 
         fixture.componentRef.setInput("depth", 0);
+        fixture.componentRef.setInput("nodes", []);
         fixture.componentRef.setInput("parent", null);
 
         fixture.detectChanges();

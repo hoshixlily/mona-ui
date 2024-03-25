@@ -107,7 +107,7 @@ export class ListService<TData> {
         enabled: false,
         height: 28
     });
-    public filterChange: EventEmitter<FilterChangeEvent> = new EventEmitter<FilterChangeEvent>();
+    public filterChange: OutputEmitterRef<FilterChangeEvent> = output();
     public selectedKeysChange: OutputEmitterRef<Array<any>> = output();
 
     public addNewDataItems(dataItems: Iterable<TData>): void {

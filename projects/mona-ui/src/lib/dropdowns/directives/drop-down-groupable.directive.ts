@@ -1,4 +1,4 @@
-import { Directive, Input } from "@angular/core";
+import { Directive, effect, inject, input, untracked } from "@angular/core";
 import { Selector } from "@mirei/ts-collections";
 import { GroupableOptions } from "../../common/list/models/GroupableOptions";
 import { ListService } from "../../common/list/services/list.service";
@@ -17,24 +17,31 @@ export class DropDownGroupableDirective<TData> {
         enabled: true,
         headerOrder: "asc"
     };
+    readonly #listService: ListService<TData> = inject(ListService);
 
-    @Input({ required: true })
-    public set groupBy(value: string | Selector<TData, any> | null | undefined) {
-        this.listService.setGroupBy(value ?? "");
-    }
+    public groupBy = input<string | Selector<TData, any> | null | undefined>("");
+    public options = input<GroupableOptions<TData, any> | "">("", {
+        alias: "monaDropDownGroupable"
+    });
 
-    @Input("monaDropDownGroupable")
-    public set options(value: GroupableOptions<TData, any> | "") {
-        if (value === "") {
-            this.listService.setGroupableOptions(this.#defaultOptions);
-        } else {
-            this.listService.setGroupableOptions({
-                ...this.#defaultOptions,
-                ...value,
-                enabled: value.enabled ?? this.#defaultOptions.enabled
+    public constructor() {
+        effect(() => {
+            const groupBy = this.groupBy() ?? "";
+            untracked(() => this.#listService.setGroupBy(groupBy));
+        });
+        effect(() => {
+            const options = this.options();
+            untracked(() => {
+                if (options === "") {
+                    this.#listService.setGroupableOptions(this.#defaultOptions);
+                } else {
+                    this.#listService.setGroupableOptions({
+                        ...this.#defaultOptions,
+                        ...options,
+                        enabled: options.enabled ?? this.#defaultOptions.enabled
+                    });
+                }
             });
-        }
+        });
     }
-
-    public constructor(private readonly listService: ListService<TData>) {}
 }

@@ -4,16 +4,18 @@ import { NgStyle, NgTemplateOutlet } from "@angular/common";
 import {
     ChangeDetectionStrategy,
     Component,
-    ContentChild,
+    contentChild,
     DestroyRef,
+    effect,
     ElementRef,
-    EventEmitter,
     inject,
-    Input,
+    input,
     NgZone,
     OnInit,
-    Output,
-    TemplateRef
+    output,
+    OutputEmitterRef,
+    TemplateRef,
+    untracked
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { asapScheduler, fromEvent, takeWhile, tap } from "rxjs";
@@ -23,7 +25,6 @@ import { NodeClickEvent } from "../../models/NodeClickEvent";
 import { NodeDragEvent } from "../../models/NodeDragEvent";
 import { NodeDragStartEvent } from "../../models/NodeDragStartEvent";
 import { NodeDropEvent } from "../../models/NodeDropEvent";
-import { NodeItem } from "../../models/NodeItem";
 import { NodeSelectEvent } from "../../models/NodeSelectEvent";
 import { TreeNode } from "../../models/TreeNode";
 import { TreeService } from "../../services/tree.service";
@@ -50,38 +51,35 @@ export class TreeComponent<T> implements OnInit {
     readonly #focusMonitor: FocusMonitor = inject(FocusMonitor);
     readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
     readonly #zone: NgZone = inject(NgZone);
+
+    protected readonly nodeCheck: OutputEmitterRef<NodeCheckEvent<T>> = output();
+    protected readonly nodeClick: OutputEmitterRef<NodeClickEvent<T>> = output();
+    protected readonly nodeDrag: OutputEmitterRef<NodeDragEvent<T>> = output();
+    protected readonly nodeDragEnd: OutputEmitterRef<NodeDragStartEvent<T>> = output();
+    protected readonly nodeDragStart: OutputEmitterRef<NodeDragStartEvent<T>> = output();
+    protected readonly nodeDrop: OutputEmitterRef<NodeDropEvent<T>> = output();
+    protected readonly nodeSelect: OutputEmitterRef<NodeSelectEvent<T>> = output();
     protected readonly treeService: TreeService<T> = inject(TreeService);
+    protected readonly nodeTemplate = contentChild(TreeNodeTemplateDirective, { read: TemplateRef });
 
-    @Input()
-    public set data(value: Iterable<T>) {
-        this.treeService.setData(value);
+    public data = input<Iterable<T>>();
+
+    public constructor() {
+        effect(() => {
+            const nodeTemplate = this.nodeTemplate() ?? null;
+            untracked(() => {
+                this.treeService.nodeTemplate.set(nodeTemplate);
+            });
+        });
+        effect(() => {
+            const data = this.data();
+            untracked(() => {
+                if (data != null) {
+                    this.treeService.setData(data);
+                }
+            });
+        });
     }
-
-    @Output()
-    public nodeCheck: EventEmitter<NodeCheckEvent<T>> = new EventEmitter();
-
-    @Output()
-    public nodeClick: EventEmitter<NodeClickEvent<T>> = new EventEmitter();
-
-    @Output()
-    public nodeDrag: EventEmitter<NodeDragEvent<T>> = new EventEmitter();
-
-    @Output()
-    public nodeDragEnd: EventEmitter<NodeDragStartEvent<T>> = new EventEmitter();
-
-    @Output()
-    public nodeDragStart: EventEmitter<NodeDragStartEvent<T>> = new EventEmitter();
-
-    @Output()
-    public nodeDrop: EventEmitter<NodeDropEvent<T>> = new EventEmitter();
-
-    @ContentChild(TreeNodeTemplateDirective, { read: TemplateRef })
-    public set nodeTemplate(value: TemplateRef<NodeItem<T>>) {
-        this.treeService.nodeTemplate.set(value);
-    }
-
-    @Output()
-    public nodeSelect: EventEmitter<NodeSelectEvent<T>> = new EventEmitter();
 
     public ngOnInit(): void {
         this.setSubscriptions();

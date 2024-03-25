@@ -9,16 +9,7 @@ import {
     CdkDropList
 } from "@angular/cdk/drag-drop";
 import { AsyncPipe, NgStyle } from "@angular/common";
-import {
-    ChangeDetectionStrategy,
-    Component,
-    inject,
-    input,
-    Input,
-    InputSignal,
-    signal,
-    WritableSignal
-} from "@angular/core";
+import { ChangeDetectionStrategy, Component, inject, input, InputSignal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { FaIconComponent } from "@fortawesome/angular-fontawesome";
 import {
@@ -77,16 +68,13 @@ export class SubTreeComponent<T> {
     protected readonly dropNotAllowIcon: IconDefinition = faBan;
     protected readonly expandedIcon: IconDefinition = faCaretDown;
     protected readonly loadingIcon: IconDefinition = faArrowsRotate;
-    protected readonly nodeSet: WritableSignal<ImmutableSet<TreeNode<T>>> = signal(ImmutableSet.create());
     protected readonly treeService: TreeService<T> = inject(TreeService);
 
     public depth: InputSignal<number> = input.required();
+    public nodes = input.required<ImmutableSet<TreeNode<T>>, Iterable<TreeNode<T>>>({
+        transform: value => ImmutableSet.create(value)
+    });
     public parent: InputSignal<TreeNode<T> | null> = input.required();
-
-    @Input({ required: true })
-    public set nodes(nodes: Iterable<TreeNode<T>>) {
-        this.nodeSet.set(ImmutableSet.create(nodes));
-    }
 
     public onExpandStateChange(node: TreeNode<T>): void {
         const expanded = this.treeService.isExpanded(node);
