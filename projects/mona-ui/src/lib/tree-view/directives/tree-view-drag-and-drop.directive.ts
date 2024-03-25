@@ -1,4 +1,4 @@
-import { Directive, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { Directive, effect, inject, input, OnInit, output, Output, OutputEmitterRef, untracked } from "@angular/core";
 import { DraggableOptions } from "../../common/tree/models/DraggableOptions";
 import { NodeCheckEvent } from "../../common/tree/models/NodeCheckEvent";
 import { NodeClickEvent } from "../../common/tree/models/NodeClickEvent";
@@ -17,49 +17,43 @@ export class TreeViewDragAndDropDirective<T> implements OnInit {
     readonly #defaultOptions: DraggableOptions = {
         enabled: true
     };
+    readonly #treeService: TreeService<T> = inject(TreeService);
 
-    @Output()
-    public nodeCheck: EventEmitter<NodeCheckEvent<T>> = new EventEmitter();
+    public readonly nodeCheck: OutputEmitterRef<NodeCheckEvent<T>> = output();
+    public readonly nodeClick: OutputEmitterRef<NodeClickEvent<T>> = output();
+    public readonly nodeDrag: OutputEmitterRef<NodeDragEvent<T>> = output();
+    public readonly nodeDragEnd: OutputEmitterRef<NodeDragEndEvent<T>> = output();
+    public readonly nodeDragStart: OutputEmitterRef<NodeDragStartEvent<T>> = output();
+    public readonly nodeDrop: OutputEmitterRef<NodeDropEvent<T>> = output();
+    public readonly nodeSelect: OutputEmitterRef<NodeSelectEvent<T>> = output();
 
-    @Output()
-    public nodeClick: EventEmitter<NodeClickEvent<T>> = new EventEmitter();
+    public options = input<Partial<DraggableOptions> | "">("", {
+        alias: "monaTreeViewDragAndDrop"
+    });
 
-    @Output()
-    public nodeDrag: EventEmitter<NodeDragEvent<T>> = new EventEmitter();
-
-    @Output()
-    public nodeDragEnd: EventEmitter<NodeDragEndEvent<T>> = new EventEmitter();
-
-    @Output()
-    public nodeDragStart: EventEmitter<NodeDragStartEvent<T>> = new EventEmitter();
-
-    @Output()
-    public nodeDrop: EventEmitter<NodeDropEvent<T>> = new EventEmitter();
-
-    @Output()
-    public nodeSelect: EventEmitter<NodeSelectEvent<T>> = new EventEmitter();
-
-    @Input("monaTreeViewDragAndDrop")
-    public set options(value: Partial<DraggableOptions> | "") {
-        if (value === "") {
-            this.treeService.setDraggableOptions(this.#defaultOptions);
-        } else {
-            this.treeService.setDraggableOptions({
-                ...this.#defaultOptions,
-                ...value
+    public constructor() {
+        effect(() => {
+            const options = this.options();
+            untracked(() => {
+                if (options === "") {
+                    this.#treeService.setDraggableOptions(this.#defaultOptions);
+                } else {
+                    this.#treeService.setDraggableOptions({
+                        ...this.#defaultOptions,
+                        ...options
+                    });
+                }
             });
-        }
+        });
     }
 
-    public constructor(private readonly treeService: TreeService<T>) {}
-
     public ngOnInit(): void {
-        this.treeService.nodeCheck = this.nodeCheck;
-        this.treeService.nodeClick = this.nodeClick;
-        this.treeService.nodeDrag = this.nodeDrag;
-        this.treeService.nodeDragEnd = this.nodeDragEnd;
-        this.treeService.nodeDragStart = this.nodeDragStart;
-        this.treeService.nodeDrop = this.nodeDrop;
-        this.treeService.nodeSelect = this.nodeSelect;
+        this.#treeService.nodeCheck = this.nodeCheck;
+        this.#treeService.nodeClick = this.nodeClick;
+        this.#treeService.nodeDrag = this.nodeDrag;
+        this.#treeService.nodeDragEnd = this.nodeDragEnd;
+        this.#treeService.nodeDragStart = this.nodeDragStart;
+        this.#treeService.nodeDrop = this.nodeDrop;
+        this.#treeService.nodeSelect = this.nodeSelect;
     }
 }

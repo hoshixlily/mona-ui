@@ -1,7 +1,17 @@
-import { DestroyRef, Directive, EventEmitter, inject, Input, OnInit, Output } from "@angular/core";
+import {
+    DestroyRef,
+    Directive,
+    effect,
+    inject,
+    input,
+    OnInit,
+    output,
+    OutputEmitterRef,
+    untracked
+} from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { Selector, sequenceEqual } from "@mirei/ts-collections";
-import { distinctUntilChanged, pairwise, skip, tap } from "rxjs";
+import { distinctUntilChanged, pairwise } from "rxjs";
 import { NodeItem } from "../../common/tree/models/NodeItem";
 import { SelectableOptions } from "../../common/tree/models/SelectableOptions";
 import { TreeService } from "../../common/tree/services/tree.service";
@@ -18,44 +28,48 @@ export class TreeViewSelectableDirective<T> implements OnInit {
         toggleable: false
     };
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
+    readonly #treeService: TreeService<T> = inject(TreeService);
 
-    @Input("monaTreeViewSelectable")
-    public set options(value: Partial<SelectableOptions> | "") {
-        if (value === "") {
-            this.treeService.setSelectableOptions(this.#defaultOptions);
-        } else {
-            this.treeService.setSelectableOptions({
-                ...this.#defaultOptions,
-                ...value
+    public readonly selectedKeysChange: OutputEmitterRef<Array<any>> = output();
+    public readonly selectionChange: OutputEmitterRef<NodeItem<T>> = output();
+
+    public selectBy = input<string | Selector<T, any> | null | undefined>("");
+    public selectedKeys = input<Iterable<any>>([]);
+    public options = input<Partial<SelectableOptions> | "">("", {
+        alias: "monaTreeViewSelectable"
+    });
+
+    public constructor() {
+        effect(() => {
+            const selectBy = this.selectBy();
+            untracked(() => this.#treeService.setSelectBy(selectBy ?? ""));
+        });
+        effect(() => {
+            const selectedKeys = this.selectedKeys();
+            untracked(() => this.#treeService.setSelectedKeys(selectedKeys ?? []));
+        });
+        effect(() => {
+            const options = this.options();
+            untracked(() => {
+                if (options === "") {
+                    this.#treeService.setSelectableOptions(this.#defaultOptions);
+                } else {
+                    this.#treeService.setSelectableOptions({
+                        ...this.#defaultOptions,
+                        ...options
+                    });
+                }
             });
-        }
+        });
     }
-
-    @Input()
-    public set selectBy(value: string | Selector<T, any> | null | undefined) {
-        this.treeService.setSelectBy(value ?? "");
-    }
-
-    @Input()
-    public set selectedKeys(value: Iterable<any> | null | undefined) {
-        this.treeService.setSelectedKeys(value ?? []);
-    }
-
-    @Output()
-    public selectedKeysChange: EventEmitter<Array<any>> = new EventEmitter<Array<any>>();
-
-    @Output()
-    public selectionChange: EventEmitter<NodeItem<T>> = new EventEmitter<NodeItem<T>>();
-
-    public constructor(private readonly treeService: TreeService<T>) {}
 
     public ngOnInit(): void {
-        this.treeService.selectionChange = this.selectionChange;
+        this.#treeService.selectionChange = this.selectionChange;
         this.setNodeSelectSubscription();
     }
 
     private setNodeSelectSubscription(): void {
-        this.treeService.selectedKeys$
+        this.#treeService.selectedKeys$
             .pipe(pairwise(), takeUntilDestroyed(this.#destroyRef))
             .subscribe(([oldKeys, keys]) => {
                 const orderedOldKeys = oldKeys.orderBy(k => k);
@@ -65,13 +79,13 @@ export class TreeViewSelectableDirective<T> implements OnInit {
                 }
                 this.selectedKeysChange.emit(keys.toArray());
             });
-        this.treeService.selectionChange$
+        this.#treeService.selectionChange$
             .pipe(
                 distinctUntilChanged((n1, n2) => n1.data === n2.data),
                 takeUntilDestroyed(this.#destroyRef)
             )
             .subscribe(nodeItem => {
-                this.treeService.selectionChange.emit(nodeItem);
+                this.#treeService.selectionChange.emit(nodeItem);
             });
     }
 }

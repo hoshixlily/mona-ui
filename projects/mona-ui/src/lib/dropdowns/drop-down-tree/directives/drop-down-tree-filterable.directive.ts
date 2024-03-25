@@ -1,4 +1,4 @@
-import { Directive, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { Directive, effect, inject, input, OnInit, output, OutputEmitterRef, untracked } from "@angular/core";
 import { FilterChangeEvent } from "../../../common/filter-input/models/FilterChangeEvent";
 import { FilterableOptions } from "../../../common/models/FilterableOptions";
 import { TreeService } from "../../../common/tree/services/tree.service";
@@ -14,30 +14,41 @@ export class DropDownTreeFilterableDirective<T> implements OnInit {
         caseSensitive: false,
         debounce: 0
     };
+    readonly #treeService: TreeService<T> = inject(TreeService);
 
-    @Input()
-    public set filter(value: string) {
-        this.treeService.filter$.next(value);
-    }
+    public readonly filterChange: OutputEmitterRef<FilterChangeEvent> = output();
 
-    @Output()
-    public filterChange: EventEmitter<FilterChangeEvent> = new EventEmitter<FilterChangeEvent>();
+    public filter = input<string>("");
+    public filterPlaceholder = input<string>("");
+    public options = input<Partial<FilterableOptions> | "">("", {
+        alias: "monaDropDownTreeFilterable"
+    });
 
-    @Input("monaDropDownTreeFilterable")
-    public set options(value: Partial<FilterableOptions> | "") {
-        if (value === "") {
-            this.treeService.setFilterableOptions(this.#defaultOptions);
-        } else {
-            this.treeService.setFilterableOptions({
-                ...this.#defaultOptions,
-                ...value
+    public constructor() {
+        effect(() => {
+            const filter = this.filter();
+            untracked(() => this.#treeService.filter$.next(filter));
+        });
+        effect(() => {
+            const placeholder = this.filterPlaceholder();
+            untracked(() => this.#treeService.filterPlaceholder.set(placeholder));
+        });
+        effect(() => {
+            const options = this.options() ?? "";
+            untracked(() => {
+                if (options === "") {
+                    this.#treeService.setFilterableOptions(this.#defaultOptions);
+                } else {
+                    this.#treeService.setFilterableOptions({
+                        ...this.#defaultOptions,
+                        ...options
+                    });
+                }
             });
-        }
+        });
     }
-
-    public constructor(private readonly treeService: TreeService<T>) {}
 
     public ngOnInit(): void {
-        this.treeService.filterChange = this.filterChange;
+        this.#treeService.filterChange = this.filterChange;
     }
 }

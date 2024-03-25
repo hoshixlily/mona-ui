@@ -4,10 +4,11 @@ import { DropDownTreeDisableDirective } from "./drop-down-tree-disable.directive
 
 describe("DropDownTreeDisableDirective", () => {
     let directive: DropDownTreeDisableDirective<any>;
-    let treeService: TreeService<any>;
     beforeEach(() => {
-        treeService = TestBed.runInInjectionContext(() => new TreeService());
-        directive = TestBed.runInInjectionContext(() => new DropDownTreeDisableDirective(treeService));
+        TestBed.configureTestingModule({
+            providers: [TreeService]
+        });
+        directive = TestBed.runInInjectionContext(() => new DropDownTreeDisableDirective());
     });
     it("should create an instance", () => {
         expect(directive).toBeTruthy();

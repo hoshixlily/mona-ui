@@ -1,4 +1,14 @@
-import { DestroyRef, Directive, EventEmitter, inject, Input, OnInit, Output } from "@angular/core";
+import {
+    DestroyRef,
+    Directive,
+    effect,
+    inject,
+    input,
+    OnInit,
+    output,
+    OutputEmitterRef,
+    untracked
+} from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { Selector, sequenceEqual } from "@mirei/ts-collections";
 import { pairwise } from "rxjs";
@@ -17,41 +27,51 @@ export class TreeViewCheckableDirective<T> implements OnInit {
         mode: "multiple"
     };
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
+    readonly #treeService: TreeService<T> = inject(TreeService);
 
-    @Input()
-    public set checkBy(value: string | Selector<T, any> | null | undefined) {
-        this.treeService.setCheckBy(value ?? "");
-    }
+    public readonly checkedKeysChange: OutputEmitterRef<Array<any>> = output();
 
-    @Input()
-    public set checkedKeys(value: Iterable<any> | null | undefined) {
-        this.treeService.setCheckedKeys(value ?? []);
-    }
+    public checkBy = input<string | Selector<T, any> | null | undefined>("");
+    public checkedKeys = input<Iterable<any>>([]);
+    public options = input<Partial<CheckableOptions> | "">("", {
+        alias: "monaTreeViewCheckable"
+    });
 
-    @Output()
-    public checkedKeysChange: EventEmitter<Array<any>> = new EventEmitter<Array<any>>();
-
-    @Input("monaTreeViewCheckable")
-    public set options(value: Partial<CheckableOptions> | "") {
-        if (value === "") {
-            this.treeService.setCheckableOptions(this.#defaultOptions);
-        } else {
-            this.treeService.setCheckableOptions({
-                ...this.#defaultOptions,
-                ...value
+    public constructor() {
+        effect(() => {
+            const checkBy = this.checkBy();
+            untracked(() => {
+                this.#treeService.setCheckBy(checkBy ?? "");
             });
-        }
+        });
+        effect(() => {
+            const checkedKeys = this.checkedKeys();
+            untracked(() => {
+                this.#treeService.setCheckedKeys(checkedKeys ?? []);
+            });
+        });
+        effect(() => {
+            const options = this.options();
+            untracked(() => {
+                if (options === "") {
+                    this.#treeService.setCheckableOptions(this.#defaultOptions);
+                } else {
+                    this.#treeService.setCheckableOptions({
+                        ...this.#defaultOptions,
+                        ...options
+                    });
+                }
+            });
+        });
     }
-
-    public constructor(private readonly treeService: TreeService<T>) {}
 
     public ngOnInit(): void {
-        this.treeService.checkedKeysChange = this.checkedKeysChange;
+        this.#treeService.checkedKeysChange = this.checkedKeysChange;
         this.setNodeCheckSubscription();
     }
 
     private setNodeCheckSubscription(): void {
-        this.treeService.checkedKeys$
+        this.#treeService.checkedKeys$
             .pipe(pairwise(), takeUntilDestroyed(this.#destroyRef))
             .subscribe(([oldKeys, keys]) => {
                 const orderedOldKeys = oldKeys.orderBy(k => k);
@@ -59,7 +79,7 @@ export class TreeViewCheckableDirective<T> implements OnInit {
                 if (sequenceEqual(orderedOldKeys, orderedKeys)) {
                     return;
                 }
-                this.treeService.checkedKeysChange.emit(keys.toArray());
+                this.#treeService.checkedKeysChange.emit(keys.toArray());
             });
     }
 }

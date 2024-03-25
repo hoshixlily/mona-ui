@@ -4,6 +4,4 @@ import { Directive } from "@angular/core";
     selector: "ng-template[monaDropDownTreeFooterTemplate]",
     standalone: true
 })
-export class DropDownTreeFooterTemplateDirective {
-    public constructor() {}
-}
+export class DropDownTreeFooterTemplateDirective {}

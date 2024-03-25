@@ -4,10 +4,11 @@ import { TreeViewDisableDirective } from "./tree-view-disable.directive";
 
 describe("TreeViewDisableDirective", () => {
     let directive: TreeViewDisableDirective<any>;
-    let treeService: TreeService<any>;
     beforeEach(() => {
-        treeService = TestBed.runInInjectionContext(() => new TreeService());
-        directive = TestBed.runInInjectionContext(() => new TreeViewDisableDirective(treeService));
+        TestBed.configureTestingModule({
+            providers: [TreeService]
+        });
+        directive = TestBed.runInInjectionContext(() => new TreeViewDisableDirective());
     });
     it("should create an instance", () => {
         expect(directive).toBeTruthy();

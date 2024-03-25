@@ -1,4 +1,4 @@
-import { Directive, EventEmitter, Input, OnInit, Output } from "@angular/core";
+import { Directive, effect, inject, input, OnInit, output, OutputEmitterRef, untracked } from "@angular/core";
 import { Selector } from "@mirei/ts-collections";
 import { ExpandableOptions } from "../../common/tree/models/ExpandableOptions";
 import { TreeService } from "../../common/tree/services/tree.service";
@@ -11,36 +11,46 @@ export class TreeViewExpandableDirective<T> implements OnInit {
     readonly #defaultOptions: ExpandableOptions = {
         enabled: true
     };
+    readonly #treeService: TreeService<T> = inject(TreeService);
 
-    @Input()
-    public set expandBy(value: string | Selector<T, any> | null | undefined) {
-        this.treeService.setExpandBy(value ?? "");
-    }
+    public readonly expandedKeysChange: OutputEmitterRef<Array<any>> = output();
 
-    @Input()
-    public set expandedKeys(value: Iterable<any> | null | undefined) {
-        this.treeService.setExpandedKeys(value ?? []);
-    }
+    public expandBy = input<string | Selector<T, any> | null | undefined>("");
+    public expandedKeys = input<Iterable<any>>([]);
+    public options = input<Partial<ExpandableOptions> | "">("", {
+        alias: "monaTreeViewExpandable"
+    });
 
-    @Output()
-    public expandedKeysChange: EventEmitter<Array<any>> = new EventEmitter<Array<any>>();
-
-    @Input("monaTreeViewExpandable")
-    public set options(value: Partial<ExpandableOptions> | "") {
-        if (value === "") {
-            this.treeService.setExpandableOptions(this.#defaultOptions);
-        } else {
-            this.treeService.setExpandableOptions({
-                ...this.#defaultOptions,
-                ...value
+    public constructor() {
+        effect(() => {
+            const expandBy = this.expandBy();
+            untracked(() => {
+                this.#treeService.setExpandBy(expandBy ?? "");
             });
-        }
+        });
+        effect(() => {
+            const expandedKeys = this.expandedKeys();
+            untracked(() => {
+                this.#treeService.setExpandedKeys(expandedKeys ?? []);
+            });
+        });
+        effect(() => {
+            const options = this.options();
+            untracked(() => {
+                if (options === "") {
+                    this.#treeService.setExpandableOptions(this.#defaultOptions);
+                } else {
+                    this.#treeService.setExpandableOptions({
+                        ...this.#defaultOptions,
+                        ...options
+                    });
+                }
+            });
+        });
     }
-
-    public constructor(private readonly treeService: TreeService<T>) {}
 
     public ngOnInit(): void {
-        this.treeService.expandedKeysChange = this.expandedKeysChange;
-        this.treeService.setNodeExpandSubscription();
+        this.#treeService.expandedKeysChange = this.expandedKeysChange;
+        this.#treeService.setNodeExpandSubscription();
     }
 }

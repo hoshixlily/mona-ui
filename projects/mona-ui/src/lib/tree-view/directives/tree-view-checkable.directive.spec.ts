@@ -4,10 +4,11 @@ import { TreeViewCheckableDirective } from "./tree-view-checkable.directive";
 
 describe("TreeViewCheckableDirective", () => {
     let directive: TreeViewCheckableDirective<any>;
-    let treeService: TreeService<any>;
     beforeEach(() => {
-        treeService = TestBed.runInInjectionContext(() => new TreeService());
-        directive = TestBed.runInInjectionContext(() => new TreeViewCheckableDirective(treeService));
+        TestBed.configureTestingModule({
+            providers: [TreeService]
+        });
+        directive = TestBed.runInInjectionContext(() => new TreeViewCheckableDirective());
     });
     it("should create an instance", () => {
         expect(directive).toBeTruthy();

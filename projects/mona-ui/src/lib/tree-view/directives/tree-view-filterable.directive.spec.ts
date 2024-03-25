@@ -2,12 +2,13 @@ import { TestBed } from "@angular/core/testing";
 import { TreeService } from "../../common/tree/services/tree.service";
 import { TreeViewFilterableDirective } from "./tree-view-filterable.directive";
 
-describe("TreeFilterableDirective", () => {
+describe("TreeViewFilterableDirective", () => {
     let directive: TreeViewFilterableDirective<any>;
-    let treeService: TreeService<any>;
     beforeEach(() => {
-        treeService = TestBed.runInInjectionContext(() => new TreeService());
-        directive = TestBed.runInInjectionContext(() => new TreeViewFilterableDirective(treeService));
+        TestBed.configureTestingModule({
+            providers: [TreeService]
+        });
+        directive = TestBed.runInInjectionContext(() => new TreeViewFilterableDirective());
     });
     it("should create an instance", () => {
         expect(directive).toBeTruthy();

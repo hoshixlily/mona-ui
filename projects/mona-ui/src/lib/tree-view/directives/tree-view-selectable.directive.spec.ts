@@ -4,10 +4,11 @@ import { TreeViewSelectableDirective } from "./tree-view-selectable.directive";
 
 describe("TreeViewSelectableDirective", () => {
     let directive: TreeViewSelectableDirective<any>;
-    let treeService: TreeService<any>;
     beforeEach(() => {
-        treeService = TestBed.runInInjectionContext(() => new TreeService());
-        directive = TestBed.runInInjectionContext(() => new TreeViewSelectableDirective(treeService));
+        TestBed.configureTestingModule({
+            providers: [TreeService]
+        });
+        directive = TestBed.runInInjectionContext(() => new TreeViewSelectableDirective());
     });
     it("should create an instance", () => {
         expect(directive).toBeTruthy();

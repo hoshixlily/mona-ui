@@ -4,6 +4,4 @@ import { Directive } from "@angular/core";
     selector: "ng-template[monaDropDownTreeNoDataTemplate]",
     standalone: true
 })
-export class DropDownTreeNoDataTemplateDirective {
-    public constructor() {}
-}
+export class DropDownTreeNoDataTemplateDirective {}
