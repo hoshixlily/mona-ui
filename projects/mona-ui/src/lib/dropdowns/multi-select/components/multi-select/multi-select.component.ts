@@ -44,12 +44,12 @@ import { SlicePipe } from "../../../../pipes/slice.pipe";
 import { PopupRef } from "../../../../popup/models/PopupRef";
 import { PopupService } from "../../../../popup/services/popup.service";
 import { Action } from "../../../../utils/Action";
+import { DropDownFooterTemplateDirective } from "../../../directives/drop-down-footer-template.directive";
+import { DropDownGroupHeaderTemplateDirective } from "../../../directives/drop-down-group-header-template.directive";
+import { DropDownHeaderTemplateDirective } from "../../../directives/drop-down-header-template.directive";
+import { DropDownItemTemplateDirective } from "../../../directives/drop-down-item-template.directive";
+import { DropDownNoDataTemplateDirective } from "../../../directives/drop-down-no-data-template.directive";
 import { DropDownService } from "../../../services/drop-down.service";
-import { MultiSelectFooterTemplateDirective } from "../../directives/multi-select-footer-template.directive";
-import { MultiSelectGroupHeaderTemplateDirective } from "../../directives/multi-select-group-header-template.directive";
-import { MultiSelectHeaderTemplateDirective } from "../../directives/multi-select-header-template.directive";
-import { MultiSelectItemTemplateDirective } from "../../directives/multi-select-item-template.directive";
-import { MultiSelectNoDataTemplateDirective } from "../../directives/multi-select-no-data-template.directive";
 import { MultiSelectTagTemplateDirective } from "../../directives/multi-select-tag-template.directive";
 
 @Component({
@@ -101,13 +101,13 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
 
     protected readonly clearIcon: IconDefinition = faTimes;
     protected readonly dropdownIcon: IconDefinition = faChevronDown;
-    protected readonly footerTemplate = contentChild(MultiSelectFooterTemplateDirective, { read: TemplateRef });
-    protected readonly groupHeaderTemplate = contentChild(MultiSelectGroupHeaderTemplateDirective, {
+    protected readonly footerTemplate = contentChild(DropDownFooterTemplateDirective, { read: TemplateRef });
+    protected readonly groupHeaderTemplate = contentChild(DropDownGroupHeaderTemplateDirective, {
         read: TemplateRef
     });
-    protected readonly headerTemplate = contentChild(MultiSelectHeaderTemplateDirective, { read: TemplateRef });
-    protected readonly itemTemplate = contentChild(MultiSelectItemTemplateDirective, { read: TemplateRef });
-    protected readonly noDataTemplate = contentChild(MultiSelectNoDataTemplateDirective, { read: TemplateRef });
+    protected readonly headerTemplate = contentChild(DropDownHeaderTemplateDirective, { read: TemplateRef });
+    protected readonly itemTemplate = contentChild(DropDownItemTemplateDirective, { read: TemplateRef });
+    protected readonly noDataTemplate = contentChild(DropDownNoDataTemplateDirective, { read: TemplateRef });
     protected readonly popupTemplate = viewChild.required<TemplateRef<any>>("popupTemplate");
     protected readonly tagTemplate = contentChild(MultiSelectTagTemplateDirective, { read: TemplateRef });
     protected readonly selectedDataItems: Signal<ImmutableSet<TData>> = computed(() => {

@@ -2,14 +2,12 @@ import { NgClass, NgTemplateOutlet } from "@angular/common";
 import {
     Component,
     contentChild,
-    ContentChild,
     DestroyRef,
     effect,
     ElementRef,
     forwardRef,
     inject,
     input,
-    Input,
     InputSignal,
     model,
     OnInit,
@@ -17,7 +15,6 @@ import {
     TemplateRef,
     untracked,
     viewChild,
-    ViewChild,
     WritableSignal
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
@@ -43,12 +40,12 @@ import { TextBoxDirective } from "../../../inputs/text-box/directives/text-box.d
 import { PopupRef } from "../../../popup/models/PopupRef";
 import { PopupService } from "../../../popup/services/popup.service";
 import { Action } from "../../../utils/Action";
+import { DropDownFooterTemplateDirective } from "../../directives/drop-down-footer-template.directive";
+import { DropDownGroupHeaderTemplateDirective } from "../../directives/drop-down-group-header-template.directive";
+import { DropDownHeaderTemplateDirective } from "../../directives/drop-down-header-template.directive";
+import { DropDownItemTemplateDirective } from "../../directives/drop-down-item-template.directive";
+import { DropDownNoDataTemplateDirective } from "../../directives/drop-down-no-data-template.directive";
 import { DropDownService } from "../../services/drop-down.service";
-import { AutoCompleteFooterTemplateDirective } from "../directives/auto-complete-footer-template.directive";
-import { AutoCompleteGroupHeaderTemplateDirective } from "../directives/auto-complete-group-header-template.directive";
-import { AutoCompleteHeaderTemplateDirective } from "../directives/auto-complete-header-template.directive";
-import { AutoCompleteItemTemplateDirective } from "../directives/auto-complete-item-template.directive";
-import { AutoCompleteNoDataTemplateDirective } from "../directives/auto-complete-no-data-template.directive";
 
 @Component({
     selector: "mona-auto-complete",
@@ -96,13 +93,13 @@ export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccesso
     protected readonly autoCompleteValue: WritableSignal<string> = signal("");
     protected readonly autoCompleteValue$: Subject<string> = new Subject<string>();
     protected readonly clearIcon: IconDefinition = faTimes;
-    protected readonly footerTemplate = contentChild(AutoCompleteFooterTemplateDirective, { read: TemplateRef });
-    protected readonly groupHeaderTemplate = contentChild(AutoCompleteGroupHeaderTemplateDirective, {
+    protected readonly footerTemplate = contentChild(DropDownFooterTemplateDirective, { read: TemplateRef });
+    protected readonly groupHeaderTemplate = contentChild(DropDownGroupHeaderTemplateDirective, {
         read: TemplateRef
     });
-    protected readonly headerTemplate = contentChild(AutoCompleteHeaderTemplateDirective, { read: TemplateRef });
-    protected readonly itemTemplate = contentChild(AutoCompleteItemTemplateDirective, { read: TemplateRef });
-    protected readonly noDataTemplate = contentChild(AutoCompleteNoDataTemplateDirective, { read: TemplateRef });
+    protected readonly headerTemplate = contentChild(DropDownHeaderTemplateDirective, { read: TemplateRef });
+    protected readonly itemTemplate = contentChild(DropDownItemTemplateDirective, { read: TemplateRef });
+    protected readonly noDataTemplate = contentChild(DropDownNoDataTemplateDirective, { read: TemplateRef });
     protected readonly popupTemplate = viewChild.required<TemplateRef<any>>("popupTemplate");
 
     protected readonly selectableOptions: SelectableOptions = {

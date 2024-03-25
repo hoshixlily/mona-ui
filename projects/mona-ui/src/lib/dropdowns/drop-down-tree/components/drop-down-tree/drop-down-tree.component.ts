@@ -45,10 +45,10 @@ import { TreeViewExpandableDirective } from "../../../../tree-view/directives/tr
 import { TreeViewFilterableDirective } from "../../../../tree-view/directives/tree-view-filterable.directive";
 import { TreeViewSelectableDirective } from "../../../../tree-view/directives/tree-view-selectable.directive";
 import { Action } from "../../../../utils/Action";
+import { DropDownFooterTemplateDirective } from "../../../directives/drop-down-footer-template.directive";
+import { DropDownHeaderTemplateDirective } from "../../../directives/drop-down-header-template.directive";
+import { DropDownNoDataTemplateDirective } from "../../../directives/drop-down-no-data-template.directive";
 import { DropDownService } from "../../../services/drop-down.service";
-import { DropDownTreeFooterTemplateDirective } from "../../directives/drop-down-tree-footer-template.directive";
-import { DropDownTreeHeaderTemplateDirective } from "../../directives/drop-down-tree-header-template.directive";
-import { DropDownTreeNoDataTemplateDirective } from "../../directives/drop-down-tree-no-data-template.directive";
 import { DropDownTreeNodeTemplateDirective } from "../../directives/drop-down-tree-node-template.directive";
 
 @Component({
@@ -100,9 +100,9 @@ export class DropDownTreeComponent<T> implements ControlValueAccessor, OnInit {
     #value: WritableSignal<any | null> = signal(null);
     protected readonly clearIcon: IconDefinition = faTimes;
     protected readonly dropdownIcon: IconDefinition = faChevronDown;
-    protected readonly footerTemplate = contentChild(DropDownTreeFooterTemplateDirective, { read: TemplateRef });
-    protected readonly headerTemplate = contentChild(DropDownTreeHeaderTemplateDirective, { read: TemplateRef });
-    protected readonly noDataTemplate = contentChild(DropDownTreeNoDataTemplateDirective, { read: TemplateRef });
+    protected readonly footerTemplate = contentChild(DropDownFooterTemplateDirective, { read: TemplateRef });
+    protected readonly headerTemplate = contentChild(DropDownHeaderTemplateDirective, { read: TemplateRef });
+    protected readonly noDataTemplate = contentChild(DropDownNoDataTemplateDirective, { read: TemplateRef });
     protected readonly nodeTemplate = contentChild(DropDownTreeNodeTemplateDirective, { read: TemplateRef });
     protected readonly popupTemplate: Signal<TemplateRef<any>> = viewChild.required("popupTemplate");
     protected readonly selectableOptions: SelectableOptions = {

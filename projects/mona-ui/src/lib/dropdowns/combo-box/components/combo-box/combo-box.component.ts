@@ -55,12 +55,12 @@ import { TextBoxDirective } from "../../../../inputs/text-box/directives/text-bo
 import { PopupRef } from "../../../../popup/models/PopupRef";
 import { PopupService } from "../../../../popup/services/popup.service";
 import { Action } from "../../../../utils/Action";
+import { DropDownFooterTemplateDirective } from "../../../directives/drop-down-footer-template.directive";
+import { DropDownGroupHeaderTemplateDirective } from "../../../directives/drop-down-group-header-template.directive";
+import { DropDownHeaderTemplateDirective } from "../../../directives/drop-down-header-template.directive";
+import { DropDownItemTemplateDirective } from "../../../directives/drop-down-item-template.directive";
+import { DropDownNoDataTemplateDirective } from "../../../directives/drop-down-no-data-template.directive";
 import { DropDownService } from "../../../services/drop-down.service";
-import { ComboBoxFooterTemplateDirective } from "../../directives/combo-box-footer-template.directive";
-import { ComboBoxGroupHeaderTemplateDirective } from "../../directives/combo-box-group-header-template.directive";
-import { ComboBoxHeaderTemplateDirective } from "../../directives/combo-box-header-template.directive";
-import { ComboBoxItemTemplateDirective } from "../../directives/combo-box-item-template.directive";
-import { ComboBoxNoDataTemplateDirective } from "../../directives/combo-box-no-data-template.directive";
 
 @Component({
     selector: "mona-combo-box",
@@ -112,11 +112,11 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
     protected readonly dropdownIcon: IconDefinition = faChevronDown;
     protected readonly comboBoxValue$: Subject<string> = new Subject<string>();
     protected readonly comboBoxValue: WritableSignal<string> = signal("");
-    protected readonly footerTemplate = contentChild(ComboBoxFooterTemplateDirective, { read: TemplateRef });
-    protected readonly groupHeaderTemplate = contentChild(ComboBoxGroupHeaderTemplateDirective, { read: TemplateRef });
-    protected readonly headerTemplate = contentChild(ComboBoxHeaderTemplateDirective, { read: TemplateRef });
-    protected readonly itemTemplate = contentChild(ComboBoxItemTemplateDirective, { read: TemplateRef });
-    protected readonly noDataTemplate = contentChild(ComboBoxNoDataTemplateDirective, { read: TemplateRef });
+    protected readonly footerTemplate = contentChild(DropDownFooterTemplateDirective, { read: TemplateRef });
+    protected readonly groupHeaderTemplate = contentChild(DropDownGroupHeaderTemplateDirective, { read: TemplateRef });
+    protected readonly headerTemplate = contentChild(DropDownHeaderTemplateDirective, { read: TemplateRef });
+    protected readonly itemTemplate = contentChild(DropDownItemTemplateDirective, { read: TemplateRef });
+    protected readonly noDataTemplate = contentChild(DropDownNoDataTemplateDirective, { read: TemplateRef });
     protected readonly popupTemplate = viewChild.required<TemplateRef<any>>("popupTemplate");
     protected readonly selectableOptions: SelectableOptions = {
         enabled: true,

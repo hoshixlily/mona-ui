@@ -23,7 +23,7 @@ import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from "@angular/f
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { faChevronDown, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { Predicate } from "@mirei/ts-collections";
-import { asyncScheduler, distinctUntilChanged, fromEvent, take, withLatestFrom } from "rxjs";
+import { distinctUntilChanged, fromEvent, take, withLatestFrom } from "rxjs";
 import { v4 } from "uuid";
 import { AnimationState } from "../../../../animations/models/AnimationState";
 import { PopupAnimationService } from "../../../../animations/services/popup-animation.service";
@@ -40,12 +40,12 @@ import { ListService } from "../../../../common/list/services/list.service";
 import { PopupRef } from "../../../../popup/models/PopupRef";
 import { PopupService } from "../../../../popup/services/popup.service";
 import { Action } from "../../../../utils/Action";
+import { DropDownFooterTemplateDirective } from "../../../directives/drop-down-footer-template.directive";
+import { DropDownGroupHeaderTemplateDirective } from "../../../directives/drop-down-group-header-template.directive";
+import { DropDownHeaderTemplateDirective } from "../../../directives/drop-down-header-template.directive";
+import { DropDownItemTemplateDirective } from "../../../directives/drop-down-item-template.directive";
+import { DropDownNoDataTemplateDirective } from "../../../directives/drop-down-no-data-template.directive";
 import { DropDownService } from "../../../services/drop-down.service";
-import { DropDownListFooterTemplateDirective } from "../../directives/drop-down-list-footer-template.directive";
-import { DropDownListGroupHeaderTemplateDirective } from "../../directives/drop-down-list-group-header-template.directive";
-import { DropDownListHeaderTemplateDirective } from "../../directives/drop-down-list-header-template.directive";
-import { DropDownListItemTemplateDirective } from "../../directives/drop-down-list-item-template.directive";
-import { DropDownListNoDataTemplateDirective } from "../../directives/drop-down-list-no-data-template.directive";
 import { DropDownListValueTemplateDirective } from "../../directives/drop-down-list-value-template.directive";
 
 @Component({
@@ -98,13 +98,13 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
 
     protected readonly clearIcon: IconDefinition = faTimes;
     protected readonly dropdownIcon: IconDefinition = faChevronDown;
-    protected readonly footerTemplate = contentChild(DropDownListFooterTemplateDirective, { read: TemplateRef });
-    protected readonly groupHeaderTemplate = contentChild(DropDownListGroupHeaderTemplateDirective, {
+    protected readonly footerTemplate = contentChild(DropDownFooterTemplateDirective, { read: TemplateRef });
+    protected readonly groupHeaderTemplate = contentChild(DropDownGroupHeaderTemplateDirective, {
         read: TemplateRef
     });
-    protected readonly headerTemplate = contentChild(DropDownListHeaderTemplateDirective, { read: TemplateRef });
-    protected readonly itemTemplate = contentChild(DropDownListItemTemplateDirective, { read: TemplateRef });
-    protected readonly noDataTemplate = contentChild(DropDownListNoDataTemplateDirective, { read: TemplateRef });
+    protected readonly headerTemplate = contentChild(DropDownHeaderTemplateDirective, { read: TemplateRef });
+    protected readonly itemTemplate = contentChild(DropDownItemTemplateDirective, { read: TemplateRef });
+    protected readonly noDataTemplate = contentChild(DropDownNoDataTemplateDirective, { read: TemplateRef });
     protected readonly popupTemplate = viewChild.required<TemplateRef<any>>("popupTemplate");
     protected readonly selectableOptions: SelectableOptions = {
         enabled: true,
