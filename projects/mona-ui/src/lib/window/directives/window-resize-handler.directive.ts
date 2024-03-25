@@ -1,4 +1,4 @@
-import { AfterViewInit, DestroyRef, Directive, ElementRef, inject, Input, NgZone } from "@angular/core";
+import { AfterViewInit, DestroyRef, Directive, ElementRef, inject, input, InputSignal, NgZone } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { fromEvent } from "rxjs";
 import { WindowReference } from "../models/WindowReference";
@@ -10,33 +10,22 @@ import { WindowResizeHandlerDirection } from "../models/WindowResizeHandlerDirec
 })
 export class WindowResizeHandlerDirective implements AfterViewInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
+    readonly #hostElementRef: ElementRef<HTMLDivElement> = inject(ElementRef);
+    readonly #zone: NgZone = inject(NgZone);
 
-    @Input()
-    public direction!: WindowResizeHandlerDirection;
-
-    @Input()
-    public maxHeight?: number;
-
-    @Input()
-    public maxWidth?: number;
-
-    @Input()
-    public minHeight?: number;
-
-    @Input()
-    public minWidth?: number;
-
-    @Input()
-    public windowRef!: WindowReference;
-
-    public constructor(private readonly elementRef: ElementRef<HTMLDivElement>, private readonly zone: NgZone) {}
+    public direction: InputSignal<WindowResizeHandlerDirection> = input.required();
+    public maxHeight: InputSignal<number | undefined> = input<number | undefined>(undefined);
+    public maxWidth: InputSignal<number | undefined> = input<number | undefined>(undefined);
+    public minHeight: InputSignal<number | undefined> = input<number | undefined>(undefined);
+    public minWidth: InputSignal<number | undefined> = input<number | undefined>(undefined);
+    public windowRef: InputSignal<WindowReference> = input.required();
 
     public ngAfterViewInit(): void {
         this.setEvents();
     }
 
     public onMouseDown(event: MouseEvent) {
-        const element = this.windowRef.element;
+        const element = this.windowRef().element;
         const initialWidth = element.getBoundingClientRect().width;
         const initialHeight = element.getBoundingClientRect().height;
         const initialX = event.clientX;
@@ -52,16 +41,16 @@ export class WindowResizeHandlerDirective implements AfterViewInit {
         const onMouseMove = (event: MouseEvent) => {
             const deltaX = event.clientX - initialX;
             const deltaY = event.clientY - initialY;
-            const minWidth = this.minWidth ?? 50;
-            const minHeight = this.minHeight ?? 50;
-            const maxWidth = this.maxWidth ?? window.innerWidth;
-            const maxHeight = this.maxHeight ?? window.innerHeight;
+            const minWidth = this.minWidth() ?? 50;
+            const minHeight = this.minHeight() ?? 50;
+            const maxWidth = this.maxWidth() ?? window.innerWidth;
+            const maxHeight = this.maxHeight() ?? window.innerHeight;
             let height: number | undefined;
             let left: number | undefined;
             let width: number | undefined;
             let top: number | undefined;
 
-            switch (this.direction) {
+            switch (this.direction()) {
                 case "northwest":
                     if (initialTop + deltaY <= 0 || initialHeight - deltaY < minHeight) {
                         return;
@@ -200,7 +189,7 @@ export class WindowResizeHandlerDirective implements AfterViewInit {
                     break;
             }
 
-            this.windowRef.resize$$.next({
+            this.windowRef().resize$$.next({
                 width: width ?? initialWidth,
                 height: height ?? initialHeight,
                 left: left ?? initialLeft,
@@ -219,8 +208,8 @@ export class WindowResizeHandlerDirective implements AfterViewInit {
     }
 
     private setEvents(): void {
-        this.zone.runOutsideAngular(() => {
-            fromEvent<MouseEvent>(this.elementRef.nativeElement, "mousedown")
+        this.#zone.runOutsideAngular(() => {
+            fromEvent<MouseEvent>(this.#hostElementRef.nativeElement, "mousedown")
                 .pipe(takeUntilDestroyed(this.#destroyRef))
                 .subscribe(event => this.onMouseDown(event));
         });

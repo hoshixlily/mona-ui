@@ -1,4 +1,4 @@
-import { forwardRef, Injectable } from "@angular/core";
+import { forwardRef, inject, Injectable } from "@angular/core";
 import { asapScheduler } from "rxjs";
 import { AnimationService } from "../../animations/services/animation.service";
 import { PopupCloseEvent } from "../../popup/models/PopupCloseEvent";
@@ -15,10 +15,8 @@ import { WindowSettings } from "../models/WindowSettings";
     providedIn: "root"
 })
 export class WindowService {
-    public constructor(
-        private readonly animationService: AnimationService,
-        private readonly popupService: PopupService
-    ) {}
+    readonly #animationService: AnimationService = inject(AnimationService);
+    readonly #popupService: PopupService = inject(PopupService);
 
     public open(settings: WindowSettings): WindowRef {
         const injectorData: WindowInjectorData = {
@@ -49,7 +47,7 @@ export class WindowService {
         };
         windowReferenceHolder.windowReference = new WindowReference(windowReferenceOptions);
         injectorData.windowReference = windowReferenceHolder.windowReference;
-        windowReferenceOptions.popupRef = this.popupService.create({
+        windowReferenceOptions.popupRef = this.#popupService.create({
             anchor: document.body,
             content: WindowContentComponent,
             closeOnBackdropClick: false,
@@ -84,7 +82,7 @@ export class WindowService {
             }
         });
         if (windowReferenceOptions.popupRef.overlayRef.overlayElement.firstElementChild) {
-            this.animationService.scaleIn(
+            this.#animationService.scaleIn(
                 windowReferenceOptions.popupRef.overlayRef.overlayElement.firstElementChild as HTMLElement,
                 200
             );
@@ -95,8 +93,8 @@ export class WindowService {
             const windowClassList = !settings.windowClass
                 ? []
                 : settings.windowClass instanceof Array
-                ? settings.windowClass
-                : [settings.windowClass];
+                  ? settings.windowClass
+                  : [settings.windowClass];
             element.classList.add("mona-window");
             windowClassList.forEach(c => element.classList.add(c));
             element.style.position = "absolute";
