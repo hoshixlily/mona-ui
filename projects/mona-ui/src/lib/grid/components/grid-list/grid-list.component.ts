@@ -13,7 +13,7 @@ import {
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { faChevronDown, faChevronRight, IconDefinition } from "@fortawesome/free-solid-svg-icons";
-import { Dictionary, KeyValuePair } from "@mirei/ts-collections";
+import { Dictionary, ImmutableList, ImmutableSet, KeyValuePair } from "@mirei/ts-collections";
 import { fromEvent, mergeWith } from "rxjs";
 import { ButtonDirective } from "../../../buttons/button/button.directive";
 import { SlicePipe } from "../../../pipes/slice.pipe";
@@ -45,16 +45,13 @@ import { GridCellComponent } from "../grid-cell/grid-cell.component";
 })
 export class GridListComponent implements OnInit, AfterViewInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
+    readonly #hostElementRef: ElementRef<HTMLDivElement> = inject(ElementRef);
     protected readonly collapseIcon: IconDefinition = faChevronDown;
     protected readonly expandIcon: IconDefinition = faChevronRight;
+    protected readonly gridService: GridService = inject(GridService);
 
-    public columns: InputSignal<Column[]> = input<Column[]>([]);
-    public data: InputSignal<Row[]> = input<Row[]>([]);
-
-    public constructor(
-        public readonly gridService: GridService,
-        private readonly elementRef: ElementRef<HTMLDivElement>
-    ) {}
+    public columns = input<ImmutableList<Column>>(ImmutableList.create());
+    public data: InputSignal<ImmutableSet<Row>> = input<ImmutableSet<Row>>(ImmutableSet.create());
 
     public ngAfterViewInit(): void {
         window.setTimeout(() => {
@@ -75,7 +72,7 @@ export class GridListComponent implements OnInit, AfterViewInit {
             ? this.handleSingleSelection(event, row)
             : this.handleMultipleSelection(event, row);
 
-        this.gridService.selectedRowsChange$.next(this.gridService.selectedRows);
+        this.gridService.selectedRowsChange$.next(this.gridService.selectedRows());
     }
 
     private isSelectableGrid(): boolean {
@@ -83,35 +80,33 @@ export class GridListComponent implements OnInit, AfterViewInit {
     }
 
     private handleSingleSelection(event: MouseEvent, row: Row): void {
-        if (row.selected && (event.ctrlKey || event.metaKey)) {
+        if (row.selected() && (event.ctrlKey || event.metaKey)) {
             this.deselectAllRows();
         } else {
-            row.selected ? this.deselectAllRows() : this.selectRow(row);
+            this.deselectAllRows();
+            this.selectRow(row);
         }
     }
 
     private handleMultipleSelection(event: MouseEvent, row: Row): void {
-        const rowIndex = this.gridService.selectedRows.findIndex(r => r === row);
-
-        if (rowIndex === -1) {
+        if (!this.gridService.selectedRows().contains(row)) {
             this.selectRow(row);
         } else if (event.ctrlKey || event.metaKey) {
-            this.gridService.selectedRows.splice(rowIndex, 1);
-            row.selected = false;
+            row.selected.set(false);
+            this.gridService.selectedRows.update(set => set.remove(row));
         }
     }
 
     private selectRow(row: Row): void {
-        this.deselectAllRows();
-        this.gridService.selectedRows = [row];
-        row.selected = true;
+        row.selected.set(true);
+        this.gridService.selectedRows.update(set => set.add(row));
     }
 
     private deselectAllRows(): void {
         if (this.gridService.selectedRows.length !== 0) {
-            this.gridService.selectedRows.forEach(r => (r.selected = false));
+            this.gridService.selectedRows().forEach(r => r.selected.set(false));
         }
-        this.gridService.selectedRows = [];
+        this.gridService.selectedRows.update(set => set.clear());
     }
 
     public onGroupExpandChange(group: GridGroup): void {
@@ -122,17 +117,17 @@ export class GridListComponent implements OnInit, AfterViewInit {
             this.gridService.gridGroupExpandState.add(
                 groupKey,
                 new Dictionary<number, boolean>([
-                    new KeyValuePair<number, boolean>(this.gridService.pageState.page, group.collapsed)
+                    new KeyValuePair<number, boolean>(this.gridService.pageState.page(), group.collapsed)
                 ])
             );
-        } else if (state.containsKey(this.gridService.pageState.page)) {
-            const value = state.get(this.gridService.pageState.page);
+        } else if (state.containsKey(this.gridService.pageState.page())) {
+            const value = state.get(this.gridService.pageState.page());
             if (value != null) {
-                state.remove(this.gridService.pageState.page);
-                state.add(this.gridService.pageState.page, !value);
+                state.remove(this.gridService.pageState.page());
+                state.add(this.gridService.pageState.page(), !value);
             }
         } else {
-            state.add(this.gridService.pageState.page, group.collapsed);
+            state.add(this.gridService.pageState.page(), group.collapsed);
         }
     }
 
@@ -158,7 +153,7 @@ export class GridListComponent implements OnInit, AfterViewInit {
 
     private synchronizeHorizontalScroll(): void {
         const headerElement = this.gridService.gridHeaderElement;
-        const gridElement = this.elementRef.nativeElement as HTMLElement;
+        const gridElement = this.#hostElementRef.nativeElement as HTMLElement;
         if (headerElement == null || gridElement == null) {
             return;
         }

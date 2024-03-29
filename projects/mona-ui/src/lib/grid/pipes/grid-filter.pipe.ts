@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from "@angular/core";
-import { Dictionary } from "@mirei/ts-collections";
+import { ImmutableDictionary, ImmutableSet } from "@mirei/ts-collections";
 import { IQuery, Query } from "../../query/core/Query";
 import { ColumnFilterState } from "../models/ColumnFilterState";
 import { ColumnSortState } from "../models/ColumnSortState";
@@ -13,9 +13,9 @@ export class GridFilterPipe implements PipeTransform {
     public constructor() {}
 
     public transform(
-        value: Row[],
-        filterStateDict: Dictionary<string, ColumnFilterState>,
-        sortStateDict: Dictionary<string, ColumnSortState>
+        value: ImmutableSet<Row>,
+        filterStateDict: ImmutableDictionary<string, ColumnFilterState>,
+        sortStateDict: ImmutableDictionary<string, ColumnSortState>
     ): Row[] {
         let queryEnumerable = Query.from(value);
         queryEnumerable = this.applyFilterStates(filterStateDict, queryEnumerable);
@@ -24,7 +24,7 @@ export class GridFilterPipe implements PipeTransform {
     }
 
     private applyFilterStates(
-        filterStateDict: Dictionary<string, ColumnFilterState>,
+        filterStateDict: ImmutableDictionary<string, ColumnFilterState>,
         queryEnumerable: IQuery<Row>
     ): IQuery<Row> {
         if (filterStateDict.length > 0) {
@@ -38,7 +38,7 @@ export class GridFilterPipe implements PipeTransform {
     }
 
     private applySortStates(
-        sortStateDict: Dictionary<string, ColumnSortState>,
+        sortStateDict: ImmutableDictionary<string, ColumnSortState>,
         queryEnumerable: IQuery<Row>
     ): IQuery<Row> {
         if (sortStateDict.length > 0) {

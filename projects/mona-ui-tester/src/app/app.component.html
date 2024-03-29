@@ -70,7 +70,7 @@
                                        (sortChange)="onGridSortChange($event)"
                                        (cellEdit)="onGridCellEdit($event)" [responsivePager]="false"
                                        monaGridEditable
-                                       [monaGridSelectable]="{enabled: false, mode:'single'}" selectionKey="OrderID"
+                                       [monaGridSelectable]="{enabled: true, mode:'single'}" selectionKey="OrderID"
                                        [selectedKeys]="gridSelectionKeys"
                                        (selectedKeysChange)="onGridSelectionKeysChange($event)">
                                 <mona-grid-column *ngFor="let col of gridOrderColumns" [field]="col.field"

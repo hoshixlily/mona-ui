@@ -480,12 +480,12 @@ export class AppComponent implements OnInit {
         //         {
         //             field: "ShipCountry",
         //             operator: "startswith",
-        //             value: "A"
+        //             value: "F"
         //         },
         //         {
         //             field: "ShipCountry",
         //             operator: "startswith",
-        //             value: "E"
+        //             value: "A"
         //         }
         //     ]
         // },
@@ -495,7 +495,7 @@ export class AppComponent implements OnInit {
         //         {
         //             field: "ShipCity",
         //             operator: "contains",
-        //             value: "z"
+        //             value: "r"
         //         }
         //     ]
         // }
@@ -542,7 +542,7 @@ export class AppComponent implements OnInit {
     ];
 
     public gridProductData: any[] = GridProductData;
-    public gridSelectionKeys: number[] = [];
+    public gridSelectionKeys: number[] = [10001, 10002];
     public gridSort: SortDescriptor[] = [
         // {
         //     dir: "asc",
@@ -1308,9 +1308,12 @@ export class AppComponent implements OnInit {
         });
         if (filterPopupRef.component) {
             const component = filterPopupRef.component.instance as FilterMenuComponent;
-            component.value = this.filterMenuValue;
+            component.value.set(this.filterMenuValue);
             component.apply.subscribe(() => {
-                this.filterMenuValue = component.value;
+                const value = component.getFilterValues();
+                if (value) {
+                    this.filterMenuValue = value;
+                }
                 filterPopupRef.close();
             });
         }

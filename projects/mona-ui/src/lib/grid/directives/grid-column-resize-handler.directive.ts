@@ -1,14 +1,13 @@
 import {
     AfterViewInit,
-    ChangeDetectorRef,
     DestroyRef,
     Directive,
     ElementRef,
-    EventEmitter,
     inject,
-    Input,
+    input,
     NgZone,
-    Output
+    output,
+    OutputEmitterRef
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { fromEvent } from "rxjs";
@@ -20,29 +19,20 @@ import { Column } from "../models/Column";
 })
 export class GridColumnResizeHandlerDirective implements AfterViewInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
+    readonly #hostElementRef: ElementRef<HTMLDivElement> = inject(ElementRef);
+    readonly #zone: NgZone = inject(NgZone);
 
-    @Input()
-    public column!: Column;
-
-    @Output()
-    public resizeEnd: EventEmitter<void> = new EventEmitter<void>();
-
-    @Output()
-    public resizeStart: EventEmitter<void> = new EventEmitter<void>();
-
-    public constructor(
-        private readonly elementRef: ElementRef<HTMLDivElement>,
-        private readonly zone: NgZone,
-        private readonly cdr: ChangeDetectorRef
-    ) {}
+    public readonly resizeEnd: OutputEmitterRef<void> = output();
+    public readonly resizeStart: OutputEmitterRef<void> = output();
+    public column = input.required<Column>();
 
     public ngAfterViewInit(): void {
         this.setEvents();
     }
 
     private onMouseDown(event: MouseEvent) {
-        const element = this.elementRef.nativeElement;
-        const initialWidth = this.column.calculatedWidth() ?? element.getBoundingClientRect().width;
+        const element = this.#hostElementRef.nativeElement;
+        const initialWidth = this.column().calculatedWidth() ?? element.getBoundingClientRect().width;
         const initialX = event.clientX;
         const oldSelectStart = document.onselectstart;
         const headerTableElement = element.closest("table");
@@ -54,8 +44,8 @@ export class GridColumnResizeHandlerDirective implements AfterViewInit {
 
         const onMouseMove = (event: MouseEvent) => {
             const deltaX = event.clientX - initialX;
-            const minWidth = this.column.minWidth;
-            const maxWidth = this.column.maxWidth ?? window.innerWidth;
+            const minWidth = this.column().minWidth;
+            const maxWidth = this.column().maxWidth ?? window.innerWidth;
 
             if (initialWidth + deltaX < minWidth) {
                 return;
@@ -65,9 +55,9 @@ export class GridColumnResizeHandlerDirective implements AfterViewInit {
                 return;
             }
 
-            const oldWidth = this.column.calculatedWidth() ?? element.getBoundingClientRect().width;
-            this.column.calculatedWidth.set(initialWidth + deltaX);
-            const calculatedWidth = this.column.calculatedWidth() as number;
+            const oldWidth = this.column().calculatedWidth() ?? element.getBoundingClientRect().width;
+            this.column().calculatedWidth.set(initialWidth + deltaX);
+            const calculatedWidth = this.column().calculatedWidth() as number;
             if (headerTableElement) {
                 headerTableElement.style.width = `${
                     headerTableElement.getBoundingClientRect().width + (calculatedWidth - oldWidth)
@@ -79,7 +69,7 @@ export class GridColumnResizeHandlerDirective implements AfterViewInit {
                 }px`;
             }
 
-            this.cdr.detectChanges();
+            // this.cdr.detectChanges();
         };
 
         const onMouseUp = () => {
@@ -94,8 +84,8 @@ export class GridColumnResizeHandlerDirective implements AfterViewInit {
     }
 
     private setEvents(): void {
-        this.zone.runOutsideAngular(() => {
-            fromEvent<MouseEvent>(this.elementRef.nativeElement, "mousedown")
+        this.#zone.runOutsideAngular(() => {
+            fromEvent<MouseEvent>(this.#hostElementRef.nativeElement, "mousedown")
                 .pipe(takeUntilDestroyed(this.#destroyRef))
                 .subscribe(event => {
                     event.stopImmediatePropagation();

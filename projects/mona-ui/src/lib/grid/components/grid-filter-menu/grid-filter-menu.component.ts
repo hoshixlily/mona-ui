@@ -7,12 +7,12 @@ import {
     ComponentRef,
     DestroyRef,
     ElementRef,
-    EventEmitter,
     inject,
     input,
     InputSignal,
     OnInit,
-    Output
+    output,
+    OutputEmitterRef
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
@@ -44,11 +44,10 @@ export class GridFilterMenuComponent implements OnInit {
     #popupRef?: PopupRef;
     protected readonly filterIcon: IconDefinition = faFilter;
 
+    public readonly apply: OutputEmitterRef<ColumnFilterState> = output();
+
     public column: InputSignal<Column> = input.required<Column>();
     public type: InputSignal<DataType> = input<DataType>("string");
-
-    @Output()
-    public apply: EventEmitter<ColumnFilterState> = new EventEmitter<ColumnFilterState>();
 
     public constructor(
         private readonly animationBuilder: AnimationBuilder,
@@ -87,18 +86,18 @@ export class GridFilterMenuComponent implements OnInit {
             });
 
         this.animateEnter();
-        const filterState = this.gridService.appliedFilters.get(this.column().field);
+        const filterState = this.gridService.appliedFilters().get(this.column().field);
         const componentRef = this.#popupRef.component as ComponentRef<FilterMenuComponent>;
         componentRef.instance.type.set(this.type());
         componentRef.instance.field.set(this.column().field);
         if (filterState?.filterMenuValue) {
-            componentRef.instance.value = filterState.filterMenuValue;
+            componentRef.instance.value.set(filterState.filterMenuValue);
         }
         componentRef.changeDetectorRef.detectChanges();
-        componentRef.instance.apply.pipe(take(1)).subscribe(filter => {
+        componentRef.instance.apply.subscribe(filter => {
             const filterState: ColumnFilterState = {
                 filter,
-                filterMenuValue: componentRef.instance.value
+                filterMenuValue: componentRef.instance.getFilterValues()
             };
             this.animateLeave();
             this.#popupRef?.closeWithDelay(100);
