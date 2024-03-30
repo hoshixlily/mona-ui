@@ -1,14 +1,14 @@
 <ul class="mona-menubar-list">
-    @for (item of menuList; track item) {
+    @for (item of menuList(); track item) {
         <li [attr.data-uid]="item.uid" (click)="onMenuClick(contextMenuComponent)"
             (mouseenter)="onMenuMouseEnter(contextMenuComponent)"
-            [ngClass]="{'mona-active': currentContextMenu?.uid===contextMenuComponent.uid, 'mona-disabled': item.disabled()}"
+            [ngClass]="{'mona-active': currentContextMenu()?.uid===contextMenuComponent.uid, 'mona-disabled': item.disabled()}"
             #listItemElement>
-            @if (!item.textTemplate) {
+            @if (!item.textTemplate()) {
                 <span>{{ item.text() }}</span>
             }
-            @if (item.textTemplate?.templateRef) {
-                <ng-container [ngTemplateOutlet]="item.textTemplate?.templateRef ?? null"
+            @if (item.textTemplate()) {
+                <ng-container [ngTemplateOutlet]="item.textTemplate() ?? null"
                               [ngTemplateOutletContext]="{$implicit: item.text(), items: item.menuItems()}">
                 </ng-container>
             }

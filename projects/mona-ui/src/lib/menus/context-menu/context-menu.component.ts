@@ -1,10 +1,10 @@
 import { Point } from "@angular/cdk/drag-drop";
 import {
-    AfterContentInit,
     ChangeDetectionStrategy,
     Component,
-    ContentChildren,
+    contentChildren,
     DestroyRef,
+    effect,
     ElementRef,
     EventEmitter,
     inject,
@@ -14,8 +14,10 @@ import {
     model,
     ModelSignal,
     OnInit,
+    output,
     Output,
-    QueryList
+    OutputEmitterRef,
+    untracked
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { any } from "@mirei/ts-collections";
@@ -39,14 +41,21 @@ import { ContextMenuService } from "../services/context-menu.service";
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ContextMenuComponent implements OnInit, AfterContentInit {
+export class ContextMenuComponent implements OnInit {
     readonly #contextMenuInjectorData: Partial<ContextMenuInjectorData> = { isRoot: true };
     readonly #contextMenuService: ContextMenuService = inject(ContextMenuService);
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     readonly #menuClickNotifier: Subject<MenuItem> = new Subject<MenuItem>();
     #contextMenuRef: PopupRef | null = null;
     #precise: boolean = true;
+
+    protected readonly menuItemComponents = contentChildren(MenuItemComponent);
+
     public readonly uid: string = v4();
+
+    public readonly close: OutputEmitterRef<ContextMenuCloseEvent> = output();
+    public readonly navigate: OutputEmitterRef<ContextMenuNavigationEvent> = output();
+    public readonly open: OutputEmitterRef<ContextMenuOpenEvent> = output();
 
     public menuItems: ModelSignal<Iterable<MenuItem>> = model<Iterable<MenuItem>>([]);
     public minWidth: InputSignalWithTransform<string | undefined, number | string | undefined> = input(undefined, {
@@ -77,27 +86,20 @@ export class ContextMenuComponent implements OnInit, AfterContentInit {
         }
     });
 
-    @Output()
-    public close: EventEmitter<ContextMenuCloseEvent> = new EventEmitter<ContextMenuCloseEvent>();
-
-    @ContentChildren(MenuItemComponent)
-    public menuItemComponents: QueryList<MenuItemComponent> = new QueryList<MenuItemComponent>();
-
-    @Output()
-    public navigate: EventEmitter<ContextMenuNavigationEvent> = new EventEmitter<ContextMenuNavigationEvent>();
-
-    @Output()
-    public open: EventEmitter<ContextMenuOpenEvent> = new EventEmitter<ContextMenuOpenEvent>();
+    public constructor() {
+        effect(() => {
+            const menuItemComponents = this.menuItemComponents();
+            untracked(() => {
+                if (any(this.menuItems())) {
+                    return;
+                }
+                this.menuItems.set(menuItemComponents.map(m => m.getMenuItem()));
+            });
+        });
+    }
 
     public closeMenu(): void {
         this.#contextMenuRef?.close();
-    }
-
-    public ngAfterContentInit(): void {
-        if (any(this.menuItems())) {
-            return;
-        }
-        this.menuItems.set(this.menuItemComponents.map(m => m.getMenuItem()) ?? []);
     }
 
     public ngOnInit(): void {

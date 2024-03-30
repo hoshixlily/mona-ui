@@ -1,21 +1,18 @@
 import {
-    AfterContentInit,
     ChangeDetectionStrategy,
     Component,
     computed,
-    ContentChildren,
-    DestroyRef,
-    EventEmitter,
-    inject,
+    contentChild,
+    contentChildren,
+    effect,
     input,
-    Input,
     InputSignal,
-    Output,
-    QueryList,
+    output,
+    OutputEmitterRef,
     Signal,
-    TemplateRef
+    TemplateRef,
+    untracked
 } from "@angular/core";
-import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { MenuItemIconTemplateDirective } from "../directives/menu-item-icon-template.directive";
 import { MenuItemTextTemplateDirective } from "../directives/menu-item-text-template.directive";
 import { MenuItem } from "../models/MenuItem";
@@ -27,8 +24,7 @@ import { MenuItem } from "../models/MenuItem";
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class MenuItemComponent implements AfterContentInit {
-    readonly #destroyRef: DestroyRef = inject(DestroyRef);
+export class MenuItemComponent {
     readonly #menuItem: Signal<MenuItem> = computed(() => {
         return {
             data: this.data(),
@@ -42,6 +38,12 @@ export class MenuItemComponent implements AfterContentInit {
         };
     });
 
+    protected readonly iconTemplate = contentChild(MenuItemIconTemplateDirective, { read: TemplateRef });
+    protected readonly submenuItems = contentChildren(MenuItemComponent);
+    protected readonly textTemplate = contentChild(MenuItemTextTemplateDirective, { read: TemplateRef });
+
+    public readonly menuClick: OutputEmitterRef<void> = output();
+
     public data: InputSignal<unknown> = input<unknown>({});
     public disabled: InputSignal<boolean> = input<boolean>(false);
     public divider: InputSignal<boolean> = input<boolean>(false);
@@ -49,38 +51,29 @@ export class MenuItemComponent implements AfterContentInit {
     public text: InputSignal<string> = input<string>("");
     public visible: InputSignal<boolean> = input<boolean>(true);
 
-    @ContentChildren(MenuItemIconTemplateDirective, { read: TemplateRef, descendants: false })
-    public iconTemplate: QueryList<TemplateRef<any>> = new QueryList<TemplateRef<any>>();
-
-    @Output()
-    public menuClick: EventEmitter<void> = new EventEmitter<void>();
-
-    @ContentChildren(MenuItemComponent)
-    public submenuItems: QueryList<MenuItemComponent> = new QueryList<MenuItemComponent>();
-
-    @ContentChildren(MenuItemTextTemplateDirective, { read: TemplateRef, descendants: false })
-    public textTemplate: QueryList<TemplateRef<any>> = new QueryList<TemplateRef<any>>();
+    public constructor() {
+        effect(() => {
+            const submenuItems = this.submenuItems();
+            untracked(() => {
+                this.#menuItem().subMenuItems = submenuItems.map(si => si.getMenuItem());
+            });
+        });
+    }
 
     public getMenuItem(): MenuItem {
         return this.getMenuItemWithDepth(0);
     }
 
-    public ngAfterContentInit(): void {
-        this.submenuItems.changes.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(() => {
-            this.#menuItem().subMenuItems = this.submenuItems.map(si => si.getMenuItem());
-        });
-    }
-
     private getMenuItemWithDepth(depth: number = 0): MenuItem {
-        this.#menuItem().iconTemplate = this.iconTemplate.get(0);
+        this.#menuItem().iconTemplate = this.iconTemplate();
         this.#menuItem().menuClick = (): void => this.menuClick.emit();
-        this.#menuItem().subMenuItems = this.submenuItems.map(si => {
+        this.#menuItem().subMenuItems = this.submenuItems().map(si => {
             const subMenuItem = si.getMenuItemWithDepth(depth + 1);
             subMenuItem.parent = this.#menuItem();
             return subMenuItem;
         });
         this.#menuItem().depth = depth;
-        this.#menuItem().textTemplate = this.textTemplate.get(0);
+        this.#menuItem().textTemplate = this.textTemplate();
         return this.#menuItem();
     }
 }

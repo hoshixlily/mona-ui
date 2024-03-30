@@ -1,19 +1,16 @@
-import { EventEmitter } from "@angular/core";
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { AnimationService } from "../../animations/services/animation.service";
 import { PopupDataInjectionToken } from "../../popup/models/PopupInjectionToken";
 import { ContextMenuInjectorData } from "../models/ContextMenuInjectorData";
-import { ContextMenuNavigationEvent } from "../models/ContextMenuNavigationEvent";
 import { ContextMenuContentComponent } from "./context-menu-content.component";
 
 const POPUP_TOKEN = [
     {
         provide: PopupDataInjectionToken,
         useValue: {
-            menuItems: [],
-            navigate: new EventEmitter<ContextMenuNavigationEvent>()
-        } as ContextMenuInjectorData
+            menuItems: []
+        } as unknown as ContextMenuInjectorData
     }
 ];
 

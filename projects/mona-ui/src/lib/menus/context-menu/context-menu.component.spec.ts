@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { ApplicationRef, Component } from "@angular/core";
 import { ComponentFixture, fakeAsync, TestBed, tick } from "@angular/core/testing";
 import { NoopAnimationsModule } from "@angular/platform-browser/animations";
 import { MenuItemComponent } from "../menu-item/menu-item.component";
@@ -56,6 +56,8 @@ describe("ContextMenuComponent", () => {
     let hostComponentWithMenuItems: ContextMenuComponentTestComponentWithMenuItems;
     let hostFixtureWithMenuItems: ComponentFixture<ContextMenuComponentTestComponentWithMenuItems>;
 
+    let appRef: ApplicationRef;
+
     beforeEach(() => {
         TestBed.configureTestingModule({
             imports: [
@@ -64,12 +66,13 @@ describe("ContextMenuComponent", () => {
                 NoopAnimationsModule,
                 ContextMenuComponentTestComponentWithMenuItems
             ],
-            providers: [ContextMenuService]
+            providers: [ContextMenuService, ApplicationRef]
         });
         hostFixture = TestBed.createComponent(ContextMenuComponentTestComponent);
         hostComponent = hostFixture.componentInstance;
         hostFixtureWithMenuItems = TestBed.createComponent(ContextMenuComponentTestComponentWithMenuItems);
         hostComponentWithMenuItems = hostFixtureWithMenuItems.componentInstance;
+        appRef = TestBed.inject(ApplicationRef);
         hostFixture.detectChanges();
         hostFixtureWithMenuItems.detectChanges();
     });
@@ -97,7 +100,7 @@ describe("ContextMenuComponent", () => {
         target.dispatchEvent(new MouseEvent("contextmenu", { bubbles: true }));
         tick();
         hostFixture.detectChanges();
-        tick();
+        appRef.tick();
         const contextMenuList = document.querySelector("ul.mona-contextmenu-list") as HTMLUListElement;
         expect(contextMenuList.children.length).toBe(3);
     }));
@@ -106,13 +109,13 @@ describe("ContextMenuComponent", () => {
         target.dispatchEvent(new MouseEvent("contextmenu", { bubbles: true }));
         tick();
         hostFixture.detectChanges();
-        tick();
+        appRef.tick();
         const contextMenuList = document.querySelector("ul.mona-contextmenu-list") as HTMLUListElement;
         const secondItem = contextMenuList.children[1] as HTMLLIElement;
         secondItem.dispatchEvent(new MouseEvent("mouseenter", { bubbles: true }));
         tick();
         hostFixture.detectChanges();
-        tick();
+        appRef.tick();
         const subMenuLists = document.querySelectorAll("ul.mona-contextmenu-list") as NodeListOf<HTMLUListElement>;
         expect(subMenuLists[1].children.length).toBe(3);
         expect(subMenuLists[1].children[0].textContent).toBe("Second Item 1");
@@ -169,7 +172,7 @@ describe("ContextMenuComponent", () => {
         target.dispatchEvent(new MouseEvent("contextmenu", { bubbles: true }));
         tick();
         hostFixture.detectChanges();
-        tick();
+        appRef.tick();
         const contextMenuList = document.querySelector("ul.mona-contextmenu-list") as HTMLUListElement;
         const firstItem = contextMenuList.children[0] as HTMLLIElement;
         firstItem.dispatchEvent(new MouseEvent("click", { bubbles: true }));
@@ -184,7 +187,7 @@ describe("ContextMenuComponent", () => {
         target.dispatchEvent(new MouseEvent("contextmenu", { bubbles: true }));
         tick();
         hostFixtureWithMenuItems.detectChanges();
-        tick();
+        appRef.tick();
         const contextMenuList = document.querySelector("ul.mona-contextmenu-list") as HTMLUListElement;
         expect(contextMenuList.children.length).toBe(2);
         expect(contextMenuList.children[0].textContent).toBe("First dynamic item");
