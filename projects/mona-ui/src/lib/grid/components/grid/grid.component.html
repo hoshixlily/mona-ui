@@ -1,8 +1,8 @@
 @if (groupable()) {
     <div class="mona-grid-group-panel" cdkDropList #groupColumnList="cdkDropList" cdkDropListOrientation="horizontal"
          (cdkDropListDropped)="onColumnDropForGrouping($event)">
-        @if (gridService.groupColumns.length !== 0) {
-            @for (groupColumn of gridService.groupColumns; track groupColumn.field) {
+        @if (gridService.groupColumns().length !== 0) {
+            @for (groupColumn of gridService.groupColumns(); track groupColumn.field) {
                 <mona-chip [removable]="true" (remove)="onGroupingColumnRemove($event, groupColumn)">
                     <span>{{ groupColumn.title }}</span>
                 </mona-chip>
@@ -16,7 +16,7 @@
     <div class="mona-grid-header-wrap">
         <table>
             <colgroup>
-                @for (_ of gridService.groupColumns; track $index) {
+                @for (_ of gridService.groupColumns(); track $index) {
                     <col style="width: 34px;">
                 }
                 @for (column of gridService.columns(); track $index) {
@@ -26,7 +26,7 @@
             <thead>
                 <tr cdkDropList [cdkDropListConnectedTo]="groupable() ? [groupColumnList()!] : []"
                     (cdkDropListDropped)="onColumnDrop($event)">
-                    @for (_ of gridService.groupColumns; track $index) {
+                    @for (_ of gridService.groupColumns(); track $index) {
                         <td></td>
                     }
                     @for (column of gridService.columns(); track $index) {
@@ -43,12 +43,12 @@
                                 }
 
                                 <div class="mona-grid-column-actions">
-                                    @if (gridService.sortableOptions.showIndices && column.sortIndex != null) {
-                                        <span>{{ column.sortIndex }}</span>
+                                    @if (gridService.sortableOptions.showIndices && column.sortIndex() != null) {
+                                        <span>{{ column.sortIndex() }}</span>
                                     }
-                                    @if (column.sortDirection === 'asc') {
+                                    @if (column.sortDirection() === 'asc') {
                                         <fa-icon [icon]="ascendingSortIcon"></fa-icon>
-                                    } @else if (column.sortDirection === 'desc') {
+                                    } @else if (column.sortDirection() === 'desc') {
                                         <fa-icon [icon]="descendingSortIcon"></fa-icon>
                                     }
                                     @if (filterable()) {
@@ -59,7 +59,7 @@
                             </div>
                             @if (dropColumn === column && dragColumn && reorderable()) {
                                 <span class="mona-grid-column-drop-hint"
-                                      [ngStyle]="{'right': dragColumn.index < dropColumn.index ? '-1px': null, 'left': dragColumn.index > dropColumn.index ? '-1px': null}"></span>
+                                      [ngStyle]="{'right': dragColumn.index() < dropColumn.index() ? '-1px': null, 'left': dragColumn.index() > dropColumn.index() ? '-1px': null}"></span>
                             }
                             @if (resizable() && !columnDragging) {
                                 <div monaGridColumnResizeHandler [column]="column" class="mona-grid-column-resizer"

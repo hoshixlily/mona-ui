@@ -136,9 +136,9 @@ export class GridCellComponent implements OnInit {
         if (!row) {
             return;
         }
-        if (this.column().index > 0) {
+        if (this.column().index() > 0) {
             const cell = row.querySelector(
-                `td .mona-grid-cell[data-col-index='${this.column().index - 1}']`
+                `td .mona-grid-cell[data-col-index='${this.column().index() - 1}']`
             ) as HTMLElement;
             if (cell) {
                 cell.focus();
@@ -162,9 +162,9 @@ export class GridCellComponent implements OnInit {
         if (!row) {
             return;
         }
-        if (this.column().index < this.gridService.columns().length - 1) {
+        if (this.column().index() < this.gridService.columns().length - 1) {
             const cell = row.querySelector(
-                `td .mona-grid-cell[data-col-index='${this.column().index + 1}']`
+                `td .mona-grid-cell[data-col-index='${this.column().index() + 1}']`
             ) as HTMLElement;
             if (cell) {
                 cell.focus();
@@ -222,14 +222,14 @@ export class GridCellComponent implements OnInit {
         if (this.editing) {
             this.updateCellValue();
         }
-        this.gridService.isInEditMode = false;
+        this.gridService.isInEditMode.set(false);
         this.editing = false;
         this.focus();
     }
 
     private handleEscapeKey(): void {
         this.editing = false;
-        this.gridService.isInEditMode = false;
+        this.gridService.isInEditMode.set(false);
         this.focus();
     }
 
@@ -239,7 +239,7 @@ export class GridCellComponent implements OnInit {
         }
         if (this.focused) {
             this.editing = true;
-            this.gridService.isInEditMode = true;
+            this.gridService.isInEditMode.set(true);
             asyncScheduler.schedule(() => {
                 this.focusCellInput();
             });
@@ -248,7 +248,7 @@ export class GridCellComponent implements OnInit {
 
     private handleFocusGain(): void {
         this.focused = true;
-        if (this.gridService.isInEditMode) {
+        if (this.gridService.isInEditMode()) {
             if (origin !== "mouse") {
                 this.editing = true;
                 asyncScheduler.schedule(() => {
@@ -286,8 +286,8 @@ export class GridCellComponent implements OnInit {
                 // tap(event => event.stopPropagation())
             )
             .subscribe(() => {
-                if (!this.editing && this.gridService.isInEditMode) {
-                    this.gridService.isInEditMode = false;
+                if (!this.editing && this.gridService.isInEditMode()) {
+                    this.gridService.isInEditMode.set(false);
                 }
             });
     }
@@ -302,7 +302,7 @@ export class GridCellComponent implements OnInit {
             )
             .subscribe(() => {
                 this.editing = false;
-                this.gridService.isInEditMode = false;
+                this.gridService.isInEditMode.set(false);
             });
     }
 
@@ -317,7 +317,7 @@ export class GridCellComponent implements OnInit {
                     return;
                 }
                 this.editing = true;
-                this.gridService.isInEditMode = true;
+                this.gridService.isInEditMode.set(true);
                 this.cdr.markForCheck();
                 asyncScheduler.schedule(() => {
                     this.focusCellInput();

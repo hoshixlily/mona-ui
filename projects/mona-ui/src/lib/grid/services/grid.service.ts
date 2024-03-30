@@ -23,12 +23,16 @@ export class GridService {
         ImmutableDictionary.create()
     );
     public readonly cellEdit$: Subject<CellEditEvent> = new Subject<CellEditEvent>();
+    public readonly columns: WritableSignal<ImmutableList<Column>> = signal(ImmutableList.create());
     public readonly filterLoad$: Subject<void> = new Subject<void>();
+    public readonly groupColumns: WritableSignal<Array<Column>> = signal([]);
+    public readonly isInEditMode: WritableSignal<boolean> = signal(false);
     public readonly pageState: PageState = { page: signal(1), skip: signal(0), take: signal(10) };
     public readonly rows: WritableSignal<ImmutableSet<Row>> = signal(ImmutableSet.create());
     public readonly selectedKeys: WritableSignal<ImmutableSet<unknown>> = signal(ImmutableSet.create());
     public readonly selectedRows: WritableSignal<ImmutableSet<Row>> = signal(ImmutableSet.create());
     public readonly selectedRowsChange$: Subject<Iterable<Row>> = new Subject<Iterable<Row>>();
+    public readonly selectionKeyField: WritableSignal<string> = signal("");
     public readonly sortLoad$: Subject<void> = new Subject<void>();
     public readonly viewPageRows: Signal<ImmutableSet<Row>> = computed(() => {
         const skip = this.pageState.skip();
@@ -61,17 +65,12 @@ export class GridService {
         return ImmutableSet.create(result);
     });
     public readonly viewRowCount: Signal<number> = computed(() => this.viewRows().size());
-
-    public columns: WritableSignal<ImmutableList<Column>> = signal(ImmutableList.create());
     public editableOptions: EditableOptions = { enabled: false };
     public gridHeaderElement?: HTMLDivElement;
-    public groupColumns: Column[] = [];
     public gridGroupExpandState: Dictionary<string, Dictionary<number, boolean>> = new Dictionary<
         string,
         Dictionary<number, boolean>
     >();
-    public isInEditMode: boolean = false;
-    public selectionKeyField: string = ""; // set by GridSelectableDirective
     public selectableOptions: SelectableOptions = {
         enabled: false,
         mode: "single"
@@ -117,7 +116,7 @@ export class GridService {
         this.selectedKeys.update(set => set.clear().addAll(selectedKeys));
         const selectedRowList: Row[] = [];
         for (const row of this.rows()) {
-            const fieldData = this.selectionKeyField ? row.data[this.selectionKeyField] : row.data;
+            const fieldData = this.selectionKeyField() ? row.data[this.selectionKeyField()] : row.data;
             if (fieldData == null) {
                 continue;
             }
@@ -137,8 +136,8 @@ export class GridService {
                 newAppliedSorts.add(column.field, {
                     sort: sort
                 });
-                column.sortIndex = index + 1;
-                column.sortDirection = sort.dir;
+                column.sortIndex.set(index + 1);
+                column.sortDirection.set(sort.dir);
             }
         }
         this.appliedSorts.set(

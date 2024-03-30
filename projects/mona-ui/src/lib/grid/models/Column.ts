@@ -13,14 +13,12 @@ export class Column {
     public editable: boolean = true;
     public field: string = "";
     public filtered: boolean = false;
-    public index: number = 0; // 0-based
+    public index: WritableSignal<number> = signal(0); // 0-based
     public maxWidth?: number;
     public minWidth: number = 40;
-    public sortDirection?: "asc" | "desc";
-    public sortIndex?: number; // 1-based
+    public sortDirection: WritableSignal<"asc" | "desc" | null> = signal(null);
+    public sortIndex: WritableSignal<number | null> = signal(null); // 1-based
     public title: string = "";
     public titleTemplate?: GridColumnTitleTemplateDirective;
     public width?: number;
-
-    public constructor() {}
 }

@@ -44,7 +44,7 @@ export class GridSelectableDirective implements OnInit {
         effect(() => {
             const selectionKey = this.selectionKey();
             untracked(() => {
-                this.#gridService.selectionKeyField = selectionKey;
+                this.#gridService.selectionKeyField.set(selectionKey);
             });
         });
         effect(() => {
@@ -70,7 +70,7 @@ export class GridSelectableDirective implements OnInit {
                     return;
                 }
                 const selectedKeys = select(newRows, r =>
-                    this.#gridService.selectionKeyField ? r.data[this.#gridService.selectionKeyField] : r.data
+                    this.#gridService.selectionKeyField() ? r.data[this.#gridService.selectionKeyField()] : r.data
                 );
                 this.#gridService.selectedKeys.update(set => set.clear().addAll(selectedKeys));
                 this.#gridService.selectedKeysChange.emit(selectedKeys.toArray());

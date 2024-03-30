@@ -139,13 +139,13 @@ export class GridListComponent implements OnInit, AfterViewInit {
                     const event = e as MouseEvent;
                     const target = event.target as HTMLElement;
                     if (target.closest(".mona-grid-cell") == null) {
-                        this.gridService.isInEditMode = false;
+                        this.gridService.isInEditMode.set(false);
                     }
                 }
                 if (e.type === "keyup") {
                     const event = e as KeyboardEvent;
                     if (event.key === "Escape") {
-                        this.gridService.isInEditMode = false;
+                        this.gridService.isInEditMode.set(false);
                     }
                 }
             });
