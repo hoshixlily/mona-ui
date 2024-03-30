@@ -68,9 +68,11 @@ export class GridListComponent implements OnInit, AfterViewInit {
             return;
         }
 
-        this.gridService.selectableOptions.mode === "single"
-            ? this.handleSingleSelection(event, row)
-            : this.handleMultipleSelection(event, row);
+        if (this.gridService.selectableOptions.mode === "single") {
+            this.handleSingleSelection(event, row);
+        } else {
+            this.handleMultipleSelection(event, row);
+        }
 
         this.gridService.selectedRowsChange$.next(this.gridService.selectedRows());
     }

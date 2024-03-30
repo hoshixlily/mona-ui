@@ -1,4 +1,4 @@
-import { Pipe, PipeTransform } from "@angular/core";
+import { inject, Pipe, PipeTransform } from "@angular/core";
 import { Column } from "../models/Column";
 import { Enumerable, IGroup } from "@mirei/ts-collections";
 import { Row } from "../models/Row";
@@ -10,8 +10,7 @@ import { GridService } from "../services/grid.service";
     standalone: true
 })
 export class GridGroupPipe implements PipeTransform {
-    public constructor(private readonly gridService: GridService) {}
-
+    readonly #gridService: GridService = inject(GridService);
     public transform(value: Row[], column: Column, page: number): Array<GridGroup> {
         return Enumerable.from(value)
             .groupBy(row => row.data[column.field()], this.cellComparer(column))
@@ -45,7 +44,7 @@ export class GridGroupPipe implements PipeTransform {
     private createGridGroup(group: IGroup<any, Row>, column: Column, page: number): GridGroup {
         const rows = group.source.toArray();
         const groupKey = this.getGroupKey(column.field(), rows);
-        const collapsed = this.gridService.gridGroupExpandState.get(groupKey)?.get(page) ?? false;
+        const collapsed = this.#gridService.gridGroupExpandState.get(groupKey)?.get(page) ?? false;
         return {
             column,
             rows,
