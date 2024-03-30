@@ -162,7 +162,7 @@ export class GridCellComponent implements OnInit {
         if (!row) {
             return;
         }
-        if (this.column().index < this.gridService.columns.length - 1) {
+        if (this.column().index < this.gridService.columns().length - 1) {
             const cell = row.querySelector(
                 `td .mona-grid-cell[data-col-index='${this.column().index + 1}']`
             ) as HTMLElement;

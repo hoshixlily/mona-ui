@@ -53,7 +53,7 @@
                                     }
                                     @if (filterable()) {
                                         <mona-grid-filter-menu [column]="column" [type]="column.dataType"
-                                                               (apply)="onColumnFilter(column, $event)"></mona-grid-filter-menu>
+                                                               (apply)="onColumnFilter(column, $event)" style="width: 30px;"></mona-grid-filter-menu>
                                     }
                                 </div>
                             </div>
@@ -79,12 +79,8 @@
 </div>
 
 
-<!--@if(gridService.rows()|gridFilter:gridService.appliedFilters():gridService.appliedSorts(); as filteredData) {-->
-<!--    @if (gridService.viewRows()|gridPage:gridService.pageState.skip():gridService.pageState.take(); as viewData) {-->
-        <mona-grid-list [columns]="gridService.columns()" [data]="gridService.viewPageRows()"></mona-grid-list>
-        <mona-pager [skip]="gridService.pageState.skip()" [pageSize]="gridService.pageState.take()"
-                    [total]="gridService.viewRowCount()"
-                    [pageInput]="true" [pageSizeValues]="pageSizeValues()" [responsive]="responsivePager()"
-                    (pageSizeChange)="onPageSizeChange($event)" (pageChange)="onPageChange($event)"></mona-pager>
-<!--    }-->
-<!--}-->
+<mona-grid-list [columns]="gridService.columns()" [data]="gridService.viewPageRows()"></mona-grid-list>
+<mona-pager [skip]="gridService.pageState.skip()" [pageSize]="gridService.pageState.take()"
+            [total]="gridService.viewRowCount()"
+            [pageInput]="true" [pageSizeValues]="pageSizeValues()" [responsive]="responsivePager()"
+            (pageSizeChange)="onPageSizeChange($event)" (pageChange)="onPageChange($event)"></mona-pager>

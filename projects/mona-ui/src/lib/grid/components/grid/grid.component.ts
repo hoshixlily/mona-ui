@@ -126,10 +126,6 @@ export class GridComponent implements OnInit {
         const dropColumnIndex = this.gridService
             .columns()
             .indexOf(this.dropColumn, c => c.field === this.dropColumn?.field);
-        const dragColumnIndex = this.gridService
-            .columns()
-            .indexOf(this.dragColumn, c => c.field === this.dragColumn?.field);
-        // this.gridService.columns.splice(dropColumnIndex, 0, this.gridService.columns.splice(dragColumnIndex, 1)[0]);
         this.gridService.columns.update(columns => {
             const list = columns.toList();
             list.remove(this.dragColumn as Column);
@@ -137,8 +133,6 @@ export class GridComponent implements OnInit {
             list.forEach((c, i) => (c.index = i));
             return list.toImmutableList();
         });
-        // this.gridService.columns.forEach((c, i) => (c.index = i));
-        // this.gridService.columns = [...this.gridService.columns];
         this.columnDragging = false;
         this.dragColumn = undefined;
         this.dropColumn = undefined;
