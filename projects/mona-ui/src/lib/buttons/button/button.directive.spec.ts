@@ -1,4 +1,4 @@
-import { Component, ViewChild } from "@angular/core";
+import { Component, viewChild, ViewChild } from "@angular/core";
 import { ComponentFixture, fakeAsync, TestBed, tick } from "@angular/core/testing";
 import { By } from "@angular/platform-browser";
 import { ButtonGroupComponent } from "../button-group/button-group.component";
@@ -23,8 +23,7 @@ class TestButtonDirectiveComponent {
     public tabIndex: number = 0;
     public toggleable: boolean = false;
 
-    @ViewChild(ButtonDirective)
-    public buttonDirective!: ButtonDirective;
+    public buttonDirective = viewChild.required(ButtonDirective);
 
     public selectedChange(selected: boolean): void {
         this.selected = selected;
@@ -67,7 +66,7 @@ describe("ButtonDirective", () => {
     });
 
     it("should have class disabled", () => {
-        buttonHostComponent.buttonDirective.disabled.set(true);
+        buttonHostComponent.buttonDirective().disabled.set(true);
         buttonHostFixture.detectChanges();
         const button = buttonHostFixture.debugElement.nativeElement.querySelector("button");
         expect(button).toHaveClass("mona-disabled");

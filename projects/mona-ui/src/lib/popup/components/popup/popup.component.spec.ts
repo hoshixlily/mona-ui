@@ -1,5 +1,5 @@
-import { Component, ViewChild } from "@angular/core";
-import { ComponentFixture, fakeAsync, TestBed, tick } from "@angular/core/testing";
+import { Component, viewChild } from "@angular/core";
+import { ComponentFixture, fakeAsync, TestBed } from "@angular/core/testing";
 
 import { PopupComponent } from "./popup.component";
 
@@ -17,8 +17,7 @@ import { PopupComponent } from "./popup.component";
 })
 class PopupComponentTestComponent {
     public trigger: string = "click";
-    @ViewChild(PopupComponent)
-    public popupComponent!: PopupComponent;
+    public popupComponent = viewChild.required(PopupComponent);
 }
 
 describe("PopupComponent", () => {

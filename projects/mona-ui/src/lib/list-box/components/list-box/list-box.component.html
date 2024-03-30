@@ -4,15 +4,15 @@
                     [monaListViewSelectable]="{enabled: true, mode: 'single'}"
                     [monaListViewNavigable]="{enabled: true, mode: 'select'}"
                     [selectedKeys]="selectedItems()" (selectedKeysChange)="onSelectedItemChange($event)">
-        @if (itemTemplate) {
+        @if (itemTemplate()) {
             <ng-template monaListViewItemTemplate let-dataItem>
-                <ng-container [ngTemplateOutlet]="itemTemplate"
+                <ng-container [ngTemplateOutlet]="itemTemplate()??null"
                               [ngTemplateOutletContext]="{$implicit:dataItem}"></ng-container>
             </ng-template>
         }
-        @if (noDataTemplate) {
+        @if (noDataTemplate()) {
             <ng-template monaListViewNoDataTemplate>
-                <ng-container [ngTemplateOutlet]="noDataTemplate"></ng-container>
+                <ng-container [ngTemplateOutlet]="noDataTemplate()??null"></ng-container>
             </ng-template>
         }
     </mona-list-view>

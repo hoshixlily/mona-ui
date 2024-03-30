@@ -1,4 +1,4 @@
-import { Component, TemplateRef, ViewChild } from "@angular/core";
+import { Component, TemplateRef, viewChild, ViewChild } from "@angular/core";
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { PopupSettingsInjectionToken } from "../../models/PopupInjectionToken";
 import { PopupSettings } from "../../models/PopupSettings";
@@ -14,8 +14,7 @@ import { PopupWrapperComponent } from "./popup-wrapper.component";
     `
 })
 class PopupWrapperComponentTestComponent {
-    @ViewChild("contentTemplate")
-    public contentTemplate!: TemplateRef<any>;
+    public contentTemplate = viewChild.required<TemplateRef<any>>("contentTemplate");
 }
 
 const POPUP_TOKEN = [

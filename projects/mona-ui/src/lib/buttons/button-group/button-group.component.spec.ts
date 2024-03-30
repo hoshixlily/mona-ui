@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from "@angular/core";
+import { Component, ElementRef, viewChild } from "@angular/core";
 import { ComponentFixture, fakeAsync, TestBed, tick } from "@angular/core/testing";
 import { By } from "@angular/platform-browser";
 import { SelectionMode } from "../../models/SelectionMode";
@@ -21,9 +21,7 @@ class ButtonGroupComponentSpecHostComponent {
     public disabled: boolean = false;
     public selectionMode: SelectionMode = "single";
     public selectedIndex: number = -1;
-
-    @ViewChild(ButtonGroupComponent)
-    public buttonGroupComponent!: ButtonGroupComponent;
+    public buttonGroupComponent = viewChild.required(ButtonGroupComponent);
 }
 
 describe("ButtonGroupComponent", () => {
