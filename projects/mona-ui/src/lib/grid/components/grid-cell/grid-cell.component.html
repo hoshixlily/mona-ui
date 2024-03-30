@@ -1,32 +1,32 @@
 <div class="mona-grid-cell" [attr.tabindex]="editing ? -1 : 0" cdkMonitorSubtreeFocus (cdkFocusChange)="onFocusChange($event)"
-     [ngClass]="{'mona-grid-cell-editing': editing}" [attr.data-ruid]="row().uid" [attr.data-field]="column().field" [attr.data-col-index]="column().index()">
+     [ngClass]="{'mona-grid-cell-editing': editing}" [attr.data-ruid]="row().uid" [attr.data-field]="column().field()" [attr.data-col-index]="column().index()">
 
     @if (editing) {
         <ng-container [ngTemplateOutlet]="cellEditTemplate"></ng-container>
     } @else {
-        @if (column().cellTemplate) {
-            <ng-container [ngTemplateOutlet]="column().cellTemplate?.templateRef ?? null"
+        @if (column().cellTemplate()) {
+            <ng-container [ngTemplateOutlet]="column().cellTemplate()"
                           [ngTemplateOutletContext]="{$implicit: row(), column: column()}"></ng-container>
         } @else {
-            <span class="mona-grid-cell-text">{{row().data[column().field]}}</span>
+            <span class="mona-grid-cell-text">{{row().data[column().field()]}}</span>
         }
     }
 </div>
 
 <ng-template #cellEditTemplate>
     <form [formGroup]="editForm" class="mona-grid-cell-edit-form">
-        @switch (column().dataType) {
+        @switch (column().dataType()) {
             @case ("string") {
-                <mona-text-box [formControlName]="column().field"></mona-text-box>
+                <mona-text-box [formControlName]="column().field()"></mona-text-box>
             }
             @case ("number") {
-                <mona-numeric-text-box [formControlName]="column().field" [decimals]="3"></mona-numeric-text-box>
+                <mona-numeric-text-box [formControlName]="column().field()" [decimals]="3"></mona-numeric-text-box>
             }
             @case ("date") {
-                <mona-date-picker [formControlName]="column().field"></mona-date-picker>
+                <mona-date-picker [formControlName]="column().field()"></mona-date-picker>
             }
             @case ("boolean") {
-                <input type="checkbox" [formControlName]="column().field" monaCheckBox />
+                <input type="checkbox" [formControlName]="column().field()" monaCheckBox />
             }
         }
     </form>

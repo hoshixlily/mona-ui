@@ -88,9 +88,9 @@ export class GridService {
         for (const filter of filters) {
             const filter1 = filter.filters[0] as FilterDescriptor;
             const filter2 = filter.filters[1] as FilterDescriptor;
-            const column = this.columns().firstOrDefault(c => c.field === filter1.field);
+            const column = this.columns().firstOrDefault(c => c.field() === filter1.field);
             if (column != null) {
-                newAppliedFilters.add(column.field, {
+                newAppliedFilters.add(column.field(), {
                     filter: filter,
                     filterMenuValue: {
                         value1: filter1 && "value" in filter1 ? filter1.value : undefined,
@@ -102,7 +102,7 @@ export class GridService {
                 });
             }
         }
-        this.columns().forEach(c => (c.filtered = newAppliedFilters.containsKey(c.field)));
+        this.columns().forEach(c => c.filtered.set(newAppliedFilters.containsKey(c.field())));
         this.appliedFilters.set(
             newAppliedFilters.toImmutableDictionary(
                 p => p.key,
@@ -131,9 +131,9 @@ export class GridService {
     public loadSorts(sorts: SortDescriptor[]): void {
         const newAppliedSorts = new Dictionary<string, ColumnSortState>();
         for (const [index, sort] of sorts.entries()) {
-            const column = this.columns().firstOrDefault(c => c.field === sort.field);
+            const column = this.columns().firstOrDefault(c => c.field() === sort.field);
             if (column != null) {
-                newAppliedSorts.add(column.field, {
+                newAppliedSorts.add(column.field(), {
                     sort: sort
                 });
                 column.sortIndex.set(index + 1);

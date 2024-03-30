@@ -2,9 +2,9 @@
     <div class="mona-grid-group-panel" cdkDropList #groupColumnList="cdkDropList" cdkDropListOrientation="horizontal"
          (cdkDropListDropped)="onColumnDropForGrouping($event)">
         @if (gridService.groupColumns().length !== 0) {
-            @for (groupColumn of gridService.groupColumns(); track groupColumn.field) {
+            @for (groupColumn of gridService.groupColumns(); track groupColumn.field()) {
                 <mona-chip [removable]="true" (remove)="onGroupingColumnRemove($event, groupColumn)">
-                    <span>{{ groupColumn.title }}</span>
+                    <span>{{ groupColumn.title() }}</span>
                 </mona-chip>
             }
         } @else if (groupPanelPlaceholderVisible) {
@@ -35,11 +35,11 @@
                             (cdkDragEntered)="onColumnDragEnter($event, column)"
                             (cdkDragStarted)="onColumnDragStart($event)">
                             <div class="mona-grid-column-wrap">
-                                @if (column.titleTemplate) {
-                                    <ng-container [ngTemplateOutlet]="column.titleTemplate.templateRef"></ng-container>
+                                @if (column.titleTemplate()) {
+                                    <ng-container [ngTemplateOutlet]="column.titleTemplate()"></ng-container>
                                 } @else {
                                     <span class="mona-grid-column-title" (click)="onColumnSort(column)"
-                                          [title]="column.title">{{ column.title }}</span>
+                                          [title]="column.title()">{{ column.title() }}</span>
                                 }
 
                                 <div class="mona-grid-column-actions">
@@ -52,7 +52,7 @@
                                         <fa-icon [icon]="descendingSortIcon"></fa-icon>
                                     }
                                     @if (filterable()) {
-                                        <mona-grid-filter-menu [column]="column" [type]="column.dataType"
+                                        <mona-grid-filter-menu [column]="column" [type]="column.dataType()"
                                                                (apply)="onColumnFilter(column, $event)" style="width: 30px;"></mona-grid-filter-menu>
                                     }
                                 </div>
@@ -67,7 +67,7 @@
                             }
                             <ng-template cdkDragPreview>
                                 <div class="mona-grid-column-drag-preview">
-                                    <span class="mona-grid-column-title">{{ column.title }}</span>
+                                    <span class="mona-grid-column-title">{{ column.title() }}</span>
                                 </div>
                             </ng-template>
                         </th>

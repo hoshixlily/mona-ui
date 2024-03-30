@@ -44,8 +44,8 @@ export class GridColumnResizeHandlerDirective implements AfterViewInit {
 
         const onMouseMove = (event: MouseEvent) => {
             const deltaX = event.clientX - initialX;
-            const minWidth = this.column().minWidth;
-            const maxWidth = this.column().maxWidth ?? window.innerWidth;
+            const minWidth = this.column().minWidth();
+            const maxWidth = this.column().maxWidth() ?? window.innerWidth;
 
             if (initialWidth + deltaX < minWidth) {
                 return;

@@ -111,7 +111,7 @@ export class GridListComponent implements OnInit, AfterViewInit {
 
     public onGroupExpandChange(group: GridGroup): void {
         group.collapsed = !group.collapsed;
-        const groupKey = `${group.column.field}-${group.rows[0].data[group.column.field]}`;
+        const groupKey = `${group.column.field()}-${group.rows[0].data[group.column.field()]}`;
         const state = this.gridService.gridGroupExpandState.get(groupKey);
         if (state == null) {
             this.gridService.gridGroupExpandState.add(

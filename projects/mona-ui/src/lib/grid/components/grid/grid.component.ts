@@ -125,7 +125,7 @@ export class GridComponent implements OnInit {
         }
         const dropColumnIndex = this.gridService
             .columns()
-            .indexOf(this.dropColumn, c => c.field === this.dropColumn?.field);
+            .indexOf(this.dropColumn, c => c.field() === this.dropColumn?.field());
         this.gridService.columns.update(columns => {
             const list = columns.toList();
             list.remove(this.dragColumn as Column);
@@ -144,7 +144,7 @@ export class GridComponent implements OnInit {
         }
         const column = event.item.data;
         this.gridService.groupColumns.update(columns => [...columns, column]);
-        if (!this.gridService.appliedSorts().containsKey(column.field)) {
+        if (!this.gridService.appliedSorts().containsKey(column.field())) {
             this.onColumnSort(column);
         }
         this.columnDragging = false;
@@ -154,11 +154,11 @@ export class GridComponent implements OnInit {
 
     public onColumnFilter(column: Column, state: ColumnFilterState): void {
         if (state.filter && state.filter.filters.length > 0) {
-            this.gridService.appliedFilters.update(dict => dict.put(column.field, state));
-            column.filtered = true;
+            this.gridService.appliedFilters.update(dict => dict.put(column.field(), state));
+            column.filtered.set(true);
         } else {
-            this.gridService.appliedFilters.update(dict => dict.remove(column.field));
-            column.filtered = false;
+            this.gridService.appliedFilters.update(dict => dict.remove(column.field()));
+            column.filtered.set(false);
         }
         const allFilters = this.gridService
             .appliedFilters()
@@ -187,7 +187,7 @@ export class GridComponent implements OnInit {
         if (!this.gridService.sortableOptions.enabled) {
             return;
         }
-        if (!column.field) {
+        if (!column.field()) {
             return;
         }
         if (column.sortDirection() == null) {
@@ -197,8 +197,8 @@ export class GridComponent implements OnInit {
         } else if (
             this.gridService
                 .groupColumns()
-                .map(c => c.field)
-                .includes(column.field)
+                .map(c => c.field())
+                .includes(column.field())
         ) {
             column.sortDirection.set("asc");
         } else if (this.gridService.sortableOptions.allowUnsort) {
@@ -218,9 +218,9 @@ export class GridComponent implements OnInit {
 
     public onGroupingColumnRemove(event: Event, column: Column): void {
         event.stopPropagation();
-        this.gridService.groupColumns.update(columns => columns.filter(c => c.field !== column.field));
+        this.gridService.groupColumns.update(columns => columns.filter(c => c.field() !== column.field()));
         this.gridService.gridGroupExpandState = this.gridService.gridGroupExpandState
-            .where(p => !p.key.startsWith(column.field))
+            .where(p => !p.key.startsWith(column.field()))
             .toDictionary(
                 p => p.key,
                 p => p.value
@@ -250,28 +250,28 @@ export class GridComponent implements OnInit {
         column.sortDirection.set(sortDirection);
         if (this.gridService.sortableOptions.mode === "single") {
             Enumerable.from(this.gridService.columns())
-                .where(c => c.field !== column.field)
+                .where(c => c.field() !== column.field())
                 .forEach(c => {
                     c.sortDirection.set(null);
                     c.sortIndex.set(null);
-                    this.gridService.appliedSorts.update(dict => dict.remove(c.field));
+                    this.gridService.appliedSorts.update(dict => dict.remove(c.field()));
                 });
         }
         if (column.sortDirection() != null) {
             const sortDescriptor: SortDescriptor = {
-                field: column.field,
+                field: column.field(),
                 dir: column.sortDirection() as "asc" | "desc"
             };
-            this.gridService.appliedSorts.update(dict => dict.put(column.field, { sort: sortDescriptor }));
+            this.gridService.appliedSorts.update(dict => dict.put(column.field(), { sort: sortDescriptor }));
         } else {
-            this.gridService.appliedSorts.update(dict => dict.remove(column.field));
+            this.gridService.appliedSorts.update(dict => dict.remove(column.field()));
             column.sortIndex.set(null);
         }
         this.gridService
             .appliedSorts()
             .keys()
             .forEach((field, fx) => {
-                const col = this.gridService.columns().firstOrDefault(c => c.field === field);
+                const col = this.gridService.columns().firstOrDefault(c => c.field() === field);
                 if (col) {
                     col.sortIndex.set(fx + 1);
                 }
@@ -327,7 +327,7 @@ export class GridComponent implements OnInit {
                 const thArray = Array.from(thList);
                 for (const [cx, columnTh] of thArray.entries()) {
                     const gridCol = this.gridService.columns().elementAt(cx);
-                    gridCol.calculatedWidth.set(gridCol.width ?? Math.floor(columnTh.getBoundingClientRect().width));
+                    gridCol.calculatedWidth.set(gridCol.width() ?? Math.floor(columnTh.getBoundingClientRect().width));
                 }
             });
         }

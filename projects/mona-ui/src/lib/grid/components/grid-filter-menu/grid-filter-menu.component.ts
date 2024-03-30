@@ -86,10 +86,10 @@ export class GridFilterMenuComponent implements OnInit {
             });
 
         this.animateEnter();
-        const filterState = this.gridService.appliedFilters().get(this.column().field);
+        const filterState = this.gridService.appliedFilters().get(this.column().field());
         const componentRef = this.#popupRef.component as ComponentRef<FilterMenuComponent>;
         componentRef.instance.type.set(this.type());
-        componentRef.instance.field.set(this.column().field);
+        componentRef.instance.field.set(this.column().field());
         if (filterState?.filterMenuValue) {
             componentRef.instance.value.set(filterState.filterMenuValue);
         }
