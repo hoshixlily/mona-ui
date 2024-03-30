@@ -1,18 +1,19 @@
 import { NgClass, NgTemplateOutlet } from "@angular/common";
 import {
     AfterContentInit,
-    AfterViewInit,
     ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
     ContentChildren,
     DestroyRef,
+    effect,
     inject,
     QueryList,
-    ViewChildren
+    untracked,
+    viewChildren
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { Collections, Enumerable, List } from "@mirei/ts-collections";
+import { Collections, Enumerable, List, zip } from "@mirei/ts-collections";
 import { ContextMenuComponent } from "../context-menu/context-menu.component";
 import { MenuComponent } from "../menu/menu.component";
 import { ContextMenuCloseEvent } from "../models/ContextMenuCloseEvent";
@@ -30,42 +31,34 @@ import { ContextMenuOpenEvent } from "../models/ContextMenuOpenEvent";
         class: "mona-menubar"
     }
 })
-export class MenubarComponent implements AfterViewInit, AfterContentInit {
+export class MenubarComponent implements AfterContentInit {
     readonly #cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
 
-    @ViewChildren(ContextMenuComponent)
-    public readonly contextMenuComponents: QueryList<ContextMenuComponent> = new QueryList<ContextMenuComponent>();
+    protected readonly contextMenuComponents = viewChildren(ContextMenuComponent);
+
     public currentContextMenu: ContextMenuComponent | null = null;
 
     @ContentChildren(MenuComponent)
     public menuList: QueryList<MenuComponent> = new QueryList<MenuComponent>();
+
+    public constructor() {
+        effect(() => {
+            const contextMenuComponents = this.contextMenuComponents();
+            untracked(() => {
+                contextMenuComponents.forEach(c => c.setPrecise(false));
+                zip(this.menuList, contextMenuComponents).forEach(([menu, context]) => {
+                    menu.contextMenu = context;
+                });
+            });
+        });
+    }
 
     public ngAfterContentInit(): void {
         this.menuList.changes.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(() => {
             this.#cdr.detectChanges();
             this.currentContextMenu?.closeMenu();
             this.currentContextMenu = null;
-        });
-    }
-
-    public ngAfterViewInit(): void {
-        window.setTimeout(() => {
-            this.contextMenuComponents.forEach(c => c.setPrecise(false));
-            this.#cdr.detectChanges();
-        });
-        const pairContext = () => {
-            Enumerable.from(this.menuList)
-                .zip(Enumerable.from(this.contextMenuComponents))
-                .forEach(([menu, context]) => {
-                    menu.contextMenu = context;
-                });
-        };
-        pairContext();
-        this.contextMenuComponents.changes.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(() => {
-            this.contextMenuComponents.forEach(c => c.setPrecise(false));
-            this.#cdr.detectChanges();
-            pairContext();
         });
     }
 
@@ -102,12 +95,12 @@ export class MenubarComponent implements AfterViewInit, AfterContentInit {
         if (this.currentContextMenu?.uid === event.uid) {
             return;
         }
-        this.contextMenuComponents.forEach(c => {
+        this.contextMenuComponents().forEach(c => {
             if (c.uid !== event.uid) {
                 c.closeMenu();
             }
         });
-        this.currentContextMenu = this.contextMenuComponents.find(c => c.uid === event.uid) ?? null;
+        this.currentContextMenu = this.contextMenuComponents().find(c => c.uid === event.uid) ?? null;
         this.#cdr.detectChanges();
     }
 
@@ -117,7 +110,7 @@ export class MenubarComponent implements AfterViewInit, AfterContentInit {
             this.currentContextMenu = null;
             return;
         }
-        this.contextMenuComponents.forEach(c => {
+        this.contextMenuComponents().forEach(c => {
             if (c !== ctx) {
                 c.closeMenu();
             }
