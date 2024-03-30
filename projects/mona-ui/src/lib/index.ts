@@ -42,10 +42,10 @@ export * from "./dropdowns/directives/drop-down-no-data-template.directive";
 export * from "./dropdowns/directives/drop-down-virtual-scroll.directive";
 
 /* Auto Complete */
-export * from "./dropdowns/auto-complete/components/auto-complete.component";
+export * from "./dropdowns/auto-complete/auto-complete.component";
 
 /* Combo Box */
-export * from "./dropdowns/combo-box/components/combo-box/combo-box.component";
+export * from "./dropdowns/combo-box/combo-box.component";
 
 /* Drop Down List */
 export * from "./dropdowns/drop-down-list/directives/drop-down-list-value-template.directive";
