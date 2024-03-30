@@ -1,22 +1,28 @@
-import { Directive, Input, OnInit } from "@angular/core";
-import { GridService } from "../services/grid.service";
+import { Directive, effect, inject, input, untracked } from "@angular/core";
 import { EditableOptions } from "../models/EditableOptions";
+import { GridService } from "../services/grid.service";
 
 @Directive({
     selector: "[monaGridEditable]",
     standalone: true
 })
-export class GridEditableDirective implements OnInit {
-    @Input("monaGridEditable")
-    public options?: EditableOptions | "";
+export class GridEditableDirective {
+    readonly #gridService: GridService = inject(GridService);
 
-    public constructor(private readonly gridService: GridService) {}
+    public options = input<EditableOptions | "" | undefined>(undefined, {
+        alias: "monaGridEditable"
+    });
 
-    public ngOnInit(): void {
-        if (this.options) {
-            this.gridService.setEditableOptions(this.options);
-        } else if (this.options === "") {
-            this.gridService.setEditableOptions({ enabled: true });
-        }
+    public constructor() {
+        effect(() => {
+            const options = this.options();
+            untracked(() => {
+                if (options) {
+                    this.#gridService.setEditableOptions(options);
+                } else if (options === "") {
+                    this.#gridService.setEditableOptions({ enabled: true });
+                }
+            });
+        });
     }
 }

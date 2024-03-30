@@ -2,19 +2,15 @@ import { animate, AnimationBuilder, style } from "@angular/animations";
 import { NgClass } from "@angular/common";
 import {
     ChangeDetectionStrategy,
-    ChangeDetectorRef,
     Component,
     ComponentRef,
-    DestroyRef,
     ElementRef,
-    EventEmitter,
     inject,
     input,
     InputSignal,
-    OnInit,
-    Output
+    output,
+    OutputEmitterRef
 } from "@angular/core";
-import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { faFilter, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { take } from "rxjs";
@@ -38,31 +34,21 @@ import { GridService } from "../../services/grid.service";
         class: "mona-grid-filter-menu"
     }
 })
-export class GridFilterMenuComponent implements OnInit {
-    readonly #destroyRef: DestroyRef = inject(DestroyRef);
+export class GridFilterMenuComponent {
+    readonly #animationBuilder: AnimationBuilder = inject(AnimationBuilder);
+    readonly #gridService: GridService = inject(GridService);
     readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
+    readonly #popupService: PopupService = inject(PopupService);
     #popupRef?: PopupRef;
     protected readonly filterIcon: IconDefinition = faFilter;
+
+    public readonly apply: OutputEmitterRef<ColumnFilterState> = output();
 
     public column: InputSignal<Column> = input.required<Column>();
     public type: InputSignal<DataType> = input<DataType>("string");
 
-    @Output()
-    public apply: EventEmitter<ColumnFilterState> = new EventEmitter<ColumnFilterState>();
-
-    public constructor(
-        private readonly animationBuilder: AnimationBuilder,
-        private readonly cdr: ChangeDetectorRef,
-        private readonly popupService: PopupService,
-        private readonly gridService: GridService
-    ) {}
-
-    public ngOnInit(): void {
-        this.setSubscriptions();
-    }
-
     public openPopup(): void {
-        this.#popupRef = this.popupService.create({
+        this.#popupRef = this.#popupService.create({
             anchor: this.#hostElementRef.nativeElement,
             content: FilterMenuComponent,
             popupClass: "mona-grid-filter-menu-popup-content",
@@ -87,18 +73,18 @@ export class GridFilterMenuComponent implements OnInit {
             });
 
         this.animateEnter();
-        const filterState = this.gridService.appliedFilters.get(this.column().field);
+        const filterState = this.#gridService.appliedFilters().get(this.column().field());
         const componentRef = this.#popupRef.component as ComponentRef<FilterMenuComponent>;
         componentRef.instance.type.set(this.type());
-        componentRef.instance.field.set(this.column().field);
+        componentRef.instance.field.set(this.column().field());
         if (filterState?.filterMenuValue) {
-            componentRef.instance.value = filterState.filterMenuValue;
+            componentRef.instance.value.set(filterState.filterMenuValue);
         }
         componentRef.changeDetectorRef.detectChanges();
-        componentRef.instance.apply.pipe(take(1)).subscribe(filter => {
+        componentRef.instance.apply.subscribe(filter => {
             const filterState: ColumnFilterState = {
                 filter,
-                filterMenuValue: componentRef.instance.value
+                filterMenuValue: componentRef.instance.getFilterValues()
             };
             this.animateLeave();
             this.#popupRef?.closeWithDelay(100);
@@ -110,7 +96,7 @@ export class GridFilterMenuComponent implements OnInit {
         if (this.#popupRef?.overlayRef?.overlayElement?.parentElement) {
             this.#popupRef.overlayRef.overlayElement.parentElement.style.overflow = "hidden";
         }
-        this.animationBuilder
+        this.#animationBuilder
             .build([
                 style({ transform: "translateY(-100%)", opacity: 1 }),
                 animate("0.15s ease-out", style({ transform: "translateY(0)", opacity: 1 }))
@@ -123,18 +109,12 @@ export class GridFilterMenuComponent implements OnInit {
         if (this.#popupRef?.overlayRef?.overlayElement?.parentElement) {
             this.#popupRef.overlayRef.overlayElement.parentElement.style.overflow = "hidden";
         }
-        this.animationBuilder
+        this.#animationBuilder
             .build([
                 style({ transform: "translateY(0)", opacity: 1 }),
                 animate("0.15s ease-out", style({ transform: "translateY(-100%)", opacity: 1 }))
             ])
             .create(this.#popupRef?.overlayRef?.overlayElement)
             .play();
-    }
-
-    private setSubscriptions(): void {
-        this.gridService.filterLoad$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(() => {
-            this.cdr.detectChanges();
-        });
     }
 }

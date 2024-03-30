@@ -1,7 +1,7 @@
 <div class="mona-grid-list-wrap">
     <table>
         <colgroup>
-            @for (_ of gridService.groupColumns; track $index) {
+            @for (_ of gridService.groupColumns(); track $index) {
                 <col style="width: 34px;">
             }
             @for (column of columns(); track $index) {
@@ -9,9 +9,9 @@
             }
         </colgroup>
         <tbody>
-            @if (gridService.groupColumns.length === 0) {
+            @if (gridService.groupColumns().length === 0) {
                 @for (row of data(); track row.uid) {
-                    <tr (click)="onGridRowClick($event, row)" [ngClass]="{'mona-selected': row.selected}"
+                    <tr (click)="onGridRowClick($event, row)" [ngClass]="{'mona-selected': row.selected()}"
                         [attr.data-ruid]="row.uid" [attr.data-row-view-index]="$index">
                         @for (column of columns(); track $index) {
                             <td>
@@ -22,14 +22,14 @@
                 }
             } @else {
                 <ng-template #gridGroupTemplate let-groupData let-column="column" let-cx="cx" let-depth="depth">
-                        @if (groupData|gridGroup:column:gridService.pageState.page; as groupItem) {
+                        @if (groupData|gridGroup:column:gridService.pageState.page(); as groupItem) {
                             @for (subGroup of groupItem; track $index) {
                                 <tr class="mona-grid-grouping-row">
-                                    @for (_ of gridService.groupColumns|monaSlice:0:cx; track $index) {
+                                    @for (_ of gridService.groupColumns()|monaSlice:0:cx; track $index) {
                                         <td></td>
                                     }
                                     @if (subGroup.rows.length > 0) {
-                                        <td [colSpan]="columns().length + gridService.groupColumns.length">
+                                        <td [colSpan]="columns().length + gridService.groupColumns().length">
                                             <button monaButton [flat]="true" style="width: 34px;"
                                                     (click)="onGroupExpandChange(subGroup)">
                                                 @if (subGroup.collapsed) {
@@ -39,21 +39,21 @@
                                                 }
                                             </button>
                                             <span class="mona-grid-grouping-row-text">{{ column.title }}
-                                                : {{ subGroup.rows[0].data[column.field] }}</span>
+                                                : {{ subGroup.rows[0].data[column.field()] }}</span>
                                         </td>
                                     }
                                 </tr>
-                                @if (cx < gridService.groupColumns.length - 1 && !subGroup.collapsed) {
+                                @if (cx < gridService.groupColumns().length - 1 && !subGroup.collapsed) {
                                     <ng-container [ngTemplateOutlet]="gridGroupTemplate"
-                                                  [ngTemplateOutletContext]="{$implicit: subGroup.rows, column: gridService.groupColumns[cx+1], cx: cx+1, depth:depth+1}">
+                                                  [ngTemplateOutletContext]="{$implicit: subGroup.rows, column: gridService.groupColumns()[cx+1], cx: cx+1, depth:depth+1}">
                                     </ng-container>
                                 }
-                                @if (depth === gridService.groupColumns.length - 1 && !subGroup.collapsed) {
+                                @if (depth === gridService.groupColumns().length - 1 && !subGroup.collapsed) {
                                     @for (row of subGroup.rows; track row.uid) {
                                         <tr (click)="onGridRowClick($event, row)"
-                                            [ngClass]="{'mona-selected': row.selected}"
+                                            [ngClass]="{'mona-selected': row.selected()}"
                                             [attr.data-ruid]="row.uid" [attr.data-row-view-index]="$index">
-                                            @for (_ of gridService.groupColumns; track $index) {
+                                            @for (_ of gridService.groupColumns(); track $index) {
                                                 <td></td>
                                             }
                                             @for (column of columns(); track $index) {
@@ -68,7 +68,7 @@
                         }
                 </ng-template>
                 <ng-container [ngTemplateOutlet]="gridGroupTemplate"
-                              [ngTemplateOutletContext]="{$implicit: data(), column: gridService.groupColumns[0], cx: 0, depth: 0}"></ng-container>
+                              [ngTemplateOutletContext]="{$implicit: data(), column: gridService.groupColumns()[0], cx: 0, depth: 0}"></ng-container>
             }
         </tbody>
     </table>

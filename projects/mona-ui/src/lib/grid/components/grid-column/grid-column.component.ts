@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ContentChild, Input } from "@angular/core";
+import { ChangeDetectionStrategy, Component, contentChild, effect, input, TemplateRef, untracked } from "@angular/core";
 import { DataType } from "../../../models/DataType";
 import { GridCellTemplateDirective } from "../../directives/grid-cell-template.directive";
 import { GridColumnTitleTemplateDirective } from "../../directives/grid-column-title-template.directive";
@@ -12,50 +12,54 @@ import { Column } from "../../models/Column";
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class GridColumnComponent {
-    public column: Column = new Column();
+    protected readonly cellTemplate = contentChild(GridCellTemplateDirective, { read: TemplateRef });
+    protected readonly titleTemplate = contentChild(GridColumnTitleTemplateDirective, { read: TemplateRef });
 
-    @ContentChild(GridCellTemplateDirective)
-    public set cellTemplate(value: GridCellTemplateDirective) {
-        this.column.cellTemplate = value;
-    }
+    public readonly column: Column = new Column();
+    public readonly editable = input<boolean>(true);
+    public readonly field = input<string>("");
+    public readonly maxWidth = input<number | null>(null);
+    public readonly minWidth = input<number>(40);
+    public readonly title = input<string>("");
+    public readonly type = input<DataType>("string");
+    public readonly width = input<number | undefined>(undefined);
 
-    @Input()
-    public set editable(value: boolean) {
-        this.column.editable = value;
-    }
-
-    @Input()
-    public set field(value: string) {
-        this.column.field = value;
-    }
-
-    @Input()
-    public set maxWidth(value: number) {
-        this.column.maxWidth = value;
-    }
-
-    @Input()
-    public set minWidth(value: number) {
-        this.column.minWidth = value;
-    }
-
-    @Input()
-    public set title(value: string) {
-        this.column.title = value;
-    }
-
-    @ContentChild(GridColumnTitleTemplateDirective)
-    public set titleTemplate(value: GridColumnTitleTemplateDirective) {
-        this.column.titleTemplate = value;
-    }
-
-    @Input()
-    public set type(value: DataType) {
-        this.column.dataType = value;
-    }
-
-    @Input()
-    public set width(value: number) {
-        this.column.width = value;
+    public constructor() {
+        effect(() => {
+            const cellTemplate = this.cellTemplate();
+            untracked(() => this.column.cellTemplate.set(cellTemplate ?? null));
+        });
+        effect(() => {
+            const editable = this.editable();
+            untracked(() => this.column.editable.set(editable));
+        });
+        effect(() => {
+            const field = this.field();
+            untracked(() => this.column.field.set(field));
+        });
+        effect(() => {
+            const maxWidth = this.maxWidth();
+            untracked(() => this.column.maxWidth.set(maxWidth));
+        });
+        effect(() => {
+            const minWidth = this.minWidth();
+            untracked(() => this.column.minWidth.set(minWidth));
+        });
+        effect(() => {
+            const title = this.title();
+            untracked(() => this.column.title.set(title));
+        });
+        effect(() => {
+            const titleTemplate = this.titleTemplate();
+            untracked(() => this.column.titleTemplate.set(titleTemplate ?? null));
+        });
+        effect(() => {
+            const type = this.type();
+            untracked(() => this.column.dataType.set(type));
+        });
+        effect(() => {
+            const width = this.width();
+            untracked(() => this.column.width.set(width));
+        });
     }
 }
