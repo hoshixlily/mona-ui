@@ -462,7 +462,9 @@ export class FilterMenuComponent {
                 break;
         }
 
-        this.selectedConnectorItem = this.connectorDataItems.find(c => c.value === values.logic) ?? null;
+        this.selectedConnectorItem = filterValues[1]
+            ? this.connectorDataItems.find(c => c.value === values.logic) ?? null
+            : null;
     }
 
     public get applyDisabled(): boolean {
