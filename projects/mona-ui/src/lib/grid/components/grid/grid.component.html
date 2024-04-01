@@ -22,7 +22,7 @@
                     <col style="width: 34px;">
                 }
                 @for (column of gridService.columns(); track $index) {
-                    <col [style.width.px]="column.calculatedWidth()" [style.min-width.px]="column.minWidth">
+                    <col [style.width.px]="column.calculatedWidth()" [style.min-width.px]="column.minWidth()">
                 }
             </colgroup>
             <thead>
