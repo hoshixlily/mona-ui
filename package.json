@@ -1,6 +1,6 @@
 {
     "name": "@mirei/mona-ui",
-    "version": "5.3.3",
+    "version": "5.3.4",
     "description": "A very light Angular UI framework",
     "main": "dist/mona-ui/fesm2022/mona-ui.mjs",
     "exports": {
