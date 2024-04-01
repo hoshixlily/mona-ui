@@ -29,10 +29,10 @@ export class GridService {
     public readonly isInEditMode: WritableSignal<boolean> = signal(false);
     public readonly pageState: PageState = { page: signal(1), skip: signal(0), take: signal(10) };
     public readonly rows: WritableSignal<ImmutableSet<Row>> = signal(ImmutableSet.create());
+    public readonly selectBy: WritableSignal<string> = signal("");
     public readonly selectedKeys: WritableSignal<ImmutableSet<unknown>> = signal(ImmutableSet.create());
     public readonly selectedRows: WritableSignal<ImmutableSet<Row>> = signal(ImmutableSet.create());
     public readonly selectedRowsChange$: Subject<Iterable<Row>> = new Subject<Iterable<Row>>();
-    public readonly selectionKeyField: WritableSignal<string> = signal("");
     public readonly sortLoad$: Subject<void> = new Subject<void>();
     public readonly viewPageRows: Signal<ImmutableSet<Row>> = computed(() => {
         const skip = this.pageState.skip();
@@ -116,7 +116,7 @@ export class GridService {
         this.selectedKeys.update(set => set.clear().addAll(selectedKeys));
         const selectedRowList: Row[] = [];
         for (const row of this.rows()) {
-            const fieldData = this.selectionKeyField() ? row.data[this.selectionKeyField()] : row.data;
+            const fieldData = this.selectBy() ? row.data[this.selectBy()] : row.data;
             if (fieldData == null) {
                 continue;
             }

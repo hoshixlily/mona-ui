@@ -24,12 +24,12 @@ import {
     OutputEmitterRef,
     signal,
     untracked,
-    viewChild
+    viewChild,
+    WritableSignal
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { faArrowDownLong, faArrowUpLong, IconDefinition } from "@fortawesome/free-solid-svg-icons";
-import { Enumerable } from "@mirei/ts-collections";
 import { ChipComponent } from "../../../buttons/chip/chip.component";
 import { PagerComponent } from "../../../pager/components/pager/pager.component";
 import { PageChangeEvent } from "../../../pager/models/PageChangeEvent";
@@ -79,6 +79,7 @@ export class GridComponent implements OnInit {
     protected readonly gridHeaderElement = viewChild.required<ElementRef<HTMLDivElement>>("gridHeaderElement");
     protected readonly gridService: GridService = inject(GridService);
     protected readonly groupColumnList = viewChild<CdkDropList>("groupColumnList");
+    protected readonly groupPanelPlaceholderVisible: WritableSignal<boolean> = signal(true);
     protected readonly groupingInProgress = signal(false);
     protected readonly headerMargin =
         navigator.userAgent.toLowerCase().indexOf("firefox") > -1 ? "0 16px 0 0" : "0 12px 0 0";
@@ -86,7 +87,6 @@ export class GridComponent implements OnInit {
     protected dragColumn?: Column;
     protected dropColumn?: Column;
     protected gridColumns: Column[] = [];
-    protected groupPanelPlaceholderVisible: boolean = true;
     protected resizing: boolean = false;
 
     public readonly cellEdit: OutputEmitterRef<CellEditEvent> = output();
@@ -118,7 +118,7 @@ export class GridComponent implements OnInit {
     }
 
     public onColumnDragEnter(event: CdkDragEnter<void, Column>, column: Column): void {
-        this.groupPanelPlaceholderVisible = event.container !== this.groupColumnList();
+        this.groupPanelPlaceholderVisible.set(event.container !== this.groupColumnList());
     }
 
     public onColumnDragEnterForGrouping(event: CdkDragEnter<void, Column>): void {
@@ -249,7 +249,7 @@ export class GridComponent implements OnInit {
                 p => p.value
             );
         this.applyColumnSort(column, null);
-        this.groupPanelPlaceholderVisible = this.gridService.groupColumns.length === 0;
+        this.groupPanelPlaceholderVisible.set(this.gridService.groupColumns().length === 0);
     }
 
     public onPageChange(event: PageChangeEvent): void {
@@ -272,7 +272,8 @@ export class GridComponent implements OnInit {
     private applyColumnSort(column: Column, sortDirection: "asc" | "desc" | null): void {
         column.sortDirection.set(sortDirection);
         if (this.gridService.sortableOptions.mode === "single") {
-            Enumerable.from(this.gridService.columns())
+            this.gridService
+                .columns()
                 .where(c => c.field() !== column.field())
                 .forEach(c => {
                     c.sortDirection.set(null);
@@ -350,7 +351,7 @@ export class GridComponent implements OnInit {
                 const thArray = Array.from(thList);
                 for (const [cx, columnTh] of thArray.entries()) {
                     const gridCol = this.gridService.columns().elementAt(cx);
-                    gridCol.calculatedWidth.set(gridCol.width() ?? Math.floor(columnTh.getBoundingClientRect().width));
+                    gridCol.calculatedWidth.set(gridCol.width() ?? Math.trunc(columnTh.getBoundingClientRect().width));
                 }
             });
         }

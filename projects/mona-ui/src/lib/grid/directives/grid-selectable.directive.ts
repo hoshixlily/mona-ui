@@ -27,8 +27,8 @@ export class GridSelectableDirective implements OnInit {
     public options = input<SelectableOptions | "" | undefined>(undefined, {
         alias: "monaGridSelectable"
     });
+    public selectBy = input<string>("");
     public selectedKeys = input<Iterable<unknown>>([]);
-    public selectionKey = input<string>("");
 
     public constructor() {
         effect(() => {
@@ -42,9 +42,9 @@ export class GridSelectableDirective implements OnInit {
             });
         });
         effect(() => {
-            const selectionKey = this.selectionKey();
+            const selectionKey = this.selectBy();
             untracked(() => {
-                this.#gridService.selectionKeyField.set(selectionKey);
+                this.#gridService.selectBy.set(selectionKey);
             });
         });
         effect(() => {
@@ -70,7 +70,7 @@ export class GridSelectableDirective implements OnInit {
                     return;
                 }
                 const selectedKeys = select(newRows, r =>
-                    this.#gridService.selectionKeyField() ? r.data[this.#gridService.selectionKeyField()] : r.data
+                    this.#gridService.selectBy() ? r.data[this.#gridService.selectBy()] : r.data
                 );
                 this.#gridService.selectedKeys.update(set => set.clear().addAll(selectedKeys));
                 this.#gridService.selectedKeysChange.emit(selectedKeys.toArray());

@@ -9,7 +9,7 @@
                     <span>{{ groupColumn.title() }}</span>
                 </mona-chip>
             }
-        } @else if (groupPanelPlaceholderVisible) {
+        } @else if (groupPanelPlaceholderVisible()) {
             <span class="mona-grid-group-panel-placeholder">Drag a column header here to group</span>
         }
     </div>
