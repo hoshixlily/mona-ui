@@ -77,6 +77,9 @@ export class PagerComponent implements AfterViewInit, OnDestroy {
         return Math.min(this.page() * this.pagerPageSize(), this.total());
     });
     protected readonly currentPageDataCountStart: Signal<number> = computed(() => {
+        if (this.total() === 0) {
+            return 0;
+        }
         return (this.page() - 1) * this.pagerPageSize() + 1;
     });
     protected readonly infoVisible: WritableSignal<boolean> = signal(true);
