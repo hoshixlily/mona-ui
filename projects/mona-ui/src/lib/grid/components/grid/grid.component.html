@@ -1,5 +1,7 @@
 @if (groupable()) {
     <div class="mona-grid-group-panel" cdkDropList #groupColumnList="cdkDropList" cdkDropListOrientation="horizontal"
+         (cdkDropListEntered)="onColumnDragEnterForGrouping($event)"
+         (cdkDropListExited)="onColumnDragExitForGrouping($event)"
          (cdkDropListDropped)="onColumnDropForGrouping($event)">
         @if (gridService.groupColumns().length !== 0) {
             @for (groupColumn of gridService.groupColumns(); track groupColumn.field()) {
@@ -57,7 +59,7 @@
                                     }
                                 </div>
                             </div>
-                            @if (dropColumn === column && dragColumn && reorderable()) {
+                            @if (dropColumn === column && dragColumn && reorderable() && !groupingInProgress()) {
                                 <span class="mona-grid-column-drop-hint"
                                       [ngStyle]="{'right': dragColumn.index() < dropColumn.index() ? '-1px': null, 'left': dragColumn.index() > dropColumn.index() ? '-1px': null}"></span>
                             }

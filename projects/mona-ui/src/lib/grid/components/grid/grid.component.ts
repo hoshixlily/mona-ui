@@ -1,4 +1,12 @@
-import { CdkDrag, CdkDragDrop, CdkDragEnter, CdkDragPreview, CdkDragStart, CdkDropList } from "@angular/cdk/drag-drop";
+import {
+    CdkDrag,
+    CdkDragDrop,
+    CdkDragEnter,
+    CdkDragExit,
+    CdkDragPreview,
+    CdkDragStart,
+    CdkDropList
+} from "@angular/cdk/drag-drop";
 import { NgStyle, NgTemplateOutlet } from "@angular/common";
 import {
     ChangeDetectionStrategy,
@@ -14,6 +22,7 @@ import {
     OnInit,
     output,
     OutputEmitterRef,
+    signal,
     untracked,
     viewChild
 } from "@angular/core";
@@ -70,6 +79,7 @@ export class GridComponent implements OnInit {
     protected readonly gridHeaderElement = viewChild.required<ElementRef<HTMLDivElement>>("gridHeaderElement");
     protected readonly gridService: GridService = inject(GridService);
     protected readonly groupColumnList = viewChild<CdkDropList>("groupColumnList");
+    protected readonly groupingInProgress = signal(false);
     protected readonly headerMargin =
         navigator.userAgent.toLowerCase().indexOf("firefox") > -1 ? "0 16px 0 0" : "0 12px 0 0";
     protected columnDragging: boolean = false;
@@ -111,6 +121,14 @@ export class GridComponent implements OnInit {
         this.groupPanelPlaceholderVisible = event.container !== this.groupColumnList();
     }
 
+    public onColumnDragEnterForGrouping(event: CdkDragEnter<void, Column>): void {
+        this.groupingInProgress.set(true);
+    }
+
+    public onColumnDragExitForGrouping(event: CdkDragExit<void, Column>): void {
+        this.groupingInProgress.set(false);
+    }
+
     public onColumnDragStart(event: CdkDragStart<Column>): void {
         if (this.resizing) {
             return;
@@ -143,6 +161,10 @@ export class GridComponent implements OnInit {
             return;
         }
         const column = event.item.data;
+        if (this.gridService.groupColumns().includes(column)) {
+            return;
+        }
+
         this.gridService.groupColumns.update(columns => [...columns, column]);
         if (!this.gridService.appliedSorts().containsKey(column.field())) {
             this.onColumnSort(column);
@@ -150,6 +172,7 @@ export class GridComponent implements OnInit {
         this.columnDragging = false;
         this.dragColumn = undefined;
         this.dropColumn = undefined;
+        this.groupingInProgress.set(false);
     }
 
     public onColumnFilter(column: Column, state: ColumnFilterState): void {
