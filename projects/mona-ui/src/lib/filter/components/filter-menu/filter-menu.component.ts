@@ -152,13 +152,20 @@ export class FilterMenuComponent {
                 field: this.field(),
                 operator: operator
             };
-        } else {
+        } else if (operator === "neq") {
+            return {
+                field: this.field(),
+                operator: "neq",
+                value: true
+            };
+        } else if (operator === "eq") {
             return {
                 field: this.field(),
                 operator: "eq",
-                value: operator === "eq"
+                value: true
             };
         }
+        return null;
     }
 
     private getDateDescriptor(operator: DateFilterOperators, value: Date | null): DateFilterDescriptor | null {
