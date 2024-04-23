@@ -7,7 +7,7 @@ import { DateTime } from "luxon";
 import { CalendarComponent } from "./calendar.component";
 
 @Component({
-    template: `<mona-calendar
+    template: ` <mona-calendar
         [disabled]="disabled"
         [ngModel]="date"
         [min]="min"
@@ -53,13 +53,17 @@ describe("CalendarComponent", () => {
         expect(component).toBeTruthy();
     });
 
-    it("should set the current date to today", () => {
+    it("should set header text to Month Year combination", fakeAsync(() => {
         const now = DateTime.now();
-        const calendarDate = DateTime.fromJSDate(component.navigatedDate);
-        expect(now.hasSame(calendarDate, "day")).toBeTrue();
-        expect(now.hasSame(calendarDate, "month")).toBeTrue();
-        expect(now.hasSame(calendarDate, "year")).toBeTrue();
-    });
+        hostComponent.date = now.toJSDate();
+        hostFixture.detectChanges();
+        tick();
+
+        const yearButton = hostFixture.debugElement.query(By.css(".mona-calendar-header div:nth-child(2) button"));
+        const yearText = yearButton.nativeElement.textContent;
+        const expectedYearText = `${now.toFormat("MMMM yyyy")}`;
+        expect(yearText).toEqual(expectedYearText);
+    }));
 
     it("should set the current date to the date passed in", () => {
         const date = DateTime.fromJSDate(setCalendarDateOfHost(hostFixture) as Date);

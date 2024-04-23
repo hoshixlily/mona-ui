@@ -45,11 +45,12 @@ import { CalendarView } from "../models/CalendarView";
 })
 export class CalendarComponent implements OnInit, ControlValueAccessor {
     #propagateChange: Action<Date | null> | null = null;
-    #value: Date | null = null;
     protected readonly calendarView: WritableSignal<CalendarView> = signal("month");
+    protected readonly navigatedDate: WritableSignal<Date> = signal(new Date());
     protected readonly nextMonthIcon: IconDefinition = faChevronRight;
     protected readonly prevMonthIcon: IconDefinition = faChevronLeft;
     protected readonly timezone = DateTime.local().zoneName ?? undefined;
+    protected readonly value: WritableSignal<Date | null> = signal<Date | null>(null);
     protected decadeYears: number[] = [];
     protected monthBounds: { start: Date; end: Date } = { start: new Date(), end: new Date() };
     protected monthlyViewDict: Dictionary<Date, number> = new Dictionary<Date, number>();
@@ -60,42 +61,43 @@ export class CalendarComponent implements OnInit, ControlValueAccessor {
     });
     public max: InputSignal<Date | null> = input<Date | null>(null);
     public min: InputSignal<Date | null> = input<Date | null>(null);
-    public navigatedDate: Date = new Date();
+    // public navigatedDate: Date = new Date();
 
     public ngOnInit(): void {
         this.setDateValues();
-        const date = this.value ?? DateTime.now().toJSDate();
+        const date = this.value() ?? DateTime.now().toJSDate();
         this.prepareMonthlyViewDictionary(date);
-        this.navigatedDate = date;
+        this.navigatedDate.set(date);
     }
 
     public onDayClick(date: Date): void {
-        if (this.value) {
-            const oldMonth = DateTime.fromJSDate(this.value).month;
+        const value = this.value();
+        if (value) {
+            const oldMonth = DateTime.fromJSDate(value).month;
             const date1 = DateTime.fromJSDate(date);
-            const newDate = DateTime.fromJSDate(this.value)
+            const newDate = DateTime.fromJSDate(value)
                 .set({ day: date1.day, month: date1.month, year: date1.year })
                 .toJSDate();
-            this.navigatedDate = newDate;
+            this.navigatedDate.set(newDate);
             if (oldMonth !== DateTime.fromJSDate(newDate).month) {
                 this.prepareMonthlyViewDictionary(newDate);
             }
             this.setCurrentDate(newDate);
         } else {
-            this.navigatedDate = date;
+            this.navigatedDate.set(date);
             this.prepareMonthlyViewDictionary(date);
             this.setCurrentDate(date);
         }
     }
 
     public onMonthClick(month: number): void {
-        this.navigatedDate = DateTime.fromJSDate(this.navigatedDate).set({ month }).toJSDate();
-        this.prepareMonthlyViewDictionary(this.navigatedDate);
+        this.navigatedDate.set(DateTime.fromJSDate(this.navigatedDate()).set({ month }).toJSDate());
+        this.prepareMonthlyViewDictionary(this.navigatedDate());
         this.calendarView.set("month");
     }
 
     public onNavigationClick(direction: "prev" | "next"): void {
-        const date = DateTime.fromJSDate(this.navigatedDate);
+        const date = DateTime.fromJSDate(this.navigatedDate());
         let unit: DurationObjectUnits;
 
         switch (this.calendarView()) {
@@ -110,9 +112,9 @@ export class CalendarComponent implements OnInit, ControlValueAccessor {
                 break;
         }
 
-        this.navigatedDate = direction === "prev" ? date.minus(unit).toJSDate() : date.plus(unit).toJSDate();
+        this.navigatedDate.set(direction === "prev" ? date.minus(unit).toJSDate() : date.plus(unit).toJSDate());
         if (this.calendarView() === "month") {
-            this.prepareMonthlyViewDictionary(this.navigatedDate);
+            this.prepareMonthlyViewDictionary(this.navigatedDate());
         } else if (this.calendarView() === "decade") {
             this.prepareDecadeYears();
         }
@@ -126,7 +128,7 @@ export class CalendarComponent implements OnInit, ControlValueAccessor {
     }
 
     public onYearClick(year: number): void {
-        this.navigatedDate = DateTime.fromJSDate(this.navigatedDate).set({ year }).toJSDate();
+        this.navigatedDate.set(DateTime.fromJSDate(this.navigatedDate()).set({ year }).toJSDate());
         this.calendarView.set("year");
     }
 
@@ -141,7 +143,7 @@ export class CalendarComponent implements OnInit, ControlValueAccessor {
     }
 
     public writeValue(date: Date | null | undefined): void {
-        this.#value = date ?? null;
+        this.value.set(date ?? null);
         this.setDateValues();
         if (date) {
             this.prepareMonthlyViewDictionary(date);
@@ -149,7 +151,7 @@ export class CalendarComponent implements OnInit, ControlValueAccessor {
     }
 
     private prepareDecadeYears(): void {
-        const date = DateTime.fromJSDate(this.navigatedDate);
+        const date = DateTime.fromJSDate(this.navigatedDate());
         const year = date.year;
         const decadeStart = year - (year % 10);
         this.decadeYears = Array.from({ length: 10 }, (_, i) => decadeStart + i);
@@ -174,15 +176,11 @@ export class CalendarComponent implements OnInit, ControlValueAccessor {
     }
 
     private setCurrentDate(date: Date | null): void {
-        this.#value = date;
+        this.value.set(date);
         this.#propagateChange?.(date);
     }
 
     private setDateValues(): void {
-        this.navigatedDate = this.value ?? DateTime.now().toJSDate();
-    }
-
-    public get value(): Date | null {
-        return this.#value;
+        this.navigatedDate.set(this.value() ?? DateTime.now().toJSDate());
     }
 }
