@@ -24,7 +24,7 @@ import {
     faSun,
     faTimes
 } from "@fortawesome/free-solid-svg-icons";
-import { Enumerable, ImmutableList, ImmutableSet, IndexableList } from "@mirei/ts-collections";
+import { Enumerable, ImmutableList, ImmutableSet, List } from "@mirei/ts-collections";
 import { DateTime } from "luxon";
 import {
     AutoCompleteComponent,
@@ -510,7 +510,7 @@ export class AppComponent implements OnInit {
         // { field: "EmployeeID", title: "Employee ID", filterType: "number" },
         // { field: "RequiredDate", title: "Required Date", filterType: "date" },
         { field: "ShippedDate", title: "Shipped Date", filterType: "date" },
-        // { field: "ShipVia", title: "Ship Via", filterType: "number" },
+        { field: "ShipVia", title: "Ship Via", filterType: "boolean" },
         { field: "ShipName", title: "Ship Name", filterType: "string" },
         // { field: "ShipAddress", title: "Ship Address", filterType: "string" },
         { field: "ShipCity", title: "Ship City", filterType: "string" },
@@ -555,8 +555,8 @@ export class AppComponent implements OnInit {
         allowUnsort: true,
         showIndices: true
     };
-    public listBox2Items: IndexableList<any> = new IndexableList([] as any[]);
-    public listViewDataItems: IndexableList<any> = new IndexableList();
+    public listBox2Items: List<any> = new List([] as any[]);
+    public listViewDataItems: List<any> = new List();
     public listViewScrollBottomItemCount: number = 20;
     public listViewSelectedKeys: Set<string> = new Set([]);
     public menuBarMenuVisible: boolean = false;
@@ -901,7 +901,7 @@ export class AppComponent implements OnInit {
         for (let vx = 1; vx <= 3000; ++vx) {
             listViewItems.push({ text: `Item ${vx}`, value: vx, group: vx % 3 === 0 ? "Group 1" : "Group 2" });
         }
-        this.listViewDataItems = new IndexableList(listViewItems);
+        this.listViewDataItems = new List(listViewItems);
         this.listViewSelectedKeys = new Set([
             "Item 3",
             "Item 5",
@@ -1535,7 +1535,7 @@ export class AppComponent implements OnInit {
                 OrderDate: new Date(),
                 RequiredDate: new Date(now.setDate(now.getDate() + Math.random() * 30)),
                 ShippedDate: new Date(now.setDate(now.getDate() + Math.random() * 30)),
-                ShipVia: Math.floor(Math.random() * 4),
+                ShipVia: Math.random() > 0.5, //Math.floor(Math.random() * 4),
                 Freight: Math.floor(Math.random() * 100),
                 ShipName: shipNames[randomShipNameIndex],
                 ShipAddress: "Random Street, " + Math.floor(Math.random() * 100),
