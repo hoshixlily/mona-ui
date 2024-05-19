@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from "@angular/core";
-import { Enumerable } from "@mirei/ts-collections";
+import { all, contains } from "@mirei/ts-collections";
 
 @Pipe({
     name: "monaContains",
@@ -11,12 +11,11 @@ export class ContainsPipe implements PipeTransform {
             return false;
         }
         if (typeof value === "string") {
-            return Enumerable.from(sequence).contains(value as any);
+            return contains(sequence, value as any);
         }
         if (Symbol.iterator in Object(value)) {
-            const enumerableSequence = Enumerable.from(sequence);
-            return Enumerable.from(value as Iterable<T>).all(item => enumerableSequence.contains(item));
+            return all(value as Iterable<T>, item => contains(sequence, item));
         }
-        return Enumerable.from(sequence).contains(value as T);
+        return contains(sequence, value as T);
     }
 }

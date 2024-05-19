@@ -13,7 +13,7 @@
                 <button monaButton (click)="onViewChangeClick('decade')">{{navigatedDate()|date:'yyyy':timezone}}</button>
             }
             @case ('decade') {
-                <button monaButton>{{decadeYears[0]}} - {{decadeYears[decadeYears.length-1]}}</button>
+                <button monaButton>{{decadeYears()[0]}} - {{decadeYears()[decadeYears().length-1]}}</button>
             }
         }
     </div>
@@ -39,9 +39,9 @@
             </thead>
             <tbody>
             <tr>
-                @for (entry of monthlyViewDict | monaSlice:0:7; track entry.key) {
+                @for (entry of monthlyViewDict() | monaSlice:0:7; track entry.key) {
                     <td (click)="onDayClick(entry.key)"
-                        [ngClass]="{'mona-calendar-other-month': entry.key|monaDateComparer:monthBounds.start:'<',
+                        [ngClass]="{'mona-calendar-other-month': entry.key|monaDateComparer:monthBounds().start:'<',
                                     'mona-selected':entry.key|monaDateComparer:value():'==',
                                     'mona-disabled': disabled()||(entry.key|monaDateInclude:disabledDates())||(min() !== null && (entry.key|monaDateComparer:min():'<'))||(max() !== null && (entry.key|monaDateComparer:max():'>'))}">
                         <span>{{entry.value}}</span>
@@ -49,7 +49,7 @@
                 }
             </tr>
             <tr>
-                @for (entry of monthlyViewDict | monaSlice:7:14; track entry.key) {
+                @for (entry of monthlyViewDict() | monaSlice:7:14; track entry.key) {
                     <td (click)="onDayClick(entry.key)"
                         [ngClass]="{'mona-selected':entry.key|monaDateComparer:value():'==',
                                     'mona-disabled': disabled()||(entry.key|monaDateInclude:disabledDates())||(min() !== null && (entry.key|monaDateComparer:min():'<'))||(max() !== null && (entry.key|monaDateComparer:max():'>'))}">
@@ -58,7 +58,7 @@
                 }
             </tr>
             <tr>
-                @for (entry of monthlyViewDict | monaSlice:14:21; track entry.key) {
+                @for (entry of monthlyViewDict() | monaSlice:14:21; track entry.key) {
                     <td (click)="onDayClick(entry.key)"
                         [ngClass]="{'mona-selected':entry.key|monaDateComparer:value():'==',
                                     'mona-disabled': disabled()||(entry.key|monaDateInclude:disabledDates())||(min() !== null && (entry.key|monaDateComparer:min():'<'))||(max() !== null && (entry.key|monaDateComparer:max():'>'))}">
@@ -67,7 +67,7 @@
                 }
             </tr>
             <tr>
-                @for (entry of monthlyViewDict | monaSlice:21:28; track entry.key) {
+                @for (entry of monthlyViewDict() | monaSlice:21:28; track entry.key) {
                     <td (click)="onDayClick(entry.key)"
                         [ngClass]="{'mona-selected':entry.key|monaDateComparer:value():'==',
                                     'mona-disabled': disabled()||(entry.key|monaDateInclude:disabledDates())||(min() !== null && (entry.key|monaDateComparer:min():'<'))||(max() !== null && (entry.key|monaDateComparer:max():'>'))}">
@@ -76,9 +76,9 @@
                 }
             </tr>
             <tr>
-                @for (entry of monthlyViewDict | monaSlice:28:35; track entry.key) {
+                @for (entry of monthlyViewDict() | monaSlice:28:35; track entry.key) {
                     <td (click)="onDayClick(entry.key)"
-                        [ngClass]="{'mona-calendar-other-month':entry.key|monaDateComparer:monthBounds.end:'>',
+                        [ngClass]="{'mona-calendar-other-month':entry.key|monaDateComparer:monthBounds().end:'>',
                                     'mona-selected':entry.key|monaDateComparer:value():'==',
                                     'mona-disabled': disabled()||(entry.key|monaDateInclude:disabledDates())||(min() !== null && (entry.key|monaDateComparer:min():'<'))||(max() !== null && (entry.key|monaDateComparer:max():'>'))}">
                         <span>{{entry.value}}</span>
@@ -86,9 +86,9 @@
                 }
             </tr>
             <tr>
-                @for (entry of monthlyViewDict | monaSlice:35:monthlyViewDict.length; track entry.key) {
+                @for (entry of monthlyViewDict() | monaSlice:35:monthlyViewDict().length; track entry.key) {
                     <td (click)="onDayClick(entry.key)"
-                        [ngClass]="{'mona-calendar-other-month': entry.key|monaDateComparer:monthBounds.end:'>',
+                        [ngClass]="{'mona-calendar-other-month': entry.key|monaDateComparer:monthBounds().end:'>',
                                 'mona-selected':entry.key|monaDateComparer:value():'==',
                                 'mona-disabled': disabled()||(entry.key|monaDateInclude:disabledDates())||(min() !== null && (entry.key|monaDateComparer:min():'<'))||(max() !== null && (entry.key|monaDateComparer:max():'>'))}">
                         <span>{{entry.value}}</span>
@@ -127,20 +127,20 @@
     <div class="mona-calendar-decade-view">
         <table class="mona-calendar-decade-view-table">
             <tr>
-                <td (click)="onYearClick(decadeYears[0])">{{decadeYears[0]}}</td>
-                <td (click)="onYearClick(decadeYears[1])">{{decadeYears[1]}}</td>
-                <td (click)="onYearClick(decadeYears[2])">{{decadeYears[2]}}</td>
-                <td (click)="onYearClick(decadeYears[3])">{{decadeYears[3]}}</td>
+                <td (click)="onYearClick(decadeYears()[0])">{{decadeYears()[0]}}</td>
+                <td (click)="onYearClick(decadeYears()[1])">{{decadeYears()[1]}}</td>
+                <td (click)="onYearClick(decadeYears()[2])">{{decadeYears()[2]}}</td>
+                <td (click)="onYearClick(decadeYears()[3])">{{decadeYears()[3]}}</td>
             </tr>
             <tr>
-                <td (click)="onYearClick(decadeYears[4])">{{decadeYears[4]}}</td>
-                <td (click)="onYearClick(decadeYears[5])">{{decadeYears[5]}}</td>
-                <td (click)="onYearClick(decadeYears[6])">{{decadeYears[6]}}</td>
-                <td (click)="onYearClick(decadeYears[7])">{{decadeYears[7]}}</td>
+                <td (click)="onYearClick(decadeYears()[4])">{{decadeYears()[4]}}</td>
+                <td (click)="onYearClick(decadeYears()[5])">{{decadeYears()[5]}}</td>
+                <td (click)="onYearClick(decadeYears()[6])">{{decadeYears()[6]}}</td>
+                <td (click)="onYearClick(decadeYears()[7])">{{decadeYears()[7]}}</td>
             </tr>
             <tr>
-                <td (click)="onYearClick(decadeYears[8])">{{decadeYears[8]}}</td>
-                <td (click)="onYearClick(decadeYears[9])">{{decadeYears[9]}}</td>
+                <td (click)="onYearClick(decadeYears()[8])">{{decadeYears()[8]}}</td>
+                <td (click)="onYearClick(decadeYears()[9])">{{decadeYears()[9]}}</td>
             </tr>
         </table>
     </div>

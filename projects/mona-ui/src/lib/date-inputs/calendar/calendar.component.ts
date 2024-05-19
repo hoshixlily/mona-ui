@@ -46,14 +46,19 @@ import { CalendarView } from "../models/CalendarView";
 export class CalendarComponent implements OnInit, ControlValueAccessor {
     #propagateChange: Action<Date | null> | null = null;
     protected readonly calendarView: WritableSignal<CalendarView> = signal("month");
+    protected readonly decadeYears: WritableSignal<number[]> = signal([]);
+    protected readonly monthBounds: WritableSignal<{ start: Date; end: Date }> = signal({
+        start: new Date(),
+        end: new Date()
+    });
+    protected readonly monthlyViewDict: WritableSignal<Dictionary<Date, number>> = signal(
+        new Dictionary<Date, number>()
+    );
     protected readonly navigatedDate: WritableSignal<Date> = signal(new Date());
     protected readonly nextMonthIcon: IconDefinition = faChevronRight;
     protected readonly prevMonthIcon: IconDefinition = faChevronLeft;
     protected readonly timezone = DateTime.local().zoneName ?? undefined;
     protected readonly value: WritableSignal<Date | null> = signal<Date | null>(null);
-    protected decadeYears: number[] = [];
-    protected monthBounds: { start: Date; end: Date } = { start: new Date(), end: new Date() };
-    protected monthlyViewDict: Dictionary<Date, number> = new Dictionary<Date, number>();
 
     public disabled: ModelSignal<boolean> = model(false);
     public disabledDates: InputSignalWithTransform<Date[], Iterable<Date>> = input([], {
@@ -61,7 +66,6 @@ export class CalendarComponent implements OnInit, ControlValueAccessor {
     });
     public max: InputSignal<Date | null> = input<Date | null>(null);
     public min: InputSignal<Date | null> = input<Date | null>(null);
-    // public navigatedDate: Date = new Date();
 
     public ngOnInit(): void {
         this.setDateValues();
@@ -154,7 +158,8 @@ export class CalendarComponent implements OnInit, ControlValueAccessor {
         const date = DateTime.fromJSDate(this.navigatedDate());
         const year = date.year;
         const decadeStart = year - (year % 10);
-        this.decadeYears = Array.from({ length: 10 }, (_, i) => decadeStart + i);
+        const yearList = Array.from({ length: 10 }, (_, i) => decadeStart + i);
+        this.decadeYears.set(yearList);
     }
 
     private prepareMonthlyViewDictionary(day: Date): void {
@@ -171,8 +176,8 @@ export class CalendarComponent implements OnInit, ControlValueAccessor {
                 dictionary.add(lastDayOfMonth.plus({ days: i + 1 }).toJSDate(), i + 1);
             }
         }
-        this.monthlyViewDict = dictionary;
-        this.monthBounds = { start: firstDayOfMonth.toJSDate(), end: lastDayOfMonth.toJSDate() };
+        this.monthlyViewDict.set(dictionary);
+        this.monthBounds.set({ start: firstDayOfMonth.toJSDate(), end: lastDayOfMonth.toJSDate() });
     }
 
     private setCurrentDate(date: Date | null): void {
