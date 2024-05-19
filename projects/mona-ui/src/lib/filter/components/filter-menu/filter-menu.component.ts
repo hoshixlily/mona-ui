@@ -1,12 +1,16 @@
 import {
     ChangeDetectionStrategy,
     Component,
+    computed,
     effect,
     InputSignal,
     model,
-    ModelSignal,
     output,
-    OutputEmitterRef
+    OutputEmitterRef,
+    Signal,
+    signal,
+    untracked,
+    WritableSignal
 } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { ButtonGroupComponent } from "../../../buttons/button-group/button-group.component";
@@ -62,18 +66,22 @@ import { ValuelessOperatorPipe } from "../../pipes/valueless-operator.pipe";
 })
 export class FilterMenuComponent {
     private booleanFilterValues: [boolean | null, boolean | null] = [null, null];
+    protected readonly applyDisabled: Signal<boolean> = computed(() => {
+        if (!this.firstFilterValid()) {
+            return true;
+        }
+        return !!(this.selectedConnectorItem() && !this.secondFilterValid());
+    });
     protected readonly booleanFilterMenuDataItems: FilterMenuDataItem[] = [
         { text: "Is true", value: "eq" },
         { text: "Is false", value: "neq" },
         { text: "Is null", value: "isnull" },
         { text: "Is not null", value: "isnotnull" }
     ];
-
     protected readonly connectorDataItems: FilterMenuConnectorItem[] = [
         { text: "AND", value: "and" },
         { text: "OR", value: "or" }
     ];
-
     protected readonly dateFilterMenuDataItems: FilterMenuDataItem[] = [
         { text: "Is equal to", value: "eq" },
         { text: "Is not equal to", value: "neq" },
@@ -84,7 +92,41 @@ export class FilterMenuComponent {
         { text: "Is null", value: "isnull" },
         { text: "Is not null", value: "isnotnull" }
     ];
-
+    protected readonly dateFilterValues: WritableSignal<[Date | null, Date | null]> = signal([null, null]);
+    protected readonly firstFilterValid: Signal<boolean> = computed(() => {
+        const operator = this.selectedFilterMenuDataItemList()[0]?.value;
+        const type = this.type();
+        const stringFilterValues = this.stringFilterValues();
+        const numberFilterValues = this.numberFilterValues();
+        const dateFilterValues = this.dateFilterValues();
+        if (!operator) {
+            return false;
+        }
+        if (operator === "isnull" || operator === "isnotnull") {
+            return true;
+        }
+        switch (type) {
+            case "string":
+                if (
+                    operator === "isempty" ||
+                    operator === "isnotempty" ||
+                    operator === "isnullorempty" ||
+                    operator === "isnotnullorempty"
+                ) {
+                    return true;
+                }
+                return stringFilterValues[0] !== "";
+            case "number":
+                return numberFilterValues[0] !== null;
+            case "date":
+                return dateFilterValues[0] !== null;
+            case "boolean":
+                return true;
+            default:
+                return false;
+        }
+    });
+    protected readonly numberFilterValues: WritableSignal<[number | null, number | null]> = signal([null, null]);
     // TODO: Add null and empty filter operators
     protected readonly numericFilterMenuDataItems: FilterMenuDataItem[] = [
         { text: "Is equal to", value: "eq" },
@@ -96,7 +138,44 @@ export class FilterMenuComponent {
         { text: "Is null", value: "isnull" },
         { text: "Is not null", value: "isnotnull" }
     ];
-
+    protected readonly secondFilterValid: Signal<boolean> = computed(() => {
+        const operator = this.selectedFilterMenuDataItemList()[1]?.value;
+        const type = this.type();
+        const stringFilterValues = this.stringFilterValues();
+        const numberFilterValues = this.numberFilterValues();
+        const dateFilterValues = this.dateFilterValues();
+        if (!operator) {
+            return false;
+        }
+        if (operator === "isnull" || operator === "isnotnull") {
+            return true;
+        }
+        switch (type) {
+            case "string":
+                if (
+                    operator === "isempty" ||
+                    operator === "isnotempty" ||
+                    operator === "isnullorempty" ||
+                    operator === "isnotnullorempty"
+                ) {
+                    return true;
+                }
+                return stringFilterValues[1] !== "";
+            case "number":
+                return numberFilterValues[1] !== null;
+            case "date":
+                return dateFilterValues[1] !== null;
+            case "boolean":
+                return true;
+            default:
+                return false;
+        }
+    });
+    protected readonly selectedConnectorItem: WritableSignal<FilterMenuConnectorItem | null> = signal(null);
+    protected readonly selectedFilterMenuDataItemList: WritableSignal<Array<FilterMenuDataItem | undefined>> = signal([
+        undefined,
+        undefined
+    ]);
     protected readonly stringFilterMenuDataItems: FilterMenuDataItem[] = [
         { text: "Contains", value: "contains" },
         { text: "Does not contain", value: "doesnotcontain" },
@@ -111,12 +190,7 @@ export class FilterMenuComponent {
         { text: "Is null or empty", value: "isnullorempty" },
         { text: "Is not null or empty", value: "isnotnullorempty" }
     ];
-
-    protected dateFilterValues: [Date | null, Date | null] = [null, null];
-    protected numberFilterValues: [number | null, number | null] = [null, null];
-    protected selectedConnectorItem: FilterMenuConnectorItem | null = null;
-    protected selectedFilterMenuDataItemList: Array<FilterMenuDataItem | undefined> = [undefined, undefined];
-    protected stringFilterValues: [string, string] = ["", ""];
+    protected readonly stringFilterValues: WritableSignal<[string, string]> = signal(["", ""]);
 
     public readonly apply: OutputEmitterRef<CompositeFilterDescriptor> = output();
 
@@ -124,25 +198,27 @@ export class FilterMenuComponent {
         format: "dd/MM/yyyy",
         type: "date"
     });
-    public field: ModelSignal<string> = model("");
-    public operators: InputSignal<Iterable<FilterOperators>> = model<Iterable<FilterOperators>>([]);
-    public type: ModelSignal<DataType> = model<DataType>("string");
+    public field = model("");
+    public operators = model<Iterable<FilterOperators>>([]);
+    public type = model<DataType>("string");
     public value = model<FilterMenuValue>();
 
     public constructor() {
         effect(() => {
             const value = this.value();
             if (value) {
-                this.setFilterValues(value);
+                untracked(() => {
+                    this.setFilterValues(value);
+                });
             }
         });
     }
 
     public onConnectorChange(item: FilterMenuConnectorItem): void {
-        if (item.value === this.selectedConnectorItem?.value) {
-            this.selectedConnectorItem = null;
+        if (item.value === this.selectedConnectorItem()?.value) {
+            this.selectedConnectorItem.set(null);
         } else {
-            this.selectedConnectorItem = item;
+            this.selectedConnectorItem.set(item);
         }
     }
 
@@ -245,12 +321,12 @@ export class FilterMenuComponent {
     }
 
     public onFilterClear(): void {
-        this.numberFilterValues = [null, null];
-        this.stringFilterValues = ["", ""];
-        this.dateFilterValues = [null, null];
+        this.numberFilterValues.set([null, null]);
+        this.stringFilterValues.set(["", ""]);
+        this.dateFilterValues.set([null, null]);
         this.booleanFilterValues = [null, null];
-        this.selectedFilterMenuDataItemList = [undefined, undefined];
-        this.selectedConnectorItem = null;
+        this.selectedFilterMenuDataItemList.set([undefined, undefined]);
+        this.selectedConnectorItem.set(null);
         this.apply.emit({
             logic: "and",
             filters: []
@@ -258,28 +334,31 @@ export class FilterMenuComponent {
     }
 
     public onFilterOperatorChange(index: number, item: FilterMenuDataItem): void {
-        this.selectedFilterMenuDataItemList[index] = item;
+        this.selectedFilterMenuDataItemList.update(list => {
+            list[index] = item;
+            return [...list];
+        });
     }
 
     public getFilterValues(): FilterMenuValue {
         type TargetType = string | number | Date | boolean | null;
         const filterValue = (target: [TargetType, TargetType]) => {
             return {
-                operator1: this.selectedFilterMenuDataItemList[0]?.value,
+                operator1: this.selectedFilterMenuDataItemList()[0]?.value,
                 value1: target[0],
-                logic: this.selectedConnectorItem?.value,
-                operator2: this.selectedFilterMenuDataItemList[1]?.value,
+                logic: this.selectedConnectorItem()?.value,
+                operator2: this.selectedFilterMenuDataItemList()[1]?.value,
                 value2: target[1]
             };
         };
 
         switch (this.type()) {
             case "string":
-                return filterValue(this.stringFilterValues);
+                return filterValue(this.stringFilterValues());
             case "number":
-                return filterValue(this.numberFilterValues);
+                return filterValue(this.numberFilterValues());
             case "date":
-                return filterValue(this.dateFilterValues);
+                return filterValue(this.dateFilterValues());
             case "boolean":
                 return filterValue(this.booleanFilterValues);
             default:
@@ -294,8 +373,8 @@ export class FilterMenuComponent {
     }
 
     private applyBooleanFilters(): void {
-        const operator1 = this.selectedFilterMenuDataItemList[0]?.value as BooleanFilterOperators;
-        const operator2 = this.selectedFilterMenuDataItemList[1]?.value as BooleanFilterOperators;
+        const operator1 = this.selectedFilterMenuDataItemList()[0]?.value as BooleanFilterOperators;
+        const operator2 = this.selectedFilterMenuDataItemList()[1]?.value as BooleanFilterOperators;
         const booleanDescriptors: BooleanFilterDescriptor[] = [];
 
         const descriptor1 = this.getBooleanDescriptor(operator1);
@@ -303,7 +382,7 @@ export class FilterMenuComponent {
             booleanDescriptors.push(descriptor1);
         }
 
-        if (this.selectedConnectorItem) {
+        if (this.selectedConnectorItem()) {
             const descriptor2 = this.getBooleanDescriptor(operator2);
             if (descriptor2 != null) {
                 booleanDescriptors.push(descriptor2);
@@ -311,7 +390,7 @@ export class FilterMenuComponent {
         }
 
         const descriptor: CompositeFilterDescriptor = {
-            logic: this.selectedConnectorItem?.value ?? "and",
+            logic: this.selectedConnectorItem()?.value ?? "and",
             filters: booleanDescriptors
         };
 
@@ -319,10 +398,10 @@ export class FilterMenuComponent {
     }
 
     private applyDateFilters(): void {
-        const value1 = this.dateFilterValues[0];
-        const value2 = this.dateFilterValues[1];
-        const operator1 = this.selectedFilterMenuDataItemList[0]?.value as DateFilterOperators;
-        const operator2 = this.selectedFilterMenuDataItemList[1]?.value as DateFilterOperators;
+        const value1 = this.dateFilterValues()[0];
+        const value2 = this.dateFilterValues()[1];
+        const operator1 = this.selectedFilterMenuDataItemList()[0]?.value as DateFilterOperators;
+        const operator2 = this.selectedFilterMenuDataItemList()[1]?.value as DateFilterOperators;
         const dateDescriptors: DateFilterDescriptor[] = [];
 
         const descriptor1 = this.getDateDescriptor(operator1, value1);
@@ -330,7 +409,7 @@ export class FilterMenuComponent {
             dateDescriptors.push(descriptor1);
         }
 
-        if (this.selectedConnectorItem) {
+        if (this.selectedConnectorItem()) {
             const descriptor2 = this.getDateDescriptor(operator2, value2);
             if (descriptor2 != null) {
                 dateDescriptors.push(descriptor2);
@@ -338,7 +417,7 @@ export class FilterMenuComponent {
         }
 
         const descriptor: CompositeFilterDescriptor = {
-            logic: this.selectedConnectorItem?.value ?? "and",
+            logic: this.selectedConnectorItem()?.value ?? "and",
             filters: dateDescriptors
         };
 
@@ -346,10 +425,10 @@ export class FilterMenuComponent {
     }
 
     private applyNumberFilters(): void {
-        const value1 = this.numberFilterValues[0];
-        const value2 = this.numberFilterValues[1];
-        const operator1 = this.selectedFilterMenuDataItemList[0]?.value as NumericFilterOperators;
-        const operator2 = this.selectedFilterMenuDataItemList[1]?.value as NumericFilterOperators;
+        const value1 = this.numberFilterValues()[0];
+        const value2 = this.numberFilterValues()[1];
+        const operator1 = this.selectedFilterMenuDataItemList()[0]?.value as NumericFilterOperators;
+        const operator2 = this.selectedFilterMenuDataItemList()[1]?.value as NumericFilterOperators;
         const numberDescriptors: NumericFilterDescriptor[] = [];
 
         const descriptor1 = this.getNumberDescriptor(operator1, value1);
@@ -357,7 +436,7 @@ export class FilterMenuComponent {
             numberDescriptors.push(descriptor1);
         }
 
-        if (this.selectedConnectorItem) {
+        if (this.selectedConnectorItem()) {
             const descriptor2 = this.getNumberDescriptor(operator2, value2);
             if (descriptor2 != null) {
                 numberDescriptors.push(descriptor2);
@@ -365,7 +444,7 @@ export class FilterMenuComponent {
         }
 
         const descriptor: CompositeFilterDescriptor = {
-            logic: this.selectedConnectorItem?.value ?? "and",
+            logic: this.selectedConnectorItem()?.value ?? "and",
             filters: numberDescriptors
         };
 
@@ -373,10 +452,10 @@ export class FilterMenuComponent {
     }
 
     private applyStringFilters(): void {
-        const value1 = this.stringFilterValues[0];
-        const value2 = this.stringFilterValues[1];
-        const operator1 = this.selectedFilterMenuDataItemList[0]?.value as StringFilterOperators;
-        const operator2 = this.selectedFilterMenuDataItemList[1]?.value as StringFilterOperators;
+        const value1 = this.stringFilterValues()[0];
+        const value2 = this.stringFilterValues()[1];
+        const operator1 = this.selectedFilterMenuDataItemList()[0]?.value as StringFilterOperators;
+        const operator2 = this.selectedFilterMenuDataItemList()[1]?.value as StringFilterOperators;
         const stringDescriptors: StringFilterDescriptor[] = [];
 
         const descriptor1 = this.getStringDescriptor(operator1, value1);
@@ -384,7 +463,7 @@ export class FilterMenuComponent {
             stringDescriptors.push(descriptor1);
         }
 
-        if (this.selectedConnectorItem) {
+        if (this.selectedConnectorItem()) {
             const descriptor2 = this.getStringDescriptor(operator2, value2);
             if (descriptor2 != null) {
                 stringDescriptors.push(descriptor2);
@@ -392,7 +471,7 @@ export class FilterMenuComponent {
         }
 
         const descriptor: CompositeFilterDescriptor = {
-            logic: this.selectedConnectorItem?.value ?? "and",
+            logic: this.selectedConnectorItem()?.value ?? "and",
             filters: stringDescriptors
         };
 
@@ -400,16 +479,16 @@ export class FilterMenuComponent {
     }
 
     private clearSecondFilterValues(): void {
-        this.selectedFilterMenuDataItemList[1] = undefined;
+        this.selectedFilterMenuDataItemList.set([this.selectedFilterMenuDataItemList()[0], undefined]);
         switch (this.type()) {
             case "string":
-                this.stringFilterValues[1] = "";
+                this.stringFilterValues.set([this.stringFilterValues()[0], ""]);
                 break;
             case "number":
-                this.numberFilterValues[1] = null;
+                this.numberFilterValues.set([this.numberFilterValues()[0], null]);
                 break;
             case "date":
-                this.dateFilterValues[1] = null;
+                this.dateFilterValues.set([this.dateFilterValues()[0], null]);
                 break;
             case "boolean":
                 this.booleanFilterValues[1] = null;
@@ -445,22 +524,22 @@ export class FilterMenuComponent {
                 break;
         }
 
-        this.selectedFilterMenuDataItemList = [
+        this.selectedFilterMenuDataItemList.set([
             filterMenuDataItems.find(f => f.value === values.operator1) ?? undefined,
             filterMenuDataItems.find(f => f.value === values.operator2) ?? undefined
-        ];
+        ]);
 
         switch (this.type()) {
             case "string":
-                this.stringFilterValues = filterValues as [string, string];
+                this.stringFilterValues.set(filterValues as [string, string]);
                 break;
             case "number":
-                this.numberFilterValues = filterValues as [number, number];
+                this.numberFilterValues.set(filterValues as [number, number]);
                 break;
             case "date":
             case "boolean":
                 if (this.type() === "date") {
-                    this.dateFilterValues = filterValues as [Date, Date];
+                    this.dateFilterValues.set(filterValues as [Date, Date]);
                 } else {
                     this.booleanFilterValues = filterValues as [boolean, boolean];
                 }
@@ -469,72 +548,9 @@ export class FilterMenuComponent {
                 break;
         }
 
-        this.selectedConnectorItem = filterValues[1]
+        const selectedConnectorItem = filterValues[1]
             ? this.connectorDataItems.find(c => c.value === values.logic) ?? null
             : null;
-    }
-
-    public get applyDisabled(): boolean {
-        return !this.firstFilterValid || (!!this.selectedConnectorItem && !this.secondFilterValid);
-    }
-
-    public get firstFilterValid(): boolean {
-        const operator = this.selectedFilterMenuDataItemList[0]?.value;
-        if (!operator) {
-            return false;
-        }
-        if (operator === "isnull" || operator === "isnotnull") {
-            return true;
-        }
-        switch (this.type()) {
-            case "string":
-                if (
-                    operator === "isempty" ||
-                    operator === "isnotempty" ||
-                    operator === "isnullorempty" ||
-                    operator === "isnotnullorempty"
-                ) {
-                    return true;
-                }
-                return this.stringFilterValues[0] !== "";
-            case "number":
-                return this.numberFilterValues[0] !== null;
-            case "date":
-                return this.dateFilterValues[0] !== null;
-            case "boolean":
-                return true;
-            default:
-                return false;
-        }
-    }
-
-    public get secondFilterValid(): boolean {
-        const operator = this.selectedFilterMenuDataItemList[1]?.value;
-        if (!operator) {
-            return false;
-        }
-        if (operator === "isnull" || operator === "isnotnull") {
-            return true;
-        }
-        switch (this.type()) {
-            case "string":
-                if (
-                    operator === "isempty" ||
-                    operator === "isnotempty" ||
-                    operator === "isnullorempty" ||
-                    operator === "isnotnullorempty"
-                ) {
-                    return true;
-                }
-                return this.stringFilterValues[1] !== "";
-            case "number":
-                return this.numberFilterValues[1] !== null;
-            case "date":
-                return this.dateFilterValues[1] !== null;
-            case "boolean":
-                return true;
-            default:
-                return false;
-        }
+        this.selectedConnectorItem.set(selectedConnectorItem);
     }
 }
