@@ -35,7 +35,7 @@ import { PagerComponent } from "../../../pager/components/pager/pager.component"
 import { PageChangeEvent } from "../../../pager/models/PageChangeEvent";
 import { PageSizeChangeEvent } from "../../../pager/models/PageSizeChangeEvent";
 import { CompositeFilterDescriptor } from "../../../query/filter/FilterDescriptor";
-import { SortDescriptor } from "../../../query/sort/SortDescriptor";
+import { SortDescriptor, SortDirection } from "../../../query/sort/SortDescriptor";
 import { GridColumnResizeHandlerDirective } from "../../directives/grid-column-resize-handler.directive";
 import { CellEditEvent } from "../../models/CellEditEvent";
 import { Column } from "../../models/Column";
@@ -269,7 +269,7 @@ export class GridComponent implements OnInit {
         this.gridService.pageState.take.set(data.newPageSize);
     }
 
-    private applyColumnSort(column: Column, sortDirection: "asc" | "desc" | null): void {
+    private applyColumnSort(column: Column, sortDirection: SortDirection | null): void {
         column.sortDirection.set(sortDirection);
         if (this.gridService.sortableOptions.mode === "single") {
             this.gridService
@@ -284,7 +284,7 @@ export class GridComponent implements OnInit {
         if (column.sortDirection() != null) {
             const sortDescriptor: SortDescriptor = {
                 field: column.field(),
-                dir: column.sortDirection() as "asc" | "desc"
+                dir: column.sortDirection() as SortDirection
             };
             this.gridService.appliedSorts.update(dict => dict.put(column.field(), { sort: sortDescriptor }));
         } else {

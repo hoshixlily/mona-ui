@@ -1,16 +1,6 @@
-import {
-    computed,
-    EventEmitter,
-    Injectable,
-    output,
-    OutputEmitterRef,
-    Signal,
-    signal,
-    WritableSignal
-} from "@angular/core";
-import { toObservable } from "@angular/core/rxjs-interop";
+import { computed, Injectable, output, OutputEmitterRef, Signal, signal, WritableSignal } from "@angular/core";
 import { from, IEnumerable, ImmutableList, ImmutableSet, Predicate, Selector } from "@mirei/ts-collections";
-import { Observable, ReplaySubject, Subject } from "rxjs";
+import { ReplaySubject, Subject } from "rxjs";
 import { FilterChangeEvent } from "../../filter-input/models/FilterChangeEvent";
 import { FilterableOptions } from "../../models/FilterableOptions";
 import { GroupableOptions } from "../models/GroupableOptions";
@@ -334,6 +324,18 @@ export class ListService<TData> {
         return valueField(dataItem);
     }
 
+    private getOrderKey(item: ListItem<TData>): any | null {
+        const orderBy = this.groupableOptions().orderBy;
+        if (orderBy) {
+            if (typeof orderBy === "string") {
+                return (item.data as any)[orderBy];
+            } else {
+                return orderBy(item.data);
+            }
+        }
+        return null;
+    }
+
     private getPreviousItemForNavigation(
         viewItems: ImmutableSet<ListItem<TData>>,
         navigationItem: ListItem<TData>
@@ -348,18 +350,6 @@ export class ListService<TData> {
             }
         }
         return prevItem;
-    }
-
-    private getOrderKey(item: ListItem<TData>): any | null {
-        const orderBy = this.groupableOptions().orderBy;
-        if (orderBy) {
-            if (typeof orderBy === "string") {
-                return (item.data as any)[orderBy];
-            } else {
-                return orderBy(item.data);
-            }
-        }
-        return null;
     }
 
     private getSelectionKey(item: ListItem<TData>): any | null {

@@ -8,7 +8,7 @@ export interface IQuery<T> extends Iterable<T> {
 
     run(): T[];
 
-    sort<R>(descriptor: SortDescriptor[], fieldSelector?: Selector<T, R>): IQuery<T>;
+    sort<R>(descriptor: SortDescriptor<T>[], fieldSelector?: Selector<T, R>): IQuery<T>;
 }
 
 export class Query<T> implements IQuery<T> {
@@ -34,7 +34,7 @@ export class Query<T> implements IQuery<T> {
         return this.enumerator.toArray();
     }
 
-    public sort<R>(descriptor: SortDescriptor[], fieldSelector?: Selector<T, R>): IQuery<T> {
+    public sort<R>(descriptor: SortDescriptor<T>[], fieldSelector?: Selector<T, R>): IQuery<T> {
         return this.enumerator.sort(descriptor, fieldSelector);
     }
 }
@@ -52,7 +52,7 @@ export class QueryEnumerator<T> extends Enumerator<T> implements IQuery<T> {
         return Array.from(this);
     }
 
-    public sort<R>(descriptor: SortDescriptor[], fieldSelector?: Selector<T, R>): IQuery<T> {
+    public sort<R>(descriptor: SortDescriptor<T>[], fieldSelector?: Selector<T, R>): IQuery<T> {
         return new QueryEnumerator(() => this.sortGenerator(descriptor, fieldSelector));
     }
 
@@ -66,7 +66,7 @@ export class QueryEnumerator<T> extends Enumerator<T> implements IQuery<T> {
         yield* this.where(predicate);
     }
 
-    private *sortGenerator<R>(descriptor: SortDescriptor[], fieldSelector?: Selector<T, R>): Iterable<T> {
+    private *sortGenerator<R>(descriptor: SortDescriptor<T>[], fieldSelector?: Selector<T, R>): Iterable<T> {
         let result =
             descriptor[0].dir === "asc"
                 ? this.orderBy(
