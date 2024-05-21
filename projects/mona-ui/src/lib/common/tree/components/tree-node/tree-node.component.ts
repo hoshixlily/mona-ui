@@ -59,6 +59,7 @@ export class TreeNodeComponent<T> implements OnInit {
         const node = this.node();
         const expandableOptions = this.treeService.expandableOptions();
         const childrenSelector = this.treeService.children();
+        const children = node?.children() ?? [];
         if (node === null) {
             return false;
         }
@@ -68,7 +69,7 @@ export class TreeNodeComponent<T> implements OnInit {
         if (typeof childrenSelector === "function") {
             return this.treeService.hasChildren(node);
         }
-        return node.children().length > 0;
+        return children.length > 0;
     });
     public readonly expanded: Signal<boolean> = computed(() => {
         const node = this.node();

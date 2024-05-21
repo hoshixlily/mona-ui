@@ -24,6 +24,17 @@ export class TreeNode<T> {
         return node;
     }
 
+    public isDescendantOf(node: TreeNode<T>): boolean {
+        let parent = this.parent;
+        while (parent != null) {
+            if (parent === node) {
+                return true;
+            }
+            parent = parent.parent;
+        }
+        return false;
+    }
+
     public get nodeItem(): NodeItem<T> {
         return {
             data: this.data,

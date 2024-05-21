@@ -54,13 +54,21 @@
                     <div class="mona-tree-node-dragging">
                     <span>
                         @if ((treeService.dropPositionChange$|async)?.position === 'before') {
-                            <fa-icon [icon]="dropBeforeIcon"></fa-icon>
+                            @if ((treeService.nodeDrag$|async)?.dropAllowed) {
+                                <fa-icon [icon]="dropBeforeIcon"></fa-icon>
+                            } @else {
+                                <fa-icon [icon]="dropNotAllowedIcon"></fa-icon>
+                            }
                         } @else if ((treeService.dropPositionChange$|async)?.position === 'after') {
-                            <fa-icon [icon]="dropAfterIcon"></fa-icon>
+                            @if ((treeService.nodeDrag$|async)?.dropAllowed) {
+                                <fa-icon [icon]="dropAfterIcon"></fa-icon>
+                            } @else {
+                                <fa-icon [icon]="dropNotAllowedIcon"></fa-icon>
+                            }
                         } @else if ((treeService.dropPositionChange$|async)?.position === 'inside') {
                             <fa-icon [icon]="dropInsideIcon"></fa-icon>
                         } @else {
-                            <fa-icon [icon]="dropNotAllowIcon"></fa-icon>
+                            <fa-icon [icon]="dropNotAllowedIcon"></fa-icon>
                         }
                     </span>
                         <span>{{nodeComponent.nodeText()}}</span>

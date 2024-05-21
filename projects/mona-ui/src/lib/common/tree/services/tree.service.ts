@@ -46,7 +46,7 @@ import { ExpandableOptions } from "../models/ExpandableOptions";
 import { NodeCheckEvent } from "../models/NodeCheckEvent";
 import { NodeClickEvent } from "../models/NodeClickEvent";
 import { NodeDragEndEvent } from "../models/NodeDragEndEvent";
-import { NodeDragEvent } from "../models/NodeDragEvent";
+import { InternalNodeDragEvent, NodeDragEvent } from "../models/NodeDragEvent";
 import { NodeDragStartEvent } from "../models/NodeDragStartEvent";
 import { NodeDropEvent } from "../models/NodeDropEvent";
 import { NodeItem } from "../models/NodeItem";
@@ -129,7 +129,7 @@ export class TreeService<T> {
     public readonly nodeCheck$: Subject<NodeCheckEvent<T>> = new Subject();
     public readonly nodeCheckChange$: Subject<TreeNodeCheckEvent<T>> = new Subject();
     public readonly nodeClick$: Subject<NodeClickEvent<T>> = new Subject();
-    public readonly nodeDrag$: Subject<NodeDragEvent<T>> = new Subject();
+    public readonly nodeDrag$: Subject<InternalNodeDragEvent<T>> = new Subject();
     public readonly nodeDragEnd$: Subject<NodeDragEndEvent<T>> = new Subject();
     public readonly nodeDragStart$: Subject<NodeDragStartEvent<T>> = new Subject();
     public readonly nodeDrop$: Subject<NodeDropEvent<T>> = new Subject();
@@ -594,6 +594,39 @@ export class TreeService<T> {
         this.textField.set(selector);
     }
 
+    public getCheckKey(node: TreeNode<T>): any {
+        const checkBy = this.checkBy();
+        if (!checkBy) {
+            return node.data;
+        }
+        if (typeof checkBy === "string") {
+            return (node.data as any)[checkBy];
+        }
+        return checkBy(node.data);
+    }
+
+    public getDisableKey(node: TreeNode<T>): any {
+        const disableBy = this.disableBy();
+        if (!disableBy) {
+            return node.data;
+        }
+        if (typeof disableBy === "string") {
+            return (node.data as any)[disableBy];
+        }
+        return disableBy(node.data);
+    }
+
+    public setNodeExpandSubscription(): void {
+        this.expandedKeys$.pipe(pairwise(), takeUntilDestroyed(this.#destroyRef)).subscribe(([oldKeys, keys]) => {
+            const orderedOldKeys = oldKeys.orderBy(k => k);
+            const orderedKeys = keys.orderBy(k => k);
+            if (sequenceEqual(orderedOldKeys, orderedKeys)) {
+                return;
+            }
+            this.expandedKeysChange.emit(keys.toArray());
+        });
+    }
+
     private createFlatNodes(data: Iterable<T>, parentId: string | null): ImmutableList<TreeNode<T>> {
         const flatIdField = this.flatIdField();
         const flatParentIdField = this.flatParentIdField();
@@ -679,39 +712,6 @@ export class TreeService<T> {
             );
         });
         return nodeList.toImmutableSet();
-    }
-
-    public getCheckKey(node: TreeNode<T>): any {
-        const checkBy = this.checkBy();
-        if (!checkBy) {
-            return node.data;
-        }
-        if (typeof checkBy === "string") {
-            return (node.data as any)[checkBy];
-        }
-        return checkBy(node.data);
-    }
-
-    public getDisableKey(node: TreeNode<T>): any {
-        const disableBy = this.disableBy();
-        if (!disableBy) {
-            return node.data;
-        }
-        if (typeof disableBy === "string") {
-            return (node.data as any)[disableBy];
-        }
-        return disableBy(node.data);
-    }
-
-    public setNodeExpandSubscription(): void {
-        this.expandedKeys$.pipe(pairwise(), takeUntilDestroyed(this.#destroyRef)).subscribe(([oldKeys, keys]) => {
-            const orderedOldKeys = oldKeys.orderBy(k => k);
-            const orderedKeys = keys.orderBy(k => k);
-            if (sequenceEqual(orderedOldKeys, orderedKeys)) {
-                return;
-            }
-            this.expandedKeysChange.emit(keys.toArray());
-        });
     }
 
     private getExpandKey(node: TreeNode<T>): any {
@@ -920,7 +920,7 @@ export class TreeService<T> {
     }
 
     private updateNodeIndices(): void {
-        const updateRecursively = (nodes: Iterable<TreeNode<T>>, parent: TreeNode<T> | null) => {
+        const updateRecursively = (nodes: Iterable<TreeNode<T>>, parent: TreeNode<T> | null): void => {
             let index = 0;
             for (const node of nodes) {
                 node.index = parent == null ? String(index++) : `${parent.index}.${index++}`;

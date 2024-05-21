@@ -16,7 +16,7 @@ export * from "./common/filter-input/models/FilterChangeEvent";
 export * from "./common/tree/models/DisableOptions";
 export * from "./common/tree/models/NodeCheckEvent";
 export * from "./common/tree/models/NodeClickEvent";
-export * from "./common/tree/models/NodeDragEvent";
+export { NodeDragEvent } from "./common/tree/models/NodeDragEvent";
 export * from "./common/tree/models/NodeDragEndEvent";
 export * from "./common/tree/models/NodeDragStartEvent";
 export * from "./common/tree/models/NodeDropEvent";

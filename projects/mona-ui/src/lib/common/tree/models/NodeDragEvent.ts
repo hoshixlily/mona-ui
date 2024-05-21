@@ -28,3 +28,21 @@ export class NodeDragEvent<T> {
         return this.#type;
     }
 }
+
+export class InternalNodeDragEvent<T> {
+    readonly #dragEvent: NodeDragEvent<T>;
+    readonly #dropAllowed: boolean;
+
+    public constructor(dragEvent: NodeDragEvent<T>, dropAllowed: boolean) {
+        this.#dragEvent = dragEvent;
+        this.#dropAllowed = dropAllowed;
+    }
+
+    public get dragEvent(): NodeDragEvent<T> {
+        return this.#dragEvent;
+    }
+
+    public get dropAllowed(): boolean {
+        return this.#dropAllowed;
+    }
+}

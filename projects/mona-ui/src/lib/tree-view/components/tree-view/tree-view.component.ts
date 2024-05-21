@@ -80,12 +80,12 @@ export class TreeViewComponent<T> {
      * - "hierarchical": The tree is a hierarchical structure.
      *
      * If the data structure is set to "flat", the following fields are required:
-     * - idField {@link idField}
-     * - parentIdField {@link parentIdField}
+     * - {@link idField}
+     * - {@link parentIdField}
      *
      * If the data structure is set to "hierarchical", the following fields are required:
-     * - children {@link children}
-     * - hasChildren {@link hasChildren}
+     * - {@link children}
+     * - {@link hasChildren}
      */
     public mode: InputSignal<DataStructure> = input<DataStructure>("hierarchical");
 
@@ -129,8 +129,7 @@ export class TreeViewComponent<T> {
             const mode = this.mode();
             if (mode === "flat") {
                 this.setFlatDataStructureFields();
-            }
-            if (mode === "hierarchical") {
+            } else if (mode === "hierarchical") {
                 this.setHierarchicalDataStructureFields();
             }
             this.setGenericDataStructureFields(mode);

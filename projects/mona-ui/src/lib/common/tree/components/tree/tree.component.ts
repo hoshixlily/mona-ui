@@ -1,6 +1,6 @@
 import { transition, trigger } from "@angular/animations";
 import { FocusMonitor } from "@angular/cdk/a11y";
-import { NgStyle, NgTemplateOutlet } from "@angular/common";
+import { AsyncPipe, NgStyle, NgTemplateOutlet } from "@angular/common";
 import {
     ChangeDetectionStrategy,
     Component,
@@ -35,7 +35,7 @@ import { TreeNodeComponent } from "../tree-node/tree-node.component";
 @Component({
     selector: "mona-tree",
     standalone: true,
-    imports: [SubTreeComponent, TreeNodeComponent, NgTemplateOutlet, NgStyle, TreeDropHintComponent],
+    imports: [SubTreeComponent, TreeNodeComponent, NgTemplateOutlet, NgStyle, TreeDropHintComponent, AsyncPipe],
     templateUrl: "./tree.component.html",
     styleUrl: "./tree.component.scss",
     changeDetection: ChangeDetectionStrategy.OnPush,
@@ -250,7 +250,7 @@ export class TreeComponent<T> implements OnInit {
     private setNodeDragSubscription(): void {
         this.treeService.nodeDrag$
             .pipe(takeUntilDestroyed(this.#destroyRef))
-            .subscribe(event => this.nodeDrag.emit(event));
+            .subscribe(event => this.nodeDrag.emit(event.dragEvent));
     }
 
     private setNodeDragEndSubscription(): void {

@@ -26,7 +26,7 @@ import { ImmutableSet } from "@mirei/ts-collections";
 import { take } from "rxjs";
 import { CheckBoxDirective } from "../../../../inputs/check-box/directives/check-box.directive";
 import { NodeDragEndEvent } from "../../models/NodeDragEndEvent";
-import { NodeDragEvent } from "../../models/NodeDragEvent";
+import { InternalNodeDragEvent, NodeDragEvent } from "../../models/NodeDragEvent";
 import { NodeDragStartEvent } from "../../models/NodeDragStartEvent";
 import { NodeDropEvent } from "../../models/NodeDropEvent";
 import { TreeNode } from "../../models/TreeNode";
@@ -65,7 +65,7 @@ export class SubTreeComponent<T> {
     protected readonly dropAfterIcon: IconDefinition = faArrowDown;
     protected readonly dropBeforeIcon: IconDefinition = faArrowUp;
     protected readonly dropInsideIcon: IconDefinition = faPlus;
-    protected readonly dropNotAllowIcon: IconDefinition = faBan;
+    protected readonly dropNotAllowedIcon: IconDefinition = faBan;
     protected readonly expandedIcon: IconDefinition = faCaretDown;
     protected readonly loadingIcon: IconDefinition = faArrowsRotate;
     protected readonly treeService: TreeService<T> = inject(TreeService);
@@ -105,7 +105,13 @@ export class SubTreeComponent<T> {
                 return;
             }
             const nodeDragEvent = new NodeDragEvent(node, e.targetNode, event.event);
-            this.treeService.nodeDrag$.next(nodeDragEvent);
+            const dropAllowed =
+                e.position !== "outside" &&
+                e.targetNode != null &&
+                e.targetNode !== node &&
+                !e.targetNode.isDescendantOf(node);
+            const internalNodeDragEvent = new InternalNodeDragEvent(nodeDragEvent, dropAllowed);
+            this.treeService.nodeDrag$.next(internalNodeDragEvent);
         });
     }
 
@@ -130,7 +136,12 @@ export class SubTreeComponent<T> {
             }
             const sourceNode = event.item.data;
             const targetNode = e.targetNode;
-            if (sourceNode === targetNode || e.position === "outside" || targetNode == null) {
+            if (
+                targetNode === null ||
+                sourceNode === targetNode ||
+                targetNode.isDescendantOf(sourceNode) ||
+                e.position === "outside"
+            ) {
                 return;
             }
             const nodeDropEvent = new NodeDropEvent(sourceNode, targetNode, e.position, event.event);
@@ -138,12 +149,8 @@ export class SubTreeComponent<T> {
             if (nodeDropEvent.isDefaultPrevented()) {
                 return;
             }
-            if (e.position === "inside") {
-                this.treeService.moveNode(sourceNode, targetNode, "inside");
-            } else if (e.position === "before") {
-                this.treeService.moveNode(sourceNode, targetNode, "before");
-            } else if (e.position === "after") {
-                this.treeService.moveNode(sourceNode, targetNode, "after");
+            if (e.position === "inside" || e.position === "before" || e.position === "after") {
+                this.treeService.moveNode(sourceNode, targetNode, e.position);
             }
             this.treeService.dropPositionChange$.next(null);
             this.focusNode(sourceNode);
