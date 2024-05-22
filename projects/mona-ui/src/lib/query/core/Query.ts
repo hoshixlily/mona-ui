@@ -1,6 +1,6 @@
-import { CompositeFilterDescriptor, FilterDescriptor } from "../filter/FilterDescriptor";
 import { Enumerator, Selector } from "@mirei/ts-collections";
-import { FilterUtils } from "../filter/FilterUtils";
+import { CompositeFilterDescriptor, FilterDescriptor } from "../filter/FilterDescriptor";
+import { compositeDescriptorToPredicate, descriptorToPredicate } from "../filter/FilterUtils";
 import { SortDescriptor } from "../sort/SortDescriptor";
 
 export interface IQuery<T> extends Iterable<T> {
@@ -61,8 +61,8 @@ export class QueryEnumerator<T> extends Enumerator<T> implements IQuery<T> {
         fieldSelector?: Selector<T, R>
     ): Iterable<T> {
         const predicate = filter.hasOwnProperty("field")
-            ? FilterUtils.descriptorToPredicate(filter as FilterDescriptor, fieldSelector)
-            : FilterUtils.compositeDescriptorToPredicate(filter as CompositeFilterDescriptor, fieldSelector);
+            ? descriptorToPredicate(filter as FilterDescriptor, fieldSelector)
+            : compositeDescriptorToPredicate(filter as CompositeFilterDescriptor, fieldSelector);
         yield* this.where(predicate);
     }
 
