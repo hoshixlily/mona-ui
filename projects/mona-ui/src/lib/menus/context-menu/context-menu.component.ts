@@ -6,7 +6,6 @@ import {
     DestroyRef,
     effect,
     ElementRef,
-    EventEmitter,
     inject,
     input,
     InputSignal,
@@ -15,7 +14,6 @@ import {
     ModelSignal,
     OnInit,
     output,
-    Output,
     OutputEmitterRef,
     untracked
 } from "@angular/core";

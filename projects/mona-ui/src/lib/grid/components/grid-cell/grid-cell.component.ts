@@ -245,13 +245,11 @@ export class GridCellComponent implements OnInit {
 
     private handleFocusGain(): void {
         this.focused = true;
-        if (this.#gridService.isInEditMode()) {
-            if (origin !== "mouse") {
-                this.editing.set(true);
-                asyncScheduler.schedule(() => {
-                    this.focusCellInput();
-                });
-            }
+        if (this.#gridService.isInEditMode() && origin !== "mouse") {
+            this.editing.set(true);
+            asyncScheduler.schedule(() => {
+                this.focusCellInput();
+            });
         }
     }
 

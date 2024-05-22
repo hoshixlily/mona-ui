@@ -1,15 +1,6 @@
 import { Highlightable } from "@angular/cdk/a11y";
 import { NgClass, NgTemplateOutlet } from "@angular/common";
-import {
-    ChangeDetectionStrategy,
-    Component,
-    ElementRef,
-    inject,
-    input,
-    Input,
-    InputSignal,
-    OnDestroy
-} from "@angular/core";
+import { ChangeDetectionStrategy, Component, ElementRef, inject, input, InputSignal, OnDestroy } from "@angular/core";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { faChevronRight, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { PopupRef } from "../../popup/models/PopupRef";

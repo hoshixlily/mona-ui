@@ -13,7 +13,7 @@ import {
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { faChevronDown, faChevronRight, IconDefinition } from "@fortawesome/free-solid-svg-icons";
-import { Dictionary, ImmutableList, ImmutableSet, KeyValuePair } from "@mirei/ts-collections";
+import { Dictionary, ImmutableList, ImmutableSet } from "@mirei/ts-collections";
 import { fromEvent, mergeWith } from "rxjs";
 import { ButtonDirective } from "../../../buttons/button/button.directive";
 import { SlicePipe } from "../../../pipes/slice.pipe";
@@ -118,9 +118,7 @@ export class GridListComponent implements OnInit, AfterViewInit {
         if (state == null) {
             this.gridService.gridGroupExpandState.add(
                 groupKey,
-                new Dictionary<number, boolean>([
-                    new KeyValuePair<number, boolean>(this.gridService.pageState.page(), group.collapsed)
-                ])
+                new Dictionary<number, boolean>([[this.gridService.pageState.page(), group.collapsed]])
             );
         } else if (state.containsKey(this.gridService.pageState.page())) {
             const value = state.get(this.gridService.pageState.page());

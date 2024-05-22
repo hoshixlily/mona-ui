@@ -14,9 +14,7 @@ import {
     Signal,
     signal,
     TemplateRef,
-    Type,
     viewChild,
-    ViewChild,
     ViewContainerRef,
     WritableSignal
 } from "@angular/core";
@@ -67,7 +65,7 @@ export class WindowContentComponent implements OnInit, AfterViewInit {
             this.contentType.set("template");
         } else {
             this.contentType.set("component");
-            this.componentRef = createComponent(this.windowData.content as Type<any>, {
+            this.componentRef = createComponent(this.windowData.content, {
                 environmentInjector: this.#appRef.injector,
                 elementInjector: this.#injector
             });
