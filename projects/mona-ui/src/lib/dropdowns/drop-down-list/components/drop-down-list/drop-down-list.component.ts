@@ -13,6 +13,8 @@ import {
     InputSignal,
     model,
     OnInit,
+    output,
+    OutputEmitterRef,
     Signal,
     TemplateRef,
     untracked,
@@ -114,6 +116,7 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
     protected readonly selectedDataItem: Signal<TData | null> = computed(() => {
         return this.selectedListItem()?.data ?? null;
     });
+    protected readonly selectedKeysChange: OutputEmitterRef<any[]> = output();
     protected readonly selectedListItem: Signal<ListItem<TData> | null> = computed(() => {
         return this.#listService.selectedListItems().firstOrDefault();
     });
@@ -273,6 +276,7 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
     private initialize(): void {
         this.#listService.setNavigableOptions({ enabled: true, mode: "select" });
         this.#listService.setSelectableOptions(this.selectableOptions);
+        this.#listService.selectedKeysChange = this.selectedKeysChange;
     }
 
     private notifyValueChange(): void {

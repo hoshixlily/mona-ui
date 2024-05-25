@@ -68,11 +68,11 @@
                     "builder": "@angular-devkit/build-angular:application",
                     "options": {
                         "outputPath": {
-                          "base": "dist/mona-ui-tester"
+                            "base": "dist/mona-ui-tester"
                         },
                         "index": "projects/mona-ui-tester/src/index.html",
                         "polyfills": [
-                          "projects/mona-ui-tester/src/polyfills.ts"
+                            "projects/mona-ui-tester/src/polyfills.ts"
                         ],
                         "tsConfig": "projects/mona-ui-tester/tsconfig.app.json",
                         "inlineStyleLanguage": "scss",
@@ -80,6 +80,11 @@
                             "projects/mona-ui-tester/src/favicon.ico",
                             "projects/mona-ui-tester/src/assets"
                         ],
+                        "stylePreprocessorOptions": {
+                            "includePaths": [
+                                ""
+                            ]
+                        },
                         "styles": [
                             "node_modules/@fortawesome/fontawesome-free/css/all.css",
                             "projects/mona-ui-tester/src/styles.scss"
@@ -112,7 +117,7 @@
                             "outputHashing": "all"
                         },
                         "development": {
-                          "optimization": false,
+                            "optimization": false,
                             "extractLicenses": false,
                             "sourceMap": true,
                             "namedChunks": true
@@ -124,10 +129,10 @@
                     "builder": "@angular-devkit/build-angular:dev-server",
                     "configurations": {
                         "production": {
-                          "buildTarget": "mona-ui-tester:build:production"
+                            "buildTarget": "mona-ui-tester:build:production"
                         },
                         "development": {
-                          "buildTarget": "mona-ui-tester:build:development"
+                            "buildTarget": "mona-ui-tester:build:development"
                         }
                     },
                     "defaultConfiguration": "development"
@@ -135,7 +140,7 @@
                 "extract-i18n": {
                     "builder": "@angular-devkit/build-angular:extract-i18n",
                     "options": {
-                      "buildTarget": "mona-ui-tester:build"
+                        "buildTarget": "mona-ui-tester:build"
                     }
                 },
                 "test": {

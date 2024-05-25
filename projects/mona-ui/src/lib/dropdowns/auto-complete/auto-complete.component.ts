@@ -11,6 +11,8 @@ import {
     InputSignal,
     model,
     OnInit,
+    output,
+    OutputEmitterRef,
     signal,
     TemplateRef,
     untracked,
@@ -101,12 +103,12 @@ export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccesso
     protected readonly itemTemplate = contentChild(DropDownItemTemplateDirective, { read: TemplateRef });
     protected readonly noDataTemplate = contentChild(DropDownNoDataTemplateDirective, { read: TemplateRef });
     protected readonly popupTemplate = viewChild.required<TemplateRef<any>>("popupTemplate");
-
     protected readonly selectableOptions: SelectableOptions = {
         enabled: true,
         mode: "single",
         toggleable: false
     };
+    protected readonly selectedKeysChange: OutputEmitterRef<any[]> = output();
 
     public data = input<Iterable<TData>>([]);
     public disabled = model(false);
@@ -261,6 +263,7 @@ export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccesso
     private initialize(): void {
         this.#listService.setNavigableOptions({ enabled: true, mode: "highlight" });
         this.#listService.setSelectableOptions(this.selectableOptions);
+        this.#listService.selectedKeysChange = this.selectedKeysChange;
         this.#listService.filterInputVisible.set(false);
     }
 

@@ -3,9 +3,7 @@
     "version": "0.0.1",
     "peerDependencies": {
         "@angular/common": "^14.1.0",
-        "@angular/core": "^14.1.0",
-        "@mirei/ts-collections": "^10.4.0",
-        "luxon": "^3.0.1"
+        "@angular/core": "^14.1.0"
     },
     "dependencies": {
         "tslib": "^2.3.0"

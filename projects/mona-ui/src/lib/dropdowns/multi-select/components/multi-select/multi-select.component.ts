@@ -14,6 +14,8 @@ import {
     model,
     OnDestroy,
     OnInit,
+    output,
+    OutputEmitterRef,
     signal,
     Signal,
     TemplateRef,
@@ -115,6 +117,7 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
             .select(i => i.data)
             .toImmutableSet();
     });
+    protected readonly selectedKeysChange: OutputEmitterRef<any[]> = output();
     protected readonly selectedListItems: Signal<ImmutableSet<ListItem<TData>>> = computed(() => {
         return this.#listService.selectedListItems();
     });
@@ -305,6 +308,7 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
             enabled: true,
             mode: "multiple"
         });
+        this.#listService.selectedKeysChange = this.selectedKeysChange;
     }
 
     private notifyValueChange(): void {

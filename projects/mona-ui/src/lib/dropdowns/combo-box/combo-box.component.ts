@@ -13,6 +13,8 @@ import {
     InputSignal,
     model,
     OnInit,
+    output,
+    OutputEmitterRef,
     Signal,
     signal,
     TemplateRef,
@@ -126,6 +128,7 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
     protected readonly selectedDataItem: Signal<TData | null> = computed(() => {
         return this.selectedListItem()?.data ?? null;
     });
+    protected readonly selectedKeysChange: OutputEmitterRef<any[]> = output();
     protected readonly selectedListItem: Signal<ListItem<TData> | null> = computed(() => {
         return this.#listService.selectedListItems().firstOrDefault();
     });
@@ -323,6 +326,7 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
         this.#listService.setNavigableOptions({ enabled: true, mode: "select" });
         this.#listService.setSelectableOptions(this.selectableOptions);
         this.#listService.filterInputVisible.set(false);
+        this.#listService.selectedKeysChange = this.selectedKeysChange;
         this.comboBoxValue.set(this.valueText());
     }
 

@@ -97,8 +97,8 @@ export class ListService<TData> {
         enabled: false,
         height: 28
     });
-    public filterChange: OutputEmitterRef<FilterChangeEvent> = output();
-    public selectedKeysChange: OutputEmitterRef<Array<any>> = output();
+    public filterChange!: OutputEmitterRef<FilterChangeEvent>;
+    public selectedKeysChange!: OutputEmitterRef<Array<any>>;
 
     public addNewDataItems(dataItems: Iterable<TData>): void {
         this.data.update(list => list.addAll(dataItems));
