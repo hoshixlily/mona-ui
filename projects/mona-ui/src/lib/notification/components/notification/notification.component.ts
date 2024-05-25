@@ -63,22 +63,23 @@ export class NotificationComponent implements OnInit, OnDestroy {
     }
 
     public ngOnInit(): void {
-        const duration = this.data().options.duration;
-        if (duration != null) {
-            const progressInterval = duration / 100;
-            interval(progressInterval)
-                .pipe(takeWhile(() => this.progressValue() > 0))
-                .subscribe({
-                    next: () => {
-                        this.progressValue.set(this.progressValue() - 1);
-                        if (this.progressValue() === 0) {
-                            asyncScheduler.schedule(() => {
-                                this.close();
-                            }, 300);
-                        }
-                    }
-                });
-        }
         this.type.set(this.data().options.type ?? "info");
+        const duration = this.data().options.duration;
+        if (duration == null) {
+            return;
+        }
+        const progressInterval = duration / 100;
+        interval(progressInterval)
+            .pipe(takeWhile(() => this.progressValue() > 0))
+            .subscribe({
+                next: () => {
+                    this.progressValue.set(this.progressValue() - 1);
+                    if (this.progressValue() === 0) {
+                        asyncScheduler.schedule(() => {
+                            this.close();
+                        }, 300);
+                    }
+                }
+            });
     }
 }

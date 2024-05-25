@@ -71,8 +71,7 @@ export class CircularProgressBarComponent {
 
     /**
      * Progress value in percentage. Value must be between 0 and 100.
-     * Do not use together with value input.
-     * @param value Progress value in percentage.
+     * Do not use together with the {@link value} input.
      */
     public progress: InputSignal<number> = input(0);
     public size: InputSignal<number> = input(100);
@@ -80,8 +79,7 @@ export class CircularProgressBarComponent {
 
     /**
      * Progress value in absolute value. Value must be between min and max.
-     * Do not use together with progress input.
-     * @param value Progress value in absolute value.
+     * Do not use together with the {@link progress} input.
      */
     public value: InputSignal<number> = input(0);
 

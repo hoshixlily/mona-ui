@@ -6,20 +6,17 @@ import {
     computed,
     effect,
     ElementRef,
-    EventEmitter,
     inject,
     input,
     InputSignal,
     InputSignalWithTransform,
     OnDestroy,
     output,
-    Output,
     OutputEmitterRef,
     Signal,
     signal,
     untracked,
     viewChild,
-    ViewChild,
     WritableSignal
 } from "@angular/core";
 import { FormsModule } from "@angular/forms";
