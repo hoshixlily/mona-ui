@@ -164,7 +164,6 @@ export class SubTreeComponent<T> {
         this.treeService.navigatedNode.set(node);
         const element = document.querySelector(`li[data-uid="${node.uid}"]`)?.closest(".mona-tree") as HTMLElement;
         if (element == null) {
-            console.warn(`Cannot find element for node ${node.uid}`);
             return;
         }
         element.focus();

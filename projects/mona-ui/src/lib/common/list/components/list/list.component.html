@@ -49,7 +49,7 @@
         </li>
     } @else {
         <li class="mona-list-item" [attr.data-uid]="item.uid"
-            (click)="onListItemSelect(item)"
+            (click)="onListItemClick(item)"
             monaListItem [item]="item">
             <mona-list-item [item]="item" [template]="itemTemplate()??null"></mona-list-item>
         </li>

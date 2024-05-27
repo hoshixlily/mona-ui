@@ -34,6 +34,7 @@ import { ListItemDirective } from "../../directives/list-item.directive";
 import { ListNoDataTemplateDirective } from "../../directives/list-no-data-template.directive";
 import { ListItem } from "../../models/ListItem";
 import { ListSizeInputType, ListSizeType } from "../../models/ListSizeType";
+import { SelectionChangeEvent } from "../../models/SelectionChangeEvent";
 import { ListService } from "../../services/list.service";
 import { ListItemComponent } from "../list-item/list-item.component";
 
@@ -117,7 +118,7 @@ export class ListComponent<TData> implements OnInit {
     });
     protected readonly virtualScrollViewport = viewChild(CdkVirtualScrollViewport);
 
-    public readonly itemSelect: OutputEmitterRef<ListItem<TData>> = output();
+    public readonly itemSelect: OutputEmitterRef<SelectionChangeEvent<TData>> = output();
 
     public data = input<Iterable<TData> | null | undefined>(null);
     public height: InputSignal<ListSizeInputType> = input<ListSizeInputType>(undefined);
@@ -163,20 +164,9 @@ export class ListComponent<TData> implements OnInit {
         }
     }
 
-    public onListItemSelect(item: ListItem<TData>): void {
-        const selectedItem = this.listService.selectedListItems();
-        const options = this.listService.selectableOptions();
-
-        if (
-            (options.mode === "single" && !selectedItem.contains(item)) ||
-            (options.mode === "single" && options.toggleable) ||
-            options.mode === "multiple" ||
-            (options.mode === "single" && selectedItem.size() > 1)
-        ) {
-            this.listService.selectItem(item);
-            this.listService.selectedKeysChange.emit(this.listService.selectedKeys().toArray());
-        }
-        this.itemSelect.emit(item);
+    public onListItemClick(item: ListItem<TData>): void {
+        this.selectItem(item);
+        this.itemSelect.emit({ item, source: { source: "mouse" } });
     }
 
     private scrollToItem(item: ListItem<TData>): void {
@@ -189,20 +179,36 @@ export class ListComponent<TData> implements OnInit {
         }
     }
 
+    private selectItem(item: ListItem<TData>): void {
+        const selectedItem = this.listService.selectedListItems();
+        const options = this.listService.selectableOptions();
+
+        if (
+            (options.mode === "single" && !selectedItem.contains(item)) ||
+            (options.mode === "single" && options.toggleable) ||
+            options.mode === "multiple" ||
+            (options.mode === "single" && selectedItem.size() > 1)
+        ) {
+            this.listService.selectItem(item);
+            this.listService.selectedKeysChange.emit(this.listService.selectedKeys().toArray());
+        }
+    }
+
     private setKeyboardEvents(): void {
         fromEvent<KeyboardEvent>(this.#hostElementRef.nativeElement, "keydown")
             .pipe(
                 takeUntilDestroyed(this.#destroyRef),
                 filter(event => event.key === "Enter" || event.key === "NumPadEnter")
             )
-            .subscribe(() => {
+            .subscribe((event: KeyboardEvent) => {
                 const highlightedItem = this.listService.highlightedItem();
                 const selectedItem = this.listService.selectedListItems().firstOrDefault();
                 if (highlightedItem) {
-                    this.onListItemSelect(highlightedItem);
+                    this.selectItem(highlightedItem);
+                    this.itemSelect.emit({ item: highlightedItem, source: { source: "keyboard", key: event.key } });
                 } else if (selectedItem) {
                     this.listService.selectedKeysChange.emit(this.listService.selectedKeys().toArray());
-                    this.itemSelect.emit(selectedItem);
+                    this.itemSelect.emit({ item: selectedItem, source: { source: "keyboard", key: event.key } });
                 }
             });
     }
@@ -229,7 +235,7 @@ export class ListComponent<TData> implements OnInit {
                     item = this.listService.navigate("previous", navigableOptions.mode);
                 }
                 if (item) {
-                    this.itemSelect.emit(item);
+                    this.itemSelect.emit({ item, source: { source: "keyboard", key: event.key } });
                 }
                 if (item /* && navigableOptions.mode === "select"*/) {
                     if (previousSelectedItems.contains(item)) {

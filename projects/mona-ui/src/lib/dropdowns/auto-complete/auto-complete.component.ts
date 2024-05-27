@@ -37,6 +37,7 @@ import { ListItemTemplateDirective } from "../../common/list/directives/list-ite
 import { ListNoDataTemplateDirective } from "../../common/list/directives/list-no-data-template.directive";
 import { ListItem } from "../../common/list/models/ListItem";
 import { SelectableOptions } from "../../common/list/models/SelectableOptions";
+import { SelectionChangeEvent } from "../../common/list/models/SelectionChangeEvent";
 import { ListService } from "../../common/list/services/list.service";
 import { TextBoxDirective } from "../../inputs/text-box/directives/text-box.directive";
 import { PopupRef } from "../../popup/models/PopupRef";
@@ -157,8 +158,8 @@ export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccesso
         this.autoCompleteValue.set(this.#value ?? "");
     }
 
-    public onItemSelect(item: ListItem<TData>): void {
-        const itemText = this.#listService.getItemText(item);
+    public onItemSelect(event: SelectionChangeEvent<TData>): void {
+        const itemText = this.#listService.getItemText(event.item);
         this.updateValue(itemText);
         this.autoCompleteValue.set(itemText);
         this.notifyValueChange();

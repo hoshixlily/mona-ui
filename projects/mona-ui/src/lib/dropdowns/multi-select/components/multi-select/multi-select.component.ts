@@ -41,6 +41,7 @@ import { ListHeaderTemplateDirective } from "../../../../common/list/directives/
 import { ListItemTemplateDirective } from "../../../../common/list/directives/list-item-template.directive";
 import { ListNoDataTemplateDirective } from "../../../../common/list/directives/list-no-data-template.directive";
 import { ListItem } from "../../../../common/list/models/ListItem";
+import { SelectionChangeEvent } from "../../../../common/list/models/SelectionChangeEvent";
 import { ListService } from "../../../../common/list/services/list.service";
 import { SlicePipe } from "../../../../pipes/slice.pipe";
 import { PopupRef } from "../../../../popup/models/PopupRef";
@@ -203,7 +204,7 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
         this.setEventListeners();
     }
 
-    public onItemSelect(item: ListItem<TData>): void {
+    public onItemSelect(event: SelectionChangeEvent<TData>): void {
         this.updateValue(this.selectedDataItems().toArray());
         this.notifyValueChange();
     }
