@@ -169,17 +169,17 @@ export class TreeService<T> {
         }
         return this.nodeSet();
     });
-    public checkedKeysChange: OutputEmitterRef<any[]> = output();
-    public expandedKeysChange: OutputEmitterRef<any[]> = output();
-    public filterChange: OutputEmitterRef<FilterChangeEvent> = output();
-    public nodeCheck: OutputEmitterRef<NodeCheckEvent<T>> = output();
-    public nodeClick: OutputEmitterRef<NodeClickEvent<T>> = output();
-    public nodeDrag: OutputEmitterRef<NodeDragEvent<T>> = output();
-    public nodeDragEnd: OutputEmitterRef<NodeDragEndEvent<T>> = output();
-    public nodeDragStart: OutputEmitterRef<NodeDragStartEvent<T>> = output();
-    public nodeDrop: OutputEmitterRef<NodeDropEvent<T>> = output();
-    public nodeSelect: OutputEmitterRef<NodeSelectEvent<T>> = output();
-    public selectionChange: OutputEmitterRef<NodeItem<T>> = output();
+    public checkedKeysChange!: OutputEmitterRef<any[]>;
+    public expandedKeysChange!: OutputEmitterRef<any[]>;
+    public filterChange!: OutputEmitterRef<FilterChangeEvent>;
+    public nodeCheck!: OutputEmitterRef<NodeCheckEvent<T>>;
+    public nodeClick!: OutputEmitterRef<NodeClickEvent<T>>;
+    public nodeDrag!: OutputEmitterRef<NodeDragEvent<T>>;
+    public nodeDragEnd!: OutputEmitterRef<NodeDragEndEvent<T>>;
+    public nodeDragStart!: OutputEmitterRef<NodeDragStartEvent<T>>;
+    public nodeDrop!: OutputEmitterRef<NodeDropEvent<T>>;
+    public nodeSelect!: OutputEmitterRef<NodeSelectEvent<T>>;
+    public selectionChange!: OutputEmitterRef<NodeItem<T>>;
 
     public constructor() {
         effect(() => {

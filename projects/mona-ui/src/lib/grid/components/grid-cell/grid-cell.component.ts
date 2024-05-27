@@ -47,9 +47,9 @@ export class GridCellComponent implements OnInit {
     readonly #focusMonitor: FocusMonitor = inject(FocusMonitor);
     readonly #gridService: GridService = inject(GridService);
     readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
-    private focused: boolean = false;
-    protected editForm!: FormGroup;
+    #focused: boolean = false;
     protected readonly editing: WritableSignal<boolean> = signal(false);
+    protected editForm!: FormGroup;
 
     public column: InputSignal<Column> = input.required<Column>();
     public row: InputSignal<Row> = input.required<Row>();
@@ -59,40 +59,12 @@ export class GridCellComponent implements OnInit {
         this.setSubscriptions();
     }
 
-    public initializeForm(): void {
-        const form = this.row().getEditForm(this.column().field());
-        if (form) {
-            this.editForm = form;
-        } else {
-            this.editForm = new FormGroup({});
-            this.editForm.addControl(this.column().field(), new FormControl(this.row().data[this.column().field()]));
-            this.row().setEditForm(this.column().field(), this.editForm);
-        }
-    }
-
     public onFocusChange(origin: FocusOrigin): void {
         if (!origin) {
             this.handleFocusLoss();
         } else {
             this.handleFocusGain();
         }
-    }
-
-    private notifyCellEdit(): CellEditEvent {
-        const event = new CellEditEvent({
-            field: this.column().field(),
-            oldValue: this.row().data[this.column().field()],
-            newValue: this.editForm.value[this.column().field()],
-            rowData: this.row().data,
-            setNewValue: (value: any) => {
-                this.editForm.get(this.column().field())?.setValue(value);
-                this.row().data[this.column().field()] = value;
-            }
-        });
-        if (event.oldValue !== event.newValue) {
-            this.#gridService.cellEdit$.next(event);
-        }
-        return event;
     }
 
     private focus(): void {
@@ -234,7 +206,7 @@ export class GridCellComponent implements OnInit {
         if (!this.gridEditable) {
             return;
         }
-        if (this.focused) {
+        if (this.#focused) {
             this.editing.set(true);
             this.#gridService.isInEditMode.set(true);
             asyncScheduler.schedule(() => {
@@ -244,7 +216,7 @@ export class GridCellComponent implements OnInit {
     }
 
     private handleFocusGain(): void {
-        this.focused = true;
+        this.#focused = true;
         if (this.#gridService.isInEditMode() && origin !== "mouse") {
             this.editing.set(true);
             asyncScheduler.schedule(() => {
@@ -270,7 +242,35 @@ export class GridCellComponent implements OnInit {
                     this.handleDateInputFocusLoss();
                 }
             });
-        this.focused = false;
+        this.#focused = false;
+    }
+
+    private initializeForm(): void {
+        const form = this.row().getEditForm(this.column().field());
+        if (form) {
+            this.editForm = form;
+        } else {
+            this.editForm = new FormGroup({});
+            this.editForm.addControl(this.column().field(), new FormControl(this.row().data[this.column().field()]));
+            this.row().setEditForm(this.column().field(), this.editForm);
+        }
+    }
+
+    private notifyCellEdit(): CellEditEvent {
+        const event = new CellEditEvent({
+            field: this.column().field(),
+            oldValue: this.row().data[this.column().field()],
+            newValue: this.editForm.value[this.column().field()],
+            rowData: this.row().data,
+            setNewValue: (value: any) => {
+                this.editForm.get(this.column().field())?.setValue(value);
+                this.row().data[this.column().field()] = value;
+            }
+        });
+        if (event.oldValue !== event.newValue) {
+            this.#gridService.cellEdit$.next(event);
+        }
+        return event;
     }
 
     private setClickSubscription(): void {

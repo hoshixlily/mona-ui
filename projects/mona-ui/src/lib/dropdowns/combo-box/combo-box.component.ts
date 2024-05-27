@@ -13,6 +13,8 @@ import {
     InputSignal,
     model,
     OnInit,
+    output,
+    OutputEmitterRef,
     Signal,
     signal,
     TemplateRef,
@@ -50,6 +52,7 @@ import { ListItemTemplateDirective } from "../../common/list/directives/list-ite
 import { ListNoDataTemplateDirective } from "../../common/list/directives/list-no-data-template.directive";
 import { ListItem } from "../../common/list/models/ListItem";
 import { SelectableOptions } from "../../common/list/models/SelectableOptions";
+import { SelectionChangeEvent } from "../../common/list/models/SelectionChangeEvent";
 import { ListService } from "../../common/list/services/list.service";
 import { TextBoxDirective } from "../../inputs/text-box/directives/text-box.directive";
 import { PopupRef } from "../../popup/models/PopupRef";
@@ -126,6 +129,7 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
     protected readonly selectedDataItem: Signal<TData | null> = computed(() => {
         return this.selectedListItem()?.data ?? null;
     });
+    protected readonly selectedKeysChange: OutputEmitterRef<any[]> = output();
     protected readonly selectedListItem: Signal<ListItem<TData> | null> = computed(() => {
         return this.#listService.selectedListItems().firstOrDefault();
     });
@@ -192,7 +196,7 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
         this.setSubscriptions();
     }
 
-    public onItemSelect(item: ListItem<TData>): void {
+    public onItemSelect(event: SelectionChangeEvent<TData>): void {
         this.close();
     }
 
@@ -323,6 +327,7 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
         this.#listService.setNavigableOptions({ enabled: true, mode: "select" });
         this.#listService.setSelectableOptions(this.selectableOptions);
         this.#listService.filterInputVisible.set(false);
+        this.#listService.selectedKeysChange = this.selectedKeysChange;
         this.comboBoxValue.set(this.valueText());
     }
 

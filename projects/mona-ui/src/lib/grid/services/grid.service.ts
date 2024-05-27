@@ -75,7 +75,7 @@ export class GridService {
         enabled: false,
         mode: "single"
     };
-    public selectedKeysChange: OutputEmitterRef<unknown[]> = output();
+    public selectedKeysChange!: OutputEmitterRef<unknown[]>;
     public sortableOptions: SortableOptions = {
         enabled: false,
         mode: "single",

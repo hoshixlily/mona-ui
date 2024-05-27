@@ -11,6 +11,8 @@ import {
     InputSignal,
     model,
     OnInit,
+    output,
+    OutputEmitterRef,
     signal,
     TemplateRef,
     untracked,
@@ -35,6 +37,7 @@ import { ListItemTemplateDirective } from "../../common/list/directives/list-ite
 import { ListNoDataTemplateDirective } from "../../common/list/directives/list-no-data-template.directive";
 import { ListItem } from "../../common/list/models/ListItem";
 import { SelectableOptions } from "../../common/list/models/SelectableOptions";
+import { SelectionChangeEvent } from "../../common/list/models/SelectionChangeEvent";
 import { ListService } from "../../common/list/services/list.service";
 import { TextBoxDirective } from "../../inputs/text-box/directives/text-box.directive";
 import { PopupRef } from "../../popup/models/PopupRef";
@@ -101,12 +104,12 @@ export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccesso
     protected readonly itemTemplate = contentChild(DropDownItemTemplateDirective, { read: TemplateRef });
     protected readonly noDataTemplate = contentChild(DropDownNoDataTemplateDirective, { read: TemplateRef });
     protected readonly popupTemplate = viewChild.required<TemplateRef<any>>("popupTemplate");
-
     protected readonly selectableOptions: SelectableOptions = {
         enabled: true,
         mode: "single",
         toggleable: false
     };
+    protected readonly selectedKeysChange: OutputEmitterRef<any[]> = output();
 
     public data = input<Iterable<TData>>([]);
     public disabled = model(false);
@@ -155,8 +158,8 @@ export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccesso
         this.autoCompleteValue.set(this.#value ?? "");
     }
 
-    public onItemSelect(item: ListItem<TData>): void {
-        const itemText = this.#listService.getItemText(item);
+    public onItemSelect(event: SelectionChangeEvent<TData>): void {
+        const itemText = this.#listService.getItemText(event.item);
         this.updateValue(itemText);
         this.autoCompleteValue.set(itemText);
         this.notifyValueChange();
@@ -261,6 +264,7 @@ export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccesso
     private initialize(): void {
         this.#listService.setNavigableOptions({ enabled: true, mode: "highlight" });
         this.#listService.setSelectableOptions(this.selectableOptions);
+        this.#listService.selectedKeysChange = this.selectedKeysChange;
         this.#listService.filterInputVisible.set(false);
     }
 

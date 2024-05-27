@@ -247,12 +247,6 @@ export class TreeComponent<T> implements OnInit {
             .subscribe(event => this.nodeClick.emit(event));
     }
 
-    private setNodeDragSubscription(): void {
-        this.treeService.nodeDrag$
-            .pipe(takeUntilDestroyed(this.#destroyRef))
-            .subscribe(event => this.nodeDrag.emit(event.dragEvent));
-    }
-
     private setNodeDragEndSubscription(): void {
         this.treeService.nodeDragEnd$
             .pipe(takeUntilDestroyed(this.#destroyRef))
@@ -274,6 +268,12 @@ export class TreeComponent<T> implements OnInit {
             .subscribe(event => this.nodeDragStart.emit(event));
     }
 
+    private setNodeDragSubscription(): void {
+        this.treeService.nodeDrag$
+            .pipe(takeUntilDestroyed(this.#destroyRef))
+            .subscribe(event => this.nodeDrag.emit(event.dragEvent));
+    }
+
     private setNodeDropSubscription(): void {
         this.treeService.nodeDrop$
             .pipe(takeUntilDestroyed(this.#destroyRef))
@@ -291,10 +291,10 @@ export class TreeComponent<T> implements OnInit {
         this.setKeydownSubscription();
         this.setNodeCheckSubscription();
         this.setNodeClickSubscription();
-        this.setNodeDragSubscription();
         this.setNodeDragEndSubscription();
         this.setNodeDragHandlerSubscription();
         this.setNodeDragStartSubscription();
+        this.setNodeDragSubscription();
         this.setNodeDropSubscription();
         this.setNodeSelectSubscription();
     }

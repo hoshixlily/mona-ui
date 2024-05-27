@@ -28,6 +28,7 @@ $step-height: 2rem;
                 justify-content: center;
                 background-color: var(--mona-background);
                 border: 1px solid var(--mona-border-color);
+                border-radius: var(--mona-border-radius);
                 color: var(--mona-text);
                 transition: background-color 250ms ease-out, color 250ms ease-out;
                 &.mona-stepper-step-active {

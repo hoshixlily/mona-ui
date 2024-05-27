@@ -13,6 +13,8 @@ import {
     InputSignal,
     model,
     OnInit,
+    output,
+    OutputEmitterRef,
     Signal,
     TemplateRef,
     untracked,
@@ -36,6 +38,7 @@ import { ListItemTemplateDirective } from "../../../../common/list/directives/li
 import { ListNoDataTemplateDirective } from "../../../../common/list/directives/list-no-data-template.directive";
 import { ListItem } from "../../../../common/list/models/ListItem";
 import { SelectableOptions } from "../../../../common/list/models/SelectableOptions";
+import { SelectionChangeEvent } from "../../../../common/list/models/SelectionChangeEvent";
 import { ListService } from "../../../../common/list/services/list.service";
 import { PopupRef } from "../../../../popup/models/PopupRef";
 import { PopupService } from "../../../../popup/services/popup.service";
@@ -114,6 +117,7 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
     protected readonly selectedDataItem: Signal<TData | null> = computed(() => {
         return this.selectedListItem()?.data ?? null;
     });
+    protected readonly selectedKeysChange: OutputEmitterRef<any[]> = output();
     protected readonly selectedListItem: Signal<ListItem<TData> | null> = computed(() => {
         return this.#listService.selectedListItems().firstOrDefault();
     });
@@ -176,8 +180,10 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
         this.setSubscriptions();
     }
 
-    public onItemSelect(item: ListItem<TData>): void {
-        this.close();
+    public onItemSelect(event: SelectionChangeEvent<TData>): void {
+        if (event.source.source === "mouse" || event.source.key === "Enter" || event.source.key === "NumpadEnter") {
+            this.close();
+        }
     }
 
     public open(): void {
@@ -273,6 +279,7 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
     private initialize(): void {
         this.#listService.setNavigableOptions({ enabled: true, mode: "select" });
         this.#listService.setSelectableOptions(this.selectableOptions);
+        this.#listService.selectedKeysChange = this.selectedKeysChange;
     }
 
     private notifyValueChange(): void {
