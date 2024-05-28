@@ -1,0 +1,14 @@
+<mona-button-group selection="multiple">
+    <button monaButton [selected]="boldSelected()" (click)="onBoldToggle()">
+        <fa-icon [icon]="boldIcon"></fa-icon>
+    </button>
+    <button monaButton [selected]="italicSelected()" (click)="onItalicToggle()">
+        <fa-icon [icon]="italicIcon"></fa-icon>
+    </button>
+    <button monaButton [selected]="underlineSelected()" (click)="onUnderlineToggle()">
+        <fa-icon [icon]="underlineIcon"></fa-icon>
+    </button>
+    <button monaButton [selected]="strikeThroughSelected()" (click)="onStrikeThroughToggle()">
+        <fa-icon [icon]="strikeThroughIcon"></fa-icon>
+    </button>
+</mona-button-group>

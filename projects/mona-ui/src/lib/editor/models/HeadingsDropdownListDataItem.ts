@@ -1,9 +1,9 @@
-export interface FormatDropdownListDataItem {
+export interface HeadingsDropdownListDataItem {
     text: string;
-    value: FormatType;
+    value: HeadingType;
 }
 
-export enum FormatType {
+export enum HeadingType {
     Heading1 = 1,
     Heading2 = 2,
     Heading3 = 3,

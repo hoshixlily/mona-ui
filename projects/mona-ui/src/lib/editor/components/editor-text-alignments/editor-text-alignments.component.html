@@ -1,0 +1,14 @@
+<mona-button-group selection="single">
+    <button monaButton [selected]="alignLeftSelected()" (click)="onAlignLeft()">
+        <fa-icon [icon]="alignLeftIcon"></fa-icon>
+    </button>
+    <button monaButton [selected]="alignCenterSelected()" (click)="onAlignCenter()">
+        <fa-icon [icon]="alignCenterIcon"></fa-icon>
+    </button>
+    <button monaButton [selected]="alignRightSelected()" (click)="onAlignRight()">
+        <fa-icon [icon]="alignRightIcon"></fa-icon>
+    </button>
+    <button monaButton [selected]="alignJustifySelected()" (click)="onAlignJustify()">
+        <fa-icon [icon]="alignJustifyIcon"></fa-icon>
+    </button>
+</mona-button-group>
