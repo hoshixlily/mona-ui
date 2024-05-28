@@ -64,6 +64,9 @@ export * from "./dropdowns/multi-select/directives/multi-select-summary-tag-temp
 export * from "./dropdowns/multi-select/directives/multi-select-tag-template.directive";
 export * from "./dropdowns/multi-select/components/multi-select/multi-select.component";
 
+/** Editor */
+export * from "./editor/components/editor/editor.component";
+
 /** Filters */
 export * from "./query/filter/FilterDescriptor";
 export { Query, IQuery } from "./query/core/Query";

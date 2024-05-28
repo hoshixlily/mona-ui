@@ -1,0 +1,49 @@
+<div class="mona-editor-toolbar">
+    <mona-button-group selection="multiple">
+        <button monaButton [selected]="boldSelected()" (click)="onBoldToggle()">
+            <fa-icon [icon]="boldIcon"></fa-icon>
+        </button>
+        <button monaButton [selected]="italicSelected()" (click)="onItalicToggle()">
+            <fa-icon [icon]="italicIcon"></fa-icon>
+        </button>
+        <button monaButton [selected]="underlineSelected()" (click)="onUnderlineToggle()">
+            <fa-icon [icon]="underlineIcon"></fa-icon>
+        </button>
+        <button monaButton [selected]="strikeThroughSelected()" (click)="onStrikeThroughToggle()">
+            <fa-icon [icon]="strikeThroughIcon"></fa-icon>
+        </button>
+    </mona-button-group>
+    <mona-drop-down-list [data]="formatDropdownListData" [ngModel]="selectedFormatDropdownItem()"
+                         (ngModelChange)="onFormatChange($event)"
+                         textField="text" valueField="value" style="width: 200px;">
+        <ng-template monaDropDownListItemTemplate let-dataItem>
+            @switch (dataItem.value) {
+                @case (FormatType.Heading1) {
+                    <h1>{{ dataItem.text }}</h1>
+                }
+                @case (FormatType.Heading2) {
+                    <h2>{{ dataItem.text }}</h2>
+                }
+                @case (FormatType.Heading3) {
+                    <h3>{{ dataItem.text }}</h3>
+                }
+                @case (FormatType.Heading4) {
+                    <h4>{{ dataItem.text }}</h4>
+                }
+                @case (FormatType.Heading5) {
+                    <h5>{{ dataItem.text }}</h5>
+                }
+                @case (FormatType.Heading6) {
+                    <h6>{{ dataItem.text }}</h6>
+                }
+                @case (FormatType.Paragraph) {
+                    <p>{{ dataItem.text }}</p>
+                }
+                @default {
+                    <p>{{ dataItem.text }}</p>
+                }
+            }
+        </ng-template>
+    </mona-drop-down-list>
+</div>
+<div class="mona-editor-container" #editorContainer></div>

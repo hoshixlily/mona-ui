@@ -786,7 +786,7 @@
                                 </mona-splitter-pane>
                                 <mona-splitter-pane [size]="40" [resizable]="false">
                                     <div style="width: 100%; height: 100%; padding: 2px;">
-                                        <mona-drop-down-list [data]="[1,2,3,4,5,6,7,8,9]"></mona-drop-down-list>
+<!--                                        <mona-drop-down-list [data]="[1,2,3,4,5,6,7,8,9]"></mona-drop-down-list>-->
                                         <mona-drop-down-button>
                                             Upwards Dropdown Button
                                             <mona-menu-item text="Menu Item I">
@@ -803,6 +803,13 @@
                                     </div>
                                 </mona-splitter-pane>
                             </mona-splitter>
+                        </div>
+                    </ng-template>
+                </mona-tab>
+                <mona-tab title="Editor">
+                    <ng-template monaTabContentTemplate>
+                        <div style="padding: 10px;">
+                            <mona-editor></mona-editor>
                         </div>
                     </ng-template>
                 </mona-tab>

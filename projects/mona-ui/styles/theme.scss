@@ -741,6 +741,38 @@ mona-filter-input.mona-popup-filter-input,
     }
 }
 
+/** Editor */
+.mona-editor {
+    display: flex;
+    flex-direction: column;
+    background-color: var(--mona-background);
+    border: 1px solid var(--mona-border-color);
+    transition: border-color 0.15s ease-in;
+    &:focus, &:focus-within {
+        border-color: var(--mona-border-color-dark);
+    }
+}
+
+.mona-editor-toolbar {
+    background: var(--mona-background-dark);
+    border-bottom: 1px solid var(--mona-border-color);
+}
+
+.mona-editor-container {
+    background: var(--mona-background);
+    & div[contenteditable] {
+        padding: 0.375rem;
+        color: var(--mona-text);
+        border: none;
+        outline: none;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        resize: none;
+        @include scrollbars-thin;
+    }
+}
+
 /** Filters */
 .mona-filter-menu {
     width: 100%;
