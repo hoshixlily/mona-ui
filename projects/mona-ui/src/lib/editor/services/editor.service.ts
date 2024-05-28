@@ -1,5 +1,7 @@
 import { Injectable, signal } from "@angular/core";
 import { Editor } from "@tiptap/core";
+import { Subscript } from "@tiptap/extension-subscript";
+import { Superscript } from "@tiptap/extension-superscript";
 import { TextAlign } from "@tiptap/extension-text-align";
 import { Underline } from "@tiptap/extension-underline";
 import { EditorState } from "@tiptap/pm/state";
@@ -18,6 +20,8 @@ export class EditorService {
             extensions: [
                 StarterKit,
                 Underline,
+                Subscript,
+                Superscript,
                 TextAlign.configure({
                     types: ["paragraph", "heading"]
                 })

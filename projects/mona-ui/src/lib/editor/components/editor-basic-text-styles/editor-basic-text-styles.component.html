@@ -11,4 +11,10 @@
     <button monaButton [selected]="strikeThroughSelected()" (click)="onStrikeThroughToggle()">
         <fa-icon [icon]="strikeThroughIcon"></fa-icon>
     </button>
+    <button monaButton [selected]="subscriptSelected()" (click)="onSubscriptToggle()">
+        <fa-icon [icon]="subscriptIcon"></fa-icon>
+    </button>
+    <button monaButton [selected]="superscriptSelected()" (click)="onSuperscriptToggle()">
+        <fa-icon [icon]="superscriptIcon"></fa-icon>
+    </button>
 </mona-button-group>

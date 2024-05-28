@@ -1,6 +1,13 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from "@angular/core";
 import { FaIconComponent } from "@fortawesome/angular-fontawesome";
-import { faBold, faItalic, faStrikethrough, faUnderline } from "@fortawesome/free-solid-svg-icons";
+import {
+    faBold,
+    faItalic,
+    faStrikethrough,
+    faSubscript,
+    faSuperscript,
+    faUnderline
+} from "@fortawesome/free-solid-svg-icons";
 import { ButtonGroupComponent } from "../../../buttons/button-group/button-group.component";
 import { ButtonDirective } from "../../../buttons/button/button.directive";
 import { EditorService } from "../../services/editor.service";
@@ -30,6 +37,16 @@ export class EditorBasicTextStylesComponent {
         this.#editorService.state();
         return this.#editorService.editor.isActive("strike");
     });
+    protected readonly subscriptIcon = faSubscript;
+    protected readonly subscriptSelected = computed(() => {
+        this.#editorService.state();
+        return this.#editorService.editor.isActive("subscript");
+    });
+    protected readonly superscriptIcon = faSuperscript;
+    protected readonly superscriptSelected = computed(() => {
+        this.#editorService.state();
+        return this.#editorService.editor.isActive("superscript");
+    });
     protected readonly underlineIcon = faUnderline;
     protected readonly underlineSelected = computed(() => {
         this.#editorService.state();
@@ -57,6 +74,22 @@ export class EditorBasicTextStylesComponent {
             this.#editorService.editor.chain().focus().unsetStrike().run();
         } else {
             this.#editorService.editor.chain().focus().setStrike().run();
+        }
+    }
+
+    public onSubscriptToggle(): void {
+        if (this.subscriptSelected()) {
+            this.#editorService.editor.chain().focus().unsetSubscript().run();
+        } else {
+            this.#editorService.editor.chain().focus().setSubscript().run();
+        }
+    }
+
+    public onSuperscriptToggle(): void {
+        if (this.superscriptSelected()) {
+            this.#editorService.editor.chain().focus().unsetSuperscript().run();
+        } else {
+            this.#editorService.editor.chain().focus().setSuperscript().run();
         }
     }
 
