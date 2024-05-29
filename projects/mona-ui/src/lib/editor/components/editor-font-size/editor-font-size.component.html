@@ -1,0 +1,4 @@
+<mona-drop-down-list [data]="fontSizes" textField="text" valueField="valueField"
+                     placeholder="Font Size"
+                     [ngModel]="selectedFontSize()" (ngModelChange)="onFontSizeChange($event)"
+                     style="width: 120px;"></mona-drop-down-list>

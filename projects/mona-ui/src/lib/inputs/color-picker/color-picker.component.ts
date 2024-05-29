@@ -63,6 +63,14 @@ export class ColorPickerComponent implements OnInit, ControlValueAccessor {
     protected readonly popupTemplate: Signal<TemplateRef<any>> = viewChild.required("popupTemplate");
 
     /**
+     * Whether to close the color picker when a color is selected.
+     * Only applies when {@link view} is set to "palette".
+     * @default true
+     * @type {boolean}
+     */
+    public closeOnSelect: InputSignal<boolean> = input(true);
+
+    /**
      * The number of columns to display in the color palette.
      * Only applies when the view is set to "palette" and the palette is a custom array of colors.
      * @default 10
@@ -91,6 +99,9 @@ export class ColorPickerComponent implements OnInit, ControlValueAccessor {
     public onColorPaletteValueChange(value: string | null): void {
         this.color.set(value);
         this.#propagateChange?.(value);
+        if (this.closeOnSelect()) {
+            this.#popupRef?.close();
+        }
     }
 
     public open(): void {
