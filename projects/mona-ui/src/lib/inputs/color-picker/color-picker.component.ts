@@ -91,6 +91,14 @@ export class ColorPickerComponent implements OnInit, ControlValueAccessor {
         this.setEventListeners();
     }
 
+    public onColorGradientApply(): void {
+        this.#popupRef?.close();
+    }
+
+    public onColorGradientCancel(): void {
+        this.#popupRef?.close();
+    }
+
     public onColorGradientValueChange(value: string | null): void {
         this.color.set(value);
         this.#propagateChange?.(value);

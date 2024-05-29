@@ -15,6 +15,8 @@
                             (ngModelChange)="onColorPaletteValueChange($event)"></mona-color-palette>
     } @else if (view() === 'gradient') {
         <mona-color-gradient [opacity]="opacity()"
-                             [ngModel]="color()" (ngModelChange)="onColorGradientValueChange($event)"></mona-color-gradient>
+                             [ngModel]="color()" (ngModelChange)="onColorGradientValueChange($event)"
+                             (apply)="onColorGradientApply()" (cancel)="onColorGradientCancel()"
+        ></mona-color-gradient>
     }
 </ng-template>

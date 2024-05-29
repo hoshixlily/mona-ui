@@ -3,10 +3,15 @@
     column-gap: 0.5rem;
 }
 
-.mona-color-gradient-preview {
+.mona-color-gradient-preview-color,
+.mona-color-gradient-current-color {
     width: 40px;
     height: 40px;
     display: flex;
+}
+
+.mona-color-gradient-current-color {
+    cursor: pointer;
 }
 
 .mona-color-gradient-sliders {
@@ -89,4 +94,12 @@ mona-numeric-text-box {
     justify-content: center;
     width: 28px;
     user-select: none;
+}
+
+.mona-color-gradient-buttons {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    column-gap: 0.25rem;
 }

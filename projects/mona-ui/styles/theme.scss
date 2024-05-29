@@ -943,6 +943,7 @@ input[type="checkbox"][monaCheckBox] {
     display: flex;
     flex-direction: column;
     user-select: none;
+    min-width: 300px;
     padding: 0.5rem;
     row-gap: 0.5rem;
     background: var(--mona-background-dark);
@@ -955,8 +956,9 @@ input[type="checkbox"][monaCheckBox] {
     border-radius: var(--mona-border-radius);
 }
 
-.mona-color-gradient-preview {
-    border: 1px solid var(--mona-border-color);
+.mona-color-gradient-preview-color,
+.mona-color-gradient-current-color {
+    border: 2px solid var(--mona-border-color);
     border-radius: var(--mona-border-radius);
 }
 

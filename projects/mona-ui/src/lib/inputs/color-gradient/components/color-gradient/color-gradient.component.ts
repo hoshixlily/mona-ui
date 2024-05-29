@@ -11,6 +11,8 @@ import {
     input,
     InputSignal,
     NgZone,
+    OnInit,
+    output,
     Signal,
     signal,
     viewChild,
@@ -65,7 +67,7 @@ import { HueSliderComponent } from "../hue-slider/hue-slider.component";
         class: "mona-color-gradient"
     }
 })
-export class ColorGradientComponent implements AfterViewInit, ControlValueAccessor {
+export class ColorGradientComponent implements OnInit, AfterViewInit, ControlValueAccessor {
     readonly #clipboard: Clipboard = inject(Clipboard);
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     readonly #zone: NgZone = inject(NgZone);
@@ -105,6 +107,7 @@ export class ColorGradientComponent implements AfterViewInit, ControlValueAccess
     protected readonly hsvPointerTop: WritableSignal<number> = signal(0);
     protected readonly hsvRectangle: Signal<ElementRef<HTMLDivElement>> = viewChild.required("hsvRectangle");
     protected readonly hueValue$: Subject<number> = new Subject<number>();
+    protected readonly lastSelectedColor: WritableSignal<string> = signal("");
     protected readonly rgb: WritableSignal<RGBSignal> = signal<RGBSignal>({
         r: signal(255),
         g: signal(255),
@@ -116,16 +119,60 @@ export class ColorGradientComponent implements AfterViewInit, ControlValueAccess
     });
     protected readonly switchIcon: IconDefinition = faSort;
 
-    public opacity: InputSignal<boolean> = input<boolean>(true);
+    public readonly apply = output<void>();
+    public readonly cancel = output<void>();
+
+    /**
+     * Specifies whether the color picker should display the alpha slider.
+     * @default true
+     */
+    public opacity = input<boolean>(true);
+
+    /**
+     * Specifies whether the color picker should display the buttons.
+     * When set to true, the color picker will display the "Apply" and "Cancel" buttons.
+     * When set to false, the color picker will not display the buttons and will emit the color value on change.
+     * @default true
+     */
+    public showButtons = input<boolean>(true);
+
+    /**
+     * Specifies whether the color picker should display the hex input.
+     * @default true
+     */
+    public showHexInput = input<boolean>(true);
+
+    /**
+     * Specifies whether the color picker should display the RGB input.
+     * @default true
+     */
+    public showRgbInput = input<boolean>(true);
 
     public ngAfterViewInit() {
         this.setSubscriptions();
     }
 
+    public ngOnInit(): void {
+        this.lastSelectedColor.set(this.hex());
+    }
+
     public onAlphaChange(value: number): void {
         this.alpha.set(value);
         this.updateHexInputValue();
+        if (!this.showButtons()) {
+            this.#propagateChange(this.hex());
+        }
+    }
+
+    public onApply(): void {
+        this.lastSelectedColor.set(this.hex());
         this.#propagateChange(this.hex());
+        this.apply.emit();
+    }
+
+    public onCancel(): void {
+        this.hexInputValue.set(this.lastSelectedColor());
+        this.cancel.emit();
     }
 
     public onCopyColorSelect(mode: "hex" | "rgb"): void {
@@ -136,6 +183,10 @@ export class ColorGradientComponent implements AfterViewInit, ControlValueAccess
             const alpha = Math.round((this.alpha() / 255) * 100) / 100;
             this.#clipboard.copy(`rgba(${rgb.r()}, ${rgb.g()}, ${rgb.b()}, ${alpha})`);
         }
+    }
+
+    public onResetColorClick(): void {
+        this.onHexChange(this.lastSelectedColor());
     }
 
     public onRgbChange(value: number, channel: "r" | "g" | "b"): void {
@@ -151,7 +202,9 @@ export class ColorGradientComponent implements AfterViewInit, ControlValueAccess
         this.updateHexInputValue();
         this.hsvPointerLeft.set(this.getPositionFromSaturation(hsv.s));
         this.hsvPointerTop.set(this.getPositionFromValue(hsv.v));
-        this.#propagateChange(this.rgba2hex(rgb.r(), rgb.g(), rgb.b(), this.alpha()));
+        if (!this.showButtons()) {
+            this.#propagateChange(this.rgba2hex(rgb.r(), rgb.g(), rgb.b(), this.alpha()));
+        }
     }
 
     public onHsvChange(value: number, channel: "h" | "s" | "v"): void {
@@ -167,7 +220,9 @@ export class ColorGradientComponent implements AfterViewInit, ControlValueAccess
         this.updateHexInputValue();
         this.hsvPointerLeft.set(this.getPositionFromSaturation(hsv.s()));
         this.hsvPointerTop.set(this.getPositionFromValue(hsv.v()));
-        this.#propagateChange(this.rgba2hex(rgb.r, rgb.g, rgb.b, this.alpha()));
+        if (!this.showButtons()) {
+            this.#propagateChange(this.rgba2hex(rgb.r, rgb.g, rgb.b, this.alpha()));
+        }
     }
 
     public onHexChange(value: string): void {
@@ -187,7 +242,9 @@ export class ColorGradientComponent implements AfterViewInit, ControlValueAccess
         this.alpha.set(rgb.a);
         this.hsvPointerLeft.set(this.getPositionFromSaturation(hsv.s));
         this.hsvPointerTop.set(this.getPositionFromValue(hsv.v));
-        this.#propagateChange(value);
+        if (!this.showButtons()) {
+            this.#propagateChange(value);
+        }
     }
 
     public onHexInputBlur(): void {
@@ -226,6 +283,7 @@ export class ColorGradientComponent implements AfterViewInit, ControlValueAccess
             this.hsvPointerLeft.set(this.getPositionFromSaturation(hsv.s));
             this.hsvPointerTop.set(this.getPositionFromValue(hsv.v));
         });
+        this.lastSelectedColor.set(this.hex());
     }
 
     private getSaturationFromPosition(): number {
@@ -473,6 +531,8 @@ export class ColorGradientComponent implements AfterViewInit, ControlValueAccess
         this.rgb().r.set(rgb.r);
         this.rgb().g.set(rgb.g);
         this.rgb().b.set(rgb.b);
-        this.#propagateChange(this.rgba2hex(rgb.r, rgb.g, rgb.b, this.alpha()));
+        if (!this.showButtons()) {
+            this.#propagateChange(this.rgba2hex(rgb.r, rgb.g, rgb.b, this.alpha()));
+        }
     }
 }
