@@ -17,6 +17,10 @@ export class EditorService {
     #editor!: Editor;
     public readonly state = this.#state.asReadonly();
 
+    public destroy(): void {
+        this.#editor.destroy();
+    }
+
     public setupEditor(settings: EditorSettings): void {
         this.#editor = new Editor({
             element: settings.element,

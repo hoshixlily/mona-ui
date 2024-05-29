@@ -1013,7 +1013,7 @@ input[type="checkbox"][monaCheckBox] {
     border: 1px solid var(--mona-border-color);
     border-radius: var(--mona-border-radius);
     background: var(--mona-background);
-    & > div:first-child {
+    & > .mona-input-selector-value {
         border: 1px solid black;
         border-radius: var(--mona-border-radius);
     }

@@ -1,8 +1,13 @@
-<div [style.background]="color()" class="mona-input-selector-value">
-    @if (!color()) {
-        <fa-icon [icon]="noColorIcon"></fa-icon>
-    }
-</div>
+@if (valueTemplate()) {
+    <ng-container [ngTemplateOutlet]="valueTemplate()??null"
+                  [ngTemplateOutletContext]="{$implicit: color()}"></ng-container>
+} @else {
+    <div [style.background]="color()" class="mona-input-selector-value">
+        @if (!color()) {
+            <fa-icon [icon]="noColorIcon"></fa-icon>
+        }
+    </div>
+}
 <div class="mona-input-selector-icon">
     <button monaButton [flat]="true" [tabindex]="-1" class="mona-input-button">
         <fa-icon [icon]="dropdownIcon"></fa-icon>

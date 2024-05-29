@@ -2,9 +2,9 @@ import {
     afterNextRender,
     ChangeDetectionStrategy,
     Component,
-    computed,
     ElementRef,
     inject,
+    OnDestroy,
     viewChild
 } from "@angular/core";
 import { FormsModule } from "@angular/forms";
@@ -13,7 +13,6 @@ import { ButtonGroupComponent } from "../../../buttons/button-group/button-group
 import { ButtonDirective } from "../../../buttons/button/button.directive";
 import { DropDownItemTemplateDirective } from "../../../dropdowns/directives/drop-down-item-template.directive";
 import { DropDownListComponent } from "../../../dropdowns/drop-down-list/components/drop-down-list/drop-down-list.component";
-import { HeadingsDropdownListDataItem, HeadingType } from "../../models/HeadingsDropdownListDataItem";
 import { EditorService } from "../../services/editor.service";
 import { EditorBasicTextStylesComponent } from "../editor-basic-text-styles/editor-basic-text-styles.component";
 import { EditorFontColorComponent } from "../editor-font-color/editor-font-color.component";
@@ -45,12 +44,17 @@ import { EditorTextAlignmentsComponent } from "../editor-text-alignments/editor-
         class: "mona-editor"
     }
 })
-export class EditorComponent {
+export class EditorComponent implements OnDestroy {
     readonly #editorService: EditorService = inject(EditorService);
     protected readonly editorContainer = viewChild.required<ElementRef<HTMLDivElement>>("editorContainer");
+
     public constructor() {
         afterNextRender(() => {
             this.#editorService.setupEditor({ element: this.editorContainer().nativeElement });
         });
+    }
+
+    public ngOnDestroy(): void {
+        this.#editorService.destroy();
     }
 }

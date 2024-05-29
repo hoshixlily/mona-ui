@@ -94,7 +94,8 @@ export * from "./inputs/color-gradient/components/color-gradient/color-gradient.
 
 export * from "./inputs/color-palette/color-palette.component";
 
-export * from "./inputs/color-picker/color-picker.component";
+export * from "./inputs/color-picker/directives/color-picker-value-template.directive";
+export * from "./inputs/color-picker/components/color-picker/color-picker.component";
 
 export * from "./inputs/numeric-text-box/directives/numeric-text-box-prefix-template.directive";
 export * from "./inputs/numeric-text-box/components/numeric-text-box/numeric-text-box.component";

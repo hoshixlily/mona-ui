@@ -1,5 +1,7 @@
+import { NgTemplateOutlet } from "@angular/common";
 import {
     Component,
+    contentChild,
     DestroyRef,
     ElementRef,
     forwardRef,
@@ -18,16 +20,18 @@ import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from "@angular/f
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { faChevronDown, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { fromEvent } from "rxjs";
-import { AnimationState } from "../../animations/models/AnimationState";
-import { PopupAnimationService } from "../../animations/services/popup-animation.service";
-import { ButtonDirective } from "../../buttons/button/button.directive";
-import { PopupRef } from "../../popup/models/PopupRef";
-import { PopupService } from "../../popup/services/popup.service";
-import { Action } from "../../utils/Action";
-import { ColorGradientComponent } from "../color-gradient/components/color-gradient/color-gradient.component";
-import { ColorPaletteComponent } from "../color-palette/color-palette.component";
-import { ColorPickerView } from "../models/ColorPickerView";
-import { PaletteType } from "../models/PaletteType";
+import { AnimationState } from "../../../../animations/models/AnimationState";
+import { PopupAnimationService } from "../../../../animations/services/popup-animation.service";
+import { ButtonDirective } from "../../../../buttons/button/button.directive";
+import { PopupRef } from "../../../../popup/models/PopupRef";
+import { PopupService } from "../../../../popup/services/popup.service";
+import { Action } from "../../../../utils/Action";
+import { ColorGradientComponent } from "../../../color-gradient/components/color-gradient/color-gradient.component";
+import { ColorPaletteComponent } from "../../../color-palette/color-palette.component";
+import { ColorPickerValueTemplateContext } from "../../models/ColorPickerValueTemplateContext";
+import { ColorPickerView } from "../../models/ColorPickerView";
+import { PaletteType } from "../../../models/PaletteType";
+import { ColorPickerValueTemplateDirective } from "../../directives/color-picker-value-template.directive";
 
 @Component({
     selector: "mona-color-picker",
@@ -41,7 +45,14 @@ import { PaletteType } from "../models/PaletteType";
         }
     ],
     standalone: true,
-    imports: [FontAwesomeModule, ButtonDirective, ColorPaletteComponent, FormsModule, ColorGradientComponent],
+    imports: [
+        FontAwesomeModule,
+        ButtonDirective,
+        ColorPaletteComponent,
+        FormsModule,
+        ColorGradientComponent,
+        NgTemplateOutlet
+    ],
     host: {
         "[class.mona-color-picker]": "true",
         "[class.mona-input-selector]": "true",
@@ -61,6 +72,10 @@ export class ColorPickerComponent implements OnInit, ControlValueAccessor {
     protected readonly noColorIcon: IconDefinition = faTimes;
     protected readonly dropdownIcon: IconDefinition = faChevronDown;
     protected readonly popupTemplate: Signal<TemplateRef<any>> = viewChild.required("popupTemplate");
+    protected readonly valueTemplate = contentChild<
+        ColorPickerValueTemplateDirective,
+        TemplateRef<ColorPickerValueTemplateContext>
+    >(ColorPickerValueTemplateDirective, { read: TemplateRef });
 
     /**
      * Whether to close the color picker when a color is selected.
