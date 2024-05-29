@@ -1,6 +1,7 @@
 import { Injectable, signal } from "@angular/core";
 import { Editor } from "@tiptap/core";
 import { Color } from "@tiptap/extension-color";
+import { Highlight } from "@tiptap/extension-highlight";
 import { Subscript } from "@tiptap/extension-subscript";
 import { Superscript } from "@tiptap/extension-superscript";
 import { TextAlign } from "@tiptap/extension-text-align";
@@ -29,6 +30,7 @@ export class EditorService {
                 Underline,
                 Subscript,
                 Superscript,
+                Highlight.configure({ multicolor: true }),
                 TextStyle,
                 Color,
                 FontSize,

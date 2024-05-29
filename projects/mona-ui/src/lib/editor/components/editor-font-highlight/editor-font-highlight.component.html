@@ -1,0 +1,8 @@
+<mona-color-picker view="gradient"  [ngModel]="selectedColor()" (ngModelChange)="onColorChange($event)">
+    <ng-template monaColorPickerValueTemplate let-color>
+        <div class="mona-editor-font-highlight-value">
+            <fa-icon [icon]="highlightIcon"></fa-icon>
+            <span class="mona-editor-font-highlight-preview" [style.background-color]="color"></span>
+        </div>
+    </ng-template>
+</mona-color-picker>

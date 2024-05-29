@@ -16,6 +16,7 @@ import { DropDownListComponent } from "../../../dropdowns/drop-down-list/compone
 import { EditorService } from "../../services/editor.service";
 import { EditorBasicTextStylesComponent } from "../editor-basic-text-styles/editor-basic-text-styles.component";
 import { EditorFontColorComponent } from "../editor-font-color/editor-font-color.component";
+import { EditorFontHighlightComponent } from "../editor-font-highlight/editor-font-highlight.component";
 import { EditorFontSizeComponent } from "../editor-font-size/editor-font-size.component";
 import { EditorHeadingsComponent } from "../editor-headings/editor-headings.component";
 import { EditorTextAlignmentsComponent } from "../editor-text-alignments/editor-text-alignments.component";
@@ -34,7 +35,8 @@ import { EditorTextAlignmentsComponent } from "../editor-text-alignments/editor-
         EditorHeadingsComponent,
         EditorTextAlignmentsComponent,
         EditorFontSizeComponent,
-        EditorFontColorComponent
+        EditorFontColorComponent,
+        EditorFontHighlightComponent
     ],
     templateUrl: "./editor.component.html",
     styleUrl: "./editor.component.scss",
