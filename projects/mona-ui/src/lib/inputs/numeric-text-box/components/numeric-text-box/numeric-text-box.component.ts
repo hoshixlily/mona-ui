@@ -180,6 +180,11 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
             });
     }
 
+    public onBlur(event: Event): void {
+        this.correctValue();
+        this.inputBlur.emit(event);
+    }
+
     public registerOnChange(fn: any): void {
         this.#propagateChange = fn;
     }
@@ -194,6 +199,29 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
         this.value.set(Number(obj));
     }
 
+    private correctValue(): void {
+        const value = this.value();
+        const min = this.min();
+        const max = this.max();
+
+        if (value == null) {
+            if (this.nullable()) {
+                this.valueChange$.next("");
+            } else if (min != null) {
+                this.valueChange$.next(min.toString());
+            } else {
+                this.valueChange$.next("0");
+            }
+            return;
+        }
+        if (min != null && value < min) {
+            this.valueChange$.next(min.toString());
+        }
+        if (max != null && value > max) {
+            this.valueChange$.next(max.toString());
+        }
+    }
+
     private focus(): void {
         this.#focusMonitor.focusVia(this.valueTextBoxRef(), "keyboard");
     }
@@ -201,12 +229,12 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
     private setBeforeInputSubscription(): void {
         this.beforeInput$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe((event: InputEvent): void => {
             const inputElement = event.target as HTMLInputElement;
-
+            const min = this.min();
             if (event.inputType.startsWith("delete")) {
-                if (inputElement.value.length === 1 && !this.nullable) {
-                    if (this.min != null) {
+                if (inputElement.value.length === 1 && !this.nullable()) {
+                    if (min != null) {
                         event.preventDefault();
-                        this.valueChange$.next(this.min.toString());
+                        this.valueChange$.next(min.toString());
                         return;
                     } else {
                         event.preventDefault();
@@ -263,19 +291,6 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
                     return;
                 }
             }
-
-            const max = this.max();
-            const min = this.min();
-            if (min != null && parseFloat(newValue) < min) {
-                event.preventDefault();
-                this.valueChange$.next(min.toString());
-                return;
-            }
-
-            if (max != null && parseFloat(newValue) > max) {
-                event.preventDefault();
-                this.valueChange$.next(max.toString());
-            }
         });
     }
 
@@ -294,7 +309,6 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
             if (event.key === "ArrowDown") {
                 event.preventDefault();
                 this.decrease();
-                return;
             }
         });
     }
@@ -335,27 +349,15 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
                 filter(v => v == null || v === "" || NumericTextBoxComponent.isNumeric(v)),
                 map(v => {
                     if (v == null || v === "") {
-                        if (this.nullable()) {
-                            return null;
-                        }
-                        if (this.min() != null) {
-                            return this.min();
-                        }
-                        return 0;
+                        return null;
                     }
                     return parseFloat(v.toString());
                 })
             )
             .subscribe(value => {
                 const previousValue = this.value();
-                const max = this.max();
-                const min = this.min();
                 if (value == null) {
                     this.value.set(null);
-                } else if (min != null && value < min) {
-                    this.value.set(min);
-                } else if (max != null && value > max) {
-                    this.value.set(max);
                 } else {
                     this.value.set(value);
                 }
