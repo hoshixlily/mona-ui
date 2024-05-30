@@ -27,7 +27,7 @@ import { ButtonDirective } from "../../../../buttons/button/button.directive";
 import { ContextMenuComponent } from "../../../../menus/context-menu/context-menu.component";
 import { MenuItemComponent } from "../../../../menus/menu-item/menu-item.component";
 import { ColorMode } from "../../../models/ColorMode";
-import { HSV, HSVSignal, RGB, RGBA, RGBSignal } from "../../../models/ColorSpaces";
+import { Channel, HSV, HSVSignal, RGB, RGBA, RGBSignal } from "../../../models/ColorSpaces";
 import { NumericTextBoxComponent } from "../../../numeric-text-box/components/numeric-text-box/numeric-text-box.component";
 import { NumericTextBoxPrefixTemplateDirective } from "../../../numeric-text-box/directives/numeric-text-box-prefix-template.directive";
 import { TextBoxComponent } from "../../../text-box/components/text-box/text-box.component";
@@ -157,6 +157,10 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
     }
 
     public onAlphaChange(value: number): void {
+        if (value == null) {
+            return;
+        }
+        value = this.getValidChannelValue(value, "a");
         this.alpha.set(value);
         this.updateHexInputValue();
         if (!this.showButtons()) {
@@ -193,6 +197,8 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
         if (value == null) {
             return;
         }
+        value = this.getValidChannelValue(value, channel);
+
         const rgb = this.rgb();
         rgb[channel].set(value);
         const hsv = this.rgb2hsv(rgb.r(), rgb.g(), rgb.b());
@@ -211,6 +217,9 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
         if (value == null) {
             return;
         }
+
+        value = this.getValidChannelValue(value, channel);
+
         const hsv = this.hsv();
         hsv[channel].set(value);
         const rgb = this.hsv2rgb(hsv.h(), hsv.s(), hsv.v());
@@ -302,6 +311,19 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
         const maxVal = this.hsvRectangle().nativeElement.offsetHeight;
         const minVal = ((100 - value) / 100) * maxVal;
         return minVal - this.hsvPointer().nativeElement.offsetHeight / 2;
+    }
+
+    private getValidChannelValue(value: number, channel: Channel): number {
+        if (channel === "r" || channel === "g" || channel === "b" || channel === "a") {
+            return Math.min(255, Math.max(0, value));
+        }
+        if (channel === "h") {
+            return Math.min(360, Math.max(0, value));
+        }
+        if (channel === "s" || channel === "v") {
+            return Math.min(100, Math.max(0, value));
+        }
+        return value;
     }
 
     private getValueFromPosition(): number {

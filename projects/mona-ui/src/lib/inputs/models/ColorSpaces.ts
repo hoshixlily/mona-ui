@@ -27,3 +27,5 @@ export interface HSVSignal {
     s: WritableSignal<number>;
     v: WritableSignal<number>;
 }
+
+export type Channel = keyof RGBA | keyof HSV;
