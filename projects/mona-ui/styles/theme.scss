@@ -773,6 +773,13 @@ mona-filter-input.mona-popup-filter-input,
     }
 }
 
+.mona-editor blockquote {
+    border-left: 4px solid var(--mona-primary);
+    padding: 0.5rem 1rem;
+    margin-left: 1rem;
+    background: var(--mona-background-lighter);
+}
+
 /** Filters */
 .mona-filter-menu {
     width: 100%;
