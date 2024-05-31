@@ -11,9 +11,13 @@
     </div>
     <div class="mona-color-gradient-preview-color" [style.background-color]="selectedColor()"></div>
     @if (showButtons()) {
-        <div class="mona-color-gradient-current-color" (click)="onResetColorClick()"
+        <div class="mona-color-gradient-current-color"
+             (click)="onResetColorClick()"
              [style.background-color]="lastSelectedColor()"></div>
     }
+    <button monaButton [flat]="true" (click)="onClearClick()">
+        <fa-icon [icon]="clearIcon"></fa-icon>
+    </button>
 </div>
 <div class="mona-color-gradient-inputs">
     @if (showRgbInput()) {
