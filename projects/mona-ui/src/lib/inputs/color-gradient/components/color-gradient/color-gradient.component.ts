@@ -100,7 +100,7 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
     });
     protected readonly hsvRectBackground: Signal<string> = computed(() => {
         const hsv = this.hsv();
-        const rgb = this.hsv2rgb(hsv.h(), 100, 100, 255);
+        const rgb = this.hsva2rgba(hsv.h(), 100, 100, 255);
         return `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
     });
     protected readonly hsvPointer: Signal<ElementRef<HTMLDivElement>> = viewChild.required("hsvPointer");
@@ -116,7 +116,11 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
     });
     protected readonly selectedColor: Signal<string> = computed(() => {
         const rgb = this.rgb();
-        return `rgba(${rgb.r()}, ${rgb.g()}, ${rgb.b()}, ${this.alpha() / 255})`;
+        const { red, green, blue } = { red: rgb.r(), green: rgb.g(), blue: rgb.b() };
+        if (red == null || green == null || blue == null) {
+            return "";
+        }
+        return `rgba(${red}, ${green}, ${blue}, ${this.alpha() / 255})`;
     });
     protected readonly switchIcon: IconDefinition = faSort;
 
@@ -208,7 +212,7 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
             return;
         }
         const rgb = this.hex2rgba(value);
-        const hsv = this.rgb2hsv(rgb.r, rgb.g, rgb.b, rgb.a);
+        const hsv = this.rgba2hsva(rgb.r, rgb.g, rgb.b, rgb.a);
         this.hsv().h.set(hsv.h);
         this.hsv().s.set(hsv.s);
         this.hsv().v.set(hsv.v);
@@ -242,7 +246,7 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
         hsv[channel].set(value);
         this.updateOtherNullChannels(channel);
 
-        const rgb = this.hsv2rgb(hsv.h(), hsv.s(), hsv.v(), this.alpha());
+        const rgb = this.hsva2rgba(hsv.h(), hsv.s(), hsv.v(), this.alpha());
         this.rgb().r.set(rgb.r);
         this.rgb().g.set(rgb.g);
         this.rgb().b.set(rgb.b);
@@ -268,7 +272,7 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
         rgb[channel].set(value);
         this.updateOtherNullChannels(channel);
 
-        const hsv = this.rgb2hsv(rgb.r(), rgb.g(), rgb.b(), this.alpha());
+        const hsv = this.rgba2hsva(rgb.r(), rgb.g(), rgb.b(), this.alpha());
         this.hsv().h.set(hsv.h);
         this.hsv().s.set(hsv.s);
         this.hsv().v.set(hsv.v);
@@ -304,6 +308,7 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
 
     private clear(): void {
         this.hexInputValue.set("");
+        this.lastSelectedColor.set("");
         this.rgb().r.set(null);
         this.rgb().g.set(null);
         this.rgb().b.set(null);
@@ -333,7 +338,6 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
         } else if (format === "rgb") {
             this.#valueChange$.next(`rgba(${red}, ${green}, ${blue}, ${alpha / 255})`);
         } else if (format === "hsl") {
-            const hsv = this.rgb2hsv(red, green, blue, alpha);
             const hsl = this.rgba2hsla(red, green, blue, alpha);
             this.#valueChange$.next(`hsla(${hsl.h}, ${hsl.s}%, ${hsl.l}%, ${alpha / 255})`);
         }
@@ -405,7 +409,7 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
         return { r: r, g: g, b: b, a: a };
     }
 
-    private hsl2hsv(
+    private hsla2hsva(
         hue: number | null,
         saturation: number | null,
         lightness: number | null,
@@ -429,7 +433,7 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
         };
     }
 
-    private hsv2rgb(hue: number | null, saturation: number | null, value: number | null, alpha: number | null): RGBA {
+    private hsva2rgba(hue: number | null, saturation: number | null, value: number | null, alpha: number | null): RGBA {
         if (hue == null || saturation == null || value == null) {
             return { r: 0, g: 0, b: 0, a: 255 };
         }
@@ -479,8 +483,8 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
             rgba = this.string2rgba(color);
         } else if (isValidHsv) {
             hsla = this.string2Hsla(color);
-            hsva = this.hsl2hsv(hsla.h, hsla.s, hsla.l, hsla.a);
-            rgba = this.hsv2rgb(hsva.h, hsva.s, hsva.v, hsva.a);
+            hsva = this.hsla2hsva(hsla.h, hsla.s, hsla.l, hsla.a);
+            rgba = this.hsva2rgba(hsva.h, hsva.s, hsva.v, hsva.a);
             hsva = {
                 h: Math.round(hsva.h as number),
                 s: Math.round(hsva.s as number),
@@ -492,7 +496,7 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
         }
 
         if (!hsva) {
-            hsva = this.rgb2hsv(rgba.r, rgba.g, rgba.b, rgba.a);
+            hsva = this.rgba2hsva(rgba.r, rgba.g, rgba.b, rgba.a);
         }
 
         this.updateHsvSignal(hsva);
@@ -561,7 +565,7 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
         };
     }
 
-    private rgb2hsv(r: number | null, g: number | null, b: number | null, a: number | null): HSVA {
+    private rgba2hsva(r: number | null, g: number | null, b: number | null, a: number | null): HSVA {
         if (r == null || g == null || b == null) {
             return { h: 0, s: 0, v: 0, a: 255 };
         }
@@ -726,7 +730,7 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
 
         this.hsv().s.set(saturation);
         this.hsv().v.set(value);
-        const rgb = this.hsv2rgb(this.hsv().h(), saturation, value, this.alpha());
+        const rgb = this.hsva2rgba(this.hsv().h(), saturation, value, this.alpha());
         if (this.rgb().r() === rgb.r && this.rgb().g() === rgb.g && this.rgb().b() === rgb.b) {
             return;
         }

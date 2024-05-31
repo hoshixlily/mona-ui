@@ -229,19 +229,6 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
     private setBeforeInputSubscription(): void {
         this.beforeInput$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe((event: InputEvent): void => {
             const inputElement = event.target as HTMLInputElement;
-            const min = this.min();
-            if (event.inputType.startsWith("delete")) {
-                if (inputElement.value.length === 1 && !this.nullable()) {
-                    if (min != null) {
-                        event.preventDefault();
-                        this.valueChange$.next(min.toString());
-                        return;
-                    } else {
-                        event.preventDefault();
-                        return;
-                    }
-                }
-            }
 
             const insertedText = event.data;
             if (insertedText == null || insertedText === "") {
