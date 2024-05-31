@@ -16,24 +16,30 @@ import { EditorService } from "../../services/editor.service";
 })
 export class EditorFontHighlightComponent {
     readonly #editorService: EditorService = inject(EditorService);
+    #lastColor: string = "";
     protected readonly highlightIcon = faDroplet;
     protected readonly selectedColor = computed(() => {
         const state = this.#editorService.state();
         if (state.selection.empty) {
             const marks = state.storedMarks || state.selection.$from.marks();
             const highlightMark = marks.find(mark => mark.type.name === "highlight");
-            return highlightMark ? highlightMark.attrs["color"] : "";
+            return highlightMark ? highlightMark.attrs["color"] : this.#lastColor;
         } else {
             const node = state.doc.nodeAt(state.selection.from);
             if (node) {
                 const highlightMark = node.marks.find(mark => mark.type.name === "highlight");
-                return highlightMark ? highlightMark.attrs["color"] : "";
+                return highlightMark ? highlightMark.attrs["color"] : this.#lastColor;
             }
-            return null;
+            return "";
         }
     });
 
     public onColorChange(color: string): void {
-        this.#editorService.editor.chain().focus().setHighlight({ color }).run();
+        if (color) {
+            this.#editorService.editor.chain().focus().setHighlight({ color }).run();
+            this.#lastColor = color;
+        } else {
+            this.#editorService.editor.chain().focus().unsetHighlight().run();
+        }
     }
 }
