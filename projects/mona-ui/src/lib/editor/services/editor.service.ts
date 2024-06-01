@@ -1,7 +1,9 @@
 import { Injectable, signal } from "@angular/core";
+import { ImmutableSet } from "@mirei/ts-collections";
 import { Editor } from "@tiptap/core";
 import { Blockquote } from "@tiptap/extension-blockquote";
 import { Color } from "@tiptap/extension-color";
+import { FontFamily } from "@tiptap/extension-font-family";
 import { Highlight } from "@tiptap/extension-highlight";
 import { Link } from "@tiptap/extension-link";
 import { Subscript } from "@tiptap/extension-subscript";
@@ -19,6 +21,22 @@ import { EditorSettings } from "../models/EditorSettings";
 export class EditorService {
     readonly #state = signal<EditorState>({} as EditorState);
     #editor!: Editor;
+    public readonly fonts = signal(
+        ImmutableSet.create([
+            "Arial",
+            "Comic Sans MS",
+            "Courier New",
+            "Georgia",
+            "Impact",
+            "Lucida Console",
+            "Lucida Sans Unicode",
+            "Palatino Linotype",
+            "Tahoma",
+            "Times New Roman",
+            "Trebuchet MS",
+            "Verdana"
+        ])
+    );
     public readonly state = this.#state.asReadonly();
 
     public destroy(): void {
@@ -43,6 +61,7 @@ export class EditorService {
                 TextStyle,
                 Color,
                 FontSize,
+                FontFamily,
                 TextAlign.configure({
                     types: ["paragraph", "heading"]
                 })

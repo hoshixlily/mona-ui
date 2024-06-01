@@ -17,6 +17,7 @@ import { EditorService } from "../../services/editor.service";
 import { EditorBasicTextStylesComponent } from "../editor-basic-text-styles/editor-basic-text-styles.component";
 import { EditorBlockquoteComponent } from "../editor-blockquote/editor-blockquote.component";
 import { EditorFontColorComponent } from "../editor-font-color/editor-font-color.component";
+import { EditorFontFamilyComponent } from "../editor-font-family/editor-font-family.component";
 import { EditorFontHighlightComponent } from "../editor-font-highlight/editor-font-highlight.component";
 import { EditorFontSizeComponent } from "../editor-font-size/editor-font-size.component";
 import { EditorHeadingsComponent } from "../editor-headings/editor-headings.component";
@@ -46,7 +47,8 @@ import { EditorTextAlignmentsComponent } from "../editor-text-alignments/editor-
         EditorLinkComponent,
         EditorListComponent,
         EditorIndentComponent,
-        EditorHistoryComponent
+        EditorHistoryComponent,
+        EditorFontFamilyComponent
     ],
     templateUrl: "./editor.component.html",
     styleUrl: "./editor.component.scss",
