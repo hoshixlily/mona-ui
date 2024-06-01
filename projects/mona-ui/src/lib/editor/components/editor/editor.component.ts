@@ -21,6 +21,7 @@ import { EditorFontHighlightComponent } from "../editor-font-highlight/editor-fo
 import { EditorFontSizeComponent } from "../editor-font-size/editor-font-size.component";
 import { EditorHeadingsComponent } from "../editor-headings/editor-headings.component";
 import { EditorLinkComponent } from "../editor-link/editor-link.component";
+import { EditorListComponent } from "../editor-list/editor-list.component";
 import { EditorTextAlignmentsComponent } from "../editor-text-alignments/editor-text-alignments.component";
 
 @Component({
@@ -40,7 +41,8 @@ import { EditorTextAlignmentsComponent } from "../editor-text-alignments/editor-
         EditorFontColorComponent,
         EditorFontHighlightComponent,
         EditorBlockquoteComponent,
-        EditorLinkComponent
+        EditorLinkComponent,
+        EditorListComponent
     ],
     templateUrl: "./editor.component.html",
     styleUrl: "./editor.component.scss",

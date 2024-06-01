@@ -1,0 +1,8 @@
+<mona-button-group selection="single">
+    <button monaButton [selected]="unorderedListSelected()" (click)="onUnorderedListToggle()">
+        <fa-icon [icon]="unorderedListIcon"></fa-icon>
+    </button>
+    <button monaButton [selected]="orderedListSelected()" (click)="onOrderedListToggle()">
+        <fa-icon [icon]="orderedListIcon"></fa-icon>
+    </button>
+</mona-button-group>

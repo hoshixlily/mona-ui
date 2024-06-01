@@ -780,6 +780,11 @@ mona-filter-input.mona-popup-filter-input,
     background: var(--mona-background-lighter);
 }
 
+.mona-editor ol,
+.mona-editor ul {
+    padding-left: 3rem;
+}
+
 /** Filters */
 .mona-filter-menu {
     width: 100%;
