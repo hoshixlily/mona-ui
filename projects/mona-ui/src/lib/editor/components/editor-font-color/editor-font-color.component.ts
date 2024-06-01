@@ -17,14 +17,17 @@ import { EditorService } from "../../services/editor.service";
 })
 export class EditorFontColorComponent {
     readonly #editorService: EditorService = inject(EditorService);
+    #lastColor: string = "";
     protected readonly fontIcon = faFont;
     protected readonly selectedColor = computed(() => {
         this.#editorService.state();
         const attributes = this.#editorService.editor.getAttributes("textStyle");
-        return ColorService.getHtmlColorCode(attributes["color"]);
+        const color = attributes["color"] || this.#lastColor;
+        return ColorService.getHtmlColorCode(color);
     });
 
     public onColorChange(color: string): void {
         this.#editorService.editor.chain().focus().setColor(color).run();
+        this.#lastColor = color;
     }
 }
