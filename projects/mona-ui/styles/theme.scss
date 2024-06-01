@@ -785,6 +785,14 @@ mona-filter-input.mona-popup-filter-input,
     padding-left: 3rem;
 }
 
+.mona-editor hr {
+    border: 1px solid var(--mona-border-color);
+    height: 4px;
+    background: var(--mona-background-dark);
+    margin-top: 0.25rem;
+    margin-bottom: 0.25rem;
+}
+
 /** Filters */
 .mona-filter-menu {
     width: 100%;
