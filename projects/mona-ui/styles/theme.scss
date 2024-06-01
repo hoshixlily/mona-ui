@@ -782,7 +782,7 @@ mona-filter-input.mona-popup-filter-input,
 
 .mona-editor ol,
 .mona-editor ul {
-    padding-left: 3rem;
+    padding-left: 2rem;
 }
 
 .mona-editor hr {
@@ -791,6 +791,16 @@ mona-filter-input.mona-popup-filter-input,
     background: var(--mona-background-dark);
     margin-top: 0.25rem;
     margin-bottom: 0.25rem;
+}
+
+.mona-editor ul[data-type="taskList"] {
+    & li {
+        display: flex;
+        padding: 0.125rem 0;
+    }
+    & input[type="checkbox"] {
+        margin-right: 0.5rem !important;
+    }
 }
 
 /** Filters */
@@ -906,7 +916,9 @@ mona-filter-input.mona-popup-filter-input,
 /** Inputs */
 
 /** Check Box */
-input[type="checkbox"][monaCheckBox] {
+input[type="checkbox"][monaCheckBox],
+.mona-editor ul[data-type="taskList"] input[type="checkbox"]
+{
     appearance: none;
     width: 20px;
     height: 20px;

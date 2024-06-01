@@ -26,6 +26,7 @@ import { EditorHorizontalRuleComponent } from "../editor-horizontal-rule/editor-
 import { EditorIndentComponent } from "../editor-indent/editor-indent.component";
 import { EditorLinkComponent } from "../editor-link/editor-link.component";
 import { EditorListComponent } from "../editor-list/editor-list.component";
+import { EditorTaskListComponent } from "../editor-task-list/editor-task-list.component";
 import { EditorTextAlignmentsComponent } from "../editor-text-alignments/editor-text-alignments.component";
 
 @Component({
@@ -50,7 +51,8 @@ import { EditorTextAlignmentsComponent } from "../editor-text-alignments/editor-
         EditorIndentComponent,
         EditorHistoryComponent,
         EditorFontFamilyComponent,
-        EditorHorizontalRuleComponent
+        EditorHorizontalRuleComponent,
+        EditorTaskListComponent
     ],
     templateUrl: "./editor.component.html",
     styleUrl: "./editor.component.scss",
