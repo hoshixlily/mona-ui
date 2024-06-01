@@ -1,8 +1,8 @@
 <mona-button-group selection="single">
-    <button monaButton [selected]="linkSelected()" (click)="onLinkDialogDisplay()">
+    <button monaButton [selected]="linkSelected()" (click)="onLinkDialogDisplay()" title="Insert Link">
         <fa-icon [icon]="linkIcon"></fa-icon>
     </button>
-    <button monaButton [disabled]="unlinkDisabled()" (click)="onUnlinkClick()">
+    <button monaButton [disabled]="unlinkDisabled()" (click)="onUnlinkClick()" title="Remove Link">
         <fa-icon [icon]="unlinkIcon"></fa-icon>
     </button>
 </mona-button-group>

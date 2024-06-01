@@ -1,14 +1,14 @@
 <mona-button-group selection="single">
-    <button monaButton [selected]="alignLeftSelected()" (click)="onAlignLeft()">
+    <button monaButton [selected]="alignLeftSelected()" (click)="onAlignLeft()" title="Align text left">
         <fa-icon [icon]="alignLeftIcon"></fa-icon>
     </button>
-    <button monaButton [selected]="alignCenterSelected()" (click)="onAlignCenter()">
+    <button monaButton [selected]="alignCenterSelected()" (click)="onAlignCenter()" title="Center text">
         <fa-icon [icon]="alignCenterIcon"></fa-icon>
     </button>
-    <button monaButton [selected]="alignRightSelected()" (click)="onAlignRight()">
+    <button monaButton [selected]="alignRightSelected()" (click)="onAlignRight()" title="Align text right">
         <fa-icon [icon]="alignRightIcon"></fa-icon>
     </button>
-    <button monaButton [selected]="alignJustifySelected()" (click)="onAlignJustify()">
+    <button monaButton [selected]="alignJustifySelected()" (click)="onAlignJustify()" title="Justify">
         <fa-icon [icon]="alignJustifyIcon"></fa-icon>
     </button>
 </mona-button-group>

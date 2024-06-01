@@ -1,20 +1,20 @@
 <mona-button-group selection="multiple">
-    <button monaButton [selected]="boldSelected()" (click)="onBoldToggle()">
+    <button monaButton [selected]="boldSelected()" (click)="onBoldToggle()" title="Bold">
         <fa-icon [icon]="boldIcon"></fa-icon>
     </button>
-    <button monaButton [selected]="italicSelected()" (click)="onItalicToggle()">
+    <button monaButton [selected]="italicSelected()" (click)="onItalicToggle()" title="Italic">
         <fa-icon [icon]="italicIcon"></fa-icon>
     </button>
-    <button monaButton [selected]="underlineSelected()" (click)="onUnderlineToggle()">
+    <button monaButton [selected]="underlineSelected()" (click)="onUnderlineToggle()" title="Underline">
         <fa-icon [icon]="underlineIcon"></fa-icon>
     </button>
-    <button monaButton [selected]="strikeThroughSelected()" (click)="onStrikeThroughToggle()">
+    <button monaButton [selected]="strikeThroughSelected()" (click)="onStrikeThroughToggle()" title="Strikethrough">
         <fa-icon [icon]="strikeThroughIcon"></fa-icon>
     </button>
-    <button monaButton [selected]="subscriptSelected()" (click)="onSubscriptToggle()">
+    <button monaButton [selected]="subscriptSelected()" (click)="onSubscriptToggle()" title="Subscript">
         <fa-icon [icon]="subscriptIcon"></fa-icon>
     </button>
-    <button monaButton [selected]="superscriptSelected()" (click)="onSuperscriptToggle()">
+    <button monaButton [selected]="superscriptSelected()" (click)="onSuperscriptToggle()" title="Superscript">
         <fa-icon [icon]="superscriptIcon"></fa-icon>
     </button>
 </mona-button-group>
