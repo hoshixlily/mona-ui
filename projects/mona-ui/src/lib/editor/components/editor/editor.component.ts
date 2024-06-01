@@ -20,6 +20,7 @@ import { EditorFontColorComponent } from "../editor-font-color/editor-font-color
 import { EditorFontHighlightComponent } from "../editor-font-highlight/editor-font-highlight.component";
 import { EditorFontSizeComponent } from "../editor-font-size/editor-font-size.component";
 import { EditorHeadingsComponent } from "../editor-headings/editor-headings.component";
+import { EditorIndentComponent } from "../editor-indent/editor-indent.component";
 import { EditorLinkComponent } from "../editor-link/editor-link.component";
 import { EditorListComponent } from "../editor-list/editor-list.component";
 import { EditorTextAlignmentsComponent } from "../editor-text-alignments/editor-text-alignments.component";
@@ -42,7 +43,8 @@ import { EditorTextAlignmentsComponent } from "../editor-text-alignments/editor-
         EditorFontHighlightComponent,
         EditorBlockquoteComponent,
         EditorLinkComponent,
-        EditorListComponent
+        EditorListComponent,
+        EditorIndentComponent
     ],
     templateUrl: "./editor.component.html",
     styleUrl: "./editor.component.scss",

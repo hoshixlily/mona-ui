@@ -1,0 +1,8 @@
+<mona-button-group selection="single">
+    <button monaButton [disabled]="indentDisabled()" (click)="onIndentClick()">
+        <fa-icon [icon]="indentIcon"></fa-icon>
+    </button>
+    <button monaButton [disabled]="outdentDisabled()" (click)="onOutdentClick()">
+        <fa-icon [icon]="outdentIcon"></fa-icon>
+    </button>
+</mona-button-group>

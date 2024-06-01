@@ -12,6 +12,7 @@ import { Underline } from "@tiptap/extension-underline";
 import { EditorState } from "@tiptap/pm/state";
 import { StarterKit } from "@tiptap/starter-kit";
 import { FontSize } from "../extensions/FontSize";
+import { Indent } from "../extensions/Indent";
 import { EditorSettings } from "../models/EditorSettings";
 
 @Injectable()
@@ -34,6 +35,7 @@ export class EditorService {
                 Superscript,
                 Highlight.configure({ multicolor: true }),
                 Blockquote,
+                Indent,
                 Link.configure({
                     openOnClick: "whenNotEditable",
                     autolink: true
