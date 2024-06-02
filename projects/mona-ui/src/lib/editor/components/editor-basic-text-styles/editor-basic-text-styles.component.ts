@@ -1,13 +1,4 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from "@angular/core";
-import { FaIconComponent } from "@fortawesome/angular-fontawesome";
-import {
-    faBold,
-    faItalic,
-    faStrikethrough,
-    faSubscript,
-    faSuperscript,
-    faUnderline
-} from "@fortawesome/free-solid-svg-icons";
 import { ButtonGroupComponent } from "../../../buttons/button-group/button-group.component";
 import { ButtonDirective } from "../../../buttons/button/button.directive";
 import { EditorService } from "../../services/editor.service";
@@ -15,39 +6,33 @@ import { EditorService } from "../../services/editor.service";
 @Component({
     selector: "mona-editor-basic-text-styles",
     standalone: true,
-    imports: [ButtonDirective, ButtonGroupComponent, FaIconComponent],
+    imports: [ButtonDirective, ButtonGroupComponent],
     templateUrl: "./editor-basic-text-styles.component.html",
     styleUrl: "./editor-basic-text-styles.component.scss",
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EditorBasicTextStylesComponent {
     readonly #editorService: EditorService = inject(EditorService);
-    protected readonly boldIcon = faBold;
     protected readonly boldSelected = computed(() => {
         this.#editorService.state();
         return this.#editorService.editor.isActive("bold");
     });
-    protected readonly italicIcon = faItalic;
     protected readonly italicSelected = computed(() => {
         this.#editorService.state();
         return this.#editorService.editor.isActive("italic");
     });
-    protected readonly strikeThroughIcon = faStrikethrough;
     protected readonly strikeThroughSelected = computed(() => {
         this.#editorService.state();
         return this.#editorService.editor.isActive("strike");
     });
-    protected readonly subscriptIcon = faSubscript;
     protected readonly subscriptSelected = computed(() => {
         this.#editorService.state();
         return this.#editorService.editor.isActive("subscript");
     });
-    protected readonly superscriptIcon = faSuperscript;
     protected readonly superscriptSelected = computed(() => {
         this.#editorService.state();
         return this.#editorService.editor.isActive("superscript");
     });
-    protected readonly underlineIcon = faUnderline;
     protected readonly underlineSelected = computed(() => {
         this.#editorService.state();
         return this.#editorService.editor.isActive("underline");

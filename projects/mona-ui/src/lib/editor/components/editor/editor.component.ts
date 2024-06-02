@@ -23,6 +23,7 @@ import { EditorFontSizeComponent } from "../editor-font-size/editor-font-size.co
 import { EditorHeadingsComponent } from "../editor-headings/editor-headings.component";
 import { EditorHistoryComponent } from "../editor-history/editor-history.component";
 import { EditorHorizontalRuleComponent } from "../editor-horizontal-rule/editor-horizontal-rule.component";
+import { EditorImageComponent } from "../editor-image/editor-image.component";
 import { EditorIndentComponent } from "../editor-indent/editor-indent.component";
 import { EditorLinkComponent } from "../editor-link/editor-link.component";
 import { EditorListComponent } from "../editor-list/editor-list.component";
@@ -52,7 +53,8 @@ import { EditorTextAlignmentsComponent } from "../editor-text-alignments/editor-
         EditorHistoryComponent,
         EditorFontFamilyComponent,
         EditorHorizontalRuleComponent,
-        EditorTaskListComponent
+        EditorTaskListComponent,
+        EditorImageComponent
     ],
     templateUrl: "./editor.component.html",
     styleUrl: "./editor.component.scss",

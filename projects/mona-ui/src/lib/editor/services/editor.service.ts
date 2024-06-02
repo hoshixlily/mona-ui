@@ -15,6 +15,7 @@ import { TextStyle } from "@tiptap/extension-text-style";
 import { Underline } from "@tiptap/extension-underline";
 import { EditorState } from "@tiptap/pm/state";
 import { StarterKit } from "@tiptap/starter-kit";
+import { ExtendedImage } from "../extensions/ExtendedImage";
 import { FontSize } from "../extensions/FontSize";
 import { Indent } from "../extensions/Indent";
 import { EditorSettings } from "../models/EditorSettings";
@@ -70,7 +71,8 @@ export class EditorService {
                 TaskItem.configure({
                     nested: true
                 }),
-                TaskList
+                TaskList,
+                ExtendedImage
             ],
             content: ``,
             onTransaction: tx => this.#state.set(tx.editor.state)

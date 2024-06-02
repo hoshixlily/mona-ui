@@ -1,6 +1,4 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from "@angular/core";
-import { FaIconComponent } from "@fortawesome/angular-fontawesome";
-import { faLink, faUnlink } from "@fortawesome/free-solid-svg-icons";
 import { take } from "rxjs";
 import { ButtonGroupComponent } from "../../../buttons/button-group/button-group.component";
 import { ButtonDirective } from "../../../buttons/button/button.directive";
@@ -10,7 +8,7 @@ import { EditorService } from "../../services/editor.service";
 @Component({
     selector: "mona-editor-link",
     standalone: true,
-    imports: [ButtonGroupComponent, ButtonDirective, FaIconComponent],
+    imports: [ButtonGroupComponent, ButtonDirective],
     templateUrl: "./editor-link.component.html",
     styleUrl: "./editor-link.component.scss",
     changeDetection: ChangeDetectionStrategy.OnPush
@@ -18,8 +16,6 @@ import { EditorService } from "../../services/editor.service";
 export class EditorLinkComponent {
     readonly #dialogService: DialogService = inject(DialogService);
     readonly #editorService: EditorService = inject(EditorService);
-    protected readonly linkIcon = faLink;
-    protected readonly unlinkIcon = faUnlink;
     protected readonly linkSelected = computed(() => {
         this.#editorService.state();
         return this.#editorService.editor.isActive("link");
