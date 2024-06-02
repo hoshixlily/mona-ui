@@ -27,6 +27,7 @@ import { EditorImageComponent } from "../editor-image/editor-image.component";
 import { EditorIndentComponent } from "../editor-indent/editor-indent.component";
 import { EditorLinkComponent } from "../editor-link/editor-link.component";
 import { EditorListComponent } from "../editor-list/editor-list.component";
+import { EditorTableComponent } from "../editor-table/editor-table.component";
 import { EditorTaskListComponent } from "../editor-task-list/editor-task-list.component";
 import { EditorTextAlignmentsComponent } from "../editor-text-alignments/editor-text-alignments.component";
 
@@ -54,7 +55,8 @@ import { EditorTextAlignmentsComponent } from "../editor-text-alignments/editor-
         EditorFontFamilyComponent,
         EditorHorizontalRuleComponent,
         EditorTaskListComponent,
-        EditorImageComponent
+        EditorImageComponent,
+        EditorTableComponent
     ],
     templateUrl: "./editor.component.html",
     styleUrl: "./editor.component.scss",

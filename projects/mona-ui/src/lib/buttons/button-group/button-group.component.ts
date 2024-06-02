@@ -32,7 +32,7 @@ export class ButtonGroupComponent implements OnInit {
 
     protected readonly buttons = contentChildren(ButtonDirective);
 
-    public disabled = model<boolean>(false);
+    public disabled = model<boolean | undefined>(undefined);
     public selection = model<SelectionMode>("multiple");
 
     public constructor() {
@@ -40,7 +40,9 @@ export class ButtonGroupComponent implements OnInit {
             const disabled = this.disabled();
             const buttons = this.buttons();
             untracked(() => {
-                buttons.forEach(b => b.disabled.set(disabled));
+                if (typeof disabled === "boolean") {
+                    buttons.forEach(b => b.disabled.set(disabled));
+                }
             });
         });
     }

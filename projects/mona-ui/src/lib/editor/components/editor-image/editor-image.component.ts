@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, effect, inject, signal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, inject, signal } from "@angular/core";
 import { ButtonDirective } from "../../../buttons/button/button.directive";
 import { WindowComponent } from "../../../window/components/window/window.component";
 import { EditorImageInsertEvent } from "../../models/EditorImageInsertEvent";
@@ -16,14 +16,6 @@ import { EditorImageInserterComponent } from "../editor-image-inserter/editor-im
 export class EditorImageComponent {
     readonly #editorService: EditorService = inject(EditorService);
     protected readonly inserterVisible = signal(false);
-
-    public constructor() {
-        effect(() => {
-            this.#editorService.state();
-            const gc = document.querySelector(".ProseMirror-gapcursor");
-            console.log(gc);
-        });
-    }
 
     public onDisplayInserterClick(): void {
         this.inserterVisible.set(true);

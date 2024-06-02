@@ -1,0 +1,15 @@
+.mona-editor-table-creator {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    column-gap: 0.125rem;
+    row-gap: 0.125rem;
+    padding: 0.25rem;
+}
+
+.mona-editor-table-creator-cell {
+    display: flex;
+    border: 1px solid var(--mona-border-color);
+    width: 24px;
+    height: 24px;
+    background: var(--mona-background-lighter);
+}
