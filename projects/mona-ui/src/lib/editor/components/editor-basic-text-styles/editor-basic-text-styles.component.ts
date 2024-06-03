@@ -12,77 +12,105 @@ import { EditorService } from "../../services/editor.service";
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EditorBasicTextStylesComponent {
-    readonly #editorService: EditorService = inject(EditorService);
-    protected readonly boldSelected = computed(() => {
-        this.#editorService.state();
-        return this.#editorService.editor.isActive("bold");
+    protected readonly anyToolVisible = computed(() => {
+        return (
+            this.boldVisible() ||
+            this.italicVisible() ||
+            this.underlineVisible() ||
+            this.strikeThroughVisible() ||
+            this.subscriptVisible() ||
+            this.superscriptVisible()
+        );
     });
+    protected readonly boldSelected = computed(() => {
+        this.editorService.state();
+        return this.editorService.editor.isActive("bold");
+    });
+    protected readonly boldVisible = computed(() => {
+        return this.editorService.settings().bold;
+    });
+    protected readonly editorService: EditorService = inject(EditorService);
     protected readonly italicSelected = computed(() => {
-        this.#editorService.state();
-        return this.#editorService.editor.isActive("italic");
+        this.editorService.state();
+        return this.editorService.editor.isActive("italic");
+    });
+    protected readonly italicVisible = computed(() => {
+        return this.editorService.settings().italic;
     });
     protected readonly strikeThroughSelected = computed(() => {
-        this.#editorService.state();
-        return this.#editorService.editor.isActive("strike");
+        this.editorService.state();
+        return this.editorService.editor.isActive("strike");
+    });
+    protected readonly strikeThroughVisible = computed(() => {
+        return this.editorService.settings().strikethrough;
     });
     protected readonly subscriptSelected = computed(() => {
-        this.#editorService.state();
-        return this.#editorService.editor.isActive("subscript");
+        this.editorService.state();
+        return this.editorService.editor.isActive("subscript");
+    });
+    protected readonly subscriptVisible = computed(() => {
+        return this.editorService.settings().subscript;
     });
     protected readonly superscriptSelected = computed(() => {
-        this.#editorService.state();
-        return this.#editorService.editor.isActive("superscript");
+        this.editorService.state();
+        return this.editorService.editor.isActive("superscript");
+    });
+    protected readonly superscriptVisible = computed(() => {
+        return this.editorService.settings().superscript;
     });
     protected readonly underlineSelected = computed(() => {
-        this.#editorService.state();
-        return this.#editorService.editor.isActive("underline");
+        this.editorService.state();
+        return this.editorService.editor.isActive("underline");
+    });
+    protected readonly underlineVisible = computed(() => {
+        return this.editorService.settings().underline;
     });
 
     public onBoldToggle(): void {
         if (this.boldSelected()) {
-            this.#editorService.editor.chain().focus().unsetBold().run();
+            this.editorService.editor.chain().focus().unsetBold().run();
         } else {
-            this.#editorService.editor.chain().focus().setBold().run();
+            this.editorService.editor.chain().focus().setBold().run();
         }
     }
 
     public onItalicToggle(): void {
         if (this.italicSelected()) {
-            this.#editorService.editor.chain().focus().unsetItalic().run();
+            this.editorService.editor.chain().focus().unsetItalic().run();
         } else {
-            this.#editorService.editor.chain().focus().setItalic().run();
+            this.editorService.editor.chain().focus().setItalic().run();
         }
     }
 
     public onStrikeThroughToggle(): void {
         if (this.strikeThroughSelected()) {
-            this.#editorService.editor.chain().focus().unsetStrike().run();
+            this.editorService.editor.chain().focus().unsetStrike().run();
         } else {
-            this.#editorService.editor.chain().focus().setStrike().run();
+            this.editorService.editor.chain().focus().setStrike().run();
         }
     }
 
     public onSubscriptToggle(): void {
         if (this.subscriptSelected()) {
-            this.#editorService.editor.chain().focus().unsetSubscript().run();
+            this.editorService.editor.chain().focus().unsetSubscript().run();
         } else {
-            this.#editorService.editor.chain().focus().setSubscript().run();
+            this.editorService.editor.chain().focus().setSubscript().run();
         }
     }
 
     public onSuperscriptToggle(): void {
         if (this.superscriptSelected()) {
-            this.#editorService.editor.chain().focus().unsetSuperscript().run();
+            this.editorService.editor.chain().focus().unsetSuperscript().run();
         } else {
-            this.#editorService.editor.chain().focus().setSuperscript().run();
+            this.editorService.editor.chain().focus().setSuperscript().run();
         }
     }
 
     public onUnderlineToggle(): void {
         if (this.underlineSelected()) {
-            this.#editorService.editor.chain().focus().unsetUnderline().run();
+            this.editorService.editor.chain().focus().unsetUnderline().run();
         } else {
-            this.#editorService.editor.chain().focus().setUnderline().run();
+            this.editorService.editor.chain().focus().setUnderline().run();
         }
     }
 }

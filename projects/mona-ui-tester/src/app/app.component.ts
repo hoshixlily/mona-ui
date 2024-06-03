@@ -67,6 +67,7 @@ import {
     DropDownTreeFilterableDirective,
     DropDownTreeNodeTemplateDirective,
     EditorComponent,
+    EditorSettings,
     ExpansionPanelActionsTemplateDirective,
     ExpansionPanelComponent,
     ExpansionPanelTitleTemplateDirective,
@@ -470,6 +471,12 @@ export class AppComponent implements OnInit {
         "Linden",
         "Maidenhair Tree"
     ];
+
+    public editorSettings: Partial<EditorSettings> = {
+        table: false,
+        image: false
+        // link: false
+    };
 
     public filterMenuValue: FilterMenuValue = {
         value1: "Item 2",

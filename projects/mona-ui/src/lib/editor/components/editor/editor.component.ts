@@ -1,10 +1,12 @@
 import {
-    afterNextRender,
     ChangeDetectionStrategy,
     Component,
+    effect,
     ElementRef,
     inject,
+    input,
     OnDestroy,
+    untracked,
     viewChild
 } from "@angular/core";
 import { FormsModule } from "@angular/forms";
@@ -13,6 +15,7 @@ import { ButtonGroupComponent } from "../../../buttons/button-group/button-group
 import { ButtonDirective } from "../../../buttons/button/button.directive";
 import { DropDownItemTemplateDirective } from "../../../dropdowns/directives/drop-down-item-template.directive";
 import { DropDownListComponent } from "../../../dropdowns/drop-down-list/components/drop-down-list/drop-down-list.component";
+import { EditorSettings } from "../../models/EditorSettings";
 import { EditorService } from "../../services/editor.service";
 import { EditorBasicTextStylesComponent } from "../editor-basic-text-styles/editor-basic-text-styles.component";
 import { EditorBlockquoteComponent } from "../editor-blockquote/editor-blockquote.component";
@@ -67,16 +70,20 @@ import { EditorTextAlignmentsComponent } from "../editor-text-alignments/editor-
     }
 })
 export class EditorComponent implements OnDestroy {
-    readonly #editorService: EditorService = inject(EditorService);
     protected readonly editorContainer = viewChild.required<ElementRef<HTMLDivElement>>("editorContainer");
+    protected readonly editorService: EditorService = inject(EditorService);
+    public settings = input<Partial<EditorSettings>>({});
 
     public constructor() {
-        afterNextRender(() => {
-            this.#editorService.setupEditor({ element: this.editorContainer().nativeElement });
+        effect(() => {
+            const settings = this.settings();
+            untracked(() => {
+                this.editorService.setupEditor(this.editorContainer().nativeElement, settings);
+            });
         });
     }
 
     public ngOnDestroy(): void {
-        this.#editorService.destroy();
+        this.editorService.destroy();
     }
 }

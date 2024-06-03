@@ -1,20 +1,34 @@
-<mona-button-group selection="multiple">
-    <button monaButton [selected]="boldSelected()" (click)="onBoldToggle()" title="Bold">
-        <i class="ri-bold"></i>
-    </button>
-    <button monaButton [selected]="italicSelected()" (click)="onItalicToggle()" title="Italic">
-        <i class="ri-italic"></i>
-    </button>
-    <button monaButton [selected]="underlineSelected()" (click)="onUnderlineToggle()" title="Underline">
-        <i class="ri-underline"></i>
-    </button>
-    <button monaButton [selected]="strikeThroughSelected()" (click)="onStrikeThroughToggle()" title="Strikethrough">
-        <i class="ri-strikethrough"></i>
-    </button>
-    <button monaButton [selected]="subscriptSelected()" (click)="onSubscriptToggle()" title="Subscript">
-        <i class="ri-subscript"></i>
-    </button>
-    <button monaButton [selected]="superscriptSelected()" (click)="onSuperscriptToggle()" title="Superscript">
-        <i class="ri-superscript"></i>
-    </button>
-</mona-button-group>
+@if (anyToolVisible()) {
+    <mona-button-group selection="multiple">
+        @if (boldVisible()) {
+            <button monaButton [selected]="boldSelected()" (click)="onBoldToggle()" title="Bold">
+                <i class="ri-bold"></i>
+            </button>
+        }
+        @if (italicVisible()) {
+            <button monaButton [selected]="italicSelected()" (click)="onItalicToggle()" title="Italic">
+                <i class="ri-italic"></i>
+            </button>
+        }
+        @if (underlineVisible()) {
+            <button monaButton [selected]="underlineSelected()" (click)="onUnderlineToggle()" title="Underline">
+                <i class="ri-underline"></i>
+            </button>
+        }
+        @if (strikeThroughVisible()) {
+            <button monaButton [selected]="strikeThroughSelected()" (click)="onStrikeThroughToggle()" title="Strikethrough">
+                <i class="ri-strikethrough"></i>
+            </button>
+        }
+        @if (subscriptVisible()) {
+            <button monaButton [selected]="subscriptSelected()" (click)="onSubscriptToggle()" title="Subscript">
+                <i class="ri-subscript"></i>
+            </button>
+        }
+        @if (superscriptVisible()) {
+            <button monaButton [selected]="superscriptSelected()" (click)="onSuperscriptToggle()" title="Superscript">
+                <i class="ri-superscript"></i>
+            </button>
+        }
+    </mona-button-group>
+}

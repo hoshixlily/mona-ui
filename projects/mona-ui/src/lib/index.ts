@@ -65,6 +65,7 @@ export * from "./dropdowns/multi-select/directives/multi-select-tag-template.dir
 export * from "./dropdowns/multi-select/components/multi-select/multi-select.component";
 
 /** Editor */
+export * from "./editor/models/EditorSettings";
 export * from "./editor/components/editor/editor.component";
 
 /** Filters */
