@@ -1,23 +1,36 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from "@angular/core/testing";
+import { EditorService } from "../../services/editor.service";
 
-import { EditorTableCreatorComponent } from './editor-table-creator.component';
+import { EditorTableCreatorComponent } from "./editor-table-creator.component";
 
-describe('EditorTableCreatorComponent', () => {
-  let component: EditorTableCreatorComponent;
-  let fixture: ComponentFixture<EditorTableCreatorComponent>;
+describe("EditorTableCreatorComponent", () => {
+    let component: EditorTableCreatorComponent;
+    let fixture: ComponentFixture<EditorTableCreatorComponent>;
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      imports: [EditorTableCreatorComponent]
-    })
-    .compileComponents();
-    
-    fixture = TestBed.createComponent(EditorTableCreatorComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+    beforeEach(async () => {
+        await TestBed.configureTestingModule({
+            imports: [EditorTableCreatorComponent],
+            providers: [
+                {
+                    provide: EditorService,
+                    useValue: jasmine.createSpyObj(
+                        "EditorService",
+                        {},
+                        {
+                            editor: jasmine.createSpyObj("Editor", ["isActive"]),
+                            state: jasmine.createSpy()
+                        }
+                    )
+                }
+            ]
+        }).compileComponents();
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+        fixture = TestBed.createComponent(EditorTableCreatorComponent);
+        component = fixture.componentInstance;
+        fixture.detectChanges();
+    });
+
+    it("should create", () => {
+        expect(component).toBeTruthy();
+    });
 });
