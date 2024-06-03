@@ -58,6 +58,18 @@ export class EditorTableComponent {
         const canDeleteTable = this.#editorService.editor.can().deleteTable();
         return !isTable || !canDeleteTable;
     });
+    protected readonly mergeCellsDisabled = computed(() => {
+        this.#editorService.state();
+        const isTable = this.#editorService.editor.isActive("table");
+        const canMergeCells = this.#editorService.editor.can().mergeCells();
+        return !isTable || !canMergeCells;
+    });
+    protected readonly splitCellDisabled = computed(() => {
+        this.#editorService.state();
+        const isTable = this.#editorService.editor.isActive("table");
+        const canSplitCell = this.#editorService.editor.can().splitCell();
+        return !isTable || !canSplitCell;
+    });
     protected readonly popover = viewChild<PopoverComponent>("popoverComponent");
 
     public onAddColumnBeforeClick(): void {
@@ -86,6 +98,14 @@ export class EditorTableComponent {
 
     public onDeleteTableClick(): void {
         this.#editorService.editor.chain().focus().deleteTable().run();
+    }
+
+    public onMergeCellsClick(): void {
+        this.#editorService.editor.chain().focus().mergeCells().run();
+    }
+
+    public onSplitCellClick(): void {
+        this.#editorService.editor.chain().focus().splitCell().run();
     }
 
     public onTableInsert(event: EditorTableInsertEvent): void {

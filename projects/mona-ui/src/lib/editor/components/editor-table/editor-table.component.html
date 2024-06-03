@@ -20,6 +20,12 @@
     <button monaButton [disabled]="deleteRowDisabled()" (click)="onDeleteRowClick()" title="Delete row">
         <i class="ri-delete-row"></i>
     </button>
+    <button monaButton [disabled]="mergeCellsDisabled()" (click)="onMergeCellsClick()" title="Merge selected cells">
+        <i class="ri-merge-cells-horizontal"></i>
+    </button>
+    <button monaButton [disabled]="splitCellDisabled()" (click)="onSplitCellClick()" title="Split cell">
+        <i class="ri-split-cells-horizontal"></i>
+    </button>
     <button monaButton [disabled]="deleteTableDisabled()" (click)="onDeleteTableClick()" title="Delete table">
         <i class="ri-close-large-line"></i>
     </button>
