@@ -10,7 +10,6 @@ import {
     viewChild
 } from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import { FaIconComponent } from "@fortawesome/angular-fontawesome";
 import { ButtonGroupComponent } from "../../../buttons/button-group/button-group.component";
 import { ButtonDirective } from "../../../buttons/button/button.directive";
 import { DropDownItemTemplateDirective } from "../../../dropdowns/directives/drop-down-item-template.directive";
@@ -19,6 +18,7 @@ import { EditorSettings } from "../../models/EditorSettings";
 import { EditorService } from "../../services/editor.service";
 import { EditorBasicTextStylesComponent } from "../editor-basic-text-styles/editor-basic-text-styles.component";
 import { EditorBlockquoteComponent } from "../editor-blockquote/editor-blockquote.component";
+import { EditorCodeBlockComponent } from "../editor-code-block/editor-code-block.component";
 import { EditorFontColorComponent } from "../editor-font-color/editor-font-color.component";
 import { EditorFontFamilyComponent } from "../editor-font-family/editor-font-family.component";
 import { EditorFontHighlightComponent } from "../editor-font-highlight/editor-font-highlight.component";
@@ -40,7 +40,6 @@ import { EditorTextAlignmentsComponent } from "../editor-text-alignments/editor-
     imports: [
         ButtonDirective,
         ButtonGroupComponent,
-        FaIconComponent,
         DropDownListComponent,
         DropDownItemTemplateDirective,
         FormsModule,
@@ -59,7 +58,8 @@ import { EditorTextAlignmentsComponent } from "../editor-text-alignments/editor-
         EditorHorizontalRuleComponent,
         EditorTaskListComponent,
         EditorImageComponent,
-        EditorTableComponent
+        EditorTableComponent,
+        EditorCodeBlockComponent
     ],
     templateUrl: "./editor.component.html",
     styleUrl: "./editor.component.scss",

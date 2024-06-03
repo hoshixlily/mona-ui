@@ -31,6 +31,7 @@ export class EditorService {
         alignment: true,
         blockquote: true,
         bold: true,
+        code: true,
         fontColor: true,
         fontFamily: true,
         fontHighlight: true,
@@ -196,6 +197,9 @@ export class EditorService {
         }
         if (!settings.horizontalRule) {
             starterKit = starterKit.configure({ horizontalRule: false });
+        }
+        if (!settings.code) {
+            starterKit = starterKit.configure({ code: false });
         }
         return starterKit;
     }

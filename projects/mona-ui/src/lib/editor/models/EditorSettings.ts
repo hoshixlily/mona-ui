@@ -2,6 +2,7 @@ export interface EditorSettings {
     alignment: boolean;
     blockquote: boolean;
     bold: boolean;
+    code: boolean;
     fontColor: boolean;
     fontFamily: boolean;
     fontHighlight: boolean;

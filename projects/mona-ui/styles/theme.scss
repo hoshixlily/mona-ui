@@ -820,6 +820,20 @@ mona-filter-input.mona-popup-filter-input,
     }
 }
 
+.mona-editor pre {
+    background: var(--mona-background-dark);
+    border: 1px solid var(--mona-border-color);
+    padding: 0.5rem;
+    white-space: pre-wrap;
+    font-family: monospace;
+
+    & code {
+        padding: 0;
+        font-size: 1em;
+        background: none;
+    }
+}
+
 .mona-editor .ProseMirror-gapcursor {
     &:after {
         border-color: var(--mona-text) !important;

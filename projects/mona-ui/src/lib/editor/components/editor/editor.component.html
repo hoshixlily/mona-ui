@@ -21,6 +21,9 @@
     @if (editorService.settings().blockquote) {
         <mona-editor-blockquote></mona-editor-blockquote>
     }
+    @if (editorService.settings().code) {
+        <mona-editor-code-block></mona-editor-code-block>
+    }
     @if (editorService.settings().link) {
         <mona-editor-link></mona-editor-link>
     }
