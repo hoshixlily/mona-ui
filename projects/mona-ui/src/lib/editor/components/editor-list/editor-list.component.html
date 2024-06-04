@@ -1,0 +1,8 @@
+<mona-button-group selection="single">
+    <button monaButton [selected]="unorderedListSelected()" (click)="onUnorderedListToggle()" title="Insert unordered list">
+        <i class="ri-list-unordered"></i>
+    </button>
+    <button monaButton [selected]="orderedListSelected()" (click)="onOrderedListToggle()" title="Insert ordered list">
+        <i class="ri-list-ordered-2"></i>
+    </button>
+</mona-button-group>

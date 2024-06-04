@@ -1,0 +1,32 @@
+<mona-drop-down-list [data]="headingsDropdownListData" [ngModel]="selectedHeadingsDropdownItem()"
+                     (ngModelChange)="onFormatChange($event)"
+                     textField="text" valueField="value" title="Format">
+    <ng-template monaDropDownListItemTemplate let-dataItem>
+        @switch (dataItem.value) {
+            @case (HeadingType.Heading1) {
+                <h1>{{ dataItem.text }}</h1>
+            }
+            @case (HeadingType.Heading2) {
+                <h2>{{ dataItem.text }}</h2>
+            }
+            @case (HeadingType.Heading3) {
+                <h3>{{ dataItem.text }}</h3>
+            }
+            @case (HeadingType.Heading4) {
+                <h4>{{ dataItem.text }}</h4>
+            }
+            @case (HeadingType.Heading5) {
+                <h5>{{ dataItem.text }}</h5>
+            }
+            @case (HeadingType.Heading6) {
+                <h6>{{ dataItem.text }}</h6>
+            }
+            @case (HeadingType.Paragraph) {
+                <p>{{ dataItem.text }}</p>
+            }
+            @default {
+                <p>{{ dataItem.text }}</p>
+            }
+        }
+    </ng-template>
+</mona-drop-down-list>

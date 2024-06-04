@@ -62,7 +62,7 @@ export class AlphaSliderComponent implements AfterViewInit, ControlValueAccessor
         const containerRect = this.#hostElementRef.nativeElement.getBoundingClientRect();
         const handleRect = this.sliderHandle().nativeElement.getBoundingClientRect();
         const value = (position - handleRect.width / 2) / containerRect.width;
-        return Math.max(0, Math.min(255, Math.round(value * 255)));
+        return Math.max(0, Math.min(255, Math.ceil(value * 255)));
     }
 
     private getPositionFromAlpha(alpha: number): number {
@@ -114,13 +114,17 @@ export class AlphaSliderComponent implements AfterViewInit, ControlValueAccessor
                 if (this.#mouseMove) {
                     return;
                 }
+                const containerRect = this.#hostElementRef.nativeElement.getBoundingClientRect();
                 const handleElement = this.sliderHandle().nativeElement;
-                const left = event.offsetX + handleElement.clientWidth / 2;
-                const alpha = this.getAlphaFromPosition(left);
-                this.#zone.run(() => {
-                    this.#propagateChange(alpha);
-                    this.setHandlePosition(left);
-                });
+                const handleRect = handleElement.getBoundingClientRect();
+                const handlePos = event.clientX - containerRect.left + handleRect.width / 2;
+                if (handlePos >= handleRect.width / 2 && handlePos <= containerRect.width + handleRect.width / 2) {
+                    this.#zone.run(() => {
+                        this.setHandlePosition(handlePos);
+                        const alpha = this.getAlphaFromPosition(handlePos);
+                        this.#propagateChange(alpha);
+                    });
+                }
             });
         });
     }

@@ -5,7 +5,7 @@
                 <col style="width: 34px;">
             }
             @for (column of columns(); track $index) {
-                <col [style.width.px]="column.calculatedWidth()" [style.min-width.px]="column.minWidth">
+                <col [style.width.px]="column.calculatedWidth()" [style.min-width.px]="column.minWidth()">
             }
         </colgroup>
         <tbody>

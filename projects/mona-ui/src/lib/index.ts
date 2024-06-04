@@ -64,6 +64,11 @@ export * from "./dropdowns/multi-select/directives/multi-select-summary-tag-temp
 export * from "./dropdowns/multi-select/directives/multi-select-tag-template.directive";
 export * from "./dropdowns/multi-select/components/multi-select/multi-select.component";
 
+/** Editor */
+export * from "./editor/models/ContentChangeEvent";
+export * from "./editor/models/EditorSettings";
+export * from "./editor/components/editor/editor.component";
+
 /** Filters */
 export * from "./query/filter/FilterDescriptor";
 export { Query, IQuery } from "./query/core/Query";
@@ -91,7 +96,8 @@ export * from "./inputs/color-gradient/components/color-gradient/color-gradient.
 
 export * from "./inputs/color-palette/color-palette.component";
 
-export * from "./inputs/color-picker/color-picker.component";
+export * from "./inputs/color-picker/directives/color-picker-value-template.directive";
+export * from "./inputs/color-picker/components/color-picker/color-picker.component";
 
 export * from "./inputs/numeric-text-box/directives/numeric-text-box-prefix-template.directive";
 export * from "./inputs/numeric-text-box/components/numeric-text-box/numeric-text-box.component";

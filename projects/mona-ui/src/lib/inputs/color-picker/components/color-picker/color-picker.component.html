@@ -1,0 +1,27 @@
+@if (valueTemplate()) {
+    <ng-container [ngTemplateOutlet]="valueTemplate()??null"
+                  [ngTemplateOutletContext]="{$implicit: color()}"></ng-container>
+} @else {
+    <div [style.background]="color()" class="mona-input-selector-value">
+        @if (!color()) {
+            <fa-icon [icon]="noColorIcon"></fa-icon>
+        }
+    </div>
+}
+<div class="mona-input-selector-icon">
+    <button monaButton [flat]="true" [tabindex]="-1" class="mona-input-button">
+        <fa-icon [icon]="dropdownIcon"></fa-icon>
+    </button>
+</div>
+
+<ng-template #popupTemplate>
+    @if (view() === 'palette') {
+        <mona-color-palette [palette]="palette()" [columns]="columns()" [ngModel]="color()"
+                            (ngModelChange)="onColorPaletteValueChange($event)"></mona-color-palette>
+    } @else if (view() === 'gradient') {
+        <mona-color-gradient [opacity]="opacity()"
+                             [ngModel]="color()" (ngModelChange)="onColorGradientValueChange($event)"
+                             (apply)="onColorGradientApply()" (cancel)="onColorGradientCancel()"
+        ></mona-color-gradient>
+    }
+</ng-template>

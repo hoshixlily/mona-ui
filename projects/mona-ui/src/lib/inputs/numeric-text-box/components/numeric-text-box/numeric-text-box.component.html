@@ -12,7 +12,7 @@
        (keydown)="keydown$.next($event)"
        (focus)="inputFocus.emit($event)"
        (focusout)="inputFocusOut.emit($event)"
-       (blur)="inputBlur.emit($event)"
+       (blur)="onBlur($event)"
        (beforeinput)="beforeInput$.next($event)"
        (wheel)="wheel$.next($event)"
        autocomplete="off" tabindex="0" class="mona-input-inner" #valueTextBox>

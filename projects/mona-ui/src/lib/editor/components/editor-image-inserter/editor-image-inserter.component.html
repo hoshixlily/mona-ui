@@ -1,0 +1,22 @@
+<form [formGroup]="imageForm">
+    <div class="editor-image-inserter-row">
+        <div class="editor-image-inserter-row-label">Image URL</div>
+        <mona-text-box formControlName="link"></mona-text-box>
+    </div>
+    <div class="editor-image-inserter-row">
+        <div class="editor-image-inserter-row-label">Alt Text</div>
+        <mona-text-box formControlName="altText"></mona-text-box>
+    </div>
+    <div class="editor-image-inserter-row">
+        <div class="editor-image-inserter-row-label">Width (px)</div>
+        <mona-numeric-text-box formControlName="width"></mona-numeric-text-box>
+    </div>
+    <div class="editor-image-inserter-row">
+        <div class="editor-image-inserter-row-label">Height (px)</div>
+        <mona-numeric-text-box formControlName="height"></mona-numeric-text-box>
+    </div>
+    <div class="editor-image-inserter-actions">
+        <button monaButton [primary]="true" [disabled]="!imageForm.valid" (click)="onImageInsert()">Insert</button>
+        <button monaButton (click)="onCancel()">Cancel</button>
+    </div>
+</form>

@@ -1,0 +1,52 @@
+<div class="mona-editor-toolbar">
+    <mona-editor-basic-text-styles></mona-editor-basic-text-styles>
+    @if (editorService.settings().headings) {
+        <mona-editor-headings></mona-editor-headings>
+    }
+    @if (editorService.settings().alignment) {
+        <mona-editor-text-alignments></mona-editor-text-alignments>
+    }
+    @if (editorService.settings().fontSize) {
+        <mona-editor-font-size></mona-editor-font-size>
+    }
+    @if (editorService.settings().fontFamily) {
+        <mona-editor-font-family></mona-editor-font-family>
+    }
+    @if (editorService.settings().fontColor) {
+        <mona-editor-font-color></mona-editor-font-color>
+    }
+    @if (editorService.settings().fontHighlight) {
+        <mona-editor-font-highlight></mona-editor-font-highlight>
+    }
+    @if (editorService.settings().blockquote) {
+        <mona-editor-blockquote></mona-editor-blockquote>
+    }
+    @if (editorService.settings().code) {
+        <mona-editor-code-block></mona-editor-code-block>
+    }
+    @if (editorService.settings().link) {
+        <mona-editor-link></mona-editor-link>
+    }
+    @if (editorService.settings().list) {
+        <mona-editor-list></mona-editor-list>
+    }
+    @if (editorService.settings().taskList) {
+        <mona-editor-task-list></mona-editor-task-list>
+    }
+    @if (editorService.settings().indent) {
+        <mona-editor-indent></mona-editor-indent>
+    }
+    @if (editorService.settings().history) {
+        <mona-editor-history></mona-editor-history>
+    }
+    @if (editorService.settings().horizontalRule) {
+        <mona-editor-horizontal-rule></mona-editor-horizontal-rule>
+    }
+    @if (editorService.settings().image) {
+        <mona-editor-image></mona-editor-image>
+    }
+    @if (editorService.settings().table) {
+        <mona-editor-table></mona-editor-table>
+    }
+</div>
+<div class="mona-editor-container" #editorContainer></div>

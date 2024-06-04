@@ -58,7 +58,7 @@ export class HueSliderComponent implements AfterViewInit, ControlValueAccessor {
         const containerRect = this.#hostElementRef.nativeElement.getBoundingClientRect();
         const handleRect = this.sliderHandle().nativeElement.getBoundingClientRect();
         const value = (position - handleRect.width / 2) / containerRect.width;
-        return Math.max(0, Math.min(360, Math.round(value * 360)));
+        return Math.max(0, Math.min(360, Math.ceil(value * 360)));
     }
 
     private getPositionFromHue(hue: number): number {
@@ -110,13 +110,17 @@ export class HueSliderComponent implements AfterViewInit, ControlValueAccessor {
                 if (this.#mouseMove) {
                     return;
                 }
+                const containerRect = this.#hostElementRef.nativeElement.getBoundingClientRect();
                 const handleElement = this.sliderHandle().nativeElement;
-                const left = event.offsetX + handleElement.clientWidth / 2;
-                const hue = this.getHueFromPosition(left);
-                this.#zone.run(() => {
-                    this.#propagateChange(hue);
-                    this.setHandlePosition(left);
-                });
+                const handleRect = handleElement.getBoundingClientRect();
+                const handlePos = event.clientX - containerRect.left + handleRect.width / 2;
+                if (handlePos >= handleRect.width / 2 && handlePos <= containerRect.width + handleRect.width / 2) {
+                    this.#zone.run(() => {
+                        this.setHandlePosition(handlePos);
+                        const hue = this.getHueFromPosition(handlePos);
+                        this.#propagateChange(hue);
+                    });
+                }
             });
         });
     }

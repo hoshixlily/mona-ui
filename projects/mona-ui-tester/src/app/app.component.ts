@@ -44,6 +44,7 @@ import {
     ColorGradientComponent,
     ColorPaletteComponent,
     ColorPickerComponent,
+    ColorPickerValueTemplateDirective,
     ComboBoxComponent,
     CompositeFilterDescriptor,
     ContextMenuComponent,
@@ -65,6 +66,8 @@ import {
     DropDownTreeExpandableDirective,
     DropDownTreeFilterableDirective,
     DropDownTreeNodeTemplateDirective,
+    EditorComponent,
+    EditorSettings,
     ExpansionPanelActionsTemplateDirective,
     ExpansionPanelComponent,
     ExpansionPanelTitleTemplateDirective,
@@ -201,6 +204,7 @@ interface TreeNodeDataItem {
         ColorGradientComponent,
         ColorPaletteComponent,
         ColorPickerComponent,
+        ColorPickerValueTemplateDirective,
         ComboBoxComponent,
         CommonModule,
         ContextMenuComponent,
@@ -216,6 +220,7 @@ interface TreeNodeDataItem {
         DropDownListComponent,
         DropDownListValueTemplateDirective,
         DropDownNoDataTemplateDirective,
+        EditorComponent,
         ExpansionPanelComponent,
         ExpansionPanelActionsTemplateDirective,
         ExpansionPanelTitleTemplateDirective,
@@ -466,6 +471,12 @@ export class AppComponent implements OnInit {
         "Linden",
         "Maidenhair Tree"
     ];
+
+    public editorSettings: Partial<EditorSettings> = {
+        table: false,
+        image: false
+        // link: false
+    };
 
     public filterMenuValue: FilterMenuValue = {
         value1: "Item 2",

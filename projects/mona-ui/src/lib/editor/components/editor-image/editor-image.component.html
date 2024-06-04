@@ -1,0 +1,9 @@
+<button monaButton (click)="onDisplayInserterClick()" title="Insert image">
+    <i class="ri-image-add-line"></i>
+</button>
+
+@if (inserterVisible()) {
+    <mona-window [width]="400" [height]="316" [modal]="false" [title]="'Insert Image'" (close)="onInserterClose()">
+        <mona-editor-image-inserter (insert)="onImageInsert($event)" (cancel)="onInsertCancel()"></mona-editor-image-inserter>
+    </mona-window>
+}

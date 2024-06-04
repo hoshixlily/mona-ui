@@ -1,0 +1,8 @@
+<mona-button-group selection="single">
+    <button monaButton [disabled]="undoDisabled()" (click)="onUndoClick()" title="Undo">
+        <i class="ri-arrow-go-back-line"></i>
+    </button>
+    <button monaButton [disabled]="redoDisabled()" (click)="onRedoClick()" title="Redo">
+        <i class="ri-arrow-go-forward-line"></i>
+    </button>
+</mona-button-group>

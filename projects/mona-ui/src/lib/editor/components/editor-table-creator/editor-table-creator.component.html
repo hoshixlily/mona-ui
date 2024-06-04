@@ -1,0 +1,10 @@
+<div class="mona-editor-table-creator" (mouseleave)="onCellMouseLeave()">
+    @for (rx of [1,2,3,4,5,6,7,8]; track rx) {
+        @for(cx of [1,2,3,4,5,6,7,8]; track cx) {
+           <div class="mona-editor-table-creator-cell"
+                [style.background-color]="rx <= highlightedCell.row && cx <= highlightedCell.col ? 'var(--mona-primary)' : 'var(--mona-background-lighter)'"
+                (click)="onCellClick(rx, cx)"
+                (mouseenter)="onCellMouseEnter(rx, cx)" ></div>
+        }
+    }
+</div>

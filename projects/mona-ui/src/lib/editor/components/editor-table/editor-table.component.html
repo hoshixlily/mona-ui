@@ -1,0 +1,39 @@
+<mona-button-group selection="single">
+    <button monaButton title="Insert table" #insertTableButton>
+        <i class="ri-grid-line"></i>
+    </button>
+    <button monaButton [disabled]="addColumnBeforeDisabled()" (click)="onAddColumnBeforeClick()" title="Add column before">
+        <i class="ri-insert-column-left"></i>
+    </button>
+    <button monaButton [disabled]="addColumnAfterDisabled()" (click)="onAddColumnAfterClick()" title="Add column after">
+        <i class="ri-insert-column-right"></i>
+    </button>
+    <button monaButton [disabled]="addRowBeforeDisabled()" (click)="onAddRowBeforeClick()" title="Add row before">
+        <i class="ri-insert-row-top"></i>
+    </button>
+    <button monaButton [disabled]="addRowAfterDisabled()" (click)="onAddRowAfterClick()" title="Add row after">
+        <i class="ri-insert-row-bottom"></i>
+    </button>
+    <button monaButton [disabled]="deleteColumnDisabled()" (click)="onDeleteColumnClick()" title="Delete column">
+        <i class="ri-delete-column"></i>
+    </button>
+    <button monaButton [disabled]="deleteRowDisabled()" (click)="onDeleteRowClick()" title="Delete row">
+        <i class="ri-delete-row"></i>
+    </button>
+    <button monaButton [disabled]="mergeCellsDisabled()" (click)="onMergeCellsClick()" title="Merge selected cells">
+        <i class="ri-merge-cells-horizontal"></i>
+    </button>
+    <button monaButton [disabled]="splitCellDisabled()" (click)="onSplitCellClick()" title="Split cell">
+        <i class="ri-split-cells-horizontal"></i>
+    </button>
+    <button monaButton [disabled]="toggleHeaderRowDisabled()" (click)="onToggleHeaderRow()" title="Toggle header row">
+        <i class="ri-table-line"></i>
+    </button>
+    <button monaButton [disabled]="deleteTableDisabled()" (click)="onDeleteTableClick()" title="Delete table">
+        <i class="ri-close-large-line"></i>
+    </button>
+</mona-button-group>
+
+<mona-popover [target]="insertTableButton" position="bottom" #popoverComponent>
+    <mona-editor-table-creator (insert)="onTableInsert($event)"></mona-editor-table-creator>
+</mona-popover>
