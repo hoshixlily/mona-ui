@@ -854,6 +854,12 @@ mona-filter-input.mona-popup-filter-input,
         position: relative;
     }
 
+    & th {
+        background: var(--mona-background-darker);
+        color: var(--mona-text);
+        font-weight: bold;
+    }
+
     & .selectedCell:after {
         content: "";
         position: absolute;
@@ -865,7 +871,22 @@ mona-filter-input.mona-popup-filter-input,
         z-index: 2;
         background: var(--mona-primary);
     }
+
+    & .column-resize-handle {
+        position: absolute;
+        background-color: var(--mona-primary);
+        width: 4px;
+        pointer-events: none;
+        top: 0;
+        bottom: -2px;
+        right: -2px;
+    }
 }
+
+.mona-editor .ProseMirror.resize-cursor {
+    cursor: ew-resize;
+}
+
 
 /** Filters */
 .mona-filter-menu {

@@ -64,13 +64,19 @@ export class EditorTableComponent {
         const canMergeCells = this.#editorService.editor.can().mergeCells();
         return !isTable || !canMergeCells;
     });
+    protected readonly popover = viewChild<PopoverComponent>("popoverComponent");
     protected readonly splitCellDisabled = computed(() => {
         this.#editorService.state();
         const isTable = this.#editorService.editor.isActive("table");
         const canSplitCell = this.#editorService.editor.can().splitCell();
         return !isTable || !canSplitCell;
     });
-    protected readonly popover = viewChild<PopoverComponent>("popoverComponent");
+    protected readonly toggleHeaderRowDisabled = computed(() => {
+        this.#editorService.state();
+        const isTable = this.#editorService.editor.isActive("table");
+        const canToggleHeaderRow = this.#editorService.editor.can().toggleHeaderRow();
+        return !isTable || !canToggleHeaderRow;
+    });
 
     public onAddColumnBeforeClick(): void {
         this.#editorService.editor.chain().focus().addColumnBefore().run();
@@ -114,5 +120,9 @@ export class EditorTableComponent {
             rows: event.row,
             cols: event.col
         });
+    }
+
+    public onToggleHeaderRow(): void {
+        this.#editorService.editor.chain().focus().toggleHeaderRow().run();
     }
 }

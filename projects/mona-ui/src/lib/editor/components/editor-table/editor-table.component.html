@@ -26,6 +26,9 @@
     <button monaButton [disabled]="splitCellDisabled()" (click)="onSplitCellClick()" title="Split cell">
         <i class="ri-split-cells-horizontal"></i>
     </button>
+    <button monaButton [disabled]="toggleHeaderRowDisabled()" (click)="onToggleHeaderRow()" title="Toggle header row">
+        <i class="ri-table-line"></i>
+    </button>
     <button monaButton [disabled]="deleteTableDisabled()" (click)="onDeleteTableClick()" title="Delete table">
         <i class="ri-close-large-line"></i>
     </button>

@@ -33,7 +33,8 @@ describe("EditorTableComponent", () => {
                                         deleteRow: jasmine.createSpy(),
                                         deleteTable: jasmine.createSpy(),
                                         mergeCells: jasmine.createSpy(),
-                                        splitCell: jasmine.createSpy()
+                                        splitCell: jasmine.createSpy(),
+                                        toggleHeaderRow: jasmine.createSpy()
                                     })
                                 }
                             ),
