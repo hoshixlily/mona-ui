@@ -1,4 +1,4 @@
-import { computed, Injectable, output, OutputEmitterRef, Signal, signal, WritableSignal } from "@angular/core";
+import { computed, Injectable, OutputEmitterRef, Signal, signal, WritableSignal } from "@angular/core";
 import { Dictionary, from, ImmutableDictionary, ImmutableList, ImmutableSet } from "@mirei/ts-collections";
 import { Subject } from "rxjs";
 import { Query } from "../../query/core/Query";

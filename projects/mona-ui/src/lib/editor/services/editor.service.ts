@@ -18,6 +18,7 @@ import { TextStyle } from "@tiptap/extension-text-style";
 import { Underline } from "@tiptap/extension-underline";
 import { EditorState } from "@tiptap/pm/state";
 import { StarterKit } from "@tiptap/starter-kit";
+import { Subject } from "rxjs";
 import { ExtendedImage } from "../extensions/ExtendedImage";
 import { FontSize } from "../extensions/FontSize";
 import { Indent } from "../extensions/Indent";
@@ -54,6 +55,25 @@ export class EditorService {
     };
     readonly #state = signal<EditorState>({} as EditorState);
     #editor!: Editor;
+    public readonly blur$ = new Subject<void>();
+    public readonly create$ = new Subject<void>();
+    public readonly focus$ = new Subject<void>();
+    public readonly fontSizes = signal(
+        ImmutableSet.create([
+            "10px",
+            "12px",
+            "14px",
+            "16px",
+            "18px",
+            "20px",
+            "24px",
+            "32px",
+            "36px",
+            "48px",
+            "60px",
+            "72px"
+        ])
+    );
     public readonly fonts = signal(
         ImmutableSet.create([
             "Arial",
@@ -71,7 +91,9 @@ export class EditorService {
         ])
     );
     public readonly state = this.#state.asReadonly();
+    public readonly selectionUpdate$ = new Subject<void>();
     public readonly settings = signal<Partial<EditorSettings>>({});
+    public readonly update$ = new Subject<void>();
 
     public destroy(): void {
         this.#editor.destroy();
@@ -89,11 +111,16 @@ export class EditorService {
             element,
             extensions: this.getExtensionsFromSettings(editorSettings),
             content: ``,
+            onBlur: () => this.blur$.next(),
             onCreate: ({ editor }) => {
                 this.#state.set(editor.state);
                 this.settings.set(editorSettings);
+                this.create$.next();
             },
-            onTransaction: tx => this.#state.set(tx.editor.state)
+            onFocus: () => this.focus$.next(),
+            onSelectionUpdate: () => this.selectionUpdate$.next(),
+            onTransaction: tx => this.#state.set(tx.editor.state),
+            onUpdate: () => this.update$.next()
         });
     }
 

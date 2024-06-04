@@ -6,14 +6,18 @@ import {
     inject,
     input,
     OnDestroy,
+    OnInit,
+    output,
     untracked,
     viewChild
 } from "@angular/core";
 import { FormsModule } from "@angular/forms";
+import { JSONContent } from "@tiptap/core";
 import { ButtonGroupComponent } from "../../../buttons/button-group/button-group.component";
 import { ButtonDirective } from "../../../buttons/button/button.directive";
 import { DropDownItemTemplateDirective } from "../../../dropdowns/directives/drop-down-item-template.directive";
 import { DropDownListComponent } from "../../../dropdowns/drop-down-list/components/drop-down-list/drop-down-list.component";
+import { ContentChangeEvent } from "../../models/ContentChangeEvent";
 import { EditorSettings } from "../../models/EditorSettings";
 import { EditorService } from "../../services/editor.service";
 import { EditorBasicTextStylesComponent } from "../editor-basic-text-styles/editor-basic-text-styles.component";
@@ -69,9 +73,46 @@ import { EditorTextAlignmentsComponent } from "../editor-text-alignments/editor-
         class: "mona-editor"
     }
 })
-export class EditorComponent implements OnDestroy {
+export class EditorComponent implements OnDestroy, OnInit {
     protected readonly editorContainer = viewChild.required<ElementRef<HTMLDivElement>>("editorContainer");
     protected readonly editorService: EditorService = inject(EditorService);
+
+    /**
+     * Emits when the editor loses focus.
+     */
+    public readonly blur = output();
+
+    /**
+     * Emits when the editor is created for the first time and is ready to be used.
+     */
+    public readonly create = output();
+
+    /**
+     * Emits when the editor gains focus.
+     */
+    public readonly focus = output();
+
+    /**
+     * Emits when the selection of the editor changes.
+     */
+    public readonly selectionUpdate = output();
+
+    /**
+     * Emits when the content of the editor changes.
+     */
+    public readonly update = output<ContentChangeEvent>();
+
+    /**
+     * The initial content of the editor.
+     * Accepted values are:
+     * - A string representing the HTML content.
+     * - A {@link JSONContent} representing the content.
+     */
+    public content = input<string | JSONContent>();
+
+    /**
+     * The settings of the editor.
+     */
     public settings = input<Partial<EditorSettings>>({});
 
     public constructor() {
@@ -81,9 +122,67 @@ export class EditorComponent implements OnDestroy {
                 this.editorService.setupEditor(this.editorContainer().nativeElement, settings);
             });
         });
+        effect(() => {
+            const content = this.content() ?? "";
+            untracked(() => {
+                this.loadEditorContent(content);
+            });
+        });
     }
 
     public ngOnDestroy(): void {
         this.editorService.destroy();
+    }
+
+    public ngOnInit(): void {
+        this.setSubscriptions();
+    }
+
+    private loadEditorContent(content: string | JSONContent): void {
+        if (typeof content === "string") {
+            this.editorService.editor.commands.setContent(content);
+        } else {
+            this.editorService.editor.commands.setContent({
+                type: "doc",
+                content: [content]
+            });
+        }
+    }
+
+    private setSubscriptions(): void {
+        this.editorService.blur$.subscribe(() => {
+            this.blur.emit();
+        });
+        this.editorService.create$.subscribe(() => {
+            this.create.emit();
+        });
+        this.editorService.focus$.subscribe(() => {
+            this.focus.emit();
+        });
+        this.editorService.selectionUpdate$.subscribe(() => {
+            this.selectionUpdate.emit();
+        });
+        this.editorService.update$.subscribe(() => {
+            this.update.emit({
+                html: this.html,
+                json: this.json
+            });
+        });
+    }
+
+    /**
+     * Returns the HTML content of the editor.
+     * It can be used to save the content of the editor in a database and restore it later.
+     */
+    public get html(): string {
+        return this.editorService.editor.getHTML();
+    }
+
+    /**
+     * Returns the JSON content of the editor in the {@link JSONContent} format.
+     * It can be used to save the content of the editor in a database and restore it later.
+     */
+    public get json(): JSONContent {
+        return this.editorService.editor.getJSON();
     }
 }

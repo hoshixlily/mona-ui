@@ -1,5 +1,7 @@
+import { signal } from "@angular/core";
 import { ComponentFixture, TestBed } from "@angular/core/testing";
 import { provideAnimations } from "@angular/platform-browser/animations";
+import { ImmutableSet } from "@mirei/ts-collections";
 import { EditorService } from "../../services/editor.service";
 
 import { EditorFontSizeComponent } from "./editor-font-size.component";
@@ -19,7 +21,8 @@ describe("EditorFontSizeComponent", () => {
                         {},
                         {
                             editor: jasmine.createSpyObj("Editor", ["isActive"]),
-                            state: jasmine.createSpy()
+                            state: jasmine.createSpy(),
+                            fontSizes: signal(ImmutableSet.create(["16px", "24px"]))
                         }
                     )
                 },
