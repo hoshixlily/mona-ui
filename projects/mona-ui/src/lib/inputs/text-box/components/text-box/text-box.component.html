@@ -12,7 +12,7 @@
        [ngModel]="value()"
        (ngModelChange)="onValueChange($event)"
        (blur)="inputBlur.emit($event)"
-       (focus)="inputFocus.emit($event)" monaTextBox />
+       (focus)="inputFocus.emit($event)" />
 
 @if (clearButton() && value().length !== 0) {
     <button monaButton [flat]="true" [tabindex]="-1" title="Clear" (click)="onClearClick()">

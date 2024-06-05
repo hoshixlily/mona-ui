@@ -157,7 +157,9 @@ export class DropDownTreeComponent<T> implements ControlValueAccessor, OnInit {
     }
 
     public onFilterChange(event: FilterChangeEvent): void {
-        this.treeService.filterChange.emit(event);
+        if (this.treeService.filterChange) {
+            this.treeService.filterChange.emit(event);
+        }
         if (!event.isDefaultPrevented()) {
             this.treeService.filter$.next(event.filter);
         }

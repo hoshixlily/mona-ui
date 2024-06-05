@@ -13,6 +13,7 @@ import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { Selector, sequenceEqual } from "@mirei/ts-collections";
 import { pairwise } from "rxjs";
 import { CheckableOptions } from "../../common/tree/models/CheckableOptions";
+import { NodeCheckEvent } from "../../common/tree/models/NodeCheckEvent";
 import { TreeService } from "../../common/tree/services/tree.service";
 
 @Directive({
@@ -30,6 +31,7 @@ export class TreeViewCheckableDirective<T> implements OnInit {
     readonly #treeService: TreeService<T> = inject(TreeService);
 
     public readonly checkedKeysChange: OutputEmitterRef<Array<any>> = output();
+    public readonly nodeCheck: OutputEmitterRef<NodeCheckEvent<T>> = output();
 
     public checkBy = input<string | Selector<T, any> | null | undefined>("");
     public checkedKeys = input<Iterable<any>>([]);
@@ -67,6 +69,7 @@ export class TreeViewCheckableDirective<T> implements OnInit {
 
     public ngOnInit(): void {
         this.#treeService.checkedKeysChange = this.checkedKeysChange;
+        this.#treeService.nodeCheck = this.nodeCheck;
         this.setNodeCheckSubscription();
     }
 
@@ -79,7 +82,9 @@ export class TreeViewCheckableDirective<T> implements OnInit {
                 if (sequenceEqual(orderedOldKeys, orderedKeys)) {
                     return;
                 }
-                this.#treeService.checkedKeysChange.emit(keys.toArray());
+                if (this.#treeService.checkedKeysChange) {
+                    this.#treeService.checkedKeysChange.emit(keys.toArray());
+                }
             });
     }
 }

@@ -13,6 +13,7 @@ import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { Selector, sequenceEqual } from "@mirei/ts-collections";
 import { distinctUntilChanged, pairwise } from "rxjs";
 import { NodeItem } from "../../common/tree/models/NodeItem";
+import { NodeSelectEvent } from "../../common/tree/models/NodeSelectEvent";
 import { SelectableOptions } from "../../common/tree/models/SelectableOptions";
 import { TreeService } from "../../common/tree/services/tree.service";
 
@@ -30,6 +31,7 @@ export class TreeViewSelectableDirective<T> implements OnInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     readonly #treeService: TreeService<T> = inject(TreeService);
 
+    public readonly nodeSelect: OutputEmitterRef<NodeSelectEvent<T>> = output();
     public readonly selectedKeysChange: OutputEmitterRef<Array<any>> = output();
     public readonly selectionChange: OutputEmitterRef<NodeItem<T>> = output();
 
@@ -65,6 +67,7 @@ export class TreeViewSelectableDirective<T> implements OnInit {
 
     public ngOnInit(): void {
         this.#treeService.selectionChange = this.selectionChange;
+        this.#treeService.nodeSelect = this.nodeSelect;
         this.setNodeSelectSubscription();
     }
 
@@ -85,7 +88,9 @@ export class TreeViewSelectableDirective<T> implements OnInit {
                 takeUntilDestroyed(this.#destroyRef)
             )
             .subscribe(nodeItem => {
-                this.#treeService.selectionChange.emit(nodeItem);
+                if (this.#treeService.selectionChange) {
+                    this.#treeService.selectionChange.emit(nodeItem);
+                }
             });
     }
 }

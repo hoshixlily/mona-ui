@@ -7,6 +7,9 @@ import {
     inject,
     input,
     InputSignal,
+    OnInit,
+    output,
+    OutputEmitterRef,
     TemplateRef,
     untracked
 } from "@angular/core";
@@ -17,6 +20,7 @@ import { FilterChangeEvent } from "../../../common/filter-input/models/FilterCha
 import { TreeComponent } from "../../../common/tree/components/tree/tree.component";
 import { TreeNodeTemplateDirective } from "../../../common/tree/directives/tree-node-template.directive";
 import { DataStructure } from "../../../common/tree/models/DataStructure";
+import { NodeClickEvent } from "../../../common/tree/models/NodeClickEvent";
 import { TreeNode } from "../../../common/tree/models/TreeNode";
 import { TreeService } from "../../../common/tree/services/tree.service";
 import { TreeViewNodeTemplateDirective } from "../../directives/tree-view-node-template.directive";
@@ -33,9 +37,14 @@ import { TreeViewNodeTemplateDirective } from "../../directives/tree-view-node-t
         class: "mona-tree-view"
     }
 })
-export class TreeViewComponent<T> {
+export class TreeViewComponent<T> implements OnInit {
     protected readonly nodeTemplate = contentChild(TreeViewNodeTemplateDirective, { read: TemplateRef });
     protected readonly treeService: TreeService<T> = inject(TreeService);
+
+    /**
+     * The node click event emitter.
+     */
+    public readonly nodeClick: OutputEmitterRef<NodeClickEvent<T>> = output();
 
     /**
      * Whether to animate the tree.
@@ -108,8 +117,14 @@ export class TreeViewComponent<T> {
         this.setAnimationEffect();
     }
 
+    public ngOnInit(): void {
+        this.treeService.nodeClick = this.nodeClick;
+    }
+
     public onFilterChange(event: FilterChangeEvent): void {
-        this.treeService.filterChange.emit(event);
+        if (this.treeService.filterChange) {
+            this.treeService.filterChange.emit(event);
+        }
         if (!event.isDefaultPrevented()) {
             this.treeService.filter$.next(event.filter);
         }

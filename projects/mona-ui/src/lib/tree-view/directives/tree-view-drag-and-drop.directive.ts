@@ -19,13 +19,10 @@ export class TreeViewDragAndDropDirective<T> implements OnInit {
     };
     readonly #treeService: TreeService<T> = inject(TreeService);
 
-    public readonly nodeCheck: OutputEmitterRef<NodeCheckEvent<T>> = output();
-    public readonly nodeClick: OutputEmitterRef<NodeClickEvent<T>> = output();
     public readonly nodeDrag: OutputEmitterRef<NodeDragEvent<T>> = output();
     public readonly nodeDragEnd: OutputEmitterRef<NodeDragEndEvent<T>> = output();
     public readonly nodeDragStart: OutputEmitterRef<NodeDragStartEvent<T>> = output();
     public readonly nodeDrop: OutputEmitterRef<NodeDropEvent<T>> = output();
-    public readonly nodeSelect: OutputEmitterRef<NodeSelectEvent<T>> = output();
 
     public options = input<Partial<DraggableOptions> | "">("", {
         alias: "monaTreeViewDragAndDrop"
@@ -48,12 +45,9 @@ export class TreeViewDragAndDropDirective<T> implements OnInit {
     }
 
     public ngOnInit(): void {
-        this.#treeService.nodeCheck = this.nodeCheck;
-        this.#treeService.nodeClick = this.nodeClick;
         this.#treeService.nodeDrag = this.nodeDrag;
         this.#treeService.nodeDragEnd = this.nodeDragEnd;
         this.#treeService.nodeDragStart = this.nodeDragStart;
         this.#treeService.nodeDrop = this.nodeDrop;
-        this.#treeService.nodeSelect = this.nodeSelect;
     }
 }
