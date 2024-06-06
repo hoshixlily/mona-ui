@@ -1024,7 +1024,7 @@ export class AppComponent implements OnInit {
 
     public onColorGradientValueChange(value: string): void {
         this.colorGradientColor = value;
-        // console.log(value);
+        console.log(value);
     }
 
     public onColorPickerValueChange(value: string | null): void {

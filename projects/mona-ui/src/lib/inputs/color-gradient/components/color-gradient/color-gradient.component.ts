@@ -19,9 +19,7 @@ import {
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from "@angular/forms";
-import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { faCopy, faDropletSlash, faSort, IconDefinition } from "@fortawesome/free-solid-svg-icons";
-import { distinctUntilChanged, fromEvent, Subject, switchMap, tap } from "rxjs";
+import { distinctUntilChanged, fromEvent, Subject, switchMap, takeUntil } from "rxjs";
 import { ButtonDirective } from "../../../../buttons/button/button.directive";
 import { ContextMenuComponent } from "../../../../menus/context-menu/context-menu.component";
 import { MenuItemComponent } from "../../../../menus/menu-item/menu-item.component";
@@ -55,7 +53,6 @@ import { HueSliderComponent } from "../hue-slider/hue-slider.component";
         NumericTextBoxComponent,
         NumericTextBoxPrefixTemplateDirective,
         ButtonDirective,
-        FontAwesomeModule,
         TextBoxComponent,
         TextBoxPrefixTemplateDirective,
         TextBoxSuffixTemplateDirective,
@@ -71,17 +68,13 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     readonly #valueChange$: Subject<string | null> = new Subject<string | null>();
     readonly #zone: NgZone = inject(NgZone);
-    #pointerMouseDown: boolean = false;
-    #pointerMouseMove: boolean = false;
     #propagateChange: (value: string | null) => void = () => {};
     protected readonly alpha: WritableSignal<number> = signal(255);
     protected readonly alphaInputColor: Signal<string> = computed(() => {
         const rgb = this.rgb();
         return this.rgba2hex(rgb.r(), rgb.g(), rgb.b(), 255);
     });
-    protected readonly clearIcon: IconDefinition = faDropletSlash;
     protected readonly colorMode: WritableSignal<ColorMode> = signal("rgb");
-    protected readonly copyIcon: IconDefinition = faCopy;
     protected readonly hex: Signal<string> = computed(() => {
         const rgb = this.rgb();
         const alpha = this.alpha();
@@ -122,7 +115,6 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
         }
         return `rgba(${red}, ${green}, ${blue}, ${this.alpha() / 255})`;
     });
-    protected readonly switchIcon: IconDefinition = faSort;
 
     public readonly apply = output<void>();
     public readonly cancel = output<void>();
@@ -288,11 +280,11 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
         this.colorMode.set(this.colorMode() === "rgb" ? "hsv" : "rgb");
     }
 
-    public registerOnChange(fn: any) {
+    public registerOnChange(fn: any): void {
         this.#propagateChange = fn;
     }
 
-    public registerOnTouched(fn: any) {}
+    public registerOnTouched(fn: any): void {}
 
     public writeValue(value: string): void {
         if (!this.hsvRectangle() || !this.hsvPointer()) {
@@ -599,43 +591,26 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
     }
 
     private setHsvRectPointerEvents(): void {
-        this.#zone.runOutsideAngular(() => {
-            fromEvent<MouseEvent>(document, "mousemove")
-                .pipe(takeUntilDestroyed(this.#destroyRef))
-                .subscribe((event: MouseEvent) => {
-                    if (this.#pointerMouseDown) {
-                        this.#zone.run(() => {
-                            this.#pointerMouseMove = true;
-                            this.updateHsvRectPointerPosition(event);
-                            this.updateHsvValues();
-                            this.updateHexInputValue();
-                        });
-                    }
-                });
+        const mouseDown$ = fromEvent<MouseEvent>(this.hsvPointer().nativeElement, "mousedown").pipe(
+            takeUntilDestroyed(this.#destroyRef)
+        );
+        const mouseMove$ = fromEvent<MouseEvent>(document, "mousemove").pipe(takeUntilDestroyed(this.#destroyRef));
+        const mouseUp$ = fromEvent<MouseEvent>(document, "mouseup").pipe(takeUntilDestroyed(this.#destroyRef));
+        mouseDown$.pipe(switchMap(() => mouseMove$.pipe(takeUntil(mouseUp$)))).subscribe((event: MouseEvent) => {
+            this.#zone.run(() => {
+                this.updateHsvRectPointerPosition(event);
+                this.updateHsvValues();
+                this.updateHexInputValue();
+            });
         });
-        fromEvent<MouseEvent>(this.hsvPointer().nativeElement, "mousedown")
-            .pipe(
-                takeUntilDestroyed(this.#destroyRef),
-                tap(() => (this.#pointerMouseDown = true)),
-                switchMap(() =>
-                    fromEvent<MouseEvent>(document, "mouseup").pipe(
-                        takeUntilDestroyed(this.#destroyRef),
-                        tap(() => {
-                            this.#pointerMouseDown = false;
-                            this.#pointerMouseMove = false;
-                        })
-                    )
-                )
-            )
-            .subscribe();
         fromEvent<MouseEvent>(this.hsvRectangle().nativeElement, "click")
             .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe((event: MouseEvent) => {
-                if (!this.#pointerMouseMove) {
-                    this.updateHsvRectPointerPosition(event);
+                this.updateHsvRectPointerPosition(event);
+                window.setTimeout(() => {
                     this.updateHsvValues();
                     this.updateHexInputValue();
-                }
+                });
             });
     }
 

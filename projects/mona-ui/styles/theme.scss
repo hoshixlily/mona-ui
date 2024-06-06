@@ -1477,7 +1477,9 @@ input[monaTextBox].mona-input-inner {
         height: 100%;
         outline: none;
         background-color: transparent;
+        color: inherit;
         padding: 0.25rem 0.5rem;
+        border: none;
         @include font-medium;
         &[disabled] {
             @include disabled;
