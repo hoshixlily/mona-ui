@@ -22,6 +22,7 @@ import { TreeNode } from "../../../common/tree/models/TreeNode";
 import { ChildrenSelector } from "../../../common/tree/models/TreeSelectors";
 import { TreeService } from "../../../common/tree/services/tree.service";
 import { TreeViewNodeTemplateDirective } from "../../directives/tree-view-node-template.directive";
+import { TreeViewNodeTemplateContext } from "../../models/TreeViewNodeTemplateContext";
 
 @Component({
     selector: "mona-tree-view",
@@ -36,7 +37,10 @@ import { TreeViewNodeTemplateDirective } from "../../directives/tree-view-node-t
     }
 })
 export class TreeViewComponent<T> implements OnInit {
-    protected readonly nodeTemplate = contentChild(TreeViewNodeTemplateDirective, { read: TemplateRef });
+    protected readonly nodeTemplate = contentChild<
+        TreeViewNodeTemplateDirective,
+        TemplateRef<TreeViewNodeTemplateContext<T>>
+    >(TreeViewNodeTemplateDirective, { read: TemplateRef });
     protected readonly treeService = inject(TreeService<T>);
 
     /**
@@ -70,7 +74,7 @@ export class TreeViewComponent<T> implements OnInit {
      * Required if the children selector is set to a function that returns an observable.
      * @param value The predicate to determine if a node has children.
      */
-    public hasChildren = input<Predicate<TreeNode<T>> | null>(null);
+    public hasChildren = input<Predicate<T> | null>(null);
 
     /**
      * The field that represents the unique identifier of a node.

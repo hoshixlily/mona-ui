@@ -140,7 +140,7 @@ export class TreeService<T> {
     public readonly nodeSelectChange$: Subject<TreeNodeSelectEvent<T>> = new Subject();
     public readonly nodeSet: WritableSignal<ImmutableSet<TreeNode<T>>> = signal(ImmutableSet.create());
     public readonly nodeTemplate: WritableSignal<TemplateRef<any> | null> = signal(null);
-    public readonly selectBy: WritableSignal<string | Selector<T, any> | null> = signal(null);
+    public readonly selectBy: WritableSignal<NodeKeySelector<T>> = signal(null);
     public readonly selectableOptions: WritableSignal<SelectableOptions> = signal({
         childrenOnly: false,
         enabled: false,
@@ -388,7 +388,7 @@ export class TreeService<T> {
         this.updateNodeIndices();
     }
 
-    public setCheckBy(selector: string | Selector<T, any> | null): void {
+    public setCheckBy(selector: NodeKeySelector<T>): void {
         this.checkBy.set(selector);
     }
 
@@ -421,7 +421,7 @@ export class TreeService<T> {
         this.structure.set(structure);
     }
 
-    public setDisableBy(selector: string | Selector<T, any> | null): void {
+    public setDisableBy(selector: NodeKeySelector<T>): void {
         this.disableBy.set(selector);
     }
 
@@ -442,7 +442,7 @@ export class TreeService<T> {
         this.draggableOptions.update(o => ({ ...o, ...options }));
     }
 
-    public setExpandBy(selector: string | Selector<T, any> | null): void {
+    public setExpandBy(selector: NodeKeySelector<T>): void {
         this.expandBy.set(selector);
     }
 
@@ -578,7 +578,7 @@ export class TreeService<T> {
         this.navigatedNode.set(node);
     }
 
-    public setSelectBy(selector: string | Selector<T, any> | null): void {
+    public setSelectBy(selector: NodeKeySelector<T>): void {
         this.selectBy.set(selector);
     }
 
@@ -740,7 +740,7 @@ export class TreeService<T> {
                         const newNodes = this.filterTree(node.children(), filterText);
                         if (!newNodes.isEmpty()) {
                             const clonedNode = node.clone();
-                            clonedNode.children.update(list => list.clear().addAll(newNodes));
+                            clonedNode.children.update(set => set.clear().addAll(newNodes));
                             result.add(clonedNode);
                         }
                     }
@@ -768,7 +768,7 @@ export class TreeService<T> {
         return nodes.where(n => n !== node).toImmutableSet();
     }
 
-    private getDataItemSelectKey(dataItem: T): any | null {
+    private getDataItemSelectKey(dataItem: T): any {
         const selectBy = this.selectBy();
         if (!selectBy) {
             return dataItem;
