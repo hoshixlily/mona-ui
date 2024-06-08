@@ -6,15 +6,12 @@ import {
     effect,
     inject,
     input,
-    InputSignal,
     OnInit,
     output,
-    OutputEmitterRef,
     TemplateRef,
     untracked
 } from "@angular/core";
 import { Predicate, Selector } from "@mirei/ts-collections";
-import { Observable } from "rxjs";
 import { FilterInputComponent } from "../../../common/filter-input/components/filter-input/filter-input.component";
 import { FilterChangeEvent } from "../../../common/filter-input/models/FilterChangeEvent";
 import { TreeComponent } from "../../../common/tree/components/tree/tree.component";
@@ -22,6 +19,7 @@ import { TreeNodeTemplateDirective } from "../../../common/tree/directives/tree-
 import { DataStructure } from "../../../common/tree/models/DataStructure";
 import { NodeClickEvent } from "../../../common/tree/models/NodeClickEvent";
 import { TreeNode } from "../../../common/tree/models/TreeNode";
+import { ChildrenSelector } from "../../../common/tree/models/TreeSelectors";
 import { TreeService } from "../../../common/tree/services/tree.service";
 import { TreeViewNodeTemplateDirective } from "../../directives/tree-view-node-template.directive";
 
@@ -39,18 +37,18 @@ import { TreeViewNodeTemplateDirective } from "../../directives/tree-view-node-t
 })
 export class TreeViewComponent<T> implements OnInit {
     protected readonly nodeTemplate = contentChild(TreeViewNodeTemplateDirective, { read: TemplateRef });
-    protected readonly treeService: TreeService<T> = inject(TreeService);
+    protected readonly treeService = inject(TreeService<T>);
 
     /**
      * The node click event emitter.
      */
-    public readonly nodeClick: OutputEmitterRef<NodeClickEvent<T>> = output();
+    public readonly nodeClick = output<NodeClickEvent<T>>();
 
     /**
      * Whether to animate the tree.
      * If true, the tree will animate when expanding or collapsing nodes.
      */
-    public animate: InputSignal<boolean> = input<boolean>(true);
+    public animate = input<boolean>(true);
 
     /**
      * The children selector for the tree.
@@ -60,27 +58,25 @@ export class TreeViewComponent<T> implements OnInit {
      * - A function that returns an observable that emits the children of a node.
      * @param value The children selector for the tree.
      */
-    public children: InputSignal<string | Selector<T, Iterable<T> | Observable<Iterable<T>>>> = input<
-        string | Selector<T, Iterable<T> | Observable<Iterable<T>>>
-    >("");
+    public children = input<ChildrenSelector<T>>("");
 
     /**
      * The data for the tree.
      */
-    public data: InputSignal<Iterable<T>> = input<Iterable<T>>([]);
+    public data = input<Iterable<T>>([]);
 
     /**
      * The predicate to determine if a node has children.
      * Required if the children selector is set to a function that returns an observable.
      * @param value The predicate to determine if a node has children.
      */
-    public hasChildren: InputSignal<Predicate<TreeNode<T>> | null> = input<Predicate<TreeNode<T>> | null>(null);
+    public hasChildren = input<Predicate<TreeNode<T>> | null>(null);
 
     /**
      * The field that represents the unique identifier of a node.
      * This is required if the data structure is set to "flat".
      */
-    public idField: InputSignal<string> = input<string>("");
+    public idField = input<string>("");
 
     /**
      * The data structure of the tree.
@@ -96,13 +92,13 @@ export class TreeViewComponent<T> implements OnInit {
      * - {@link children}
      * - {@link hasChildren}
      */
-    public mode: InputSignal<DataStructure> = input<DataStructure>("hierarchical");
+    public mode = input<DataStructure>("hierarchical");
 
     /**
      * The field that represents the parent identifier of a node.
      * This is required if the data structure is set to "flat".
      */
-    public parentIdField: InputSignal<string> = input<string>("");
+    public parentIdField = input<string>("");
 
     /**
      * The text field for the tree.
@@ -110,7 +106,7 @@ export class TreeViewComponent<T> implements OnInit {
      * - A string representing the property name of the text.
      * - A function that returns the text of a node.
      */
-    public textField: InputSignal<string | Selector<T, string>> = input<string | Selector<T, string>>("");
+    public textField = input<string | Selector<T, string>>("");
 
     public constructor() {
         this.setDataStructureFields();

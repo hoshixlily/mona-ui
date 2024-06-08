@@ -10,10 +10,11 @@ import {
     untracked
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { Selector, sequenceEqual } from "@mirei/ts-collections";
+import { sequenceEqual } from "@mirei/ts-collections";
 import { pairwise } from "rxjs";
 import { CheckableOptions } from "../../common/tree/models/CheckableOptions";
 import { NodeCheckEvent } from "../../common/tree/models/NodeCheckEvent";
+import { NodeKeySelector } from "../../common/tree/models/TreeSelectors";
 import { TreeService } from "../../common/tree/services/tree.service";
 
 @Directive({
@@ -33,7 +34,7 @@ export class TreeViewCheckableDirective<T> implements OnInit {
     public readonly checkedKeysChange: OutputEmitterRef<Array<any>> = output();
     public readonly nodeCheck: OutputEmitterRef<NodeCheckEvent<T>> = output();
 
-    public checkBy = input<string | Selector<T, any> | null | undefined>("");
+    public checkBy = input<NodeKeySelector<T> | undefined>("");
     public checkedKeys = input<Iterable<any>>([]);
     public options = input<Partial<CheckableOptions> | "">("", {
         alias: "monaTreeViewCheckable"

@@ -10,11 +10,12 @@ import {
     untracked
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { Selector, sequenceEqual } from "@mirei/ts-collections";
+import { sequenceEqual } from "@mirei/ts-collections";
 import { distinctUntilChanged, pairwise } from "rxjs";
 import { NodeItem } from "../../common/tree/models/NodeItem";
 import { NodeSelectEvent } from "../../common/tree/models/NodeSelectEvent";
 import { SelectableOptions } from "../../common/tree/models/SelectableOptions";
+import { NodeKeySelector } from "../../common/tree/models/TreeSelectors";
 import { TreeService } from "../../common/tree/services/tree.service";
 
 @Directive({
@@ -35,7 +36,7 @@ export class TreeViewSelectableDirective<T> implements OnInit {
     public readonly selectedKeysChange: OutputEmitterRef<Array<any>> = output();
     public readonly selectionChange: OutputEmitterRef<NodeItem<T>> = output();
 
-    public selectBy = input<string | Selector<T, any> | null | undefined>("");
+    public selectBy = input<NodeKeySelector<T> | undefined>("");
     public selectedKeys = input<Iterable<any>>([]);
     public options = input<Partial<SelectableOptions> | "">("", {
         alias: "monaTreeViewSelectable"

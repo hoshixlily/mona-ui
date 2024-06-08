@@ -1,6 +1,6 @@
 import { Directive, effect, inject, input, untracked } from "@angular/core";
-import { Selector } from "@mirei/ts-collections";
 import { DisableOptions } from "../../common/tree/models/DisableOptions";
+import { NodeKeySelector } from "../../common/tree/models/TreeSelectors";
 import { TreeService } from "../../common/tree/services/tree.service";
 
 @Directive({
@@ -14,7 +14,7 @@ export class TreeViewDisableDirective<T> {
     };
     readonly #treeService: TreeService<T> = inject(TreeService);
 
-    public disableBy = input<string | Selector<T, any> | null | undefined>("");
+    public disableBy = input<NodeKeySelector<T> | undefined>("");
     public disabledKeys = input<Iterable<any>>([]);
     public options = input<Partial<DisableOptions> | "">("", {
         alias: "monaTreeViewDisable"

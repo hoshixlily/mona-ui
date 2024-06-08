@@ -1,15 +1,16 @@
-import { signal, WritableSignal } from "@angular/core";
+import { signal } from "@angular/core";
 import { ImmutableSet } from "@mirei/ts-collections";
 import { v4 } from "uuid";
 import { NodeItem } from "./NodeItem";
 
 export class TreeNode<T> {
+    public readonly checked = signal(false);
+    public readonly children = signal(ImmutableSet.create<TreeNode<T>>());
     public readonly data: T;
+    public readonly loaded = signal(false);
+    public readonly loading = signal(false);
     public readonly uid: string = v4();
-    public children: WritableSignal<ImmutableSet<TreeNode<T>>> = signal(ImmutableSet.create());
     public index: string = "";
-    public loaded: WritableSignal<boolean> = signal(false);
-    public loading: WritableSignal<boolean> = signal(false);
     public parent: TreeNode<T> | null = null;
 
     public constructor(data: T) {
