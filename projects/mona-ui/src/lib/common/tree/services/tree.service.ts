@@ -2,10 +2,8 @@ import {
     computed,
     DestroyRef,
     effect,
-    EventEmitter,
     inject,
     Injectable,
-    output,
     OutputEmitterRef,
     Signal,
     signal,
@@ -16,9 +14,9 @@ import {
 import { takeUntilDestroyed, toObservable, toSignal } from "@angular/core/rxjs-interop";
 import {
     aggregate,
+    EnumerableSet,
     from,
     ImmutableDictionary,
-    ImmutableList,
     ImmutableSet,
     List,
     Predicate,
@@ -79,6 +77,7 @@ export class TreeService<T> {
     });
     private readonly structure: WritableSignal<DataStructure> = signal("hierarchical");
     private readonly unfilteredExpandedKeys: WritableSignal<ImmutableSet<any>> = signal(ImmutableSet.create());
+    public readonly animationTemporarilyDisabled: WritableSignal<boolean> = signal(false);
     public readonly animationEnabled: WritableSignal<boolean> = signal(true);
     public readonly checkBy: WritableSignal<string | Selector<T, any> | null> = signal(null);
     public readonly checkableOptions: WritableSignal<CheckableOptions> = signal({
@@ -629,7 +628,7 @@ export class TreeService<T> {
         });
     }
 
-    private createFlatNodes(data: Iterable<T>, parentId: string | null): ImmutableList<TreeNode<T>> {
+    private createFlatNodes(data: Iterable<T>, parentId: string | null): ImmutableSet<TreeNode<T>> {
         const flatIdField = this.flatIdField();
         const flatParentIdField = this.flatParentIdField();
         const nodes = new List<TreeNode<T>>();
@@ -642,38 +641,59 @@ export class TreeService<T> {
                 nodes.add(node);
             }
         }
-        return nodes.toImmutableList();
+        return nodes.toImmutableSet();
     }
 
-    private createHierarchicalNodes(root: Iterable<T>, parent: TreeNode<T> | null): List<TreeNode<T>> | null {
+    private createHierarchicalNodes(
+        root: Iterable<T>,
+        parent: TreeNode<T> | null,
+        nodeDict: ImmutableDictionary<string, TreeNode<T>>
+    ): ImmutableSet<TreeNode<T>> | null {
         const rootList = new List(root);
         const children = this.children();
         if (rootList.isEmpty() || !children) {
             return null;
         }
-        const nodes = new List<TreeNode<T>>();
+        const nodes = new EnumerableSet<TreeNode<T>>();
         for (const dataItem of rootList) {
-            const node = new TreeNode(dataItem);
-            node.parent = parent;
+            const existingNode = nodeDict.firstOrDefault(n => n.value.data === dataItem);
+            let node: TreeNode<T>;
+            if (existingNode) {
+                node = existingNode.value;
+            } else {
+                node = new TreeNode(dataItem);
+                node.parent = parent;
+            }
 
             if (typeof children === "string") {
                 const subNodes = (dataItem as any)[children];
                 if (subNodes) {
-                    const childNodes = this.createHierarchicalNodes(subNodes, node);
-                    node.children.update(list => list.clear().addAll(childNodes ?? []));
+                    const childNodes = this.createHierarchicalNodes(subNodes, node, nodeDict);
                     node.loaded.set(true);
+                    node.children.update(list => list.clear().addAll(childNodes ?? []));
+                    if (node.parent) {
+                        node.parent.children.update(list => list.add(node));
+                    }
                 }
             } else {
                 const result = children(dataItem);
                 if (!(result instanceof Observable)) {
-                    const childNodes = this.createHierarchicalNodes(result, node);
-                    node.children.update(list => list.clear().addAll(childNodes ?? []));
+                    const childNodes = this.createHierarchicalNodes(result, node, nodeDict);
                     node.loaded.set(true);
+                    node.children.update(list => list.clear().addAll(childNodes ?? []));
+                    if (node.parent) {
+                        node.parent.children.update(list => list.add(node));
+                    }
+                } else if (result instanceof Observable && node.loaded()) {
+                    result.pipe(take(1)).subscribe(c => {
+                        const childNodes = this.createHierarchicalNodes(c, node, nodeDict);
+                        node.children.update(list => list.clear().addAll(childNodes ?? []));
+                    });
                 }
             }
             nodes.add(node);
         }
-        return nodes;
+        return nodes.toImmutableSet();
     }
 
     private createNodeDictionary(nodes: Iterable<TreeNode<T>>): ImmutableDictionary<string, TreeNode<T>> {
@@ -688,8 +708,8 @@ export class TreeService<T> {
         if (structure === "flat") {
             return this.createFlatNodes(data, null).toImmutableSet();
         }
-        const nodes = this.createHierarchicalNodes(data, null) ?? new List<TreeNode<T>>();
-        return ImmutableSet.create(nodes);
+        const nodeDictionary = this.nodeDictionary();
+        return this.createHierarchicalNodes(data, null, nodeDictionary) ?? ImmutableSet.create();
     }
 
     private filterTree(nodes: Iterable<TreeNode<T>>, filterText: string): ImmutableSet<TreeNode<T>> {
@@ -805,14 +825,14 @@ export class TreeService<T> {
             });
         }
         if (targetNode.parent) {
-            const index = targetNode.parent.children().indexOf(targetNode);
+            const index = targetNode.parent.children().toImmutableList().indexOf(targetNode);
             if (index === -1) {
                 return;
             }
-            targetNode.parent.children.update(list => {
-                const tempList = list.toList();
+            targetNode.parent.children.update(set => {
+                const tempList = set.toList();
                 tempList.addAt(sourceNode, index + 1);
-                return tempList.toImmutableList();
+                return tempList.toImmutableSet();
             });
 
             if (!sourceNode.parent) {
@@ -844,14 +864,14 @@ export class TreeService<T> {
             });
         }
         if (targetNode.parent) {
-            const index = targetNode.parent.children().indexOf(targetNode);
+            const index = targetNode.parent.children().toImmutableList().indexOf(targetNode);
             if (index === -1) {
                 return;
             }
-            targetNode.parent.children.update(list => {
-                const tempList = list.toList();
+            targetNode.parent.children.update(set => {
+                const tempList = set.toList();
                 tempList.addAt(sourceNode, index);
-                return tempList.toImmutableList();
+                return tempList.toImmutableSet();
             });
             if (!sourceNode.parent) {
                 this.nodeSet.update(nodes => nodes.remove(sourceNode));

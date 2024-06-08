@@ -1,4 +1,4 @@
-<mona-sub-tree [nodes]="treeService.viewNodeSet()" [parent]="null" [depth]="0"></mona-sub-tree>
+<mona-sub-tree [nodes]="treeService.viewNodeSet()" [parent]="null" [depth]="0" [@.disabled]="treeService.animationTemporarilyDisabled()"></mona-sub-tree>
 @if ((treeService.dragging$|async) && (treeService.nodeDrag$|async)?.dropAllowed) {
     <mona-tree-drop-hint></mona-tree-drop-hint>
 }

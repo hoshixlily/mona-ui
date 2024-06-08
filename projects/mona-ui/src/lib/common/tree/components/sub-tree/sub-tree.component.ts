@@ -147,16 +147,16 @@ export class SubTreeComponent<T> {
             ) {
                 return;
             }
+            this.treeService.animationTemporarilyDisabled.set(true);
             const nodeDropEvent = new NodeDropEvent(sourceNode, targetNode, e.position, event.event);
             this.treeService.nodeDrop$.next(nodeDropEvent);
             if (nodeDropEvent.isDefaultPrevented()) {
+                this.treeService.animationTemporarilyDisabled.set(false);
                 return;
-            }
-            if (e.position === "inside" || e.position === "before" || e.position === "after") {
-                this.treeService.moveNode(sourceNode, targetNode, e.position);
             }
             this.treeService.dropPositionChange$.next(null);
             this.focusNode(sourceNode);
+            window.setTimeout(() => this.treeService.animationTemporarilyDisabled.set(false));
         });
     }
 

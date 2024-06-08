@@ -11,7 +11,7 @@ import {
     Signal
 } from "@angular/core";
 import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
-import { map, startWith, Subject, withLatestFrom } from "rxjs";
+import { map, Subject } from "rxjs";
 import { NodeCheckEvent } from "../../models/NodeCheckEvent";
 import { NodeClickEvent } from "../../models/NodeClickEvent";
 import { NodeSelectEvent } from "../../models/NodeSelectEvent";
@@ -170,17 +170,15 @@ export class TreeNodeComponent<T> implements OnInit {
                     const nodeCheckEvent = new NodeCheckEvent(node, event);
                     this.treeService.nodeCheck$.next(nodeCheckEvent);
                     return nodeCheckEvent;
-                }),
-                withLatestFrom(
-                    this.checkboxCheck$.pipe(startWith(this.treeService.isChecked(this.node() as TreeNode<T>)))
-                )
+                })
             )
-            .subscribe(([event, checked]) => {
+            .subscribe(event => {
                 const node = this.node() as TreeNode<T>;
                 if (event.isDefaultPrevented()) {
                     event.originalEvent?.preventDefault();
                     return;
                 }
+                const checked = this.treeService.isChecked(node);
                 this.treeService.setNodeCheck(node, !checked);
                 this.treeService.nodeCheckChange$.next({ node, checked: !checked });
             });
