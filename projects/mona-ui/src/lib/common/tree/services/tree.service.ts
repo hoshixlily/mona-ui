@@ -289,11 +289,13 @@ export class TreeService<T> {
         if (node.children().isEmpty()) {
             return false;
         }
-        const childNodes = this.getChildNodes(node);
+        const childNodes = node.children();
         const checkedNodes = childNodes.where(n => this.isChecked(n));
+        const indeterminateNodes = childNodes.where(n => this.isIndeterminate(n));
         const checkedCount = checkedNodes.count();
+        const indeterminateCount = indeterminateNodes.count();
         const childCount = childNodes.size();
-        return checkedCount > 0 && checkedCount < childCount;
+        return (checkedCount > 0 && checkedCount < childCount) || indeterminateCount > 0;
     }
 
     public isNavigated(node: TreeNode<T>): boolean {
