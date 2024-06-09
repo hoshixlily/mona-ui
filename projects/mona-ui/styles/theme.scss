@@ -969,6 +969,13 @@ mona-filter-input.mona-popup-filter-input,
     }
 }
 
+.mona-grid-virtual-list {
+    height: 100%;
+    overflow: auto hidden;
+    width: 100%;
+    @include scrollbars-thick;
+}
+
 .mona-grid-filtered {
     color: var(--mona-primary-light);
 }

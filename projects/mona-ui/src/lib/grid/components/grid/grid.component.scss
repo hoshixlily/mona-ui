@@ -27,7 +27,6 @@
     & table {
         border-collapse: collapse;
         table-layout: fixed;
-        width: 100%;
         & tr {
             position: relative;
         }
@@ -37,6 +36,7 @@
             text-align: left;
             position: relative;
             user-select: none;
+            display: inline-flex;
             &:not(:last-child) {
                 border-right: 1px solid var(--mona-border-color);
             }

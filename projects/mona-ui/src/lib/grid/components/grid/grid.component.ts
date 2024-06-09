@@ -45,6 +45,7 @@ import { GridService } from "../../services/grid.service";
 import { GridColumnComponent } from "../grid-column/grid-column.component";
 import { GridFilterMenuComponent } from "../grid-filter-menu/grid-filter-menu.component";
 import { GridListComponent } from "../grid-list/grid-list.component";
+import { GridVirtualListComponent } from "../grid-virtual-list/grid-virtual-list.component";
 
 @Component({
     selector: "mona-grid",
@@ -64,7 +65,8 @@ import { GridListComponent } from "../grid-list/grid-list.component";
         GridColumnResizeHandlerDirective,
         CdkDragPreview,
         GridListComponent,
-        PagerComponent
+        PagerComponent,
+        GridVirtualListComponent
     ],
     host: {
         class: "mona-grid"

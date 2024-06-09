@@ -51,7 +51,7 @@ export class GridListComponent implements OnInit, AfterViewInit {
     protected readonly gridService: GridService = inject(GridService);
 
     public columns = input<ImmutableList<Column>>(ImmutableList.create());
-    public data: InputSignal<ImmutableSet<Row>> = input<ImmutableSet<Row>>(ImmutableSet.create());
+    public data = input<ImmutableSet<Row>>(ImmutableSet.create());
 
     public ngAfterViewInit(): void {
         window.setTimeout(() => {

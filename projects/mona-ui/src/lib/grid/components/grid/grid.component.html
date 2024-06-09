@@ -17,25 +17,27 @@
 <div class="mona-grid-header" [ngStyle]="{'margin': headerMargin}" #gridHeaderElement>
     <div class="mona-grid-header-wrap">
         <table>
-            <colgroup>
-                @for (_ of gridService.groupColumns(); track $index) {
-                    <col style="width: 34px;">
-                }
-                @for (column of gridService.columns(); track $index) {
-                    <col [style.width.px]="column.calculatedWidth()" [style.min-width.px]="column.minWidth()">
-                }
-            </colgroup>
+<!--            <colgroup>-->
+<!--                @for (_ of gridService.groupColumns(); track $index) {-->
+<!--                    <col style="width: 34px;">-->
+<!--                }-->
+<!--                @for (column of gridService.columns(); track $index) {-->
+<!--                    <col [style.width.px]="column.calculatedWidth()" [style.min-width.px]="column.minWidth()">-->
+<!--                }-->
+<!--            </colgroup>-->
             <thead>
                 <tr cdkDropList [cdkDropListConnectedTo]="groupable() ? [groupColumnList()!] : []"
                     (cdkDropListDropped)="onColumnDrop($event)">
                     @for (_ of gridService.groupColumns(); track $index) {
-                        <td></td>
+                        <td style="width: 34px;"></td>
                     }
                     @for (column of gridService.columns(); track $index) {
                         <th cdkDrag [cdkDragData]="column" [cdkDragDisabled]="!reorderable() && !groupable()"
                             (mouseenter)="onColumnMouseEnter($event, column)"
                             (cdkDragEntered)="onColumnDragEnter($event, column)"
-                            (cdkDragStarted)="onColumnDragStart($event)">
+                            (cdkDragStarted)="onColumnDragStart($event)"
+                            [style.min-width.px]="column.minWidth()"
+                            [style.width.px]="column.calculatedWidth()">
                             <div class="mona-grid-column-wrap">
                                 @if (column.titleTemplate()) {
                                     <ng-container [ngTemplateOutlet]="column.titleTemplate()"></ng-container>
@@ -81,8 +83,10 @@
 </div>
 
 
-<mona-grid-list [columns]="gridService.columns()" [data]="gridService.viewPageRows()"></mona-grid-list>
-<mona-pager [skip]="gridService.pageState.skip()" [pageSize]="gridService.pageState.take()"
-            [total]="gridService.viewRowCount()"
-            [pageInput]="true" [pageSizeValues]="pageSizeValues()" [responsive]="responsivePager()"
-            (pageSizeChange)="onPageSizeChange($event)" (pageChange)="onPageChange($event)"></mona-pager>
+<!--<mona-grid-list [columns]="gridService.columns()" [data]="gridService.viewPageRows()"></mona-grid-list>-->
+<!--<mona-pager [skip]="gridService.pageState.skip()" [pageSize]="gridService.pageState.take()"-->
+<!--            [total]="gridService.viewRowCount()"-->
+<!--            [pageInput]="true" [pageSizeValues]="pageSizeValues()" [responsive]="responsivePager()"-->
+<!--            (pageSizeChange)="onPageSizeChange($event)" (pageChange)="onPageChange($event)"></mona-pager>-->
+
+<mona-grid-virtual-list [columns]="gridService.columns()" [data]="gridService.rows()"></mona-grid-virtual-list>

@@ -11,8 +11,6 @@ import {
     output,
     OutputEmitterRef
 } from "@angular/core";
-import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { faFilter, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { take } from "rxjs";
 import { ButtonDirective } from "../../../buttons/button/button.directive";
 import { FilterMenuComponent } from "../../../filter/components/filter-menu/filter-menu.component";
@@ -29,7 +27,7 @@ import { GridService } from "../../services/grid.service";
     styleUrls: ["./grid-filter-menu.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
     standalone: true,
-    imports: [ButtonDirective, NgClass, FontAwesomeModule],
+    imports: [ButtonDirective, NgClass],
     host: {
         class: "mona-grid-filter-menu"
     }
@@ -40,7 +38,6 @@ export class GridFilterMenuComponent {
     readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
     readonly #popupService: PopupService = inject(PopupService);
     #popupRef?: PopupRef;
-    protected readonly filterIcon: IconDefinition = faFilter;
 
     public readonly apply: OutputEmitterRef<ColumnFilterState> = output();
 
