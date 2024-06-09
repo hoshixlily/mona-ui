@@ -74,6 +74,19 @@ input, textarea, button {
     }
 }
 
+@mixin rotating-animation($duration: 2s) {
+    animation: rotate $duration linear infinite;
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 /** General **/
 .mona-no-animation {
     &, & * {
@@ -87,6 +100,10 @@ input, textarea, button {
 
 .mona-invisible {
     visibility: hidden !important;
+}
+
+.mona-rotate-anim {
+    @include rotating-animation(2s);
 }
 
 .mona-unselectable {

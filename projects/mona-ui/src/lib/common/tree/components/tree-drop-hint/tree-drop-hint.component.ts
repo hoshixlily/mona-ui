@@ -1,14 +1,12 @@
 import { Component, computed, effect, ElementRef, inject, Signal } from "@angular/core";
 import { toSignal } from "@angular/core/rxjs-interop";
-import { FaIconComponent } from "@fortawesome/angular-fontawesome";
-import { faCaretRight, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { DropPositionChangeEvent } from "../../models/DropPositionChangeEvent";
 import { TreeService } from "../../services/tree.service";
 
 @Component({
     selector: "mona-tree-drop-hint",
     standalone: true,
-    imports: [FaIconComponent],
+    imports: [],
     templateUrl: "./tree-drop-hint.component.html",
     styleUrl: "./tree-drop-hint.component.scss",
     host: {
@@ -23,7 +21,6 @@ export class TreeDropHintComponent<T> {
         }
     );
     readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
-    protected readonly dropHintIcon: IconDefinition = faCaretRight;
     protected readonly dropHintStyles: Signal<Partial<CSSStyleDeclaration>> = computed(() => {
         const dropPositionData = this.#dropPositionChange();
         if (!dropPositionData) {
