@@ -16,7 +16,7 @@ export class ListViewPageableDirective {
         pageSizeValues: [5, 10, 20, 25, 50, 100],
         visiblePages: 5
     };
-    readonly #host: ListViewComponent = inject(ListViewComponent);
+    readonly #host = inject(ListViewComponent);
 
     public options = input<Partial<PagerSettings> | "">("", {
         alias: "monaListViewPageable"

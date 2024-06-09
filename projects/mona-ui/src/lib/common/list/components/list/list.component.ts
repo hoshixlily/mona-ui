@@ -33,6 +33,7 @@ import { ListItemTemplateDirective } from "../../directives/list-item-template.d
 import { ListItemDirective } from "../../directives/list-item.directive";
 import { ListNoDataTemplateDirective } from "../../directives/list-no-data-template.directive";
 import { ListItem } from "../../models/ListItem";
+import { ListKeySelector } from "../../models/ListSelectors";
 import { ListSizeInputType, ListSizeType } from "../../models/ListSizeType";
 import { SelectionChangeEvent } from "../../models/SelectionChangeEvent";
 import { ListService } from "../../services/list.service";
@@ -123,7 +124,7 @@ export class ListComponent<TData> implements OnInit {
     public data = input<Iterable<TData> | null | undefined>(null);
     public height: InputSignal<ListSizeInputType> = input<ListSizeInputType>(undefined);
     public maxHeight: InputSignal<ListSizeInputType> = input<ListSizeInputType>(undefined);
-    public textField = input<string | Selector<TData, string> | null | undefined>(null);
+    public textField = input<ListKeySelector<TData, string> | undefined>(null);
     public width: InputSignal<ListSizeInputType> = input<ListSizeInputType>(undefined);
 
     public constructor() {

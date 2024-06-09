@@ -1,20 +1,20 @@
 import { Directive, effect, inject, input, untracked } from "@angular/core";
-import { Selector } from "@mirei/ts-collections";
 import { GroupableOptions } from "../../common/list/models/GroupableOptions";
+import { ListKeySelector } from "../../common/list/models/ListSelectors";
 import { ListService } from "../../common/list/services/list.service";
 
 @Directive({
     selector: "mona-list-view[monaListViewGroupable]",
     standalone: true
 })
-export class ListViewGroupableDirective<T> {
-    readonly #defaultOptions: GroupableOptions<T, any> = {
+export class ListViewGroupableDirective<T, K = T> {
+    readonly #defaultOptions: GroupableOptions<T, K> = {
         enabled: true
     };
-    readonly #listService: ListService<T> = inject(ListService);
+    readonly #listService = inject(ListService<T>);
 
-    public groupBy = input<string | Selector<T, any> | null | undefined>("");
-    public options = input<GroupableOptions<T, any> | "">("", {
+    public groupBy = input<ListKeySelector<T, K> | undefined>("");
+    public options = input<GroupableOptions<T, K> | "">("", {
         alias: "monaListViewGroupable"
     });
 

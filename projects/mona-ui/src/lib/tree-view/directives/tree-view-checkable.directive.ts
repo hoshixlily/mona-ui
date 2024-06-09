@@ -31,8 +31,8 @@ export class TreeViewCheckableDirective<T, K = T> implements OnInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     readonly #treeService: TreeService<T> = inject(TreeService);
 
-    public readonly checkedKeysChange: OutputEmitterRef<Array<K>> = output();
-    public readonly nodeCheck: OutputEmitterRef<NodeCheckEvent<T>> = output();
+    public readonly checkedKeysChange = output<Array<K>>();
+    public readonly nodeCheck = output<NodeCheckEvent<T>>();
 
     public checkBy = input<NodeKeySelector<T, K> | undefined>("");
     public checkedKeys = input<Iterable<K>>([]);

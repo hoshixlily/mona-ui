@@ -1,17 +1,5 @@
-import {
-    Directive,
-    effect,
-    EventEmitter,
-    inject,
-    input,
-    Input,
-    OnInit,
-    output,
-    Output,
-    OutputEmitterRef,
-    untracked
-} from "@angular/core";
-import { Selector } from "@mirei/ts-collections";
+import { Directive, effect, inject, input, OnInit, output, untracked } from "@angular/core";
+import { ListKeySelector } from "../../common/list/models/ListSelectors";
 import { SelectableOptions } from "../../common/list/models/SelectableOptions";
 import { ListService } from "../../common/list/services/list.service";
 
@@ -19,20 +7,20 @@ import { ListService } from "../../common/list/services/list.service";
     selector: "mona-list-view[monaListViewSelectable]",
     standalone: true
 })
-export class ListViewSelectableDirective<T> implements OnInit {
+export class ListViewSelectableDirective<T, K = T> implements OnInit {
     readonly #defaultOptions: SelectableOptions = {
         mode: "single",
         enabled: true,
         toggleable: false
     };
-    readonly #listService: ListService<T> = inject(ListService);
+    readonly #listService = inject(ListService<T>);
 
-    public readonly selectedKeysChange: OutputEmitterRef<any[]> = output();
+    public readonly selectedKeysChange = output<Array<K>>();
     public options = input<Partial<SelectableOptions> | "">("", {
         alias: "monaListViewSelectable"
     });
-    public selectedKeys = input<Iterable<any>>([]);
-    public selectionKey = input<string | Selector<T, any> | null | undefined>("");
+    public selectedKeys = input<Iterable<K>>([]);
+    public selectionKey = input<ListKeySelector<T, K> | undefined>("");
 
     public constructor() {
         effect(() => {

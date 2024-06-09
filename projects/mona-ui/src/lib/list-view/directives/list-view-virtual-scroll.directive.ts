@@ -1,4 +1,4 @@
-import { Directive, effect, inject, input, Input, untracked } from "@angular/core";
+import { Directive, effect, inject, input, untracked } from "@angular/core";
 import { VirtualScrollOptions } from "../../common/list/models/VirtualScrollOptions";
 import { ListService } from "../../common/list/services/list.service";
 
@@ -7,7 +7,7 @@ import { ListService } from "../../common/list/services/list.service";
     standalone: true
 })
 export class ListViewVirtualScrollDirective<T> {
-    readonly #listService: ListService<T> = inject(ListService);
+    readonly #listService = inject(ListService<T>);
     public options = input.required<VirtualScrollOptions>({
         alias: "monaListViewVirtualScroll"
     });

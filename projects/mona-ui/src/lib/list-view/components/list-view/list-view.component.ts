@@ -11,18 +11,13 @@ import {
     ElementRef,
     inject,
     input,
-    InputSignal,
-    InputSignalWithTransform,
     output,
-    OutputEmitterRef,
-    Signal,
     signal,
     TemplateRef,
-    untracked,
-    WritableSignal
+    untracked
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { ImmutableSet, Selector } from "@mirei/ts-collections";
+import { ImmutableSet } from "@mirei/ts-collections";
 import { filter, fromEvent } from "rxjs";
 import { ListComponent } from "../../../common/list/components/list/list.component";
 import { ListFooterTemplateDirective } from "../../../common/list/directives/list-footer-template.directive";
@@ -30,6 +25,7 @@ import { ListGroupHeaderTemplateDirective } from "../../../common/list/directive
 import { ListHeaderTemplateDirective } from "../../../common/list/directives/list-header-template.directive";
 import { ListItemTemplateDirective } from "../../../common/list/directives/list-item-template.directive";
 import { ListNoDataTemplateDirective } from "../../../common/list/directives/list-no-data-template.directive";
+import { ListKeySelector } from "../../../common/list/models/ListSelectors";
 import { ListSizeInputType, ListSizeType } from "../../../common/list/models/ListSizeType";
 import { ListService } from "../../../common/list/services/list.service";
 import { PagerComponent } from "../../../pager/components/pager/pager.component";
@@ -69,9 +65,9 @@ import { PageState } from "../../models/PageState";
     }
 })
 export class ListViewComponent<T = any> implements AfterViewInit {
-    readonly #destroyRef: DestroyRef = inject(DestroyRef);
-    readonly #hostElementRef: ElementRef<HTMLDivElement> = inject(ElementRef);
-    readonly #scrollBottomEnabled: Signal<boolean> = computed(() => {
+    readonly #destroyRef = inject(DestroyRef);
+    readonly #hostElementRef = inject(ElementRef<HTMLDivElement>);
+    readonly #scrollBottomEnabled = computed(() => {
         const pageableOptions = this.pagerSettings();
         return !pageableOptions.enabled;
     });
@@ -79,12 +75,12 @@ export class ListViewComponent<T = any> implements AfterViewInit {
     protected readonly footerTemplate = contentChild(ListViewFooterTemplateDirective, { read: TemplateRef });
     protected readonly groupHeaderTemplate = contentChild(ListViewGroupHeaderTemplateDirective, { read: TemplateRef });
     protected readonly headerTemplate = contentChild(ListViewHeaderTemplateDirective, { read: TemplateRef });
-    protected readonly itemCount: Signal<number> = computed(() => this.items().size());
+    protected readonly itemCount = computed(() => this.items().size());
     protected readonly itemTemplate = contentChild(ListViewItemTemplateDirective, { read: TemplateRef });
-    protected readonly listService: ListService<T> = inject(ListService);
+    protected readonly listService = inject(ListService<T>);
     protected readonly noDataTemplate = contentChild(ListViewNoDataTemplateDirective, { read: TemplateRef });
     protected readonly pageState: PageState = { page: signal(1), skip: signal(0), take: signal(10) };
-    protected readonly pagerSettings: WritableSignal<PagerSettings> = signal({
+    protected readonly pagerSettings = signal<PagerSettings>({
         enabled: false,
         firstLast: false,
         info: true,
@@ -93,7 +89,7 @@ export class ListViewComponent<T = any> implements AfterViewInit {
         type: "numeric",
         visiblePages: 5
     });
-    protected readonly viewItems: Signal<ImmutableSet<T>> = computed(() => {
+    protected readonly viewItems = computed(() => {
         const items = this.items();
         const pageableOptions = this.pagerSettings();
         const skip = this.pageState.skip();
@@ -104,9 +100,9 @@ export class ListViewComponent<T = any> implements AfterViewInit {
         return items.skip(skip).take(take).toImmutableSet();
     });
 
-    public readonly scrollBottom: OutputEmitterRef<Event> = output();
+    public readonly scrollBottom = output<Event>();
 
-    public height: InputSignalWithTransform<ListSizeType, ListSizeInputType> = input("100%", {
+    public height = input<ListSizeType, ListSizeInputType>("100%", {
         transform: value => {
             if (value == null) {
                 return undefined;
@@ -117,13 +113,11 @@ export class ListViewComponent<T = any> implements AfterViewInit {
             }
         }
     });
-    public items: InputSignalWithTransform<ImmutableSet<T>, Iterable<T>> = input(ImmutableSet.create(), {
+    public items = input<ImmutableSet<T>, Iterable<T>>(ImmutableSet.create(), {
         transform: value => ImmutableSet.create(value)
     });
-    public textField: InputSignal<string | Selector<T, string> | null | undefined> = input<
-        string | Selector<T, string> | null | undefined
-    >("");
-    public width: InputSignalWithTransform<ListSizeType, ListSizeInputType> = input("100%", {
+    public textField = input<ListKeySelector<T, string> | undefined>("");
+    public width = input<ListSizeType, ListSizeInputType>("100%", {
         transform: value => {
             if (value == null) {
                 return undefined;

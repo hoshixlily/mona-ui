@@ -1,10 +1,11 @@
-import { computed, Injectable, output, OutputEmitterRef, Signal, signal, WritableSignal } from "@angular/core";
+import { computed, Injectable, OutputEmitterRef, Signal, signal, WritableSignal } from "@angular/core";
 import { from, IEnumerable, ImmutableList, ImmutableSet, Predicate, Selector } from "@mirei/ts-collections";
 import { ReplaySubject, Subject } from "rxjs";
 import { FilterChangeEvent } from "../../filter-input/models/FilterChangeEvent";
 import { FilterableOptions } from "../../models/FilterableOptions";
 import { GroupableOptions } from "../models/GroupableOptions";
 import { ListItem } from "../models/ListItem";
+import { ListKeySelector } from "../models/ListSelectors";
 import { NavigableOptions } from "../models/NavigableOptions";
 import { NavigationDirection } from "../models/NavigationDirection";
 import { NavigationMode } from "../models/NavigationMode";
@@ -30,7 +31,7 @@ export class ListService<TData> {
         debounce: 0,
         operator: "contains"
     });
-    public readonly groupBy: WritableSignal<string | Selector<TData, any> | null> = signal(null);
+    public readonly groupBy: WritableSignal<ListKeySelector<TData>> = signal(null);
     public readonly groupableOptions: WritableSignal<GroupableOptions<TData, any>> = signal({
         enabled: false,
         headerOrder: "asc"
@@ -241,7 +242,7 @@ export class ListService<TData> {
         this.filterableOptions.update(o => ({ ...o, ...options }));
     }
 
-    public setGroupBy(groupSelector: string | Selector<TData, any> | null): void {
+    public setGroupBy(groupSelector: ListKeySelector<TData>): void {
         this.groupBy.set(groupSelector);
     }
 
@@ -313,7 +314,7 @@ export class ListService<TData> {
         }
     }
 
-    private getDataItemSelectionKey(dataItem: TData): any | null {
+    private getDataItemSelectionKey(dataItem: TData): any {
         const valueField = this.valueField();
         if (!valueField) {
             return dataItem;
@@ -324,7 +325,7 @@ export class ListService<TData> {
         return valueField(dataItem);
     }
 
-    private getOrderKey(item: ListItem<TData>): any | null {
+    private getOrderKey(item: ListItem<TData>): any {
         const orderBy = this.groupableOptions().orderBy;
         if (orderBy) {
             if (typeof orderBy === "string") {
@@ -352,7 +353,7 @@ export class ListService<TData> {
         return prevItem;
     }
 
-    private getSelectionKey(item: ListItem<TData>): any | null {
+    private getSelectionKey(item: ListItem<TData>): any {
         return this.getDataItemSelectionKey(item.data);
     }
 
