@@ -556,7 +556,7 @@ export class TreeService<T> {
             return;
         }
         const childrenOnly = selectableOptions.childrenOnly;
-        if (childrenOnly && !node.children().isEmpty()) {
+        if (childrenOnly && this.hasChildren(node)) {
             return;
         }
         const key = this.getSelectKey(node);
