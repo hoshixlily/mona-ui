@@ -9,11 +9,12 @@
     pointer-events: none;
 }
 
-fa-icon {
+i {
     position: absolute;
     display: flex;
     align-items: center;
     justify-content: center;
-    top: -6px;
-    left: -2px;
+    top: -16px;
+    left: -14px;
+    font-size: 24px;
 }

@@ -18,24 +18,21 @@
                          (click)="onExpandStateChange(node)">
                         @if (!node.loading()) {
                             @if (nodeComponent.expanded()) {
-                                <fa-icon [icon]="expandedIcon"></fa-icon>
+                                <i class="ri-arrow-down-s-fill"></i>
                             } @else {
-                                <fa-icon [icon]="collapsedIcon"></fa-icon>
+                                <i class="ri-arrow-right-s-fill"></i>
                             }
                         } @else {
-                            <fa-icon [icon]="loadingIcon" animation="spin"></fa-icon>
+                            <i class="ri-loader-2-line mona-rotate-anim"></i>
                         }
                     </div>
                 }
                 @if (nodeComponent.checkable()) {
-                    <input type="checkbox"
-                           id="mona-tree-node-checkbox-{{node.uid}}"
-                           [disabled]="nodeComponent.disabled()"
-                           [indeterminate]="nodeComponent.indeterminate()"
-                           [ngModel]="nodeComponent.checked()"
-                           (click)="nodeComponent.checkboxClick$.next($event)"
-                           (ngModelChange)="nodeComponent.checkboxCheck$.next($event)" monaCheckBox />
-                    <label for="mona-tree-node-checkbox-{{node.uid}}"></label>
+                    <mona-check-box [disabled]="nodeComponent.disabled()"
+                                    [indeterminate]="nodeComponent.indeterminate()"
+                                    [ngModel]="nodeComponent.checked()"
+                                    (click)="nodeComponent.checkboxClick$.next($event)"
+                                    (ngModelChange)="nodeComponent.checkboxCheck$.next($event)"></mona-check-box>
                 }
                 <mona-tree-node [node]="node" [depth]="depth()" #nodeComponent></mona-tree-node>
             </div>
@@ -43,10 +40,7 @@
                 <div class="mona-sub-tree-container"
                      [@nodeExpand]="nodeComponent.expanded()"
                      [@.disabled]="!treeService.animationEnabled() || treeService.filterText().length !== 0">
-                    <mona-sub-tree [nodes]="node.children()"
-                                   [depth]="depth()+1"
-                                   [parent]="node"
-                    ></mona-sub-tree>
+                    <mona-sub-tree [nodes]="node.children()" [depth]="depth()+1" [parent]="node"></mona-sub-tree>
                 </div>
             }
             @if (!nodeComponent.disabled()) {
@@ -55,20 +49,20 @@
                     <span>
                         @if ((treeService.dropPositionChange$|async)?.position === 'before') {
                             @if ((treeService.nodeDrag$|async)?.dropAllowed) {
-                                <fa-icon [icon]="dropBeforeIcon"></fa-icon>
+                                <i class="ri-arrow-up-line"></i>
                             } @else {
-                                <fa-icon [icon]="dropNotAllowedIcon"></fa-icon>
+                                <i class="ri-prohibited-2-line"></i>
                             }
                         } @else if ((treeService.dropPositionChange$|async)?.position === 'after') {
                             @if ((treeService.nodeDrag$|async)?.dropAllowed) {
-                                <fa-icon [icon]="dropAfterIcon"></fa-icon>
+                                <i class="ri-arrow-down-line"></i>
                             } @else {
-                                <fa-icon [icon]="dropNotAllowedIcon"></fa-icon>
+                                <i class="ri-prohibited-2-line"></i>
                             }
                         } @else if ((treeService.dropPositionChange$|async)?.position === 'inside') {
-                            <fa-icon [icon]="dropInsideIcon"></fa-icon>
+                            <i class="ri-add-line"></i>
                         } @else {
-                            <fa-icon [icon]="dropNotAllowedIcon"></fa-icon>
+                            <i class="ri-prohibited-2-line"></i>
                         }
                     </span>
                         <span>{{nodeComponent.nodeText()}}</span>

@@ -14,7 +14,9 @@ import {
 import { takeUntilDestroyed, toObservable, toSignal } from "@angular/core/rxjs-interop";
 import {
     aggregate,
+    contains,
     EnumerableSet,
+    forEach,
     from,
     ImmutableDictionary,
     ImmutableSet,
@@ -54,9 +56,11 @@ import { TreeNode } from "../models/TreeNode";
 import { TreeNodeCheckEvent } from "../models/TreeNodeCheckEvent";
 import { TreeNodeExpandEvent } from "../models/TreeNodeExpandEvent";
 import { TreeNodeSelectEvent } from "../models/TreeNodeSelectEvent";
+import { ChildrenSelector, NodeKeySelector } from "../models/TreeSelectors";
 
 @Injectable()
 export class TreeService<T> {
+    readonly #checkedKeys: WritableSignal<ImmutableSet<any>> = signal(ImmutableSet.create());
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     private readonly data: WritableSignal<ImmutableSet<T>> = signal(ImmutableSet.create());
     private readonly filteredExpandedKeys: WritableSignal<ImmutableSet<any>> = signal(ImmutableSet.create());
@@ -79,7 +83,7 @@ export class TreeService<T> {
     private readonly unfilteredExpandedKeys: WritableSignal<ImmutableSet<any>> = signal(ImmutableSet.create());
     public readonly animationTemporarilyDisabled: WritableSignal<boolean> = signal(false);
     public readonly animationEnabled: WritableSignal<boolean> = signal(true);
-    public readonly checkBy: WritableSignal<string | Selector<T, any> | null> = signal(null);
+    public readonly checkBy: WritableSignal<NodeKeySelector<T>> = signal(null);
     public readonly checkableOptions: WritableSignal<CheckableOptions> = signal({
         checkChildren: true,
         checkDisabledChildren: false,
@@ -88,10 +92,9 @@ export class TreeService<T> {
         enabled: false,
         mode: "multiple"
     });
-    public readonly checkedKeys: WritableSignal<ImmutableSet<any>> = signal(ImmutableSet.create());
-    public readonly checkedKeys$: Observable<ImmutableSet<any>> = toObservable(this.checkedKeys);
-    public readonly children: WritableSignal<string | Selector<T, Iterable<T> | Observable<Iterable<T>>>> = signal("");
-    public readonly disableBy: WritableSignal<string | Selector<T, any> | null> = signal(null);
+    public readonly checkedKeys$: Observable<ImmutableSet<any>> = toObservable(this.#checkedKeys);
+    public readonly children: WritableSignal<ChildrenSelector<T>> = signal("");
+    public readonly disableBy: WritableSignal<NodeKeySelector<T>> = signal(null);
     public readonly disableOptions: WritableSignal<DisableOptions> = signal({
         disableChildren: true,
         enabled: false
@@ -102,7 +105,7 @@ export class TreeService<T> {
     public readonly dragging$: Observable<boolean> = toObservable(this.dragging);
     public readonly dropPositionChange$: BehaviorSubject<DropPositionChangeEvent<T> | null> =
         new BehaviorSubject<DropPositionChangeEvent<T> | null>(null);
-    public readonly expandBy: WritableSignal<string | Selector<T, any> | null> = signal(null);
+    public readonly expandBy: WritableSignal<NodeKeySelector<T>> = signal(null);
     public readonly expandableOptions: WritableSignal<ExpandableOptions> = signal({ enabled: false });
     public readonly expandedKeys: Signal<ImmutableSet<any>> = computed(() => {
         const filterText = this.filterText();
@@ -137,7 +140,7 @@ export class TreeService<T> {
     public readonly nodeSelectChange$: Subject<TreeNodeSelectEvent<T>> = new Subject();
     public readonly nodeSet: WritableSignal<ImmutableSet<TreeNode<T>>> = signal(ImmutableSet.create());
     public readonly nodeTemplate: WritableSignal<TemplateRef<any> | null> = signal(null);
-    public readonly selectBy: WritableSignal<string | Selector<T, any> | null> = signal(null);
+    public readonly selectBy: WritableSignal<NodeKeySelector<T>> = signal(null);
     public readonly selectableOptions: WritableSignal<SelectableOptions> = signal({
         childrenOnly: false,
         enabled: false,
@@ -245,12 +248,7 @@ export class TreeService<T> {
     }
 
     public isChecked(node: TreeNode<T>): boolean {
-        const checkableOptions = this.checkableOptions();
-        if (!checkableOptions.enabled) {
-            return false;
-        }
-        const key = this.getCheckKey(node);
-        return this.checkedKeys().contains(key);
+        return node.checked();
     }
 
     public isDisabled(node: TreeNode<T>): boolean {
@@ -289,11 +287,13 @@ export class TreeService<T> {
         if (node.children().isEmpty()) {
             return false;
         }
-        const childNodes = this.getChildNodes(node);
+        const childNodes = node.children();
         const checkedNodes = childNodes.where(n => this.isChecked(n));
+        const indeterminateNodes = childNodes.where(n => this.isIndeterminate(n));
         const checkedCount = checkedNodes.count();
+        const indeterminateCount = indeterminateNodes.count();
         const childCount = childNodes.size();
-        return checkedCount > 0 && checkedCount < childCount;
+        return (checkedCount > 0 && checkedCount < childCount) || indeterminateCount > 0;
     }
 
     public isNavigated(node: TreeNode<T>): boolean {
@@ -326,11 +326,14 @@ export class TreeService<T> {
         }
         node.loading.set(true);
         children.pipe(take(1)).subscribe(c => {
+            const childNodes = new List<TreeNode<T>>();
             for (const child of c) {
                 const childNode = new TreeNode(child);
                 childNode.parent = node;
-                node.children.update(list => list.add(childNode));
+                childNodes.add(childNode);
             }
+            this.loadCheckedKeysForChildren(node, childNodes);
+            node.children.update(list => list.clear().addAll(childNodes));
             node.loading.set(false);
             node.loaded.set(true);
         });
@@ -385,7 +388,7 @@ export class TreeService<T> {
         this.updateNodeIndices();
     }
 
-    public setCheckBy(selector: string | Selector<T, any> | null): void {
+    public setCheckBy(selector: NodeKeySelector<T>): void {
         this.checkBy.set(selector);
     }
 
@@ -394,12 +397,18 @@ export class TreeService<T> {
     }
 
     public setCheckedKeys(keys: Iterable<any>): void {
-        const checkedKeys = this.checkedKeys().orderBy(k => k);
+        const checkedKeys = this.#checkedKeys().orderBy(k => k);
         const orderedKeys = from(keys).orderBy(k => k);
         if (sequenceEqual(checkedKeys, orderedKeys)) {
             return;
         }
-        this.checkedKeys.set(ImmutableSet.create(keys));
+        const checkedKeysSet = this.nodeDictionary()
+            .values()
+            .where(n => contains(keys, this.getCheckKey(n)))
+            .toEnumerableSet();
+        this.nodeDictionary().forEach(n => {
+            n.value.checked.set(checkedKeysSet.contains(n.value));
+        });
     }
 
     public setData(data: Iterable<T>): void {
@@ -412,7 +421,7 @@ export class TreeService<T> {
         this.structure.set(structure);
     }
 
-    public setDisableBy(selector: string | Selector<T, any> | null): void {
+    public setDisableBy(selector: NodeKeySelector<T>): void {
         this.disableBy.set(selector);
     }
 
@@ -433,7 +442,7 @@ export class TreeService<T> {
         this.draggableOptions.update(o => ({ ...o, ...options }));
     }
 
-    public setExpandBy(selector: string | Selector<T, any> | null): void {
+    public setExpandBy(selector: NodeKeySelector<T>): void {
         this.expandBy.set(selector);
     }
 
@@ -479,9 +488,14 @@ export class TreeService<T> {
         const mode = checkableOptions.mode;
         const key = this.getCheckKey(node);
 
-        const checkedKeys = this.checkedKeys().toEnumerableSet();
+        const checkedKeys = this.#checkedKeys().toEnumerableSet();
+        const nodeDictionary = this.nodeDictionary();
 
         if (mode === "single") {
+            nodeDictionary
+                .values()
+                .where(n => n !== node)
+                .forEach(n => n.checked.set(false));
             checkedKeys.clear();
             checkedKeys.add(key);
         } else if (checked) {
@@ -489,6 +503,7 @@ export class TreeService<T> {
         } else {
             checkedKeys.remove(key);
         }
+        node.checked.set(checked);
 
         if (checkChildren) {
             const childNodes = this.getChildNodes(node);
@@ -500,16 +515,16 @@ export class TreeService<T> {
                     } else {
                         checkedKeys.remove(childKey);
                     }
+                    n.checked.set(checked);
                 }
             });
         }
         if (checkParents && !childrenOnly) {
             const parentNodes = this.getParentNodes(node);
             parentNodes.forEach(n => {
-                const childNodes = this.getChildNodes(n);
+                const childNodes = n.children();
                 const allChecked = childNodes.all(c => {
-                    const childKey = this.getCheckKey(c);
-                    return checkedKeys.contains(childKey);
+                    return c.checked();
                 });
                 const parentKey = this.getCheckKey(n);
                 if (allChecked) {
@@ -517,9 +532,10 @@ export class TreeService<T> {
                 } else {
                     checkedKeys.remove(parentKey);
                 }
+                n.checked.set(allChecked);
             });
         }
-        this.checkedKeys.set(checkedKeys.toImmutableSet());
+        this.#checkedKeys.set(checkedKeys.toImmutableSet());
     }
 
     public setNodeExpand(node: TreeNode<T>, expanded: boolean): void {
@@ -562,7 +578,7 @@ export class TreeService<T> {
         this.navigatedNode.set(node);
     }
 
-    public setSelectBy(selector: string | Selector<T, any> | null): void {
+    public setSelectBy(selector: NodeKeySelector<T>): void {
         this.selectBy.set(selector);
     }
 
@@ -724,7 +740,7 @@ export class TreeService<T> {
                         const newNodes = this.filterTree(node.children(), filterText);
                         if (!newNodes.isEmpty()) {
                             const clonedNode = node.clone();
-                            clonedNode.children.update(list => list.clear().addAll(newNodes));
+                            clonedNode.children.update(set => set.clear().addAll(newNodes));
                             result.add(clonedNode);
                         }
                     }
@@ -752,7 +768,7 @@ export class TreeService<T> {
         return nodes.where(n => n !== node).toImmutableSet();
     }
 
-    private getDataItemSelectKey(dataItem: T): any | null {
+    private getDataItemSelectKey(dataItem: T): any {
         const selectBy = this.selectBy();
         if (!selectBy) {
             return dataItem;
@@ -815,6 +831,22 @@ export class TreeService<T> {
             return text.startsWith(filter);
         }
         return text.indexOf(filter) >= 0;
+    }
+
+    private loadCheckedKeysForChildren(node: TreeNode<T>, childNodes: Iterable<TreeNode<T>>): void {
+        if (node.checked() && this.checkableOptions().checkChildren) {
+            const checkedKeys = this.#checkedKeys();
+            const checkDisabledChildren = this.checkableOptions().checkDisabledChildren;
+            const childKeys = new EnumerableSet();
+            forEach(childNodes, n => {
+                if (checkDisabledChildren || !this.isDisabled(n)) {
+                    const childKey = this.getCheckKey(n);
+                    childKeys.add(childKey);
+                    n.checked.set(true);
+                }
+            });
+            this.#checkedKeys.set(checkedKeys.addAll(childKeys));
+        }
     }
 
     private moveNodeAfter(sourceNode: TreeNode<T>, targetNode: TreeNode<T>): void {

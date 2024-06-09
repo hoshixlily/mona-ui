@@ -1,21 +1,21 @@
 import { Directive, effect, inject, input, untracked } from "@angular/core";
-import { Selector } from "@mirei/ts-collections";
 import { DisableOptions } from "../../common/tree/models/DisableOptions";
+import { NodeKeySelector } from "../../common/tree/models/TreeSelectors";
 import { TreeService } from "../../common/tree/services/tree.service";
 
 @Directive({
     selector: "mona-tree-view[monaTreeViewDisable]",
     standalone: true
 })
-export class TreeViewDisableDirective<T> {
+export class TreeViewDisableDirective<T, K = T> {
     readonly #defaultOptions: DisableOptions = {
         disableChildren: true,
         enabled: true
     };
     readonly #treeService: TreeService<T> = inject(TreeService);
 
-    public disableBy = input<string | Selector<T, any> | null | undefined>("");
-    public disabledKeys = input<Iterable<any>>([]);
+    public disableBy = input<NodeKeySelector<T, K> | undefined>("");
+    public disabledKeys = input<Iterable<K>>([]);
     public options = input<Partial<DisableOptions> | "">("", {
         alias: "monaTreeViewDisable"
     });

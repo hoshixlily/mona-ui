@@ -10,17 +10,18 @@ import {
     untracked
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { Selector, sequenceEqual } from "@mirei/ts-collections";
+import { sequenceEqual } from "@mirei/ts-collections";
 import { pairwise } from "rxjs";
 import { CheckableOptions } from "../../common/tree/models/CheckableOptions";
 import { NodeCheckEvent } from "../../common/tree/models/NodeCheckEvent";
+import { NodeKeySelector } from "../../common/tree/models/TreeSelectors";
 import { TreeService } from "../../common/tree/services/tree.service";
 
 @Directive({
     selector: "mona-tree-view[monaTreeViewCheckable]",
     standalone: true
 })
-export class TreeViewCheckableDirective<T> implements OnInit {
+export class TreeViewCheckableDirective<T, K = T> implements OnInit {
     readonly #defaultOptions: CheckableOptions = {
         checkChildren: true,
         checkParents: true,
@@ -30,11 +31,11 @@ export class TreeViewCheckableDirective<T> implements OnInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     readonly #treeService: TreeService<T> = inject(TreeService);
 
-    public readonly checkedKeysChange: OutputEmitterRef<Array<any>> = output();
+    public readonly checkedKeysChange: OutputEmitterRef<Array<K>> = output();
     public readonly nodeCheck: OutputEmitterRef<NodeCheckEvent<T>> = output();
 
-    public checkBy = input<string | Selector<T, any> | null | undefined>("");
-    public checkedKeys = input<Iterable<any>>([]);
+    public checkBy = input<NodeKeySelector<T, K> | undefined>("");
+    public checkedKeys = input<Iterable<K>>([]);
     public options = input<Partial<CheckableOptions> | "">("", {
         alias: "monaTreeViewCheckable"
     });

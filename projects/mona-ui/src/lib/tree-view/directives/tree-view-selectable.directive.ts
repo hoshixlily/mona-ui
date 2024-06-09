@@ -10,18 +10,19 @@ import {
     untracked
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { Selector, sequenceEqual } from "@mirei/ts-collections";
+import { sequenceEqual } from "@mirei/ts-collections";
 import { distinctUntilChanged, pairwise } from "rxjs";
 import { NodeItem } from "../../common/tree/models/NodeItem";
 import { NodeSelectEvent } from "../../common/tree/models/NodeSelectEvent";
 import { SelectableOptions } from "../../common/tree/models/SelectableOptions";
+import { NodeKeySelector } from "../../common/tree/models/TreeSelectors";
 import { TreeService } from "../../common/tree/services/tree.service";
 
 @Directive({
     selector: "mona-tree-view[monaTreeViewSelectable]",
     standalone: true
 })
-export class TreeViewSelectableDirective<T> implements OnInit {
+export class TreeViewSelectableDirective<T, K = T> implements OnInit {
     readonly #defaultOptions: SelectableOptions = {
         childrenOnly: false,
         enabled: true,
@@ -31,12 +32,12 @@ export class TreeViewSelectableDirective<T> implements OnInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     readonly #treeService: TreeService<T> = inject(TreeService);
 
-    public readonly nodeSelect: OutputEmitterRef<NodeSelectEvent<T>> = output();
-    public readonly selectedKeysChange: OutputEmitterRef<Array<any>> = output();
-    public readonly selectionChange: OutputEmitterRef<NodeItem<T>> = output();
+    public readonly nodeSelect = output<NodeSelectEvent<T>>();
+    public readonly selectedKeysChange = output<Array<K>>();
+    public readonly selectionChange = output<NodeItem<T>>();
 
-    public selectBy = input<string | Selector<T, any> | null | undefined>("");
-    public selectedKeys = input<Iterable<any>>([]);
+    public selectBy = input<NodeKeySelector<T, K> | undefined>("");
+    public selectedKeys = input<Iterable<K>>([]);
     public options = input<Partial<SelectableOptions> | "">("", {
         alias: "monaTreeViewSelectable"
     });

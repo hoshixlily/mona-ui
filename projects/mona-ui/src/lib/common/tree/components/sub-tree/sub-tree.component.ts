@@ -11,20 +11,9 @@ import {
 import { AsyncPipe, NgStyle } from "@angular/common";
 import { ChangeDetectionStrategy, Component, inject, input, InputSignal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
-import { FaIconComponent } from "@fortawesome/angular-fontawesome";
-import {
-    faArrowDown,
-    faArrowsRotate,
-    faArrowUp,
-    faBan,
-    faCaretDown,
-    faCaretRight,
-    faPlus,
-    IconDefinition
-} from "@fortawesome/free-solid-svg-icons";
 import { ImmutableSet } from "@mirei/ts-collections";
 import { take } from "rxjs";
-import { CheckBoxDirective } from "../../../../inputs/check-box/directives/check-box.directive";
+import { CheckBoxComponent } from "../../../../inputs/check-box/components/check-box/check-box.component";
 import { NodeDragEndEvent } from "../../models/NodeDragEndEvent";
 import { InternalNodeDragEvent, NodeDragEvent } from "../../models/NodeDragEvent";
 import { NodeDragStartEvent } from "../../models/NodeDragStartEvent";
@@ -39,14 +28,13 @@ import { TreeNodeComponent } from "../tree-node/tree-node.component";
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         TreeNodeComponent,
-        FaIconComponent,
         NgStyle,
-        CheckBoxDirective,
         FormsModule,
         CdkDropList,
         CdkDrag,
         CdkDragPreview,
-        AsyncPipe
+        AsyncPipe,
+        CheckBoxComponent
     ],
     templateUrl: "./sub-tree.component.html",
     styleUrl: "./sub-tree.component.scss",
@@ -61,13 +49,6 @@ import { TreeNodeComponent } from "../tree-node/tree-node.component";
     ]
 })
 export class SubTreeComponent<T> {
-    protected readonly collapsedIcon: IconDefinition = faCaretRight;
-    protected readonly dropAfterIcon: IconDefinition = faArrowDown;
-    protected readonly dropBeforeIcon: IconDefinition = faArrowUp;
-    protected readonly dropInsideIcon: IconDefinition = faPlus;
-    protected readonly dropNotAllowedIcon: IconDefinition = faBan;
-    protected readonly expandedIcon: IconDefinition = faCaretDown;
-    protected readonly loadingIcon: IconDefinition = faArrowsRotate;
     protected readonly treeService: TreeService<T> = inject(TreeService);
 
     public depth: InputSignal<number> = input.required();

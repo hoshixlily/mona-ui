@@ -1,22 +1,22 @@
-import { Directive, effect, inject, input, OnInit, output, OutputEmitterRef, untracked } from "@angular/core";
-import { Selector } from "@mirei/ts-collections";
+import { Directive, effect, inject, input, OnInit, output, untracked } from "@angular/core";
 import { ExpandableOptions } from "../../common/tree/models/ExpandableOptions";
+import { NodeKeySelector } from "../../common/tree/models/TreeSelectors";
 import { TreeService } from "../../common/tree/services/tree.service";
 
 @Directive({
     selector: "mona-tree-view[monaTreeViewExpandable]",
     standalone: true
 })
-export class TreeViewExpandableDirective<T> implements OnInit {
+export class TreeViewExpandableDirective<T, K = T> implements OnInit {
     readonly #defaultOptions: ExpandableOptions = {
         enabled: true
     };
     readonly #treeService: TreeService<T> = inject(TreeService);
 
-    public readonly expandedKeysChange: OutputEmitterRef<Array<any>> = output();
+    public readonly expandedKeysChange = output<Array<K>>();
 
-    public expandBy = input<string | Selector<T, any> | null | undefined>("");
-    public expandedKeys = input<Iterable<any>>([]);
+    public expandBy = input<NodeKeySelector<T, K> | undefined>("");
+    public expandedKeys = input<Iterable<K>>([]);
     public options = input<Partial<ExpandableOptions> | "">("", {
         alias: "monaTreeViewExpandable"
     });

@@ -3,23 +3,16 @@ import {
     ChangeDetectionStrategy,
     Component,
     contentChildren,
-    ContentChildren,
-    EventEmitter,
     forwardRef,
     input,
-    Input,
     InputSignal,
     output,
-    Output,
     OutputEmitterRef,
-    QueryList,
     signal,
     TemplateRef,
     WritableSignal
 } from "@angular/core";
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from "@angular/forms";
-import { FaIconComponent } from "@fortawesome/angular-fontawesome";
-import { faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { ButtonDirective } from "../../../../buttons/button/button.directive";
 import { Action } from "../../../../utils/Action";
 import { TextBoxPrefixTemplateDirective } from "../../directives/text-box-prefix-template.directive";
@@ -40,7 +33,7 @@ import { InputType } from "../../models/InputType";
         }
     ],
     standalone: true,
-    imports: [NgTemplateOutlet, TextBoxDirective, FormsModule, ButtonDirective, FaIconComponent],
+    imports: [NgTemplateOutlet, TextBoxDirective, FormsModule, ButtonDirective],
     host: {
         "[class.mona-text-box]": "true",
         "[class.mona-disabled]": "disabled()",
@@ -50,7 +43,6 @@ import { InputType } from "../../models/InputType";
 export class TextBoxComponent implements ControlValueAccessor {
     #propagateChange: Action<string, any> | null = null;
 
-    protected readonly clearIcon: IconDefinition = faTimes;
     protected readonly prefixTemplateList = contentChildren(TextBoxPrefixTemplateDirective, { read: TemplateRef });
     protected readonly suffixTemplateList = contentChildren(TextBoxSuffixTemplateDirective, { read: TemplateRef });
 
