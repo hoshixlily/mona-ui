@@ -39,15 +39,16 @@ export class GridVirtualListComponent implements AfterViewInit {
     }
 
     private synchronizeHorizontalScroll(): void {
-        const headerElement = this.gridService.gridHeaderElement;
+        const headerElement = this.gridService.gridHeaderElement();
         const gridElement = this.#hostElementRef.nativeElement as HTMLElement;
         if (headerElement == null || gridElement == null) {
             return;
         }
-        fromEvent(gridElement, "scroll")
+        const scrollableElement = gridElement.querySelector(".cdk-virtual-scroll-viewport") as HTMLElement;
+        fromEvent(scrollableElement, "scroll")
             .pipe(takeUntilDestroyed(this.#destroyRef))
             .subscribe(() => {
-                headerElement.scrollLeft = gridElement.scrollLeft;
+                headerElement.scrollLeft = scrollableElement.scrollLeft;
             });
     }
 }

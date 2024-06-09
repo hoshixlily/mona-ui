@@ -17,14 +17,6 @@
 <div class="mona-grid-header" [ngStyle]="{'margin': headerMargin}" #gridHeaderElement>
     <div class="mona-grid-header-wrap">
         <table>
-<!--            <colgroup>-->
-<!--                @for (_ of gridService.groupColumns(); track $index) {-->
-<!--                    <col style="width: 34px;">-->
-<!--                }-->
-<!--                @for (column of gridService.columns(); track $index) {-->
-<!--                    <col [style.width.px]="column.calculatedWidth()" [style.min-width.px]="column.minWidth()">-->
-<!--                }-->
-<!--            </colgroup>-->
             <thead>
                 <tr cdkDropList [cdkDropListConnectedTo]="groupable() ? [groupColumnList()!] : []"
                     (cdkDropListDropped)="onColumnDrop($event)">
@@ -66,7 +58,7 @@
                                       [ngStyle]="{'right': dragColumn.index() < dropColumn.index() ? '-1px': null, 'left': dragColumn.index() > dropColumn.index() ? '-1px': null}"></span>
                             }
                             @if (resizable() && !columnDragging) {
-                                <div monaGridColumnResizeHandler [column]="column" class="mona-grid-column-resizer"
+                                <div monaGridColumnResizeHandler [column]="column" [gridId]="uid" class="mona-grid-column-resizer"
                                      (resizeStart)="onColumnResizeStart()" (resizeEnd)="resizing=false;"></div>
                             }
                             <ng-template cdkDragPreview>
@@ -83,10 +75,14 @@
 </div>
 
 
-<!--<mona-grid-list [columns]="gridService.columns()" [data]="gridService.viewPageRows()"></mona-grid-list>-->
-<!--<mona-pager [skip]="gridService.pageState.skip()" [pageSize]="gridService.pageState.take()"-->
-<!--            [total]="gridService.viewRowCount()"-->
-<!--            [pageInput]="true" [pageSizeValues]="pageSizeValues()" [responsive]="responsivePager()"-->
-<!--            (pageSizeChange)="onPageSizeChange($event)" (pageChange)="onPageChange($event)"></mona-pager>-->
 
-<mona-grid-virtual-list [columns]="gridService.columns()" [data]="gridService.rows()"></mona-grid-virtual-list>
+
+@if (gridService.virtualScrollOptions().enabled) {
+    <mona-grid-virtual-list [columns]="gridService.columns()" [data]="gridService.viewRows()"></mona-grid-virtual-list>
+} @else {
+    <mona-grid-list [columns]="gridService.columns()" [data]="gridService.viewPageRows()"></mona-grid-list>
+    <mona-pager [skip]="gridService.pageState.skip()" [pageSize]="gridService.pageState.take()"
+                [total]="gridService.viewRowCount()"
+                [pageInput]="true" [pageSizeValues]="pageSizeValues()" [responsive]="responsivePager()"
+                (pageSizeChange)="onPageSizeChange($event)" (pageChange)="onPageChange($event)"></mona-pager>
+}

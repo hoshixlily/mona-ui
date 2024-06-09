@@ -1,6 +1,7 @@
 import { computed, Injectable, OutputEmitterRef, Signal, signal, WritableSignal } from "@angular/core";
 import { Dictionary, from, ImmutableDictionary, ImmutableList, ImmutableSet } from "@mirei/ts-collections";
 import { Subject } from "rxjs";
+import { VirtualScrollOptions } from "../../common/models/VirtualScrollOptions";
 import { Query } from "../../query/core/Query";
 import { CompositeFilterDescriptor, FilterDescriptor } from "../../query/filter/FilterDescriptor";
 import { SortDescriptor } from "../../query/sort/SortDescriptor";
@@ -65,8 +66,9 @@ export class GridService {
         return ImmutableSet.create(result);
     });
     public readonly viewRowCount: Signal<number> = computed(() => this.viewRows().size());
+    public readonly virtualScrollOptions = signal<VirtualScrollOptions>({ enabled: false, height: 28 });
     public editableOptions: EditableOptions = { enabled: false };
-    public gridHeaderElement?: HTMLDivElement;
+    public gridHeaderElement = signal<HTMLDivElement | null>(null);
     public gridGroupExpandState: Dictionary<string, Dictionary<number, boolean>> = new Dictionary<
         string,
         Dictionary<number, boolean>
@@ -163,5 +165,9 @@ export class GridService {
 
     public setSortableOptions(options: SortableOptions): void {
         this.sortableOptions = { ...this.sortableOptions, ...options };
+    }
+
+    public setVirtualScrollOptions(options: VirtualScrollOptions): void {
+        this.virtualScrollOptions.update(v => ({ ...v, ...options }));
     }
 }

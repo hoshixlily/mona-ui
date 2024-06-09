@@ -1,16 +1,7 @@
 <div class="mona-grid-virtual-list" style="width: 100%; height: 100%;">
     <cdk-virtual-scroll-viewport [itemSize]="30" [style.height.%]="100">
-
-    <table style="height: 100%;">
-<!--        <colgroup>-->
-<!--            @for (_ of gridService.groupColumns(); track $index) {-->
-<!--                <col style="width: 34px;">-->
-<!--            }-->
-<!--            @for (column of columns(); track $index) {-->
-<!--                <col [style.width.px]="column.calculatedWidth()" [style.min-width.px]="column.minWidth()">-->
-<!--            }-->
-<!--        </colgroup>-->
-        <tbody>
+        <table style="height: 100%;">
+            <tbody>
                 <ng-container *cdkVirtualFor="let row of data(); let $index=index">
                     <tr [ngClass]="{'mona-selected': row.selected()}"
                         [attr.data-ruid]="row.uid" [attr.data-row-view-index]="$index">
@@ -21,8 +12,7 @@
                         }
                     </tr>
                 </ng-container>
-        </tbody>
-    </table>
+            </tbody>
+        </table>
     </cdk-virtual-scroll-viewport>
-
 </div>

@@ -9,8 +9,10 @@ import {
 } from "@angular/cdk/drag-drop";
 import { NgStyle, NgTemplateOutlet } from "@angular/common";
 import {
+    afterNextRender,
     ChangeDetectionStrategy,
     Component,
+    computed,
     contentChildren,
     DestroyRef,
     effect,
@@ -30,6 +32,7 @@ import {
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { faArrowDownLong, faArrowUpLong, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { v4 } from "uuid";
 import { ChipComponent } from "../../../buttons/chip/chip.component";
 import { PagerComponent } from "../../../pager/components/pager/pager.component";
 import { PageChangeEvent } from "../../../pager/models/PageChangeEvent";
@@ -69,7 +72,8 @@ import { GridVirtualListComponent } from "../grid-virtual-list/grid-virtual-list
         GridVirtualListComponent
     ],
     host: {
-        class: "mona-grid"
+        class: "mona-grid",
+        "[data.uid]": "uid"
     }
 })
 export class GridComponent implements OnInit {
@@ -85,6 +89,8 @@ export class GridComponent implements OnInit {
     protected readonly groupingInProgress = signal(false);
     protected readonly headerMargin =
         navigator.userAgent.toLowerCase().indexOf("firefox") > -1 ? "0 16px 0 0" : "0 12px 0 0";
+    protected readonly uid = v4();
+    protected readonly virtualScrollEnabled = computed(() => this.gridService.virtualScrollOptions().enabled);
     protected columnDragging: boolean = false;
     protected dragColumn?: Column;
     protected dropColumn?: Column;
@@ -336,24 +342,38 @@ export class GridComponent implements OnInit {
     }
 
     private setGridHeaderElementEffect(): void {
-        effect(() => {
+        afterNextRender(() => {
             const headerElement = this.gridHeaderElement();
             untracked(() => {
-                this.gridService.gridHeaderElement = headerElement.nativeElement;
-                this.setInitialCalculatedWidthOfColumns();
+                window.setTimeout(() => {
+                    this.gridService.gridHeaderElement.set(headerElement.nativeElement);
+                });
             });
+        });
+        effect(() => {
+            const headerElement = this.gridHeaderElement();
+            if (headerElement) {
+                untracked(() => {
+                    window.setTimeout(() => {
+                        this.setInitialCalculatedWidthOfColumns();
+                    });
+                });
+            }
         });
     }
 
     private setInitialCalculatedWidthOfColumns(): void {
-        if (this.gridService.gridHeaderElement) {
+        if (this.gridService.gridHeaderElement()) {
             window.setTimeout(() => {
-                const headerElement = this.gridService.gridHeaderElement as HTMLElement;
+                const headerElement = this.gridService.gridHeaderElement() as HTMLElement;
+                const headerParentElement = headerElement.parentElement as HTMLElement;
                 const thList = headerElement.querySelectorAll("th");
                 const thArray = Array.from(thList);
                 for (const [cx, columnTh] of thArray.entries()) {
                     const gridCol = this.gridService.columns().elementAt(cx);
-                    gridCol.calculatedWidth.set(gridCol.width() ?? Math.trunc(columnTh.getBoundingClientRect().width));
+                    const width = headerParentElement.clientWidth / thArray.length;
+                    const offset = 2;
+                    gridCol.calculatedWidth.set(gridCol.width() ?? Math.trunc(width - offset));
                 }
             });
         }

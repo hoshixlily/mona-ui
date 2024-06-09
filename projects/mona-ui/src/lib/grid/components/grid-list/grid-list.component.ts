@@ -1,14 +1,14 @@
 import { NgClass, NgTemplateOutlet } from "@angular/common";
 import {
-    AfterViewInit,
     ChangeDetectionStrategy,
     Component,
     DestroyRef,
+    effect,
     ElementRef,
     inject,
     input,
-    InputSignal,
-    OnInit
+    OnInit,
+    untracked
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
@@ -43,7 +43,7 @@ import { GridCellComponent } from "../grid-cell/grid-cell.component";
         class: "mona-grid-list"
     }
 })
-export class GridListComponent implements OnInit, AfterViewInit {
+export class GridListComponent implements OnInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     readonly #hostElementRef: ElementRef<HTMLDivElement> = inject(ElementRef);
     protected readonly collapseIcon: IconDefinition = faChevronDown;
@@ -53,10 +53,8 @@ export class GridListComponent implements OnInit, AfterViewInit {
     public columns = input<ImmutableList<Column>>(ImmutableList.create());
     public data = input<ImmutableSet<Row>>(ImmutableSet.create());
 
-    public ngAfterViewInit(): void {
-        window.setTimeout(() => {
-            this.synchronizeHorizontalScroll();
-        }, 0);
+    public constructor() {
+        effect(() => untracked(() => this.synchronizeHorizontalScroll()));
     }
 
     public ngOnInit(): void {
@@ -152,7 +150,7 @@ export class GridListComponent implements OnInit, AfterViewInit {
     }
 
     private synchronizeHorizontalScroll(): void {
-        const headerElement = this.gridService.gridHeaderElement;
+        const headerElement = this.gridService.gridHeaderElement();
         const gridElement = this.#hostElementRef.nativeElement as HTMLElement;
         if (headerElement == null || gridElement == null) {
             return;

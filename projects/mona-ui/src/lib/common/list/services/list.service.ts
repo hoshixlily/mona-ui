@@ -10,7 +10,7 @@ import { NavigableOptions } from "../models/NavigableOptions";
 import { NavigationDirection } from "../models/NavigationDirection";
 import { NavigationMode } from "../models/NavigationMode";
 import { SelectableOptions } from "../models/SelectableOptions";
-import { VirtualScrollOptions } from "../models/VirtualScrollOptions";
+import { VirtualScrollOptions } from "../../models/VirtualScrollOptions";
 
 @Injectable()
 export class ListService<TData> {

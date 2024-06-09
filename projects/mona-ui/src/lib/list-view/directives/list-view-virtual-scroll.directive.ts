@@ -1,5 +1,5 @@
 import { Directive, effect, inject, input, untracked } from "@angular/core";
-import { VirtualScrollOptions } from "../../common/list/models/VirtualScrollOptions";
+import { VirtualScrollOptions } from "../../common/models/VirtualScrollOptions";
 import { ListService } from "../../common/list/services/list.service";
 
 @Directive({
