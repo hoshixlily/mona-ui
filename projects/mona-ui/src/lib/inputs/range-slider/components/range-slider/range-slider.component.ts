@@ -20,7 +20,7 @@ import {
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
-import { delay, filter, fromEvent, map, merge, take } from "rxjs";
+import { filter, fromEvent, map, merge, switchMap, take, takeUntil, tap } from "rxjs";
 import { Orientation } from "../../../../models/Orientation";
 import { Action } from "../../../../utils/Action";
 import { SliderHandleData } from "../../../models/SliderHandleData";
@@ -54,8 +54,6 @@ export class RangeSliderComponent implements AfterViewInit, ControlValueAccessor
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
     readonly #zone: NgZone = inject(NgZone);
-    #mouseDown: boolean = false;
-    #mouseMove: boolean = false;
     #propagateChange: Action<[number, number]> | null = null;
     protected readonly dragging: WritableSignal<boolean> = signal(false);
     protected readonly handlePosition: WritableSignal<[number, number]> = signal([0, 0]);
@@ -306,27 +304,24 @@ export class RangeSliderComponent implements AfterViewInit, ControlValueAccessor
                     map(event => ({ event, type: "secondary" }))
                 )
             )
-                .pipe(takeUntilDestroyed(this.#destroyRef))
-                .subscribe(({ event, type }) => {
-                    this.dragging.set(true);
-                    this.#mouseDown = true;
-                    const moveSubscription = fromEvent<MouseEvent>(document, "mousemove").subscribe(event => {
-                        if (this.#mouseDown) {
-                            this.#mouseMove = true;
-                            this.handleHandleMove(event, this.orientation(), type as SliderHandleType);
-                        }
-                    });
-                    fromEvent<MouseEvent>(document, "mouseup")
-                        .pipe(delay(1), take(1))
-                        .subscribe(() => {
-                            this.#mouseDown = false;
-                            this.#mouseMove = false;
-                            moveSubscription.unsubscribe();
-                            this.#zone.run(() => {
-                                this.dragging.set(false);
-                            });
-                        });
-                });
+                .pipe(
+                    switchMap(({ type }) => {
+                        this.#zone.run(() => this.dragging.set(true)); // Ensure Angular knows dragging started
+                        return fromEvent<MouseEvent>(document, "mousemove").pipe(
+                            tap(moveEvent =>
+                                this.handleHandleMove(moveEvent, this.orientation(), type as SliderHandleType)
+                            ),
+                            takeUntil(
+                                fromEvent<MouseEvent>(document, "mouseup").pipe(
+                                    tap(() => this.#zone.run(() => this.dragging.set(false))),
+                                    take(1)
+                                )
+                            )
+                        );
+                    }),
+                    takeUntilDestroyed(this.#destroyRef)
+                )
+                .subscribe();
         });
         this.setKeyboardSubscriptions();
         this.setTrackClickSubscription();
@@ -337,7 +332,7 @@ export class RangeSliderComponent implements AfterViewInit, ControlValueAccessor
             fromEvent<MouseEvent>(this.#hostElementRef.nativeElement, "click")
                 .pipe(
                     takeUntilDestroyed(this.#destroyRef),
-                    filter(() => !this.disabled() && !this.#mouseMove),
+                    filter(() => !this.disabled()),
                     map(event => {
                         const handleData = this.getClosestHandlerDataToMouse(event);
                         return { event, handleData };

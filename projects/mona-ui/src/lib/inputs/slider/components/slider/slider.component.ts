@@ -20,7 +20,7 @@ import {
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
-import { delay, filter, fromEvent, take, tap } from "rxjs";
+import { filter, fromEvent, mergeMap, take, takeUntil, tap } from "rxjs";
 import { Action } from "../../../../utils/Action";
 import { SliderLabelPosition } from "../../../models/SliderLabelPosition";
 import { SliderTick } from "../../../models/SliderTick";
@@ -51,8 +51,6 @@ export class SliderComponent implements AfterViewInit, ControlValueAccessor {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     readonly #hostElementRef: ElementRef<HTMLDivElement> = inject(ElementRef);
     readonly #zone: NgZone = inject(NgZone);
-    #mouseDown: boolean = false;
-    #mouseMove: boolean = false;
     #propagateChange: Action<number> | null = null;
     protected readonly dragging: WritableSignal<boolean> = signal(false);
     protected readonly handlePosition: WritableSignal<number> = signal(0);
@@ -177,36 +175,27 @@ export class SliderComponent implements AfterViewInit, ControlValueAccessor {
             fromEvent<MouseEvent>(this.sliderHandle().nativeElement, "mousedown")
                 .pipe(
                     takeUntilDestroyed(this.#destroyRef),
-                    filter(() => !this.disabled())
+                    filter(() => !this.disabled()),
+                    mergeMap(() => {
+                        this.dragging.set(true);
+                        return fromEvent<MouseEvent>(document, "mousemove").pipe(
+                            tap((event: MouseEvent) => this.handleHandleMove(event, this.orientation())),
+                            takeUntil(
+                                fromEvent<MouseEvent>(document, "mouseup").pipe(
+                                    take(1),
+                                    tap(() => this.#zone.run(() => this.dragging.set(false)))
+                                )
+                            )
+                        );
+                    })
                 )
-                .subscribe(() => {
-                    this.#mouseDown = true;
-                    this.dragging.set(true);
-                    const moveSubscription = fromEvent<MouseEvent>(document, "mousemove").subscribe(
-                        (event: MouseEvent) => {
-                            if (this.#mouseDown) {
-                                this.#mouseMove = true;
-                                this.handleHandleMove(event, this.orientation());
-                            }
-                        }
-                    );
-                    fromEvent<MouseEvent>(document, "mouseup")
-                        .pipe(delay(10), take(1))
-                        .subscribe(() => {
-                            this.#mouseDown = false;
-                            this.#mouseMove = false;
-                            moveSubscription.unsubscribe();
-                            this.#zone.run(() => {
-                                this.dragging.set(false);
-                            });
-                        });
-                });
+                .subscribe();
 
             fromEvent<MouseEvent>(this.#hostElementRef.nativeElement, "click")
                 .pipe(
                     takeUntilDestroyed(this.#destroyRef),
                     tap(() => this.dragging.set(false)),
-                    filter(() => !this.disabled() && !this.#mouseMove)
+                    filter(() => !this.disabled())
                 )
                 .subscribe((event: MouseEvent) => {
                     this.handleHandleMove(event, this.orientation());
