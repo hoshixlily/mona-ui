@@ -82,6 +82,7 @@ import {
     GridComponent,
     GridEditableDirective,
     GridSelectableDirective,
+    GridVirtualScrollDirective,
     ListBoxActionClickEvent,
     ListBoxComponent,
     ListBoxItemTemplateDirective,
@@ -92,6 +93,7 @@ import {
     ListViewHeaderTemplateDirective,
     ListViewItemTemplateDirective,
     ListViewNavigableDirective,
+    ListViewNoDataTemplateDirective,
     ListViewPageableDirective,
     ListViewSelectableDirective,
     ListViewVirtualScrollDirective,
@@ -171,7 +173,6 @@ import {
 } from "mona-ui";
 import { delay, map, Observable, of, take } from "rxjs";
 import { v4 } from "uuid";
-import { ListViewNoDataTemplateDirective } from "../../../mona-ui/src/lib/list-view/directives/list-view-no-data-template.directive";
 import { GridOrderData } from "./GridOrderData";
 import { GridProductData } from "./GridProductData";
 import { TestComponentComponent } from "./test-component/test-component.component";
@@ -234,6 +235,7 @@ interface TreeNodeDataItem {
         GridColumnTitleTemplateDirective,
         GridEditableDirective,
         GridSelectableDirective,
+        GridVirtualScrollDirective,
         ListBoxComponent,
         ListBoxItemTemplateDirective,
         ListViewComponent,

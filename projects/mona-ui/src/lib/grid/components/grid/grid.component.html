@@ -21,7 +21,7 @@
                 <tr cdkDropList [cdkDropListConnectedTo]="groupable() ? [groupColumnList()!] : []"
                     (cdkDropListDropped)="onColumnDrop($event)">
                     @for (_ of gridService.groupColumns(); track $index) {
-                        <td style="width: 34px;"></td>
+                        <td class="mona-grid-group-column" [style.width.px]="gridService.groupColumnWidth"></td>
                     }
                     @for (column of gridService.columns(); track $index) {
                         <th cdkDrag [cdkDragData]="column" [cdkDragDisabled]="!reorderable() && !groupable()"
@@ -43,9 +43,9 @@
                                         <span>{{ column.sortIndex() }}</span>
                                     }
                                     @if (column.sortDirection() === 'asc') {
-                                        <fa-icon [icon]="ascendingSortIcon"></fa-icon>
+                                        <i class="ri-arrow-down-line"></i>
                                     } @else if (column.sortDirection() === 'desc') {
-                                        <fa-icon [icon]="descendingSortIcon"></fa-icon>
+                                        <i class="ri-arrow-up-line"></i>
                                     }
                                     @if (filterable()) {
                                         <mona-grid-filter-menu [column]="column" [type]="column.dataType()"

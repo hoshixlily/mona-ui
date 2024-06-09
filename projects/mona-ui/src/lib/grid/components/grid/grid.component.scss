@@ -83,6 +83,10 @@ mona-grid-list, mona-grid-virtual-list {
     display: flex;
     align-items: center;
     justify-content: center;
+    font-size: 0.8em;
+    & i {
+        font-size: 1em;
+    }
 }
 
 .mona-grid-column-drop-hint {
@@ -94,6 +98,10 @@ mona-grid-list, mona-grid-virtual-list {
     z-index: 1;
     top: 0;
     bottom: 0;
+}
+
+.mona-grid-group-column {
+        border-right: 1px solid var(--mona-border-color);
 }
 
 mona-pager {

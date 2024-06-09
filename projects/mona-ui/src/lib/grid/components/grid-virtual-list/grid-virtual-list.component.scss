@@ -12,6 +12,7 @@ table {
     }
 
     & tr {
+        display: inline-flex;
         &:nth-child(even) {
             background-color: var(--mona-background-dark);
         }
@@ -23,7 +24,7 @@ table {
         &:not(:last-child) {
             border-bottom: 1px solid var(--mona-border-color);
         }
-        display: flex;
+
     }
 
     & td {

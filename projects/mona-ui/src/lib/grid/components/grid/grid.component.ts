@@ -73,7 +73,7 @@ import { GridVirtualListComponent } from "../grid-virtual-list/grid-virtual-list
     ],
     host: {
         class: "mona-grid",
-        "[data.uid]": "uid"
+        "[attr.data-uid]": "uid"
     }
 })
 export class GridComponent implements OnInit {
@@ -87,10 +87,8 @@ export class GridComponent implements OnInit {
     protected readonly groupColumnList = viewChild<CdkDropList>("groupColumnList");
     protected readonly groupPanelPlaceholderVisible: WritableSignal<boolean> = signal(true);
     protected readonly groupingInProgress = signal(false);
-    protected readonly headerMargin =
-        navigator.userAgent.toLowerCase().indexOf("firefox") > -1 ? "0 16px 0 0" : "0 12px 0 0";
+    protected readonly headerMargin = "0 16px 0 0";
     protected readonly uid = v4();
-    protected readonly virtualScrollEnabled = computed(() => this.gridService.virtualScrollOptions().enabled);
     protected columnDragging: boolean = false;
     protected dragColumn?: Column;
     protected dropColumn?: Column;
