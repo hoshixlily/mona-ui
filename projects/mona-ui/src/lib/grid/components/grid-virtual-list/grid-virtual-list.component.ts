@@ -247,7 +247,7 @@ export class GridVirtualListComponent implements OnInit, AfterViewInit {
          * We manually trigger the update so that grid is rendered when the grouping changes.
          * @see @angular/components issue #21793 on GitHub
          */
-        this.#groupColumns$.subscribe(columns => {
+        this.#groupColumns$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(columns => {
             const reRender = (): void => {
                 const renderedRange = this.viewport().getRenderedRange();
                 this.viewport().setRenderedRange({

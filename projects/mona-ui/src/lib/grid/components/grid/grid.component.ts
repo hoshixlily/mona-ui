@@ -3,6 +3,7 @@ import {
     CdkDragDrop,
     CdkDragEnter,
     CdkDragExit,
+    CdkDragPlaceholder,
     CdkDragPreview,
     CdkDragStart,
     CdkDropList
@@ -13,14 +14,12 @@ import {
     ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
-    computed,
     contentChildren,
     DestroyRef,
     effect,
     ElementRef,
     inject,
     input,
-    InputSignal,
     model,
     OnInit,
     output,
@@ -67,7 +66,8 @@ import { GridVirtualListComponent } from "../grid-virtual-list/grid-virtual-list
         CdkDragPreview,
         GridListComponent,
         PagerComponent,
-        GridVirtualListComponent
+        GridVirtualListComponent,
+        CdkDragPlaceholder
     ],
     host: {
         class: "mona-grid",
