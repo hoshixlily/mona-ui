@@ -15,7 +15,7 @@ export class GridColumnComponent {
     protected readonly cellTemplate = contentChild(GridCellTemplateDirective, { read: TemplateRef });
     protected readonly titleTemplate = contentChild(GridColumnTitleTemplateDirective, { read: TemplateRef });
 
-    public readonly column: Column = new Column();
+    public readonly column = new Column();
     public readonly editable = input<boolean>(true);
     public readonly field = input<string>("");
     public readonly maxWidth = input<number | null>(null);

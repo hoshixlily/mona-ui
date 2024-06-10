@@ -23,20 +23,20 @@ export class GridService {
     public readonly appliedSorts: WritableSignal<ImmutableDictionary<string, ColumnSortState>> = signal(
         ImmutableDictionary.create()
     );
-    public readonly cellEdit$: Subject<CellEditEvent> = new Subject<CellEditEvent>();
-    public readonly columns: WritableSignal<ImmutableList<Column>> = signal(ImmutableList.create());
-    public readonly filterLoad$: Subject<void> = new Subject<void>();
+    public readonly cellEdit$ = new Subject<CellEditEvent>();
+    public readonly columns = signal<ImmutableList<Column>>(ImmutableList.create());
+    public readonly filterLoad$ = new Subject<void>();
     public readonly groupColumnWidth = 34;
     public readonly groupColumns = signal<ImmutableSet<Column>>(ImmutableSet.create());
-    public readonly isInEditMode: WritableSignal<boolean> = signal(false);
+    public readonly isInEditMode = signal(false);
     public readonly pageState: PageState = { page: signal(1), skip: signal(0), take: signal(10) };
-    public readonly rows: WritableSignal<ImmutableSet<Row>> = signal(ImmutableSet.create());
-    public readonly selectBy: WritableSignal<string> = signal("");
-    public readonly selectedKeys: WritableSignal<ImmutableSet<unknown>> = signal(ImmutableSet.create());
+    public readonly rows = signal<ImmutableSet<Row>>(ImmutableSet.create());
+    public readonly selectBy = signal("");
+    public readonly selectedKeys = signal<ImmutableSet<unknown>>(ImmutableSet.create());
     public readonly selectedKeysLoad$ = new BehaviorSubject<ImmutableSet<unknown>>(ImmutableSet.create());
-    public readonly selectedRows: WritableSignal<ImmutableSet<Row>> = signal(ImmutableSet.create());
-    public readonly selectedRowsChange$: Subject<Iterable<Row>> = new Subject<Iterable<Row>>();
-    public readonly sortLoad$: Subject<void> = new Subject<void>();
+    public readonly selectedRows = signal<ImmutableSet<Row>>(ImmutableSet.create());
+    public readonly selectedRowsChange$ = new Subject<Iterable<Row>>();
+    public readonly sortLoad$ = new Subject<void>();
     public readonly viewPageRows: Signal<ImmutableSet<Row>> = computed(() => {
         const skip = this.pageState.skip();
         const take = this.pageState.take();
@@ -67,14 +67,11 @@ export class GridService {
         const result = queryEnumerable.run();
         return ImmutableSet.create(result);
     });
-    public readonly viewRowCount: Signal<number> = computed(() => this.viewRows().size());
+    public readonly viewRowCount = computed(() => this.viewRows().size());
     public readonly virtualScrollOptions = signal<VirtualScrollOptions>({ enabled: false, height: 28 });
     public editableOptions: EditableOptions = { enabled: false };
     public gridHeaderElement = signal<HTMLDivElement | null>(null);
-    public gridGroupExpandState: Dictionary<string, Dictionary<number, boolean>> = new Dictionary<
-        string,
-        Dictionary<number, boolean>
-    >();
+    public gridGroupExpandState = new Dictionary<string, Dictionary<number, boolean>>();
     public selectableOptions: SelectableOptions = {
         enabled: false,
         mode: "single"

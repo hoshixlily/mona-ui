@@ -1,16 +1,6 @@
 import { animate, AnimationBuilder, style } from "@angular/animations";
 import { NgClass } from "@angular/common";
-import {
-    ChangeDetectionStrategy,
-    Component,
-    ComponentRef,
-    ElementRef,
-    inject,
-    input,
-    InputSignal,
-    output,
-    OutputEmitterRef
-} from "@angular/core";
+import { ChangeDetectionStrategy, Component, ComponentRef, ElementRef, inject, input, output } from "@angular/core";
 import { take } from "rxjs";
 import { ButtonDirective } from "../../../buttons/button/button.directive";
 import { FilterMenuComponent } from "../../../filter/components/filter-menu/filter-menu.component";
@@ -33,16 +23,16 @@ import { GridService } from "../../services/grid.service";
     }
 })
 export class GridFilterMenuComponent {
-    readonly #animationBuilder: AnimationBuilder = inject(AnimationBuilder);
-    readonly #gridService: GridService = inject(GridService);
-    readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
-    readonly #popupService: PopupService = inject(PopupService);
+    readonly #animationBuilder = inject(AnimationBuilder);
+    readonly #gridService = inject(GridService);
+    readonly #hostElementRef = inject(ElementRef<HTMLElement>);
+    readonly #popupService = inject(PopupService);
     #popupRef?: PopupRef;
 
-    public readonly apply: OutputEmitterRef<ColumnFilterState> = output();
+    public readonly apply = output<ColumnFilterState>();
 
-    public column: InputSignal<Column> = input.required<Column>();
-    public type: InputSignal<DataType> = input<DataType>("string");
+    public column = input.required<Column>();
+    public type = input<DataType>("string");
 
     public openPopup(): void {
         this.#popupRef = this.#popupService.create({

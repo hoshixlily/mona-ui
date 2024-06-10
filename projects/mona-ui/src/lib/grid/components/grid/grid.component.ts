@@ -26,8 +26,7 @@ import {
     OutputEmitterRef,
     signal,
     untracked,
-    viewChild,
-    WritableSignal
+    viewChild
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { v4 } from "uuid";
@@ -76,21 +75,21 @@ import { GridVirtualListComponent } from "../grid-virtual-list/grid-virtual-list
 })
 export class GridComponent implements OnInit {
     readonly #cdr = inject(ChangeDetectorRef);
-    readonly #destroyRef: DestroyRef = inject(DestroyRef);
-    readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
+    readonly #destroyRef = inject(DestroyRef);
+    readonly #hostElementRef = inject(ElementRef<HTMLElement>);
     protected readonly columns = contentChildren(GridColumnComponent);
     protected readonly gridHeaderElement = viewChild.required<ElementRef<HTMLDivElement>>("gridHeaderElement");
-    protected readonly gridService: GridService = inject(GridService);
+    protected readonly gridService = inject(GridService);
     protected readonly groupColumnList = viewChild<CdkDropList>("groupColumnList");
-    protected readonly groupPanelPlaceholderVisible: WritableSignal<boolean> = signal(true);
+    protected readonly groupPanelPlaceholderVisible = signal(true);
     protected readonly groupingInProgress = signal(false);
     protected readonly headerMargin = "0 16px 0 0";
     protected readonly uid = v4();
-    protected columnDragging: boolean = false;
+    protected columnDragging = false;
     protected dragColumn?: Column;
     protected dropColumn?: Column;
     protected gridColumns: Column[] = [];
-    protected resizing: boolean = false;
+    protected resizing = false;
 
     public readonly cellEdit: OutputEmitterRef<CellEditEvent> = output();
 

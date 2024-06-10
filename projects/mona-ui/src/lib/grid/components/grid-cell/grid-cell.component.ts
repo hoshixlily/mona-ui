@@ -7,10 +7,8 @@ import {
     ElementRef,
     inject,
     input,
-    InputSignal,
     OnInit,
-    signal,
-    WritableSignal
+    signal
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule } from "@angular/forms";
@@ -43,16 +41,16 @@ import { GridService } from "../../services/grid.service";
     ]
 })
 export class GridCellComponent implements OnInit {
-    readonly #destroyRef: DestroyRef = inject(DestroyRef);
-    readonly #focusMonitor: FocusMonitor = inject(FocusMonitor);
-    readonly #gridService: GridService = inject(GridService);
-    readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
-    #focused: boolean = false;
-    protected readonly editing: WritableSignal<boolean> = signal(false);
+    readonly #destroyRef = inject(DestroyRef);
+    readonly #focusMonitor = inject(FocusMonitor);
+    readonly #gridService = inject(GridService);
+    readonly #hostElementRef = inject(ElementRef<HTMLElement>);
+    #focused = false;
+    protected readonly editing = signal(false);
     protected editForm!: FormGroup;
 
-    public column: InputSignal<Column> = input.required<Column>();
-    public row: InputSignal<Row> = input.required<Row>();
+    public column = input.required<Column>();
+    public row = input.required<Row>();
 
     public ngOnInit(): void {
         this.initializeForm();

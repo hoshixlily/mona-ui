@@ -49,8 +49,8 @@ import { GridCellComponent } from "../grid-cell/grid-cell.component";
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class GridVirtualListComponent implements OnInit, AfterViewInit {
-    readonly #destroyRef: DestroyRef = inject(DestroyRef);
-    readonly #hostElementRef: ElementRef<HTMLDivElement> = inject(ElementRef);
+    readonly #destroyRef = inject(DestroyRef);
+    readonly #hostElementRef = inject(ElementRef<HTMLDivElement>);
     readonly #groupColumns$: Observable<ImmutableSet<Column>>;
     readonly #injector = inject(Injector);
     readonly #virtualGridRows = computed(() => {
@@ -62,7 +62,7 @@ export class GridVirtualListComponent implements OnInit, AfterViewInit {
     protected readonly collapseIcon = faChevronDown;
     protected readonly collapsedGroups = signal<ImmutableSet<string>>(ImmutableSet.create());
     protected readonly expandIcon = faChevronRight;
-    protected readonly gridService: GridService = inject(GridService);
+    protected readonly gridService = inject(GridService);
     protected readonly groupedGridRows = computed(() => {
         const collapsedGroups = this.collapsedGroups();
         const rows = this.#virtualGridRows();

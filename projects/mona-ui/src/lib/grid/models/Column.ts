@@ -8,18 +8,18 @@ export class Column {
     /**
      * Only used internally for column resizing
      */
-    public calculatedWidth: WritableSignal<number | undefined> = signal(undefined);
-    public cellTemplate: WritableSignal<TemplateRef<any> | null> = signal(null);
-    public dataType: WritableSignal<DataType> = signal("string");
-    public editable: WritableSignal<boolean> = signal(false);
-    public field: WritableSignal<string> = signal("");
-    public filtered: WritableSignal<boolean> = signal(false);
-    public index: WritableSignal<number> = signal(0); // 0-based
-    public maxWidth: WritableSignal<number | null> = signal(null);
-    public minWidth: WritableSignal<number> = signal(40);
-    public sortDirection: WritableSignal<SortDirection | null> = signal(null);
-    public sortIndex: WritableSignal<number | null> = signal(null); // 1-based
-    public title: WritableSignal<string> = signal("");
-    public titleTemplate: WritableSignal<TemplateRef<any> | null> = signal(null);
-    public width: WritableSignal<number | undefined> = signal(undefined);
+    public calculatedWidth = signal<number | undefined>(undefined);
+    public cellTemplate = signal<TemplateRef<any> | null>(null);
+    public dataType = signal<DataType>("string");
+    public editable = signal(false);
+    public field = signal("");
+    public filtered = signal(false);
+    public index = signal(0); // 0-based
+    public maxWidth = signal<number | null>(null);
+    public minWidth = signal(40);
+    public sortDirection = signal<SortDirection | null>(null);
+    public sortIndex = signal<number | null>(null); // 1-based
+    public title = signal("");
+    public titleTemplate = signal<TemplateRef<any> | null>(null);
+    public width = signal<number | undefined>(undefined);
 }
