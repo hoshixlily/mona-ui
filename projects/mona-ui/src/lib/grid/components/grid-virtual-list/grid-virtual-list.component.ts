@@ -1,6 +1,7 @@
 import { CdkFixedSizeVirtualScroll, CdkVirtualForOf, CdkVirtualScrollViewport } from "@angular/cdk/scrolling";
 import { NgClass } from "@angular/common";
 import {
+    afterNextRender,
     AfterViewInit,
     ChangeDetectionStrategy,
     Component,
@@ -8,14 +9,17 @@ import {
     DestroyRef,
     ElementRef,
     inject,
+    Injector,
     input,
-    signal
+    OnInit,
+    signal,
+    viewChild
 } from "@angular/core";
-import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { takeUntilDestroyed, toObservable } from "@angular/core/rxjs-interop";
 import { FaIconComponent } from "@fortawesome/angular-fontawesome";
 import { faChevronDown, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { EnumerableSet, from, ImmutableList, ImmutableSet } from "@mirei/ts-collections";
-import { fromEvent } from "rxjs";
+import { fromEvent, Observable, pairwise, startWith } from "rxjs";
 import { ButtonDirective } from "../../../buttons/button/button.directive";
 import { ContainsPipe } from "../../../pipes/contains.pipe";
 import { SlicePipe } from "../../../pipes/slice.pipe";
@@ -44,32 +48,47 @@ import { GridCellComponent } from "../grid-cell/grid-cell.component";
     styleUrl: "./grid-virtual-list.component.scss",
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class GridVirtualListComponent implements AfterViewInit {
+export class GridVirtualListComponent implements OnInit, AfterViewInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     readonly #hostElementRef: ElementRef<HTMLDivElement> = inject(ElementRef);
+    readonly #groupColumns$: Observable<ImmutableSet<Column>>;
+    readonly #injector = inject(Injector);
+    readonly #virtualGridRows = computed(() => {
+        const data = this.data();
+        const columns = this.gridService.groupColumns();
+        const rows = this.flattenGroups(this.createGridGroup(data, columns), 0, null);
+        return rows.toImmutableSet();
+    });
     protected readonly collapseIcon = faChevronDown;
     protected readonly collapsedGroups = signal<ImmutableSet<string>>(ImmutableSet.create());
     protected readonly expandIcon = faChevronRight;
     protected readonly gridService: GridService = inject(GridService);
-    protected readonly virtualGridRows = computed(() => {
-        const data = this.data();
-        const columns = this.gridService.groupColumns();
+    protected readonly groupedGridRows = computed(() => {
         const collapsedGroups = this.collapsedGroups();
-        const rows = this.flattenGroups(this.createGridGroup(data, columns), 0, null);
+        const rows = this.#virtualGridRows();
         return rows
             .where(row => {
-                const parents = this.getAllParents(row);
+                const parents = row.parentList;
                 return parents.every(p => p.type === "group" && !collapsedGroups.contains(p.groupId));
             })
-            .toImmutableSet();
+            .toArray();
     });
+    protected readonly viewport = viewChild.required(CdkVirtualScrollViewport);
     public columns = input<ImmutableList<Column>>(ImmutableList.create());
     public data = input<ImmutableSet<Row>>(ImmutableSet.create());
+
+    public constructor() {
+        this.#groupColumns$ = toObservable(this.gridService.groupColumns);
+    }
 
     public ngAfterViewInit(): void {
         window.setTimeout(() => {
             this.synchronizeHorizontalScroll();
         }, 0);
+    }
+
+    public ngOnInit(): void {
+        this.setSubscriptions();
     }
 
     public onGroupExpandChange(rowItem: VirtualGridRow): void {
@@ -100,11 +119,10 @@ export class GridVirtualListComponent implements AfterViewInit {
                     const rows = g.source.toArray();
                     return {
                         column,
+                        key: this.getGroupKey(column.field(), rows),
                         rows,
-                        collapsed: signal(false),
-                        title: rows[0].data[column.field()],
-                        uid: this.getGroupKey(column.field(), rows)
-                    };
+                        title: rows[0].data[column.field()]
+                    } as VirtualGridGroup;
                 })
                 .toArray();
         }
@@ -115,13 +133,13 @@ export class GridVirtualListComponent implements AfterViewInit {
         return grouped
             .select<VirtualGridGroup>(g => {
                 const rows = g.source.toArray();
+                const groupedRows = this.createGridGroup(g.source, remainingColumns);
                 return {
                     column: firstColumn,
-                    rows: this.createGridGroup(g.source, remainingColumns),
-                    collapsed: signal(false),
-                    title: rows[0].data[firstColumn.field()],
-                    uid: this.getGroupKey(firstColumn.field(), rows)
-                };
+                    key: this.getGroupKey(firstColumn.field(), rows),
+                    rows: groupedRows,
+                    title: rows[0].data[firstColumn.field()]
+                } as VirtualGridGroup;
             })
             .toArray();
     }
@@ -136,23 +154,29 @@ export class GridVirtualListComponent implements AfterViewInit {
             if (group.rows.length === 0) {
                 continue;
             }
+            const parentList = [...(parentHeader?.parentList ?? []), parentHeader].filter(
+                p => p != null
+            ) as VirtualGridRow[];
+            const groupId = this.getNestedGroupKey(parentList, group.key);
             const headerRow: VirtualGridRow = {
                 type: "group",
                 column: group.column,
                 level,
                 groupTitle: group.title,
-                groupId: group.uid,
-                parent: parentHeader
+                groupId,
+                parentList
             };
             result.add(headerRow);
             if (group.rows[0] instanceof Row) {
+                const parentList = [...headerRow.parentList, headerRow].filter(p => p != null) as VirtualGridRow[];
+                const groupId = this.getNestedGroupKey(parentList, group.key);
                 const rows = group.rows.map<VirtualGridRow>(row => ({
                     type: "row",
                     row: row as Row,
                     column: group.column,
                     level,
-                    groupId: group.uid,
-                    parent: headerRow
+                    groupId,
+                    parentList
                 }));
                 result.addAll(rows);
             } else {
@@ -162,18 +186,47 @@ export class GridVirtualListComponent implements AfterViewInit {
         return new EnumerableSet<VirtualGridRow>(result);
     }
 
-    private getAllParents(row: VirtualGridRow): VirtualGridRow[] {
-        const parents: VirtualGridRow[] = [];
-        let currentRow = row.parent;
-        while (currentRow != null) {
-            parents.push(currentRow);
-            currentRow = currentRow.parent;
-        }
-        return parents;
-    }
-
     private getGroupKey(field: string, rows: Row[]): string {
         return `${field}-${rows[0].data[field]}`;
+    }
+
+    private getNestedGroupKey(parentList: VirtualGridRow[], key: string): string {
+        return `${parentList.map(p => p.groupId).join("-")}-${key}`.replaceAll(" ", "_");
+    }
+
+    private setSubscriptions(): void {
+        this.#groupColumns$
+            .pipe(startWith(this.gridService.groupColumns()), pairwise(), takeUntilDestroyed(this.#destroyRef))
+            .subscribe(([prev, current]) => {
+                const removedColumns = prev.where(c => !current.contains(c));
+                removedColumns.forEach(c => {
+                    this.collapsedGroups.update(groups => {
+                        return groups.where(g => !g.startsWith(c.field())).toImmutableSet();
+                    });
+                });
+            });
+
+        /**
+         * This is a workaround to force the virtual scroll to update the rendered range
+         * When the data changes, the view is not rendered correctly. It is empty until the user scrolls,
+         * which triggers the update of the rendered range.
+         * We manually trigger the update so that grid is rendered when the grouping changes.
+         * @see @angular/components issue #21793 on GitHub
+         */
+        this.#groupColumns$.subscribe(columns => {
+            const reRender = (): void => {
+                const renderedRange = this.viewport().getRenderedRange();
+                this.viewport().setRenderedRange({
+                    start: renderedRange.start,
+                    end: renderedRange.end + 1
+                });
+            };
+            if (columns.any()) {
+                reRender();
+            } else {
+                afterNextRender(() => reRender(), { injector: this.#injector });
+            }
+        });
     }
 
     private synchronizeHorizontalScroll(): void {

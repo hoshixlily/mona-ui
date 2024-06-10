@@ -11,6 +11,7 @@ import { NgStyle, NgTemplateOutlet } from "@angular/common";
 import {
     afterNextRender,
     ChangeDetectionStrategy,
+    ChangeDetectorRef,
     Component,
     computed,
     contentChildren,
@@ -30,8 +31,6 @@ import {
     WritableSignal
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { faArrowDownLong, faArrowUpLong, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { v4 } from "uuid";
 import { ChipComponent } from "../../../buttons/chip/chip.component";
 import { PagerComponent } from "../../../pager/components/pager/pager.component";
@@ -63,7 +62,6 @@ import { GridVirtualListComponent } from "../grid-virtual-list/grid-virtual-list
         NgStyle,
         CdkDrag,
         NgTemplateOutlet,
-        FontAwesomeModule,
         GridFilterMenuComponent,
         GridColumnResizeHandlerDirective,
         CdkDragPreview,
@@ -77,11 +75,10 @@ import { GridVirtualListComponent } from "../grid-virtual-list/grid-virtual-list
     }
 })
 export class GridComponent implements OnInit {
+    readonly #cdr = inject(ChangeDetectorRef);
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
-    protected readonly ascendingSortIcon: IconDefinition = faArrowUpLong;
     protected readonly columns = contentChildren(GridColumnComponent);
-    protected readonly descendingSortIcon: IconDefinition = faArrowDownLong;
     protected readonly gridHeaderElement = viewChild.required<ElementRef<HTMLDivElement>>("gridHeaderElement");
     protected readonly gridService: GridService = inject(GridService);
     protected readonly groupColumnList = viewChild<CdkDropList>("groupColumnList");
@@ -99,13 +96,13 @@ export class GridComponent implements OnInit {
 
     public data = input<any[]>([]);
     public filter = model<CompositeFilterDescriptor[]>([]);
-    public filterable: InputSignal<boolean> = input(false);
-    public groupable: InputSignal<boolean> = input(false);
+    public filterable = input(false);
+    public groupable = input(false);
     public pageSize = input<number | undefined>(undefined);
-    public pageSizeValues: InputSignal<number[]> = input<number[]>([]);
-    public reorderable: InputSignal<boolean> = input(false);
-    public resizable: InputSignal<boolean> = input(false);
-    public responsivePager: InputSignal<boolean> = input(true);
+    public pageSizeValues = input<number[]>([]);
+    public reorderable = input(false);
+    public resizable = input(false);
+    public responsivePager = input(true);
     public sort = model<SortDescriptor[]>([]);
     public sortable = input<boolean | SortableOptions>(false);
 
@@ -167,11 +164,11 @@ export class GridComponent implements OnInit {
             return;
         }
         const column = event.item.data;
-        if (this.gridService.groupColumns().includes(column)) {
+        if (this.gridService.groupColumns().contains(column)) {
             return;
         }
 
-        this.gridService.groupColumns.update(columns => [...columns, column]);
+        this.gridService.groupColumns.update(columns => columns.add(column));
         if (!this.gridService.appliedSorts().containsKey(column.field())) {
             this.onColumnSort(column);
         }
@@ -179,6 +176,7 @@ export class GridComponent implements OnInit {
         this.dragColumn = undefined;
         this.dropColumn = undefined;
         this.groupingInProgress.set(false);
+        this.#cdr.detectChanges();
     }
 
     public onColumnFilter(column: Column, state: ColumnFilterState): void {
@@ -226,8 +224,8 @@ export class GridComponent implements OnInit {
         } else if (
             this.gridService
                 .groupColumns()
-                .map(c => c.field())
-                .includes(column.field())
+                .select(c => c.field())
+                .contains(column.field())
         ) {
             column.sortDirection.set("asc");
         } else if (this.gridService.sortableOptions.allowUnsort) {
@@ -247,7 +245,9 @@ export class GridComponent implements OnInit {
 
     public onGroupingColumnRemove(event: Event, column: Column): void {
         event.stopPropagation();
-        this.gridService.groupColumns.update(columns => columns.filter(c => c.field() !== column.field()));
+        this.gridService.groupColumns.update(columns =>
+            columns.where(c => c.field() !== column.field()).toImmutableSet()
+        );
         this.gridService.gridGroupExpandState = this.gridService.gridGroupExpandState
             .where(p => !p.key.startsWith(column.field()))
             .toDictionary(

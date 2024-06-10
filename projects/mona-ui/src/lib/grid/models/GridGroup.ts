@@ -10,14 +10,14 @@ export interface GridGroup {
 
 export interface VirtualGridGroup {
     column: Column;
+    key: string;
     rows: Row[] | VirtualGridGroup[];
     title: string;
-    uid: string;
 }
 
 export type VirtualGridRow = {
     column: Column;
     level: number;
     groupId: string;
-    parent: VirtualGridRow | null;
+    parentList: VirtualGridRow[];
 } & ({ type: "group"; groupTitle: string } | { type: "row"; row: Row });

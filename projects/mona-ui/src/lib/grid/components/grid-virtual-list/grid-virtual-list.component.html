@@ -14,21 +14,21 @@
                         </tr>
                     </ng-container>
                 } @else {
-                    <ng-container *cdkVirtualFor="let rowItem of virtualGridRows()">
+                    <ng-container *cdkVirtualFor="let rowItem of groupedGridRows()">
                         @if (rowItem.type==='group') {
                             <tr class="mona-grid-grouping-row">
                                 @for (_ of gridService.groupColumns()|monaSlice:0:rowItem.level+1; track $index) {
                                     <td [style.width.px]="gridService.groupColumnWidth">
                                         @if ($index === rowItem.level) {
                                             <span class="mona-grid-grouping-toggle-wrapper" [style.width.px]="gridService.groupColumnWidth">
-                                            <button monaButton [flat]="true" (click)="onGroupExpandChange(rowItem)">
-                                                @if (collapsedGroups()|monaContains:rowItem.groupId) {
-                                                    <fa-icon [icon]="expandIcon"></fa-icon>
-                                                } @else {
-                                                    <fa-icon [icon]="collapseIcon"></fa-icon>
-                                                }
-                                            </button>
-                                        </span>
+                                                <button monaButton [flat]="true" (click)="onGroupExpandChange(rowItem)">
+                                                    @if (collapsedGroups()|monaContains:rowItem.groupId) {
+                                                        <fa-icon [icon]="expandIcon"></fa-icon>
+                                                    } @else {
+                                                        <fa-icon [icon]="collapseIcon"></fa-icon>
+                                                    }
+                                                </button>
+                                            </span>
                                         }
                                     </td>
                                 }
@@ -36,7 +36,7 @@
                                     <span class="mona-grid-grouping-row-text">{{ rowItem.column.title() }}: {{ rowItem.groupTitle }}</span>
                                 </td>
                             </tr>
-                        } @else {
+                        } @else if (rowItem.type==='row') {
                             <tr>
                                 @for (_ of gridService.groupColumns()|monaSlice:0:rowItem.level+1; track $index) {
                                     <td [style.width.px]="gridService.groupColumnWidth"></td>

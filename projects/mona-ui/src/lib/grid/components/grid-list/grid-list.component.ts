@@ -16,6 +16,7 @@ import { faChevronDown, faChevronRight, IconDefinition } from "@fortawesome/free
 import { Dictionary, ImmutableList, ImmutableSet } from "@mirei/ts-collections";
 import { fromEvent, mergeWith } from "rxjs";
 import { ButtonDirective } from "../../../buttons/button/button.directive";
+import { ElementAtPipe } from "../../../pipes/element-at.pipe";
 import { SlicePipe } from "../../../pipes/slice.pipe";
 import { Column } from "../../models/Column";
 import { GridGroup } from "../../models/GridGroup";
@@ -37,7 +38,8 @@ import { GridCellComponent } from "../grid-cell/grid-cell.component";
         FontAwesomeModule,
         NgTemplateOutlet,
         SlicePipe,
-        GridGroupPipe
+        GridGroupPipe,
+        ElementAtPipe
     ],
     host: {
         class: "mona-grid-list"

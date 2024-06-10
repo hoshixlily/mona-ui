@@ -27,7 +27,7 @@ export class GridService {
     public readonly columns: WritableSignal<ImmutableList<Column>> = signal(ImmutableList.create());
     public readonly filterLoad$: Subject<void> = new Subject<void>();
     public readonly groupColumnWidth = 34;
-    public readonly groupColumns: WritableSignal<Array<Column>> = signal([]);
+    public readonly groupColumns = signal<ImmutableSet<Column>>(ImmutableSet.create());
     public readonly isInEditMode: WritableSignal<boolean> = signal(false);
     public readonly pageState: PageState = { page: signal(1), skip: signal(0), take: signal(10) };
     public readonly rows: WritableSignal<ImmutableSet<Row>> = signal(ImmutableSet.create());

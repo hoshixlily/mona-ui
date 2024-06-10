@@ -38,7 +38,7 @@
                                 </tr>
                                 @if (cx < gridService.groupColumns().length - 1 && !subGroup.collapsed) {
                                     <ng-container [ngTemplateOutlet]="gridGroupTemplate"
-                                                  [ngTemplateOutletContext]="{$implicit: subGroup.rows, column: gridService.groupColumns()[cx+1], cx: cx+1, depth:depth+1}">
+                                                  [ngTemplateOutletContext]="{$implicit: subGroup.rows, column: gridService.groupColumns()|monaElementAt:cx+1, cx: cx+1, depth:depth+1}">
                                     </ng-container>
                                 }
                                 @if (depth === gridService.groupColumns().length - 1 && !subGroup.collapsed) {
@@ -61,7 +61,7 @@
                         }
                 </ng-template>
                 <ng-container [ngTemplateOutlet]="gridGroupTemplate"
-                              [ngTemplateOutletContext]="{$implicit: data(), column: gridService.groupColumns()[0], cx: 0, depth: 0}"></ng-container>
+                              [ngTemplateOutletContext]="{$implicit: data(), column: gridService.groupColumns()|monaElementAt:0, cx: 0, depth: 0}"></ng-container>
             }
         </tbody>
     </table>
