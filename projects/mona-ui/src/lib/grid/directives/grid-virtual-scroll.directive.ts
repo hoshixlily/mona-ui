@@ -9,7 +9,7 @@ import { GridService } from "../services/grid.service";
 export class GridVirtualScrollDirective {
     readonly #defaultOptions: VirtualScrollOptions = {
         enabled: true,
-        height: 28
+        height: 32
     };
     readonly #gridService = inject(GridService);
     public options = input<Partial<VirtualScrollOptions> | "" | undefined>(undefined, {

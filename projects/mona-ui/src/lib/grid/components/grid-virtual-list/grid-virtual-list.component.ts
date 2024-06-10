@@ -71,7 +71,7 @@ export class GridVirtualListComponent implements OnInit, AfterViewInit {
                 const parents = row.parentList;
                 return parents.every(p => p.type === "group" && !collapsedGroups.contains(p.groupId));
             })
-            .toArray();
+            .toImmutableList();
     });
     protected readonly viewport = viewChild.required(CdkVirtualScrollViewport);
     public columns = input<ImmutableList<Column>>(ImmutableList.create());
@@ -101,6 +101,10 @@ export class GridVirtualListComponent implements OnInit, AfterViewInit {
                 return groups.add(groupId);
             });
         }
+    }
+
+    public onGridRowClick(event: MouseEvent, row: Row): void {
+        this.gridService.handleRowClick(event, row);
     }
 
     private createGridGroup(rows: Iterable<Row>, columns: Iterable<Column>): VirtualGridGroup[] {
@@ -194,6 +198,36 @@ export class GridVirtualListComponent implements OnInit, AfterViewInit {
         return `${parentList.map(p => p.groupId).join("-")}-${key}`.replaceAll(" ", "_");
     }
 
+    private setSelectedKeysLoadSubscription(): void {
+        this.gridService.selectedKeysLoad$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(selectedKeys => {
+            const firstKey = selectedKeys.firstOrDefault();
+            if (firstKey == null) {
+                return;
+            }
+            if (this.gridService.groupColumns().any()) {
+                const viewData = this.groupedGridRows();
+                const selectedRow = viewData.firstOrDefault(
+                    r => r.type === "row" && r.row.data[this.gridService.selectBy()] === firstKey
+                );
+                if (selectedRow != null) {
+                    const index = viewData.indexOf(selectedRow);
+                    window.setTimeout(() => {
+                        this.viewport().scrollToIndex(index);
+                    });
+                }
+            } else {
+                const viewData = this.data().toImmutableList();
+                const selectedRow = viewData.firstOrDefault(r => r.data[this.gridService.selectBy()] === firstKey);
+                if (selectedRow != null) {
+                    const index = viewData.indexOf(selectedRow);
+                    window.setTimeout(() => {
+                        this.viewport().scrollToIndex(index);
+                    });
+                }
+            }
+        });
+    }
+
     private setSubscriptions(): void {
         this.#groupColumns$
             .pipe(startWith(this.gridService.groupColumns()), pairwise(), takeUntilDestroyed(this.#destroyRef))
@@ -227,6 +261,7 @@ export class GridVirtualListComponent implements OnInit, AfterViewInit {
                 afterNextRender(() => reRender(), { injector: this.#injector });
             }
         });
+        this.setSelectedKeysLoadSubscription();
     }
 
     private synchronizeHorizontalScroll(): void {

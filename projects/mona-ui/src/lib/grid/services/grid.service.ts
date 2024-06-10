@@ -1,6 +1,6 @@
 import { computed, Injectable, OutputEmitterRef, Signal, signal, WritableSignal } from "@angular/core";
 import { Dictionary, from, ImmutableDictionary, ImmutableList, ImmutableSet } from "@mirei/ts-collections";
-import { Subject } from "rxjs";
+import { BehaviorSubject, Subject } from "rxjs";
 import { VirtualScrollOptions } from "../../common/models/VirtualScrollOptions";
 import { Query } from "../../query/core/Query";
 import { CompositeFilterDescriptor, FilterDescriptor } from "../../query/filter/FilterDescriptor";
@@ -33,6 +33,7 @@ export class GridService {
     public readonly rows: WritableSignal<ImmutableSet<Row>> = signal(ImmutableSet.create());
     public readonly selectBy: WritableSignal<string> = signal("");
     public readonly selectedKeys: WritableSignal<ImmutableSet<unknown>> = signal(ImmutableSet.create());
+    public readonly selectedKeysLoad$ = new BehaviorSubject<ImmutableSet<unknown>>(ImmutableSet.create());
     public readonly selectedRows: WritableSignal<ImmutableSet<Row>> = signal(ImmutableSet.create());
     public readonly selectedRowsChange$: Subject<Iterable<Row>> = new Subject<Iterable<Row>>();
     public readonly sortLoad$: Subject<void> = new Subject<void>();
@@ -82,9 +83,50 @@ export class GridService {
     public sortableOptions: SortableOptions = {
         enabled: false,
         mode: "single",
-        allowUnsort: false,
+        allowUnsort: true,
         showIndices: true
     };
+
+    public deselectAllRows(): void {
+        if (this.selectedRows().length !== 0) {
+            this.selectedRows().forEach(r => r.selected.set(false));
+        }
+        this.selectedRows.update(set => set.clear());
+    }
+
+    public handleMultipleSelection(event: MouseEvent, row: Row): void {
+        if (!this.selectedRows().contains(row)) {
+            this.selectRow(row);
+        } else if (event.ctrlKey || event.metaKey) {
+            row.selected.set(false);
+            this.selectedRows.update(set => set.remove(row));
+        }
+    }
+
+    public handleRowClick(event: MouseEvent, row: Row): void {
+        if (!this.isSelectableGrid()) {
+            return;
+        }
+        if (this.selectableOptions.mode === "single") {
+            this.handleSingleSelection(event, row);
+        } else {
+            this.handleMultipleSelection(event, row);
+        }
+        this.selectedRowsChange$.next(this.selectedRows());
+    }
+
+    public handleSingleSelection(event: MouseEvent, row: Row): void {
+        if (row.selected() && (event.ctrlKey || event.metaKey)) {
+            this.deselectAllRows();
+        } else {
+            this.deselectAllRows();
+            this.selectRow(row);
+        }
+    }
+
+    public isSelectableGrid(): boolean {
+        return this.selectableOptions != null && !!this.selectableOptions.enabled;
+    }
 
     public loadFilters(filters: CompositeFilterDescriptor[]): void {
         const newAppliedFilters = new Dictionary<string, ColumnFilterState>();
@@ -129,6 +171,7 @@ export class GridService {
             }
         }
         this.selectedRows.update(set => set.clear().addAll(selectedRowList));
+        this.selectedKeysLoad$.next(this.selectedKeys());
     }
 
     public loadSorts(sorts: SortDescriptor[]): void {
@@ -150,6 +193,11 @@ export class GridService {
             )
         );
         this.sortLoad$.next();
+    }
+
+    public selectRow(row: Row): void {
+        row.selected.set(true);
+        this.selectedRows.update(set => set.add(row));
     }
 
     public setEditableOptions(options: EditableOptions): void {

@@ -64,17 +64,7 @@ export class GridListComponent implements OnInit {
     }
 
     public onGridRowClick(event: MouseEvent, row: Row): void {
-        if (!this.isSelectableGrid()) {
-            return;
-        }
-
-        if (this.gridService.selectableOptions.mode === "single") {
-            this.handleSingleSelection(event, row);
-        } else {
-            this.handleMultipleSelection(event, row);
-        }
-
-        this.gridService.selectedRowsChange$.next(this.gridService.selectedRows());
+        this.gridService.handleRowClick(event, row);
     }
 
     public onGroupExpandChange(group: GridGroup): void {
@@ -95,40 +85,6 @@ export class GridListComponent implements OnInit {
         } else {
             state.add(this.gridService.pageState.page(), group.collapsed);
         }
-    }
-
-    private deselectAllRows(): void {
-        if (this.gridService.selectedRows().length !== 0) {
-            this.gridService.selectedRows().forEach(r => r.selected.set(false));
-        }
-        this.gridService.selectedRows.update(set => set.clear());
-    }
-
-    private isSelectableGrid(): boolean {
-        return this.gridService.selectableOptions != null && !!this.gridService.selectableOptions.enabled;
-    }
-
-    private handleMultipleSelection(event: MouseEvent, row: Row): void {
-        if (!this.gridService.selectedRows().contains(row)) {
-            this.selectRow(row);
-        } else if (event.ctrlKey || event.metaKey) {
-            row.selected.set(false);
-            this.gridService.selectedRows.update(set => set.remove(row));
-        }
-    }
-
-    private handleSingleSelection(event: MouseEvent, row: Row): void {
-        if (row.selected() && (event.ctrlKey || event.metaKey)) {
-            this.deselectAllRows();
-        } else {
-            this.deselectAllRows();
-            this.selectRow(row);
-        }
-    }
-
-    private selectRow(row: Row): void {
-        row.selected.set(true);
-        this.gridService.selectedRows.update(set => set.add(row));
     }
 
     private setSubscriptions(): void {
