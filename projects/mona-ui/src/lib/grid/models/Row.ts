@@ -4,10 +4,10 @@ import { FormGroup } from "@angular/forms";
 import { v4 } from "uuid";
 
 export class Row {
-    readonly #editFromDictionary: Dictionary<string, FormGroup> = new Dictionary<string, FormGroup>();
-    public readonly uid: string = v4();
+    readonly #editFromDictionary = new Dictionary<string, FormGroup>();
+    public readonly uid = v4();
     public data: Record<string, any> = {};
-    public selected: WritableSignal<boolean> = signal(false);
+    public selected = signal(false);
     public constructor(data: Record<string, any>) {
         this.data = data;
     }
@@ -18,5 +18,12 @@ export class Row {
 
     public setEditForm(key: string, form: FormGroup): void {
         this.#editFromDictionary.put(key, form);
+    }
+}
+
+export class VirtualGroupRow {
+    public readonly text: string;
+    public constructor(text: string) {
+        this.text = text;
     }
 }

@@ -25,12 +25,12 @@
                                             <span class="mona-grid-grouping-toggle-wrapper" [style.width.px]="gridService.groupColumnWidth">
                                                 <button monaButton [flat]="true"
                                                         (click)="onGroupExpandChange(subGroup)">
-                                                @if (subGroup.collapsed) {
-                                                    <fa-icon [icon]="expandIcon"></fa-icon>
-                                                } @else {
-                                                    <fa-icon [icon]="collapseIcon"></fa-icon>
-                                                }
-                                            </button>
+                                                    @if (subGroup.collapsed) {
+                                                        <fa-icon [icon]="expandIcon"></fa-icon>
+                                                    } @else {
+                                                        <fa-icon [icon]="collapseIcon"></fa-icon>
+                                                    }
+                                                </button>
                                             </span>
                                             <span class="mona-grid-grouping-row-text">{{ column.title() }}: {{ subGroup.rows[0].data[column.field()] }}</span>
                                         </td>

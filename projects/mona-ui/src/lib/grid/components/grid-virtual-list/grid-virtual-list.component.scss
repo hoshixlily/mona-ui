@@ -36,3 +36,25 @@ table {
     }
 }
 
+.mona-grid-grouping-row {
+    width: 100%;
+    & > td {
+        display: flex;
+        align-items: center;
+    }
+    & > td:last-child {
+        padding: 0;
+    }
+}
+
+.mona-grid-grouping-toggle-wrapper {
+    display: inline-flex;
+    & button {
+        width: 100%;
+    }
+}
+
+.mona-grid-grouping-row-text {
+    font-weight: bold;
+    margin-left: 0.5rem;
+}
