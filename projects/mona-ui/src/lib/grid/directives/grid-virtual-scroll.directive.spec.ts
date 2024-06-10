@@ -1,8 +1,16 @@
-import { GridVirtualScrollDirective } from './grid-virtual-scroll.directive';
+import { TestBed } from "@angular/core/testing";
+import { GridService } from "../services/grid.service";
+import { GridVirtualScrollDirective } from "./grid-virtual-scroll.directive";
 
-describe('GridVirtualScrollDirective', () => {
-  it('should create an instance', () => {
-    const directive = new GridVirtualScrollDirective();
-    expect(directive).toBeTruthy();
-  });
+describe("GridVirtualScrollDirective", () => {
+    let directive: GridVirtualScrollDirective;
+    beforeEach(() => {
+        TestBed.configureTestingModule({
+            providers: [GridService]
+        });
+        directive = TestBed.runInInjectionContext(() => new GridVirtualScrollDirective());
+    });
+    it("should create an instance", () => {
+        expect(directive).toBeTruthy();
+    });
 });
