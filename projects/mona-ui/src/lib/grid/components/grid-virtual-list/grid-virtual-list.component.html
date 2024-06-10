@@ -1,0 +1,63 @@
+<div class="mona-grid-virtual-list" style="width: 100%; height: 100%;">
+    <cdk-virtual-scroll-viewport [itemSize]="30" [style.height.%]="100">
+        <table style="height: 100%;">
+            <tbody>
+                @if (gridService.groupColumns().length === 0) {
+                    <ng-container *cdkVirtualFor="let row of data(); let $index=index">
+                        <tr [ngClass]="{'mona-selected': row.selected()}"
+                            (click)="onGridRowClick($event, row)"
+                            [attr.data-ruid]="row.uid" [attr.data-row-view-index]="$index">
+                            @for (column of columns(); track $index) {
+                                <td [style.width.px]="column.calculatedWidth()"
+                                    [style.min-width.px]="column.minWidth()">
+                                    <mona-grid-cell [column]="column" [row]="row"></mona-grid-cell>
+                                </td>
+                            }
+                        </tr>
+                    </ng-container>
+                } @else {
+                    <ng-container *cdkVirtualFor="let rowItem of groupedGridRows(); let $index=index">
+                        @if (rowItem.type === 'group') {
+                            <tr class="mona-grid-grouping-row">
+                                @for (_ of gridService.groupColumns()|monaSlice:0:rowItem.level + 1; track $index) {
+                                    <td [style.width.px]="gridService.groupColumnWidth">
+                                        @if ($index === rowItem.level) {
+                                            <span class="mona-grid-grouping-toggle-wrapper"
+                                                  [style.width.px]="gridService.groupColumnWidth">
+                                                <button monaButton [flat]="true" (click)="onGroupExpandChange(rowItem)">
+                                                    @if (collapsedGroups()|monaContains:rowItem.groupId) {
+                                                        <fa-icon [icon]="expandIcon"></fa-icon>
+                                                    } @else {
+                                                        <fa-icon [icon]="collapseIcon"></fa-icon>
+                                                    }
+                                                </button>
+                                            </span>
+                                        }
+                                    </td>
+                                }
+                                <td [style.width.px]="gridService.groupColumnWidth*(columns().length + gridService.groupColumns().length)">
+                                    <span class="mona-grid-grouping-row-text">{{ rowItem.column.title() }}
+                                        : {{ rowItem.groupTitle }}</span>
+                                </td>
+                            </tr>
+                        } @else if (rowItem.type === 'row') {
+                            <tr (click)="onGridRowClick($event, rowItem.row)"
+                                [ngClass]="{'mona-selected': rowItem.row.selected()}"
+                                [attr.data-ruid]="rowItem.row.uid" [attr.data-row-view-index]="$index">
+                                @for (_ of gridService.groupColumns()|monaSlice:0:rowItem.level + 1; track $index) {
+                                    <td [style.width.px]="gridService.groupColumnWidth"></td>
+                                }
+                                @for (column of columns(); track $index) {
+                                    <td [style.width.px]="column.calculatedWidth()"
+                                        [style.min-width.px]="column.minWidth()">
+                                        <mona-grid-cell [column]="column" [row]="rowItem.row"></mona-grid-cell>
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    </ng-container>
+                }
+            </tbody>
+        </table>
+    </cdk-virtual-scroll-viewport>
+</div>

@@ -4,6 +4,7 @@ import { Column } from "../models/Column";
 import { GridGroup } from "../models/GridGroup";
 import { Row } from "../models/Row";
 import { GridService } from "../services/grid.service";
+import { cellComparer } from "../utilities/GridUtils";
 
 @Pipe({
     name: "gridGroup",
@@ -14,32 +15,9 @@ export class GridGroupPipe implements PipeTransform {
 
     public transform(value: Row[], column: Column, page: number): Array<GridGroup> {
         return from(value)
-            .groupBy(row => row.data[column.field()], this.cellComparer(column))
+            .groupBy(row => row.data[column.field()], cellComparer(column))
             .select(g => this.createGridGroup(g, column, page))
             .toArray();
-    }
-
-    private cellComparer(column: Column) {
-        return (r1: any, r2: any) => {
-            if (column.dataType() === "date") {
-                if (r1 == null || r2 == null) {
-                    return Object.is(r1, r2);
-                }
-                return this.compareDates(r1 as Date, r2 as Date);
-            }
-            return Object.is(r1, r2);
-        };
-    }
-
-    private compareDates(date1: Date, date2: Date): boolean {
-        return (
-            date1.getFullYear() === date2.getFullYear() &&
-            date1.getMonth() === date2.getMonth() &&
-            date1.getDate() === date2.getDate() &&
-            date1.getHours() === date2.getHours() &&
-            date1.getMinutes() === date2.getMinutes() &&
-            date1.getSeconds() === date2.getSeconds()
-        );
     }
 
     private createGridGroup(group: IGroup<unknown, Row>, column: Column, page: number): GridGroup {

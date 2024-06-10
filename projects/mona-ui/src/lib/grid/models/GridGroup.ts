@@ -6,3 +6,17 @@ export interface GridGroup {
     column: Column;
     rows: Row[];
 }
+
+export interface VirtualGridGroup {
+    column: Column;
+    key: string;
+    rows: Row[] | VirtualGridGroup[];
+    title: string;
+}
+
+export type VirtualGridRow = {
+    column: Column;
+    level: number;
+    groupId: string;
+    parentList: VirtualGridRow[];
+} & ({ type: "group"; groupTitle: string } | { type: "row"; row: Row });

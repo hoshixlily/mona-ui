@@ -70,6 +70,7 @@
                                        (sortChange)="onGridSortChange($event)"
                                        (cellEdit)="onGridCellEdit($event)" [responsivePager]="false"
                                        monaGridEditable
+                                       monaGridVirtualScroll
                                        [monaGridSelectable]="{enabled: true, mode:'single'}" selectBy="OrderID"
                                        [selectedKeys]="gridSelectionKeys"
                                        (selectedKeysChange)="onGridSelectionKeysChange($event)">
@@ -86,8 +87,10 @@
                                 </mona-grid-column>
                             </mona-grid>
                             <mona-grid [data]="gridProductData" [pageSize]="5" [pageSizeValues]="[5,10,15,20,25,50,100]"
+                                       [resizable]="true" [groupable]="true" [sortable]="{enabled: true, mode: 'multiple'}"
+                                       [filterable]="true"
                                        style="height: 400px">
-                                <mona-grid-column title="Avatar" [width]="70">
+                                <mona-grid-column title="Avatar">
                                     <ng-template monaGridColumnTitleTemplate>
                                         <span style="color: red; width: 100%; display: flex; justify-content: center;">Avatar</span>
                                     </ng-template>

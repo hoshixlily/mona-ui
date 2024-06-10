@@ -25,6 +25,7 @@ export class GridColumnResizeHandlerDirective implements AfterViewInit {
     public readonly resizeEnd: OutputEmitterRef<void> = output();
     public readonly resizeStart: OutputEmitterRef<void> = output();
     public column = input.required<Column>();
+    public gridId = input.required<string>();
 
     public ngAfterViewInit(): void {
         this.setEvents();
@@ -35,8 +36,12 @@ export class GridColumnResizeHandlerDirective implements AfterViewInit {
         const initialWidth = this.column().calculatedWidth() ?? element.getBoundingClientRect().width;
         const initialX = event.clientX;
         const oldSelectStart = document.onselectstart;
-        const headerTableElement = element.closest("table");
-        const bodyTableElement = document.querySelector(".mona-grid-list-wrap > table") as HTMLTableElement;
+        const headerTableElement = document.querySelector(
+            `[data-grid-id='${this.gridId()}'] table:first-child`
+        ) as HTMLTableElement;
+        const bodyTableElement = document.querySelector(
+            `[data-grid-id='${this.gridId()}'] table:last-child`
+        ) as HTMLTableElement;
 
         document.onselectstart = () => false;
 
@@ -68,8 +73,6 @@ export class GridColumnResizeHandlerDirective implements AfterViewInit {
                     bodyTableElement.getBoundingClientRect().width + (calculatedWidth - oldWidth)
                 }px`;
             }
-
-            // this.cdr.detectChanges();
         };
 
         const onMouseUp = () => {

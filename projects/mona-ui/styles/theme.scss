@@ -936,7 +936,8 @@ mona-filter-input.mona-popup-filter-input,
     border-radius: var(--mona-border-radius);
 }
 
-.mona-grid-list {
+.mona-grid-list,
+.mona-grid-virtual-list {
     height: 100%;
     overflow: auto scroll;
     width: 100%;
@@ -967,6 +968,10 @@ mona-filter-input.mona-popup-filter-input,
             }
         }
     }
+}
+
+.mona-grid-virtual-list {
+    overflow: auto hidden;
 }
 
 .mona-grid-filtered {

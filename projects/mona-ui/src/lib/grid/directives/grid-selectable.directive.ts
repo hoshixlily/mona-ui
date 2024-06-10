@@ -10,7 +10,7 @@ import {
     untracked
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { select } from "@mirei/ts-collections";
+import { orderBy, select, sequenceEqual } from "@mirei/ts-collections";
 import { pairwise, startWith } from "rxjs";
 import { SelectableOptions } from "../models/SelectableOptions";
 import { GridService } from "../services/grid.service";
@@ -50,6 +50,15 @@ export class GridSelectableDirective implements OnInit {
         effect(() => {
             const selectedKeys = this.selectedKeys();
             untracked(() => {
+                const alreadySelectedKeys = this.#gridService.selectedKeys();
+                if (
+                    sequenceEqual(
+                        orderBy(alreadySelectedKeys, k => k),
+                        orderBy(selectedKeys, k => k)
+                    )
+                ) {
+                    return;
+                }
                 this.#gridService.loadSelectedKeys(selectedKeys);
             });
         });

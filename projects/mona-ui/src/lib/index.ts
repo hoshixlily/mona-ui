@@ -85,6 +85,7 @@ export * from "./grid/directives/grid-editable.directive";
 export * from "./grid/directives/grid-selectable.directive";
 export * from "./grid/directives/grid-cell-template.directive";
 export * from "./grid/directives/grid-column-title-template.directive";
+export * from "./grid/directives/grid-virtual-scroll.directive";
 export * from "./grid/components/grid-column/grid-column.component";
 export * from "./grid/components/grid/grid.component";
 
@@ -181,6 +182,7 @@ export * from "./list-view/directives/list-view-groupable.directive";
 export * from "./list-view/directives/list-view-header-template.directive";
 export * from "./list-view/directives/list-view-item-template.directive";
 export * from "./list-view/directives/list-view-navigable.directive";
+export * from "./list-view/directives/list-view-no-data-template.directive";
 export * from "./list-view/directives/list-view-pageable.directive";
 export * from "./list-view/directives/list-view-selectable.directive";
 export * from "./list-view/directives/list-view-virtual-scroll.directive";
