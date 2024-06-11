@@ -7,6 +7,7 @@ export class Row {
     readonly #editFromDictionary = new Dictionary<string, FormGroup>();
     public readonly uid = v4();
     public data: Record<string, any> = {};
+    public detailVisible = signal(false);
     public selected = signal(false);
     public constructor(data: Record<string, any>) {
         this.data = data;

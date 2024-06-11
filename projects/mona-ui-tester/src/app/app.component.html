@@ -85,6 +85,9 @@
                                     <!--                                        </ng-container>-->
                                     <!--                                    </ng-template>-->
                                 </mona-grid-column>
+                                <ng-template monaGridDetailTemplate let-dataItem>
+                                    <span style="padding: 0.25rem; 0.5rem;">{{dataItem|json}}</span>
+                                </ng-template>
                             </mona-grid>
                             <mona-grid [data]="gridProductData" [pageSize]="5" [pageSizeValues]="[5,10,15,20,25,50,100]"
                                        [resizable]="true" [groupable]="true" [sortable]="{enabled: true, mode: 'multiple'}"
@@ -119,6 +122,9 @@
                                                            labelPosition="end"></mona-progress-bar>
                                     </ng-template>
                                 </mona-grid-column>
+                                <ng-template monaGridDetailTemplate let-dataItem>
+                                    <span style="padding: 0.25rem 0.5rem;">{{dataItem|json}}</span>
+                                </ng-template>
                             </mona-grid>
                         </div>
                     </ng-template>

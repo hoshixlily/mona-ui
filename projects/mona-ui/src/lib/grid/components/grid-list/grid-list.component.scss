@@ -42,12 +42,20 @@ table {
     }
 }
 
-.mona-grid-grouping-toggle-wrapper {
-    border-right: 1px solid var(--mona-border-color);
+.mona-grid-grouping-toggle-wrapper,
+.mona-grid-detail-toggle-wrapper {
     display: inline-flex;
     & button {
         width: 100%;
+        height: 100%;
+        &:focus {
+            box-shadow: none;
+        }
     }
+}
+
+.mona-grid-grouping-toggle-wrapper {
+    border-right: 1px solid var(--mona-border-color);
 }
 
 .mona-grid-grouping-row-text {

@@ -13,6 +13,7 @@ table {
 
     & tr {
         display: inline-flex;
+        width: 100%;
         &:nth-child(even) {
             background-color: var(--mona-background-dark);
         }
@@ -47,10 +48,15 @@ table {
     }
 }
 
-.mona-grid-grouping-toggle-wrapper {
+.mona-grid-grouping-toggle-wrapper,
+.mona-grid-detail-toggle-wrapper {
     display: inline-flex;
     & button {
         width: 100%;
+        height: 100%;
+        &:focus {
+            box-shadow: none;
+        }
     }
 }
 
