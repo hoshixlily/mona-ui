@@ -1,4 +1,4 @@
-import { computed, Injectable, OutputEmitterRef, Signal, signal, WritableSignal } from "@angular/core";
+import { computed, Injectable, OutputEmitterRef, Signal, signal, TemplateRef, WritableSignal } from "@angular/core";
 import { Dictionary, from, ImmutableDictionary, ImmutableList, ImmutableSet } from "@mirei/ts-collections";
 import { BehaviorSubject, Subject } from "rxjs";
 import { VirtualScrollOptions } from "../../common/models/VirtualScrollOptions";
@@ -28,7 +28,28 @@ export class GridService {
     public readonly filterLoad$ = new Subject<void>();
     public readonly groupColumnWidth = 34;
     public readonly groupColumns = signal<ImmutableSet<Column>>(ImmutableSet.create());
+    public readonly groupHeaderRowWidth = computed(() => {
+        const groupColumns = this.groupColumns();
+        const columns = this.columns();
+        const groupColumnWidth = this.groupColumnWidth;
+        const groupColumnCount = groupColumns.size();
+        const detailRowOffset = this.masterDetailTemplate() ? this.groupColumnWidth : 0;
+        const columnListWidth = columns.aggregate((acc, c) => acc + (c.calculatedWidth() ?? c.width() ?? 0), 0);
+        return groupColumnWidth * groupColumnCount + columnListWidth + detailRowOffset;
+    });
     public readonly isInEditMode = signal(false);
+    public readonly masterDetailRowWidth = computed(() => {
+        const groupColumns = this.groupColumns();
+        const columns = this.columns();
+        const groupColumnWidth = this.groupColumnWidth;
+        const groupColumnCount = groupColumns.size();
+        const columnListWidth = columns.aggregate((acc, c) => acc + (c.calculatedWidth() ?? c.width() ?? 0), 0);
+        return groupColumnWidth * (groupColumnCount + 1) + columnListWidth;
+    });
+    public readonly masterDetailEmptyCellWidth = computed(() => {
+        return this.groupColumnWidth * (this.groupColumns().size() + 1);
+    });
+    public readonly masterDetailTemplate = signal<TemplateRef<any> | null>(null);
     public readonly pageState: PageState = { page: signal(1), skip: signal(0), take: signal(10) };
     public readonly rows = signal<ImmutableSet<Row>>(ImmutableSet.create());
     public readonly selectBy = signal("");

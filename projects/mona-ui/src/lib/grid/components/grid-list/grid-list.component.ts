@@ -19,7 +19,7 @@ import { ButtonDirective } from "../../../buttons/button/button.directive";
 import { ElementAtPipe } from "../../../pipes/element-at.pipe";
 import { SlicePipe } from "../../../pipes/slice.pipe";
 import { Column } from "../../models/Column";
-import { GridGroup } from "../../models/GridGroup";
+import { GridGroup, VirtualGridRow } from "../../models/GridGroup";
 import { Row } from "../../models/Row";
 import { GridGroupPipe } from "../../pipes/grid-group.pipe";
 import { GridService } from "../../services/grid.service";
@@ -85,6 +85,11 @@ export class GridListComponent implements OnInit {
         } else {
             state.add(this.gridService.pageState.page(), group.collapsed);
         }
+    }
+
+    public onToggleDetailClick(event: MouseEvent, row: Row): void {
+        event.stopPropagation();
+        row.detailVisible.update(v => !v);
     }
 
     private setSubscriptions(): void {

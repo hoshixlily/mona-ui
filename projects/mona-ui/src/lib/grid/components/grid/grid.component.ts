@@ -14,6 +14,7 @@ import {
     ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
+    contentChild,
     contentChildren,
     DestroyRef,
     effect,
@@ -25,6 +26,7 @@ import {
     output,
     OutputEmitterRef,
     signal,
+    TemplateRef,
     untracked,
     viewChild
 } from "@angular/core";
@@ -37,6 +39,7 @@ import { PageSizeChangeEvent } from "../../../pager/models/PageSizeChangeEvent";
 import { CompositeFilterDescriptor } from "../../../query/filter/FilterDescriptor";
 import { SortDescriptor, SortDirection } from "../../../query/sort/SortDescriptor";
 import { GridColumnResizeHandlerDirective } from "../../directives/grid-column-resize-handler.directive";
+import { GridDetailTemplateDirective } from "../../directives/grid-detail-template.directive";
 import { CellEditEvent } from "../../models/CellEditEvent";
 import { Column } from "../../models/Column";
 import { ColumnFilterState } from "../../models/ColumnFilterState";
@@ -78,6 +81,7 @@ export class GridComponent implements OnInit {
     readonly #destroyRef = inject(DestroyRef);
     readonly #hostElementRef = inject(ElementRef<HTMLElement>);
     protected readonly columns = contentChildren(GridColumnComponent);
+    protected readonly gridDetailTemplate = contentChild(GridDetailTemplateDirective, { read: TemplateRef });
     protected readonly gridHeaderElement = viewChild.required<ElementRef<HTMLDivElement>>("gridHeaderElement");
     protected readonly gridService = inject(GridService);
     protected readonly groupColumnList = viewChild<CdkDropList>("groupColumnList");
@@ -112,6 +116,7 @@ export class GridComponent implements OnInit {
         this.setPageSizeEffect();
         this.setColumnEffect();
         this.setGridHeaderElementEffect();
+        this.setGridDetailEffect();
         this.setDataEffect();
     }
 
@@ -335,6 +340,13 @@ export class GridComponent implements OnInit {
         effect(() => {
             const filter = this.filter();
             untracked(() => this.gridService.loadFilters(filter));
+        });
+    }
+
+    private setGridDetailEffect(): void {
+        effect(() => {
+            const detailTemplate = this.gridDetailTemplate() ?? null;
+            untracked(() => this.gridService.masterDetailTemplate.set(detailTemplate));
         });
     }
 

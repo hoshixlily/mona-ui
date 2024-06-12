@@ -38,9 +38,7 @@
             position: relative;
             user-select: none;
             display: inline-flex;
-            &:not(:last-child) {
-                border-right: 1px solid var(--mona-border-color);
-            }
+            border-right: 1px solid var(--mona-border-color);
         }
     }
 }
@@ -100,8 +98,9 @@ mona-grid-list, mona-grid-virtual-list {
     bottom: 0;
 }
 
-.mona-grid-group-column {
-        border-right: 1px solid var(--mona-border-color);
+.mona-grid-group-column,
+.mona-grid-detail-column {
+    border-right: 1px solid var(--mona-border-color);
 }
 
 mona-pager {

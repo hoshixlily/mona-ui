@@ -5,23 +5,47 @@
                 @for (row of data(); track row.uid) {
                     <tr (click)="onGridRowClick($event, row)" [ngClass]="{'mona-selected': row.selected()}"
                         [attr.data-ruid]="row.uid" [attr.data-row-view-index]="$index">
+                        @if (gridService.masterDetailTemplate()) {
+                            <td [style.width.px]="gridService.groupColumnWidth">
+                                <span class="mona-grid-detail-toggle-wrapper">
+                                    <button monaButton [flat]="true" (click)="onToggleDetailClick($event, row)">
+                                        @if (row.detailVisible()) {
+                                            <i class="ri-subtract-line"></i>
+                                        } @else {
+                                            <i class="ri-add-line"></i>
+                                        }
+                                    </button>
+                                </span>
+                            </td>
+                        }
                         @for (column of columns(); track $index) {
                             <td [style.width.px]="column.calculatedWidth()" [style.min-width.px]="column.minWidth()">
                                 <mona-grid-cell [column]="column" [row]="row"></mona-grid-cell>
                             </td>
                         }
                     </tr>
+                    @if (row.detailVisible()) {
+                        <tr [style.width.px]="gridService.masterDetailRowWidth()">
+                            <td [style.min-width.px]="gridService.masterDetailEmptyCellWidth()"
+                                [style.max-width.px]="gridService.masterDetailEmptyCellWidth()"></td>
+                            <td>
+                                <ng-container [ngTemplateOutlet]="gridService.masterDetailTemplate()"
+                                              [ngTemplateOutletContext]="{$implicit: row.data}"></ng-container>
+                            </td>
+                        </tr>
+                    }
                 }
             } @else {
                 <ng-template #gridGroupTemplate let-groupData let-column="column" let-cx="cx" let-depth="depth">
                         @if (groupData|gridGroup:column:gridService.pageState.page(); as groupItem) {
                             @for (subGroup of groupItem; track $index) {
-                                <tr class="mona-grid-grouping-row">
+                                <tr class="mona-grid-grouping-row" [style.width.px]="gridService.groupHeaderRowWidth()">
                                     @for (_ of gridService.groupColumns()|monaSlice:0:cx; track $index) {
                                         <td [style.width.px]="gridService.groupColumnWidth"></td>
                                     }
+
                                     @if (subGroup.rows.length > 0) {
-                                        <td  [style.width.px]="gridService.groupColumnWidth*(columns().length + gridService.groupColumns().length)">
+                                        <td [style.width.px]="gridService.groupColumnWidth*(columns().length + gridService.groupColumns().length)">
                                             <span class="mona-grid-grouping-toggle-wrapper" [style.width.px]="gridService.groupColumnWidth">
                                                 <button monaButton [flat]="true"
                                                         (click)="onGroupExpandChange(subGroup)">
@@ -49,12 +73,35 @@
                                             @for (_ of gridService.groupColumns(); track $index) {
                                                 <td [style.width.px]="gridService.groupColumnWidth"></td>
                                             }
+                                            @if (gridService.masterDetailTemplate()) {
+                                                <td [style.width.px]="gridService.groupColumnWidth">
+                                                    <span class="mona-grid-detail-toggle-wrapper">
+                                                        <button monaButton [flat]="true" (click)="onToggleDetailClick($event, row)">
+                                                            @if (row.detailVisible()) {
+                                                                <i class="ri-subtract-line"></i>
+                                                            } @else {
+                                                                <i class="ri-add-line"></i>
+                                                            }
+                                                        </button>
+                                                    </span>
+                                                </td>
+                                            }
                                             @for (column of columns(); track $index) {
                                                 <td [style.width.px]="column.calculatedWidth()">
                                                     <mona-grid-cell [column]="column" [row]="row"></mona-grid-cell>
                                                 </td>
                                             }
                                         </tr>
+                                        @if (row.detailVisible()) {
+                                            <tr [style.width.px]="gridService.masterDetailRowWidth()">
+                                                <td [style.min-width.px]="gridService.masterDetailEmptyCellWidth()"
+                                                    [style.max-width.px]="gridService.masterDetailEmptyCellWidth()"></td>
+                                                <td>
+                                                    <ng-container [ngTemplateOutlet]="gridService.masterDetailTemplate()"
+                                                                  [ngTemplateOutletContext]="{$implicit: row.data}"></ng-container>
+                                                </td>
+                                            </tr>
+                                        }
                                     }
                                 }
                             }

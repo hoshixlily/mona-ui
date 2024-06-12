@@ -1,5 +1,6 @@
 @if (groupable()) {
-    <div class="mona-grid-group-panel" cdkDropList #groupColumnList="cdkDropList" cdkDropListOrientation="horizontal"
+    <div class="mona-grid-group-panel" cdkDropList #groupColumnList="cdkDropList"
+         cdkDropListOrientation="horizontal"
          (cdkDropListEntered)="onColumnDragEnterForGrouping($event)"
          (cdkDropListExited)="onColumnDragExitForGrouping($event)"
          (cdkDropListDropped)="onColumnDropForGrouping($event)">
@@ -22,6 +23,9 @@
                     (cdkDropListDropped)="onColumnDrop($event)">
                     @for (_ of gridService.groupColumns(); track $index) {
                         <td class="mona-grid-group-column" [style.width.px]="gridService.groupColumnWidth"></td>
+                    }
+                    @if (gridService.masterDetailTemplate()) {
+                        <td class="mona-grid-detail-column" [style.width.px]="gridService.groupColumnWidth"></td>
                     }
                     @for (column of gridService.columns(); track $index) {
                         <th cdkDrag [cdkDragData]="column" [cdkDragDisabled]="!reorderable() && !groupable()"

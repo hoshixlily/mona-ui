@@ -25,34 +25,10 @@ table {
     & td {
         position: relative;
         display: flex;
-        &:not(:last-child) {
-            border-right: 1px solid var(--mona-border-color);
-        }
-    }
-}
-
-.mona-grid-grouping-row {
-    width: 100%;
-    & > td {
-        display: flex;
-        align-items: center;
-    }
-    & > td:last-child {
-        padding: 0;
+        border-right: 1px solid var(--mona-border-color);
     }
 }
 
 .mona-grid-grouping-toggle-wrapper {
     border-right: 1px solid var(--mona-border-color);
-    display: inline-flex;
-    & button {
-        width: 100%;
-    }
 }
-
-.mona-grid-grouping-row-text {
-    font-weight: bold;
-    margin-left: 0.5rem;
-    white-space: nowrap;
-}
-

@@ -1,5 +1,5 @@
 import { CdkFixedSizeVirtualScroll, CdkVirtualForOf, CdkVirtualScrollViewport } from "@angular/cdk/scrolling";
-import { NgClass } from "@angular/common";
+import { NgClass, NgTemplateOutlet } from "@angular/common";
 import {
     afterNextRender,
     AfterViewInit,
@@ -42,7 +42,8 @@ import { GridCellComponent } from "../grid-cell/grid-cell.component";
         ButtonDirective,
         FaIconComponent,
         SlicePipe,
-        ContainsPipe
+        ContainsPipe,
+        NgTemplateOutlet
     ],
     templateUrl: "./grid-virtual-list.component.html",
     styleUrl: "./grid-virtual-list.component.scss",
@@ -105,6 +106,15 @@ export class GridVirtualListComponent implements OnInit, AfterViewInit {
 
     public onGridRowClick(event: MouseEvent, row: Row): void {
         this.gridService.handleRowClick(event, row);
+    }
+
+    public onToggleDetailClick(event: MouseEvent, row: VirtualGridRow | Row): void {
+        event.stopPropagation();
+        if (row instanceof Row) {
+            row.detailVisible.update(v => !v);
+        } else if (row.type === "row") {
+            row.row.detailVisible.update(v => !v);
+        }
     }
 
     private createGridGroup(rows: Iterable<Row>, columns: Iterable<Column>): VirtualGridGroup[] {
@@ -235,7 +245,7 @@ export class GridVirtualListComponent implements OnInit, AfterViewInit {
                 const removedColumns = prev.where(c => !current.contains(c));
                 removedColumns.forEach(c => {
                     this.collapsedGroups.update(groups => {
-                        return groups.where(g => !g.startsWith(c.field())).toImmutableSet();
+                        return groups.where(g => !g.includes(c.field())).toImmutableSet();
                     });
                 });
             });
