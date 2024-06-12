@@ -25,7 +25,7 @@
                         }
                     </tr>
                     @if (row.detailVisible()) {
-                        <tr>
+                        <tr [style.width.px]="gridService.masterDetailRowWidth()">
                             <td [style.min-width.px]="gridService.masterDetailEmptyCellWidth()"
                                 [style.max-width.px]="gridService.masterDetailEmptyCellWidth()"></td>
                             <td>
@@ -39,7 +39,7 @@
                 <ng-template #gridGroupTemplate let-groupData let-column="column" let-cx="cx" let-depth="depth">
                         @if (groupData|gridGroup:column:gridService.pageState.page(); as groupItem) {
                             @for (subGroup of groupItem; track $index) {
-                                <tr class="mona-grid-grouping-row">
+                                <tr class="mona-grid-grouping-row" [style.width.px]="gridService.groupHeaderRowWidth()">
                                     @for (_ of gridService.groupColumns()|monaSlice:0:cx; track $index) {
                                         <td [style.width.px]="gridService.groupColumnWidth"></td>
                                     }
@@ -93,7 +93,7 @@
                                             }
                                         </tr>
                                         @if (row.detailVisible()) {
-                                            <tr>
+                                            <tr [style.width.px]="gridService.masterDetailRowWidth()">
                                                 <td [style.min-width.px]="gridService.masterDetailEmptyCellWidth()"
                                                     [style.max-width.px]="gridService.masterDetailEmptyCellWidth()"></td>
                                                 <td>

@@ -28,12 +28,23 @@ export class GridService {
     public readonly filterLoad$ = new Subject<void>();
     public readonly groupColumnWidth = 34;
     public readonly groupColumns = signal<ImmutableSet<Column>>(ImmutableSet.create());
-    public readonly isInEditMode = signal(false);
-    public readonly masterDetailContentCellColspan = computed(() => {
-        return this.columns().size() - (this.groupColumns().size() + 1);
+    public readonly groupHeaderRowWidth = computed(() => {
+        const groupColumns = this.groupColumns();
+        const columns = this.columns();
+        const groupColumnWidth = this.groupColumnWidth;
+        const groupColumnCount = groupColumns.size();
+        const detailRowOffset = this.masterDetailTemplate() ? this.groupColumnWidth : 0;
+        const columnListWidth = columns.aggregate((acc, c) => acc + (c.calculatedWidth() ?? c.width() ?? 0), 0);
+        return groupColumnWidth * groupColumnCount + columnListWidth + detailRowOffset;
     });
-    public readonly masterDetailEmptyCellColspan = computed(() => {
-        return this.groupColumns().size() + 1;
+    public readonly isInEditMode = signal(false);
+    public readonly masterDetailRowWidth = computed(() => {
+        const groupColumns = this.groupColumns();
+        const columns = this.columns();
+        const groupColumnWidth = this.groupColumnWidth;
+        const groupColumnCount = groupColumns.size();
+        const columnListWidth = columns.aggregate((acc, c) => acc + (c.calculatedWidth() ?? c.width() ?? 0), 0);
+        return groupColumnWidth * (groupColumnCount + 1) + columnListWidth;
     });
     public readonly masterDetailEmptyCellWidth = computed(() => {
         return this.groupColumnWidth * (this.groupColumns().size() + 1);

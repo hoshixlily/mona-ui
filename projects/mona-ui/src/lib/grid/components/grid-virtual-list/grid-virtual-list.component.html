@@ -28,7 +28,7 @@
                             }
                         </tr>
                         @if (row.detailVisible()) {
-                            <tr>
+                            <tr [style.width.px]="gridService.masterDetailRowWidth()">
                                 <td [style.min-width.px]="gridService.masterDetailEmptyCellWidth()"
                                     [style.max-width.px]="gridService.masterDetailEmptyCellWidth()"></td>
                                 <td>
@@ -41,7 +41,7 @@
                 } @else {
                     <ng-container *cdkVirtualFor="let rowItem of groupedGridRows(); let $index=index">
                         @if (rowItem.type === 'group') {
-                            <tr class="mona-grid-grouping-row">
+                            <tr class="mona-grid-grouping-row" [style.width.px]="gridService.groupHeaderRowWidth()">
                                 @for (_ of gridService.groupColumns()|monaSlice:0:rowItem.level + 1; track $index) {
                                     <td [style.width.px]="gridService.groupColumnWidth">
                                         @if ($index === rowItem.level) {
@@ -91,7 +91,7 @@
                                 }
                             </tr>
                             @if (rowItem.row.detailVisible()) {
-                                <tr>
+                                <tr [style.width.px]="gridService.masterDetailRowWidth()">
                                     <td [style.min-width.px]="gridService.masterDetailEmptyCellWidth()"
                                         [style.max-width.px]="gridService.masterDetailEmptyCellWidth()"></td>
                                     <td>
