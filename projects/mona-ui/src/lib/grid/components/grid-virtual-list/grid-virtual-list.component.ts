@@ -245,7 +245,7 @@ export class GridVirtualListComponent implements OnInit, AfterViewInit {
                 const removedColumns = prev.where(c => !current.contains(c));
                 removedColumns.forEach(c => {
                     this.collapsedGroups.update(groups => {
-                        return groups.where(g => !g.startsWith(c.field())).toImmutableSet();
+                        return groups.where(g => !g.includes(c.field())).toImmutableSet();
                     });
                 });
             });
