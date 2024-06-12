@@ -14,6 +14,7 @@ import {
     ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
+    computed,
     contentChild,
     contentChildren,
     DestroyRef,
@@ -86,8 +87,9 @@ export class GridComponent implements OnInit {
     protected readonly gridService = inject(GridService);
     protected readonly groupColumnList = viewChild<CdkDropList>("groupColumnList");
     protected readonly groupPanelPlaceholderVisible = signal(true);
+    protected readonly groupable = computed(() => this.gridService.groupableOptions().enabled);
     protected readonly groupingInProgress = signal(false);
-    protected readonly headerMargin = "0 16px 0 0";
+    protected readonly headerMargin = "0 15px 0 0";
     protected readonly uid = v4();
     protected columnDragging = false;
     protected dragColumn?: Column;
@@ -100,7 +102,7 @@ export class GridComponent implements OnInit {
     public data = input<any[]>([]);
     public filter = model<CompositeFilterDescriptor[]>([]);
     public filterable = input(false);
-    public groupable = input(false);
+    // public groupable = input(false);
     public pageSize = input<number | undefined>(undefined);
     public pageSizeValues = input<number[]>([]);
     public reorderable = input(false);

@@ -1,5 +1,5 @@
 import { computed, Injectable, OutputEmitterRef, Signal, signal, TemplateRef, WritableSignal } from "@angular/core";
-import { Dictionary, from, ImmutableDictionary, ImmutableList, ImmutableSet } from "@mirei/ts-collections";
+import { any, Dictionary, from, ImmutableDictionary, ImmutableList, ImmutableSet, select } from "@mirei/ts-collections";
 import { BehaviorSubject, Subject } from "rxjs";
 import { VirtualScrollOptions } from "../../common/models/VirtualScrollOptions";
 import { Query } from "../../query/core/Query";
@@ -10,6 +10,8 @@ import { Column } from "../models/Column";
 import { ColumnFilterState } from "../models/ColumnFilterState";
 import { ColumnSortState } from "../models/ColumnSortState";
 import { EditableOptions } from "../models/EditableOptions";
+import { GroupableOptions } from "../models/GroupableOptions";
+import { GroupDescriptor } from "../models/GroupDescriptor";
 import { PageState } from "../models/PageState";
 import { Row } from "../models/Row";
 import { SelectableOptions } from "../models/SelectableOptions";
@@ -37,6 +39,7 @@ export class GridService {
         const columnListWidth = columns.aggregate((acc, c) => acc + (c.calculatedWidth() ?? c.width() ?? 0), 0);
         return groupColumnWidth * groupColumnCount + columnListWidth + detailRowOffset;
     });
+    public readonly groupableOptions = signal<GroupableOptions>({ enabled: false });
     public readonly isInEditMode = signal(false);
     public readonly masterDetailRowWidth = computed(() => {
         const groupColumns = this.groupColumns();
@@ -112,6 +115,13 @@ export class GridService {
         this.selectedRows.update(set => set.clear());
     }
 
+    public getGroupDescriptors(columns: Iterable<Column>): GroupDescriptor[] {
+        return select(columns, c => ({
+            field: c.field(),
+            dir: c.sortDirection() ?? undefined
+        })).toArray();
+    }
+
     public handleMultipleSelection(event: MouseEvent, row: Row): void {
         if (!this.selectedRows().contains(row)) {
             this.selectRow(row);
@@ -175,6 +185,16 @@ export class GridService {
         this.filterLoad$.next();
     }
 
+    public loadGroupColumns(descriptors: Iterable<GroupDescriptor>): void {
+        const columns = this.columns();
+        const groupColumns = columns.where(c => any(descriptors, d => d.field === c.field()));
+        const currentGroupColumns = this.groupColumns();
+        if (groupColumns.sequenceEqual(currentGroupColumns)) {
+            return;
+        }
+        this.groupColumns.set(ImmutableSet.create(groupColumns));
+    }
+
     public loadSelectedKeys(selectedKeys: Iterable<unknown>): void {
         this.selectedKeys.update(set => set.clear().addAll(selectedKeys));
         const selectedRowList: Row[] = [];
@@ -220,6 +240,10 @@ export class GridService {
 
     public setEditableOptions(options: EditableOptions): void {
         this.editableOptions = { ...this.editableOptions, ...options };
+    }
+
+    public setGroupableOptions(options: Partial<GroupableOptions>): void {
+        this.groupableOptions.update(v => ({ ...v, ...options }));
     }
 
     public setRows(value: any[]): void {

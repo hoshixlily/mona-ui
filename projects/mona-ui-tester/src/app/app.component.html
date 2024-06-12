@@ -62,7 +62,9 @@
                         <div style="padding: 40px;">
                             <mona-grid [data]="gridOrderDataRandom" [pageSize]="5"
                                        [pageSizeValues]="[5, 10, 15, 20, 25, 50, 100]" style="height: 400px; margin-bottom: 10px;"
-                                       [groupable]="true"
+                                       monaGridGroupable
+                                       [group]="[{field: 'ShipCountry', dir: 'desc'}]"
+                                       (groupChange)="onGridGroupChange($event)"
                                        [filterable]="true" [filter]="gridFilters"
                                        (filterChange)="onGridFilterChange($event)"
                                        [resizable]="true"

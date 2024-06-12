@@ -82,8 +82,10 @@ import {
     GridComponent,
     GridDetailTemplateDirective,
     GridEditableDirective,
+    GridGroupableDirective,
     GridSelectableDirective,
     GridVirtualScrollDirective,
+    GroupDescriptor,
     ListBoxActionClickEvent,
     ListBoxComponent,
     ListBoxItemTemplateDirective,
@@ -236,6 +238,7 @@ interface TreeNodeDataItem {
         GridColumnTitleTemplateDirective,
         GridDetailTemplateDirective,
         GridEditableDirective,
+        GridGroupableDirective,
         GridSelectableDirective,
         GridVirtualScrollDirective,
         ListBoxComponent,
@@ -1114,6 +1117,11 @@ export class AppComponent implements OnInit {
     public onGridFilterChange(filters: CompositeFilterDescriptor[]): void {
         console.log(filters);
         this.gridFilters = filters;
+    }
+
+    public onGridGroupChange(groups: GroupDescriptor[]): void {
+        console.log(groups);
+        // this.gridGroups = groups;
     }
 
     public onGridSelectionKeysChange(keys: unknown[]): void {
