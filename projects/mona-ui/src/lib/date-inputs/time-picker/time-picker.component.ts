@@ -22,7 +22,6 @@ import {
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { faClock, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { DateTime } from "luxon";
 import { fromEvent, take } from "rxjs";
 import { AnimationState } from "../../animations/models/AnimationState";
@@ -71,7 +70,6 @@ export class TimePickerComponent implements OnInit, ControlValueAccessor {
 
     protected readonly currentDateString: WritableSignal<string> = signal("");
     protected readonly navigatedDate: WritableSignal<Date> = signal(new Date());
-    protected readonly timeIcon: IconDefinition = faClock;
     protected readonly timePopupTemplateRef: Signal<TemplateRef<any>> = viewChild.required("timePopupTemplate");
     protected readonly value: WritableSignal<Date | null> = signal(null);
 

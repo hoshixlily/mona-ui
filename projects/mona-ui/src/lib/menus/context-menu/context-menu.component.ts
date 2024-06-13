@@ -4,21 +4,18 @@ import {
     Component,
     contentChildren,
     DestroyRef,
-    effect,
     ElementRef,
     inject,
     input,
     InputSignal,
     InputSignalWithTransform,
-    model,
-    ModelSignal,
     OnInit,
     output,
     OutputEmitterRef,
-    untracked
+    signal
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { any } from "@mirei/ts-collections";
+import { any, ImmutableSet } from "@mirei/ts-collections";
 import { fromEvent, mergeWith, Subject, take } from "rxjs";
 import { v4 } from "uuid";
 import { PopupOffset } from "../../popup/models/PopupOffset";
@@ -48,6 +45,7 @@ export class ContextMenuComponent implements OnInit {
     #precise: boolean = true;
 
     protected readonly menuItemComponents = contentChildren(MenuItemComponent);
+    protected readonly menuItemList = signal<ImmutableSet<MenuItem>>(ImmutableSet.create());
 
     public readonly uid: string = v4();
 
@@ -55,7 +53,7 @@ export class ContextMenuComponent implements OnInit {
     public readonly navigate: OutputEmitterRef<ContextMenuNavigationEvent> = output();
     public readonly open: OutputEmitterRef<ContextMenuOpenEvent> = output();
 
-    public menuItems: ModelSignal<Iterable<MenuItem>> = model<Iterable<MenuItem>>([]);
+    public menuItems = input<Iterable<MenuItem>>([]);
     public minWidth: InputSignalWithTransform<string | undefined, number | string | undefined> = input(undefined, {
         transform: (value: string | number | undefined) => {
             if (typeof value === "number") {
@@ -84,18 +82,6 @@ export class ContextMenuComponent implements OnInit {
         }
     });
 
-    public constructor() {
-        effect(() => {
-            const menuItemComponents = this.menuItemComponents();
-            untracked(() => {
-                if (any(this.menuItems())) {
-                    return;
-                }
-                this.menuItems.set(menuItemComponents.map(m => m.getMenuItem()));
-            });
-        });
-    }
-
     public closeMenu(): void {
         this.#contextMenuRef?.close();
     }
@@ -113,8 +99,10 @@ export class ContextMenuComponent implements OnInit {
     }
 
     private create(event: MouseEvent): void {
+        this.initMenuItems();
+
         this.#contextMenuInjectorData.menuClick = this.#menuClickNotifier;
-        this.#contextMenuInjectorData.menuItems = this.menuItems();
+        this.#contextMenuInjectorData.menuItems = this.menuItemList();
         this.#contextMenuInjectorData.navigate = this.navigate;
         this.#contextMenuInjectorData.popupClass = this.popupClass();
 
@@ -146,6 +134,15 @@ export class ContextMenuComponent implements OnInit {
         this.#contextMenuRef.closed
             .pipe(take(1))
             .subscribe(() => this.close.emit({ uid: this.uid, popupRef: this.#contextMenuRef as PopupRef }));
+    }
+
+    private initMenuItems(): void {
+        const menuItemComponents = this.menuItemComponents();
+        if (any(this.menuItems())) {
+            this.menuItemList.update(set => set.clear().addAll(this.menuItems()));
+            return;
+        }
+        this.menuItemList.set(ImmutableSet.create(menuItemComponents.map(m => m.getMenuItem())));
     }
 
     private onOutsideClick(event: MouseEvent): void {

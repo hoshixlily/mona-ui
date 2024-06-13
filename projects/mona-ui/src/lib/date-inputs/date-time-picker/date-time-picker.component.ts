@@ -22,7 +22,6 @@ import {
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { faCalendar, faClock, IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { DateTime } from "luxon";
 import { fromEvent, take } from "rxjs";
 import { AnimationState } from "../../animations/models/AnimationState";
@@ -79,10 +78,8 @@ export class DateTimePickerComponent implements OnInit, ControlValueAccessor {
     #propagateChange: Action<Date | null> | null = null;
 
     protected readonly currentDateString: WritableSignal<string> = signal("");
-    protected readonly dateIcon: IconDefinition = faCalendar;
     protected readonly datePopupTemplateRef: Signal<TemplateRef<any>> = viewChild.required("datePopupTemplate");
     protected readonly navigatedDate: WritableSignal<Date> = signal(new Date());
-    protected readonly timeIcon: IconDefinition = faClock;
     protected readonly timePickerMax: Signal<Date | null> = computed(() => {
         const maxDate = this.max();
         const navigatedDate = this.navigatedDate();

@@ -94,7 +94,7 @@ export class GridService {
 
         const appliedNonGroupSorts = appliedSorts
             .values()
-            .where(sort => !groupColumns.any(c => c.field() === sort.sort.field));
+            .where(state => !groupColumns.any(c => c.field() === state.sort.field));
 
         if (appliedNonGroupSorts.any()) {
             const sortState = appliedNonGroupSorts.select(d => d.sort).toArray();

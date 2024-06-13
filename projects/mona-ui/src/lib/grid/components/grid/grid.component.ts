@@ -32,9 +32,12 @@ import {
     viewChild
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { Collections } from "@mirei/ts-collections";
 import { v4 } from "uuid";
-import { ButtonDirective } from "../../../buttons/button/button.directive";
 import { ChipComponent } from "../../../buttons/chip/chip.component";
+import { ContextMenuComponent } from "../../../menus/context-menu/context-menu.component";
+import { MenuItemIconTemplateDirective } from "../../../menus/directives/menu-item-icon-template.directive";
+import { MenuItemComponent } from "../../../menus/menu-item/menu-item.component";
 import { PagerComponent } from "../../../pager/components/pager/pager.component";
 import { PageChangeEvent } from "../../../pager/models/PageChangeEvent";
 import { PageSizeChangeEvent } from "../../../pager/models/PageSizeChangeEvent";
@@ -71,7 +74,10 @@ import { GridVirtualListComponent } from "../grid-virtual-list/grid-virtual-list
         GridListComponent,
         PagerComponent,
         GridVirtualListComponent,
-        CdkDragPlaceholder
+        CdkDragPlaceholder,
+        ContextMenuComponent,
+        MenuItemComponent,
+        MenuItemIconTemplateDirective
     ],
     host: {
         class: "mona-grid",
@@ -258,6 +264,19 @@ export class GridComponent implements OnInit {
                 p => p.value
             );
         this.groupPanelPlaceholderVisible.set(this.gridService.groupColumns().length === 0);
+    }
+
+    public onGroupColumnReorder(column: Column, moveAs: "prev" | "next"): void {
+        this.gridService.groupColumns.update(cols => {
+            const colList = cols.toList();
+            const index = colList.indexOf(column);
+            const newIndex = moveAs === "prev" ? index - 1 : index + 1;
+            if (newIndex < 0 || newIndex >= colList.size()) {
+                return colList.toImmutableSet();
+            }
+            Collections.swap(colList, index, newIndex);
+            return colList.toImmutableSet();
+        });
     }
 
     public onGroupingColumnSort(column: Column): void {

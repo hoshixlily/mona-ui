@@ -5,7 +5,7 @@
          (cdkDropListExited)="onColumnDragExitForGrouping($event)"
          (cdkDropListDropped)="onColumnDropForGrouping($event)">
         @if (gridService.groupColumns().length !== 0) {
-            @for (groupColumn of gridService.groupColumns(); track groupColumn.field()) {
+            @for (groupColumn of gridService.groupColumns(); track groupColumn) {
                 <mona-chip [removable]="true" (click)="onGroupingColumnSort(groupColumn)"
                            (remove)="onGroupingColumnRemove($event, groupColumn)">
                     @if (groupColumn.groupSortDirection() === 'asc') {
@@ -14,6 +14,25 @@
                         <i class="ri-arrow-up-line"></i>
                     }
                     <span>{{ groupColumn.title() }}</span>
+                    <span style="margin-left: 0.5rem;" #groupReorder>
+                        <i class="ri-more-2-fill"></i>
+                    </span>
+                    <mona-contextmenu [target]="groupReorder" trigger="click">
+                        <mona-menu-item [text]="'Move as previous'"
+                                        [disabled]="$first"
+                                        (menuClick)="onGroupColumnReorder(groupColumn, 'prev')">
+                            <ng-template monaMenuItemIconTemplate>
+                                <i class="ri-arrow-left-fill"></i>
+                            </ng-template>
+                        </mona-menu-item>
+                        <mona-menu-item [text]="'Move as next'"
+                                        [disabled]="$last"
+                                        (menuClick)="onGroupColumnReorder(groupColumn, 'next')">
+                            <ng-template monaMenuItemIconTemplate>
+                                <i class="ri-arrow-right-fill"></i>
+                            </ng-template>
+                        </mona-menu-item>
+                    </mona-contextmenu>
                 </mona-chip>
             }
         } @else if (groupPanelPlaceholderVisible()) {

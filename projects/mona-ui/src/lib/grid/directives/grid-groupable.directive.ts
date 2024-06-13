@@ -1,6 +1,6 @@
 import { DestroyRef, Directive, effect, inject, input, OnInit, output, untracked } from "@angular/core";
 import { takeUntilDestroyed, toObservable } from "@angular/core/rxjs-interop";
-import { orderBy, sequenceEqual } from "@mirei/ts-collections";
+import { any, orderBy, sequenceEqual } from "@mirei/ts-collections";
 import { filter, map, pairwise, skip, startWith } from "rxjs";
 import { GroupableOptions } from "../models/GroupableOptions";
 import { GroupDescriptor } from "../models/GroupDescriptor";
@@ -18,15 +18,10 @@ export class GridGroupableDirective implements OnInit {
         startWith(this.#gridService.groupColumns()),
         pairwise(),
         filter(([prev, curr]) => {
-            return (
-                !sequenceEqual(
-                    orderBy(prev, c => c.field()),
-                    orderBy(curr, c => c.field())
-                ) ||
-                !sequenceEqual(
-                    orderBy(prev, c => c.groupSortDirection()),
-                    orderBy(curr, c => c.groupSortDirection())
-                )
+            return !sequenceEqual(
+                prev,
+                curr,
+                (p, n) => p.field() === n.field() && p.groupSortDirection() === n.groupSortDirection()
             );
         }),
         map(([_, curr]) => {
@@ -87,9 +82,11 @@ export class GridGroupableDirective implements OnInit {
     }
 
     private setSubscriptions(): void {
-        this.#groupColumnsChange$.pipe(skip(1), takeUntilDestroyed(this.#destroyRef)).subscribe(groupDescriptors => {
-            this.groupChange.emit(groupDescriptors);
-        });
+        this.#groupColumnsChange$
+            .pipe(skip(any(this.group()) ? 1 : 0), takeUntilDestroyed(this.#destroyRef))
+            .subscribe(groupDescriptors => {
+                this.groupChange.emit(groupDescriptors);
+            });
         this.#groupSortChange$.subscribe(groupDescriptors => {
             this.groupChange.emit(groupDescriptors);
         });
