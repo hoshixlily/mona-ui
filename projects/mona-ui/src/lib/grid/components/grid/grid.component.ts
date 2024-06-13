@@ -33,6 +33,7 @@ import {
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { v4 } from "uuid";
+import { ButtonDirective } from "../../../buttons/button/button.directive";
 import { ChipComponent } from "../../../buttons/chip/chip.component";
 import { PagerComponent } from "../../../pager/components/pager/pager.component";
 import { PageChangeEvent } from "../../../pager/models/PageChangeEvent";
@@ -102,7 +103,6 @@ export class GridComponent implements OnInit {
     public data = input<any[]>([]);
     public filter = model<CompositeFilterDescriptor[]>([]);
     public filterable = input(false);
-    // public groupable = input(false);
     public pageSize = input<number | undefined>(undefined);
     public pageSizeValues = input<number[]>([]);
     public reorderable = input(false);
@@ -174,10 +174,12 @@ export class GridComponent implements OnInit {
             return;
         }
 
+        column.groupSortDirection.set("asc");
         this.gridService.groupColumns.update(columns => columns.add(column));
-        if (!this.gridService.appliedSorts().containsKey(column.field())) {
-            this.onColumnSort(column);
-        }
+        this.gridService.appliedGroupSorts.update(dict =>
+            dict.put(column.field(), { sort: { field: column.field(), dir: "asc" } })
+        );
+
         this.columnDragging = false;
         this.dragColumn = undefined;
         this.dropColumn = undefined;
@@ -223,24 +225,17 @@ export class GridComponent implements OnInit {
         if (!column.field()) {
             return;
         }
-        if (column.sortDirection() == null) {
-            column.sortDirection.set("asc");
-        } else if (column.sortDirection() === "asc") {
-            column.sortDirection.set("desc");
-        } else if (
-            this.gridService
-                .groupColumns()
-                .select(c => c.field())
-                .contains(column.field())
-        ) {
-            column.sortDirection.set("asc");
+        if (column.columnSortDirection() == null) {
+            column.columnSortDirection.set("asc");
+        } else if (column.columnSortDirection() === "asc") {
+            column.columnSortDirection.set("desc");
         } else if (this.gridService.sortableOptions.allowUnsort) {
-            column.sortDirection.set(null);
+            column.columnSortDirection.set(null);
             column.sortIndex.set(null);
         } else {
-            column.sortDirection.set("asc");
+            column.columnSortDirection.set("asc");
         }
-        this.applyColumnSort(column, column.sortDirection());
+        this.applyColumnSort(column, column.columnSortDirection());
         const sortDescriptors = this.gridService
             .appliedSorts()
             .values()
@@ -251,6 +246,8 @@ export class GridComponent implements OnInit {
 
     public onGroupingColumnRemove(event: Event, column: Column): void {
         event.stopPropagation();
+        column.groupSortDirection.set(null);
+        this.gridService.appliedGroupSorts.update(dict => dict.remove(column.field()));
         this.gridService.groupColumns.update(columns =>
             columns.where(c => c.field() !== column.field()).toImmutableSet()
         );
@@ -260,8 +257,22 @@ export class GridComponent implements OnInit {
                 p => p.key,
                 p => p.value
             );
-        this.applyColumnSort(column, null);
         this.groupPanelPlaceholderVisible.set(this.gridService.groupColumns().length === 0);
+    }
+
+    public onGroupingColumnSort(column: Column): void {
+        if (column.groupSortDirection() == null) {
+            column.groupSortDirection.set("asc");
+        } else if (column.groupSortDirection() === "asc") {
+            column.groupSortDirection.set("desc");
+        } else if (column.groupSortDirection() === "desc") {
+            column.groupSortDirection.set("asc");
+        }
+        this.gridService.appliedGroupSorts.update(dict =>
+            dict
+                .remove(column.field())
+                .add(column.field(), { sort: { field: column.field(), dir: column.groupSortDirection() ?? "asc" } })
+        );
     }
 
     public onPageChange(event: PageChangeEvent): void {
@@ -282,21 +293,21 @@ export class GridComponent implements OnInit {
     }
 
     private applyColumnSort(column: Column, sortDirection: SortDirection | null): void {
-        column.sortDirection.set(sortDirection);
+        column.columnSortDirection.set(sortDirection);
         if (this.gridService.sortableOptions.mode === "single") {
             this.gridService
                 .columns()
                 .where(c => c.field() !== column.field())
                 .forEach(c => {
-                    c.sortDirection.set(null);
+                    c.columnSortDirection.set(null);
                     c.sortIndex.set(null);
                     this.gridService.appliedSorts.update(dict => dict.remove(c.field()));
                 });
         }
-        if (column.sortDirection() != null) {
+        if (column.columnSortDirection() != null) {
             const sortDescriptor: SortDescriptor = {
                 field: column.field(),
-                dir: column.sortDirection() as SortDirection
+                dir: column.columnSortDirection() as SortDirection
             };
             this.gridService.appliedSorts.update(dict => dict.put(column.field(), { sort: sortDescriptor }));
         } else {

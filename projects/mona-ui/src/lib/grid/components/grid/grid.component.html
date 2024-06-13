@@ -6,7 +6,13 @@
          (cdkDropListDropped)="onColumnDropForGrouping($event)">
         @if (gridService.groupColumns().length !== 0) {
             @for (groupColumn of gridService.groupColumns(); track groupColumn.field()) {
-                <mona-chip [removable]="true" (remove)="onGroupingColumnRemove($event, groupColumn)">
+                <mona-chip [removable]="true" (click)="onGroupingColumnSort(groupColumn)"
+                           (remove)="onGroupingColumnRemove($event, groupColumn)">
+                    @if (groupColumn.groupSortDirection() === 'asc') {
+                        <i class="ri-arrow-down-line"></i>
+                    } @else if (groupColumn.groupSortDirection() === 'desc') {
+                        <i class="ri-arrow-up-line"></i>
+                    }
                     <span>{{ groupColumn.title() }}</span>
                 </mona-chip>
             }
@@ -46,9 +52,9 @@
                                     @if (gridService.sortableOptions.showIndices && column.sortIndex() != null) {
                                         <span>{{ column.sortIndex() }}</span>
                                     }
-                                    @if (column.sortDirection() === 'asc') {
+                                    @if (column.columnSortDirection() === 'asc') {
                                         <i class="ri-arrow-down-line"></i>
-                                    } @else if (column.sortDirection() === 'desc') {
+                                    } @else if (column.columnSortDirection() === 'desc') {
                                         <i class="ri-arrow-up-line"></i>
                                     }
                                     @if (filterable()) {

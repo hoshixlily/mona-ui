@@ -1,7 +1,7 @@
 import { DestroyRef, Directive, effect, inject, input, OnInit, output, untracked } from "@angular/core";
 import { takeUntilDestroyed, toObservable } from "@angular/core/rxjs-interop";
 import { orderBy, sequenceEqual } from "@mirei/ts-collections";
-import { filter, map, pairwise, startWith } from "rxjs";
+import { filter, map, pairwise, skip, startWith } from "rxjs";
 import { GroupableOptions } from "../models/GroupableOptions";
 import { GroupDescriptor } from "../models/GroupDescriptor";
 import { GridService } from "../services/grid.service";
@@ -18,27 +18,43 @@ export class GridGroupableDirective implements OnInit {
         startWith(this.#gridService.groupColumns()),
         pairwise(),
         filter(([prev, curr]) => {
-            return !sequenceEqual(
-                orderBy(prev, c => c.field()),
-                orderBy(curr, c => c.field())
+            return (
+                !sequenceEqual(
+                    orderBy(prev, c => c.field()),
+                    orderBy(curr, c => c.field())
+                ) ||
+                !sequenceEqual(
+                    orderBy(prev, c => c.groupSortDirection()),
+                    orderBy(curr, c => c.groupSortDirection())
+                )
             );
         }),
         map(([_, curr]) => {
             return this.#gridService.getGroupDescriptors(curr);
         })
     );
-    readonly #sortStatusChange$ = toObservable(this.#gridService.appliedSorts).pipe(
+    readonly #groupSortChange$ = toObservable(this.#gridService.appliedGroupSorts).pipe(
         takeUntilDestroyed(this.#destroyRef),
-        startWith(this.#gridService.appliedSorts()),
-        map(sorts => sorts.values()),
-        map(s => s.select(sort => sort.sort)),
+        startWith(this.#gridService.appliedGroupSorts()),
         pairwise(),
         filter(([prev, curr]) => {
-            const changedFields = curr
-                .except(prev, (a, b) => a.field === b.field && a.dir === b.dir)
-                .select(s => s.field);
-            const groupFields = this.#gridService.groupColumns().select(c => c.field());
-            return groupFields.any(f => changedFields.contains(f));
+            if (prev.length !== curr.length) {
+                return false; // Different number of sorts, not handled by this subscription
+            }
+            return (
+                !sequenceEqual(
+                    orderBy(prev, p => p.value.sort.field),
+                    orderBy(curr, p => p.value.sort.field)
+                ) ||
+                !sequenceEqual(
+                    orderBy(prev, p => p.value.sort.dir),
+                    orderBy(curr, p => p.value.sort.dir)
+                )
+            );
+        }),
+        map(() => {
+            const groupColumns = this.#gridService.groupColumns();
+            return this.#gridService.getGroupDescriptors(groupColumns);
         })
     );
     public readonly groupChange = output<GroupDescriptor[]>();
@@ -71,11 +87,10 @@ export class GridGroupableDirective implements OnInit {
     }
 
     private setSubscriptions(): void {
-        this.#groupColumnsChange$.subscribe(groupDescriptors => {
+        this.#groupColumnsChange$.pipe(skip(1), takeUntilDestroyed(this.#destroyRef)).subscribe(groupDescriptors => {
             this.groupChange.emit(groupDescriptors);
         });
-        this.#sortStatusChange$.subscribe(() => {
-            const groupDescriptors = this.#gridService.getGroupDescriptors(this.#gridService.groupColumns());
+        this.#groupSortChange$.subscribe(groupDescriptors => {
             this.groupChange.emit(groupDescriptors);
         });
     }

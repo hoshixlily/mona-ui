@@ -22,6 +22,9 @@ export class GridService {
     public readonly appliedFilters: WritableSignal<ImmutableDictionary<string, ColumnFilterState>> = signal(
         ImmutableDictionary.create()
     );
+    public readonly appliedGroupSorts: WritableSignal<ImmutableDictionary<string, ColumnSortState>> = signal(
+        ImmutableDictionary.create()
+    );
     public readonly appliedSorts: WritableSignal<ImmutableDictionary<string, ColumnSortState>> = signal(
         ImmutableDictionary.create()
     );
@@ -74,6 +77,7 @@ export class GridService {
         const rows = this.rows();
         const appliedFilters = this.appliedFilters();
         const appliedSorts = this.appliedSorts();
+        const groupColumns = this.groupColumns();
 
         let queryEnumerable = Query.from(rows);
         for (const filter of appliedFilters) {
@@ -81,11 +85,19 @@ export class GridService {
                 queryEnumerable = queryEnumerable.filter(filter.value.filter, r => r.data);
             }
         }
-        if (appliedSorts.any()) {
-            const sortState = appliedSorts
-                .values()
-                .select(d => d.sort)
-                .toArray();
+
+        if (groupColumns.any()) {
+            const groupDescriptors = this.getGroupDescriptors(groupColumns);
+            const sortStates = groupDescriptors.map<SortDescriptor>(d => ({ field: d.field, dir: d.dir ?? "asc" }));
+            queryEnumerable = queryEnumerable.sort(sortStates, r => r.data);
+        }
+
+        const appliedNonGroupSorts = appliedSorts
+            .values()
+            .where(sort => !groupColumns.any(c => c.field() === sort.sort.field));
+
+        if (appliedNonGroupSorts.any()) {
+            const sortState = appliedNonGroupSorts.select(d => d.sort).toArray();
             queryEnumerable = queryEnumerable.sort(sortState, r => r.data);
         }
         const result = queryEnumerable.run();
@@ -118,7 +130,7 @@ export class GridService {
     public getGroupDescriptors(columns: Iterable<Column>): GroupDescriptor[] {
         return select(columns, c => ({
             field: c.field(),
-            dir: c.sortDirection() ?? undefined
+            dir: c.groupSortDirection() ?? undefined
         })).toArray();
     }
 
@@ -189,8 +201,17 @@ export class GridService {
         const columns = this.columns();
         const groupColumns = columns.where(c => any(descriptors, d => d.field === c.field()));
         const currentGroupColumns = this.groupColumns();
-        if (groupColumns.sequenceEqual(currentGroupColumns)) {
+        if (groupColumns.orderBy(c => c.field()).sequenceEqual(currentGroupColumns.orderBy(c => c.field()))) {
             return;
+        }
+        for (const descriptor of descriptors) {
+            const column = columns.firstOrDefault(c => c.field() === descriptor.field);
+            if (column != null) {
+                column.groupSortDirection.set(descriptor.dir ?? "asc");
+                this.appliedGroupSorts.update(v =>
+                    v.add(column.field(), { sort: { field: descriptor.field, dir: descriptor.dir ?? "asc" } })
+                );
+            }
         }
         this.groupColumns.set(ImmutableSet.create(groupColumns));
     }
@@ -221,7 +242,7 @@ export class GridService {
                     sort: sort
                 });
                 column.sortIndex.set(index + 1);
-                column.sortDirection.set(sort.dir);
+                column.columnSortDirection.set(sort.dir);
             }
         }
         this.appliedSorts.set(
