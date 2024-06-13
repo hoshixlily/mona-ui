@@ -5,7 +5,7 @@
          (cdkDropListExited)="onColumnDragExitForGrouping($event)"
          (cdkDropListDropped)="onColumnDropForGrouping($event)">
         @if (gridService.groupColumns().length !== 0) {
-            @for (groupColumn of gridService.groupColumns(); track groupColumn) {
+            @for (groupColumn of gridService.groupColumns(); track $index) {
                 <mona-chip [removable]="true" (click)="onGroupingColumnSort(groupColumn)"
                            (remove)="onGroupingColumnRemove($event, groupColumn)">
                     @if (groupColumn.groupSortDirection() === 'asc') {
