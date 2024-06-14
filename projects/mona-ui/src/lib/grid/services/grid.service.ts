@@ -127,6 +127,31 @@ export class GridService {
         this.selectedRows.update(set => set.clear());
     }
 
+    public findTextWidthOfColumn(column: Column, element: HTMLTableCellElement): number {
+        let longestValue = this.findLongestCellContentOfColumn(column);
+        if (column.title().length > longestValue.length) {
+            longestValue = column.title();
+        }
+        const div = document.createElement("canvas");
+        const context = div.getContext("2d");
+        if (context == null) {
+            return 0;
+        }
+        const documentBodyStyle = window.getComputedStyle(document.body);
+        const fontFamily = documentBodyStyle.getPropertyValue("font-family");
+        const fontSize = documentBodyStyle.getPropertyValue("font-size");
+        const titleElement = element.querySelector(".mona-grid-column-title");
+        const actionsElement = element.querySelector(".mona-grid-column-actions");
+        const actionsWidth = actionsElement ? actionsElement.clientWidth : 0;
+        const leftRightPadding = titleElement
+            ? parseInt(window.getComputedStyle(titleElement).paddingLeft, 10) +
+              parseInt(window.getComputedStyle(titleElement).paddingRight, 10)
+            : 0;
+        const totalAdditionalWidth = actionsWidth + leftRightPadding;
+        context.font = `${fontSize} ${fontFamily}`;
+        return context.measureText(longestValue).width + totalAdditionalWidth;
+    }
+
     public getGroupDescriptors(columns: Iterable<Column>): GroupDescriptor[] {
         return select(columns, c => ({
             field: c.field(),
@@ -267,7 +292,7 @@ export class GridService {
         this.groupableOptions.update(v => ({ ...v, ...options }));
     }
 
-    public setRows(value: any[]): void {
+    public setRows(value: Iterable<any>): void {
         this.rows.set(ImmutableSet.create(from(value).select(r => new Row(r))));
     }
 
@@ -281,5 +306,20 @@ export class GridService {
 
     public setVirtualScrollOptions(options: VirtualScrollOptions): void {
         this.virtualScrollOptions.update(v => ({ ...v, ...options }));
+    }
+
+    private findLongestCellContentOfColumn(column: Column): string {
+        let maxLength = 0;
+        let longestValue = "";
+        for (const row of this.rows()) {
+            const value = row.data[column.field()];
+            if (value != null) {
+                maxLength = Math.max(maxLength, value.toString().length);
+                if (maxLength === value.toString().length) {
+                    longestValue = value.toString();
+                }
+            }
+        }
+        return longestValue;
     }
 }

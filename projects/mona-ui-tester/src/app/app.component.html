@@ -63,11 +63,11 @@
                             <mona-grid [data]="gridOrderDataRandom" [pageSize]="5"
                                        [pageSizeValues]="[5, 10, 15, 20, 25, 50, 100]" style="height: 400px; margin-bottom: 10px;"
                                        monaGridGroupable
-                                       [group]="[{field: 'ShipCountry', dir: 'desc'}]"
+                                       [group]="gridGroups"
                                        (groupChange)="onGridGroupChange($event)"
                                        [filterable]="true" [filter]="gridFilters"
                                        (filterChange)="onGridFilterChange($event)"
-                                       [resizable]="true"
+                                       [resizable]="true" resizeMethod="auto"
                                        [sortable]="gridSortOptions" [reorderable]="true" [sort]="gridSort"
                                        (sortChange)="onGridSortChange($event)"
                                        (cellEdit)="onGridCellEdit($event)" [responsivePager]="false"
@@ -88,14 +88,16 @@
                                     <!--                                    </ng-template>-->
                                 </mona-grid-column>
                                 <ng-template monaGridDetailTemplate let-dataItem>
-                                    <span style="padding: 0.25rem; 0.5rem;">{{dataItem|json}}</span>
+                                    <span style="padding:1rem;">{{dataItem|json}}</span>
                                 </ng-template>
                             </mona-grid>
                             <mona-grid [data]="gridProductData" [pageSize]="5" [pageSizeValues]="[5,10,15,20,25,50,100]"
-                                       [resizable]="true" [groupable]="true" [sortable]="{enabled: true, mode: 'multiple'}"
+                                       [resizable]="true" resizeMethod="fitView"
+                                       monaGridGroupable
+                                       [sortable]="{enabled: true, mode: 'multiple'}"
                                        [filterable]="true"
                                        style="height: 400px">
-                                <mona-grid-column title="Avatar">
+                                <mona-grid-column title="Avatar" [minWidth]="100" [maxWidth]="200">
                                     <ng-template monaGridColumnTitleTemplate>
                                         <span style="color: red; width: 100%; display: flex; justify-content: center;">Avatar</span>
                                     </ng-template>
@@ -106,7 +108,7 @@
                                     </ng-template>
                                 </mona-grid-column>
                                 <mona-grid-column *ngFor="let col of gridProductColumns" [field]="col.field"
-                                                  [title]="col.title"></mona-grid-column>
+                                                  [title]="col.title" [type]="col.filterType"></mona-grid-column>
                                 <mona-grid-column title="Slider">
                                     <ng-template monaGridCellTemplate>
                                         <mona-slider style="width: 200px;" [ngModel]="sliderValue"

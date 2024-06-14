@@ -48,6 +48,7 @@ import { GridDetailTemplateDirective } from "../../directives/grid-detail-templa
 import { CellEditEvent } from "../../models/CellEditEvent";
 import { Column } from "../../models/Column";
 import { ColumnFilterState } from "../../models/ColumnFilterState";
+import { ResizeMethod } from "../../models/ResizeMethod";
 import { SortableOptions } from "../../models/SortableOptions";
 import { GridService } from "../../services/grid.service";
 import { GridColumnComponent } from "../grid-column/grid-column.component";
@@ -84,7 +85,7 @@ import { GridVirtualListComponent } from "../grid-virtual-list/grid-virtual-list
         "[attr.data-uid]": "uid"
     }
 })
-export class GridComponent implements OnInit {
+export class GridComponent<T> implements OnInit {
     readonly #cdr = inject(ChangeDetectorRef);
     readonly #destroyRef = inject(DestroyRef);
     readonly #hostElementRef = inject(ElementRef<HTMLElement>);
@@ -92,6 +93,7 @@ export class GridComponent implements OnInit {
     protected readonly gridDetailTemplate = contentChild(GridDetailTemplateDirective, { read: TemplateRef });
     protected readonly gridHeaderElement = viewChild.required<ElementRef<HTMLDivElement>>("gridHeaderElement");
     protected readonly gridService = inject(GridService);
+    protected readonly gridWidthSet = signal(false);
     protected readonly groupColumnList = viewChild<CdkDropList>("groupColumnList");
     protected readonly groupPanelPlaceholderVisible = signal(true);
     protected readonly groupable = computed(() => this.gridService.groupableOptions().enabled);
@@ -104,17 +106,70 @@ export class GridComponent implements OnInit {
     protected gridColumns: Column[] = [];
     protected resizing = false;
 
+    /**
+     * Emitted when a cell is edited.
+     */
     public readonly cellEdit: OutputEmitterRef<CellEditEvent> = output();
 
-    public data = input<any[]>([]);
+    /**
+     * The row data to be displayed in the grid.
+     */
+    public data = input<Iterable<T>>([]);
+
+    /**
+     * Initial filter configuration to be applied to the grid when it is loaded.
+     */
     public filter = model<CompositeFilterDescriptor[]>([]);
+
+    /**
+     * Whether the grid is filterable.
+     */
     public filterable = input(false);
+
+    /**
+     * The number of items to be displayed on a page.
+     */
     public pageSize = input<number | undefined>(undefined);
+
+    /**
+     * The page sizes that the user can select from.
+     * These values will be displayed in the page size dropdown.
+     */
     public pageSizeValues = input<number[]>([]);
+
+    /**
+     * Whether the columns of the grid can be reordered.
+     */
     public reorderable = input(false);
+
+    /**
+     * Whether the columns of the grid can be resized.
+     */
     public resizable = input(false);
+
+    /**
+     * The method to be used to set initial column widths.
+     * It can be the following values:
+     * - `fitView`: The columns will be resized to fit the available width.
+     * - `auto`: The columns will be resized based on the content.
+     * @default "fitView"
+     */
+    public resizeMethod = input<ResizeMethod>("fitView");
+
+    /**
+     * Whether the pager is responsive.
+     * If set to `true`, the pager will be displayed as a dropdown when the grid width gets smaller.
+     */
     public responsivePager = input(true);
+
+    /**
+     * Initial sort configuration to be applied to the grid when it is loaded.
+     */
     public sort = model<SortDescriptor[]>([]);
+
+    /**
+     * Whether the grid is sortable.
+     */
     public sortable = input<boolean | SortableOptions>(false);
 
     public constructor() {
@@ -344,6 +399,22 @@ export class GridComponent implements OnInit {
             });
     }
 
+    private getTableColumnHeaderCellList(): HTMLTableCellElement[] {
+        const headerElement = this.gridHeaderElement();
+        if (!headerElement) {
+            return [];
+        }
+        const thList = headerElement.nativeElement.querySelectorAll("th");
+        const headerCells = Array.from(thList) as HTMLTableCellElement[];
+        if (this.gridService.masterDetailTemplate()) {
+            headerCells.shift();
+        }
+        for (const _ of this.gridService.groupColumns()) {
+            headerCells.shift();
+        }
+        return headerCells;
+    }
+
     private setColumnEffect(): void {
         effect(() => {
             const columns = this.columns();
@@ -397,6 +468,7 @@ export class GridComponent implements OnInit {
                 untracked(() => {
                     window.setTimeout(() => {
                         this.setInitialCalculatedWidthOfColumns();
+                        this.gridWidthSet.set(true);
                     });
                 });
             }
@@ -405,18 +477,29 @@ export class GridComponent implements OnInit {
 
     private setInitialCalculatedWidthOfColumns(): void {
         if (this.gridService.gridHeaderElement()) {
-            window.setTimeout(() => {
-                const headerElement = this.gridService.gridHeaderElement() as HTMLElement;
-                const headerParentElement = headerElement.parentElement as HTMLElement;
-                const thList = headerElement.querySelectorAll("th");
-                const thArray = Array.from(thList);
-                for (const [cx, columnTh] of thArray.entries()) {
-                    const gridCol = this.gridService.columns().elementAt(cx);
-                    const width = headerParentElement.clientWidth / thArray.length;
-                    const offset = 2;
-                    gridCol.calculatedWidth.set(gridCol.width() ?? Math.trunc(width - offset));
+            const headerElement = this.gridService.gridHeaderElement() as HTMLElement;
+            const headerCells = this.getTableColumnHeaderCellList();
+            let headerWidth = headerElement.clientWidth;
+            if (this.gridService.masterDetailTemplate()) {
+                headerWidth -= this.gridService.groupColumnWidth;
+            }
+            for (const _ of this.gridService.groupColumns()) {
+                headerWidth -= this.gridService.groupColumnWidth;
+            }
+            for (const [cx, columnTh] of headerCells.entries()) {
+                const gridCol = this.gridService.columns().elementAt(cx);
+                let calculatedWidth: number;
+                if (this.resizeMethod() === "fitView") {
+                    calculatedWidth = (headerWidth + 1) / headerCells.length;
+                } else {
+                    calculatedWidth = this.gridService.findTextWidthOfColumn(gridCol, columnTh);
                 }
-            });
+                if (gridCol.width() != null) {
+                    gridCol.calculatedWidth.set(gridCol.width());
+                } else {
+                    gridCol.calculatedWidth.set(calculatedWidth);
+                }
+            }
         }
     }
 
