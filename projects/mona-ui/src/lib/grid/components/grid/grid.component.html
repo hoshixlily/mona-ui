@@ -5,9 +5,34 @@
          (cdkDropListExited)="onColumnDragExitForGrouping($event)"
          (cdkDropListDropped)="onColumnDropForGrouping($event)">
         @if (gridService.groupColumns().length !== 0) {
-            @for (groupColumn of gridService.groupColumns(); track groupColumn.field()) {
-                <mona-chip [removable]="true" (remove)="onGroupingColumnRemove($event, groupColumn)">
+            @for (groupColumn of gridService.groupColumns(); track $index) {
+                <mona-chip [removable]="true" (click)="onGroupingColumnSort(groupColumn)"
+                           (remove)="onGroupingColumnRemove($event, groupColumn)">
+                    @if (groupColumn.groupSortDirection() === 'asc') {
+                        <i class="ri-arrow-down-line"></i>
+                    } @else if (groupColumn.groupSortDirection() === 'desc') {
+                        <i class="ri-arrow-up-line"></i>
+                    }
                     <span>{{ groupColumn.title() }}</span>
+                    <span style="margin-left: 0.5rem;" #groupReorder>
+                        <i class="ri-more-2-fill"></i>
+                    </span>
+                    <mona-contextmenu [target]="groupReorder" trigger="click">
+                        <mona-menu-item [text]="'Move as previous'"
+                                        [disabled]="$first"
+                                        (menuClick)="onGroupColumnReorder(groupColumn, 'prev')">
+                            <ng-template monaMenuItemIconTemplate>
+                                <i class="ri-arrow-left-fill"></i>
+                            </ng-template>
+                        </mona-menu-item>
+                        <mona-menu-item [text]="'Move as next'"
+                                        [disabled]="$last"
+                                        (menuClick)="onGroupColumnReorder(groupColumn, 'next')">
+                            <ng-template monaMenuItemIconTemplate>
+                                <i class="ri-arrow-right-fill"></i>
+                            </ng-template>
+                        </mona-menu-item>
+                    </mona-contextmenu>
                 </mona-chip>
             }
         } @else if (groupPanelPlaceholderVisible()) {
@@ -18,14 +43,14 @@
 <div class="mona-grid-header" [ngStyle]="{'margin': headerMargin}" #gridHeaderElement>
     <div class="mona-grid-header-wrap">
         <table>
-            <thead>
+            <thead [style.visibility]="!gridWidthSet()?'hidden':undefined">
                 <tr cdkDropList [cdkDropListConnectedTo]="groupable() ? [groupColumnList()!] : []"
                     (cdkDropListDropped)="onColumnDrop($event)">
                     @for (_ of gridService.groupColumns(); track $index) {
-                        <td class="mona-grid-group-column" [style.width.px]="gridService.groupColumnWidth"></td>
+                        <th class="mona-grid-group-column" [style.width.px]="gridService.groupColumnWidth"></th>
                     }
                     @if (gridService.masterDetailTemplate()) {
-                        <td class="mona-grid-detail-column" [style.width.px]="gridService.groupColumnWidth"></td>
+                        <th class="mona-grid-detail-column" [style.width.px]="gridService.detailColumnWidth"></th>
                     }
                     @for (column of gridService.columns(); track $index) {
                         <th cdkDrag [cdkDragData]="column" [cdkDragDisabled]="!reorderable() && !groupable()"
@@ -46,9 +71,9 @@
                                     @if (gridService.sortableOptions.showIndices && column.sortIndex() != null) {
                                         <span>{{ column.sortIndex() }}</span>
                                     }
-                                    @if (column.sortDirection() === 'asc') {
+                                    @if (column.columnSortDirection() === 'asc') {
                                         <i class="ri-arrow-down-line"></i>
-                                    } @else if (column.sortDirection() === 'desc') {
+                                    } @else if (column.columnSortDirection() === 'desc') {
                                         <i class="ri-arrow-up-line"></i>
                                     }
                                     @if (filterable()) {
@@ -63,7 +88,7 @@
                             }
                             @if (resizable() && !columnDragging) {
                                 <div monaGridColumnResizeHandler [column]="column" [gridId]="uid" class="mona-grid-column-resizer"
-                                     (resizeStart)="onColumnResizeStart()" (resizeEnd)="resizing=false;"></div>
+                                     (resizeStart)="onColumnResizeStart()" (resizeEnd)="resizing.set(false);"></div>
                             }
                             <ng-template cdkDragPreview>
                                 <div class="mona-grid-column-drag-preview">
@@ -84,15 +109,14 @@
     </div>
 </div>
 
-
-
-
-@if (gridService.virtualScrollOptions().enabled) {
-    <mona-grid-virtual-list [columns]="gridService.columns()" [data]="gridService.viewRows()"></mona-grid-virtual-list>
-} @else {
-    <mona-grid-list [columns]="gridService.columns()" [data]="gridService.viewPageRows()"></mona-grid-list>
-    <mona-pager [skip]="gridService.pageState.skip()" [pageSize]="gridService.pageState.take()"
-                [total]="gridService.viewRowCount()"
-                [pageInput]="true" [pageSizeValues]="pageSizeValues()" [responsive]="responsivePager()"
-                (pageSizeChange)="onPageSizeChange($event)" (pageChange)="onPageChange($event)"></mona-pager>
+@defer (when gridWidthSet()) {
+    @if (gridService.virtualScrollOptions().enabled) {
+        <mona-grid-virtual-list [columns]="gridService.columns()" [data]="gridService.viewRows()"></mona-grid-virtual-list>
+    } @else {
+        <mona-grid-list [columns]="gridService.columns()" [data]="gridService.viewPageRows()"></mona-grid-list>
+        <mona-pager [skip]="gridService.pageState.skip()" [pageSize]="gridService.pageState.take()"
+                    [total]="gridService.viewRowCount()"
+                    [pageInput]="true" [pageSizeValues]="pageSizeValues()" [responsive]="responsivePager()"
+                    (pageSizeChange)="onPageSizeChange($event)" (pageChange)="onPageChange($event)"></mona-pager>
+    }
 }

@@ -8,7 +8,7 @@
                             (click)="onGridRowClick($event, row)"
                             [attr.data-ruid]="row.uid" [attr.data-row-view-index]="$index">
                             @if (gridService.masterDetailTemplate()) {
-                                <td [style.width.px]="gridService.groupColumnWidth">
+                                <td [style.width.px]="gridService.detailColumnWidth">
                                     <span class="mona-grid-detail-toggle-wrapper">
                                         <button monaButton [flat]="true" (click)="onToggleDetailClick($event, row)">
                                             @if (row.detailVisible()) {
@@ -59,8 +59,7 @@
                                     </td>
                                 }
                                 <td [style.width.px]="gridService.groupColumnWidth*(columns().length + gridService.groupColumns().length)">
-                                    <span class="mona-grid-grouping-row-text">{{ rowItem.column.title() }}
-                                        : {{ rowItem.groupTitle }}</span>
+                                    <span class="mona-grid-grouping-row-text">{{ rowItem.column.title() }}: {{ rowItem.groupTitle }}</span>
                                 </td>
                             </tr>
                         } @else if (rowItem.type === 'row') {
@@ -71,7 +70,7 @@
                                     <td [style.width.px]="gridService.groupColumnWidth"></td>
                                 }
                                 @if (gridService.masterDetailTemplate()) {
-                                    <td [style.width.px]="gridService.groupColumnWidth">
+                                    <td [style.width.px]="gridService.detailColumnWidth">
                                         <span class="mona-grid-detail-toggle-wrapper">
                                             <button monaButton [flat]="true" (click)="onToggleDetailClick($event, rowItem)">
                                                 @if (rowItem.row.detailVisible()) {

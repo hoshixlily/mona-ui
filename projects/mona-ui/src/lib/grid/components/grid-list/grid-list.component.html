@@ -6,7 +6,7 @@
                     <tr (click)="onGridRowClick($event, row)" [ngClass]="{'mona-selected': row.selected()}"
                         [attr.data-ruid]="row.uid" [attr.data-row-view-index]="$index">
                         @if (gridService.masterDetailTemplate()) {
-                            <td [style.width.px]="gridService.groupColumnWidth">
+                            <td [style.width.px]="gridService.detailColumnWidth">
                                 <span class="mona-grid-detail-toggle-wrapper">
                                     <button monaButton [flat]="true" (click)="onToggleDetailClick($event, row)">
                                         @if (row.detailVisible()) {
@@ -43,7 +43,6 @@
                                     @for (_ of gridService.groupColumns()|monaSlice:0:cx; track $index) {
                                         <td [style.width.px]="gridService.groupColumnWidth"></td>
                                     }
-
                                     @if (subGroup.rows.length > 0) {
                                         <td [style.width.px]="gridService.groupColumnWidth*(columns().length + gridService.groupColumns().length)">
                                             <span class="mona-grid-grouping-toggle-wrapper" [style.width.px]="gridService.groupColumnWidth">
@@ -74,7 +73,7 @@
                                                 <td [style.width.px]="gridService.groupColumnWidth"></td>
                                             }
                                             @if (gridService.masterDetailTemplate()) {
-                                                <td [style.width.px]="gridService.groupColumnWidth">
+                                                <td [style.width.px]="gridService.detailColumnWidth">
                                                     <span class="mona-grid-detail-toggle-wrapper">
                                                         <button monaButton [flat]="true" (click)="onToggleDetailClick($event, row)">
                                                             @if (row.detailVisible()) {

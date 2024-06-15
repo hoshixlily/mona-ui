@@ -78,21 +78,21 @@ export class TreeViewComponent<T> implements OnInit {
 
     /**
      * The field that represents the unique identifier of a node.
-     * This is required if the data structure is set to "flat".
+     * This is required if the data structure is set to `flat`.
      */
     public idField = input<string>("");
 
     /**
      * The data structure of the tree.
      * It can be either of the following:
-     * - "flat": The tree is a flat list of nodes.
-     * - "hierarchical": The tree is a hierarchical structure.
+     * - `flat`: The tree is a flat list of nodes.
+     * - `hierarchical`: The tree is a hierarchical structure.
      *
-     * If the data structure is set to "flat", the following fields are required:
+     * If the data structure is set to `flat`, the following fields are required:
      * - {@link idField}
      * - {@link parentIdField}
      *
-     * If the data structure is set to "hierarchical", the following fields are required:
+     * If the data structure is set to `hierarchical`, the following fields are required:
      * - {@link children}
      * - {@link hasChildren}
      */
@@ -100,7 +100,7 @@ export class TreeViewComponent<T> implements OnInit {
 
     /**
      * The field that represents the parent identifier of a node.
-     * This is required if the data structure is set to "flat".
+     * This is required if the data structure is set to `flat`.
      */
     public parentIdField = input<string>("");
 

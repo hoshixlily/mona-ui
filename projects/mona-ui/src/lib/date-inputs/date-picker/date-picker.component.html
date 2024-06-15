@@ -3,7 +3,7 @@
        (ngModelChange)="onDateStringEdit($event)" (blur)="onDateInputBlur()">
 <button monaButton class="mona-input-button" (click)="onDateInputButtonClick()"
         [disabled]="disabled()" [tabindex]="-1">
-    <fa-icon [icon]="dateIcon"></fa-icon>
+    <i class="ri-calendar-line"></i>
 </button>
 
 <ng-template #datePopupTemplate>

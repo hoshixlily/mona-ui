@@ -1,5 +1,5 @@
 import { computed, Injectable, OutputEmitterRef, Signal, signal, TemplateRef, WritableSignal } from "@angular/core";
-import { Dictionary, from, ImmutableDictionary, ImmutableList, ImmutableSet } from "@mirei/ts-collections";
+import { any, Dictionary, from, ImmutableDictionary, ImmutableList, ImmutableSet, select } from "@mirei/ts-collections";
 import { BehaviorSubject, Subject } from "rxjs";
 import { VirtualScrollOptions } from "../../common/models/VirtualScrollOptions";
 import { Query } from "../../query/core/Query";
@@ -10,6 +10,8 @@ import { Column } from "../models/Column";
 import { ColumnFilterState } from "../models/ColumnFilterState";
 import { ColumnSortState } from "../models/ColumnSortState";
 import { EditableOptions } from "../models/EditableOptions";
+import { GroupableOptions } from "../models/GroupableOptions";
+import { GroupDescriptor } from "../models/GroupDescriptor";
 import { PageState } from "../models/PageState";
 import { Row } from "../models/Row";
 import { SelectableOptions } from "../models/SelectableOptions";
@@ -20,11 +22,15 @@ export class GridService {
     public readonly appliedFilters: WritableSignal<ImmutableDictionary<string, ColumnFilterState>> = signal(
         ImmutableDictionary.create()
     );
+    public readonly appliedGroupSorts: WritableSignal<ImmutableDictionary<string, ColumnSortState>> = signal(
+        ImmutableDictionary.create()
+    );
     public readonly appliedSorts: WritableSignal<ImmutableDictionary<string, ColumnSortState>> = signal(
         ImmutableDictionary.create()
     );
     public readonly cellEdit$ = new Subject<CellEditEvent>();
     public readonly columns = signal<ImmutableList<Column>>(ImmutableList.create());
+    public readonly detailColumnWidth = 34;
     public readonly filterLoad$ = new Subject<void>();
     public readonly groupColumnWidth = 34;
     public readonly groupColumns = signal<ImmutableSet<Column>>(ImmutableSet.create());
@@ -33,10 +39,11 @@ export class GridService {
         const columns = this.columns();
         const groupColumnWidth = this.groupColumnWidth;
         const groupColumnCount = groupColumns.size();
-        const detailRowOffset = this.masterDetailTemplate() ? this.groupColumnWidth : 0;
+        const detailRowOffset = this.masterDetailTemplate() ? this.detailColumnWidth : 0;
         const columnListWidth = columns.aggregate((acc, c) => acc + (c.calculatedWidth() ?? c.width() ?? 0), 0);
         return groupColumnWidth * groupColumnCount + columnListWidth + detailRowOffset;
     });
+    public readonly groupableOptions = signal<GroupableOptions>({ enabled: false });
     public readonly isInEditMode = signal(false);
     public readonly masterDetailRowWidth = computed(() => {
         const groupColumns = this.groupColumns();
@@ -47,7 +54,7 @@ export class GridService {
         return groupColumnWidth * (groupColumnCount + 1) + columnListWidth;
     });
     public readonly masterDetailEmptyCellWidth = computed(() => {
-        return this.groupColumnWidth * (this.groupColumns().size() + 1);
+        return this.detailColumnWidth * (this.groupColumns().size() + 1);
     });
     public readonly masterDetailTemplate = signal<TemplateRef<any> | null>(null);
     public readonly pageState: PageState = { page: signal(1), skip: signal(0), take: signal(10) };
@@ -71,6 +78,7 @@ export class GridService {
         const rows = this.rows();
         const appliedFilters = this.appliedFilters();
         const appliedSorts = this.appliedSorts();
+        const groupColumns = this.groupColumns();
 
         let queryEnumerable = Query.from(rows);
         for (const filter of appliedFilters) {
@@ -78,11 +86,19 @@ export class GridService {
                 queryEnumerable = queryEnumerable.filter(filter.value.filter, r => r.data);
             }
         }
-        if (appliedSorts.any()) {
-            const sortState = appliedSorts
-                .values()
-                .select(d => d.sort)
-                .toArray();
+
+        if (groupColumns.any()) {
+            const groupDescriptors = this.getGroupDescriptors(groupColumns);
+            const sortStates = groupDescriptors.map<SortDescriptor>(d => ({ field: d.field, dir: d.dir ?? "asc" }));
+            queryEnumerable = queryEnumerable.sort(sortStates, r => r.data);
+        }
+
+        const appliedNonGroupSorts = appliedSorts
+            .values()
+            .where(state => !groupColumns.any(c => c.field() === state.sort.field));
+
+        if (appliedNonGroupSorts.any()) {
+            const sortState = appliedNonGroupSorts.select(d => d.sort).toArray();
             queryEnumerable = queryEnumerable.sort(sortState, r => r.data);
         }
         const result = queryEnumerable.run();
@@ -110,6 +126,38 @@ export class GridService {
             this.selectedRows().forEach(r => r.selected.set(false));
         }
         this.selectedRows.update(set => set.clear());
+    }
+
+    public findTextWidthOfColumn(column: Column, element: HTMLTableCellElement): number {
+        let longestValue = this.findLongestCellContentOfColumn(column);
+        if (column.title().length > longestValue.length) {
+            longestValue = column.title();
+        }
+        const div = document.createElement("canvas");
+        const context = div.getContext("2d");
+        if (context == null) {
+            return 0;
+        }
+        const documentBodyStyle = window.getComputedStyle(document.body);
+        const fontFamily = documentBodyStyle.getPropertyValue("font-family");
+        const fontSize = documentBodyStyle.getPropertyValue("font-size");
+        const titleElement = element.querySelector(".mona-grid-column-title");
+        const actionsElement = element.querySelector(".mona-grid-column-actions");
+        const actionsWidth = actionsElement ? actionsElement.clientWidth : 0;
+        const leftRightPadding = titleElement
+            ? parseInt(window.getComputedStyle(titleElement).paddingLeft, 10) +
+              parseInt(window.getComputedStyle(titleElement).paddingRight, 10)
+            : 0;
+        const totalAdditionalWidth = actionsWidth + leftRightPadding;
+        context.font = `${fontSize} ${fontFamily}`;
+        return context.measureText(longestValue).width + totalAdditionalWidth;
+    }
+
+    public getGroupDescriptors(columns: Iterable<Column>): GroupDescriptor[] {
+        return select(columns, c => ({
+            field: c.field(),
+            dir: c.groupSortDirection() ?? undefined
+        })).toArray();
     }
 
     public handleMultipleSelection(event: MouseEvent, row: Row): void {
@@ -175,6 +223,25 @@ export class GridService {
         this.filterLoad$.next();
     }
 
+    public loadGroupColumns(descriptors: Iterable<GroupDescriptor>): void {
+        const columns = this.columns();
+        const groupColumns = columns.where(c => any(descriptors, d => d.field === c.field()));
+        const currentGroupColumns = this.groupColumns();
+        if (groupColumns.orderBy(c => c.field()).sequenceEqual(currentGroupColumns.orderBy(c => c.field()))) {
+            return;
+        }
+        for (const descriptor of descriptors) {
+            const column = columns.firstOrDefault(c => c.field() === descriptor.field);
+            if (column != null) {
+                column.groupSortDirection.set(descriptor.dir ?? "asc");
+                this.appliedGroupSorts.update(v =>
+                    v.add(column.field(), { sort: { field: descriptor.field, dir: descriptor.dir ?? "asc" } })
+                );
+            }
+        }
+        this.groupColumns.set(ImmutableSet.create(groupColumns));
+    }
+
     public loadSelectedKeys(selectedKeys: Iterable<unknown>): void {
         this.selectedKeys.update(set => set.clear().addAll(selectedKeys));
         const selectedRowList: Row[] = [];
@@ -201,7 +268,7 @@ export class GridService {
                     sort: sort
                 });
                 column.sortIndex.set(index + 1);
-                column.sortDirection.set(sort.dir);
+                column.columnSortDirection.set(sort.dir);
             }
         }
         this.appliedSorts.set(
@@ -222,7 +289,11 @@ export class GridService {
         this.editableOptions = { ...this.editableOptions, ...options };
     }
 
-    public setRows(value: any[]): void {
+    public setGroupableOptions(options: Partial<GroupableOptions>): void {
+        this.groupableOptions.update(v => ({ ...v, ...options }));
+    }
+
+    public setRows(value: Iterable<any>): void {
         this.rows.set(ImmutableSet.create(from(value).select(r => new Row(r))));
     }
 
@@ -236,5 +307,20 @@ export class GridService {
 
     public setVirtualScrollOptions(options: VirtualScrollOptions): void {
         this.virtualScrollOptions.update(v => ({ ...v, ...options }));
+    }
+
+    private findLongestCellContentOfColumn(column: Column): string {
+        let maxLength = 0;
+        let longestValue = "";
+        for (const row of this.rows()) {
+            const value = row.data[column.field()];
+            if (value != null) {
+                maxLength = Math.max(maxLength, value.toString().length);
+                if (maxLength === value.toString().length) {
+                    longestValue = value.toString();
+                }
+            }
+        }
+        return longestValue;
     }
 }
