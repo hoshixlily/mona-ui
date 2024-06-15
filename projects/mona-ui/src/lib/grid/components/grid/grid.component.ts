@@ -99,12 +99,12 @@ export class GridComponent<T> implements OnInit {
     protected readonly groupable = computed(() => this.gridService.groupableOptions().enabled);
     protected readonly groupingInProgress = signal(false);
     protected readonly headerMargin = "0 15px 0 0";
+    protected readonly resizing = signal(false);
     protected readonly uid = v4();
     protected columnDragging = false;
     protected dragColumn?: Column;
     protected dropColumn?: Column;
     protected gridColumns: Column[] = [];
-    protected resizing = false;
 
     /**
      * Emitted when a cell is edited.
@@ -152,6 +152,8 @@ export class GridComponent<T> implements OnInit {
      * It can be the following values:
      * - `fitView`: The columns will be resized to fit the available width.
      * - `auto`: The columns will be resized based on the content.
+     * - A number representing the width of the columns. All columns except the columns with a specified width
+     *   will have the same width.
      * @default "fitView"
      */
     public resizeMethod = input<ResizeMethod>("fitView");
@@ -200,7 +202,7 @@ export class GridComponent<T> implements OnInit {
     }
 
     public onColumnDragStart(event: CdkDragStart<Column>): void {
-        if (this.resizing) {
+        if (this.resizing()) {
             return;
         }
         this.columnDragging = true;
@@ -208,7 +210,7 @@ export class GridComponent<T> implements OnInit {
     }
 
     public onColumnDrop(event: CdkDragDrop<Column>): void {
-        if (!this.dropColumn || !this.dragColumn || !this.columnDragging || this.resizing || !this.reorderable()) {
+        if (!this.dropColumn || !this.dragColumn || !this.columnDragging || this.resizing() || !this.reorderable()) {
             return;
         }
         const dropColumnIndex = this.gridService
@@ -269,14 +271,14 @@ export class GridComponent<T> implements OnInit {
     }
 
     public onColumnMouseEnter(event: MouseEvent, column: Column): void {
-        if (!this.columnDragging || this.resizing) {
+        if (!this.columnDragging || this.resizing()) {
             return;
         }
         this.dropColumn = column;
     }
 
     public onColumnResizeStart(): void {
-        this.resizing = true;
+        this.resizing.set(true);
     }
 
     public onColumnSort(column: Column): void {
@@ -480,16 +482,21 @@ export class GridComponent<T> implements OnInit {
             const headerElement = this.gridService.gridHeaderElement() as HTMLElement;
             const headerCells = this.getTableColumnHeaderCellList();
             let headerWidth = headerElement.clientWidth;
+            const columnsWithWidth = this.gridService.columns().where(c => c.width() != null);
+            if (columnsWithWidth.any()) {
+                headerWidth -= columnsWithWidth.sum(c => c.width() ?? 0);
+            }
             if (this.gridService.masterDetailTemplate()) {
-                headerWidth -= this.gridService.groupColumnWidth;
+                headerWidth -= this.gridService.detailColumnWidth;
             }
-            for (const _ of this.gridService.groupColumns()) {
-                headerWidth -= this.gridService.groupColumnWidth;
-            }
+            headerWidth -= this.gridService.groupColumnWidth * this.gridService.groupColumns().size();
+
             for (const [cx, columnTh] of headerCells.entries()) {
                 const gridCol = this.gridService.columns().elementAt(cx);
                 let calculatedWidth: number;
-                if (this.resizeMethod() === "fitView") {
+                if (typeof this.resizeMethod() === "number") {
+                    calculatedWidth = this.resizeMethod() as number;
+                } else if (this.resizeMethod() === "fitView") {
                     calculatedWidth = (headerWidth + 1) / headerCells.length;
                 } else {
                     calculatedWidth = this.gridService.findTextWidthOfColumn(gridCol, columnTh);
@@ -497,6 +504,13 @@ export class GridComponent<T> implements OnInit {
                 if (gridCol.width() != null) {
                     gridCol.calculatedWidth.set(gridCol.width());
                 } else {
+                    const minWidth = gridCol.minWidth();
+                    const maxWidth = gridCol.maxWidth();
+                    if (minWidth && calculatedWidth < minWidth) {
+                        calculatedWidth = gridCol.minWidth();
+                    } else if (maxWidth && calculatedWidth > maxWidth) {
+                        calculatedWidth = maxWidth;
+                    }
                     gridCol.calculatedWidth.set(calculatedWidth);
                 }
             }

@@ -1,1 +1,1 @@
-export type ResizeMethod = "auto" | "fitView";
+export type ResizeMethod = "auto" | "fitView" | number;

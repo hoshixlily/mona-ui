@@ -5,8 +5,8 @@ import { PagerComponent } from "../../../pager/components/pager/pager.component"
 import { GridComponent } from "./grid.component";
 
 describe("GridComponent", () => {
-    let component: GridComponent;
-    let fixture: ComponentFixture<GridComponent>;
+    let component: GridComponent<any>;
+    let fixture: ComponentFixture<GridComponent<any>>;
 
     beforeEach(() => {
         TestBed.configureTestingModule({

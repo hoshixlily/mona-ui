@@ -518,6 +518,10 @@ export class AppComponent implements OnInit {
         //     ]
         // }
     ];
+    public gridGroups: GroupDescriptor[] = [
+        // { field: "ShipCountry", dir: "desc" },
+        // { field: "ShipCity", dir: "asc" }
+    ];
 
     public gridOrderColumns: any[] = [
         { field: "OrderID", title: "Order ID", filterType: "number" },
@@ -702,7 +706,7 @@ export class AppComponent implements OnInit {
             ]
         }
     ];
-    public treeDataRandom: any[] = this.generateRandomTreeData(50);
+    public treeDataRandom: TreeNodeDataItem[] = this.generateRandomTreeData(250);
     public treeFilter: WritableSignal<string> = signal("Apple");
 
     public treeFlatData = [
@@ -726,15 +730,18 @@ export class AppComponent implements OnInit {
     public dropdownTreeSelectedValue = this.treeData[0].items![1].items![0];
 
     public treeChildren = (item: TreeNodeDataItem) => {
-        return of(item.items ?? []).pipe(delay(this.generateRandomNumber(1000, 4000)));
+        return of(item.items ?? []).pipe(delay(this.generateRandomNumber(250, 1750)));
     };
     // public treeChildren = "items";
-    public treeDisabledKeys: string[] = ["1-1-1", "1-1-4", "1-5"];
-    public treeExpandedKeys: string[] = ["1", "1-3"];
+    public treeDisabledKeys: string[] = ["1-1-2"];
+    public treeExpandedKeys: string[] = ["1"];
 
     // item has TreeNode<T> type
-    public treeHasChildren = (item: any) => item.items != null && item.items.length > 0;
-    public treeSelectedKeys: string[] = ["1-3-3"];
+    public treeHasChildren = (item: TreeNodeDataItem) => {
+        const children = item.items ?? [];
+        return children.length > 0;
+    };
+    public treeSelectedKeys: string[] = ["1-1-3"];
 
     public windowHeight: number = 333;
     public windowLeft: number = 444;
@@ -1115,13 +1122,13 @@ export class AppComponent implements OnInit {
     }
 
     public onGridFilterChange(filters: CompositeFilterDescriptor[]): void {
-        console.log(filters);
+        console.log("Grid filter Change: ", filters);
         this.gridFilters = filters;
     }
 
     public onGridGroupChange(groups: GroupDescriptor[]): void {
-        console.log(groups);
-        // this.gridGroups = groups;
+        console.log("Grid group change: ", groups);
+        this.gridGroups = groups;
     }
 
     public onGridSelectionKeysChange(keys: unknown[]): void {
@@ -1131,7 +1138,7 @@ export class AppComponent implements OnInit {
 
     public onGridSortChange(sort: SortDescriptor[]): void {
         this.gridSort = sort;
-        console.log(sort);
+        console.log("Grid sort change: ", sort);
     }
 
     public onListFilterChange(event: FilterChangeEvent): void {

@@ -67,7 +67,7 @@
                                        (groupChange)="onGridGroupChange($event)"
                                        [filterable]="true" [filter]="gridFilters"
                                        (filterChange)="onGridFilterChange($event)"
-                                       [resizable]="true" resizeMethod="auto"
+                                       [resizable]="true" [resizeMethod]="'fitView'"
                                        [sortable]="gridSortOptions" [reorderable]="true" [sort]="gridSort"
                                        (sortChange)="onGridSortChange($event)"
                                        (cellEdit)="onGridCellEdit($event)" [responsivePager]="false"
@@ -76,17 +76,19 @@
                                        [monaGridSelectable]="{enabled: true, mode:'single'}" selectBy="OrderID"
                                        [selectedKeys]="gridSelectionKeys"
                                        (selectedKeysChange)="onGridSelectionKeysChange($event)">
-                                <mona-grid-column *ngFor="let col of gridOrderColumns" [field]="col.field"
-                                                  [title]="col.title" [type]="col.filterType">
-                                    <!--                                    <ng-template monaGridCellTemplate let-row>-->
-                                    <!--                                        <ng-container *ngIf="col.field === 'OrderDate' || col.field==='ShippedDate'">-->
-                                    <!--                                            {{row.data[col.field] | date: 'dd/MM/yyyy'}}-->
-                                    <!--                                        </ng-container>-->
-                                    <!--                                        <ng-container *ngIf="col.field !== 'OrderDate' && col.field!=='ShippedDate'">-->
-                                    <!--                                            {{row.data[col.field]}}-->
-                                    <!--                                        </ng-container>-->
-                                    <!--                                    </ng-template>-->
-                                </mona-grid-column>
+                                @for (col of gridOrderColumns; track $index) {
+                                    <mona-grid-column [field]="col.field"
+                                                      [title]="col.title" [type]="col.filterType">
+                                        <!--                                    <ng-template monaGridCellTemplate let-row>-->
+                                        <!--                                        <ng-container *ngIf="col.field === 'OrderDate' || col.field==='ShippedDate'">-->
+                                        <!--                                            {{row.data[col.field] | date: 'dd/MM/yyyy'}}-->
+                                        <!--                                        </ng-container>-->
+                                        <!--                                        <ng-container *ngIf="col.field !== 'OrderDate' && col.field!=='ShippedDate'">-->
+                                        <!--                                            {{row.data[col.field]}}-->
+                                        <!--                                        </ng-container>-->
+                                        <!--                                    </ng-template>-->
+                                    </mona-grid-column>
+                                }
                                 <ng-template monaGridDetailTemplate let-dataItem>
                                     <span style="padding:1rem;">{{dataItem|json}}</span>
                                 </ng-template>

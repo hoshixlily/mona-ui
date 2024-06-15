@@ -50,7 +50,7 @@
                         <th class="mona-grid-group-column" [style.width.px]="gridService.groupColumnWidth"></th>
                     }
                     @if (gridService.masterDetailTemplate()) {
-                        <th class="mona-grid-detail-column" [style.width.px]="gridService.groupColumnWidth"></th>
+                        <th class="mona-grid-detail-column" [style.width.px]="gridService.detailColumnWidth"></th>
                     }
                     @for (column of gridService.columns(); track $index) {
                         <th cdkDrag [cdkDragData]="column" [cdkDragDisabled]="!reorderable() && !groupable()"
@@ -88,7 +88,7 @@
                             }
                             @if (resizable() && !columnDragging) {
                                 <div monaGridColumnResizeHandler [column]="column" [gridId]="uid" class="mona-grid-column-resizer"
-                                     (resizeStart)="onColumnResizeStart()" (resizeEnd)="resizing=false;"></div>
+                                     (resizeStart)="onColumnResizeStart()" (resizeEnd)="resizing.set(false);"></div>
                             }
                             <ng-template cdkDragPreview>
                                 <div class="mona-grid-column-drag-preview">

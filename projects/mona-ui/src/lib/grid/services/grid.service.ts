@@ -30,6 +30,7 @@ export class GridService {
     );
     public readonly cellEdit$ = new Subject<CellEditEvent>();
     public readonly columns = signal<ImmutableList<Column>>(ImmutableList.create());
+    public readonly detailColumnWidth = 34;
     public readonly filterLoad$ = new Subject<void>();
     public readonly groupColumnWidth = 34;
     public readonly groupColumns = signal<ImmutableSet<Column>>(ImmutableSet.create());
@@ -38,7 +39,7 @@ export class GridService {
         const columns = this.columns();
         const groupColumnWidth = this.groupColumnWidth;
         const groupColumnCount = groupColumns.size();
-        const detailRowOffset = this.masterDetailTemplate() ? this.groupColumnWidth : 0;
+        const detailRowOffset = this.masterDetailTemplate() ? this.detailColumnWidth : 0;
         const columnListWidth = columns.aggregate((acc, c) => acc + (c.calculatedWidth() ?? c.width() ?? 0), 0);
         return groupColumnWidth * groupColumnCount + columnListWidth + detailRowOffset;
     });
@@ -53,7 +54,7 @@ export class GridService {
         return groupColumnWidth * (groupColumnCount + 1) + columnListWidth;
     });
     public readonly masterDetailEmptyCellWidth = computed(() => {
-        return this.groupColumnWidth * (this.groupColumns().size() + 1);
+        return this.detailColumnWidth * (this.groupColumns().size() + 1);
     });
     public readonly masterDetailTemplate = signal<TemplateRef<any> | null>(null);
     public readonly pageState: PageState = { page: signal(1), skip: signal(0), take: signal(10) };
