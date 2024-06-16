@@ -47,6 +47,14 @@ mona-grid-list, mona-grid-virtual-list {
     border-top: 1px solid var(--mona-border-color);
 }
 
+.mona-grid-no-data {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    border-top: 1px solid var(--mona-border-color);
+}
+
 .mona-grid-column-resizer {
     position: absolute;
     top: 0;

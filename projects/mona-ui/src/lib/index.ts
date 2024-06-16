@@ -89,6 +89,7 @@ export * from "./grid/directives/grid-context-menu.directive";
 export * from "./grid/directives/grid-detail-template.directive";
 export * from "./grid/directives/grid-editable.directive";
 export * from "./grid/directives/grid-groupable.directive";
+export * from "./grid/directives/grid-no-data-template.directive";
 export * from "./grid/directives/grid-selectable.directive";
 export * from "./grid/directives/grid-virtual-scroll.directive";
 export * from "./grid/components/grid-column/grid-column.component";
