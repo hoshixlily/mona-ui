@@ -30,6 +30,7 @@ export class GridService {
         ImmutableDictionary.create()
     );
     public readonly cellEdit$ = new Subject<CellEditEvent>();
+    public readonly cellTooltipTemplate = signal<TemplateRef<any> | null>(null);
     public readonly columns = signal<ImmutableList<Column>>(ImmutableList.create());
     public readonly contextMenuItems = signal(ImmutableSet.create<MenuItem>());
     public readonly detailColumnWidth = 34;

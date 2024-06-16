@@ -79,14 +79,14 @@
                                 @for (col of gridOrderColumns; track $index) {
                                     <mona-grid-column [field]="col.field"
                                                       [title]="col.title" [type]="col.filterType">
-                                        <!--                                    <ng-template monaGridCellTemplate let-row>-->
-                                        <!--                                        <ng-container *ngIf="col.field === 'OrderDate' || col.field==='ShippedDate'">-->
-                                        <!--                                            {{row.data[col.field] | date: 'dd/MM/yyyy'}}-->
-                                        <!--                                        </ng-container>-->
-                                        <!--                                        <ng-container *ngIf="col.field !== 'OrderDate' && col.field!=='ShippedDate'">-->
-                                        <!--                                            {{row.data[col.field]}}-->
-                                        <!--                                        </ng-container>-->
-                                        <!--                                    </ng-template>-->
+<!--                                        <ng-template monaGridCellTemplate let-row>-->
+<!--                                            <ng-container *ngIf="col.field === 'OrderDate' || col.field==='ShippedDate'">-->
+<!--                                                {{row.data[col.field] | date: 'dd/MM/yyyy'}}-->
+<!--                                            </ng-container>-->
+<!--                                            <ng-container *ngIf="col.field !== 'OrderDate' && col.field!=='ShippedDate'">-->
+<!--                                                {{row.data[col.field]}}-->
+<!--                                            </ng-container>-->
+<!--                                        </ng-template>-->
                                     </mona-grid-column>
                                 }
                                 <ng-template monaGridDetailTemplate let-dataItem>
@@ -99,6 +99,9 @@
                                 <ng-container monaGridContextMenu>
                                     <mona-menu-item text="Print" (menuClick)="print($event)"></mona-menu-item>
                                 </ng-container>
+                                <ng-template monaGridCellTooltipTemplate let-text>
+                                    <span style="color: var(--mona-text); font-weight: 600;">{{text}}</span>
+                                </ng-template>
                             </mona-grid>
                             <mona-grid [data]="gridProductData" [pageSize]="5" [pageSizeValues]="[5,10,15,20,25,50,100]"
                                        [resizable]="true" resizeMethod="fitView"
@@ -137,6 +140,9 @@
                                 </mona-grid-column>
                                 <ng-template monaGridDetailTemplate let-dataItem>
                                     <span style="padding: 0.25rem 0.5rem;">{{dataItem|json}}</span>
+                                </ng-template>
+                                <ng-template monaGridCellTooltipTemplate let-text>
+                                    <span style="color: var(--mona-text); font-weight: 600;">{{text}}</span>
                                 </ng-template>
                                 <ng-container monaGridContextMenu>
                                     <mona-menu-item text="Print" (menuClick)="print($event)"></mona-menu-item>

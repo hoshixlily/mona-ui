@@ -17,6 +17,7 @@ import { DatePickerComponent } from "../../../date-inputs/date-picker/date-picke
 import { CheckBoxDirective } from "../../../inputs/check-box/directives/check-box.directive";
 import { NumericTextBoxComponent } from "../../../inputs/numeric-text-box/components/numeric-text-box/numeric-text-box.component";
 import { TextBoxComponent } from "../../../inputs/text-box/components/text-box/text-box.component";
+import { TooltipComponent } from "../../../tooltips/tooltip/tooltip.component";
 import { CellEditEvent } from "../../models/CellEditEvent";
 import { Column } from "../../models/Column";
 import { Row } from "../../models/Row";
@@ -37,16 +38,17 @@ import { GridService } from "../../services/grid.service";
         TextBoxComponent,
         NumericTextBoxComponent,
         DatePickerComponent,
-        CheckBoxDirective
+        CheckBoxDirective,
+        TooltipComponent
     ]
 })
 export class GridCellComponent implements OnInit {
     readonly #destroyRef = inject(DestroyRef);
     readonly #focusMonitor = inject(FocusMonitor);
-    readonly #gridService = inject(GridService);
     readonly #hostElementRef = inject(ElementRef<HTMLElement>);
     #focused = false;
     protected readonly editing = signal(false);
+    protected readonly gridService = inject(GridService);
     protected editForm!: FormGroup;
 
     public column = input.required<Column>();
@@ -129,7 +131,7 @@ export class GridCellComponent implements OnInit {
         if (!row) {
             return;
         }
-        if (this.column().index() < this.#gridService.columns().length - 1) {
+        if (this.column().index() < this.gridService.columns().length - 1) {
             const cell = row.querySelector(
                 `td .mona-grid-cell[data-col-index='${this.column().index() + 1}']`
             ) as HTMLElement;
@@ -189,14 +191,14 @@ export class GridCellComponent implements OnInit {
         if (this.editing()) {
             this.updateCellValue();
         }
-        this.#gridService.isInEditMode.set(false);
+        this.gridService.isInEditMode.set(false);
         this.editing.set(false);
         this.focus();
     }
 
     private handleEscapeKey(): void {
         this.editing.set(false);
-        this.#gridService.isInEditMode.set(false);
+        this.gridService.isInEditMode.set(false);
         this.focus();
     }
 
@@ -206,7 +208,7 @@ export class GridCellComponent implements OnInit {
         }
         if (this.#focused) {
             this.editing.set(true);
-            this.#gridService.isInEditMode.set(true);
+            this.gridService.isInEditMode.set(true);
             asyncScheduler.schedule(() => {
                 this.focusCellInput();
             });
@@ -215,7 +217,7 @@ export class GridCellComponent implements OnInit {
 
     private handleFocusGain(): void {
         this.#focused = true;
-        if (this.#gridService.isInEditMode() && origin !== "mouse") {
+        if (this.gridService.isInEditMode() && origin !== "mouse") {
             this.editing.set(true);
             asyncScheduler.schedule(() => {
                 this.focusCellInput();
@@ -266,7 +268,7 @@ export class GridCellComponent implements OnInit {
             }
         });
         if (event.oldValue !== event.newValue) {
-            this.#gridService.cellEdit$.next(event);
+            this.gridService.cellEdit$.next(event);
         }
         return event;
     }
@@ -278,8 +280,8 @@ export class GridCellComponent implements OnInit {
                 // tap(event => event.stopPropagation())
             )
             .subscribe(() => {
-                if (!this.editing && this.#gridService.isInEditMode()) {
-                    this.#gridService.isInEditMode.set(false);
+                if (!this.editing && this.gridService.isInEditMode()) {
+                    this.gridService.isInEditMode.set(false);
                 }
             });
     }
@@ -294,7 +296,7 @@ export class GridCellComponent implements OnInit {
             )
             .subscribe(() => {
                 this.editing.set(false);
-                this.#gridService.isInEditMode.set(false);
+                this.gridService.isInEditMode.set(false);
             });
     }
 
@@ -309,7 +311,7 @@ export class GridCellComponent implements OnInit {
                     return;
                 }
                 this.editing.set(true);
-                this.#gridService.isInEditMode.set(true);
+                this.gridService.isInEditMode.set(true);
                 asyncScheduler.schedule(() => {
                     this.focusCellInput();
                 });
@@ -381,9 +383,7 @@ export class GridCellComponent implements OnInit {
 
     private get gridEditable(): boolean {
         return (
-            !!this.#gridService.editableOptions &&
-            !!this.#gridService.editableOptions.enabled &&
-            this.column().editable()
+            !!this.gridService.editableOptions && !!this.gridService.editableOptions.enabled && this.column().editable()
         );
     }
 }
