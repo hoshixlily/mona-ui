@@ -19,6 +19,7 @@ import { PopupDataInjectionToken } from "../../popup/models/PopupInjectionToken"
 import { PopupRef } from "../../popup/models/PopupRef";
 import { ContextMenuItemComponent } from "../context-menu-item/context-menu-item.component";
 import { ContextMenuInjectorData } from "../models/ContextMenuInjectorData";
+import { defaultSubMenuPositions } from "../models/ContextMenuSettings";
 import { MenuItem } from "../models/MenuItem";
 import { ContextMenuService } from "../services/context-menu.service";
 
@@ -118,7 +119,7 @@ export class ContextMenuContentComponent implements OnInit, AfterViewInit {
             closeOnOutsideClick: true,
             content: ContextMenuContentComponent,
             data: this.#contextMenuInjectorData,
-            positions: this.#contextMenuService.defaultSubMenuPositions,
+            positions: defaultSubMenuPositions,
             popupClass: ["mona-contextmenu-content", ...popupClasses]
         });
         this.menuPopupRef.set(popupRef);
