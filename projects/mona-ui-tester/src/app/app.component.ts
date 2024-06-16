@@ -80,6 +80,7 @@ import {
     GridColumnComponent,
     GridColumnTitleTemplateDirective,
     GridComponent,
+    GridContextMenuDirective,
     GridDetailTemplateDirective,
     GridEditableDirective,
     GridGroupableDirective,
@@ -236,6 +237,7 @@ interface TreeNodeDataItem {
         GridCellTemplateDirective,
         GridColumnComponent,
         GridColumnTitleTemplateDirective,
+        GridContextMenuDirective,
         GridDetailTemplateDirective,
         GridEditableDirective,
         GridGroupableDirective,
@@ -534,10 +536,10 @@ export class AppComponent implements OnInit {
         { field: "ShippedDate", title: "Shipped Date", filterType: "date" },
         { field: "ShipVia", title: "Ship Via", filterType: "boolean" },
         { field: "ShipName", title: "Ship Name", filterType: "string" },
-        // { field: "ShipAddress", title: "Ship Address", filterType: "string" },
+        { field: "ShipAddress", title: "Ship Address", filterType: "string" },
         { field: "ShipCity", title: "Ship City", filterType: "string" },
-        { field: "ShipRegion", title: "Ship Region", filterType: "string" }
-        // { field: "ShipPostalCode", title: "Ship Postal Code", filterType: "string" }
+        // { field: "ShipRegion", title: "Ship Region", filterType: "string" },
+        { field: "ShipPostalCode", title: "Ship Postal Code", filterType: "string" }
     ];
 
     public gridOrderData: any[] = GridOrderData.map(d => {
@@ -553,13 +555,13 @@ export class AppComponent implements OnInit {
         { field: "ProductID", title: "Product ID", filterType: "number" },
         { field: "ProductName", title: "Product Name", filterType: "string" },
         { field: "SupplierID", title: "Supplier ID", filterType: "number" },
-        { field: "CategoryID", title: "Category ID", filterType: "number" }
-        // { field: "QuantityPerUnit", title: "Quantity Per Unit", filterType: "string" },
-        // { field: "UnitPrice", title: "Unit Price", filterType: "number" },
+        { field: "CategoryID", title: "Category ID", filterType: "number" },
+        { field: "QuantityPerUnit", title: "Quantity Per Unit", filterType: "string" },
+        { field: "UnitPrice", title: "Unit Price", filterType: "number" },
         // { field: "UnitsInStock", title: "Units In Stock", filterType: "number" },
         // { field: "UnitsOnOrder", title: "Units On Order", filterType: "number" },
         // { field: "ReorderLevel", title: "Reorder Level", filterType: "number" },
-        // { field: "Discontinued", title: "Discontinued", filterType: "boolean" },
+        { field: "Discontinued", title: "Discontinued", filterType: "boolean" }
         // { field: "FirstOrderedOn", title: "First Ordered On", filterType: "date" }
     ];
 

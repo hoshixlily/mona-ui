@@ -85,6 +85,7 @@ export * from "./grid/models/GroupableOptions";
 export * from "./grid/models/SortableOptions";
 export * from "./grid/directives/grid-cell-template.directive";
 export * from "./grid/directives/grid-column-title-template.directive";
+export * from "./grid/directives/grid-context-menu.directive";
 export * from "./grid/directives/grid-detail-template.directive";
 export * from "./grid/directives/grid-editable.directive";
 export * from "./grid/directives/grid-groupable.directive";

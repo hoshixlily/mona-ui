@@ -2,6 +2,7 @@ import { computed, Injectable, OutputEmitterRef, Signal, signal, TemplateRef, Wr
 import { any, Dictionary, from, ImmutableDictionary, ImmutableList, ImmutableSet, select } from "@mirei/ts-collections";
 import { BehaviorSubject, Subject } from "rxjs";
 import { VirtualScrollOptions } from "../../common/models/VirtualScrollOptions";
+import { MenuItem } from "../../menus/models/MenuItem";
 import { Query } from "../../query/core/Query";
 import { CompositeFilterDescriptor, FilterDescriptor } from "../../query/filter/FilterDescriptor";
 import { SortDescriptor } from "../../query/sort/SortDescriptor";
@@ -30,6 +31,7 @@ export class GridService {
     );
     public readonly cellEdit$ = new Subject<CellEditEvent>();
     public readonly columns = signal<ImmutableList<Column>>(ImmutableList.create());
+    public readonly contextMenuItems = signal(ImmutableSet.create<MenuItem>());
     public readonly detailColumnWidth = 34;
     public readonly filterLoad$ = new Subject<void>();
     public readonly groupColumnWidth = 34;

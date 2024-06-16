@@ -92,6 +92,9 @@
                                 <ng-template monaGridDetailTemplate let-dataItem>
                                     <span style="padding:1rem;">{{dataItem|json}}</span>
                                 </ng-template>
+                                <ng-container monaGridContextMenu>
+                                    <mona-menu-item text="Print" (menuClick)="print($event)"></mona-menu-item>
+                                </ng-container>
                             </mona-grid>
                             <mona-grid [data]="gridProductData" [pageSize]="5" [pageSizeValues]="[5,10,15,20,25,50,100]"
                                        [resizable]="true" resizeMethod="fitView"
@@ -131,6 +134,9 @@
                                 <ng-template monaGridDetailTemplate let-dataItem>
                                     <span style="padding: 0.25rem 0.5rem;">{{dataItem|json}}</span>
                                 </ng-template>
+                                <ng-container monaGridContextMenu>
+                                    <mona-menu-item text="Print" (menuClick)="print($event)"></mona-menu-item>
+                                </ng-container>
                             </mona-grid>
                         </div>
                     </ng-template>

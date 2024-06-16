@@ -4,7 +4,7 @@
             @if (gridService.groupColumns().length === 0) {
                 @for (row of data(); track row.uid) {
                     <tr (click)="onGridRowClick($event, row)" [ngClass]="{'mona-selected': row.selected()}"
-                        [attr.data-ruid]="row.uid" [attr.data-row-view-index]="$index">
+                        [attr.data-ruid]="row.uid" [attr.data-row-view-index]="$index" #rowElement>
                         @if (gridService.masterDetailTemplate()) {
                             <td [style.width.px]="gridService.detailColumnWidth">
                                 <span class="mona-grid-detail-toggle-wrapper">
@@ -22,6 +22,11 @@
                             <td [style.width.px]="column.calculatedWidth()" [style.min-width.px]="column.minWidth()">
                                 <mona-grid-cell [column]="column" [row]="row"></mona-grid-cell>
                             </td>
+                        }
+                        @if (gridService.contextMenuItems().length !== 0) {
+                            <ng-container [ngTemplateOutlet]="contextMenuTemplate"
+                                          [ngTemplateOutletContext]="{$implicit: row.data, element: rowElement, index: $index}">
+                            </ng-container>
                         }
                     </tr>
                     @if (row.detailVisible()) {
@@ -68,7 +73,7 @@
                                     @for (row of subGroup.rows; track row.uid) {
                                         <tr (click)="onGridRowClick($event, row)"
                                             [ngClass]="{'mona-selected': row.selected()}"
-                                            [attr.data-ruid]="row.uid" [attr.data-row-view-index]="$index">
+                                            [attr.data-ruid]="row.uid" [attr.data-row-view-index]="$index" #rowElement>
                                             @for (_ of gridService.groupColumns(); track $index) {
                                                 <td [style.width.px]="gridService.groupColumnWidth"></td>
                                             }
@@ -89,6 +94,11 @@
                                                 <td [style.width.px]="column.calculatedWidth()">
                                                     <mona-grid-cell [column]="column" [row]="row"></mona-grid-cell>
                                                 </td>
+                                            }
+                                            @if (gridService.contextMenuItems().length !== 0) {
+                                                <ng-container [ngTemplateOutlet]="contextMenuTemplate"
+                                                              [ngTemplateOutletContext]="{$implicit: row.data, element: rowElement, index: $index}">
+                                                </ng-container>
                                             }
                                         </tr>
                                         @if (row.detailVisible()) {
@@ -112,3 +122,9 @@
         </tbody>
     </table>
 </div>
+
+<ng-template let-rowData let-element="element" let-rowIndex="index" #contextMenuTemplate>
+    <mona-contextmenu [target]="element"
+                      [context]="{rowData, element, rowIndex}"
+                      [menuItems]="gridService.contextMenuItems()"></mona-contextmenu>
+</ng-template>
