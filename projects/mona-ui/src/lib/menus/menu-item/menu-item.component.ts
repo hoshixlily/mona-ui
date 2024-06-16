@@ -6,15 +6,14 @@ import {
     contentChildren,
     effect,
     input,
-    InputSignal,
     output,
-    OutputEmitterRef,
     Signal,
     TemplateRef,
     untracked
 } from "@angular/core";
 import { MenuItemIconTemplateDirective } from "../directives/menu-item-icon-template.directive";
 import { MenuItemTextTemplateDirective } from "../directives/menu-item-text-template.directive";
+import { InternalMenuItemClickEvent, MenuItemClickEvent } from "../models/ContextMenuInjectorData";
 import { MenuItem } from "../models/MenuItem";
 
 @Component({
@@ -24,7 +23,7 @@ import { MenuItem } from "../models/MenuItem";
     standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class MenuItemComponent {
+export class MenuItemComponent<T = unknown> {
     readonly #menuItem: Signal<MenuItem> = computed(() => {
         return {
             data: this.data(),
@@ -42,14 +41,14 @@ export class MenuItemComponent {
     protected readonly submenuItems = contentChildren(MenuItemComponent);
     protected readonly textTemplate = contentChild(MenuItemTextTemplateDirective, { read: TemplateRef });
 
-    public readonly menuClick: OutputEmitterRef<void> = output();
+    public readonly menuClick = output<MenuItemClickEvent<any, T>>();
 
-    public data: InputSignal<unknown> = input<unknown>({});
-    public disabled: InputSignal<boolean> = input<boolean>(false);
-    public divider: InputSignal<boolean> = input<boolean>(false);
-    public iconClass: InputSignal<string> = input<string>("");
-    public text: InputSignal<string> = input<string>("");
-    public visible: InputSignal<boolean> = input<boolean>(true);
+    public data = input<T>();
+    public disabled = input<boolean>(false);
+    public divider = input<boolean>(false);
+    public iconClass = input<string>("");
+    public text = input<string>("");
+    public visible = input<boolean>(true);
 
     public constructor() {
         effect(() => {
@@ -66,7 +65,12 @@ export class MenuItemComponent {
 
     private getMenuItemWithDepth(depth: number = 0): MenuItem {
         this.#menuItem().iconTemplate = this.iconTemplate();
-        this.#menuItem().menuClick = (): void => this.menuClick.emit();
+        this.#menuItem().menuClick = (event: InternalMenuItemClickEvent<any>): void => {
+            this.menuClick.emit({
+                ...event,
+                data: this.data()
+            });
+        };
         this.#menuItem().subMenuItems = this.submenuItems().map(si => {
             const subMenuItem = si.getMenuItemWithDepth(depth + 1);
             subMenuItem.parent = this.#menuItem();
