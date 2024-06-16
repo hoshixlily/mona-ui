@@ -13,7 +13,7 @@
             @if (gridService.cellTooltipTemplate()) {
                 <mona-tooltip [target]="cellElement">
                     <ng-container [ngTemplateOutlet]="gridService.cellTooltipTemplate()"
-                                  [ngTemplateOutletContext]="{$implicit: row().data[column().field()], field: column().field, dataItem: row().data}"></ng-container>
+                                  [ngTemplateOutletContext]="{$implicit: row().data[column().field()], field: column().field(), dataItem: row().data}"></ng-container>
                 </mona-tooltip>
             }
         }
