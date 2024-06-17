@@ -18,7 +18,7 @@ import { AnimationService } from "../../animations/services/animation.service";
 import { PopupDataInjectionToken } from "../../popup/models/PopupInjectionToken";
 import { PopupRef } from "../../popup/models/PopupRef";
 import { ContextMenuItemComponent } from "../context-menu-item/context-menu-item.component";
-import { ContextMenuInjectorData } from "../models/ContextMenuInjectorData";
+import { ContextMenuInjectorData, InternalMenuItemClickEvent } from "../models/ContextMenuInjectorData";
 import { defaultSubMenuPositions } from "../models/ContextMenuSettings";
 import { MenuItem } from "../models/MenuItem";
 import { ContextMenuService } from "../services/context-menu.service";
@@ -31,10 +31,10 @@ import { ContextMenuService } from "../services/context-menu.service";
     standalone: true,
     imports: [NgClass, ContextMenuItemComponent]
 })
-export class ContextMenuContentComponent implements OnInit, AfterViewInit {
+export class ContextMenuContentComponent<C> implements OnInit, AfterViewInit {
     readonly #animationService: AnimationService = inject(AnimationService);
     readonly #cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
-    readonly #contextMenuInjectorData: Partial<ContextMenuInjectorData> = { isRoot: false };
+    readonly #contextMenuInjectorData: Partial<ContextMenuInjectorData<C>> = { isRoot: false };
     readonly #contextMenuService: ContextMenuService = inject(ContextMenuService);
     readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
     #currentMenuItem: MenuItem | null = null;
@@ -42,7 +42,8 @@ export class ContextMenuContentComponent implements OnInit, AfterViewInit {
     protected readonly iconSpaceVisible: WritableSignal<boolean> = signal(false);
     protected readonly linkSpaceVisible: WritableSignal<boolean> = signal(false);
     protected readonly menuPopupRef: WritableSignal<PopupRef | null> = signal(null);
-    public readonly contextMenuData: ContextMenuInjectorData = inject<ContextMenuInjectorData>(PopupDataInjectionToken);
+    public readonly contextMenuData: ContextMenuInjectorData<C> =
+        inject<ContextMenuInjectorData>(PopupDataInjectionToken);
     public keyManager!: ActiveDescendantKeyManager<ContextMenuItemComponent>;
 
     public ngAfterViewInit(): void {
@@ -74,8 +75,12 @@ export class ContextMenuContentComponent implements OnInit, AfterViewInit {
         if (menuItem.disabled || menuItem.divider || (menuItem.subMenuItems && menuItem.subMenuItems.length > 0)) {
             return;
         }
-        menuItem.menuClick?.();
-        this.contextMenuData.menuClick?.next(menuItem);
+        const clickEvent: InternalMenuItemClickEvent<C> = {
+            context: this.contextMenuData.context,
+            originalEvent: event
+        };
+        menuItem.menuClick?.(clickEvent);
+        this.contextMenuData.menuClick?.next(clickEvent);
     }
 
     public onListItemMouseEnter(event: MouseEvent, menuItem: MenuItem): void {
@@ -105,6 +110,7 @@ export class ContextMenuContentComponent implements OnInit, AfterViewInit {
     }
 
     private create(anchor: HTMLElement, menuItem: MenuItem, viaKeyboard?: boolean): void {
+        this.#contextMenuInjectorData.context = this.contextMenuData.context;
         this.#contextMenuInjectorData.menuItems = menuItem.subMenuItems;
         this.#contextMenuInjectorData.menuClick = this.contextMenuData.menuClick;
         this.#contextMenuInjectorData.navigate = this.contextMenuData.navigate;
@@ -184,15 +190,19 @@ export class ContextMenuContentComponent implements OnInit, AfterViewInit {
         }
     }
 
-    private handleInputKeys(): void {
+    private handleInputKeys(event: KeyboardEvent): void {
         const menuItem = this.keyManager.activeItem?.menuItem();
         if (menuItem) {
             if (menuItem.subMenuItems && menuItem.subMenuItems.length > 0) {
                 return;
             }
             if (this.keyManager.activeItem) {
-                this.keyManager.activeItem.menuItem().menuClick?.();
-                this.contextMenuData.menuClick?.next(this.keyManager.activeItem.menuItem());
+                const clickEvent: InternalMenuItemClickEvent<C> = {
+                    context: this.contextMenuData.context,
+                    originalEvent: event
+                };
+                this.keyManager.activeItem.menuItem().menuClick?.(clickEvent);
+                this.contextMenuData.menuClick?.next(clickEvent);
             }
         }
     }
@@ -230,7 +240,7 @@ export class ContextMenuContentComponent implements OnInit, AfterViewInit {
                         break;
                     case "Enter":
                     case " ":
-                        this.handleInputKeys();
+                        this.handleInputKeys(event);
                         break;
                     case "ArrowRight":
                         this.handleArrowRightKey();

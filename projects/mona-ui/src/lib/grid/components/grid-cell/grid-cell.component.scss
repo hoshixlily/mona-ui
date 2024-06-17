@@ -18,6 +18,8 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    cursor: default;
+    user-select: none;
 }
 
 .mona-grid-cell-editing {

@@ -35,6 +35,7 @@ import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { Collections } from "@mirei/ts-collections";
 import { v4 } from "uuid";
 import { ChipComponent } from "../../../buttons/chip/chip.component";
+import { PlaceholderComponent } from "../../../layout/placeholder/placeholder.component";
 import { ContextMenuComponent } from "../../../menus/context-menu/context-menu.component";
 import { MenuItemIconTemplateDirective } from "../../../menus/directives/menu-item-icon-template.directive";
 import { MenuItemComponent } from "../../../menus/menu-item/menu-item.component";
@@ -45,6 +46,7 @@ import { CompositeFilterDescriptor } from "../../../query/filter/FilterDescripto
 import { SortDescriptor, SortDirection } from "../../../query/sort/SortDescriptor";
 import { GridColumnResizeHandlerDirective } from "../../directives/grid-column-resize-handler.directive";
 import { GridDetailTemplateDirective } from "../../directives/grid-detail-template.directive";
+import { GridNoDataTemplateDirective } from "../../directives/grid-no-data-template.directive";
 import { CellEditEvent } from "../../models/CellEditEvent";
 import { Column } from "../../models/Column";
 import { ColumnFilterState } from "../../models/ColumnFilterState";
@@ -78,7 +80,8 @@ import { GridVirtualListComponent } from "../grid-virtual-list/grid-virtual-list
         CdkDragPlaceholder,
         ContextMenuComponent,
         MenuItemComponent,
-        MenuItemIconTemplateDirective
+        MenuItemIconTemplateDirective,
+        PlaceholderComponent
     ],
     host: {
         class: "mona-grid",
@@ -99,6 +102,7 @@ export class GridComponent<T> implements OnInit {
     protected readonly groupable = computed(() => this.gridService.groupableOptions().enabled);
     protected readonly groupingInProgress = signal(false);
     protected readonly headerMargin = "0 15px 0 0";
+    protected readonly noDataTemplate = contentChild(GridNoDataTemplateDirective, { read: TemplateRef });
     protected readonly resizing = signal(false);
     protected readonly uid = v4();
     protected columnDragging = false;

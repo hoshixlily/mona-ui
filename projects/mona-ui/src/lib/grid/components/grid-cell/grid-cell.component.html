@@ -9,7 +9,13 @@
             <ng-container [ngTemplateOutlet]="column().cellTemplate()"
                           [ngTemplateOutletContext]="{$implicit: row(), column: column()}"></ng-container>
         } @else {
-            <span class="mona-grid-cell-text">{{row().data[column().field()]}}</span>
+            <span class="mona-grid-cell-text" #cellElement>{{row().data[column().field()]}}</span>
+            @if (gridService.cellTooltipTemplate()) {
+                <mona-tooltip [target]="cellElement">
+                    <ng-container [ngTemplateOutlet]="gridService.cellTooltipTemplate()"
+                                  [ngTemplateOutletContext]="{$implicit: row().data[column().field()], field: column().field(), dataItem: row().data}"></ng-container>
+                </mona-tooltip>
+            }
         }
     }
 </div>

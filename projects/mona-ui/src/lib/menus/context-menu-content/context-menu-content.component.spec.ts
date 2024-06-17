@@ -15,8 +15,8 @@ const POPUP_TOKEN = [
 ];
 
 describe("ContextMenuContentComponent", () => {
-    let component: ContextMenuContentComponent;
-    let fixture: ComponentFixture<ContextMenuContentComponent>;
+    let component: ContextMenuContentComponent<any>;
+    let fixture: ComponentFixture<ContextMenuContentComponent<any>>;
 
     beforeEach(() => {
         TestBed.configureTestingModule({

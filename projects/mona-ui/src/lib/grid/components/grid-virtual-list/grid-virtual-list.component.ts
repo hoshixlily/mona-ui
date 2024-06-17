@@ -21,6 +21,7 @@ import { faChevronDown, faChevronRight } from "@fortawesome/free-solid-svg-icons
 import { EnumerableSet, from, ImmutableList, ImmutableSet } from "@mirei/ts-collections";
 import { fromEvent, Observable, pairwise, startWith } from "rxjs";
 import { ButtonDirective } from "../../../buttons/button/button.directive";
+import { ContextMenuComponent } from "../../../menus/context-menu/context-menu.component";
 import { ContainsPipe } from "../../../pipes/contains.pipe";
 import { SlicePipe } from "../../../pipes/slice.pipe";
 import { Column } from "../../models/Column";
@@ -43,7 +44,8 @@ import { GridCellComponent } from "../grid-cell/grid-cell.component";
         FaIconComponent,
         SlicePipe,
         ContainsPipe,
-        NgTemplateOutlet
+        NgTemplateOutlet,
+        ContextMenuComponent
     ],
     templateUrl: "./grid-virtual-list.component.html",
     styleUrl: "./grid-virtual-list.component.scss",

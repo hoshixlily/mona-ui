@@ -111,12 +111,32 @@
 
 @defer (when gridWidthSet()) {
     @if (gridService.virtualScrollOptions().enabled) {
-        <mona-grid-virtual-list [columns]="gridService.columns()" [data]="gridService.viewRows()"></mona-grid-virtual-list>
+        @if (gridService.viewRows().length !== 0) {
+            <mona-grid-virtual-list [columns]="gridService.columns()" [data]="gridService.viewRows()"></mona-grid-virtual-list>
+        } @else {
+            <ng-container [ngTemplateOutlet]="emptyGridTemplate"></ng-container>
+        }
     } @else {
-        <mona-grid-list [columns]="gridService.columns()" [data]="gridService.viewPageRows()"></mona-grid-list>
-        <mona-pager [skip]="gridService.pageState.skip()" [pageSize]="gridService.pageState.take()"
-                    [total]="gridService.viewRowCount()"
-                    [pageInput]="true" [pageSizeValues]="pageSizeValues()" [responsive]="responsivePager()"
-                    (pageSizeChange)="onPageSizeChange($event)" (pageChange)="onPageChange($event)"></mona-pager>
+        @if (gridService.viewPageRows().length !== 0) {
+            <mona-grid-list [columns]="gridService.columns()" [data]="gridService.viewPageRows()"></mona-grid-list>
+            <mona-pager [skip]="gridService.pageState.skip()" [pageSize]="gridService.pageState.take()"
+                        [total]="gridService.viewRowCount()"
+                        [pageInput]="true" [pageSizeValues]="pageSizeValues()" [responsive]="responsivePager()"
+                        (pageSizeChange)="onPageSizeChange($event)" (pageChange)="onPageChange($event)"></mona-pager>
+        } @else {
+            <ng-container [ngTemplateOutlet]="emptyGridTemplate"></ng-container>
+        }
     }
+} @placeholder {
+    <mona-placeholder text="Loading..."></mona-placeholder>
 }
+
+<ng-template #emptyGridTemplate>
+    <div class="mona-grid-no-data">
+        @if (noDataTemplate()) {
+            <ng-container [ngTemplateOutlet]="noDataTemplate()??null"></ng-container>
+        } @else {
+            <mona-placeholder text="No data"></mona-placeholder>
+        }
+    </div>
+</ng-template>
