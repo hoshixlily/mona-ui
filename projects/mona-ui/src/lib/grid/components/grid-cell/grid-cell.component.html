@@ -7,7 +7,7 @@
     } @else {
         @if (column().cellTemplate()) {
             <ng-container [ngTemplateOutlet]="column().cellTemplate()"
-                          [ngTemplateOutletContext]="{$implicit: row(), column: column()}" #cellElement></ng-container>
+                          [ngTemplateOutletContext]="{$implicit: row(), column: column()}"></ng-container>
         } @else {
             <span class="mona-grid-cell-text" #cellElement>{{row().data[column().field()]}}</span>
             @if (gridService.cellTooltipTemplate()) {
