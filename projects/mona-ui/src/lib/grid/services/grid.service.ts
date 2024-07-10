@@ -73,7 +73,7 @@ export class GridService {
         const take = this.pageState.take();
         const viewRows = this.viewRows();
         if (!viewRows.any()) {
-            return ImmutableSet.create();
+            return ImmutableSet.create<Row>();
         }
         return viewRows.skip(skip).take(take).toImmutableSet();
     });
