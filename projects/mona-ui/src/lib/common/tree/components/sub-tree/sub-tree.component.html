@@ -46,25 +46,25 @@
             @if (!nodeComponent.disabled()) {
                 <ng-template cdkDragPreview [data]="node">
                     <div class="mona-tree-node-dragging">
-                    <span>
-                        @if ((treeService.dropPositionChange$|async)?.position === 'before') {
-                            @if ((treeService.nodeDrag$|async)?.dropAllowed) {
-                                <i class="ri-arrow-up-line"></i>
+                        <span>
+                            @if ((treeService.dropPositionChange$|async)?.position === 'before') {
+                                @if ((treeService.nodeDrag$|async)?.dropAllowed) {
+                                    <i class="ri-arrow-up-line"></i>
+                                } @else {
+                                    <i class="ri-prohibited-2-line"></i>
+                                }
+                            } @else if ((treeService.dropPositionChange$|async)?.position === 'after') {
+                                @if ((treeService.nodeDrag$|async)?.dropAllowed) {
+                                    <i class="ri-arrow-down-line"></i>
+                                } @else {
+                                    <i class="ri-prohibited-2-line"></i>
+                                }
+                            } @else if ((treeService.dropPositionChange$|async)?.position === 'inside') {
+                                <i class="ri-add-line"></i>
                             } @else {
                                 <i class="ri-prohibited-2-line"></i>
                             }
-                        } @else if ((treeService.dropPositionChange$|async)?.position === 'after') {
-                            @if ((treeService.nodeDrag$|async)?.dropAllowed) {
-                                <i class="ri-arrow-down-line"></i>
-                            } @else {
-                                <i class="ri-prohibited-2-line"></i>
-                            }
-                        } @else if ((treeService.dropPositionChange$|async)?.position === 'inside') {
-                            <i class="ri-add-line"></i>
-                        } @else {
-                            <i class="ri-prohibited-2-line"></i>
-                        }
-                    </span>
+                        </span>
                         <span>{{nodeComponent.nodeText()}}</span>
                     </div>
                 </ng-template>

@@ -68,7 +68,7 @@ export class GridService {
     public readonly selectedRows = signal<ImmutableSet<Row>>(ImmutableSet.create());
     public readonly selectedRowsChange$ = new Subject<Iterable<Row>>();
     public readonly sortLoad$ = new Subject<void>();
-    public readonly viewPageRows: Signal<ImmutableSet<Row>> = computed(() => {
+    public readonly viewPageRows = computed(() => {
         const skip = this.pageState.skip();
         const take = this.pageState.take();
         const viewRows = this.viewRows();
@@ -77,7 +77,7 @@ export class GridService {
         }
         return viewRows.skip(skip).take(take).toImmutableSet();
     });
-    public readonly viewRows: Signal<ImmutableSet<Row>> = computed(() => {
+    public readonly viewRows = computed(() => {
         const rows = this.rows();
         const appliedFilters = this.appliedFilters();
         const appliedSorts = this.appliedSorts();

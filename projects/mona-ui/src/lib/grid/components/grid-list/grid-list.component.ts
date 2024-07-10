@@ -20,7 +20,7 @@ import { ContextMenuComponent } from "../../../menus/context-menu/context-menu.c
 import { ElementAtPipe } from "../../../pipes/element-at.pipe";
 import { SlicePipe } from "../../../pipes/slice.pipe";
 import { Column } from "../../models/Column";
-import { GridGroup, VirtualGridRow } from "../../models/GridGroup";
+import { GridGroup } from "../../models/GridGroup";
 import { Row } from "../../models/Row";
 import { GridGroupPipe } from "../../pipes/grid-group.pipe";
 import { GridService } from "../../services/grid.service";
