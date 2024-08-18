@@ -7,12 +7,9 @@ import {
     ElementRef,
     inject,
     input,
-    InputSignal,
     model,
-    ModelSignal,
     OnDestroy,
     output,
-    OutputEmitterRef,
     Signal,
     TemplateRef,
     viewChild
@@ -42,23 +39,23 @@ export class WindowComponent implements OnDestroy, AfterViewInit {
     protected readonly titleTemplate = contentChild(WindowTitleTemplateDirective, { read: TemplateRef });
     protected readonly windowTemplate: Signal<TemplateRef<any>> = viewChild.required("windowTemplate");
 
-    public readonly close: OutputEmitterRef<WindowCloseEvent> = output();
-    public readonly dragEnd: OutputEmitterRef<void> = output();
-    public readonly dragStart: OutputEmitterRef<void> = output();
+    public readonly close = output<WindowCloseEvent>();
+    public readonly dragEnd = output();
+    public readonly dragStart = output();
 
-    public draggable: InputSignal<boolean> = input(true);
+    public draggable = input(true);
     public focusedElement = input<HTMLElement | ElementRef<HTMLElement> | string | undefined>(undefined);
-    public height: ModelSignal<number | undefined> = model<number | undefined>(undefined);
-    public left: ModelSignal<number | undefined> = model<number | undefined>(undefined);
-    public maxHeight: InputSignal<number | undefined> = input<number | undefined>(undefined);
-    public maxWidth: InputSignal<number | undefined> = input<number | undefined>(undefined);
-    public minHeight: InputSignal<number | undefined> = input<number | undefined>(undefined);
-    public minWidth: InputSignal<number | undefined> = input<number | undefined>(undefined);
-    public modal: InputSignal<boolean | undefined> = input<boolean | undefined>(undefined);
-    public resizable: InputSignal<boolean | undefined> = input<boolean | undefined>(undefined);
-    public title: InputSignal<string | undefined> = input<string | undefined>(undefined);
-    public top: ModelSignal<number | undefined> = model<number | undefined>(undefined);
-    public width: ModelSignal<number | undefined> = model<number | undefined>(undefined);
+    public height = model<number | undefined>(undefined);
+    public left = model<number | undefined>(undefined);
+    public maxHeight = input<number | undefined>(undefined);
+    public maxWidth = input<number | undefined>(undefined);
+    public minHeight = input<number | undefined>(undefined);
+    public minWidth = input<number | undefined>(undefined);
+    public modal = input<boolean | undefined>(undefined);
+    public resizable = input<boolean | undefined>(undefined);
+    public title = input<string | undefined>(undefined);
+    public top = model<number | undefined>(undefined);
+    public width = model<number | undefined>(undefined);
 
     public ngAfterViewInit(): void {
         asapScheduler.schedule(() => {

@@ -10,12 +10,9 @@ import {
     forwardRef,
     inject,
     input,
-    InputSignal,
     model,
     OnInit,
     output,
-    OutputEmitterRef,
-    Signal,
     TemplateRef,
     untracked,
     viewChild
@@ -23,7 +20,7 @@ import {
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { faChevronDown, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { faChevronDown, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { Predicate } from "@mirei/ts-collections";
 import { distinctUntilChanged, fromEvent, take, withLatestFrom } from "rxjs";
 import { v4 } from "uuid";
@@ -36,7 +33,6 @@ import { ListGroupHeaderTemplateDirective } from "../../../../common/list/direct
 import { ListHeaderTemplateDirective } from "../../../../common/list/directives/list-header-template.directive";
 import { ListItemTemplateDirective } from "../../../../common/list/directives/list-item-template.directive";
 import { ListNoDataTemplateDirective } from "../../../../common/list/directives/list-no-data-template.directive";
-import { ListItem } from "../../../../common/list/models/ListItem";
 import { SelectableOptions } from "../../../../common/list/models/SelectableOptions";
 import { SelectionChangeEvent } from "../../../../common/list/models/SelectionChangeEvent";
 import { ListService } from "../../../../common/list/services/list.service";
@@ -94,13 +90,13 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
     readonly #listService: ListService<TData> = inject(ListService);
     readonly #popupAnimationService: PopupAnimationService = inject(PopupAnimationService);
     readonly #popupService: PopupService = inject(PopupService);
-    readonly #popupUidClass: string = `mona-dropdown-popup-${v4()}`;
+    readonly #popupUidClass = `mona-dropdown-popup-${v4()}`;
     #popupRef: PopupRef | null = null;
     #propagateChange: Action<TData | null> | null = null;
     #value: TData | null = null;
 
-    protected readonly clearIcon: IconDefinition = faTimes;
-    protected readonly dropdownIcon: IconDefinition = faChevronDown;
+    protected readonly clearIcon = faTimes;
+    protected readonly dropdownIcon = faChevronDown;
     protected readonly footerTemplate = contentChild(DropDownFooterTemplateDirective, { read: TemplateRef });
     protected readonly groupHeaderTemplate = contentChild(DropDownGroupHeaderTemplateDirective, {
         read: TemplateRef
@@ -114,15 +110,15 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
         mode: "single",
         toggleable: false
     };
-    protected readonly selectedDataItem: Signal<TData | null> = computed(() => {
+    protected readonly selectedDataItem = computed(() => {
         return this.selectedListItem()?.data ?? null;
     });
-    protected readonly selectedKeysChange: OutputEmitterRef<any[]> = output();
-    protected readonly selectedListItem: Signal<ListItem<TData> | null> = computed(() => {
+    protected readonly selectedKeysChange = output<any[]>();
+    protected readonly selectedListItem = computed(() => {
         return this.#listService.selectedListItems().firstOrDefault();
     });
     protected readonly valueTemplate = contentChild(DropDownListValueTemplateDirective, { read: TemplateRef });
-    protected readonly valueText: Signal<string> = computed(() => {
+    protected readonly valueText = computed(() => {
         const listItem = this.selectedListItem();
         if (!listItem) {
             return "";
@@ -133,8 +129,8 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
     public data = input<Iterable<TData>>([]);
     public disabled = model(false);
     public itemDisabled = input<string | Predicate<TData> | null | undefined>("");
-    public placeholder: InputSignal<string> = input("");
-    public showClearButton: InputSignal<boolean> = input(false);
+    public placeholder = input("");
+    public showClearButton = input(false);
     public textField = input<string | null | undefined>("");
     public valueField = input<string | null | undefined>("");
 
@@ -331,7 +327,7 @@ export class DropDownListComponent<TData> implements OnInit, ControlValueAccesso
     }
 
     private setSubscriptions(): void {
-        this.#listService.selectedKeysChange.subscribe(keys => {
+        this.#listService.selectedKeysChange.subscribe(() => {
             const item = this.selectedDataItem();
             this.updateValue(item);
         });

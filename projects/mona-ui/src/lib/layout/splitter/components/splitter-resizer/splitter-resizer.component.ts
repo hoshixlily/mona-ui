@@ -1,16 +1,4 @@
-import {
-    ChangeDetectionStrategy,
-    Component,
-    computed,
-    ElementRef,
-    inject,
-    input,
-    InputSignal,
-    OnInit,
-    Signal,
-    signal,
-    WritableSignal
-} from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, ElementRef, inject, input, OnInit, signal } from "@angular/core";
 import { FaIconComponent } from "@fortawesome/angular-fontawesome";
 import { filter, fromEvent, skipUntil, takeUntil, tap } from "rxjs";
 import { ButtonDirective } from "../../../../buttons/button/button.directive";
@@ -37,13 +25,13 @@ import { SplitterPaneComponent } from "../splitter-pane/splitter-pane.component"
 })
 export class SplitterResizerComponent implements OnInit {
     readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
-    protected readonly resizable: Signal<boolean> = computed(() => {
+    protected readonly resizable = computed(() => {
         return this.previousPane().resizable() && this.nextPane().resizable();
     });
-    protected readonly resizing: WritableSignal<boolean> = signal(false);
-    public nextPane: InputSignal<SplitterPaneComponent> = input.required<SplitterPaneComponent>();
-    public orientation: InputSignal<Orientation> = input.required<Orientation>();
-    public previousPane: InputSignal<SplitterPaneComponent> = input.required<SplitterPaneComponent>();
+    protected readonly resizing = signal(false);
+    public nextPane = input.required<SplitterPaneComponent>();
+    public orientation = input.required<Orientation>();
+    public previousPane = input.required<SplitterPaneComponent>();
 
     public ngOnInit(): void {
         this.setEvents();

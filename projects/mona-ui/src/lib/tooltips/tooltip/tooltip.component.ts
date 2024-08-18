@@ -6,7 +6,6 @@ import {
     ElementRef,
     inject,
     input,
-    InputSignal,
     OnInit,
     TemplateRef,
     viewChild
@@ -37,8 +36,8 @@ export class TooltipComponent implements OnInit {
     protected readonly templateRef = viewChild.required(TemplateRef);
 
     public readonly uid: string = v4();
-    public position: InputSignal<Position> = input<Position>("top");
-    public target: InputSignal<Element | ElementRef> = input.required<Element | ElementRef>();
+    public position = input<Position>("top");
+    public target = input.required<Element | ElementRef>();
 
     public ngOnInit(): void {
         this.setSubscriptions();

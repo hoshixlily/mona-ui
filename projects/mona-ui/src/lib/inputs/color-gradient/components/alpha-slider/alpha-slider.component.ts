@@ -6,7 +6,6 @@ import {
     forwardRef,
     inject,
     input,
-    InputSignal,
     NgZone,
     Signal,
     viewChild
@@ -31,13 +30,13 @@ import { delay, fromEvent } from "rxjs";
 export class AlphaSliderComponent implements AfterViewInit, ControlValueAccessor {
     readonly #hostElementRef: ElementRef<HTMLDivElement> = inject(ElementRef);
     readonly #zone: NgZone = inject(NgZone);
-    #mouseDown: boolean = false;
-    #mouseMove: boolean = false;
+    #mouseDown = false;
+    #mouseMove = false;
     #propagateChange: (value: number) => void = () => {};
 
     protected readonly sliderHandle: Signal<ElementRef<HTMLDivElement>> = viewChild.required("sliderHandle");
 
-    public color: InputSignal<string> = input<string>("#000000");
+    public color = input<string>("#000000");
 
     public ngAfterViewInit(): void {
         this.setSubscriptions();

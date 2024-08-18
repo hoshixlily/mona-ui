@@ -1,15 +1,5 @@
 import { NgClass } from "@angular/common";
-import {
-    Component,
-    computed,
-    forwardRef,
-    Host,
-    input,
-    InputSignal,
-    signal,
-    Signal,
-    WritableSignal
-} from "@angular/core";
+import { Component, computed, forwardRef, Host, input, signal, Signal } from "@angular/core";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { Action } from "../../utils/Action";
 import { ColorScheme } from "../models/ColorScheme";
@@ -55,11 +45,11 @@ export class ColorPaletteComponent implements ControlValueAccessor {
             name: "custom"
         };
     });
-    protected readonly selectedColor: WritableSignal<string | null> = signal<string | null>(null);
+    protected readonly selectedColor = signal<string | null>(null);
 
-    public columns: InputSignal<number> = input(10);
-    public palette: InputSignal<PaletteType | Iterable<string>> = input<PaletteType | Iterable<string>>([]);
-    public tileSize: InputSignal<number> = input(18);
+    public columns = input(10);
+    public palette = input<PaletteType | Iterable<string>>([]);
+    public tileSize = input(18);
 
     public constructor(@Host() private readonly colorService: ColorService) {}
 

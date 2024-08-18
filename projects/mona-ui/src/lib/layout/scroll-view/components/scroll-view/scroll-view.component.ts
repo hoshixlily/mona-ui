@@ -10,20 +10,16 @@ import {
     ElementRef,
     inject,
     input,
-    InputSignal,
-    InputSignalWithTransform,
     model,
-    ModelSignal,
     OnDestroy,
     Signal,
     signal,
     TemplateRef,
-    viewChild,
-    WritableSignal
+    viewChild
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { faChevronLeft, faChevronRight, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { asyncScheduler, filter, fromEvent, interval, Subject, takeUntil, timer } from "rxjs";
 import { ScrollDirection } from "../../../../models/ScrollDirection";
 import { PagerOverlay } from "../../models/PagerOverlay";
@@ -61,30 +57,30 @@ export class ScrollViewComponent implements OnDestroy, AfterViewInit {
     #resizeObserver: ResizeObserver | null = null;
     #scroll$: Subject<void> = new Subject<void>();
 
-    protected readonly contentTemplate: Signal<TemplateRef<any> | undefined> = contentChild(TemplateRef);
-    protected readonly itemCount: Signal<number> = computed(() => this.data().length);
-    protected readonly leftArrow: IconDefinition = faChevronLeft;
-    protected readonly pagerArrowVisible: WritableSignal<boolean> = signal(false);
+    protected readonly contentTemplate = contentChild(TemplateRef);
+    protected readonly itemCount = computed(() => this.data().length);
+    protected readonly leftArrow = faChevronLeft;
+    protected readonly pagerArrowVisible = signal(false);
     protected readonly pagerListElementRef: Signal<ElementRef<HTMLUListElement> | undefined> =
         viewChild("pageListElement");
-    protected readonly pagerPosition: WritableSignal<string> = signal("0");
-    protected readonly rightArrow: IconDefinition = faChevronRight;
+    protected readonly pagerPosition = signal("0");
+    protected readonly rightArrow = faChevronRight;
     protected lastDirection: ScrollDirection | "none" = "none";
 
-    public arrows: InputSignal<boolean> = input(false);
-    public data: InputSignalWithTransform<ScrollViewListItem[], Iterable<any>> = input([], {
-        transform: value => Array.from(value).map<ScrollViewListItem>((i, ix) => ({ data: i }))
+    public arrows = input(false);
+    public data = input([], {
+        transform: (value: Iterable<any>) => Array.from(value).map<ScrollViewListItem>((i, ix) => ({ data: i }))
     });
-    public height: InputSignalWithTransform<string, number | string> = input.required({
-        transform: value => (typeof value === "number" ? `${value}px` : value)
+    public height = input.required({
+        transform: (value: number | string) => (typeof value === "number" ? `${value}px` : value)
     });
-    public index: ModelSignal<number> = model(0);
-    public infinite: InputSignal<boolean> = input(false);
-    public pageable: InputSignal<boolean> = input(false);
-    public pagerBlur: InputSignal<number> = input(3);
-    public pagerOverlay: InputSignal<PagerOverlay> = input<PagerOverlay>("dark");
-    public width: InputSignalWithTransform<string, number | string> = input.required({
-        transform: value => (typeof value === "number" ? `${value}px` : value)
+    public index = model(0);
+    public infinite = input(false);
+    public pageable = input(false);
+    public pagerBlur = input(3);
+    public pagerOverlay = input<PagerOverlay>("dark");
+    public width = input.required({
+        transform: (value: number | string) => (typeof value === "number" ? `${value}px` : value)
     });
 
     public ngAfterViewInit(): void {

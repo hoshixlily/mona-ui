@@ -1,14 +1,4 @@
-import {
-    AfterViewInit,
-    DestroyRef,
-    Directive,
-    ElementRef,
-    inject,
-    input,
-    NgZone,
-    output,
-    OutputEmitterRef
-} from "@angular/core";
+import { AfterViewInit, DestroyRef, Directive, ElementRef, inject, input, NgZone, output } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { fromEvent } from "rxjs";
 import { Column } from "../models/Column";
@@ -22,8 +12,8 @@ export class GridColumnResizeHandlerDirective implements AfterViewInit {
     readonly #hostElementRef: ElementRef<HTMLDivElement> = inject(ElementRef);
     readonly #zone: NgZone = inject(NgZone);
 
-    public readonly resizeEnd: OutputEmitterRef<void> = output();
-    public readonly resizeStart: OutputEmitterRef<void> = output();
+    public readonly resizeEnd = output();
+    public readonly resizeStart = output();
     public column = input.required<Column>();
     public gridId = input.required<string>();
 

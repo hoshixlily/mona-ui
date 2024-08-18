@@ -1,4 +1,4 @@
-import { AfterViewInit, DestroyRef, Directive, ElementRef, inject, input, InputSignal, NgZone } from "@angular/core";
+import { AfterViewInit, DestroyRef, Directive, ElementRef, inject, input, NgZone } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { fromEvent } from "rxjs";
 import { WindowReference } from "../models/WindowReference";
@@ -12,8 +12,8 @@ export class WindowDragHandlerDirective implements AfterViewInit {
     readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
     readonly #zone: NgZone = inject(NgZone);
 
-    public draggable: InputSignal<boolean> = input(true);
-    public windowRef: InputSignal<WindowReference> = input.required();
+    public draggable = input(true);
+    public windowRef = input.required<WindowReference>();
 
     public ngAfterViewInit(): void {
         this.setEvents();

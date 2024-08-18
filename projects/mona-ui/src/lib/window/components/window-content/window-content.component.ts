@@ -11,16 +11,14 @@ import {
     inject,
     Injector,
     OnInit,
-    Signal,
     signal,
     TemplateRef,
     viewChild,
-    ViewContainerRef,
-    WritableSignal
+    ViewContainerRef
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { faClose, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { faClose } from "@fortawesome/free-solid-svg-icons";
 import { filter, fromEvent } from "rxjs";
 import { AnimationService } from "../../../animations/services/animation.service";
 import { ButtonDirective } from "../../../buttons/button/button.directive";
@@ -52,12 +50,12 @@ export class WindowContentComponent implements OnInit, AfterViewInit {
     readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
     readonly #injector: Injector = inject(Injector);
     readonly #viewContainerRef: ViewContainerRef = inject(ViewContainerRef);
-    protected readonly closeIcon: IconDefinition = faClose;
-    protected readonly componentAnchor: Signal<ViewContainerRef> = viewChild.required("componentAnchor", {
+    protected readonly closeIcon = faClose;
+    protected readonly componentAnchor = viewChild.required("componentAnchor", {
         read: ViewContainerRef
     });
     protected readonly componentRef?: ComponentRef<any>;
-    protected readonly contentType: WritableSignal<"template" | "component"> = signal("template");
+    protected readonly contentType = signal<"template" | "component">("template");
     protected readonly windowData: WindowInjectorData = inject<WindowInjectorData>(PopupDataInjectionToken);
 
     public constructor() {

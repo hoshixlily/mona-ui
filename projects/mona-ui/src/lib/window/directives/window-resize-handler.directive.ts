@@ -1,4 +1,4 @@
-import { AfterViewInit, DestroyRef, Directive, ElementRef, inject, input, InputSignal, NgZone } from "@angular/core";
+import { AfterViewInit, DestroyRef, Directive, ElementRef, inject, input, NgZone } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { fromEvent } from "rxjs";
 import { WindowReference } from "../models/WindowReference";
@@ -13,12 +13,12 @@ export class WindowResizeHandlerDirective implements AfterViewInit {
     readonly #hostElementRef: ElementRef<HTMLDivElement> = inject(ElementRef);
     readonly #zone: NgZone = inject(NgZone);
 
-    public direction: InputSignal<WindowResizeHandlerDirection> = input.required();
-    public maxHeight: InputSignal<number | undefined> = input<number | undefined>(undefined);
-    public maxWidth: InputSignal<number | undefined> = input<number | undefined>(undefined);
-    public minHeight: InputSignal<number | undefined> = input<number | undefined>(undefined);
-    public minWidth: InputSignal<number | undefined> = input<number | undefined>(undefined);
-    public windowRef: InputSignal<WindowReference> = input.required();
+    public direction = input.required<WindowResizeHandlerDirection>();
+    public maxHeight = input<number | undefined>(undefined);
+    public maxWidth = input<number | undefined>(undefined);
+    public minHeight = input<number | undefined>(undefined);
+    public minWidth = input<number | undefined>(undefined);
+    public windowRef = input.required<WindowReference>();
 
     public ngAfterViewInit(): void {
         this.setEvents();

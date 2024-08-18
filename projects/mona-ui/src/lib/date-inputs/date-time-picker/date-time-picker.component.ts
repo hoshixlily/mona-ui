@@ -9,15 +9,12 @@ import {
     forwardRef,
     inject,
     input,
-    InputSignal,
     model,
-    ModelSignal,
     OnInit,
     Signal,
     signal,
     TemplateRef,
-    viewChild,
-    WritableSignal
+    viewChild
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from "@angular/forms";
@@ -73,14 +70,14 @@ export class DateTimePickerComponent implements OnInit, ControlValueAccessor {
     readonly #hostElementRef: ElementRef = inject(ElementRef);
     readonly #popupAnimationService: PopupAnimationService = inject(PopupAnimationService);
     readonly #popupService: PopupService = inject(PopupService);
-    readonly #value: WritableSignal<Date | null> = signal(null);
+    readonly #value = signal<Date | null>(null);
     #popupRef: PopupRef | null = null;
     #propagateChange: Action<Date | null> | null = null;
 
-    protected readonly currentDateString: WritableSignal<string> = signal("");
+    protected readonly currentDateString = signal("");
     protected readonly datePopupTemplateRef: Signal<TemplateRef<any>> = viewChild.required("datePopupTemplate");
-    protected readonly navigatedDate: WritableSignal<Date> = signal(new Date());
-    protected readonly timePickerMax: Signal<Date | null> = computed(() => {
+    protected readonly navigatedDate = signal(new Date());
+    protected readonly timePickerMax = computed(() => {
         const maxDate = this.max();
         const navigatedDate = this.navigatedDate();
         if (!maxDate) {
@@ -93,7 +90,7 @@ export class DateTimePickerComponent implements OnInit, ControlValueAccessor {
         }
         return null;
     });
-    protected readonly timePickerMin: Signal<Date | null> = computed(() => {
+    protected readonly timePickerMin = computed(() => {
         const minDate = this.min();
         const navigatedDate = this.navigatedDate();
         if (!minDate) {
@@ -108,14 +105,14 @@ export class DateTimePickerComponent implements OnInit, ControlValueAccessor {
     });
     protected readonly timePopupTemplateRef: Signal<TemplateRef<any>> = viewChild.required("timePopupTemplate");
 
-    public disabled: ModelSignal<boolean> = model(false);
-    public disabledDates: InputSignal<Iterable<Date>> = input<Iterable<Date>>([]);
-    public format: InputSignal<string> = input("dd/MM/yyyy HH:mm");
-    public hourFormat: InputSignal<"12" | "24"> = input<"12" | "24">("24");
-    public max: InputSignal<Date | null> = input<Date | null>(null);
-    public min: InputSignal<Date | null> = input<Date | null>(null);
-    public readonly: InputSignal<boolean> = input(false);
-    public showSeconds: InputSignal<boolean> = input(false);
+    public disabled = model(false);
+    public disabledDates = input<Iterable<Date>>([]);
+    public format = input("dd/MM/yyyy HH:mm");
+    public hourFormat = input<"12" | "24">("24");
+    public max = input<Date | null>(null);
+    public min = input<Date | null>(null);
+    public readonly = input(false);
+    public showSeconds = input(false);
 
     public ngOnInit(): void {
         this.setDateValues();

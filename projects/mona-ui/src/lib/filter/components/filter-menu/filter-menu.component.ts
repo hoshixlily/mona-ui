@@ -3,14 +3,11 @@ import {
     Component,
     computed,
     effect,
-    InputSignal,
+    input,
     model,
     output,
-    OutputEmitterRef,
-    Signal,
     signal,
-    untracked,
-    WritableSignal
+    untracked
 } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { ButtonGroupComponent } from "../../../buttons/button-group/button-group.component";
@@ -66,7 +63,7 @@ import { ValuelessOperatorPipe } from "../../pipes/valueless-operator.pipe";
 })
 export class FilterMenuComponent {
     private booleanFilterValues: [boolean | null, boolean | null] = [null, null];
-    protected readonly applyDisabled: Signal<boolean> = computed(() => {
+    protected readonly applyDisabled = computed(() => {
         if (!this.firstFilterValid()) {
             return true;
         }
@@ -92,8 +89,8 @@ export class FilterMenuComponent {
         { text: "Is null", value: "isnull" },
         { text: "Is not null", value: "isnotnull" }
     ];
-    protected readonly dateFilterValues: WritableSignal<[Date | null, Date | null]> = signal([null, null]);
-    protected readonly firstFilterValid: Signal<boolean> = computed(() => {
+    protected readonly dateFilterValues = signal<[Date | null, Date | null]>([null, null]);
+    protected readonly firstFilterValid = computed(() => {
         const operator = this.selectedFilterMenuDataItemList()[0]?.value;
         const type = this.type();
         const stringFilterValues = this.stringFilterValues();
@@ -126,7 +123,7 @@ export class FilterMenuComponent {
                 return false;
         }
     });
-    protected readonly numberFilterValues: WritableSignal<[number | null, number | null]> = signal([null, null]);
+    protected readonly numberFilterValues = signal<[number | null, number | null]>([null, null]);
     // TODO: Add null and empty filter operators
     protected readonly numericFilterMenuDataItems: FilterMenuDataItem[] = [
         { text: "Is equal to", value: "eq" },
@@ -138,7 +135,7 @@ export class FilterMenuComponent {
         { text: "Is null", value: "isnull" },
         { text: "Is not null", value: "isnotnull" }
     ];
-    protected readonly secondFilterValid: Signal<boolean> = computed(() => {
+    protected readonly secondFilterValid = computed(() => {
         const operator = this.selectedFilterMenuDataItemList()[1]?.value;
         const type = this.type();
         const stringFilterValues = this.stringFilterValues();
@@ -171,8 +168,8 @@ export class FilterMenuComponent {
                 return false;
         }
     });
-    protected readonly selectedConnectorItem: WritableSignal<FilterMenuConnectorItem | null> = signal(null);
-    protected readonly selectedFilterMenuDataItemList: WritableSignal<Array<FilterMenuDataItem | undefined>> = signal([
+    protected readonly selectedConnectorItem = signal<FilterMenuConnectorItem | null>(null);
+    protected readonly selectedFilterMenuDataItemList = signal<Array<FilterMenuDataItem | undefined>>([
         undefined,
         undefined
     ]);
@@ -190,11 +187,11 @@ export class FilterMenuComponent {
         { text: "Is null or empty", value: "isnullorempty" },
         { text: "Is not null or empty", value: "isnotnullorempty" }
     ];
-    protected readonly stringFilterValues: WritableSignal<[string, string]> = signal(["", ""]);
+    protected readonly stringFilterValues = signal<[string, string]>(["", ""]);
 
-    public readonly apply: OutputEmitterRef<CompositeFilterDescriptor> = output();
+    public readonly apply = output<CompositeFilterDescriptor>();
 
-    public dateOptions: InputSignal<FilterMenuDateOptions> = model<FilterMenuDateOptions>({
+    public dateOptions = input<FilterMenuDateOptions>({
         format: "dd/MM/yyyy",
         type: "date"
     });
@@ -549,7 +546,7 @@ export class FilterMenuComponent {
         }
 
         const selectedConnectorItem = filterValues[1]
-            ? this.connectorDataItems.find(c => c.value === values.logic) ?? null
+            ? (this.connectorDataItems.find(c => c.value === values.logic) ?? null)
             : null;
         this.selectedConnectorItem.set(selectedConnectorItem);
     }

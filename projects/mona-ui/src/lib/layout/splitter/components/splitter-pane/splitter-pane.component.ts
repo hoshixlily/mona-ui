@@ -1,4 +1,4 @@
-import { Component, input, InputSignal, model, ModelSignal, Signal, TemplateRef, viewChild } from "@angular/core";
+import { Component, input, model, TemplateRef, viewChild } from "@angular/core";
 import { v4 } from "uuid";
 
 @Component({
@@ -13,8 +13,8 @@ import { v4 } from "uuid";
     styles: ""
 })
 export class SplitterPaneComponent {
-    public readonly template: Signal<TemplateRef<any>> = viewChild.required(TemplateRef);
+    public readonly template = viewChild.required(TemplateRef);
     public readonly uid: string = v4();
-    public resizable: InputSignal<boolean> = input<boolean>(true);
-    public size: ModelSignal<string | number> = model<string | number>("");
+    public resizable = input(true);
+    public size = model<string | number>("");
 }

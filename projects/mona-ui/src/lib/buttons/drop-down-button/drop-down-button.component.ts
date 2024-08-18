@@ -7,15 +7,12 @@ import {
     ElementRef,
     inject,
     input,
-    InputSignal,
     Signal,
     signal,
-    viewChild,
-    WritableSignal
+    viewChild
 } from "@angular/core";
 import { ContextMenuComponent } from "../../menus/context-menu/context-menu.component";
 import { MenuItemComponent } from "../../menus/menu-item/menu-item.component";
-import { MenuItem } from "../../menus/models/MenuItem";
 import { ButtonDirective } from "../button/button.directive";
 
 @Component({
@@ -37,12 +34,10 @@ export class DropDownButtonComponent implements AfterViewInit {
     });
     protected readonly contextMenuComponent: Signal<ContextMenuComponent> = viewChild.required("contextMenuComponent");
     protected readonly menuItemComponents: Signal<readonly MenuItemComponent[]> = contentChildren(MenuItemComponent);
-    protected readonly menuItems: Signal<readonly MenuItem[]> = computed(() =>
-        this.menuItemComponents().map(m => m.getMenuItem())
-    );
+    protected readonly menuItems = computed(() => this.menuItemComponents().map(m => m.getMenuItem()));
 
-    public disabled: InputSignal<boolean> = input(false);
-    public popupWidth: WritableSignal<number> = signal(0);
+    public disabled = input(false);
+    public popupWidth = signal(0);
 
     public constructor() {
         this.#destroyRef.onDestroy(() => {

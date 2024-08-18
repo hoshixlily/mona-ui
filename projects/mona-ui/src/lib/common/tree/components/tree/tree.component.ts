@@ -13,7 +13,6 @@ import {
     NgZone,
     OnInit,
     output,
-    OutputEmitterRef,
     TemplateRef,
     untracked
 } from "@angular/core";
@@ -52,13 +51,13 @@ export class TreeComponent<T> implements OnInit {
     readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
     readonly #zone: NgZone = inject(NgZone);
 
-    protected readonly nodeCheck: OutputEmitterRef<NodeCheckEvent<T>> = output();
-    protected readonly nodeClick: OutputEmitterRef<NodeClickEvent<T>> = output();
-    protected readonly nodeDrag: OutputEmitterRef<NodeDragEvent<T>> = output();
-    protected readonly nodeDragEnd: OutputEmitterRef<NodeDragStartEvent<T>> = output();
-    protected readonly nodeDragStart: OutputEmitterRef<NodeDragStartEvent<T>> = output();
-    protected readonly nodeDrop: OutputEmitterRef<NodeDropEvent<T>> = output();
-    protected readonly nodeSelect: OutputEmitterRef<NodeSelectEvent<T>> = output();
+    protected readonly nodeCheck = output<NodeCheckEvent<T>>();
+    protected readonly nodeClick = output<NodeClickEvent<T>>();
+    protected readonly nodeDrag = output<NodeDragEvent<T>>();
+    protected readonly nodeDragEnd = output<NodeDragStartEvent<T>>();
+    protected readonly nodeDragStart = output<NodeDragStartEvent<T>>();
+    protected readonly nodeDrop = output<NodeDropEvent<T>>();
+    protected readonly nodeSelect = output<NodeSelectEvent<T>>();
     protected readonly treeService: TreeService<T> = inject(TreeService);
     protected readonly nodeTemplate = contentChild(TreeNodeTemplateDirective, { read: TemplateRef });
 

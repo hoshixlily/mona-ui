@@ -5,11 +5,9 @@ import {
     inject,
     Injectable,
     OutputEmitterRef,
-    Signal,
     signal,
     TemplateRef,
-    untracked,
-    WritableSignal
+    untracked
 } from "@angular/core";
 import { takeUntilDestroyed, toObservable, toSignal } from "@angular/core/rxjs-interop";
 import {
@@ -60,14 +58,14 @@ import { ChildrenSelector, NodeKeySelector } from "../models/TreeSelectors";
 
 @Injectable()
 export class TreeService<T> {
-    readonly #checkedKeys: WritableSignal<ImmutableSet<any>> = signal(ImmutableSet.create());
+    readonly #checkedKeys = signal(ImmutableSet.create<any>());
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
-    private readonly data: WritableSignal<ImmutableSet<T>> = signal(ImmutableSet.create());
-    private readonly filteredExpandedKeys: WritableSignal<ImmutableSet<any>> = signal(ImmutableSet.create());
-    private readonly flatIdField: WritableSignal<string> = signal("");
-    private readonly flatParentIdField: WritableSignal<string> = signal("");
-    private readonly hasChildrenPredicate: WritableSignal<Predicate<any> | null> = signal(null);
-    private readonly navigableNodes: Signal<ImmutableSet<TreeNode<T>>> = computed(() => {
+    private readonly data = signal(ImmutableSet.create<T>());
+    private readonly filteredExpandedKeys = signal(ImmutableSet.create<any>());
+    private readonly flatIdField = signal("");
+    private readonly flatParentIdField = signal("");
+    private readonly hasChildrenPredicate = signal<Predicate<any> | null>(null);
+    private readonly navigableNodes = computed(() => {
         const flattenedNodes = TreeService.flatten(this.viewNodeSet());
         return flattenedNodes
             .where(n => n.parent === null || !this.isAnyParentCollapsed(n))
@@ -75,16 +73,16 @@ export class TreeService<T> {
             .orderBy(n => n.index)
             .toImmutableSet();
     });
-    private readonly nodeDictionary: Signal<ImmutableDictionary<string, TreeNode<T>>> = computed(() => {
+    private readonly nodeDictionary = computed(() => {
         const nodes = this.nodeSet();
         return this.createNodeDictionary(nodes);
     });
-    private readonly structure: WritableSignal<DataStructure> = signal("hierarchical");
-    private readonly unfilteredExpandedKeys: WritableSignal<ImmutableSet<any>> = signal(ImmutableSet.create());
-    public readonly animationTemporarilyDisabled: WritableSignal<boolean> = signal(false);
-    public readonly animationEnabled: WritableSignal<boolean> = signal(true);
-    public readonly checkBy: WritableSignal<NodeKeySelector<T>> = signal(null);
-    public readonly checkableOptions: WritableSignal<CheckableOptions> = signal({
+    private readonly structure = signal<DataStructure>("hierarchical");
+    private readonly unfilteredExpandedKeys = signal(ImmutableSet.create<any>());
+    public readonly animationTemporarilyDisabled = signal(false);
+    public readonly animationEnabled = signal(true);
+    public readonly checkBy = signal<NodeKeySelector<T>>(null);
+    public readonly checkableOptions = signal<CheckableOptions>({
         checkChildren: true,
         checkDisabledChildren: false,
         checkParents: true,
@@ -92,64 +90,63 @@ export class TreeService<T> {
         enabled: false,
         mode: "multiple"
     });
-    public readonly checkedKeys$: Observable<ImmutableSet<any>> = toObservable(this.#checkedKeys);
-    public readonly children: WritableSignal<ChildrenSelector<T>> = signal("");
-    public readonly disableBy: WritableSignal<NodeKeySelector<T>> = signal(null);
-    public readonly disableOptions: WritableSignal<DisableOptions> = signal({
+    public readonly checkedKeys$ = toObservable(this.#checkedKeys);
+    public readonly children = signal<ChildrenSelector<T>>("");
+    public readonly disableBy = signal<NodeKeySelector<T>>(null);
+    public readonly disableOptions = signal<DisableOptions>({
         disableChildren: true,
         enabled: false
     });
-    public readonly disabledKeys: WritableSignal<ImmutableSet<any>> = signal(ImmutableSet.create());
-    public readonly draggableOptions: WritableSignal<DraggableOptions> = signal({ enabled: false });
-    public readonly dragging: WritableSignal<boolean> = signal(false);
-    public readonly dragging$: Observable<boolean> = toObservable(this.dragging);
-    public readonly dropPositionChange$: BehaviorSubject<DropPositionChangeEvent<T> | null> =
-        new BehaviorSubject<DropPositionChangeEvent<T> | null>(null);
-    public readonly expandBy: WritableSignal<NodeKeySelector<T>> = signal(null);
-    public readonly expandableOptions: WritableSignal<ExpandableOptions> = signal({ enabled: false });
-    public readonly expandedKeys: Signal<ImmutableSet<any>> = computed(() => {
+    public readonly disabledKeys = signal(ImmutableSet.create<any>());
+    public readonly draggableOptions = signal<DraggableOptions>({ enabled: false });
+    public readonly dragging = signal(false);
+    public readonly dragging$ = toObservable(this.dragging);
+    public readonly dropPositionChange$ = new BehaviorSubject<DropPositionChangeEvent<T> | null>(null);
+    public readonly expandBy = signal<NodeKeySelector<T>>(null);
+    public readonly expandableOptions = signal<ExpandableOptions>({ enabled: false });
+    public readonly expandedKeys = computed(() => {
         const filterText = this.filterText();
         if (filterText) {
             return this.filteredExpandedKeys();
         }
         return this.unfilteredExpandedKeys();
     });
-    public readonly expandedKeys$: Observable<ImmutableSet<any>> = toObservable(this.expandedKeys);
-    public readonly filterableOptions: WritableSignal<FilterableOptions> = signal({
+    public readonly expandedKeys$ = toObservable(this.expandedKeys);
+    public readonly filterableOptions = signal<FilterableOptions>({
         enabled: false,
         debounce: 0,
         caseSensitive: false,
         operator: "contains"
     });
-    public readonly filter$: ReplaySubject<string> = new ReplaySubject<string>(1);
-    public readonly filterPlaceholder: WritableSignal<string> = signal("");
-    public readonly filterText: Signal<string> = toSignal(
+    public readonly filter$ = new ReplaySubject<string>(1);
+    public readonly filterPlaceholder = signal("");
+    public readonly filterText = toSignal(
         this.filter$.pipe(debounceTime(this.filterableOptions().debounce), distinctUntilChanged()),
         { initialValue: "" }
     );
-    public readonly navigatedNode: WritableSignal<TreeNode<T> | null> = signal(null);
-    public readonly nodeCheck$: Subject<NodeCheckEvent<T>> = new Subject();
-    public readonly nodeCheckChange$: Subject<TreeNodeCheckEvent<T>> = new Subject();
-    public readonly nodeClick$: Subject<NodeClickEvent<T>> = new Subject();
-    public readonly nodeDrag$: Subject<InternalNodeDragEvent<T>> = new Subject();
-    public readonly nodeDragEnd$: Subject<NodeDragEndEvent<T>> = new Subject();
-    public readonly nodeDragStart$: Subject<NodeDragStartEvent<T>> = new Subject();
-    public readonly nodeDrop$: Subject<NodeDropEvent<T>> = new Subject();
-    public readonly nodeExpand$: Subject<TreeNodeExpandEvent<T>> = new Subject();
-    public readonly nodeSelect$: Subject<NodeSelectEvent<T>> = new Subject();
-    public readonly nodeSelectChange$: Subject<TreeNodeSelectEvent<T>> = new Subject();
-    public readonly nodeSet: WritableSignal<ImmutableSet<TreeNode<T>>> = signal(ImmutableSet.create());
-    public readonly nodeTemplate: WritableSignal<TemplateRef<any> | null> = signal(null);
-    public readonly selectBy: WritableSignal<NodeKeySelector<T>> = signal(null);
-    public readonly selectableOptions: WritableSignal<SelectableOptions> = signal({
+    public readonly navigatedNode = signal<TreeNode<T> | null>(null);
+    public readonly nodeCheck$ = new Subject<NodeCheckEvent<T>>();
+    public readonly nodeCheckChange$ = new Subject<TreeNodeCheckEvent<T>>();
+    public readonly nodeClick$ = new Subject<NodeClickEvent<T>>();
+    public readonly nodeDrag$ = new Subject<InternalNodeDragEvent<T>>();
+    public readonly nodeDragEnd$ = new Subject<NodeDragEndEvent<T>>();
+    public readonly nodeDragStart$ = new Subject<NodeDragStartEvent<T>>();
+    public readonly nodeDrop$ = new Subject<NodeDropEvent<T>>();
+    public readonly nodeExpand$ = new Subject<TreeNodeExpandEvent<T>>();
+    public readonly nodeSelect$ = new Subject<NodeSelectEvent<T>>();
+    public readonly nodeSelectChange$ = new Subject<TreeNodeSelectEvent<T>>();
+    public readonly nodeSet = signal(ImmutableSet.create<TreeNode<T>>());
+    public readonly nodeTemplate = signal<TemplateRef<any> | null>(null);
+    public readonly selectBy = signal<NodeKeySelector<T>>(null);
+    public readonly selectableOptions = signal<SelectableOptions>({
         childrenOnly: false,
         enabled: false,
         mode: "single",
         toggleable: false
     });
-    public readonly selectedKeys: WritableSignal<ImmutableSet<any>> = signal(ImmutableSet.create());
-    public readonly selectedKeys$: Observable<ImmutableSet<any>> = toObservable(this.selectedKeys);
-    public readonly selectedNodes: Signal<ImmutableSet<TreeNode<T>>> = computed(() => {
+    public readonly selectedKeys = signal(ImmutableSet.create<any>());
+    public readonly selectedKeys$ = toObservable(this.selectedKeys);
+    public readonly selectedNodes = computed(() => {
         const selectedKeys = this.selectedKeys();
         const nodeDictionary = this.nodeDictionary();
         return selectedKeys
@@ -163,9 +160,9 @@ export class TreeService<T> {
             .cast<TreeNode<T>>()
             .toImmutableSet();
     });
-    public readonly selectionChange$: Subject<NodeItem<T>> = new Subject();
-    public readonly textField: WritableSignal<string | Selector<T, string>> = signal("");
-    public readonly viewNodeSet: Signal<ImmutableSet<TreeNode<T>>> = computed(() => {
+    public readonly selectionChange$ = new Subject<NodeItem<T>>();
+    public readonly textField = signal<string | Selector<T, string>>("");
+    public readonly viewNodeSet = computed(() => {
         if (this.filterText()) {
             return this.filterTree(this.nodeSet(), this.filterText());
         }

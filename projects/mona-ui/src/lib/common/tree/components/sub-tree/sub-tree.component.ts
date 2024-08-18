@@ -9,7 +9,7 @@ import {
     CdkDropList
 } from "@angular/cdk/drag-drop";
 import { AsyncPipe, NgStyle } from "@angular/common";
-import { ChangeDetectionStrategy, Component, inject, input, InputSignal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, inject, input } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { ImmutableSet } from "@mirei/ts-collections";
 import { take } from "rxjs";
@@ -51,11 +51,11 @@ import { TreeNodeComponent } from "../tree-node/tree-node.component";
 export class SubTreeComponent<T> {
     protected readonly treeService: TreeService<T> = inject(TreeService);
 
-    public depth: InputSignal<number> = input.required();
+    public depth = input.required<number>();
     public nodes = input.required<ImmutableSet<TreeNode<T>>, Iterable<TreeNode<T>>>({
         transform: value => ImmutableSet.create(value)
     });
-    public parent: InputSignal<TreeNode<T> | null> = input.required();
+    public parent = input.required<TreeNode<T> | null>();
 
     public onExpandStateChange(node: TreeNode<T>): void {
         const expanded = this.treeService.isExpanded(node);

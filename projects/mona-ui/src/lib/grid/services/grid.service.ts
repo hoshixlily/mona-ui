@@ -1,4 +1,4 @@
-import { computed, Injectable, OutputEmitterRef, Signal, signal, TemplateRef, WritableSignal } from "@angular/core";
+import { computed, Injectable, OutputEmitterRef, signal, TemplateRef } from "@angular/core";
 import { any, Dictionary, from, ImmutableDictionary, ImmutableList, ImmutableSet, select } from "@mirei/ts-collections";
 import { BehaviorSubject, Subject } from "rxjs";
 import { VirtualScrollOptions } from "../../common/models/VirtualScrollOptions";
@@ -20,15 +20,9 @@ import { SortableOptions } from "../models/SortableOptions";
 
 @Injectable()
 export class GridService {
-    public readonly appliedFilters: WritableSignal<ImmutableDictionary<string, ColumnFilterState>> = signal(
-        ImmutableDictionary.create()
-    );
-    public readonly appliedGroupSorts: WritableSignal<ImmutableDictionary<string, ColumnSortState>> = signal(
-        ImmutableDictionary.create()
-    );
-    public readonly appliedSorts: WritableSignal<ImmutableDictionary<string, ColumnSortState>> = signal(
-        ImmutableDictionary.create()
-    );
+    public readonly appliedFilters = signal(ImmutableDictionary.create<string, ColumnFilterState>());
+    public readonly appliedGroupSorts = signal(ImmutableDictionary.create<string, ColumnSortState>());
+    public readonly appliedSorts = signal(ImmutableDictionary.create<string, ColumnSortState>());
     public readonly cellEdit$ = new Subject<CellEditEvent>();
     public readonly cellTooltipTemplate = signal<TemplateRef<any> | null>(null);
     public readonly columns = signal<ImmutableList<Column>>(ImmutableList.create());

@@ -6,12 +6,8 @@ import {
     computed,
     effect,
     input,
-    InputSignal,
-    InputSignalWithTransform,
-    Signal,
     signal,
-    untracked,
-    WritableSignal
+    untracked
 } from "@angular/core";
 import { Action } from "../../../../utils/Action";
 import { LabelPosition } from "../../models/LabelPosition";
@@ -29,15 +25,15 @@ import { LabelPosition } from "../../models/LabelPosition";
     }
 })
 export class ProgressBarComponent implements AfterViewInit {
-    readonly #color: WritableSignal<string> = signal("var(--mona-primary)");
-    protected readonly formatted: WritableSignal<boolean> = signal(false);
-    protected readonly label: Signal<string> = computed(() => {
+    readonly #color = signal("var(--mona-primary)");
+    protected readonly formatted = signal(false);
+    protected readonly label = computed(() => {
         const progress = this.progress();
         const labelFormat = this.labelFormat();
         return labelFormat(progress);
     });
-    protected readonly progress: WritableSignal<number> = signal(0);
-    protected readonly progressStyles: Signal<Partial<CSSStyleDeclaration>> = computed(() => {
+    protected readonly progress = signal(0);
+    protected readonly progressStyles = computed(() => {
         const progress = this.progress();
         const color = this.#color();
         const progressColor = progress === 0 ? "transparent" : color;
@@ -49,30 +45,25 @@ export class ProgressBarComponent implements AfterViewInit {
             backgroundColor: progressColor
         } as Partial<CSSStyleDeclaration>;
     });
-    protected readonly rightClip: WritableSignal<number> = signal(-1);
+    protected readonly rightClip = signal(-1);
 
-    public color: InputSignal<string | Action<number, string>> = input<string | Action<number, string>>(
-        "var(--mona-primary)"
-    );
-    public disabled: InputSignal<boolean> = input(false);
-    public indeterminate: InputSignal<boolean> = input(false);
-    public labelFormat: InputSignalWithTransform<Action<number, string>, Action<number, string> | string> = input(
-        (progress: number) => `${progress}%`,
-        {
-            transform: (labelFormat: string | Action<number, string>) => {
-                if (typeof labelFormat === "string") {
-                    return () => labelFormat;
-                }
-                return labelFormat;
+    public color = input<string | Action<number, string>>("var(--mona-primary)");
+    public disabled = input(false);
+    public indeterminate = input(false);
+    public labelFormat = input((progress: number) => `${progress}%`, {
+        transform: (labelFormat: string | Action<number, string>) => {
+            if (typeof labelFormat === "string") {
+                return () => labelFormat;
             }
+            return labelFormat;
         }
-    );
-    public labelPosition: InputSignal<LabelPosition> = input<LabelPosition>("center");
-    public labelStyles: InputSignal<Partial<CSSStyleDeclaration>> = input<Partial<CSSStyleDeclaration>>({});
-    public labelVisible: InputSignal<boolean> = input(true);
-    public max: InputSignal<number> = input(100);
-    public min: InputSignal<number> = input(0);
-    public value: InputSignal<number> = input(0);
+    });
+    public labelPosition = input<LabelPosition>("center");
+    public labelStyles = input<Partial<CSSStyleDeclaration>>({});
+    public labelVisible = input(true);
+    public max = input(100);
+    public min = input(0);
+    public value = input(0);
 
     public constructor() {
         effect(() => {

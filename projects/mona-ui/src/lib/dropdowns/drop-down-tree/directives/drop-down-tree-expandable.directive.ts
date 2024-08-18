@@ -1,4 +1,4 @@
-import { Directive, effect, inject, input, OnInit, output, OutputEmitterRef, untracked } from "@angular/core";
+import { Directive, effect, inject, input, OnInit, output, untracked } from "@angular/core";
 import { Selector } from "@mirei/ts-collections";
 import { ExpandableOptions } from "../../../common/tree/models/ExpandableOptions";
 import { TreeService } from "../../../common/tree/services/tree.service";
@@ -13,7 +13,7 @@ export class DropDownTreeExpandableDirective<T> implements OnInit {
     };
     readonly #treeService: TreeService<T> = inject(TreeService);
 
-    public readonly expandedKeysChange: OutputEmitterRef<unknown[]> = output();
+    public readonly expandedKeysChange = output<unknown[]>();
 
     public expandBy = input<string | Selector<T, any> | null | undefined>();
     public expandedKeys = input<Iterable<unknown>>();

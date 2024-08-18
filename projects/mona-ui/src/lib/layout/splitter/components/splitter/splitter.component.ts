@@ -1,13 +1,5 @@
 import { NgTemplateOutlet } from "@angular/common";
-import {
-    ChangeDetectionStrategy,
-    Component,
-    computed,
-    contentChildren,
-    input,
-    InputSignal,
-    Signal
-} from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, contentChildren, input, Signal } from "@angular/core";
 import { from, zip } from "@mirei/ts-collections";
 import { Orientation } from "../../../../models/Orientation";
 import { SplitterPaneComponent } from "../splitter-pane/splitter-pane.component";
@@ -43,14 +35,14 @@ export class SplitterComponent {
         const array = new Array(resizerCount).fill({ size: "4px" });
         return [...array, { size: "" }];
     });
-    protected readonly templateColumnStyles: Signal<string | undefined> = computed(() => {
+    protected readonly templateColumnStyles = computed(() => {
         const orientation = this.orientation();
         if (orientation === "vertical") {
             return undefined;
         }
         return this.getPaneSizeStyles();
     });
-    protected readonly templateRowStyles: Signal<string | undefined> = computed(() => {
+    protected readonly templateRowStyles = computed(() => {
         const orientation = this.orientation();
         if (orientation === "horizontal") {
             return undefined;
@@ -58,7 +50,7 @@ export class SplitterComponent {
         return this.getPaneSizeStyles();
     });
 
-    public orientation: InputSignal<Orientation> = input<Orientation>("horizontal");
+    public orientation = input<Orientation>("horizontal");
     public paneList = contentChildren(SplitterPaneComponent);
 
     private getPaneSizeStyles(): string {

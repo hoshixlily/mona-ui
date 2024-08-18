@@ -1,17 +1,7 @@
 import { NgClass, NgTemplateOutlet } from "@angular/common";
-import {
-    ChangeDetectionStrategy,
-    Component,
-    contentChild,
-    input,
-    InputSignalWithTransform,
-    output,
-    OutputEmitterRef,
-    Signal,
-    TemplateRef
-} from "@angular/core";
+import { ChangeDetectionStrategy, Component, contentChild, input, output, Signal, TemplateRef } from "@angular/core";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { faChevronRight, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { BreadcrumbItemTemplateDirective } from "../../directives/breadcrumb-item-template.directive";
 import { BreadcrumbSeparatorTemplateDirective } from "../../directives/breadcrumb-separator-template.directive";
 import { BreadcrumbItem } from "../../models/BreadcrumbItem";
@@ -33,15 +23,15 @@ export class BreadcrumbComponent {
         BreadcrumbItemTemplateDirective,
         { read: TemplateRef }
     );
-    protected readonly separator: IconDefinition = faChevronRight;
+    protected readonly separator = faChevronRight;
     protected readonly separatorTemplate: Signal<TemplateRef<BreadcrumbItemTemplateContext> | undefined> = contentChild(
         BreadcrumbSeparatorTemplateDirective,
         { read: TemplateRef }
     );
 
-    public readonly itemClick: OutputEmitterRef<BreadcrumbItem> = output();
-    public items: InputSignalWithTransform<BreadcrumbItem[], Iterable<BreadcrumbItem>> = input([], {
-        transform: value => Array.from(value)
+    public readonly itemClick = output<BreadcrumbItem>();
+    public items = input([], {
+        transform: (value: Iterable<BreadcrumbItem>) => Array.from(value)
     });
 
     public onItemClick(item: BreadcrumbItem): void {

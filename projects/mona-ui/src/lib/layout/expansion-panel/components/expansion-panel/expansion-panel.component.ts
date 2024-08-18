@@ -1,16 +1,7 @@
 import { NgClass, NgTemplateOutlet } from "@angular/common";
-import {
-    ChangeDetectionStrategy,
-    Component,
-    contentChild,
-    input,
-    InputSignal,
-    model,
-    ModelSignal,
-    TemplateRef
-} from "@angular/core";
+import { ChangeDetectionStrategy, Component, contentChild, input, model, TemplateRef } from "@angular/core";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { faMinus, faPlus, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
 import { SlideVertical } from "../../../../animations/models/slide.animation";
 import { ExpansionPanelActionsTemplateDirective } from "../../directives/expansion-panel-actions-template.directive";
 import { ExpansionPanelTitleTemplateDirective } from "../../directives/expansion-panel-title-template.directive";
@@ -30,10 +21,10 @@ import { ExpansionPanelTitleTemplateDirective } from "../../directives/expansion
 })
 export class ExpansionPanelComponent {
     protected readonly actionsTemplate = contentChild(ExpansionPanelActionsTemplateDirective, { read: TemplateRef });
-    protected readonly collapseIcon: IconDefinition = faMinus;
-    protected readonly expandIcon: IconDefinition = faPlus;
+    protected readonly collapseIcon = faMinus;
+    protected readonly expandIcon = faPlus;
     protected readonly titleTemplate = contentChild(ExpansionPanelTitleTemplateDirective, { read: TemplateRef });
 
-    public expanded: ModelSignal<boolean> = model(false);
-    public title: InputSignal<string> = input("");
+    public expanded = model(false);
+    public title = input("");
 }

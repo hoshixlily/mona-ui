@@ -8,16 +8,12 @@ import {
     ElementRef,
     inject,
     input,
-    InputSignal,
-    InputSignalWithTransform,
     OnInit,
     output,
-    OutputEmitterRef,
     signal,
     TemplateRef,
     untracked,
-    viewChild,
-    WritableSignal
+    viewChild
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { asapScheduler, filter, fromEvent, take, takeUntil } from "rxjs";
@@ -51,19 +47,19 @@ export class PopoverComponent implements OnInit {
     #popupRef?: PopupRef;
 
     protected readonly footerTemplateRef = contentChild(PopoverFooterTemplateDirective, { read: TemplateRef });
-    protected readonly popupPosition: WritableSignal<Position> = signal("top");
+    protected readonly popupPosition = signal<Position>("top");
     protected readonly titleTemplateRef = contentChild(PopoverTitleTemplateDirective, { read: TemplateRef });
     protected readonly templateRef = viewChild.required(TemplateRef);
 
-    public readonly uid: string = v4();
-    public hide: OutputEmitterRef<PopoverHideEvent> = output();
-    public hidden: OutputEmitterRef<void> = output();
-    public position: InputSignal<Position> = input<Position>("top");
-    public show: OutputEmitterRef<PopoverShowEvent> = output();
-    public shown: OutputEmitterRef<PopoverShownEvent> = output();
-    public target: InputSignal<Element | ElementRef> = input.required<Element | ElementRef>();
-    public title: InputSignal<string> = input<string>("");
-    public trigger: InputSignalWithTransform<string, PopoverTrigger> = input("click", {
+    public readonly uid = v4();
+    public hide = output<PopoverHideEvent>();
+    public hidden = output();
+    public position = input<Position>("top");
+    public show = output<PopoverShowEvent>();
+    public shown = output<PopoverShownEvent>();
+    public target = input.required<Element | ElementRef>();
+    public title = input("");
+    public trigger = input("click", {
         transform: (value: PopoverTrigger) => {
             let triggerString: string = "";
             switch (value) {

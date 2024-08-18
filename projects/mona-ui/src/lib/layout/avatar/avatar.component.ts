@@ -1,13 +1,5 @@
 import { NgStyle } from "@angular/common";
-import {
-    ChangeDetectionStrategy,
-    Component,
-    computed,
-    input,
-    InputSignal,
-    InputSignalWithTransform,
-    Signal
-} from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, input, Signal } from "@angular/core";
 
 @Component({
     selector: "mona-avatar",
@@ -44,40 +36,40 @@ export class AvatarComponent {
         };
     });
 
-    public backgroundColor: InputSignal<string> = input("var(--mona-primary)");
-    public borderColor: InputSignal<string> = input("var(--mona-border-color)");
-    public borderRadius: InputSignalWithTransform<string, string | number> = input("0", {
-        transform: value => {
+    public backgroundColor = input("var(--mona-primary)");
+    public borderColor = input("var(--mona-border-color)");
+    public borderRadius = input("0", {
+        transform: (value: string | number) => {
             if (typeof value === "number") {
                 return `${value}px`;
             }
             return value;
         }
     });
-    public borderWidth: InputSignalWithTransform<string, string | number> = input("1px", {
-        transform: value => {
+    public borderWidth = input("1px", {
+        transform: (value: string | number) => {
             if (typeof value === "number") {
                 return `${value}px`;
             }
             return value;
         }
     });
-    public customStyles: InputSignal<Partial<CSSStyleDeclaration>> = input({});
-    public height: InputSignalWithTransform<string, string | number> = input("64px", {
-        transform: value => {
+    public customStyles = input<Partial<CSSStyleDeclaration>>({});
+    public height = input("64px", {
+        transform: (value: string | number) => {
             if (typeof value === "string") {
                 return value;
             }
             return `${value}px`;
         }
     });
-    public image: InputSignal<string> = input("");
-    public label: InputSignal<string> = input("");
-    public labelColor: InputSignal<string> = input("var(--mona-text)");
-    public labelFontSize: InputSignal<string> = input("1rem");
-    public labelFontWeight: InputSignal<string> = input("700");
-    public width: InputSignalWithTransform<string, string | number> = input("64px", {
-        transform: value => {
+    public image = input("");
+    public label = input("");
+    public labelColor = input("var(--mona-text)");
+    public labelFontSize = input("1rem");
+    public labelFontWeight = input("700");
+    public width = input("64px", {
+        transform: (value: string | number) => {
             if (typeof value === "string") {
                 return value;
             }

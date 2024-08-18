@@ -1,8 +1,9 @@
-import { computed, Injectable, OutputEmitterRef, Signal, signal, WritableSignal } from "@angular/core";
+import { computed, Injectable, OutputEmitterRef, signal } from "@angular/core";
 import { from, IEnumerable, ImmutableList, ImmutableSet, Predicate, Selector } from "@mirei/ts-collections";
 import { ReplaySubject, Subject } from "rxjs";
 import { FilterChangeEvent } from "../../filter-input/models/FilterChangeEvent";
 import { FilterableOptions } from "../../models/FilterableOptions";
+import { VirtualScrollOptions } from "../../models/VirtualScrollOptions";
 import { GroupableOptions } from "../models/GroupableOptions";
 import { ListItem } from "../models/ListItem";
 import { ListKeySelector } from "../models/ListSelectors";
@@ -10,47 +11,46 @@ import { NavigableOptions } from "../models/NavigableOptions";
 import { NavigationDirection } from "../models/NavigationDirection";
 import { NavigationMode } from "../models/NavigationMode";
 import { SelectableOptions } from "../models/SelectableOptions";
-import { VirtualScrollOptions } from "../../models/VirtualScrollOptions";
 
 @Injectable()
 export class ListService<TData> {
-    private readonly data: WritableSignal<ImmutableList<TData>> = signal(ImmutableList.create());
-    private readonly listItems: Signal<ImmutableSet<ListItem<TData>>> = computed(() => {
+    private readonly data = signal(ImmutableList.create<TData>());
+    private readonly listItems = computed(() => {
         const data = this.data();
         return from(data)
             .select(item => new ListItem({ data: item, header: "" }))
             .toImmutableSet();
     });
-    public readonly disabledBy: WritableSignal<string | Predicate<TData>> = signal("");
-    public readonly filterInputVisible: WritableSignal<boolean> = signal(true);
-    public readonly filterPlaceholder: WritableSignal<string> = signal("");
-    public readonly filterText: WritableSignal<string> = signal("");
-    public readonly filterableOptions: WritableSignal<FilterableOptions> = signal({
+    public readonly disabledBy = signal<string | Predicate<TData>>("");
+    public readonly filterInputVisible = signal(true);
+    public readonly filterPlaceholder = signal("");
+    public readonly filterText = signal("");
+    public readonly filterableOptions = signal<FilterableOptions>({
         enabled: false,
         caseSensitive: false,
         debounce: 0,
         operator: "contains"
     });
-    public readonly groupBy: WritableSignal<ListKeySelector<TData>> = signal(null);
-    public readonly groupableOptions: WritableSignal<GroupableOptions<TData, any>> = signal({
+    public readonly groupBy = signal<ListKeySelector<TData>>(null);
+    public readonly groupableOptions = signal<GroupableOptions<TData, any>>({
         enabled: false,
         headerOrder: "asc"
     });
-    public readonly highlightedItem: WritableSignal<ListItem<TData> | null> = signal(null);
-    public readonly navigableOptions: WritableSignal<NavigableOptions> = signal({
+    public readonly highlightedItem = signal<ListItem<TData> | null>(null);
+    public readonly navigableOptions = signal<NavigableOptions>({
         enabled: false,
         mode: "select",
         wrap: false
     });
-    public readonly scrollToItem$: ReplaySubject<ListItem<TData>> = new ReplaySubject<ListItem<TData>>(1);
-    public readonly selectableOptions: WritableSignal<SelectableOptions> = signal({
+    public readonly scrollToItem$ = new ReplaySubject<ListItem<TData>>(1);
+    public readonly selectableOptions = signal<SelectableOptions>({
         mode: "single",
         enabled: false,
         toggleable: false
     });
-    public readonly selectedKeys: WritableSignal<ImmutableSet<any>> = signal(ImmutableSet.create());
-    public readonly selectionChange$: Subject<ListItem<TData>> = new Subject<ListItem<TData>>();
-    public readonly selectedListItems: Signal<ImmutableSet<ListItem<TData>>> = computed(() => {
+    public readonly selectedKeys = signal(ImmutableSet.create<any>());
+    public readonly selectionChange$ = new Subject<ListItem<TData>>();
+    public readonly selectedListItems = computed(() => {
         const selectedKeys = this.selectedKeys();
         return selectedKeys
             .select(key => this.listItems().firstOrDefault(i => this.getSelectionKey(i) === key))
@@ -58,9 +58,9 @@ export class ListService<TData> {
             .cast<ListItem<TData>>()
             .toImmutableSet();
     });
-    public readonly textField: WritableSignal<string | Selector<TData, string>> = signal("");
-    public readonly valueField: WritableSignal<string | Selector<TData, any>> = signal("");
-    public readonly viewItems: Signal<ImmutableSet<ListItem<TData>>> = computed(() => {
+    public readonly textField = signal<string | Selector<TData, string>>("");
+    public readonly valueField = signal<string | Selector<TData, any>>("");
+    public readonly viewItems = computed(() => {
         const listItems = this.listItems();
         const filterText = this.filterText();
         const groupableOptions = this.groupableOptions();
@@ -94,7 +94,7 @@ export class ListService<TData> {
             return enumerable.toImmutableSet();
         }
     });
-    public readonly virtualScrollOptions: WritableSignal<VirtualScrollOptions> = signal({
+    public readonly virtualScrollOptions = signal<VirtualScrollOptions>({
         enabled: false,
         height: 28
     });

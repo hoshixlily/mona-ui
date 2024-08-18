@@ -1,4 +1,4 @@
-import { Directive, effect, inject, input, OnInit, output, OutputEmitterRef, untracked } from "@angular/core";
+import { Directive, effect, inject, input, OnInit, output, untracked } from "@angular/core";
 import { FilterChangeEvent } from "../../common/filter-input/models/FilterChangeEvent";
 import { FilterableOptions } from "../../common/models/FilterableOptions";
 import { TreeService } from "../../common/tree/services/tree.service";
@@ -16,7 +16,7 @@ export class TreeViewFilterableDirective<T> implements OnInit {
     };
     readonly #treeService: TreeService<T> = inject(TreeService);
 
-    public readonly filterChange: OutputEmitterRef<FilterChangeEvent> = output();
+    public readonly filterChange = output<FilterChangeEvent>();
 
     public filter = input<string>("");
     public filterPlaceholder = input<string>("");

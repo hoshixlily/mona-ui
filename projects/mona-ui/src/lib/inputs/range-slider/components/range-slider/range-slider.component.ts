@@ -10,13 +10,11 @@ import {
     forwardRef,
     inject,
     input,
-    InputSignal,
     NgZone,
     Signal,
     signal,
     TemplateRef,
-    viewChild,
-    WritableSignal
+    viewChild
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
@@ -55,13 +53,13 @@ export class RangeSliderComponent implements AfterViewInit, ControlValueAccessor
     readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
     readonly #zone: NgZone = inject(NgZone);
     #propagateChange: Action<[number, number]> | null = null;
-    protected readonly dragging: WritableSignal<boolean> = signal(false);
-    protected readonly handlePosition: WritableSignal<[number, number]> = signal([0, 0]);
-    protected readonly handleValue: WritableSignal<[number, number]> = signal([0, 0]);
+    protected readonly dragging = signal(false);
+    protected readonly handlePosition = signal<[number, number]>([0, 0]);
+    protected readonly handleValue = signal<[number, number]>([0, 0]);
     protected readonly primaryHandle: Signal<ElementRef<HTMLDivElement>> = viewChild.required("primaryHandle");
     protected readonly secondaryHandle: Signal<ElementRef<HTMLDivElement>> = viewChild.required("secondaryHandle");
     protected readonly tickValueTemplate = contentChild(RangeSliderTickValueTemplateDirective, { read: TemplateRef });
-    protected readonly trackSelectionStyleData: Signal<{ size: number; position: number }> = computed(() => {
+    protected readonly trackSelectionStyleData = computed(() => {
         const handlePosition = this.handlePosition();
         return {
             position: Math.min(handlePosition[0], handlePosition[1]),
@@ -69,7 +67,7 @@ export class RangeSliderComponent implements AfterViewInit, ControlValueAccessor
         };
     });
 
-    public ticks: Signal<SliderTick[]> = computed(() => {
+    public ticks = computed(() => {
         const min = this.min();
         const max = this.max();
         let index = 0;
@@ -87,16 +85,16 @@ export class RangeSliderComponent implements AfterViewInit, ControlValueAccessor
         return tickList;
     });
 
-    public disabled: InputSignal<boolean> = input(false);
-    public labelPosition: InputSignal<SliderLabelPosition> = input<SliderLabelPosition>("before");
-    public labelStep: InputSignal<number> = input(1);
-    public max: InputSignal<number> = input(10);
-    public min: InputSignal<number> = input(0);
-    public orientation: InputSignal<Orientation> = input<Orientation>("horizontal");
-    public showLabels: InputSignal<boolean> = input(false);
-    public showTicks: InputSignal<boolean> = input(false);
-    public step: InputSignal<number> = input(1);
-    public tickStep: InputSignal<number> = input(1);
+    public disabled = input(false);
+    public labelPosition = input<SliderLabelPosition>("before");
+    public labelStep = input(1);
+    public max = input(10);
+    public min = input(0);
+    public orientation = input<Orientation>("horizontal");
+    public showLabels = input(false);
+    public showTicks = input(false);
+    public step = input(1);
+    public tickStep = input(1);
 
     public ngAfterViewInit() {
         this.setSubscriptions();

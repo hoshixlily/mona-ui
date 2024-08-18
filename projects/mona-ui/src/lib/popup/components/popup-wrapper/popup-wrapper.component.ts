@@ -7,8 +7,7 @@ import {
     inject,
     OnInit,
     signal,
-    TemplateRef,
-    WritableSignal
+    TemplateRef
 } from "@angular/core";
 import { PopupSettingsInjectionToken } from "../../models/PopupInjectionToken";
 import { PopupSettings } from "../../models/PopupSettings";
@@ -27,9 +26,9 @@ import { PopupSettings } from "../../models/PopupSettings";
 export class PopupWrapperComponent implements OnInit, AfterViewInit {
     readonly #popupSettings: PopupSettings = inject<PopupSettings>(PopupSettingsInjectionToken);
     readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
-    public readonly templateRef: WritableSignal<TemplateRef<any> | null> = signal(null);
-    public visible: WritableSignal<boolean> = signal(false);
-    public wrapperClass: WritableSignal<string> = signal("");
+    public readonly templateRef = signal<TemplateRef<any> | null>(null);
+    public visible = signal(false);
+    public wrapperClass = signal("");
 
     public ngAfterViewInit(): void {
         if (this.wrapperClass()) {

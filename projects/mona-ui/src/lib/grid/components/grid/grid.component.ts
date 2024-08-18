@@ -25,7 +25,6 @@ import {
     model,
     OnInit,
     output,
-    OutputEmitterRef,
     signal,
     TemplateRef,
     untracked,
@@ -113,7 +112,7 @@ export class GridComponent<T> implements OnInit {
     /**
      * Emitted when a cell is edited.
      */
-    public readonly cellEdit: OutputEmitterRef<CellEditEvent> = output();
+    public readonly cellEdit = output<CellEditEvent>();
 
     /**
      * The row data to be displayed in the grid.

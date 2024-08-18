@@ -1,24 +1,12 @@
 import { NgStyle, NgTemplateOutlet } from "@angular/common";
-import {
-    ChangeDetectionStrategy,
-    Component,
-    computed,
-    input,
-    InputSignal,
-    OnDestroy,
-    OnInit,
-    Signal,
-    signal,
-    WritableSignal
-} from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, input, OnDestroy, OnInit, signal } from "@angular/core";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import {
     faCheckCircle,
     faExclamationCircle,
     faInfoCircle,
     faTimes,
-    faTimesCircle,
-    IconDefinition
+    faTimesCircle
 } from "@fortawesome/free-solid-svg-icons";
 import { asyncScheduler, interval, takeWhile } from "rxjs";
 import { ProgressBarComponent } from "../../../progress-bars/progress-bar/components/progress-bar/progress-bar.component";
@@ -39,19 +27,19 @@ import { NotificationType } from "../../models/NotificationType";
     }
 })
 export class NotificationComponent implements OnInit, OnDestroy {
-    protected readonly closeIcon: IconDefinition = faTimes;
-    protected readonly errorIcon: IconDefinition = faTimesCircle;
-    protected readonly infoIcon: IconDefinition = faInfoCircle;
-    protected readonly progressColor: Signal<string> = computed(() => {
+    protected readonly closeIcon = faTimes;
+    protected readonly errorIcon = faTimesCircle;
+    protected readonly infoIcon = faInfoCircle;
+    protected readonly progressColor = computed(() => {
         const type = this.type();
         const propertyName = `--mona-${type}`;
         return getComputedStyle(document.documentElement).getPropertyValue(propertyName);
     });
-    protected readonly progressValue: WritableSignal<number> = signal(100);
-    protected readonly successIcon: IconDefinition = faCheckCircle;
-    protected readonly type: WritableSignal<NotificationType> = signal("info");
-    protected readonly warningIcon: IconDefinition = faExclamationCircle;
-    public data: InputSignal<NotificationData> = input.required<NotificationData>();
+    protected readonly progressValue = signal(100);
+    protected readonly successIcon = faCheckCircle;
+    protected readonly type = signal<NotificationType>("info");
+    protected readonly warningIcon = faExclamationCircle;
+    public data = input.required<NotificationData>();
 
     public close(): void {
         this.data().visible.set(false);

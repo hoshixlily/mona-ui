@@ -10,13 +10,11 @@ import {
     forwardRef,
     inject,
     input,
-    InputSignal,
     NgZone,
     Signal,
     signal,
     TemplateRef,
-    viewChild,
-    WritableSignal
+    viewChild
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
@@ -52,12 +50,12 @@ export class SliderComponent implements AfterViewInit, ControlValueAccessor {
     readonly #hostElementRef: ElementRef<HTMLDivElement> = inject(ElementRef);
     readonly #zone: NgZone = inject(NgZone);
     #propagateChange: Action<number> | null = null;
-    protected readonly dragging: WritableSignal<boolean> = signal(false);
-    protected readonly handlePosition: WritableSignal<number> = signal(0);
-    protected readonly handleValue: WritableSignal<number> = signal(0);
+    protected readonly dragging = signal(false);
+    protected readonly handlePosition = signal(0);
+    protected readonly handleValue = signal(0);
     protected readonly sliderHandle: Signal<ElementRef<HTMLDivElement>> = viewChild.required("sliderHandle");
     protected readonly tickValueTemplate = contentChild(SliderTickValueTemplateDirective, { read: TemplateRef });
-    protected readonly ticks: Signal<SliderTick[]> = computed(() => {
+    protected readonly ticks = computed(() => {
         const min = this.min();
         const max = this.max();
         const tickList: SliderTick[] = [];
@@ -75,16 +73,16 @@ export class SliderComponent implements AfterViewInit, ControlValueAccessor {
         return tickList;
     });
 
-    public disabled: InputSignal<boolean> = input(false);
-    public labelPosition: InputSignal<SliderLabelPosition> = input<SliderLabelPosition>("after");
-    public labelStep: InputSignal<number> = input(1);
-    public max: InputSignal<number> = input(10);
-    public min: InputSignal<number> = input(0);
-    public orientation: InputSignal<"horizontal" | "vertical"> = input<"horizontal" | "vertical">("horizontal");
-    public showLabels: InputSignal<boolean> = input(false);
-    public showTicks: InputSignal<boolean> = input(false);
-    public step: InputSignal<number> = input(1);
-    public tickStep: InputSignal<number> = input(1);
+    public disabled = input(false);
+    public labelPosition = input<SliderLabelPosition>("after");
+    public labelStep = input(1);
+    public max = input(10);
+    public min = input(0);
+    public orientation = input<"horizontal" | "vertical">("horizontal");
+    public showLabels = input(false);
+    public showTicks = input(false);
+    public step = input(1);
+    public tickStep = input(1);
 
     public ngAfterViewInit(): void {
         this.setSubscription();

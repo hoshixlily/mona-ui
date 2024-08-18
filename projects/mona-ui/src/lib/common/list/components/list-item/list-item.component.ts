@@ -1,14 +1,5 @@
 import { NgClass, NgTemplateOutlet } from "@angular/common";
-import {
-    ChangeDetectionStrategy,
-    Component,
-    computed,
-    inject,
-    input,
-    InputSignal,
-    Signal,
-    TemplateRef
-} from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, inject, input, Signal, TemplateRef } from "@angular/core";
 import { ListItem } from "../../models/ListItem";
 import { ListItemTemplateContext } from "../../models/ListItemTemplateContext";
 import { ListService } from "../../services/list.service";
@@ -23,7 +14,7 @@ import { ListService } from "../../services/list.service";
 })
 export class ListItemComponent<TData> {
     protected readonly dataItem: Signal<TData | null> = computed(() => this.item()?.data ?? null);
-    protected readonly itemText: Signal<string> = computed(() => {
+    protected readonly itemText = computed(() => {
         const item = this.item();
         if (item == null) {
             return "";
@@ -35,6 +26,6 @@ export class ListItemComponent<TData> {
     });
     protected readonly listService: ListService<TData> = inject(ListService);
 
-    public item: InputSignal<ListItem<TData>> = input.required();
+    public item = input.required<ListItem<TData>>();
     public template = input<TemplateRef<ListItemTemplateContext<TData>> | null>(null);
 }

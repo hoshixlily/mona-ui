@@ -1,15 +1,5 @@
 import { NgTemplateOutlet } from "@angular/common";
-import {
-    ChangeDetectionStrategy,
-    Component,
-    computed,
-    DestroyRef,
-    inject,
-    input,
-    InputSignal,
-    OnInit,
-    Signal
-} from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, input, OnInit } from "@angular/core";
 import { takeUntilDestroyed, toSignal } from "@angular/core/rxjs-interop";
 import { map, Subject } from "rxjs";
 import { NodeCheckEvent } from "../../models/NodeCheckEvent";
@@ -28,19 +18,19 @@ import { TreeService } from "../../services/tree.service";
 })
 export class TreeNodeComponent<T> implements OnInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
-    readonly #dragging: Signal<boolean> = toSignal(this.treeService.dragging$, {
+    readonly #dragging = toSignal(this.treeService.dragging$, {
         initialValue: false
     });
-    public readonly checkable: Signal<boolean> = computed(() => {
+    public readonly checkable = computed(() => {
         const node = this.node();
         if (node === null) {
             return false;
         }
         return this.treeService.isCheckable(node);
     });
-    public readonly checkboxCheck$: Subject<boolean> = new Subject<boolean>();
-    public readonly checkboxClick$: Subject<MouseEvent> = new Subject<MouseEvent>();
-    public readonly checked: Signal<boolean> = computed(() => {
+    public readonly checkboxCheck$ = new Subject<boolean>();
+    public readonly checkboxClick$ = new Subject<MouseEvent>();
+    public readonly checked = computed(() => {
         const node = this.node();
         this.#dragging();
         if (node === null) {
@@ -48,14 +38,14 @@ export class TreeNodeComponent<T> implements OnInit {
         }
         return this.treeService.isChecked(node);
     });
-    public readonly disabled: Signal<boolean> = computed(() => {
+    public readonly disabled = computed(() => {
         const node = this.node();
         if (node === null) {
             return false;
         }
         return this.treeService.isDisabled(node);
     });
-    public readonly expandable: Signal<boolean> = computed(() => {
+    public readonly expandable = computed(() => {
         const node = this.node();
         const expandableOptions = this.treeService.expandableOptions();
         const childrenSelector = this.treeService.children();
@@ -71,14 +61,14 @@ export class TreeNodeComponent<T> implements OnInit {
         }
         return children.length > 0;
     });
-    public readonly expanded: Signal<boolean> = computed(() => {
+    public readonly expanded = computed(() => {
         const node = this.node();
         if (node === null) {
             return true;
         }
         return this.treeService.isExpanded(node);
     });
-    public readonly indeterminate: Signal<boolean> = computed(() => {
+    public readonly indeterminate = computed(() => {
         const node = this.node();
         this.#dragging();
         if (node === null) {
@@ -86,21 +76,21 @@ export class TreeNodeComponent<T> implements OnInit {
         }
         return this.treeService.isIndeterminate(node);
     });
-    public readonly navigated: Signal<boolean> = computed(() => {
+    public readonly navigated = computed(() => {
         const node = this.node();
         if (node === null) {
             return false;
         }
         return this.treeService.isNavigated(node);
     });
-    public readonly nodeText: Signal<string> = computed(() => {
+    public readonly nodeText = computed(() => {
         const node = this.node();
         if (node === null) {
             return "";
         }
         return this.treeService.getNodeText(node);
     });
-    public readonly selected: Signal<boolean> = computed(() => {
+    public readonly selected = computed(() => {
         const node = this.node();
         if (node === null) {
             return false;
@@ -108,8 +98,8 @@ export class TreeNodeComponent<T> implements OnInit {
         return this.treeService.isSelected(node);
     });
 
-    public depth: InputSignal<number> = input(0);
-    public node: InputSignal<TreeNode<T> | null> = input<TreeNode<T> | null>(null);
+    public depth = input(0);
+    public node = input<TreeNode<T> | null>(null);
 
     public constructor(protected readonly treeService: TreeService<T>) {}
 

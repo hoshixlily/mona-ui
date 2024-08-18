@@ -1,7 +1,7 @@
 import { NgClass } from "@angular/common";
-import { ChangeDetectionStrategy, Component, input, InputSignal, output, OutputEmitterRef } from "@angular/core";
+import { ChangeDetectionStrategy, Component, input, output } from "@angular/core";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import { ButtonDirective } from "../button/button.directive";
 
 @Component({
@@ -19,10 +19,10 @@ import { ButtonDirective } from "../button/button.directive";
     }
 })
 export class ChipComponent {
-    protected readonly closeIcon: IconDefinition = faTimes;
-    public disabled: InputSignal<boolean> = input(false);
-    public label: InputSignal<string> = input("");
-    public removable: InputSignal<boolean> = input(false);
-    public remove: OutputEmitterRef<Event> = output();
-    public tabindex: InputSignal<number | string> = input<number | string>(0);
+    protected readonly closeIcon = faTimes;
+    public disabled = input(false);
+    public label = input("");
+    public removable = input(false);
+    public remove = output<Event>();
+    public tabindex = input<number | string>(0);
 }

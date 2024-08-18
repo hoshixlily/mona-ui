@@ -6,12 +6,9 @@ import {
     Host,
     inject,
     input,
-    InputSignal,
     model,
-    ModelSignal,
     OnInit,
     Optional,
-    signal,
     untracked
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
@@ -38,9 +35,9 @@ export class ButtonDirective implements OnInit {
     readonly #hostElementRef: ElementRef<HTMLButtonElement> = inject(ElementRef);
 
     public disabled = model<boolean>(false);
-    public flat: InputSignal<boolean> = input(false);
-    public primary: InputSignal<boolean> = input(false);
-    public selected: ModelSignal<boolean> = model(false);
+    public flat = input(false);
+    public primary = input(false);
+    public selected = model(false);
     public tabindex = input<number, number | string>(0, {
         transform: (value: number | string) => (typeof value === "string" ? parseInt(value, 10) : value)
     });

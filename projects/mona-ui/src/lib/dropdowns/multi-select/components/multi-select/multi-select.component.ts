@@ -10,24 +10,20 @@ import {
     forwardRef,
     inject,
     input,
-    InputSignal,
     model,
     OnDestroy,
     OnInit,
     output,
-    OutputEmitterRef,
     signal,
-    Signal,
     TemplateRef,
     untracked,
-    viewChild,
-    WritableSignal
+    viewChild
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { faChevronDown, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
-import { ImmutableDictionary, ImmutableSet, Predicate } from "@mirei/ts-collections";
+import { faChevronDown, faTimes } from "@fortawesome/free-solid-svg-icons";
+import { Predicate } from "@mirei/ts-collections";
 import { fromEvent, take } from "rxjs";
 import { v4 } from "uuid";
 import { AnimationState } from "../../../../animations/models/AnimationState";
@@ -96,14 +92,14 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
     readonly #listService: ListService<TData> = inject(ListService);
     readonly #popupAnimationService: PopupAnimationService = inject(PopupAnimationService);
     readonly #popupService: PopupService = inject(PopupService);
-    readonly #popupUidClass: string = `mona-dropdown-popup-${v4()}`;
+    readonly #popupUidClass = `mona-dropdown-popup-${v4()}`;
     #popupRef: PopupRef | null = null;
     #propagateChange: Action<TData[]> | null = null;
     #resizeObserver: ResizeObserver | null = null;
     #value: TData[] = [];
 
-    protected readonly clearIcon: IconDefinition = faTimes;
-    protected readonly dropdownIcon: IconDefinition = faChevronDown;
+    protected readonly clearIcon = faTimes;
+    protected readonly dropdownIcon = faChevronDown;
     protected readonly footerTemplate = contentChild(DropDownFooterTemplateDirective, { read: TemplateRef });
     protected readonly groupHeaderTemplate = contentChild(DropDownGroupHeaderTemplateDirective, {
         read: TemplateRef
@@ -113,16 +109,16 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
     protected readonly noDataTemplate = contentChild(DropDownNoDataTemplateDirective, { read: TemplateRef });
     protected readonly popupTemplate = viewChild.required<TemplateRef<any>>("popupTemplate");
     protected readonly tagTemplate = contentChild(MultiSelectTagTemplateDirective, { read: TemplateRef });
-    protected readonly selectedDataItems: Signal<ImmutableSet<TData>> = computed(() => {
+    protected readonly selectedDataItems = computed(() => {
         return this.selectedListItems()
             .select(i => i.data)
             .toImmutableSet();
     });
-    protected readonly selectedKeysChange: OutputEmitterRef<any[]> = output();
-    protected readonly selectedListItems: Signal<ImmutableSet<ListItem<TData>>> = computed(() => {
+    protected readonly selectedKeysChange = output<any[]>();
+    protected readonly selectedListItems = computed(() => {
         return this.#listService.selectedListItems();
     });
-    protected readonly summaryTagText: Signal<string> = computed(() => {
+    protected readonly summaryTagText = computed(() => {
         const tagCount = this.tagCount();
         const itemCount = this.selectedListItems().size();
         if (tagCount < 0) {
@@ -133,7 +129,7 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
             return `+${itemCount - tagCount} item${itemCount - tagCount > 1 ? "s" : ""}`;
         }
     });
-    protected readonly valueTextMap: Signal<ImmutableDictionary<ListItem<TData>, string>> = computed(() => {
+    protected readonly valueTextMap = computed(() => {
         const tagCount = this.visibleTagCount();
         return this.selectedListItems()
             .take(tagCount)
@@ -142,7 +138,7 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
                 i => this.#listService.getItemText(i)
             );
     });
-    protected readonly visibleTagCount: Signal<number> = computed(() => {
+    protected readonly visibleTagCount = computed(() => {
         const tagCount = this.tagCount();
         const itemCount = this.selectedListItems().size();
         if (tagCount < 0) {
@@ -151,13 +147,13 @@ export class MultiSelectComponent<TData> implements OnInit, OnDestroy, ControlVa
         return tagCount;
     });
 
-    public readonly summaryTagTemplate: WritableSignal<TemplateRef<any> | null> = signal(null);
-    public readonly tagCount: WritableSignal<number> = signal(-1);
+    public readonly summaryTagTemplate = signal<TemplateRef<any> | null>(null);
+    public readonly tagCount = signal(-1);
 
     public data = input<Iterable<TData>>([]);
     public disabled = model(false);
     public itemDisabled = input<string | Predicate<TData> | null | undefined>("");
-    public showClearButton: InputSignal<boolean> = input(true);
+    public showClearButton = input(true);
     public textField = input<string | null | undefined>("");
     public valueField = input<string | null | undefined>("");
 

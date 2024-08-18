@@ -14,8 +14,7 @@ import {
     output,
     Signal,
     signal,
-    viewChild,
-    WritableSignal
+    viewChild
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from "@angular/forms";
@@ -66,16 +65,16 @@ import { HueSliderComponent } from "../hue-slider/hue-slider.component";
 export class ColorGradientComponent implements OnInit, AfterViewInit, ControlValueAccessor {
     readonly #clipboard: Clipboard = inject(Clipboard);
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
-    readonly #valueChange$: Subject<string | null> = new Subject<string | null>();
+    readonly #valueChange$ = new Subject<string | null>();
     readonly #zone: NgZone = inject(NgZone);
     #propagateChange: (value: string | null) => void = () => {};
-    protected readonly alpha: WritableSignal<number> = signal(255);
-    protected readonly alphaInputColor: Signal<string> = computed(() => {
+    protected readonly alpha = signal(255);
+    protected readonly alphaInputColor = computed(() => {
         const rgb = this.rgb();
         return this.rgba2hex(rgb.r(), rgb.g(), rgb.b(), 255);
     });
-    protected readonly colorMode: WritableSignal<ColorMode> = signal("rgb");
-    protected readonly hex: Signal<string> = computed(() => {
+    protected readonly colorMode = signal<ColorMode>("rgb");
+    protected readonly hex = computed(() => {
         const rgb = this.rgb();
         const alpha = this.alpha();
         const focused = this.hexFocused();
@@ -84,30 +83,30 @@ export class ColorGradientComponent implements OnInit, AfterViewInit, ControlVal
         }
         return this.hexInputValue();
     });
-    protected readonly hexFocused: WritableSignal<boolean> = signal(false);
-    protected readonly hexInputValue: WritableSignal<string> = signal("");
-    protected readonly hsv: WritableSignal<HSVSignal> = signal<HSVSignal>({
+    protected readonly hexFocused = signal(false);
+    protected readonly hexInputValue = signal("");
+    protected readonly hsv = signal<HSVSignal>({
         h: signal(255),
         s: signal(255),
         v: signal(255)
     });
-    protected readonly hsvRectBackground: Signal<string> = computed(() => {
+    protected readonly hsvRectBackground = computed(() => {
         const hsv = this.hsv();
         const rgb = this.hsva2rgba(hsv.h(), 100, 100, 255);
         return `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
     });
     protected readonly hsvPointer: Signal<ElementRef<HTMLDivElement>> = viewChild.required("hsvPointer");
-    protected readonly hsvPointerLeft: WritableSignal<number> = signal(0);
-    protected readonly hsvPointerTop: WritableSignal<number> = signal(0);
+    protected readonly hsvPointerLeft = signal(0);
+    protected readonly hsvPointerTop = signal(0);
     protected readonly hsvRectangle: Signal<ElementRef<HTMLDivElement>> = viewChild.required("hsvRectangle");
-    protected readonly hueValue$: Subject<number> = new Subject<number>();
-    protected readonly lastSelectedColor: WritableSignal<string> = signal("");
-    protected readonly rgb: WritableSignal<RGBSignal> = signal<RGBSignal>({
+    protected readonly hueValue$ = new Subject<number>();
+    protected readonly lastSelectedColor = signal("");
+    protected readonly rgb = signal<RGBSignal>({
         r: signal(255),
         g: signal(255),
         b: signal(255)
     });
-    protected readonly selectedColor: Signal<string> = computed(() => {
+    protected readonly selectedColor = computed(() => {
         const rgb = this.rgb();
         const { red, green, blue } = { red: rgb.r(), green: rgb.g(), blue: rgb.b() };
         if (red == null || green == null || blue == null) {

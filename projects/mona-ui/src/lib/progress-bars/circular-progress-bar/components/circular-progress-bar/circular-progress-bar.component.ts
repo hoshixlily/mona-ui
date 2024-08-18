@@ -6,12 +6,9 @@ import {
     contentChild,
     effect,
     input,
-    InputSignal,
-    Signal,
     signal,
     TemplateRef,
-    untracked,
-    WritableSignal
+    untracked
 } from "@angular/core";
 import { Action } from "../../../../utils/Action";
 import { CircularProgressBarLabelTemplateDirective } from "../../directives/circular-progress-bar-label-template.directive";
@@ -31,29 +28,27 @@ import { CircularProgressBarLabelTemplateDirective } from "../../directives/circ
     }
 })
 export class CircularProgressBarComponent {
-    protected readonly center: Signal<{ x: Signal<number>; y: Signal<number> }> = computed(() => {
+    protected readonly center = computed(() => {
         return {
             x: computed(() => this.size() / 2),
             y: computed(() => this.size() / 2)
         };
     });
-    protected readonly circumference: Signal<number> = computed(
-        () => 2 * Math.PI * (this.size() / 2 - this.thickness())
-    );
+    protected readonly circumference = computed(() => 2 * Math.PI * (this.size() / 2 - this.thickness()));
     protected readonly labelTemplate = contentChild(CircularProgressBarLabelTemplateDirective, {
         read: TemplateRef
     });
-    protected readonly pixelSize: Signal<string> = computed(() => `${this.size()}px`);
-    protected readonly progressValue: WritableSignal<number> = signal(0);
-    protected readonly radius: Signal<number> = computed(() => this.size() / 2 - this.thickness());
-    protected readonly strokeColor: Signal<string> = computed(() => {
+    protected readonly pixelSize = computed(() => `${this.size()}px`);
+    protected readonly progressValue = signal(0);
+    protected readonly radius = computed(() => this.size() / 2 - this.thickness());
+    protected readonly strokeColor = computed(() => {
         if (typeof this.color() === "string") {
             return this.color() as string;
         }
         const colorize = this.color() as Action<number, string>;
         return colorize(this.progressValue());
     });
-    protected readonly strokeDashOffset: Signal<number> = computed(() => {
+    protected readonly strokeDashOffset = computed(() => {
         const dashOffset = this.circumference() * (1 - this.progressValue() / 100);
         return this.indeterminate() ? this.circumference() / 1.42 : dashOffset;
     });
@@ -61,27 +56,25 @@ export class CircularProgressBarComponent {
     /**
      * Color of progress bar. Can be string or function that takes progress value and returns color.
      */
-    public color: InputSignal<string | Action<number, string>> = input<string | Action<number, string>>(
-        "var(--mona-primary)"
-    );
-    public disabled: InputSignal<boolean> = input(false);
-    public indeterminate: InputSignal<boolean> = input(false);
-    public max: InputSignal<number> = input(100);
-    public min: InputSignal<number> = input(0);
+    public color = input<string | Action<number, string>>("var(--mona-primary)");
+    public disabled = input(false);
+    public indeterminate = input(false);
+    public max = input(100);
+    public min = input(0);
 
     /**
      * Progress value in percentage. Value must be between 0 and 100.
      * Do not use together with the {@link value} input.
      */
-    public progress: InputSignal<number> = input(0);
-    public size: InputSignal<number> = input(100);
-    public thickness: InputSignal<number> = input(5);
+    public progress = input(0);
+    public size = input(100);
+    public thickness = input(5);
 
     /**
      * Progress value in absolute value. Value must be between min and max.
      * Do not use together with the {@link progress} input.
      */
-    public value: InputSignal<number> = input(0);
+    public value = input(0);
 
     public constructor() {
         effect(() => {

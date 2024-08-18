@@ -9,8 +9,7 @@ import {
     inject,
     OnInit,
     signal,
-    viewChildren,
-    WritableSignal
+    viewChildren
 } from "@angular/core";
 import { any } from "@mirei/ts-collections";
 import { filter, fromEvent, Subject } from "rxjs";
@@ -39,9 +38,9 @@ export class ContextMenuContentComponent<C> implements OnInit, AfterViewInit {
     readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
     #currentMenuItem: MenuItem | null = null;
     protected readonly contextMenuItemComponents = viewChildren(ContextMenuItemComponent);
-    protected readonly iconSpaceVisible: WritableSignal<boolean> = signal(false);
-    protected readonly linkSpaceVisible: WritableSignal<boolean> = signal(false);
-    protected readonly menuPopupRef: WritableSignal<PopupRef | null> = signal(null);
+    protected readonly iconSpaceVisible = signal(false);
+    protected readonly linkSpaceVisible = signal(false);
+    protected readonly menuPopupRef = signal<PopupRef | null>(null);
     public readonly contextMenuData: ContextMenuInjectorData<C> =
         inject<ContextMenuInjectorData>(PopupDataInjectionToken);
     public keyManager!: ActiveDescendantKeyManager<ContextMenuItemComponent>;

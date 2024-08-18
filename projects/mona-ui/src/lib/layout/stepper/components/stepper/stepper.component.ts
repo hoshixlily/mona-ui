@@ -8,13 +8,9 @@ import {
     ElementRef,
     inject,
     input,
-    InputSignal,
-    InputSignalWithTransform,
     model,
-    ModelSignal,
     OnInit,
     output,
-    OutputEmitterRef,
     Signal,
     TemplateRef
 } from "@angular/core";
@@ -45,16 +41,16 @@ import { StepperTemplateContext } from "../../models/StepperTemplateContext";
 export class StepperComponent implements OnInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
-    readonly #trackItemSize: Signal<number> = computed(() => {
+    readonly #trackItemSize = computed(() => {
         const stepCount = this.steps().length;
         return stepCount !== 0 ? 100 / stepCount : 0;
     });
-    readonly #trackLength: Signal<string> = computed(() => {
+    readonly #trackLength = computed(() => {
         const step = this.activeStep();
         return step ? `${(100 / (this.steps().length - 1)) * step.index}%` : "0%";
     });
 
-    protected readonly activeStep: Signal<Step> = computed(() => {
+    protected readonly activeStep = computed(() => {
         const step = this.step();
         return this.steps()[step];
     });
@@ -103,12 +99,12 @@ export class StepperComponent implements OnInit {
         return { gridColumn, gridRow };
     });
 
-    public readonly stepChange: OutputEmitterRef<number> = output();
+    public readonly stepChange = output<number>();
 
-    public linear: InputSignal<boolean> = input(false);
-    public orientation: InputSignal<"horizontal" | "vertical"> = input<"horizontal" | "vertical">("horizontal");
-    public step: ModelSignal<number> = model(0);
-    public steps: InputSignalWithTransform<Step[], Iterable<StepOptions>> = input([], {
+    public linear = input(false);
+    public orientation = input<"horizontal" | "vertical">("horizontal");
+    public step = model(0);
+    public steps = input([], {
         transform: (steps: Iterable<StepOptions>) => {
             return Array.from(steps).map((s, ix) => {
                 const step = new Step(s);

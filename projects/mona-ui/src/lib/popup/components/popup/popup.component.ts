@@ -8,10 +8,8 @@ import {
     ElementRef,
     inject,
     input,
-    InputSignal,
     OnDestroy,
     output,
-    OutputEmitterRef,
     TemplateRef
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
@@ -39,21 +37,21 @@ export class PopupComponent implements OnDestroy, AfterViewInit {
 
     protected readonly contentTemplate = contentChild.required(TemplateRef);
 
-    public readonly close: OutputEmitterRef<void> = output();
-    public readonly open: OutputEmitterRef<PopupRef> = output();
+    public readonly close = output();
+    public readonly open = output<PopupRef>();
 
-    public anchor: InputSignal<FlexibleConnectedPositionStrategyOrigin> = input.required();
-    public closeOnEscape: InputSignal<boolean> = input(true);
-    public height: InputSignal<number | string | undefined> = input<number | string | undefined>(undefined);
-    public maxHeight: InputSignal<number | string | undefined> = input<number | string | undefined>(undefined);
-    public maxWidth: InputSignal<number | string | undefined> = input<number | string | undefined>(undefined);
-    public minHeight: InputSignal<number | string | undefined> = input<number | string | undefined>(undefined);
-    public minWidth: InputSignal<number | string | undefined> = input<number | string | undefined>(undefined);
-    public offset: InputSignal<PopupOffset | undefined> = input<PopupOffset | undefined>(undefined);
-    public popupClass: InputSignal<string | string[]> = input<string | string[]>([]);
-    public popupWrapperClass: InputSignal<string | string[]> = input<string | string[]>([]);
-    public trigger: InputSignal<string> = input("click");
-    public width: InputSignal<number | string | undefined> = input<number | string | undefined>(undefined);
+    public anchor = input.required<FlexibleConnectedPositionStrategyOrigin>();
+    public closeOnEscape = input(true);
+    public height = input<number | string | undefined>(undefined);
+    public maxHeight = input<number | string | undefined>(undefined);
+    public maxWidth = input<number | string | undefined>(undefined);
+    public minHeight = input<number | string | undefined>(undefined);
+    public minWidth = input<number | string | undefined>(undefined);
+    public offset = input<PopupOffset | undefined>(undefined);
+    public popupClass = input<string | string[]>([]);
+    public popupWrapperClass = input<string | string[]>([]);
+    public trigger = input("click");
+    public width = input<number | string | undefined>(undefined);
 
     public ngAfterViewInit(): void {
         window.setTimeout(() => {

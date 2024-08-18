@@ -6,9 +6,7 @@ import {
     EmbeddedViewRef,
     inject,
     input,
-    InputSignal,
     model,
-    ModelSignal,
     TemplateRef,
     ViewContainerRef
 } from "@angular/core";
@@ -29,12 +27,12 @@ export class TabComponent implements AfterViewInit {
     protected readonly contentTemplate = contentChild(TabContentTemplateDirective, { read: TemplateRef });
 
     public readonly titleTemplate = contentChild(TabTitleTemplateDirective, { read: TemplateRef });
-    public readonly uid: string = v4();
-    public closable: InputSignal<boolean | undefined> = input<boolean | undefined>(undefined);
-    public disabled: InputSignal<boolean> = input(false);
-    public index: number = 0;
-    public selected: ModelSignal<boolean> = model(false);
-    public title: InputSignal<string> = input("");
+    public readonly uid = v4();
+    public closable = input<boolean | undefined>(undefined);
+    public disabled = input(false);
+    public index = 0;
+    public selected = model(false);
+    public title = input("");
 
     public createView(): void {
         const contentTemplate = this.contentTemplate();

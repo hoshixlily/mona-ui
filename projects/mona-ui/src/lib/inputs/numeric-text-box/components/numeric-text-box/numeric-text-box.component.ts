@@ -10,21 +10,18 @@ import {
     forwardRef,
     inject,
     input,
-    InputSignal,
     OnDestroy,
     OnInit,
     output,
-    OutputEmitterRef,
     Signal,
     signal,
     TemplateRef,
-    viewChild,
-    WritableSignal
+    viewChild
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { faChevronDown, faChevronUp, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { faChevronDown, faChevronUp } from "@fortawesome/free-solid-svg-icons";
 import { delay, distinctUntilChanged, filter, interval, map, Subject, takeUntil } from "rxjs";
 import { ButtonDirective } from "../../../../buttons/button/button.directive";
 import { Action } from "../../../../utils/Action";
@@ -58,11 +55,11 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
     readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
     #propagateChange: Action<number | null> | null = null;
 
-    protected readonly beforeInput$: Subject<InputEvent> = new Subject<InputEvent>();
-    protected readonly decreaseIcon: IconDefinition = faChevronDown;
-    protected readonly increaseIcon: IconDefinition = faChevronUp;
-    protected readonly focused: WritableSignal<boolean> = signal(false);
-    protected readonly formattedValue: Signal<string> = computed(() => {
+    protected readonly beforeInput$ = new Subject<InputEvent>();
+    protected readonly decreaseIcon = faChevronDown;
+    protected readonly increaseIcon = faChevronUp;
+    protected readonly focused = signal(false);
+    protected readonly formattedValue = computed(() => {
         const value = this.value();
         const focused = this.focused();
         const decimals = this.decimals();
@@ -81,34 +78,32 @@ export class NumericTextBoxComponent implements OnInit, OnDestroy, ControlValueA
         }
         return value?.toString() ?? "";
     });
-    protected readonly keydown$: Subject<KeyboardEvent> = new Subject<KeyboardEvent>();
-    protected readonly spin$: Subject<Sign> = new Subject<Sign>();
-    protected readonly spinStop$: Subject<void> = new Subject<void>();
+    protected readonly keydown$ = new Subject<KeyboardEvent>();
+    protected readonly spin$ = new Subject<Sign>();
+    protected readonly spinStop$ = new Subject<void>();
     protected readonly prefixTemplateList = contentChildren(NumericTextBoxPrefixTemplateDirective, {
         read: TemplateRef
     });
-    protected readonly value: WritableSignal<number | null> = signal(null);
-    protected readonly valueChange$: Subject<string> = new Subject<string>();
+    protected readonly value = signal<number | null>(null);
+    protected readonly valueChange$ = new Subject<string>();
     protected readonly valueTextBoxRef: Signal<ElementRef<HTMLInputElement>> = viewChild.required("valueTextBox");
-    protected readonly wheel$: Subject<WheelEvent> = new Subject<WheelEvent>();
+    protected readonly wheel$ = new Subject<WheelEvent>();
 
-    public readonly inputBlur: OutputEmitterRef<Event> = output();
-    public readonly inputFocus: OutputEmitterRef<Event> = output();
-    public readonly inputFocusOut: OutputEmitterRef<Event> = output();
+    public readonly inputBlur = output<Event>();
+    public readonly inputFocus = output<Event>();
+    public readonly inputFocusOut = output<Event>();
 
-    public decimals: InputSignal<number> = input(0);
-    public disabled: InputSignal<boolean> = input(false);
-    public formatter: InputSignal<Action<number | null, string> | null> = input<Action<number | null, string> | null>(
-        null
-    );
-    public max: InputSignal<number | undefined> = input<number | undefined>(undefined);
-    public min: InputSignal<number | undefined> = input<number | undefined>(undefined);
-    public nullable: InputSignal<boolean> = input(true);
-    public readonly: InputSignal<boolean> = input(false);
-    public required: InputSignal<boolean> = input(false);
-    public spinners: InputSignal<boolean> = input(true);
-    public step: InputSignal<number> = input(1);
-    public tabindex: InputSignal<number> = input(0);
+    public decimals = input(0);
+    public disabled = input(false);
+    public formatter = input<Action<number | null, string> | null>(null);
+    public max = input<number | undefined>(undefined);
+    public min = input<number | undefined>(undefined);
+    public nullable = input(true);
+    public readonly = input(false);
+    public required = input(false);
+    public spinners = input(true);
+    public step = input(1);
+    public tabindex = input(0);
 
     private static calculate(value: number, step: number, type: Sign): number {
         const precision = Math.max(

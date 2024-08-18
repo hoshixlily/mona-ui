@@ -1,8 +1,8 @@
 import { NgClass } from "@angular/common";
-import { AfterContentInit, ChangeDetectionStrategy, Component, signal, WritableSignal } from "@angular/core";
+import { AfterContentInit, ChangeDetectionStrategy, Component, signal } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { faCheck, faExclamation, faInfo, faQuestion, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faExclamation, faInfo, faQuestion, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { Subject, take } from "rxjs";
 import { ButtonDirective } from "../../../buttons/button/button.directive";
 import { NumericTextBoxComponent } from "../../../inputs/numeric-text-box/components/numeric-text-box/numeric-text-box.component";
@@ -21,24 +21,24 @@ import { DialogType } from "../../models/DialogType";
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DialogContentComponent implements AfterContentInit {
-    readonly #dialogResult$: Subject<DialogResult> = new Subject<DialogResult>();
+    readonly #dialogResult$ = new Subject<DialogResult>();
     #dialogRef: DialogRef = {
         result: this.#dialogResult$.asObservable(),
         close: () => {}
     };
-    protected readonly confirmIcon: IconDefinition = faQuestion;
-    protected readonly errorIcon: IconDefinition = faTimes;
-    protected readonly infoIcon: IconDefinition = faInfo;
-    protected readonly inputIcon: IconDefinition = faQuestion;
-    protected readonly successIcon: IconDefinition = faCheck;
-    protected readonly warningIcon: IconDefinition = faExclamation;
+    protected readonly confirmIcon = faQuestion;
+    protected readonly errorIcon = faTimes;
+    protected readonly infoIcon = faInfo;
+    protected readonly inputIcon = faQuestion;
+    protected readonly successIcon = faCheck;
+    protected readonly warningIcon = faExclamation;
 
-    public readonly actions: WritableSignal<DialogAction[]> = signal([]);
-    public readonly inputType: WritableSignal<"string" | "number"> = signal("string");
-    public readonly text: WritableSignal<string> = signal("");
-    public readonly type: WritableSignal<DialogType> = signal("info");
-    public readonly valueNumber: WritableSignal<number | null> = signal(null);
-    public readonly valueString: WritableSignal<string> = signal("");
+    public readonly actions = signal<DialogAction[]>([]);
+    public readonly inputType = signal<"string" | "number">("string");
+    public readonly text = signal("");
+    public readonly type = signal<DialogType>("info");
+    public readonly valueNumber = signal<number | null>(null);
+    public readonly valueString = signal("");
     public dialogHandler?: DialogHandler; // This is set by DialogService
 
     public ngAfterContentInit(): void {

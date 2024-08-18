@@ -8,16 +8,12 @@ import {
     ElementRef,
     inject,
     input,
-    InputSignal,
-    InputSignalWithTransform,
     OnDestroy,
     output,
-    OutputEmitterRef,
     Signal,
     signal,
     untracked,
-    viewChild,
-    WritableSignal
+    viewChild
 } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
@@ -26,8 +22,7 @@ import {
     faAngleDoubleRight,
     faAngleLeft,
     faAngleRight,
-    faEllipsis,
-    IconDefinition
+    faEllipsis
 } from "@fortawesome/free-solid-svg-icons";
 import { range } from "@mirei/ts-collections";
 import { ButtonDirective } from "../../../buttons/button/button.directive";
@@ -62,58 +57,58 @@ import { PageSizeChangeEvent } from "../../models/PageSizeChangeEvent";
 })
 export class PagerComponent implements AfterViewInit, OnDestroy {
     readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
-    readonly #skip: WritableSignal<number> = signal(0);
+    readonly #skip = signal(0);
     #widthObserver: ResizeObserver | null = null;
-    #previousPageSize: number = 10;
-    protected readonly ellipsisIcon: IconDefinition = faEllipsis;
-    protected readonly firstPageIcon: IconDefinition = faAngleDoubleLeft;
-    protected readonly lastPageIcon: IconDefinition = faAngleDoubleRight;
-    protected readonly nextIcon: IconDefinition = faAngleRight;
-    protected readonly previousIcon: IconDefinition = faAngleLeft;
-    protected readonly currentPageDataCountEnd: Signal<number> = computed(() => {
+    #previousPageSize = 10;
+    protected readonly ellipsisIcon = faEllipsis;
+    protected readonly firstPageIcon = faAngleDoubleLeft;
+    protected readonly lastPageIcon = faAngleDoubleRight;
+    protected readonly nextIcon = faAngleRight;
+    protected readonly previousIcon = faAngleLeft;
+    protected readonly currentPageDataCountEnd = computed(() => {
         return Math.min(this.page() * this.pagerPageSize(), this.total());
     });
-    protected readonly currentPageDataCountStart: Signal<number> = computed(() => {
+    protected readonly currentPageDataCountStart = computed(() => {
         if (this.total() === 0) {
             return 0;
         }
         return (this.page() - 1) * this.pagerPageSize() + 1;
     });
-    protected readonly infoVisible: WritableSignal<boolean> = signal(true);
-    protected readonly inputValue: WritableSignal<number> = signal(1);
-    protected readonly nextJumperVisible: Signal<boolean> = computed(
+    protected readonly infoVisible = signal(true);
+    protected readonly inputValue = signal(1);
+    protected readonly nextJumperVisible = computed(
         () =>
             this.pages().length > this.visiblePages() &&
             this.pages()[this.pages().length - 1].page - this.pages()[this.pages().length - 2].page > 1
     );
-    protected readonly pageCount: Signal<number> = computed(() => Math.ceil(this.total() / this.pagerPageSize()));
-    protected readonly pageInputVisible: WritableSignal<boolean> = signal(true);
-    protected readonly pageList: Signal<number[]> = computed(() => {
+    protected readonly pageCount = computed(() => Math.ceil(this.total() / this.pagerPageSize()));
+    protected readonly pageInputVisible = signal(true);
+    protected readonly pageList = computed(() => {
         return range(1, this.pageCount()).toArray();
     });
-    protected readonly pageListVisible: WritableSignal<boolean> = signal(true);
+    protected readonly pageListVisible = signal(true);
     protected readonly pageSizeDropdownList: Signal<DropDownListComponent<number> | undefined> =
         viewChild("pageSizeDropdownList");
-    protected readonly pagerInfo: Signal<string> = computed(() => {
+    protected readonly pagerInfo = computed(() => {
         const start = (this.page() - 1) * this.pagerPageSize() + 1;
         const end = Math.min(this.page() * this.pagerPageSize(), this.total());
         return `${start} - ${end} of ${this.total()} items`;
     });
-    protected readonly pages: Signal<Page[]> = computed(() => {
+    protected readonly pages = computed(() => {
         return this.preparePages(this.page(), this.visiblePages(), this.pageCount());
     });
-    protected readonly previousJumperVisible: Signal<boolean> = computed(
+    protected readonly previousJumperVisible = computed(
         () => this.pages().length > this.visiblePages() && this.pages()[1].page - 1 > 1
     );
 
-    public readonly page: Signal<number> = computed(() => Math.floor(this.#skip() / this.pagerPageSize()) + 1);
-    public readonly pageChange: OutputEmitterRef<PageChangeEvent> = output();
-    public readonly pageSizeChange: OutputEmitterRef<PageSizeChangeEvent> = output();
-    public readonly pagerPageSize: WritableSignal<number> = signal(10);
-    public firstLast: InputSignal<boolean> = input(true);
-    public pageInput: InputSignal<boolean> = input(false);
-    public pageSize: InputSignal<number> = input(10);
-    public pageSizeValues: InputSignalWithTransform<number[], number[] | boolean> = input([5, 10, 20, 50, 100], {
+    public readonly page = computed(() => Math.floor(this.#skip() / this.pagerPageSize()) + 1);
+    public readonly pageChange = output<PageChangeEvent>();
+    public readonly pageSizeChange = output<PageSizeChangeEvent>();
+    public readonly pagerPageSize = signal(10);
+    public firstLast = input(true);
+    public pageInput = input(false);
+    public pageSize = input(10);
+    public pageSizeValues = input([5, 10, 20, 50, 100], {
         transform: (value: number[] | boolean) => {
             if (value === false || (Array.isArray(value) && value.length === 0)) {
                 return [];
@@ -124,12 +119,12 @@ export class PagerComponent implements AfterViewInit, OnDestroy {
             }
         }
     });
-    public previousNext: InputSignal<boolean> = input(true);
-    public responsive: InputSignal<boolean> = input(true);
-    public skip: InputSignal<number> = input(0);
-    public total: InputSignal<number> = input(0);
-    public type: InputSignal<PagerType> = input<PagerType>("numeric");
-    public visiblePages: InputSignal<number> = input(5);
+    public previousNext = input(true);
+    public responsive = input(true);
+    public skip = input(0);
+    public total = input(0);
+    public type = input<PagerType>("numeric");
+    public visiblePages = input(5);
 
     public constructor() {
         effect(() => {

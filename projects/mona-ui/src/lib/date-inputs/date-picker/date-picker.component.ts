@@ -8,15 +8,12 @@ import {
     forwardRef,
     inject,
     input,
-    InputSignal,
     model,
-    ModelSignal,
     OnInit,
     Signal,
     signal,
     TemplateRef,
-    viewChild,
-    WritableSignal
+    viewChild
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from "@angular/forms";
@@ -68,16 +65,16 @@ export class DatePickerComponent implements OnInit, ControlValueAccessor {
     private popupRef: PopupRef | null = null;
 
     protected readonly datePopupTemplateRef: Signal<TemplateRef<any>> = viewChild.required("datePopupTemplate");
-    protected readonly currentDateString: WritableSignal<string> = signal("");
-    protected readonly navigatedDate: WritableSignal<Date> = signal(new Date());
+    protected readonly currentDateString = signal("");
+    protected readonly navigatedDate = signal(new Date());
 
-    public readonly value: WritableSignal<Date | null> = signal(null);
-    public disabled: ModelSignal<boolean> = model(false);
-    public disabledDates: InputSignal<Iterable<Date>> = input<Iterable<Date>>([]);
-    public format: InputSignal<string> = input("dd/MM/yyyy");
-    public max: InputSignal<Date | null> = input<Date | null>(null);
-    public min: InputSignal<Date | null> = input<Date | null>(null);
-    public readonly: InputSignal<boolean> = input(false);
+    public readonly value = signal<Date | null>(null);
+    public disabled = model(false);
+    public disabledDates = input<Iterable<Date>>([]);
+    public format = input("dd/MM/yyyy");
+    public max = input<Date | null>(null);
+    public min = input<Date | null>(null);
+    public readonly = input(false);
 
     public ngOnInit(): void {
         this.setDateValues();

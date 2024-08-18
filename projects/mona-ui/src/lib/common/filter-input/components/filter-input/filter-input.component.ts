@@ -8,18 +8,14 @@ import {
     inject,
     Injector,
     input,
-    InputSignal,
     OnInit,
     output,
-    OutputEmitterRef,
     signal,
-    untracked,
-    WritableSignal
+    untracked
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FormsModule } from "@angular/forms";
 import { FaIconComponent } from "@fortawesome/angular-fontawesome";
-import { faSearch } from "@fortawesome/free-solid-svg-icons";
 import { debounceTime, fromEvent, Subject } from "rxjs";
 import { TextBoxComponent } from "../../../../inputs/text-box/components/text-box/text-box.component";
 import { TextBoxPrefixTemplateDirective } from "../../../../inputs/text-box/directives/text-box-prefix-template.directive";
@@ -40,15 +36,14 @@ export class FilterInputComponent implements OnInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
     readonly #injector: Injector = inject(Injector);
-    protected readonly filter$: Subject<string> = new Subject<string>();
-    protected readonly filterIcon = faSearch;
-    protected readonly filterText: WritableSignal<string> = signal("");
+    protected readonly filter$ = new Subject<string>();
+    protected readonly filterText = signal("");
 
-    public readonly filterChange: OutputEmitterRef<FilterChangeEvent> = output();
+    public readonly filterChange = output<FilterChangeEvent>();
 
-    public filter: InputSignal<string> = input("");
-    public debounce: InputSignal<number> = input(0);
-    public placeholder: InputSignal<string> = input("");
+    public filter = input("");
+    public debounce = input(0);
+    public placeholder = input("");
 
     public constructor() {
         effect(() => {

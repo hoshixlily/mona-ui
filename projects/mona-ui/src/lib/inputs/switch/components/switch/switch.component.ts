@@ -8,11 +8,9 @@ import {
     forwardRef,
     inject,
     input,
-    InputSignal,
     OnInit,
     signal,
-    TemplateRef,
-    WritableSignal
+    TemplateRef
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
@@ -48,13 +46,13 @@ export class SwitchComponent implements OnInit, ControlValueAccessor {
     readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
     #propagateChange: Action<boolean> | null = null;
 
-    protected readonly active: WritableSignal<boolean> = signal(false);
+    protected readonly active = signal(false);
     protected readonly offLabelTemplate = contentChild(SwitchOffLabelTemplateDirective, { read: TemplateRef });
     protected readonly onLabelTemplate = contentChild(SwitchOnLabelTemplateDirective, { read: TemplateRef });
 
-    public disabled: InputSignal<boolean> = input(false);
-    public labelOff: InputSignal<string> = input("OFF");
-    public labelOn: InputSignal<string> = input("ON");
+    public disabled = input(false);
+    public labelOff = input("OFF");
+    public labelOn = input("ON");
 
     public ngOnInit(): void {
         this.setEventListeners();

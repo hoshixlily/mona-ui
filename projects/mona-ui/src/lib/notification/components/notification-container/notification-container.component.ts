@@ -1,5 +1,5 @@
 import { NgClass } from "@angular/common";
-import { ChangeDetectionStrategy, Component, computed, Signal, signal, WritableSignal } from "@angular/core";
+import { ChangeDetectionStrategy, Component, computed, Signal, signal } from "@angular/core";
 import { NotificationData } from "../../models/NotificationData";
 import { NotificationPosition } from "../../models/NotificationPosition";
 import { NotificationComponent } from "../notification/notification.component";
@@ -20,6 +20,6 @@ export class NotificationContainerComponent {
     protected readonly positionClass: Signal<string> = computed(() => {
         return this.position() as string;
     });
-    public readonly notificationDataList: WritableSignal<NotificationData[]> = signal([]);
-    public readonly position: WritableSignal<NotificationPosition> = signal("topright");
+    public readonly notificationDataList = signal<NotificationData[]>([]);
+    public readonly position = signal<NotificationPosition>("topright");
 }

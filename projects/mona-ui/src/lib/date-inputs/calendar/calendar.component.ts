@@ -1,20 +1,8 @@
 import { DatePipe, NgClass } from "@angular/common";
-import {
-    ChangeDetectionStrategy,
-    Component,
-    forwardRef,
-    input,
-    InputSignal,
-    InputSignalWithTransform,
-    model,
-    ModelSignal,
-    OnInit,
-    signal,
-    WritableSignal
-} from "@angular/core";
+import { ChangeDetectionStrategy, Component, forwardRef, input, model, OnInit, signal } from "@angular/core";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { faChevronLeft, faChevronRight, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { faChevronLeft, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { Dictionary } from "@mirei/ts-collections";
 import { DateTime, DurationObjectUnits } from "luxon";
 import { ButtonDirective } from "../../buttons/button/button.directive";
@@ -45,27 +33,25 @@ import { CalendarView } from "../models/CalendarView";
 })
 export class CalendarComponent implements OnInit, ControlValueAccessor {
     #propagateChange: Action<Date | null> | null = null;
-    protected readonly calendarView: WritableSignal<CalendarView> = signal("month");
-    protected readonly decadeYears: WritableSignal<number[]> = signal([]);
-    protected readonly monthBounds: WritableSignal<{ start: Date; end: Date }> = signal({
+    protected readonly calendarView = signal<CalendarView>("month");
+    protected readonly decadeYears = signal<number[]>([]);
+    protected readonly monthBounds = signal({
         start: new Date(),
         end: new Date()
     });
-    protected readonly monthlyViewDict: WritableSignal<Dictionary<Date, number>> = signal(
-        new Dictionary<Date, number>()
-    );
-    protected readonly navigatedDate: WritableSignal<Date> = signal(new Date());
-    protected readonly nextMonthIcon: IconDefinition = faChevronRight;
-    protected readonly prevMonthIcon: IconDefinition = faChevronLeft;
+    protected readonly monthlyViewDict = signal(new Dictionary<Date, number>());
+    protected readonly navigatedDate = signal(new Date());
+    protected readonly nextMonthIcon = faChevronRight;
+    protected readonly prevMonthIcon = faChevronLeft;
     protected readonly timezone = DateTime.local().zoneName ?? undefined;
-    protected readonly value: WritableSignal<Date | null> = signal<Date | null>(null);
+    protected readonly value = signal<Date | null>(null);
 
-    public disabled: ModelSignal<boolean> = model(false);
-    public disabledDates: InputSignalWithTransform<Date[], Iterable<Date>> = input([], {
+    public disabled = model(false);
+    public disabledDates = input([], {
         transform: (value: Iterable<Date>) => Array.from(value)
     });
-    public max: InputSignal<Date | null> = input<Date | null>(null);
-    public min: InputSignal<Date | null> = input<Date | null>(null);
+    public max = input<Date | null>(null);
+    public min = input<Date | null>(null);
 
     public ngOnInit(): void {
         this.setDateValues();

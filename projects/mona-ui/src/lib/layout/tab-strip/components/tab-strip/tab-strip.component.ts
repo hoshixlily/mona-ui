@@ -9,18 +9,15 @@ import {
     ElementRef,
     inject,
     input,
-    InputSignal,
     OnDestroy,
     output,
-    OutputEmitterRef,
     signal,
     untracked,
     viewChild,
-    ViewContainerRef,
-    WritableSignal
+    ViewContainerRef
 } from "@angular/core";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { faChevronLeft, faChevronRight, faXmark, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { faChevronLeft, faChevronRight, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { asapScheduler, interval, Subject, takeUntil, timer } from "rxjs";
 import { ButtonDirective } from "../../../../buttons/button/button.directive";
 import { ScrollDirection } from "../../../../models/ScrollDirection";
@@ -41,23 +38,23 @@ import { TabComponent } from "../tab/tab.component";
 export class TabStripComponent implements OnDestroy, AfterViewInit {
     readonly #cdr: ChangeDetectorRef = inject(ChangeDetectorRef);
     #resizeObserver: ResizeObserver | null = null;
-    #scroll$: Subject<void> = new Subject<void>();
+    #scroll$ = new Subject<void>();
 
     protected readonly initialLoadAnchor = viewChild.required("initialLoadAnchor", { read: ViewContainerRef });
     protected readonly initialLoadContainer = viewChild.required<ElementRef<HTMLDivElement>>("initialLoadContainer");
-    protected readonly scrollLeftIcon: IconDefinition = faChevronLeft;
-    protected readonly scrollRightIcon: IconDefinition = faChevronRight;
-    protected readonly tabCloseIcon: IconDefinition = faXmark;
-    protected readonly scrollsVisible: WritableSignal<boolean> = signal(false);
+    protected readonly scrollLeftIcon = faChevronLeft;
+    protected readonly scrollRightIcon = faChevronRight;
+    protected readonly tabCloseIcon = faXmark;
+    protected readonly scrollsVisible = signal(false);
     protected readonly tabComponents = contentChildren(TabComponent);
     protected readonly tabContentVcr = viewChild.required("tabContentContainer", {
         read: ViewContainerRef
     });
     protected readonly tabListElement = viewChild.required<ElementRef<HTMLUListElement>>("tabListElement");
 
-    public readonly tabClose: OutputEmitterRef<TabCloseEvent> = output();
-    public closable: InputSignal<boolean> = input(false);
-    public keepTabContent: InputSignal<boolean> = input(false);
+    public readonly tabClose = output<TabCloseEvent>();
+    public closable = input(false);
+    public keepTabContent = input(false);
 
     public constructor() {
         effect(() => {

@@ -1,5 +1,5 @@
 import { NgTemplateOutlet } from "@angular/common";
-import { ChangeDetectionStrategy, Component, contentChild, input, InputSignal, TemplateRef } from "@angular/core";
+import { ChangeDetectionStrategy, Component, contentChild, input, TemplateRef } from "@angular/core";
 import { FieldsetLegendTemplateDirective } from "../../directives/fieldset-legend-template.directive";
 
 @Component({
@@ -15,5 +15,5 @@ import { FieldsetLegendTemplateDirective } from "../../directives/fieldset-legen
 })
 export class FieldsetComponent {
     protected readonly legendTemplate = contentChild(FieldsetLegendTemplateDirective, { read: TemplateRef });
-    public legend: InputSignal<string> = input("");
+    public legend = input("");
 }

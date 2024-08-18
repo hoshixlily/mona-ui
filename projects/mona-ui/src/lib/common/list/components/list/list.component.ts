@@ -11,17 +11,14 @@ import {
     ElementRef,
     inject,
     input,
-    InputSignal,
     OnInit,
     output,
-    OutputEmitterRef,
     Signal,
     TemplateRef,
     untracked,
     viewChild
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
-import { Selector } from "@mirei/ts-collections";
 import { filter, fromEvent, tap } from "rxjs";
 import { PlaceholderComponent } from "../../../../layout/placeholder/placeholder.component";
 import { FilterInputComponent } from "../../../filter-input/components/filter-input/filter-input.component";
@@ -119,13 +116,13 @@ export class ListComponent<TData> implements OnInit {
     });
     protected readonly virtualScrollViewport = viewChild(CdkVirtualScrollViewport);
 
-    public readonly itemSelect: OutputEmitterRef<SelectionChangeEvent<TData>> = output();
+    public readonly itemSelect = output<SelectionChangeEvent<TData>>();
 
     public data = input<Iterable<TData> | null | undefined>(null);
-    public height: InputSignal<ListSizeInputType> = input<ListSizeInputType>(undefined);
-    public maxHeight: InputSignal<ListSizeInputType> = input<ListSizeInputType>(undefined);
+    public height = input<ListSizeInputType>(undefined);
+    public maxHeight = input<ListSizeInputType>(undefined);
     public textField = input<ListKeySelector<TData, string> | undefined>(null);
-    public width: InputSignal<ListSizeInputType> = input<ListSizeInputType>(undefined);
+    public width = input<ListSizeInputType>(undefined);
 
     public constructor() {
         effect(() => {

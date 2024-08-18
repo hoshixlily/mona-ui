@@ -8,14 +8,11 @@ import {
     forwardRef,
     inject,
     input,
-    InputSignal,
     model,
-    ModelSignal,
     OnInit,
     Signal,
     signal,
-    viewChild,
-    WritableSignal
+    viewChild
 } from "@angular/core";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { Enumerable } from "@mirei/ts-collections";
@@ -49,11 +46,11 @@ export class TimeSelectorComponent implements OnInit, AfterViewInit, ControlValu
     readonly #hostElementRef: ElementRef<HTMLElement> = inject(ElementRef);
     #propagateChange: Action<Date | null> | null = null;
     #value: Date | null = null;
-    protected readonly amMeridiemVisible: Signal<boolean> = computed(() => {
+    protected readonly amMeridiemVisible = computed(() => {
         const min = this.min();
         return !(min && min.getHours() >= 12);
     });
-    protected readonly hour: Signal<number> = computed(() => {
+    protected readonly hour = computed(() => {
         const hour = this.navigatedDate().getHours();
         const hourFormat = this.hourFormat();
         if (hourFormat === "24") {
@@ -62,19 +59,19 @@ export class TimeSelectorComponent implements OnInit, AfterViewInit, ControlValu
         return hour % 12 || 12;
     });
     protected readonly hoursListElement: Signal<ElementRef<HTMLOListElement>> = viewChild.required("hoursListElement");
-    protected readonly minute: Signal<number> = computed(() => this.navigatedDate().getMinutes());
-    protected readonly minutes: TimeUnit[] = Enumerable.range(0, 60)
+    protected readonly minute = computed(() => this.navigatedDate().getMinutes());
+    protected readonly minutes = Enumerable.range(0, 60)
         .select<TimeUnit>(m => ({ value: m, viewValue: m }))
         .toArray();
     protected readonly minutesListElement: Signal<ElementRef<HTMLOListElement>> =
         viewChild.required("minutesListElement");
-    protected readonly navigatedDate: WritableSignal<Date> = signal(new Date());
-    protected readonly pmMeridiemVisible: Signal<boolean> = computed(() => {
+    protected readonly navigatedDate = signal(new Date());
+    protected readonly pmMeridiemVisible = computed(() => {
         const max = this.max();
         return !(max && max.getHours() < 12);
     });
-    protected readonly second: Signal<number> = computed(() => this.navigatedDate().getSeconds());
-    protected readonly seconds: TimeUnit[] = Enumerable.range(0, 60)
+    protected readonly second = computed(() => this.navigatedDate().getSeconds());
+    protected readonly seconds = Enumerable.range(0, 60)
         .select<TimeUnit>(s => ({ value: s, viewValue: s }))
         .toArray();
     protected readonly secondsListElement: Signal<ElementRef<HTMLOListElement>> =
@@ -82,12 +79,12 @@ export class TimeSelectorComponent implements OnInit, AfterViewInit, ControlValu
     protected hours: TimeUnit[] = [];
     protected meridiem: Meridiem = "AM";
 
-    public disabled: ModelSignal<boolean> = model(false);
-    public hourFormat: InputSignal<"12" | "24"> = input<"12" | "24">("24");
-    public max: InputSignal<Date | null> = input<Date | null>(null);
-    public min: InputSignal<Date | null> = input<Date | null>(null);
-    public readonly: InputSignal<boolean> = input(false);
-    public showSeconds: InputSignal<boolean> = input(false);
+    public disabled = model(false);
+    public hourFormat = input<"12" | "24">("24");
+    public max = input<Date | null>(null);
+    public min = input<Date | null>(null);
+    public readonly = input(false);
+    public showSeconds = input(false);
 
     public ngAfterViewInit(): void {
         window.setTimeout(() => {

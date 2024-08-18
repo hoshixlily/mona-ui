@@ -6,8 +6,7 @@ import {
     effect,
     signal,
     untracked,
-    viewChildren,
-    WritableSignal
+    viewChildren
 } from "@angular/core";
 import { Collections, List, zip } from "@mirei/ts-collections";
 import { ContextMenuComponent } from "../context-menu/context-menu.component";
@@ -29,7 +28,7 @@ import { ContextMenuOpenEvent } from "../models/ContextMenuOpenEvent";
 })
 export class MenubarComponent {
     protected readonly contextMenuComponents = viewChildren(ContextMenuComponent);
-    protected readonly currentContextMenu: WritableSignal<ContextMenuComponent | null> = signal(null);
+    protected readonly currentContextMenu = signal<ContextMenuComponent | null>(null);
     protected readonly menuList = contentChildren(MenuComponent);
 
     public constructor() {

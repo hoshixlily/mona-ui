@@ -16,13 +16,12 @@ import {
     signal,
     TemplateRef,
     untracked,
-    viewChild,
-    WritableSignal
+    viewChild
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { FaIconComponent } from "@fortawesome/angular-fontawesome";
-import { faChevronDown, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { faChevronDown } from "@fortawesome/free-solid-svg-icons";
 import { Selector } from "@mirei/ts-collections";
 import { distinctUntilChanged, fromEvent, Observable, take } from "rxjs";
 import { v4 } from "uuid";
@@ -97,9 +96,8 @@ export class DropDownTreeComponent<T> implements ControlValueAccessor, OnInit {
     });
     #popupRef: PopupRef | null = null;
     #propagateChange: Action<any> | null = null;
-    #value: WritableSignal<any | null> = signal(null);
-    protected readonly clearIcon: IconDefinition = faTimes;
-    protected readonly dropdownIcon: IconDefinition = faChevronDown;
+    #value = signal<any | null>(null);
+    protected readonly dropdownIcon = faChevronDown;
     protected readonly footerTemplate = contentChild(DropDownFooterTemplateDirective, { read: TemplateRef });
     protected readonly headerTemplate = contentChild(DropDownHeaderTemplateDirective, { read: TemplateRef });
     protected readonly noDataTemplate = contentChild(DropDownNoDataTemplateDirective, { read: TemplateRef });

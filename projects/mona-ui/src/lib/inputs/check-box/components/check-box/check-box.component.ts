@@ -5,13 +5,10 @@ import {
     ElementRef,
     forwardRef,
     input,
-    InputSignal,
     output,
-    OutputEmitterRef,
     Signal,
     signal,
-    viewChild,
-    WritableSignal
+    viewChild
 } from "@angular/core";
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { Action } from "../../../../utils/Action";
@@ -40,15 +37,15 @@ export class CheckBoxComponent implements ControlValueAccessor {
     #propagateChange: Action<boolean> | null = null;
 
     protected readonly checkBox: Signal<ElementRef<HTMLInputElement>> = viewChild.required("checkBox");
-    protected readonly checked: WritableSignal<boolean> = signal<boolean>(false);
-    protected readonly inputBlur: OutputEmitterRef<FocusEvent> = output();
-    protected readonly inputChange: OutputEmitterRef<Event> = output();
-    protected readonly inputFocus: OutputEmitterRef<FocusEvent> = output();
+    protected readonly checked = signal<boolean>(false);
+    protected readonly inputBlur = output<FocusEvent>();
+    protected readonly inputChange = output<Event>();
+    protected readonly inputFocus = output<FocusEvent>();
 
-    public disabled: InputSignal<boolean> = input<boolean>(false);
-    public indeterminate: InputSignal<boolean> = input<boolean>(false);
-    public label: InputSignal<string> = input<string>("");
-    public labelPosition: InputSignal<"before" | "after"> = input<"before" | "after">("after");
+    public disabled = input<boolean>(false);
+    public indeterminate = input<boolean>(false);
+    public label = input<string>("");
+    public labelPosition = input<"before" | "after">("after");
 
     public constructor() {
         effect(() => {

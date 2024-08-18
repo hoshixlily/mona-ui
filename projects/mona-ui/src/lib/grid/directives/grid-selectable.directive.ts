@@ -1,14 +1,4 @@
-import {
-    DestroyRef,
-    Directive,
-    effect,
-    inject,
-    input,
-    OnInit,
-    output,
-    OutputEmitterRef,
-    untracked
-} from "@angular/core";
+import { DestroyRef, Directive, effect, inject, input, OnInit, output, untracked } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { orderBy, select, sequenceEqual } from "@mirei/ts-collections";
 import { pairwise, startWith } from "rxjs";
@@ -23,7 +13,7 @@ export class GridSelectableDirective implements OnInit {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     readonly #gridService: GridService = inject(GridService);
 
-    public readonly selectedKeysChange: OutputEmitterRef<unknown[]> = output();
+    public readonly selectedKeysChange = output<unknown[]>();
     public options = input<SelectableOptions | "" | undefined>(undefined, {
         alias: "monaGridSelectable"
     });

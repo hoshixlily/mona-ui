@@ -1,14 +1,4 @@
-import {
-    ChangeDetectionStrategy,
-    Component,
-    forwardRef,
-    input,
-    InputSignal,
-    output,
-    OutputEmitterRef,
-    signal,
-    WritableSignal
-} from "@angular/core";
+import { ChangeDetectionStrategy, Component, forwardRef, input, output, signal } from "@angular/core";
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { Action } from "../../../../utils/Action";
 import { RadioButtonDirective } from "../../directives/radio-button.directive";
@@ -35,17 +25,17 @@ import { RadioButtonDirective } from "../../directives/radio-button.directive";
 export class RadioButtonComponent implements ControlValueAccessor {
     #propagateChange: Action<any> | null = null;
 
-    protected readonly selectedValue: WritableSignal<any> = signal<any>(undefined);
+    protected readonly selectedValue = signal<any>(undefined);
 
-    public readonly inputBlur: OutputEmitterRef<FocusEvent> = output();
-    public readonly inputClick: OutputEmitterRef<MouseEvent> = output();
-    public readonly inputFocus: OutputEmitterRef<FocusEvent> = output();
+    public readonly inputBlur = output<FocusEvent>();
+    public readonly inputClick = output<FocusEvent>();
+    public readonly inputFocus = output<FocusEvent>();
 
-    public disabled: InputSignal<boolean> = input<boolean>(false);
-    public label: InputSignal<string> = input<string>("");
-    public labelPosition: InputSignal<"before" | "after"> = input<"before" | "after">("after");
-    public name: InputSignal<string> = input<string>("");
-    public value: InputSignal<any> = input<any>(undefined);
+    public disabled = input(false);
+    public label = input("");
+    public labelPosition = input<"before" | "after">("after");
+    public name = input("");
+    public value = input<any>(undefined);
 
     public onCheckedChange(checked: boolean): void {
         this.selectedValue.set(checked);

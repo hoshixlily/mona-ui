@@ -1,12 +1,9 @@
-import { Directive, effect, inject, input, OnInit, output, Output, OutputEmitterRef, untracked } from "@angular/core";
+import { Directive, effect, inject, input, OnInit, output, untracked } from "@angular/core";
 import { DraggableOptions } from "../../common/tree/models/DraggableOptions";
-import { NodeCheckEvent } from "../../common/tree/models/NodeCheckEvent";
-import { NodeClickEvent } from "../../common/tree/models/NodeClickEvent";
 import { NodeDragEndEvent } from "../../common/tree/models/NodeDragEndEvent";
 import { NodeDragEvent } from "../../common/tree/models/NodeDragEvent";
 import { NodeDragStartEvent } from "../../common/tree/models/NodeDragStartEvent";
 import { NodeDropEvent } from "../../common/tree/models/NodeDropEvent";
-import { NodeSelectEvent } from "../../common/tree/models/NodeSelectEvent";
 import { TreeService } from "../../common/tree/services/tree.service";
 
 @Directive({
@@ -19,10 +16,10 @@ export class TreeViewDragAndDropDirective<T> implements OnInit {
     };
     readonly #treeService: TreeService<T> = inject(TreeService);
 
-    public readonly nodeDrag: OutputEmitterRef<NodeDragEvent<T>> = output();
-    public readonly nodeDragEnd: OutputEmitterRef<NodeDragEndEvent<T>> = output();
-    public readonly nodeDragStart: OutputEmitterRef<NodeDragStartEvent<T>> = output();
-    public readonly nodeDrop: OutputEmitterRef<NodeDropEvent<T>> = output();
+    public readonly nodeDrag = output<NodeDragEvent<T>>();
+    public readonly nodeDragEnd = output<NodeDragEndEvent<T>>();
+    public readonly nodeDragStart = output<NodeDragStartEvent<T>>();
+    public readonly nodeDrop = output<NodeDropEvent<T>>();
 
     public options = input<Partial<DraggableOptions> | "">("", {
         alias: "monaTreeViewDragAndDrop"

@@ -1,4 +1,4 @@
-import { Directive, effect, inject, input, OnInit, output, OutputEmitterRef, untracked } from "@angular/core";
+import { Directive, effect, inject, input, OnInit, output, untracked } from "@angular/core";
 import { FilterChangeEvent } from "../../common/filter-input/models/FilterChangeEvent";
 import { ListService } from "../../common/list/services/list.service";
 import { FilterableOptions } from "../../common/models/FilterableOptions";
@@ -21,7 +21,7 @@ export class DropDownFilterableDirective<TData> implements OnInit {
     };
     readonly #listService: ListService<TData> = inject(ListService);
 
-    public readonly filterChange: OutputEmitterRef<FilterChangeEvent> = output();
+    public readonly filterChange = output<FilterChangeEvent>();
 
     public filter = input<string>("");
     public filterPlaceholder = input<string>("");

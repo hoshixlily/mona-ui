@@ -8,16 +8,13 @@ import {
     forwardRef,
     inject,
     input,
-    InputSignal,
     model,
-    ModelSignal,
     OnInit,
     Signal,
     signal,
     TemplateRef,
     untracked,
-    viewChild,
-    WritableSignal
+    viewChild
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from "@angular/forms";
@@ -68,18 +65,18 @@ export class TimePickerComponent implements OnInit, ControlValueAccessor {
 
     private popupRef: PopupRef | null = null;
 
-    protected readonly currentDateString: WritableSignal<string> = signal("");
-    protected readonly navigatedDate: WritableSignal<Date> = signal(new Date());
+    protected readonly currentDateString = signal("");
+    protected readonly navigatedDate = signal(new Date());
     protected readonly timePopupTemplateRef: Signal<TemplateRef<any>> = viewChild.required("timePopupTemplate");
-    protected readonly value: WritableSignal<Date | null> = signal(null);
+    protected readonly value = signal<Date | null>(null);
 
-    public disabled: ModelSignal<boolean> = model(false);
-    public format: InputSignal<string> = input(" HH:mm");
-    public hourFormat: InputSignal<"12" | "24"> = input<"12" | "24">("24");
-    public max: InputSignal<Date | null> = input<Date | null>(null);
-    public min: InputSignal<Date | null> = input<Date | null>(null);
-    public readonly: InputSignal<boolean> = input(false);
-    public showSeconds: InputSignal<boolean> = input(false);
+    public disabled = model(false);
+    public format = input(" HH:mm");
+    public hourFormat = input<"12" | "24">("24");
+    public max = input<Date | null>(null);
+    public min = input<Date | null>(null);
+    public readonly = input(false);
+    public showSeconds = input(false);
 
     public constructor() {
         effect(() => {

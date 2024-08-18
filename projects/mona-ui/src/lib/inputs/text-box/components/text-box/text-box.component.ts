@@ -5,12 +5,9 @@ import {
     contentChildren,
     forwardRef,
     input,
-    InputSignal,
     output,
-    OutputEmitterRef,
     signal,
-    TemplateRef,
-    WritableSignal
+    TemplateRef
 } from "@angular/core";
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { ButtonDirective } from "../../../../buttons/button/button.directive";
@@ -46,19 +43,17 @@ export class TextBoxComponent implements ControlValueAccessor {
     protected readonly prefixTemplateList = contentChildren(TextBoxPrefixTemplateDirective, { read: TemplateRef });
     protected readonly suffixTemplateList = contentChildren(TextBoxSuffixTemplateDirective, { read: TemplateRef });
 
-    public readonly inputBlur: OutputEmitterRef<Event> = output();
-    public readonly inputFocus: OutputEmitterRef<Event> = output();
+    public readonly inputBlur = output<Event>();
+    public readonly inputFocus = output<Event>();
 
-    public clearButton: InputSignal<boolean> = input<boolean>(false);
-    public disabled: InputSignal<boolean> = input<boolean>(false);
-    public inputClass: InputSignal<string | string[]> = input<string | string[]>("");
-    public inputStyle: InputSignal<string | Partial<CSSStyleDeclaration> | null | undefined> = input<
-        string | Partial<CSSStyleDeclaration | null | undefined>
-    >(undefined);
-    public placeholder: InputSignal<string> = input<string>("");
-    public readonly: InputSignal<boolean> = input<boolean>(false);
-    public type: InputSignal<InputType> = input<InputType>("text");
-    public value: WritableSignal<string> = signal<string>("");
+    public clearButton = input<boolean>(false);
+    public disabled = input<boolean>(false);
+    public inputClass = input<string | string[]>("");
+    public inputStyle = input<string | Partial<CSSStyleDeclaration | null | undefined>>(undefined);
+    public placeholder = input<string>("");
+    public readonly = input<boolean>(false);
+    public type = input<InputType>("text");
+    public value = signal<string>("");
 
     public onClearClick(): void {
         this.value.set("");

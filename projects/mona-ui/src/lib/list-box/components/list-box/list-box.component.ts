@@ -8,16 +8,12 @@ import {
     ElementRef,
     inject,
     input,
-    InputSignal,
-    InputSignalWithTransform,
     OnInit,
     output,
-    OutputEmitterRef,
     Signal,
     signal,
     TemplateRef,
-    untracked,
-    WritableSignal
+    untracked
 } from "@angular/core";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import {
@@ -27,8 +23,7 @@ import {
     faAnglesLeft,
     faAnglesRight,
     faAngleUp,
-    faTrash,
-    IconDefinition
+    faTrash
 } from "@fortawesome/free-solid-svg-icons";
 import { Collections, Enumerable, ImmutableList, List } from "@mirei/ts-collections";
 import { ButtonDirective } from "../../../buttons/button/button.directive";
@@ -104,20 +99,20 @@ export class ListBoxComponent<T = any> implements OnInit {
         ListBoxItemTemplateDirective,
         { read: TemplateRef }
     );
-    protected readonly moveDownIcon: IconDefinition = faAngleDown;
-    protected readonly moveUpIcon: IconDefinition = faAngleUp;
+    protected readonly moveDownIcon = faAngleDown;
+    protected readonly moveUpIcon = faAngleUp;
     protected readonly noDataTemplate: Signal<TemplateRef<any> | undefined> = contentChild(
         ListBoxNoDataTemplateDirective,
         { read: TemplateRef }
     );
-    protected readonly removeIcon: IconDefinition = faTrash;
-    protected readonly transferAllFromIcon: IconDefinition = faAnglesLeft;
-    protected readonly transferAllToIcon: IconDefinition = faAnglesRight;
-    protected readonly transferFromIcon: IconDefinition = faAngleLeft;
-    protected readonly transferToIcon: IconDefinition = faAngleRight;
-    protected selectedItem: WritableSignal<T | null> = signal(null);
-    protected selectedItems: WritableSignal<ImmutableList<T>> = signal(ImmutableList.create());
-    protected toolbarOptions: Signal<ToolbarOptions | null> = computed(() => {
+    protected readonly removeIcon = faTrash;
+    protected readonly transferAllFromIcon = faAnglesLeft;
+    protected readonly transferAllToIcon = faAnglesRight;
+    protected readonly transferFromIcon = faAngleLeft;
+    protected readonly transferToIcon = faAngleRight;
+    protected selectedItem = signal<T | null>(null);
+    protected selectedItems = signal(ImmutableList.create<T>());
+    protected toolbarOptions = computed(() => {
         const toolbar = this.toolbar();
         if (typeof toolbar === "boolean") {
             return toolbar ? this.getDefaultToolbarOptions() : null;
@@ -125,15 +120,15 @@ export class ListBoxComponent<T = any> implements OnInit {
         return this.updateToolbarOptions(toolbar);
     });
 
-    public readonly actionClick: OutputEmitterRef<ListBoxActionClickEvent> = output();
-    public readonly listBoxItems: WritableSignal<ImmutableList<T>> = signal(ImmutableList.create());
-    public readonly selectionChange: OutputEmitterRef<ListBoxSelectionEvent> = output();
-    public connectedList: InputSignal<ListBoxComponent<T> | null> = input<ListBoxComponent<T> | null>(null);
-    public items: InputSignalWithTransform<List<T>, Iterable<T>> = input(new List(), {
-        transform: (items: Iterable<T>) => new List(items)
+    public readonly actionClick = output<ListBoxActionClickEvent>();
+    public readonly listBoxItems = signal(ImmutableList.create<T>());
+    public readonly selectionChange = output<ListBoxSelectionEvent>();
+    public connectedList = input<ListBoxComponent<T> | null>(null);
+    public items = input(new List<T>(), {
+        transform: (items: Iterable<T>) => new List<T>(items)
     });
-    public textField: InputSignal<string> = input("");
-    public toolbar: InputSignal<boolean | Partial<ToolbarOptions>> = input<boolean | Partial<ToolbarOptions>>(true);
+    public textField = input("");
+    public toolbar = input<boolean | Partial<ToolbarOptions>>(true);
 
     public constructor() {
         effect(() => {

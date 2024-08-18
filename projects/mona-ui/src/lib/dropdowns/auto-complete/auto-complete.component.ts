@@ -8,21 +8,18 @@ import {
     forwardRef,
     inject,
     input,
-    InputSignal,
     model,
     OnInit,
     output,
-    OutputEmitterRef,
     signal,
     TemplateRef,
     untracked,
-    viewChild,
-    WritableSignal
+    viewChild
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { faTimes } from "@fortawesome/free-solid-svg-icons";
 import { Predicate, Selector } from "@mirei/ts-collections";
 import { debounceTime, fromEvent, Subject, take, tap } from "rxjs";
 import { v4 } from "uuid";
@@ -91,11 +88,11 @@ export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccesso
     readonly #popupUidClass: string = `mona-dropdown-popup-${v4()}`;
     #popupRef: PopupRef | null = null;
     #propagateChange: Action<string | null> | null = null;
-    #value: string = "";
+    #value = "";
 
-    protected readonly autoCompleteValue: WritableSignal<string> = signal("");
-    protected readonly autoCompleteValue$: Subject<string> = new Subject<string>();
-    protected readonly clearIcon: IconDefinition = faTimes;
+    protected readonly autoCompleteValue = signal("");
+    protected readonly autoCompleteValue$ = new Subject<string>();
+    protected readonly clearIcon = faTimes;
     protected readonly footerTemplate = contentChild(DropDownFooterTemplateDirective, { read: TemplateRef });
     protected readonly groupHeaderTemplate = contentChild(DropDownGroupHeaderTemplateDirective, {
         read: TemplateRef
@@ -109,13 +106,13 @@ export class AutoCompleteComponent<TData> implements OnInit, ControlValueAccesso
         mode: "single",
         toggleable: false
     };
-    protected readonly selectedKeysChange: OutputEmitterRef<any[]> = output();
+    protected readonly selectedKeysChange = output<any[]>();
 
     public data = input<Iterable<TData>>([]);
     public disabled = model(false);
     public itemDisabled = input<string | Predicate<TData> | null | undefined>("");
-    public placeholder: InputSignal<string> = input("");
-    public showClearButton: InputSignal<boolean> = input(false);
+    public placeholder = input("");
+    public showClearButton = input(false);
     public textField = input<string | Selector<TData, string> | null | undefined>("");
     public valueField = input<string | Selector<TData, any> | null | undefined>("");
 

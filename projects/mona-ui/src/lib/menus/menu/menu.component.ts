@@ -5,9 +5,7 @@ import {
     contentChildren,
     effect,
     input,
-    InputSignal,
     model,
-    ModelSignal,
     TemplateRef,
     untracked
 } from "@angular/core";
@@ -32,9 +30,9 @@ export class MenuComponent {
     public readonly uid: string = v4();
 
     public contextMenu: ContextMenuComponent | null = null;
-    public disabled: InputSignal<boolean> = input(false);
-    public menuItems: ModelSignal<Iterable<MenuItem>> = model<Iterable<MenuItem>>([]);
-    public text: InputSignal<string> = input("");
+    public disabled = input(false);
+    public menuItems = model<Iterable<MenuItem>>([]);
+    public text = input("");
 
     public constructor() {
         effect(() => {

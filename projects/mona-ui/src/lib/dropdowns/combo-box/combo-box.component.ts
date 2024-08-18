@@ -14,18 +14,15 @@ import {
     model,
     OnInit,
     output,
-    OutputEmitterRef,
-    Signal,
     signal,
     TemplateRef,
     untracked,
-    viewChild,
-    WritableSignal
+    viewChild
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
-import { faChevronDown, faTimes, IconDefinition } from "@fortawesome/free-solid-svg-icons";
+import { faChevronDown, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { Predicate, Selector } from "@mirei/ts-collections";
 import {
     debounceTime,
@@ -50,7 +47,6 @@ import { ListGroupHeaderTemplateDirective } from "../../common/list/directives/l
 import { ListHeaderTemplateDirective } from "../../common/list/directives/list-header-template.directive";
 import { ListItemTemplateDirective } from "../../common/list/directives/list-item-template.directive";
 import { ListNoDataTemplateDirective } from "../../common/list/directives/list-no-data-template.directive";
-import { ListItem } from "../../common/list/models/ListItem";
 import { SelectableOptions } from "../../common/list/models/SelectableOptions";
 import { SelectionChangeEvent } from "../../common/list/models/SelectionChangeEvent";
 import { ListService } from "../../common/list/services/list.service";
@@ -106,15 +102,15 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
     readonly #listService: ListService<TData> = inject(ListService);
     readonly #popupAnimationService: PopupAnimationService = inject(PopupAnimationService);
     readonly #popupService: PopupService = inject(PopupService);
-    readonly #popupUidClass: string = `mona-dropdown-popup-${v4()}`;
+    readonly #popupUidClass = `mona-dropdown-popup-${v4()}`;
     #popupRef: PopupRef | null = null;
     #propagateChange: Action<TData | null> | null = null;
     #value: any;
 
-    protected readonly clearIcon: IconDefinition = faTimes;
-    protected readonly dropdownIcon: IconDefinition = faChevronDown;
-    protected readonly comboBoxValue$: Subject<string> = new Subject<string>();
-    protected readonly comboBoxValue: WritableSignal<string> = signal("");
+    protected readonly clearIcon = faTimes;
+    protected readonly dropdownIcon = faChevronDown;
+    protected readonly comboBoxValue$ = new Subject<string>();
+    protected readonly comboBoxValue = signal("");
     protected readonly footerTemplate = contentChild(DropDownFooterTemplateDirective, { read: TemplateRef });
     protected readonly groupHeaderTemplate = contentChild(DropDownGroupHeaderTemplateDirective, { read: TemplateRef });
     protected readonly headerTemplate = contentChild(DropDownHeaderTemplateDirective, { read: TemplateRef });
@@ -126,14 +122,14 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
         mode: "single",
         toggleable: false
     };
-    protected readonly selectedDataItem: Signal<TData | null> = computed(() => {
+    protected readonly selectedDataItem = computed(() => {
         return this.selectedListItem()?.data ?? null;
     });
-    protected readonly selectedKeysChange: OutputEmitterRef<any[]> = output();
-    protected readonly selectedListItem: Signal<ListItem<TData> | null> = computed(() => {
+    protected readonly selectedKeysChange = output<any[]>();
+    protected readonly selectedListItem = computed(() => {
         return this.#listService.selectedListItems().firstOrDefault();
     });
-    protected readonly valueText: Signal<string> = computed(() => {
+    protected readonly valueText = computed(() => {
         const listItem = this.selectedListItem();
         if (!listItem) {
             return "";
@@ -141,12 +137,12 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
         return this.#listService.getItemText(listItem);
     });
 
-    public allowCustomValue: InputSignal<boolean> = input(false);
+    public allowCustomValue = input(false);
     public data = input<Iterable<TData>>([]);
     public disabled = model(false);
     public itemDisabled = input<string | Predicate<TData> | null | undefined>("");
-    public placeholder: InputSignal<string> = input("");
-    public showClearButton: InputSignal<boolean> = input(false);
+    public placeholder = input("");
+    public showClearButton = input(false);
     public textField = input<string | Selector<TData, string> | null | undefined>("");
     public valueField = input<string | Selector<TData, any> | null | undefined>("");
     public valueNormalizer: InputSignal<Action<Observable<string>, Observable<any>>> = input(
@@ -416,7 +412,7 @@ export class ComboBoxComponent<TData> implements OnInit, ControlValueAccessor {
                 }
                 this.comboBoxValue.set(value);
             });
-        this.#listService.selectedKeysChange.subscribe(keys => {
+        this.#listService.selectedKeysChange.subscribe(() => {
             const item = this.selectedDataItem();
             this.updateValue(item);
         });
