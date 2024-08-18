@@ -12,6 +12,7 @@
         flex: 1 1 50%;
         padding: 0.0625rem 0.5rem;
         font-size: 0.625em;
+        cursor: pointer;
 
         & fa-icon {
             display: flex;
@@ -33,6 +34,5 @@
             box-shadow: none;
         }
 
-        cursor: pointer;
     }
 }

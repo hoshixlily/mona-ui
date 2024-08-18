@@ -82,13 +82,13 @@
         }
     }
     & > div:nth-child(2) {
+        flex: 1;
         & button {
             border-left: none;
             border-right: none;
             width: 100%;
             border-radius: 0;
         }
-        flex: 1;
     }
 }
 
