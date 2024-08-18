@@ -27,11 +27,11 @@ div.content {
     align-items: center;
     justify-content: center;
     flex-direction: column;
+    background: var(--mona-background-light);
     & > div {
         margin: 5px;
         display: flex;
     }
-    background: var(--mona-background-light);
 }
 
 div.component-container {
