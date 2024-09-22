@@ -15,6 +15,8 @@ export interface WindowRefParams<R = unknown> {
     move: (params: { top?: number; left?: number }) => void;
     resize: (params: { width?: number; hight?: number; center?: boolean }) => void;
 
+    get beforeClose$(): Observable<WindowCloseEvent>;
+
     get close$(): Observable<WindowCloseEvent>;
 
     get component(): ComponentRef<any> | null;

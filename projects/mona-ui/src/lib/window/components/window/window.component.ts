@@ -89,7 +89,8 @@ export class WindowComponent implements OnDestroy, AfterViewInit {
                     this.top.set(event.top);
                 }
             });
-            this.#windowRef.close$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(event => {
+            this.#windowRef.beforeClose$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(event => {
+                // The close event is emitted here to allow the user to prevent the window from closing.
                 this.close.emit(event);
             });
             this.#windowRef.drag$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(event => {

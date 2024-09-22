@@ -91,8 +91,12 @@ export class WindowContentComponent implements OnInit, AfterViewInit {
     }
 
     private closeWindow(event: Event): void {
-        const closeEvent = new WindowCloseEvent({ event, via: PopupCloseSource.CloseButton });
+        const closeEvent = new WindowCloseEvent({ event, via: PopupCloseSource.CloseButton, originalEvent: event });
         if (this.windowData.preventClose && this.windowData.preventClose(closeEvent)) {
+            return;
+        }
+        this.windowData.windowReference.beforeClose$$.next(closeEvent);
+        if (closeEvent.isDefaultPrevented()) {
             return;
         }
         this.#animationService.scaleOut(this.windowData.windowReference.element);

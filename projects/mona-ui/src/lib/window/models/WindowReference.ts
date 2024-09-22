@@ -13,6 +13,7 @@ import { WindowReferenceOptions } from "./WindowReferenceOptions";
  * @internal - used by WindowService. Do not export.
  */
 export class WindowReference<R = unknown> implements WindowRefParams<R> {
+    public readonly beforeClose$$ = new Subject<WindowCloseEvent>();
     public readonly move$$: Subject<MoveEvent> = new Subject<MoveEvent>();
     public readonly moveEnd$$: Subject<void> = new Subject<void>();
     public readonly moveStart$$: Subject<void> = new Subject<void>();
@@ -60,6 +61,10 @@ export class WindowReference<R = unknown> implements WindowRefParams<R> {
         if (params.center) {
             asapScheduler.schedule(() => this.center());
         }
+    }
+
+    public get beforeClose$(): Observable<WindowCloseEvent> {
+        return this.beforeClose$$.asObservable();
     }
 
     public get close$(): Observable<WindowCloseEvent> {
