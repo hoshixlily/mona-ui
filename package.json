@@ -6,11 +6,9 @@
     "exports": {
         ".": {
             "types": "./dist/mona-ui/index.d.ts",
-            "import": "./dist/mona-ui/fesm2022/mona-ui.mjs",
-            "sass": [
-                "./styles/kafka.scss",
-                "./styles/mona.scss"
-            ]
+            "esm2022": "./dist/mona-ui/esm2022/mona-ui.mjs",
+            "esm": "./dist/mona-ui/esm2022/mona-ui.mjs",
+            "default": "./dist/mona-ui/fesm2022/mona-ui.mjs"
         }
     },
     "typings": "dist/mona-ui/index.d.ts",
