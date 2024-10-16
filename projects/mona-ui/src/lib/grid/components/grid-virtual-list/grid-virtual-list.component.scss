@@ -13,11 +13,13 @@ table {
 
     & tr {
         display: inline-flex;
-        &:nth-child(even) {
+        &.mona-grid-row-even,
+        &.mona-grid-detail-row-even {
             background-color: var(--mona-background-dark);
         }
 
-        &:nth-child(odd) {
+        &.mona-grid-row-odd,
+        &.mona-grid-detail-row-odd {
             background-color: var(--mona-background);
         }
 

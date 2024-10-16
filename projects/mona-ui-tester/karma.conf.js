@@ -39,7 +39,6 @@ module.exports = function (config) {
             ChromeHeadless: {
                 base: "Chrome",
                 flags: [
-                    "--headless=old",
                     "--disable-gpu",
                     "--disable-translate",
                     "--disable-extensions",

@@ -21,8 +21,8 @@ export class PopupService {
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     readonly #injector: Injector = inject(Injector);
     readonly #overlay: Overlay = inject(Overlay);
-    private readonly outsideEventsToClose = ["click", "mousedown", "dblclick", "contextmenu", "auxclick"];
-    private readonly popupStateMap: Dictionary<string, PopupState> = new Dictionary<string, PopupState>();
+    readonly #outsideEventsToClose = ["click", "mousedown", "dblclick", "contextmenu", "auxclick"];
+    readonly #popupStateMap = new Dictionary<string, PopupState>();
 
     public create(settings: PopupSettings): PopupRef {
         const uid = v4();
@@ -95,7 +95,7 @@ export class PopupService {
                         const prevented = preventClose ? preventClose(event) || event.isDefaultPrevented() : false;
                         if (!prevented) {
                             popupReference.close(event);
-                            this.popupStateMap.remove(uid);
+                            this.#popupStateMap.remove(uid);
                             backdropSubject.next();
                             backdropSubject.complete();
                         }
@@ -108,7 +108,7 @@ export class PopupService {
                     .outsidePointerEvents()
                     .pipe(takeUntilDestroyed(this.#destroyRef))
                     .subscribe(event => {
-                        if (this.outsideEventsToClose.includes(event.type)) {
+                        if (this.#outsideEventsToClose.includes(event.type)) {
                             const closeEvent = new PopupCloseEvent({
                                 event,
                                 originalEvent: event,
@@ -119,7 +119,7 @@ export class PopupService {
                                 : false;
                             if (!prevented) {
                                 popupReference.close(closeEvent);
-                                this.popupStateMap.remove(uid);
+                                this.#popupStateMap.remove(uid);
                                 subscription.unsubscribe();
                             }
                         }
@@ -128,14 +128,14 @@ export class PopupService {
             }
         }
         popupReference.closed.pipe(take(1)).subscribe(() => {
-            this.popupStateMap.remove(uid);
+            this.#popupStateMap.remove(uid);
         });
-        this.popupStateMap.add(uid, {
+        this.#popupStateMap.add(uid, {
             uid,
             popupRef: popupReference.popupRef,
             settings
         });
-        this.setEventListeners(this.popupStateMap.get(uid) as PopupState);
+        this.setEventListeners(this.#popupStateMap.get(uid) as PopupState);
         return popupReference.popupRef;
     }
 
@@ -159,7 +159,7 @@ export class PopupService {
                             : false;
                         if (!prevented) {
                             state.popupRef.close(closeEvent);
-                            this.popupStateMap.remove(state.uid);
+                            this.#popupStateMap.remove(state.uid);
                         }
                     }
                 });

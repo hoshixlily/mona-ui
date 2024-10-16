@@ -4,7 +4,10 @@
             <tbody>
                 @if (gridService.groupColumns().length === 0) {
                     <ng-container *cdkVirtualFor="let row of data(); let $index=index">
-                        <tr [ngClass]="{'mona-selected': row.selected()}"
+                        <tr [class.mona-selected]="row.selected()"
+                            [class.mona-grid-row]="true"
+                            [class.mona-grid-row-odd]="$index % 2 === 0"
+                            [class.mona-grid-row-even]="$index % 2 !== 0"
                             (click)="onGridRowClick($event, row)"
                             [attr.data-ruid]="row.uid" [attr.data-row-view-index]="$index" #rowElement>
                             @if (gridService.masterDetailTemplate()) {
@@ -27,13 +30,17 @@
                                 </td>
                             }
                             @if (gridService.contextMenuItems().length !== 0) {
-                               <ng-container [ngTemplateOutlet]="contextMenuTemplate"
-                                             [ngTemplateOutletContext]="{$implicit: row.data, element: rowElement, index: $index}">
-                               </ng-container>
+                                <ng-container [ngTemplateOutlet]="contextMenuTemplate"
+                                              [ngTemplateOutletContext]="{$implicit: row.data, element: rowElement, index: $index}">
+                                </ng-container>
                             }
                         </tr>
                         @if (row.detailVisible()) {
-                            <tr [style.width.px]="gridService.masterDetailRowWidth()">
+                            <tr [style.width.px]="gridService.masterDetailRowWidth()"
+                                [class.mona-grid-detail-row]="true"
+                                [class.mona-grid-detail-row-odd]="$index % 2 === 0"
+                                [class.mona-grid-detail-row-even]="$index % 2 !== 0"
+                            >
                                 <td [style.min-width.px]="gridService.masterDetailEmptyCellWidth()"
                                     [style.max-width.px]="gridService.masterDetailEmptyCellWidth()"></td>
                                 <td>
@@ -64,12 +71,16 @@
                                     </td>
                                 }
                                 <td [style.width.px]="gridService.groupColumnWidth*(columns().length + gridService.groupColumns().length)">
-                                    <span class="mona-grid-grouping-row-text">{{ rowItem.column.title() }}: {{ rowItem.groupTitle }}</span>
+                                    <span class="mona-grid-grouping-row-text">{{ rowItem.column.title() }}
+                                        : {{ rowItem.groupTitle }}</span>
                                 </td>
                             </tr>
                         } @else if (rowItem.type === 'row') {
                             <tr (click)="onGridRowClick($event, rowItem.row)"
-                                [ngClass]="{'mona-selected': rowItem.row.selected()}"
+                                [class.mona-selected]="rowItem.row.selected()"
+                                [class.mona-grid-row]="true"
+                                [class.mona-grid-row-odd]="$index % 2 === 0"
+                                [class.mona-grid-row-even]="$index % 2 !== 0"
                                 [attr.data-ruid]="rowItem.row.uid" [attr.data-row-view-index]="$index" #rowElement>
                                 @for (_ of gridService.groupColumns()|monaSlice:0:rowItem.level + 1; track $index) {
                                     <td [style.width.px]="gridService.groupColumnWidth"></td>
@@ -77,7 +88,8 @@
                                 @if (gridService.masterDetailTemplate()) {
                                     <td [style.width.px]="gridService.detailColumnWidth">
                                         <span class="mona-grid-detail-toggle-wrapper">
-                                            <button monaButton [flat]="true" (click)="onToggleDetailClick($event, rowItem)">
+                                            <button monaButton [flat]="true"
+                                                    (click)="onToggleDetailClick($event, rowItem)">
                                                 @if (rowItem.row.detailVisible()) {
                                                     <i class="ri-subtract-line"></i>
                                                 } @else {
@@ -100,7 +112,10 @@
                                 }
                             </tr>
                             @if (rowItem.row.detailVisible()) {
-                                <tr [style.width.px]="gridService.masterDetailRowWidth()">
+                                <tr [style.width.px]="gridService.masterDetailRowWidth()"
+                                    [class.mona-grid-detail-row]="true"
+                                    [class.mona-grid-detail-row-odd]="$index % 2 === 0"
+                                    [class.mona-grid-detail-row-even]="$index % 2 !== 0">
                                     <td [style.min-width.px]="gridService.masterDetailEmptyCellWidth()"
                                         [style.max-width.px]="gridService.masterDetailEmptyCellWidth()"></td>
                                     <td>

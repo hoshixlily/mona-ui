@@ -14,9 +14,9 @@ import { SelectableOptions } from "../models/SelectableOptions";
 
 @Injectable()
 export class ListService<TData> {
-    private readonly data = signal(ImmutableList.create<TData>());
-    private readonly listItems = computed(() => {
-        const data = this.data();
+    readonly #data = signal(ImmutableList.create<TData>());
+    readonly #listItems = computed(() => {
+        const data = this.#data();
         return from(data)
             .select(item => new ListItem({ data: item, header: "" }))
             .toImmutableSet();
@@ -53,7 +53,7 @@ export class ListService<TData> {
     public readonly selectedListItems = computed(() => {
         const selectedKeys = this.selectedKeys();
         return selectedKeys
-            .select(key => this.listItems().firstOrDefault(i => this.getSelectionKey(i) === key))
+            .select(key => this.#listItems().firstOrDefault(i => this.getSelectionKey(i) === key))
             .where(i => i != null)
             .cast<ListItem<TData>>()
             .toImmutableSet();
@@ -61,7 +61,7 @@ export class ListService<TData> {
     public readonly textField = signal<string | Selector<TData, string>>("");
     public readonly valueField = signal<string | Selector<TData, any>>("");
     public readonly viewItems = computed(() => {
-        const listItems = this.listItems();
+        const listItems = this.#listItems();
         const filterText = this.filterText();
         const groupableOptions = this.groupableOptions();
         let enumerable: IEnumerable<ListItem<TData>> = listItems;
@@ -102,7 +102,7 @@ export class ListService<TData> {
     public selectedKeysChange!: OutputEmitterRef<Array<any>>;
 
     public addNewDataItems(dataItems: Iterable<TData>): void {
-        this.data.update(list => list.addAll(dataItems));
+        this.#data.update(list => list.addAll(dataItems));
     }
 
     public clearFilter(): void {
@@ -223,7 +223,7 @@ export class ListService<TData> {
     }
 
     public setData(data: Iterable<TData>) {
-        this.data.update(list => list.clear().addAll(data));
+        this.#data.update(list => list.clear().addAll(data));
     }
 
     public setDisabledBy(disabledBy: string | Predicate<TData>): void {

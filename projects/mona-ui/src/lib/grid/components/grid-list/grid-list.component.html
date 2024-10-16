@@ -3,7 +3,11 @@
         <tbody>
             @if (gridService.groupColumns().length === 0) {
                 @for (row of data(); track row.uid) {
-                    <tr (click)="onGridRowClick($event, row)" [ngClass]="{'mona-selected': row.selected()}"
+                    <tr (click)="onGridRowClick($event, row)"
+                        [class.mona-selected]="row.selected()"
+                        [class.mona-grid-row]="true"
+                        [class.mona-grid-row-odd]="$index % 2 === 0"
+                        [class.mona-grid-row-even]="$index % 2 !== 0"
                         [attr.data-ruid]="row.uid" [attr.data-row-view-index]="$index" #rowElement>
                         @if (gridService.masterDetailTemplate()) {
                             <td [style.width.px]="gridService.detailColumnWidth">
@@ -30,7 +34,11 @@
                         }
                     </tr>
                     @if (row.detailVisible()) {
-                        <tr [style.width.px]="gridService.masterDetailRowWidth()">
+                        <tr [style.width.px]="gridService.masterDetailRowWidth()"
+                            [class.mona-grid-detail-row]="true"
+                            [class.mona-grid-detail-row-odd]="$index % 2 === 0"
+                            [class.mona-grid-detail-row-even]="$index % 2 !== 0"
+                        >
                             <td [style.min-width.px]="gridService.masterDetailEmptyCellWidth()"
                                 [style.max-width.px]="gridService.masterDetailEmptyCellWidth()"></td>
                             <td>
@@ -72,7 +80,10 @@
                                 @if (depth === gridService.groupColumns().length - 1 && !subGroup.collapsed) {
                                     @for (row of subGroup.rows; track row.uid) {
                                         <tr (click)="onGridRowClick($event, row)"
-                                            [ngClass]="{'mona-selected': row.selected()}"
+                                            [class.mona-selected]="row.selected()"
+                                            [class.mona-grid-row]="true"
+                                            [class.mona-grid-row-odd]="$index % 2 === 0"
+                                            [class.mona-grid-row-even]="$index % 2 !== 0"
                                             [attr.data-ruid]="row.uid" [attr.data-row-view-index]="$index" #rowElement>
                                             @for (_ of gridService.groupColumns(); track $index) {
                                                 <td [style.width.px]="gridService.groupColumnWidth"></td>
@@ -102,7 +113,10 @@
                                             }
                                         </tr>
                                         @if (row.detailVisible()) {
-                                            <tr [style.width.px]="gridService.masterDetailRowWidth()">
+                                            <tr [style.width.px]="gridService.masterDetailRowWidth()"
+                                                [class.mona-grid-detail-row]="true"
+                                                [class.mona-grid-detail-row-odd]="$index % 2 === 0"
+                                                [class.mona-grid-detail-row-even]="$index % 2 !== 0">
                                                 <td [style.min-width.px]="gridService.masterDetailEmptyCellWidth()"
                                                     [style.max-width.px]="gridService.masterDetailEmptyCellWidth()"></td>
                                                 <td>
