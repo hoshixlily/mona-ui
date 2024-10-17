@@ -481,6 +481,7 @@ ul.mona-list mona-text-box.filter-box {
     background: var(--mona-background);
     transition: box-shadow 0.15s ease-in;
     outline: none;
+    overflow: hidden;
     &.mona-disabled {
         @include disabled;
     }

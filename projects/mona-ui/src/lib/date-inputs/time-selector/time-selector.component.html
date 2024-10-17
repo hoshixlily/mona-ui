@@ -1,5 +1,5 @@
 <ol #hoursListElement>
-    @for (h of hours|hourSelector:hourFormat():meridiem|timeLimiter:'h':navigatedDate():min():max(); track h) {
+    @for (h of viewHours()|timeLimiter:'h':navigatedDate():min():max(); track h) {
         <li [ngClass]="{'mona-selected':h.viewValue===hour()}"
             (click)="onHourChange(h.value)"
             [attr.data-value]="h.value">{{h.viewValue | number:'2.0'}}
@@ -25,10 +25,10 @@
 @if (hourFormat()==='12') {
     <ol>
         @if (amMeridiemVisible()) {
-            <li [ngClass]="{'mona-selected': meridiem==='AM'}"
+            <li [ngClass]="{'mona-selected': meridiem()==='AM'}"
                 (click)="onMeridiemClick('AM')">AM</li>
         } @else if (pmMeridiemVisible()) {
-            <li [ngClass]="{'mona-selected': meridiem==='PM'}"
+            <li [ngClass]="{'mona-selected': meridiem()==='PM'}"
                 (click)="onMeridiemClick('PM')">PM</li>
         }
     </ol>

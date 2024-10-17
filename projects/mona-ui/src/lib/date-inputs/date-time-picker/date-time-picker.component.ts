@@ -30,6 +30,7 @@ import { PopupRef } from "../../popup/models/PopupRef";
 import { PopupService } from "../../popup/services/popup.service";
 import { Action } from "../../utils/Action";
 import { CalendarComponent } from "../calendar/calendar.component";
+import { HourFormat } from "../models/HourFormat";
 import { TimeSelectorComponent } from "../time-selector/time-selector.component";
 
 @Component({
@@ -108,7 +109,7 @@ export class DateTimePickerComponent implements OnInit, ControlValueAccessor {
     public disabled = model(false);
     public disabledDates = input<Iterable<Date>>([]);
     public format = input("dd/MM/yyyy HH:mm");
-    public hourFormat = input<"12" | "24">("24");
+    public hourFormat = input<HourFormat>("24");
     public max = input<Date | null>(null);
     public min = input<Date | null>(null);
     public readonly = input(false);

@@ -29,6 +29,7 @@ import { TextBoxDirective } from "../../inputs/text-box/directives/text-box.dire
 import { PopupRef } from "../../popup/models/PopupRef";
 import { PopupService } from "../../popup/services/popup.service";
 import { Action } from "../../utils/Action";
+import { HourFormat } from "../models/HourFormat";
 import { TimeSelectorComponent } from "../time-selector/time-selector.component";
 
 @Component({
@@ -72,7 +73,7 @@ export class TimePickerComponent implements OnInit, ControlValueAccessor {
 
     public disabled = model(false);
     public format = input(" HH:mm");
-    public hourFormat = input<"12" | "24">("24");
+    public hourFormat = input<HourFormat>("24");
     public max = input<Date | null>(null);
     public min = input<Date | null>(null);
     public readonly = input(false);

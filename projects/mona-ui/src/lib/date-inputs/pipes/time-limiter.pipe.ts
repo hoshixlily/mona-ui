@@ -1,4 +1,5 @@
 import { Pipe, PipeTransform } from "@angular/core";
+import { ImmutableSet, toImmutableSet, where } from "@mirei/ts-collections";
 import { TimeUnit } from "../models/TimeUnit";
 
 @Pipe({
@@ -7,17 +8,17 @@ import { TimeUnit } from "../models/TimeUnit";
 })
 export class TimeLimiterPipe implements PipeTransform {
     public transform(
-        timeValues: TimeUnit[],
+        timeValues: Iterable<TimeUnit>,
         type: "h" | "m" | "s",
         currentDate: Date,
         min?: Date | null,
         max?: Date | null
-    ): TimeUnit[] {
+    ): ImmutableSet<TimeUnit> {
         if (!min && !max) {
-            return timeValues;
+            return toImmutableSet(timeValues);
         }
         const normalizedDates = this.normalizeDates(currentDate, min, max);
-        const result = timeValues.filter(timeUnit => {
+        const result = where(timeValues, timeUnit => {
             let dateWithTimeUnit = new Date(normalizedDates.date);
             if (type === "h") {
                 dateWithTimeUnit.setHours(timeUnit.value);
@@ -57,7 +58,7 @@ export class TimeLimiterPipe implements PipeTransform {
             }
             return false;
         });
-        return result;
+        return result.toImmutableSet();
     }
 
     private normalizeDates(
