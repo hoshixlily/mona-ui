@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { inject, Injectable } from "@angular/core";
 import { takeUntil } from "rxjs";
 import { PopupRef } from "../../popup/models/PopupRef";
 import { AnimationService } from "./animation.service";
@@ -13,29 +13,29 @@ import { AnimationState } from "../models/AnimationState";
     providedIn: "root"
 })
 export class PopupAnimationService {
-    public constructor(private readonly animationService: AnimationService) {}
+    readonly #animationService = inject(AnimationService);
 
     public animateDropdown(popupRef: PopupRef, state: AnimationState): void {
         switch (state) {
             case AnimationState.Show:
-                this.animationService.slideDown(popupRef.overlayRef.overlayElement.firstElementChild as Element);
+                this.#animationService.slideDown(popupRef.overlayRef.overlayElement.firstElementChild as Element);
                 this.animateDropdownBoxShadow(popupRef, state);
                 break;
             case AnimationState.Hide:
                 this.animateDropdownBoxShadow(popupRef, state);
-                this.animationService.slideUp(popupRef.overlayRef.overlayElement.firstElementChild as Element);
+                this.#animationService.slideUp(popupRef.overlayRef.overlayElement.firstElementChild as Element);
         }
     }
 
     public animatePopover(popupRef: PopupRef, state: AnimationState): void {
         switch (state) {
             case AnimationState.Show:
-                this.animationService.fadeIn(popupRef.overlayRef.overlayElement.firstElementChild as Element, 200);
+                this.#animationService.fadeIn(popupRef.overlayRef.overlayElement.firstElementChild as Element, 200);
                 this.animatePopoverBoxShadow(popupRef, state);
                 break;
             case AnimationState.Hide:
                 this.animatePopoverBoxShadow(popupRef, state);
-                this.animationService.fadeOut(popupRef.overlayRef.overlayElement.firstElementChild as Element, 300);
+                this.#animationService.fadeOut(popupRef.overlayRef.overlayElement.firstElementChild as Element, 300);
         }
     }
 
@@ -46,7 +46,7 @@ export class PopupAnimationService {
             .subscribe(e => {
                 if (e.type.includes("click")) {
                     this.animateDropdownBoxShadow(popupRef, AnimationState.Hide);
-                    this.animationService.slideUp(popupRef.overlayRef.overlayElement.firstElementChild as Element);
+                    this.#animationService.slideUp(popupRef.overlayRef.overlayElement.firstElementChild as Element);
                     popupRef.closeWithDelay();
                 }
             });
@@ -55,7 +55,7 @@ export class PopupAnimationService {
     private animateDropdownBoxShadow(popupRef: PopupRef, state: AnimationState): void {
         switch (state) {
             case AnimationState.Show:
-                this.animationService.animate({
+                this.#animationService.animate({
                     element: popupRef.overlayRef.overlayElement,
                     duration: 200,
                     delay: 150,
@@ -64,7 +64,7 @@ export class PopupAnimationService {
                 });
                 break;
             case AnimationState.Hide:
-                this.animationService.animate({
+                this.#animationService.animate({
                     element: popupRef.overlayRef.overlayElement,
                     duration: 10,
                     startStyles: { boxShadow: "var(--mona-popup-shadow)" },
@@ -77,7 +77,7 @@ export class PopupAnimationService {
     private animatePopoverBoxShadow(popupRef: PopupRef, state: AnimationState): void {
         switch (state) {
             case AnimationState.Show:
-                this.animationService.animate({
+                this.#animationService.animate({
                     element: popupRef.overlayRef.overlayElement,
                     duration: 200,
                     startStyles: { boxShadow: "none" },
@@ -85,7 +85,7 @@ export class PopupAnimationService {
                 });
                 break;
             case AnimationState.Hide:
-                this.animationService.animate({
+                this.#animationService.animate({
                     element: popupRef.overlayRef.overlayElement,
                     startStyles: { boxShadow: "var(--mona-popup-shadow)" },
                     endStyles: { boxShadow: "none" }

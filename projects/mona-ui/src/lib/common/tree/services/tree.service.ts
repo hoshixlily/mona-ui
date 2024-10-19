@@ -59,13 +59,13 @@ import { ChildrenSelector, NodeKeySelector } from "../models/TreeSelectors";
 @Injectable()
 export class TreeService<T> {
     readonly #checkedKeys = signal(ImmutableSet.create<any>());
+    readonly #data = signal(ImmutableSet.create<T>());
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
-    private readonly data = signal(ImmutableSet.create<T>());
-    private readonly filteredExpandedKeys = signal(ImmutableSet.create<any>());
-    private readonly flatIdField = signal("");
-    private readonly flatParentIdField = signal("");
-    private readonly hasChildrenPredicate = signal<Predicate<any> | null>(null);
-    private readonly navigableNodes = computed(() => {
+    readonly #filteredExpandedKeys = signal(ImmutableSet.create<any>());
+    readonly #flatIdField = signal("");
+    readonly #flatParentIdField = signal("");
+    readonly #hasChildrenPredicate = signal<Predicate<any> | null>(null);
+    readonly #navigableNodes = computed(() => {
         const flattenedNodes = TreeService.flatten(this.viewNodeSet());
         return flattenedNodes
             .where(n => n.parent === null || !this.isAnyParentCollapsed(n))
@@ -73,12 +73,12 @@ export class TreeService<T> {
             .orderBy(n => n.index)
             .toImmutableSet();
     });
-    private readonly nodeDictionary = computed(() => {
+    readonly #nodeDictionary = computed(() => {
         const nodes = this.nodeSet();
         return this.createNodeDictionary(nodes);
     });
-    private readonly structure = signal<DataStructure>("hierarchical");
-    private readonly unfilteredExpandedKeys = signal(ImmutableSet.create<any>());
+    readonly #structure = signal<DataStructure>("hierarchical");
+    readonly #unfilteredExpandedKeys = signal(ImmutableSet.create<any>());
     public readonly animationTemporarilyDisabled = signal(false);
     public readonly animationEnabled = signal(true);
     public readonly checkBy = signal<NodeKeySelector<T>>(null);
@@ -107,9 +107,9 @@ export class TreeService<T> {
     public readonly expandedKeys = computed(() => {
         const filterText = this.filterText();
         if (filterText) {
-            return this.filteredExpandedKeys();
+            return this.#filteredExpandedKeys();
         }
-        return this.unfilteredExpandedKeys();
+        return this.#unfilteredExpandedKeys();
     });
     public readonly expandedKeys$ = toObservable(this.expandedKeys);
     public readonly filterableOptions = signal<FilterableOptions>({
@@ -148,7 +148,7 @@ export class TreeService<T> {
     public readonly selectedKeys$ = toObservable(this.selectedKeys);
     public readonly selectedNodes = computed(() => {
         const selectedKeys = this.selectedKeys();
-        const nodeDictionary = this.nodeDictionary();
+        const nodeDictionary = this.#nodeDictionary();
         return selectedKeys
             .select(k => {
                 return nodeDictionary.values().firstOrDefault(n => {
@@ -189,7 +189,7 @@ export class TreeService<T> {
                     .where(n => !n.children().isEmpty())
                     .select(n => this.getExpandKey(n))
                     .toImmutableSet();
-                this.filteredExpandedKeys.set(expandedKeys);
+                this.#filteredExpandedKeys.set(expandedKeys);
             });
         });
     }
@@ -210,7 +210,7 @@ export class TreeService<T> {
     }
 
     public getNodeByUid(uid: string): TreeNode<T> | null {
-        const nodeDictionary = this.nodeDictionary();
+        const nodeDictionary = this.#nodeDictionary();
         return nodeDictionary.get(uid) ?? null;
     }
 
@@ -229,7 +229,7 @@ export class TreeService<T> {
         if (node === null) {
             return false;
         }
-        const hasChildrenPredicate = this.hasChildrenPredicate();
+        const hasChildrenPredicate = this.#hasChildrenPredicate();
         if (hasChildrenPredicate) {
             return hasChildrenPredicate(node.data);
         }
@@ -352,7 +352,7 @@ export class TreeService<T> {
     }
 
     public navigate(direction: "next" | "previous"): TreeNode<T> | null {
-        const navigableNodes = this.navigableNodes();
+        const navigableNodes = this.#navigableNodes();
         const navigatedNode = this.navigatedNode();
         if (navigableNodes.isEmpty()) {
             return null;
@@ -381,7 +381,7 @@ export class TreeService<T> {
 
     public setChildrenSelector(selector: string | Selector<T, Iterable<T> | Observable<Iterable<T>>>): void {
         this.children.set(selector);
-        this.nodeSet.set(this.createNodes(this.data()));
+        this.nodeSet.set(this.createNodes(this.#data()));
         this.updateNodeIndices();
     }
 
@@ -399,23 +399,23 @@ export class TreeService<T> {
         if (sequenceEqual(checkedKeys, orderedKeys)) {
             return;
         }
-        const checkedKeysSet = this.nodeDictionary()
+        const checkedKeysSet = this.#nodeDictionary()
             .values()
             .where(n => contains(keys, this.getCheckKey(n)))
             .toEnumerableSet();
-        this.nodeDictionary().forEach(n => {
+        this.#nodeDictionary().forEach(n => {
             n.value.checked.set(checkedKeysSet.contains(n.value));
         });
     }
 
     public setData(data: Iterable<T>): void {
-        this.data.set(ImmutableSet.create(data));
+        this.#data.set(ImmutableSet.create(data));
         this.nodeSet.set(this.createNodes(data));
         this.updateNodeIndices();
     }
 
     public setDataStructure(structure: DataStructure): void {
-        this.structure.set(structure);
+        this.#structure.set(structure);
     }
 
     public setDisableBy(selector: NodeKeySelector<T>): void {
@@ -453,8 +453,8 @@ export class TreeService<T> {
         if (sequenceEqual(expandedKeys, orderedKeys)) {
             return;
         }
-        this.unfilteredExpandedKeys.set(ImmutableSet.create(keys));
-        this.filteredExpandedKeys.set(ImmutableSet.create(keys));
+        this.#unfilteredExpandedKeys.set(ImmutableSet.create(keys));
+        this.#filteredExpandedKeys.set(ImmutableSet.create(keys));
     }
 
     public setFilterableOptions(options: Partial<FilterableOptions>): void {
@@ -462,15 +462,15 @@ export class TreeService<T> {
     }
 
     public setFlatIdField(field: string): void {
-        this.flatIdField.set(field);
+        this.#flatIdField.set(field);
     }
 
     public setFlatParentIdField(field: string): void {
-        this.flatParentIdField.set(field);
+        this.#flatParentIdField.set(field);
     }
 
     public setHasChildrenPredicate(predicate: Predicate<any>): void {
-        this.hasChildrenPredicate.set(predicate);
+        this.#hasChildrenPredicate.set(predicate);
     }
 
     public setNodeCheck(node: TreeNode<T>, checked: boolean): void {
@@ -486,7 +486,7 @@ export class TreeService<T> {
         const key = this.getCheckKey(node);
 
         const checkedKeys = this.#checkedKeys().toEnumerableSet();
-        const nodeDictionary = this.nodeDictionary();
+        const nodeDictionary = this.#nodeDictionary();
 
         if (mode === "single") {
             nodeDictionary
@@ -537,7 +537,7 @@ export class TreeService<T> {
 
     public setNodeExpand(node: TreeNode<T>, expanded: boolean): void {
         const key = this.getExpandKey(node);
-        const expandedKeysSignal = this.isTreeFiltered() ? this.filteredExpandedKeys : this.unfilteredExpandedKeys;
+        const expandedKeysSignal = this.isTreeFiltered() ? this.#filteredExpandedKeys : this.#unfilteredExpandedKeys;
         expandedKeysSignal.update(keys => {
             if (expanded) {
                 return keys.add(key);
@@ -642,8 +642,8 @@ export class TreeService<T> {
     }
 
     private createFlatNodes(data: Iterable<T>, parentId: string | null): ImmutableSet<TreeNode<T>> {
-        const flatIdField = this.flatIdField();
-        const flatParentIdField = this.flatParentIdField();
+        const flatIdField = this.#flatIdField();
+        const flatParentIdField = this.#flatParentIdField();
         const nodes = new List<TreeNode<T>>();
         for (const item of data) {
             const dataItem = item as any;
@@ -717,11 +717,11 @@ export class TreeService<T> {
     }
 
     private createNodes(data: Iterable<T>): ImmutableSet<TreeNode<T>> {
-        const structure = this.structure();
+        const structure = this.#structure();
         if (structure === "flat") {
             return this.createFlatNodes(data, null).toImmutableSet();
         }
-        const nodeDictionary = this.nodeDictionary();
+        const nodeDictionary = this.#nodeDictionary();
         return this.createHierarchicalNodes(data, null, nodeDictionary) ?? ImmutableSet.create();
     }
 
@@ -941,7 +941,7 @@ export class TreeService<T> {
     }
 
     private navigateToNextNode(): TreeNode<T> {
-        const navigableNodes = this.navigableNodes();
+        const navigableNodes = this.#navigableNodes();
         const navigatedNode = this.navigatedNode();
         const firstNode = navigableNodes.first();
         let nextNode: TreeNode<T> | null = navigableNodes
@@ -958,7 +958,7 @@ export class TreeService<T> {
     }
 
     private navigateToPreviousNode(): TreeNode<T> {
-        const navigableNodes = this.navigableNodes();
+        const navigableNodes = this.#navigableNodes();
         const navigatedNode = this.navigatedNode();
         let previousNode: TreeNode<T> | null = navigableNodes.takeWhile(n => n !== navigatedNode).lastOrDefault();
         if (previousNode === null) {

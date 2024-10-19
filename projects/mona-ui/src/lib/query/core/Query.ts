@@ -12,10 +12,10 @@ export interface IQuery<T> extends Iterable<T> {
 }
 
 export class Query<T> implements IQuery<T> {
-    private readonly enumerator: QueryEnumerator<T>;
+    readonly #enumerator: QueryEnumerator<T>;
 
     private constructor(private readonly iterable: Iterable<T>) {
-        this.enumerator = new QueryEnumerator(() => iterable);
+        this.#enumerator = new QueryEnumerator(() => iterable);
     }
 
     *[Symbol.iterator](): Iterator<T> {
@@ -27,15 +27,15 @@ export class Query<T> implements IQuery<T> {
     }
 
     public filter<R>(filter: FilterDescriptor | CompositeFilterDescriptor, fieldSelector?: Selector<T, R>): IQuery<T> {
-        return this.enumerator.filter(filter, fieldSelector);
+        return this.#enumerator.filter(filter, fieldSelector);
     }
 
     public run(): T[] {
-        return this.enumerator.toArray();
+        return this.#enumerator.toArray();
     }
 
     public sort<R>(descriptor: SortDescriptor<T>[], fieldSelector?: Selector<T, R>): IQuery<T> {
-        return this.enumerator.sort(descriptor, fieldSelector);
+        return this.#enumerator.sort(descriptor, fieldSelector);
     }
 }
 

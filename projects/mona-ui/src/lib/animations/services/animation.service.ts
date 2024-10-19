@@ -1,4 +1,4 @@
-import { Injectable } from "@angular/core";
+import { inject, Injectable } from "@angular/core";
 import { animate, AnimationBuilder, style } from "@angular/animations";
 import { AnimationOptions } from "../models/AnimationOptions";
 
@@ -6,14 +6,14 @@ import { AnimationOptions } from "../models/AnimationOptions";
     providedIn: "root"
 })
 export class AnimationService {
-    public constructor(private readonly animationBuilder: AnimationBuilder) {}
+    readonly #animationBuilder = inject(AnimationBuilder);
 
     public animate(options: AnimationOptions): void {
         const { duration, delay, element, endStyles, startStyles, timingFunction } = options;
         const durationValue = duration ? `${duration}ms` : "0ms";
         const delayValue = delay ? `${delay}ms` : "0ms";
         const timingFunctionValue = timingFunction || "ease-out";
-        const animation = this.animationBuilder.build([
+        const animation = this.#animationBuilder.build([
             style(startStyles),
             animate(`${durationValue} ${delayValue} ${timingFunctionValue}`, style(endStyles))
         ]);

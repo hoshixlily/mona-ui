@@ -1,5 +1,5 @@
 import { NgClass } from "@angular/common";
-import { Component, computed, forwardRef, Host, input, signal, Signal } from "@angular/core";
+import { Component, computed, forwardRef, Host, inject, input, signal, Signal } from "@angular/core";
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from "@angular/forms";
 import { Action } from "../../utils/Action";
 import { ColorScheme } from "../models/ColorScheme";
@@ -27,12 +27,13 @@ import { ColorService } from "../services/color.service";
     }
 })
 export class ColorPaletteComponent implements ControlValueAccessor {
-    private propagateChange: Action<string | null> | null = null;
+    readonly #colorService = inject(ColorService, { host: true });
+    #propagateChange: Action<string | null> | null = null;
     protected readonly colorScheme: Signal<ColorScheme> = computed(() => {
         const palette = this.palette();
         const columns = this.columns();
         if (typeof palette === "string") {
-            return this.colorService.getColorScheme(palette as PaletteType);
+            return this.#colorService.getColorScheme(palette as PaletteType);
         } else {
             const paletteArray = Array.from(palette);
             if (paletteArray.length === 0) {
@@ -51,20 +52,14 @@ export class ColorPaletteComponent implements ControlValueAccessor {
     public palette = input<PaletteType | Iterable<string>>([]);
     public tileSize = input(18);
 
-    public constructor(@Host() private readonly colorService: ColorService) {}
-
     public onColorSelect(color: string): void {
-        if (this.selectedColor() === color) {
-            this.selectedColor.set(null);
-            this.propagateChange?.(null);
-            return;
-        }
-        this.selectedColor.set(color);
-        this.propagateChange?.(color);
+        const resultColor = this.selectedColor() === color ? null : color;
+        this.selectedColor.set(resultColor);
+        this.#propagateChange?.(resultColor);
     }
 
     public registerOnChange(fn: any): void {
-        this.propagateChange = fn;
+        this.#propagateChange = fn;
     }
 
     public registerOnTouched(fn: any) {

@@ -5,6 +5,4 @@ import { ListBoxItemTemplateContext } from "../models/ListBoxItemTemplateContext
     selector: "ng-template[monaListBoxItemTemplate]",
     standalone: true
 })
-export class ListBoxItemTemplateDirective {
-    public constructor(private readonly templateRef: TemplateRef<ListBoxItemTemplateContext>) {}
-}
+export class ListBoxItemTemplateDirective {}

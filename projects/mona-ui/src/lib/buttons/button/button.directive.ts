@@ -1,16 +1,4 @@
-import {
-    DestroyRef,
-    Directive,
-    effect,
-    ElementRef,
-    Host,
-    inject,
-    input,
-    model,
-    OnInit,
-    Optional,
-    untracked
-} from "@angular/core";
+import { DestroyRef, Directive, effect, ElementRef, inject, input, model, OnInit, untracked } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { fromEvent, takeWhile } from "rxjs";
 import { ButtonService } from "../services/button.service";
@@ -31,6 +19,7 @@ import { ButtonService } from "../services/button.service";
     standalone: true
 })
 export class ButtonDirective implements OnInit {
+    readonly #buttonService = inject(ButtonService, { host: true, optional: true });
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     readonly #hostElementRef: ElementRef<HTMLButtonElement> = inject(ElementRef);
 
@@ -43,12 +32,12 @@ export class ButtonDirective implements OnInit {
     });
     public toggleable = input(false);
 
-    public constructor(@Host() @Optional() private readonly buttonService: ButtonService) {
+    public constructor() {
         effect(() => {
             this.selected();
             untracked(() => {
-                if (this.buttonService) {
-                    this.buttonService.buttonSelected$.next(this);
+                if (this.#buttonService) {
+                    this.#buttonService.buttonSelected$.next(this);
                 }
             });
         });
@@ -68,7 +57,7 @@ export class ButtonDirective implements OnInit {
     }
 
     public ngOnInit(): void {
-        this.buttonService?.buttonSelect$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(result => {
+        this.#buttonService?.buttonSelect$.pipe(takeUntilDestroyed(this.#destroyRef)).subscribe(result => {
             const [button, selected] = result;
             if (button === this) {
                 this.selected.set(selected);
@@ -83,8 +72,8 @@ export class ButtonDirective implements OnInit {
                 takeWhile(() => this.toggleable())
             )
             .subscribe(() => {
-                if (this.buttonService) {
-                    this.buttonService.buttonClick$.next(this);
+                if (this.#buttonService) {
+                    this.#buttonService.buttonClick$.next(this);
                 } else {
                     this.selected.set(!this.selected());
                 }
