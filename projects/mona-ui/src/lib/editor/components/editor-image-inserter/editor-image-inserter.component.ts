@@ -8,7 +8,6 @@ import { EditorImageInsertEvent } from "../../models/EditorImageInsertEvent";
 
 @Component({
     selector: "mona-editor-image-inserter",
-    standalone: true,
     imports: [TextBoxComponent, ReactiveFormsModule, ButtonDirective, NumericTextBoxComponent],
     templateUrl: "./editor-image-inserter.component.html",
     styleUrl: "./editor-image-inserter.component.scss",

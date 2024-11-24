@@ -14,7 +14,6 @@ import { CalendarComponent } from "./calendar.component";
         [max]="max"
         [disabledDates]="disabledDates"
         (ngModelChange)="onDateChange($event)"></mona-calendar>`,
-    standalone: true,
     imports: [CalendarComponent, FormsModule]
 })
 class CalendarComponentTestComponent {

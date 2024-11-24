@@ -5,7 +5,6 @@ import { RadioButtonDirective } from "../../directives/radio-button.directive";
 
 @Component({
     selector: "mona-radio-button",
-    standalone: true,
     imports: [RadioButtonDirective, FormsModule],
     templateUrl: "./radio-button.component.html",
     styleUrl: "./radio-button.component.scss",

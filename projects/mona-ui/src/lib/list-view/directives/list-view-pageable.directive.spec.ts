@@ -7,7 +7,6 @@ import { ListViewPageableDirective } from "./list-view-pageable.directive";
 
 @Component({
     imports: [ListViewPageableDirective, ListViewComponent],
-    standalone: true,
     providers: [ListService],
     template: ` <mona-list-view [items]="data" textField="name" monaListViewPageable></mona-list-view> `
 })

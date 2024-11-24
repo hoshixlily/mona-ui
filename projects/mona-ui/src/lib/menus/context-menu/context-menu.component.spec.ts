@@ -20,7 +20,6 @@ import { ContextMenuComponent } from "./context-menu.component";
             <mona-menu-item text="Third Item"></mona-menu-item>
         </mona-contextmenu>
     `,
-    standalone: true,
     imports: [ContextMenuComponent, MenuItemComponent]
 })
 class ContextMenuComponentTestComponent {}
@@ -33,7 +32,6 @@ class ContextMenuComponentTestComponent {}
             <mona-menu-item text="Second Item"></mona-menu-item>
         </mona-contextmenu>
     `,
-    standalone: true,
     imports: [ContextMenuComponent, MenuItemComponent]
 })
 class ContextMenuComponentTestComponentWithMenuItems {

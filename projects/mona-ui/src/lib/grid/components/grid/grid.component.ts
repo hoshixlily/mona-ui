@@ -63,7 +63,6 @@ import { GridVirtualListComponent } from "../grid-virtual-list/grid-virtual-list
     styleUrls: ["./grid.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [GridService],
-    standalone: true,
     imports: [
         CdkDropList,
         ChipComponent,

@@ -14,7 +14,6 @@ import { ButtonGroupComponent } from "./button-group.component";
             <button monaButton [toggleable]="true" [selected]="selectedIndex === 2">Button 3</button>
         </mona-button-group>
     `,
-    standalone: true,
     imports: [ButtonGroupComponent, ButtonDirective]
 })
 class ButtonGroupComponentSpecHostComponent {

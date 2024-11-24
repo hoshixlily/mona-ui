@@ -11,7 +11,6 @@ import { BreadcrumbItemTemplateContext } from "../../models/BreadcrumbItemTempla
     selector: "mona-breadcrumb",
     templateUrl: "./breadcrumb.component.html",
     styleUrls: ["./breadcrumb.component.scss"],
-    standalone: true,
     imports: [NgClass, NgTemplateOutlet, FontAwesomeModule],
     changeDetection: ChangeDetectionStrategy.OnPush,
     host: {

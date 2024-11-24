@@ -8,7 +8,6 @@ import { EditorTableCreatorComponent } from "../editor-table-creator/editor-tabl
 
 @Component({
     selector: "mona-editor-table",
-    standalone: true,
     imports: [ButtonGroupComponent, ButtonDirective, PopoverComponent, EditorTableCreatorComponent],
     templateUrl: "./editor-table.component.html",
     styleUrl: "./editor-table.component.scss",

@@ -19,7 +19,6 @@ import { NotificationType } from "../../models/NotificationType";
     templateUrl: "./notification.component.html",
     styleUrls: ["./notification.component.scss"],
     animations: [NotificationSlide, NotificationFade],
-    standalone: true,
     imports: [FontAwesomeModule, NgTemplateOutlet, NgStyle, ProgressBarComponent],
     changeDetection: ChangeDetectionStrategy.OnPush,
     host: {

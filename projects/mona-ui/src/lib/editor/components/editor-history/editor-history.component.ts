@@ -5,7 +5,6 @@ import { EditorService } from "../../services/editor.service";
 
 @Component({
     selector: "mona-editor-history",
-    standalone: true,
     imports: [ButtonGroupComponent, ButtonDirective],
     templateUrl: "./editor-history.component.html",
     styleUrl: "./editor-history.component.scss",

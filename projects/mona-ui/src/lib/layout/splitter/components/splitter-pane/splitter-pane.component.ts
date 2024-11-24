@@ -3,7 +3,6 @@ import { v4 } from "uuid";
 
 @Component({
     selector: "mona-splitter-pane",
-    standalone: true,
     imports: [],
     template: `
         <ng-template>

@@ -1,4 +1,4 @@
-import { NgClass, NgTemplateOutlet } from "@angular/common";
+import { NgTemplateOutlet } from "@angular/common";
 import {
     AfterViewInit,
     ChangeDetectionStrategy,
@@ -17,8 +17,7 @@ import { PopupSettings } from "../../models/PopupSettings";
     templateUrl: "./popup-wrapper.component.html",
     styleUrls: ["./popup-wrapper.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
-    imports: [NgClass, NgTemplateOutlet],
+    imports: [NgTemplateOutlet],
     host: {
         class: "mona-popup-wrapper"
     }

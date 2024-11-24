@@ -7,7 +7,6 @@ import { EditorService } from "../../services/editor.service";
 
 @Component({
     selector: "mona-editor-link",
-    standalone: true,
     imports: [ButtonGroupComponent, ButtonDirective],
     templateUrl: "./editor-link.component.html",
     styleUrl: "./editor-link.component.scss",

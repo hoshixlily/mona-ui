@@ -32,7 +32,6 @@ import { SwitchOnLabelTemplateDirective } from "../../directives/switch-on-label
             multi: true
         }
     ],
-    standalone: true,
     imports: [NgClass, NgTemplateOutlet],
     changeDetection: ChangeDetectionStrategy.OnPush,
     host: {

@@ -24,7 +24,6 @@ import { DefaultTooltipPositionMap } from "../models/DefaultTooltipPositionMap";
     templateUrl: "./tooltip.component.html",
     styleUrls: ["./tooltip.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [NgClass]
 })
 export class TooltipComponent implements OnInit {

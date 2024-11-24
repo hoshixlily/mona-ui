@@ -27,7 +27,6 @@ import { StepperTemplateContext } from "../../models/StepperTemplateContext";
     templateUrl: "./stepper.component.html",
     styleUrls: ["./stepper.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [NgStyle, NgClass, NgTemplateOutlet],
     host: {
         class: "mona-stepper",

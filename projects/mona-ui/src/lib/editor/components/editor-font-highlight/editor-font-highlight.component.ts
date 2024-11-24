@@ -6,7 +6,6 @@ import { EditorService } from "../../services/editor.service";
 
 @Component({
     selector: "mona-editor-font-highlight",
-    standalone: true,
     imports: [ColorPickerComponent, ColorPickerValueTemplateDirective, FormsModule],
     templateUrl: "./editor-font-highlight.component.html",
     styleUrl: "./editor-font-highlight.component.scss",

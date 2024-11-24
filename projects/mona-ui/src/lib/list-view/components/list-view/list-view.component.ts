@@ -1,4 +1,3 @@
-import { CdkFixedSizeVirtualScroll, CdkVirtualForOf, CdkVirtualScrollViewport } from "@angular/cdk/scrolling";
 import { NgTemplateOutlet } from "@angular/common";
 import {
     AfterViewInit,
@@ -45,12 +44,8 @@ import { PageState } from "../../models/PageState";
     styleUrls: ["./list-view.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [ListService],
-    standalone: true,
     imports: [
         NgTemplateOutlet,
-        CdkVirtualScrollViewport,
-        CdkFixedSizeVirtualScroll,
-        CdkVirtualForOf,
         PagerComponent,
         ListComponent,
         ListHeaderTemplateDirective,

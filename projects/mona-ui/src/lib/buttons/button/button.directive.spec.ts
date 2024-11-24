@@ -14,7 +14,6 @@ import { ButtonDirective } from "./button.directive";
         (selectedChange)="selectedChange($event)">
         TEST BUTTON
     </button>`,
-    standalone: true,
     imports: [ButtonDirective]
 })
 class TestButtonDirectiveComponent {
@@ -38,7 +37,6 @@ class TestButtonDirectiveComponent {
             <button monaButton [toggleable]="true">C</button>
         </mona-button-group>
     `,
-    standalone: true,
     imports: [ButtonDirective, ButtonGroupComponent]
 })
 class TestButtonGroupButtonComponent {}

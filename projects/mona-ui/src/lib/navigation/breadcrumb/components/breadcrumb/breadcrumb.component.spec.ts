@@ -7,7 +7,6 @@ import { BreadcrumbComponent } from "./breadcrumb.component";
 
 @Component({
     template: ` <mona-breadcrumb [items]="items" (itemClick)="onItemClick($event)"></mona-breadcrumb> `,
-    standalone: true,
     imports: [BreadcrumbComponent]
 })
 class TestHostComponent {

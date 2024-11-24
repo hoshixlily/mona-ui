@@ -7,7 +7,6 @@ import { EditorImageInserterComponent } from "../editor-image-inserter/editor-im
 
 @Component({
     selector: "mona-editor-image",
-    standalone: true,
     imports: [WindowComponent, EditorImageInserterComponent, ButtonDirective],
     templateUrl: "./editor-image.component.html",
     styleUrl: "./editor-image.component.scss",

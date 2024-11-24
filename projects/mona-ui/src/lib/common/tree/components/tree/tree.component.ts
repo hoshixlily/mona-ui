@@ -1,6 +1,6 @@
 import { transition, trigger } from "@angular/animations";
 import { FocusMonitor } from "@angular/cdk/a11y";
-import { AsyncPipe, NgStyle, NgTemplateOutlet } from "@angular/common";
+import { AsyncPipe } from "@angular/common";
 import {
     ChangeDetectionStrategy,
     Component,
@@ -29,12 +29,10 @@ import { TreeNode } from "../../models/TreeNode";
 import { TreeService } from "../../services/tree.service";
 import { SubTreeComponent } from "../sub-tree/sub-tree.component";
 import { TreeDropHintComponent } from "../tree-drop-hint/tree-drop-hint.component";
-import { TreeNodeComponent } from "../tree-node/tree-node.component";
 
 @Component({
     selector: "mona-tree",
-    standalone: true,
-    imports: [SubTreeComponent, TreeNodeComponent, NgTemplateOutlet, NgStyle, TreeDropHintComponent, AsyncPipe],
+    imports: [SubTreeComponent, TreeDropHintComponent, AsyncPipe],
     templateUrl: "./tree.component.html",
     styleUrl: "./tree.component.scss",
     changeDetection: ChangeDetectionStrategy.OnPush,

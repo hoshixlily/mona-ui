@@ -27,7 +27,6 @@ import { ContextMenuService } from "../services/context-menu.service";
     templateUrl: "./context-menu-content.component.html",
     styleUrls: ["./context-menu-content.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [NgClass, ContextMenuItemComponent]
 })
 export class ContextMenuContentComponent<C> implements OnInit, AfterViewInit {

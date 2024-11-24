@@ -7,7 +7,6 @@ import { SplitterResizerComponent } from "../splitter-resizer/splitter-resizer.c
 
 @Component({
     selector: "mona-splitter",
-    standalone: true,
     imports: [SplitterResizerComponent, NgTemplateOutlet],
     templateUrl: "./splitter.component.html",
     styleUrl: "./splitter.component.scss",

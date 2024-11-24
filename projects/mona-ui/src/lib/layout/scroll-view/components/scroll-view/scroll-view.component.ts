@@ -42,7 +42,6 @@ import { ScrollViewListItem } from "../../models/ScrollViewListItem";
             ])
         ])
     ],
-    standalone: true,
     imports: [NgTemplateOutlet, NgClass, FontAwesomeModule, NgStyle],
     host: {
         class: "mona-scroll-view",

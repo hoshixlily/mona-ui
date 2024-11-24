@@ -44,7 +44,6 @@ import { HueSliderComponent } from "../hue-slider/hue-slider.component";
             multi: true
         }
     ],
-    standalone: true,
     imports: [
         HueSliderComponent,
         FormsModule,

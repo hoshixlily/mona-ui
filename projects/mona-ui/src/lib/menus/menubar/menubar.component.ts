@@ -20,7 +20,6 @@ import { ContextMenuOpenEvent } from "../models/ContextMenuOpenEvent";
     templateUrl: "./menubar.component.html",
     styleUrls: ["./menubar.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [NgClass, NgTemplateOutlet, ContextMenuComponent],
     host: {
         class: "mona-menubar"

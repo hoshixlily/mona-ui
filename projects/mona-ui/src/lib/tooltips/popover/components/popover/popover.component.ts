@@ -37,7 +37,6 @@ import { PopoverTrigger } from "../../models/PopoverTrigger";
     styleUrls: ["./popover.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
     exportAs: "monaPopover",
-    standalone: true,
     imports: [NgTemplateOutlet, NgClass]
 })
 export class PopoverComponent implements OnInit {

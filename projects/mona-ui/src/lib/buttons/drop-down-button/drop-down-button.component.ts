@@ -19,7 +19,6 @@ import { ButtonDirective } from "../button/button.directive";
     selector: "mona-drop-down-button",
     templateUrl: "./drop-down-button.component.html",
     styleUrls: ["./drop-down-button.component.scss"],
-    standalone: true,
     imports: [ButtonDirective, ContextMenuComponent],
     host: {
         "[class.mona-drop-down-button]": "true"

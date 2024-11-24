@@ -29,7 +29,6 @@ import { TabComponent } from "../tab/tab.component";
     templateUrl: "./tab-strip.component.html",
     styleUrls: ["./tab-strip.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [ButtonDirective, FontAwesomeModule, NgClass, NgTemplateOutlet],
     host: {
         class: "mona-tab-strip"

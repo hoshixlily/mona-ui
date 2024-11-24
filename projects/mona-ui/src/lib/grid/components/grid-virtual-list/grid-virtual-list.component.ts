@@ -1,5 +1,5 @@
 import { CdkFixedSizeVirtualScroll, CdkVirtualForOf, CdkVirtualScrollViewport } from "@angular/cdk/scrolling";
-import { NgClass, NgTemplateOutlet } from "@angular/common";
+import { NgTemplateOutlet } from "@angular/common";
 import {
     afterNextRender,
     AfterViewInit,
@@ -33,13 +33,11 @@ import { GridCellComponent } from "../grid-cell/grid-cell.component";
 
 @Component({
     selector: "mona-grid-virtual-list",
-    standalone: true,
     imports: [
         CdkVirtualScrollViewport,
         CdkFixedSizeVirtualScroll,
         CdkVirtualForOf,
         GridCellComponent,
-        NgClass,
         ButtonDirective,
         FaIconComponent,
         SlicePipe,

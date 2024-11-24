@@ -12,7 +12,6 @@ import { PopupComponent } from "./popup.component";
             </ng-template>
         </mona-popup>
     `,
-    standalone: true,
     imports: [PopupComponent]
 })
 class PopupComponentTestComponent {

@@ -4,7 +4,6 @@ import { EditorService } from "../../services/editor.service";
 
 @Component({
     selector: "mona-editor-blockquote",
-    standalone: true,
     imports: [ButtonDirective],
     templateUrl: "./editor-blockquote.component.html",
     styleUrl: "./editor-blockquote.component.scss",

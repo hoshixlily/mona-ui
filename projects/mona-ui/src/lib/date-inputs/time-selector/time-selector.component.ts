@@ -35,7 +35,6 @@ import { generateHourSet } from "../utils/generateHourSet";
             multi: true
         }
     ],
-    standalone: true,
     imports: [NgClass, DecimalPipe, TimeLimiterPipe],
     host: {
         "[class.mona-time-selector]": "true",

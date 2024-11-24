@@ -8,7 +8,7 @@ import {
     CdkDragStart,
     CdkDropList
 } from "@angular/cdk/drag-drop";
-import { AsyncPipe, NgStyle } from "@angular/common";
+import { AsyncPipe } from "@angular/common";
 import { ChangeDetectionStrategy, Component, inject, input } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { ImmutableSet } from "@mirei/ts-collections";
@@ -24,18 +24,8 @@ import { TreeNodeComponent } from "../tree-node/tree-node.component";
 
 @Component({
     selector: "mona-sub-tree",
-    standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [
-        TreeNodeComponent,
-        NgStyle,
-        FormsModule,
-        CdkDropList,
-        CdkDrag,
-        CdkDragPreview,
-        AsyncPipe,
-        CheckBoxComponent
-    ],
+    imports: [TreeNodeComponent, FormsModule, CdkDropList, CdkDrag, CdkDragPreview, AsyncPipe, CheckBoxComponent],
     templateUrl: "./sub-tree.component.html",
     styleUrl: "./sub-tree.component.scss",
     animations: [

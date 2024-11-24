@@ -1,4 +1,4 @@
-import { NgClass, NgTemplateOutlet } from "@angular/common";
+import { NgTemplateOutlet } from "@angular/common";
 import {
     ChangeDetectionStrategy,
     Component,
@@ -39,7 +39,6 @@ import { ListNoDataTemplateDirective } from "../../../../common/list/directives/
 import { ListItem } from "../../../../common/list/models/ListItem";
 import { SelectionChangeEvent } from "../../../../common/list/models/SelectionChangeEvent";
 import { ListService } from "../../../../common/list/services/list.service";
-import { SlicePipe } from "../../../../pipes/slice.pipe";
 import { PopupRef } from "../../../../popup/models/PopupRef";
 import { PopupService } from "../../../../popup/services/popup.service";
 import { Action } from "../../../../utils/Action";
@@ -64,14 +63,11 @@ import { MultiSelectTagTemplateDirective } from "../../directives/multi-select-t
         }
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        NgClass,
         ChipComponent,
         NgTemplateOutlet,
         FontAwesomeModule,
         ButtonDirective,
-        SlicePipe,
         ListComponent,
         ListGroupHeaderTemplateDirective,
         ListItemTemplateDirective,

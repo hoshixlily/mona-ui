@@ -13,10 +13,6 @@ import {
 } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { JSONContent } from "@tiptap/core";
-import { ButtonGroupComponent } from "../../../buttons/button-group/button-group.component";
-import { ButtonDirective } from "../../../buttons/button/button.directive";
-import { DropDownItemTemplateDirective } from "../../../dropdowns/directives/drop-down-item-template.directive";
-import { DropDownListComponent } from "../../../dropdowns/drop-down-list/components/drop-down-list/drop-down-list.component";
 import { ContentChangeEvent } from "../../models/ContentChangeEvent";
 import { EditorSettings } from "../../models/EditorSettings";
 import { EditorService } from "../../services/editor.service";
@@ -40,12 +36,7 @@ import { EditorTextAlignmentsComponent } from "../editor-text-alignments/editor-
 
 @Component({
     selector: "mona-editor",
-    standalone: true,
     imports: [
-        ButtonDirective,
-        ButtonGroupComponent,
-        DropDownListComponent,
-        DropDownItemTemplateDirective,
         FormsModule,
         EditorBasicTextStylesComponent,
         EditorHeadingsComponent,

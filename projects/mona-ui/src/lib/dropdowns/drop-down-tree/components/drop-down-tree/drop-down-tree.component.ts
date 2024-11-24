@@ -38,11 +38,6 @@ import { TreeService } from "../../../../common/tree/services/tree.service";
 import { PlaceholderComponent } from "../../../../layout/placeholder/placeholder.component";
 import { PopupRef } from "../../../../popup/models/PopupRef";
 import { PopupService } from "../../../../popup/services/popup.service";
-import { TreeViewComponent } from "../../../../tree-view/components/tree-view/tree-view.component";
-import { TreeViewDisableDirective } from "../../../../tree-view/directives/tree-view-disable.directive";
-import { TreeViewExpandableDirective } from "../../../../tree-view/directives/tree-view-expandable.directive";
-import { TreeViewFilterableDirective } from "../../../../tree-view/directives/tree-view-filterable.directive";
-import { TreeViewSelectableDirective } from "../../../../tree-view/directives/tree-view-selectable.directive";
 import { Action } from "../../../../utils/Action";
 import { DropDownFooterTemplateDirective } from "../../../directives/drop-down-footer-template.directive";
 import { DropDownHeaderTemplateDirective } from "../../../directives/drop-down-header-template.directive";
@@ -52,16 +47,10 @@ import { DropDownTreeNodeTemplateDirective } from "../../directives/drop-down-tr
 
 @Component({
     selector: "mona-drop-down-tree",
-    standalone: true,
     imports: [
         CommonModule,
         ButtonDirective,
         FaIconComponent,
-        TreeViewComponent,
-        TreeViewDisableDirective,
-        TreeViewSelectableDirective,
-        TreeViewFilterableDirective,
-        TreeViewExpandableDirective,
         TreeComponent,
         FilterInputComponent,
         TreeNodeTemplateDirective,

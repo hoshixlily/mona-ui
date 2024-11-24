@@ -4,7 +4,6 @@ import { EditorService } from "../../services/editor.service";
 
 @Component({
     selector: "mona-editor-task-list",
-    standalone: true,
     imports: [ButtonDirective],
     templateUrl: "./editor-task-list.component.html",
     styleUrl: "./editor-task-list.component.scss",

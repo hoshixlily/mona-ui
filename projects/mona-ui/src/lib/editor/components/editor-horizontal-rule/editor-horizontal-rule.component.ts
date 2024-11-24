@@ -4,7 +4,6 @@ import { EditorService } from "../../services/editor.service";
 
 @Component({
     selector: "mona-editor-horizontal-rule",
-    standalone: true,
     imports: [ButtonDirective],
     templateUrl: "./editor-horizontal-rule.component.html",
     styleUrl: "./editor-horizontal-rule.component.scss",

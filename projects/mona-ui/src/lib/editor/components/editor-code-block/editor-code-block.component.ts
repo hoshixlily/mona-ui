@@ -4,7 +4,6 @@ import { EditorService } from "../../services/editor.service";
 
 @Component({
     selector: "mona-editor-code-block",
-    standalone: true,
     imports: [ButtonDirective],
     templateUrl: "./editor-code-block.component.html",
     styleUrl: "./editor-code-block.component.scss",

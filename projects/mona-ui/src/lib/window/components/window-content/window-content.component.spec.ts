@@ -8,7 +8,8 @@ import { WindowInjectorData } from "../../models/WindowInjectorData";
 import { WindowContentComponent } from "./window-content.component";
 
 @Component({
-    template: ` <div>Test</div> `
+    template: ` <div>Test</div> `,
+    standalone: false
 })
 class WindowContentComponentTestComponent {}
 

@@ -8,7 +8,6 @@ import { ButtonDirective } from "../button/button.directive";
     selector: "mona-chip",
     templateUrl: "./chip.component.html",
     styleUrls: ["./chip.component.scss"],
-    standalone: true,
     imports: [NgClass, ButtonDirective, FontAwesomeModule],
     changeDetection: ChangeDetectionStrategy.OnPush,
     host: {

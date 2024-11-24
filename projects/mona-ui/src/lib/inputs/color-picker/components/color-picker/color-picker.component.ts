@@ -42,7 +42,6 @@ import { ColorPickerView } from "../../models/ColorPickerView";
             multi: true
         }
     ],
-    standalone: true,
     imports: [
         FontAwesomeModule,
         ButtonDirective,

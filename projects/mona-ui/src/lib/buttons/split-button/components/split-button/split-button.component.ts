@@ -27,7 +27,6 @@ import { SplitButtonTextTemplateDirective } from "../../directives/split-button-
     selector: "mona-split-button",
     templateUrl: "./split-button.component.html",
     styleUrls: ["./split-button.component.scss"],
-    standalone: true,
     imports: [ButtonDirective, NgTemplateOutlet, FontAwesomeModule, ContextMenuComponent],
     host: {
         "[class.mona-split-button]": "true",

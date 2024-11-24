@@ -13,7 +13,6 @@ import { SplitterResizerComponent } from "./splitter-resizer.component";
         </mona-splitter>
     `,
     styles: "",
-    standalone: true,
     imports: [SplitterComponent, SplitterPaneComponent]
 })
 class TestHostComponent {}

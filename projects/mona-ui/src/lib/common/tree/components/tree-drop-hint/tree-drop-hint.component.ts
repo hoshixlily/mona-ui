@@ -5,7 +5,6 @@ import { TreeService } from "../../services/tree.service";
 
 @Component({
     selector: "mona-tree-drop-hint",
-    standalone: true,
     imports: [],
     templateUrl: "./tree-drop-hint.component.html",
     styleUrl: "./tree-drop-hint.component.scss",

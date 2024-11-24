@@ -1,5 +1,4 @@
 import { FocusMonitor } from "@angular/cdk/a11y";
-import { NgClass } from "@angular/common";
 import {
     ChangeDetectionStrategy,
     Component,
@@ -45,9 +44,7 @@ import { TimeSelectorComponent } from "../time-selector/time-selector.component"
             multi: true
         }
     ],
-    standalone: true,
     imports: [
-        NgClass,
         TextBoxDirective,
         FormsModule,
         ButtonDirective,

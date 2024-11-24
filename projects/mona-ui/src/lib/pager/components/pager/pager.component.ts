@@ -40,7 +40,6 @@ import { PageSizeChangeEvent } from "../../models/PageSizeChangeEvent";
     templateUrl: "./pager.component.html",
     styleUrls: ["./pager.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
         ButtonDirective,
         FontAwesomeModule,

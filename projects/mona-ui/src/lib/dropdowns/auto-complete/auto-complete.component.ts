@@ -1,4 +1,4 @@
-import { NgClass, NgTemplateOutlet } from "@angular/common";
+import { NgTemplateOutlet } from "@angular/common";
 import {
     Component,
     contentChild,
@@ -59,9 +59,7 @@ import { DropDownService } from "../services/drop-down.service";
             multi: true
         }
     ],
-    standalone: true,
     imports: [
-        NgClass,
         TextBoxDirective,
         FormsModule,
         FontAwesomeModule,

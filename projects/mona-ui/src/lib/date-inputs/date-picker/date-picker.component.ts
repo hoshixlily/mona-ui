@@ -1,5 +1,4 @@
 import { FocusMonitor } from "@angular/cdk/a11y";
-import { NgClass } from "@angular/common";
 import {
     ChangeDetectionStrategy,
     Component,
@@ -42,8 +41,7 @@ import { CalendarComponent } from "../calendar/calendar.component";
             multi: true
         }
     ],
-    standalone: true,
-    imports: [NgClass, TextBoxDirective, FormsModule, ButtonDirective, FontAwesomeModule, CalendarComponent],
+    imports: [TextBoxDirective, FormsModule, ButtonDirective, FontAwesomeModule, CalendarComponent],
     host: {
         "[class.mona-dropdown]": "true",
         "[class.mona-date-picker]": "true",

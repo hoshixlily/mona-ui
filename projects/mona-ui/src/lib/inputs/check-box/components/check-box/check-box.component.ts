@@ -16,7 +16,6 @@ import { CheckBoxDirective } from "../../directives/check-box.directive";
 
 @Component({
     selector: "mona-check-box",
-    standalone: true,
     imports: [CheckBoxDirective, FormsModule],
     templateUrl: "./check-box.component.html",
     styleUrl: "./check-box.component.scss",
