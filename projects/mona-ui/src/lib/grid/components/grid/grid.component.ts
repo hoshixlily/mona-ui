@@ -30,7 +30,7 @@ import {
     untracked,
     viewChild
 } from "@angular/core";
-import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
+import { takeUntilDestroyed, toObservable } from "@angular/core/rxjs-interop";
 import { Collections } from "@mirei/ts-collections";
 import { v4 } from "uuid";
 import { ChipComponent } from "../../../buttons/chip/chip.component";
@@ -56,6 +56,7 @@ import { GridColumnComponent } from "../grid-column/grid-column.component";
 import { GridFilterMenuComponent } from "../grid-filter-menu/grid-filter-menu.component";
 import { GridListComponent } from "../grid-list/grid-list.component";
 import { GridVirtualListComponent } from "../grid-virtual-list/grid-virtual-list.component";
+import { asyncScheduler, delay, filter, observeOn, take, tap } from "rxjs";
 
 @Component({
     selector: "mona-grid",
@@ -63,7 +64,6 @@ import { GridVirtualListComponent } from "../grid-virtual-list/grid-virtual-list
     styleUrls: ["./grid.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
     providers: [GridService],
-    standalone: true,
     imports: [
         CdkDropList,
         ChipComponent,
@@ -91,6 +91,7 @@ export class GridComponent<T> implements OnInit {
     readonly #cdr = inject(ChangeDetectorRef);
     readonly #destroyRef = inject(DestroyRef);
     readonly #hostElementRef = inject(ElementRef<HTMLElement>);
+    #resizeObserver: ResizeObserver | null = null;
     protected readonly columns = contentChildren(GridColumnComponent);
     protected readonly gridDetailTemplate = contentChild(GridDetailTemplateDirective, { read: TemplateRef });
     protected readonly gridHeaderElement = viewChild.required<ElementRef<HTMLDivElement>>("gridHeaderElement");
@@ -186,10 +187,12 @@ export class GridComponent<T> implements OnInit {
         this.setGridHeaderElementEffect();
         this.setGridDetailEffect();
         this.setDataEffect();
+        this.#destroyRef.onDestroy(() => this.#resizeObserver?.disconnect());
     }
 
     public ngOnInit(): void {
         this.setSubscriptions();
+        this.setResizeObserver();
     }
 
     public onColumnDragEnter(event: CdkDragEnter<void, Column>, column: Column): void {
@@ -459,25 +462,18 @@ export class GridComponent<T> implements OnInit {
     }
 
     private setGridHeaderElementEffect(): void {
-        afterNextRender(() => {
-            const headerElement = this.gridHeaderElement();
-            untracked(() => {
-                window.setTimeout(() => {
-                    this.gridService.gridHeaderElement.set(headerElement.nativeElement);
-                });
-            });
-        });
-        effect(() => {
-            const headerElement = this.gridHeaderElement();
-            if (headerElement) {
-                untracked(() => {
-                    window.setTimeout(() => {
-                        this.setInitialCalculatedWidthOfColumns();
-                        this.gridWidthSet.set(true);
-                    });
-                });
-            }
-        });
+        toObservable(this.gridHeaderElement)
+            .pipe(
+                filter(h => h != null),
+                observeOn(asyncScheduler),
+                take(1),
+                tap(h => {
+                    this.gridService.gridHeaderElement.set(h.nativeElement);
+                    this.setInitialCalculatedWidthOfColumns();
+                    this.gridWidthSet.set(true);
+                })
+            )
+            .subscribe();
     }
 
     private setInitialCalculatedWidthOfColumns(): void {
@@ -486,6 +482,7 @@ export class GridComponent<T> implements OnInit {
             const headerCells = this.getTableColumnHeaderCellList();
             let headerWidth = headerElement.clientWidth;
             const columnsWithWidth = this.gridService.columns().where(c => c.width() != null);
+            const columnsWithoutWidthCount = this.gridService.columns().count() - columnsWithWidth.count();
             if (columnsWithWidth.any()) {
                 headerWidth -= columnsWithWidth.sum(c => c.width() ?? 0);
             }
@@ -500,7 +497,7 @@ export class GridComponent<T> implements OnInit {
                 if (typeof this.resizeMethod() === "number") {
                     calculatedWidth = this.resizeMethod() as number;
                 } else if (this.resizeMethod() === "fitView") {
-                    calculatedWidth = (headerWidth + 1) / headerCells.length;
+                    calculatedWidth = (headerWidth + 1) / Math.min(headerCells.length, columnsWithoutWidthCount);
                 } else {
                     calculatedWidth = this.gridService.findTextWidthOfColumn(gridCol, columnTh);
                 }
@@ -527,6 +524,14 @@ export class GridComponent<T> implements OnInit {
                 untracked(() => this.gridService.pageState.take.set(pageSize));
             }
         });
+    }
+
+    private setResizeObserver(): void {
+        this.#resizeObserver = new ResizeObserver(() => {
+            const rect = this.#hostElementRef.nativeElement.getBoundingClientRect();
+            this.gridService.virtualGridMinBuffer.set(rect.height);
+        });
+        this.#resizeObserver.observe(this.#hostElementRef.nativeElement);
     }
 
     private setSortEffect(): void {

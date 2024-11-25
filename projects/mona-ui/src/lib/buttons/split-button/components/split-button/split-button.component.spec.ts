@@ -24,7 +24,6 @@ import { SplitButtonComponent } from "./split-button.component";
             }
         </mona-split-button>
     `,
-    standalone: true,
     imports: [SplitButtonComponent, MenuItemComponent, CommonModule]
 })
 class TestHostComponent {

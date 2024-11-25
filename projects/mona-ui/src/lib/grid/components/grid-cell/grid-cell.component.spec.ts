@@ -8,7 +8,6 @@ import { GridCellComponent } from "./grid-cell.component";
 
 @Component({
     template: ` <mona-grid-cell [column]="column" [row]="row"></mona-grid-cell> `,
-    standalone: true,
     imports: [GridCellComponent],
     changeDetection: ChangeDetectionStrategy.OnPush
 })

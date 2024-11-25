@@ -38,7 +38,6 @@ import { ListItemComponent } from "../list-item/list-item.component";
 
 @Component({
     selector: "mona-list",
-    standalone: true,
     imports: [
         FilterInputComponent,
         ListItemComponent,

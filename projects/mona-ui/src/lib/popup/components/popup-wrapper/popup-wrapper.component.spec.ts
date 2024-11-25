@@ -11,7 +11,8 @@ import { PopupWrapperComponent } from "./popup-wrapper.component";
             <div>Test</div>
         </ng-template>
         <div>Test</div>
-    `
+    `,
+    standalone: false
 })
 class PopupWrapperComponentTestComponent {
     public contentTemplate = viewChild.required<TemplateRef<any>>("contentTemplate");

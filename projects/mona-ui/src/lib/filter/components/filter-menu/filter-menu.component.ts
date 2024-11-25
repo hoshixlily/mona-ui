@@ -43,7 +43,6 @@ import { ValuelessOperatorPipe } from "../../pipes/valueless-operator.pipe";
     templateUrl: "./filter-menu.component.html",
     styleUrls: ["./filter-menu.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
         DropDownListComponent,
         FormsModule,

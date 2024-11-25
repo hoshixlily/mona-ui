@@ -1,4 +1,4 @@
-import { NgClass, NgTemplateOutlet } from "@angular/common";
+import { NgTemplateOutlet } from "@angular/common";
 import { ChangeDetectionStrategy, Component, computed, inject, input, Signal, TemplateRef } from "@angular/core";
 import { ListItem } from "../../models/ListItem";
 import { ListItemTemplateContext } from "../../models/ListItemTemplateContext";
@@ -6,8 +6,7 @@ import { ListService } from "../../services/list.service";
 
 @Component({
     selector: "mona-list-item",
-    standalone: true,
-    imports: [NgClass, NgTemplateOutlet],
+    imports: [NgTemplateOutlet],
     templateUrl: "./list-item.component.html",
     styleUrl: "./list-item.component.scss",
     changeDetection: ChangeDetectionStrategy.OnPush

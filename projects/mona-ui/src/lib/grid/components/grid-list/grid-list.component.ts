@@ -1,4 +1,4 @@
-import { NgClass, NgTemplateOutlet } from "@angular/common";
+import { NgTemplateOutlet } from "@angular/common";
 import {
     ChangeDetectionStrategy,
     Component,
@@ -31,9 +31,7 @@ import { GridCellComponent } from "../grid-cell/grid-cell.component";
     templateUrl: "./grid-list.component.html",
     styleUrls: ["./grid-list.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
-        NgClass,
         GridCellComponent,
         ButtonDirective,
         FontAwesomeModule,

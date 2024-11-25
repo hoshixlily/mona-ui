@@ -10,7 +10,6 @@ import { TooltipComponent } from "./tooltip.component";
         <button #target>Tooltip Anchor</button>,
         <mona-tooltip [target]="target"></mona-tooltip>
     `,
-    standalone: true,
     imports: [TooltipComponent]
 })
 class TooltipComponentTestComponent {}

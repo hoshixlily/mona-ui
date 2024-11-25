@@ -47,7 +47,6 @@ type ListBoxDirection = "horizontal" | "horizontal-reverse" | "vertical" | "vert
     templateUrl: "./list-box.component.html",
     styleUrls: ["./list-box.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
         ListViewComponent,
         ListViewSelectableDirective,

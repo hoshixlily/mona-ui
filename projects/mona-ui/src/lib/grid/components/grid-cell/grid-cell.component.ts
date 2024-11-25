@@ -28,7 +28,6 @@ import { GridService } from "../../services/grid.service";
     templateUrl: "./grid-cell.component.html",
     styleUrls: ["./grid-cell.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
         A11yModule,
         NgClass,

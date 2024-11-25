@@ -6,7 +6,6 @@ import { ListItemDirective } from "./list-item.directive";
 
 @Component({
     imports: [ListItemDirective],
-    standalone: true,
     template: `
         <ul>
             <li monaListItem [item]="listItem"></li>

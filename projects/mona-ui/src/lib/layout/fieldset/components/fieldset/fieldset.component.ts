@@ -6,7 +6,6 @@ import { FieldsetLegendTemplateDirective } from "../../directives/fieldset-legen
     selector: "mona-fieldset",
     templateUrl: "./fieldset.component.html",
     styleUrls: ["./fieldset.component.scss"],
-    standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [NgTemplateOutlet],
     host: {

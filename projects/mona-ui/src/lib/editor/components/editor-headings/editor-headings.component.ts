@@ -7,7 +7,6 @@ import { EditorService } from "../../services/editor.service";
 
 @Component({
     selector: "mona-editor-headings",
-    standalone: true,
     imports: [DropDownListComponent, FormsModule, DropDownItemTemplateDirective],
     templateUrl: "./editor-headings.component.html",
     styleUrl: "./editor-headings.component.scss",

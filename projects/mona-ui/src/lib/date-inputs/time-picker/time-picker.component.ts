@@ -44,7 +44,6 @@ import { TimeSelectorComponent } from "../time-selector/time-selector.component"
             multi: true
         }
     ],
-    standalone: true,
     imports: [TextBoxDirective, FormsModule, ButtonDirective, FontAwesomeModule, TimeSelectorComponent],
     host: {
         "[class.mona-dropdown]": "true",

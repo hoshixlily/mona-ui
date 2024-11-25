@@ -10,7 +10,6 @@ import { TreeService } from "../../services/tree.service";
 
 @Component({
     selector: "mona-tree-node",
-    standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [NgTemplateOutlet],
     templateUrl: "./tree-node.component.html",

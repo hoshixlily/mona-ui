@@ -17,7 +17,6 @@ import { LabelPosition } from "../../models/LabelPosition";
     templateUrl: "./progress-bar.component.html",
     styleUrls: ["./progress-bar.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [NgClass, NgStyle, DecimalPipe],
     host: {
         class: "mona-progress-bar",

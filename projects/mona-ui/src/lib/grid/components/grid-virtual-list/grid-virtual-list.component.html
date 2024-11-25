@@ -1,5 +1,9 @@
 <div class="mona-grid-virtual-list" style="width: 100%; height: 100%;">
-    <cdk-virtual-scroll-viewport [itemSize]="30" [style.height.%]="100">
+    <cdk-virtual-scroll-viewport
+        [style.height.%]="100"
+        [itemSize]="gridService.virtualScrollOptions().height"
+        [minBufferPx]="gridService.virtualGridMinBuffer()"
+        [maxBufferPx]="gridService.virtualGridMaxBuffer()">
         <table style="height: 100%;">
             <tbody>
                 @if (gridService.groupColumns().length === 0) {

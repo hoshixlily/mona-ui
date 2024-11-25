@@ -1,14 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, ElementRef, inject, input, OnInit, signal } from "@angular/core";
-import { FaIconComponent } from "@fortawesome/angular-fontawesome";
 import { filter, fromEvent, skipUntil, takeUntil, tap } from "rxjs";
-import { ButtonDirective } from "../../../../buttons/button/button.directive";
 import { Orientation } from "../../../../models/Orientation";
 import { SplitterPaneComponent } from "../splitter-pane/splitter-pane.component";
 
 @Component({
     selector: "mona-splitter-resizer",
-    standalone: true,
-    imports: [FaIconComponent, ButtonDirective],
     template: `
         @if (resizable()) {
             <div class="mona-splitter-resizer-handle"></div>

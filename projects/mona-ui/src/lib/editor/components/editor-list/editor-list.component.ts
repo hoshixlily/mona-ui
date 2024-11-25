@@ -5,7 +5,6 @@ import { EditorService } from "../../services/editor.service";
 
 @Component({
     selector: "mona-editor-list",
-    standalone: true,
     imports: [ButtonGroupComponent, ButtonDirective],
     templateUrl: "./editor-list.component.html",
     styleUrl: "./editor-list.component.scss",

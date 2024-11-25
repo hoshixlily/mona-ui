@@ -3,7 +3,6 @@ import { EditorTableInsertEvent } from "../../models/EditorTableInsertEvent";
 
 @Component({
     selector: "mona-editor-table-creator",
-    standalone: true,
     imports: [],
     templateUrl: "./editor-table-creator.component.html",
     styleUrl: "./editor-table-creator.component.scss",

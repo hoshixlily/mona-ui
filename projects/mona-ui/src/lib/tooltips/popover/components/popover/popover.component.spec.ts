@@ -11,7 +11,6 @@ import { PopoverComponent } from "./popover.component";
         <button #target>Popover Anchor</button>,
         <mona-popover [target]="target" [trigger]="trigger"></mona-popover>
     `,
-    standalone: true,
     imports: [PopoverComponent]
 })
 class PopoverComponentTestComponent {

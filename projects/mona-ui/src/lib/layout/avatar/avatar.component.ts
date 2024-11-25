@@ -6,7 +6,6 @@ import { ChangeDetectionStrategy, Component, computed, input, Signal } from "@an
     templateUrl: "./avatar.component.html",
     styleUrls: ["./avatar.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [NgStyle],
     host: {
         class: "mona-avatar",

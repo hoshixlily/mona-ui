@@ -1,5 +1,5 @@
 import { FocusMonitor, FocusOrigin } from "@angular/cdk/a11y";
-import { NgClass, NgTemplateOutlet } from "@angular/common";
+import { NgTemplateOutlet } from "@angular/common";
 import {
     ChangeDetectionStrategy,
     Component,
@@ -42,8 +42,7 @@ type Sign = "-" | "+";
             multi: true
         }
     ],
-    standalone: true,
-    imports: [NgClass, NgTemplateOutlet, TextBoxDirective, FormsModule, ButtonDirective, FontAwesomeModule],
+    imports: [NgTemplateOutlet, TextBoxDirective, FormsModule, ButtonDirective, FontAwesomeModule],
     host: {
         "[class.mona-numeric-text-box]": "true",
         "[class.mona-disabled]": "disabled()"

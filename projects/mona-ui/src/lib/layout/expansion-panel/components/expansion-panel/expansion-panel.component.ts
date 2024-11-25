@@ -1,4 +1,4 @@
-import { NgClass, NgTemplateOutlet } from "@angular/common";
+import { NgTemplateOutlet } from "@angular/common";
 import { ChangeDetectionStrategy, Component, contentChild, input, model, TemplateRef } from "@angular/core";
 import { FontAwesomeModule } from "@fortawesome/angular-fontawesome";
 import { faMinus, faPlus } from "@fortawesome/free-solid-svg-icons";
@@ -12,8 +12,7 @@ import { ExpansionPanelTitleTemplateDirective } from "../../directives/expansion
     styleUrls: ["./expansion-panel.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
     animations: [SlideVertical],
-    standalone: true,
-    imports: [NgClass, NgTemplateOutlet, FontAwesomeModule],
+    imports: [NgTemplateOutlet, FontAwesomeModule],
     host: {
         class: "mona-expansion-panel",
         "[class.collapsed]": "!expanded()"

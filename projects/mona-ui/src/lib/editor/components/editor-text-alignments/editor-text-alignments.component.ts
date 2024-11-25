@@ -5,7 +5,6 @@ import { EditorService } from "../../services/editor.service";
 
 @Component({
     selector: "mona-editor-text-alignments",
-    standalone: true,
     imports: [ButtonGroupComponent, ButtonDirective],
     templateUrl: "./editor-text-alignments.component.html",
     styleUrl: "./editor-text-alignments.component.scss",

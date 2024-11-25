@@ -36,7 +36,6 @@ import { SliderTickValueTemplateDirective } from "../../directives/slider-tick-v
             multi: true
         }
     ],
-    standalone: true,
     imports: [NgClass, NgTemplateOutlet],
     host: {
         "[class.mona-slider]": "true",

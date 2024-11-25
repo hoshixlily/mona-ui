@@ -14,7 +14,6 @@ import { ButtonDirective } from "../../../../buttons/button/button.directive";
 import { Action } from "../../../../utils/Action";
 import { TextBoxPrefixTemplateDirective } from "../../directives/text-box-prefix-template.directive";
 import { TextBoxSuffixTemplateDirective } from "../../directives/text-box-suffix-template.directive";
-import { TextBoxDirective } from "../../directives/text-box.directive";
 import { InputType } from "../../models/InputType";
 
 @Component({
@@ -29,8 +28,7 @@ import { InputType } from "../../models/InputType";
             multi: true
         }
     ],
-    standalone: true,
-    imports: [NgTemplateOutlet, TextBoxDirective, FormsModule, ButtonDirective],
+    imports: [NgTemplateOutlet, FormsModule, ButtonDirective],
     host: {
         "[class.mona-text-box]": "true",
         "[class.mona-disabled]": "disabled()",

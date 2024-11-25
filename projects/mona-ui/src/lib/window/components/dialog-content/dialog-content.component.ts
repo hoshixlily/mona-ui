@@ -16,7 +16,6 @@ import { DialogType } from "../../models/DialogType";
 @Component({
     templateUrl: "./dialog-content.component.html",
     styleUrls: ["./dialog-content.component.scss"],
-    standalone: true,
     imports: [FontAwesomeModule, TextBoxComponent, FormsModule, NumericTextBoxComponent, ButtonDirective, NgClass],
     changeDetection: ChangeDetectionStrategy.OnPush
 })

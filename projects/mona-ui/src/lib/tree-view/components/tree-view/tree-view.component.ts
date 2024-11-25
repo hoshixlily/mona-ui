@@ -26,7 +26,6 @@ import { TreeViewNodeTemplateContext } from "../../models/TreeViewNodeTemplateCo
 
 @Component({
     selector: "mona-tree-view",
-    standalone: true,
     imports: [FilterInputComponent, TreeComponent, TreeNodeTemplateDirective, NgTemplateOutlet],
     templateUrl: "./tree-view.component.html",
     styleUrl: "./tree-view.component.scss",

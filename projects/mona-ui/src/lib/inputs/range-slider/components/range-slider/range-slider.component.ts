@@ -39,7 +39,6 @@ import { RangeSliderTickValueTemplateDirective } from "../../directives/range-sl
             multi: true
         }
     ],
-    standalone: true,
     imports: [NgClass, NgTemplateOutlet],
     host: {
         "[class.mona-range-slider]": "true",

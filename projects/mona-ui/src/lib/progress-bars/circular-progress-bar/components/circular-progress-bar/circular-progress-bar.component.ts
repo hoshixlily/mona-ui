@@ -1,4 +1,4 @@
-import { NgClass, NgStyle, NgTemplateOutlet } from "@angular/common";
+import { NgClass, NgTemplateOutlet } from "@angular/common";
 import {
     ChangeDetectionStrategy,
     Component,
@@ -17,9 +17,8 @@ import { CircularProgressBarLabelTemplateDirective } from "../../directives/circ
     selector: "mona-circular-progress-bar",
     templateUrl: "./circular-progress-bar.component.html",
     styleUrls: ["./circular-progress-bar.component.scss"],
-    standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [NgStyle, NgClass, NgTemplateOutlet],
+    imports: [NgClass, NgTemplateOutlet],
     host: {
         class: "mona-circular-progress-bar",
         "[class.mon-disabled]": "disabled()",

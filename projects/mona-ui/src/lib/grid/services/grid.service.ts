@@ -62,6 +62,8 @@ export class GridService {
     public readonly selectedRows = signal<ImmutableSet<Row>>(ImmutableSet.create());
     public readonly selectedRowsChange$ = new Subject<Iterable<Row>>();
     public readonly sortLoad$ = new Subject<void>();
+    public readonly virtualGridMaxBuffer = computed(() => this.virtualGridMinBuffer() * 1.42857);
+    public readonly virtualGridMinBuffer = signal(0);
     public readonly viewPageRows = computed(() => {
         const skip = this.pageState.skip();
         const take = this.pageState.take();

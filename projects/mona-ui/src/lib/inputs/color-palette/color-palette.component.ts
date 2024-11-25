@@ -18,7 +18,6 @@ import { ColorService } from "../services/color.service";
         },
         ColorService
     ],
-    standalone: true,
     imports: [NgClass],
     host: {
         "[class.mona-color-palette]": "true",

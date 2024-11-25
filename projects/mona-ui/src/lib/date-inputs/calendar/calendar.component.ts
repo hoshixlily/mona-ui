@@ -24,7 +24,6 @@ import { CalendarView } from "../models/CalendarView";
             multi: true
         }
     ],
-    standalone: true,
     imports: [ButtonDirective, FontAwesomeModule, NgClass, DatePipe, SlicePipe, DateComparerPipe, DateIncludePipe],
     host: {
         "[class.mona-calendar]": "true",

@@ -16,7 +16,6 @@ import { GridService } from "../../services/grid.service";
     templateUrl: "./grid-filter-menu.component.html",
     styleUrls: ["./grid-filter-menu.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [ButtonDirective, NgClass],
     host: {
         class: "mona-grid-filter-menu"

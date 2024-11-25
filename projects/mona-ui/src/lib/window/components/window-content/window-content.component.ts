@@ -34,7 +34,6 @@ import { WindowInjectorData } from "../../models/WindowInjectorData";
     templateUrl: "./window-content.component.html",
     styleUrls: ["./window-content.component.scss"],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    standalone: true,
     imports: [
         WindowDragHandlerDirective,
         NgTemplateOutlet,

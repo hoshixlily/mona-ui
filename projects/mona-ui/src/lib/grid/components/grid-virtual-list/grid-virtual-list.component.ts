@@ -1,5 +1,5 @@
 import { CdkFixedSizeVirtualScroll, CdkVirtualForOf, CdkVirtualScrollViewport } from "@angular/cdk/scrolling";
-import { NgClass, NgTemplateOutlet } from "@angular/common";
+import { NgTemplateOutlet } from "@angular/common";
 import {
     afterNextRender,
     AfterViewInit,
@@ -19,7 +19,7 @@ import { takeUntilDestroyed, toObservable } from "@angular/core/rxjs-interop";
 import { FaIconComponent } from "@fortawesome/angular-fontawesome";
 import { faChevronDown, faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { EnumerableSet, from, ImmutableList, ImmutableSet } from "@mirei/ts-collections";
-import { fromEvent, Observable, pairwise, startWith } from "rxjs";
+import { fromEvent, pairwise, startWith } from "rxjs";
 import { ButtonDirective } from "../../../buttons/button/button.directive";
 import { ContextMenuComponent } from "../../../menus/context-menu/context-menu.component";
 import { ContainsPipe } from "../../../pipes/contains.pipe";
@@ -33,13 +33,11 @@ import { GridCellComponent } from "../grid-cell/grid-cell.component";
 
 @Component({
     selector: "mona-grid-virtual-list",
-    standalone: true,
     imports: [
         CdkVirtualScrollViewport,
         CdkFixedSizeVirtualScroll,
         CdkVirtualForOf,
         GridCellComponent,
-        NgClass,
         ButtonDirective,
         FaIconComponent,
         SlicePipe,
@@ -54,7 +52,7 @@ import { GridCellComponent } from "../grid-cell/grid-cell.component";
 export class GridVirtualListComponent implements OnInit, AfterViewInit {
     readonly #destroyRef = inject(DestroyRef);
     readonly #hostElementRef = inject(ElementRef<HTMLDivElement>);
-    readonly #groupColumns$: Observable<ImmutableSet<Column>>;
+    readonly #groupColumns$ = toObservable(inject(GridService).groupColumns);
     readonly #injector = inject(Injector);
     readonly #virtualGridRows = computed(() => {
         const data = this.data();
@@ -79,10 +77,6 @@ export class GridVirtualListComponent implements OnInit, AfterViewInit {
     protected readonly viewport = viewChild.required(CdkVirtualScrollViewport);
     public columns = input<ImmutableList<Column>>(ImmutableList.create());
     public data = input<ImmutableSet<Row>>(ImmutableSet.create());
-
-    public constructor() {
-        this.#groupColumns$ = toObservable(this.gridService.groupColumns);
-    }
 
     public ngAfterViewInit(): void {
         window.setTimeout(() => {

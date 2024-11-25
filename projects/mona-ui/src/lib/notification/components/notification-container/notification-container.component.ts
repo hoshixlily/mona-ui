@@ -1,4 +1,3 @@
-import { NgClass } from "@angular/common";
 import { ChangeDetectionStrategy, Component, computed, Signal, signal } from "@angular/core";
 import { NotificationData } from "../../models/NotificationData";
 import { NotificationPosition } from "../../models/NotificationPosition";
@@ -8,8 +7,7 @@ import { NotificationComponent } from "../notification/notification.component";
     selector: "mona-notification-container",
     templateUrl: "./notification-container.component.html",
     styleUrls: ["./notification-container.component.scss"],
-    standalone: true,
-    imports: [NgClass, NotificationComponent],
+    imports: [NotificationComponent],
     changeDetection: ChangeDetectionStrategy.OnPush,
     host: {
         class: "mona-notification-container",

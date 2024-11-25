@@ -5,7 +5,6 @@ import { EditorService } from "../../services/editor.service";
 
 @Component({
     selector: "mona-editor-indent",
-    standalone: true,
     imports: [ButtonGroupComponent, ButtonDirective],
     templateUrl: "./editor-indent.component.html",
     styleUrl: "./editor-indent.component.scss",

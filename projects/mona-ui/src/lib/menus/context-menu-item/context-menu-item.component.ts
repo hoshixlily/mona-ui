@@ -10,7 +10,6 @@ import { MenuItem } from "../models/MenuItem";
     selector: "mona-contextmenu-item",
     templateUrl: "./context-menu-item.component.html",
     styleUrls: ["./context-menu-item.component.scss"],
-    standalone: true,
     imports: [NgClass, NgTemplateOutlet, FontAwesomeModule],
     changeDetection: ChangeDetectionStrategy.OnPush
 })

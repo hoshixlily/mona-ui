@@ -15,7 +15,6 @@ import {
 } from "@angular/core";
 import { takeUntilDestroyed } from "@angular/core/rxjs-interop";
 import { FormsModule } from "@angular/forms";
-import { FaIconComponent } from "@fortawesome/angular-fontawesome";
 import { debounceTime, fromEvent, Subject } from "rxjs";
 import { TextBoxComponent } from "../../../../inputs/text-box/components/text-box/text-box.component";
 import { TextBoxPrefixTemplateDirective } from "../../../../inputs/text-box/directives/text-box-prefix-template.directive";
@@ -23,9 +22,8 @@ import { FilterChangeEvent } from "../../models/FilterChangeEvent";
 
 @Component({
     selector: "mona-filter-input",
-    standalone: true,
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [TextBoxComponent, FormsModule, TextBoxPrefixTemplateDirective, FaIconComponent],
+    imports: [TextBoxComponent, FormsModule, TextBoxPrefixTemplateDirective],
     templateUrl: "./filter-input.component.html",
     styleUrl: "./filter-input.component.scss",
     host: {

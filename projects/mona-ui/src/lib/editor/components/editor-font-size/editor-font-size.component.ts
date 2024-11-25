@@ -5,7 +5,6 @@ import { EditorService } from "../../services/editor.service";
 
 @Component({
     selector: "mona-editor-font-size",
-    standalone: true,
     imports: [DropDownListComponent, FormsModule],
     templateUrl: "./editor-font-size.component.html",
     styleUrl: "./editor-font-size.component.scss",

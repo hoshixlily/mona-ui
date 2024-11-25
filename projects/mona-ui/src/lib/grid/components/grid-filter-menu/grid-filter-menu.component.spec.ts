@@ -11,7 +11,6 @@ import { GridFilterMenuComponent } from "./grid-filter-menu.component";
 
 @Component({
     template: ` <mona-grid-filter-menu [column]="column"></mona-grid-filter-menu> `,
-    standalone: true,
     imports: [GridFilterMenuComponent],
     changeDetection: ChangeDetectionStrategy.OnPush
 })
