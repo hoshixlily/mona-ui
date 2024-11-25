@@ -5,6 +5,8 @@ table {
 
     & tbody {
         text-align: left;
+        display: flex;
+        flex-direction: column;
     }
 
     & tr {

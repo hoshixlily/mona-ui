@@ -1527,7 +1527,7 @@ export class AppComponent implements OnInit {
             "Uncharted Journey",
             "Thunderous Whirlpool"
         ];
-        let orderNumber = 10000;
+        let orderNumber = 1;
 
         for (let i = 0; i < count; i++) {
             const now = new Date();
