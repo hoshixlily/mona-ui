@@ -67,7 +67,7 @@ export class ListComponent<TData> implements OnInit {
     protected readonly groupHeaderTemplate = contentChild(ListGroupHeaderTemplateDirective, { read: TemplateRef });
     protected readonly headerTemplate = contentChild(ListHeaderTemplateDirective, { read: TemplateRef });
     protected readonly itemTemplate = contentChild(ListItemTemplateDirective, { read: TemplateRef });
-    protected readonly listHeight: Signal<string | undefined> = computed(() => {
+    protected readonly listHeight = computed(() => {
         const height = this.height();
         if (height == null) {
             return undefined;
@@ -77,7 +77,7 @@ export class ListComponent<TData> implements OnInit {
         }
         return height;
     });
-    protected readonly listMaxHeight: Signal<ListSizeType> = computed(() => {
+    protected readonly listMaxHeight = computed(() => {
         const maxHeight = this.maxHeight();
         if (maxHeight == null) {
             return undefined;
@@ -87,7 +87,7 @@ export class ListComponent<TData> implements OnInit {
         }
         return maxHeight;
     });
-    protected readonly listService: ListService<TData> = inject(ListService);
+    protected readonly listService = inject(ListService<TData>);
     protected readonly listWidth: Signal<ListSizeType> = computed(() => {
         const width = this.width();
         if (width == null) {
