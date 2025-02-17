@@ -65,7 +65,6 @@ export default [
 
             "@typescript-eslint/explicit-function-return-type": "off",
             "@typescript-eslint/explicit-member-accessibility": "off",
-
             "@typescript-eslint/member-ordering": [
                 "error",
                 {
@@ -107,7 +106,6 @@ export default [
                     }
                 }
             ],
-
             "@typescript-eslint/naming-convention": [
                 "error",
                 {
@@ -153,7 +151,6 @@ export default [
                     format: ["strictCamelCase"]
                 }
             ],
-
             "@typescript-eslint/no-inferrable-types": "off"
         }
     },

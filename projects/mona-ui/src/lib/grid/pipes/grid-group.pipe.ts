@@ -11,7 +11,7 @@ import { cellComparer } from "../utilities/GridUtils";
     standalone: true
 })
 export class GridGroupPipe implements PipeTransform {
-    readonly #gridService: GridService = inject(GridService);
+    readonly #gridService = inject(GridService);
 
     public transform(value: Row[], column: Column, page: number): Array<GridGroup> {
         return from(value)

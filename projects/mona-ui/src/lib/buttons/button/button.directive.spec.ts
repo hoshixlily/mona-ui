@@ -172,4 +172,38 @@ describe("ButtonDirective", () => {
 
         expect(button).not.toHaveClass("mona-selected");
     });
+
+    it("should not emit selectedChange when not toggleable", fakeAsync(() => {
+        const spy = spyOn(buttonHostComponent, "selectedChange");
+        const button = buttonHostFixture.debugElement.query(By.css("button")).nativeElement;
+        button.click();
+        tick();
+        buttonHostFixture.detectChanges();
+        expect(spy).not.toHaveBeenCalled();
+    }));
+
+    it("should have class 'mona-button'", () => {
+        const button = buttonHostFixture.debugElement.query(By.css("button")).nativeElement;
+        expect(button).toHaveClass("mona-button");
+    });
+
+    it("should have class 'mona-selected' when selected is true", () => {
+        buttonHostComponent.selected = true;
+        buttonHostFixture.detectChanges();
+        const button = buttonHostFixture.debugElement.query(By.css("button")).nativeElement;
+        expect(button).toHaveClass("mona-selected");
+    });
+
+    it("should not toggle when disabled", fakeAsync(() => {
+        buttonHostComponent.toggleable = true;
+        buttonHostComponent.buttonDirective().disabled.set(true);
+        buttonHostFixture.detectChanges();
+
+        const button = buttonHostFixture.debugElement.query(By.css("button")).nativeElement;
+        button.click();
+        tick();
+        buttonHostFixture.detectChanges();
+
+        expect(button).not.toHaveClass("mona-selected");
+    }));
 });

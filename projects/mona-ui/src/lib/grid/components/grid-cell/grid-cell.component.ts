@@ -289,9 +289,7 @@ export class GridCellComponent implements OnInit {
         this.editForm.controls[this.column().field()].valueChanges
             .pipe(
                 takeUntilDestroyed(this.#destroyRef),
-                map(value => {
-                    return value as Date;
-                })
+                map(value => value as Date)
             )
             .subscribe(() => {
                 this.editing.set(false);

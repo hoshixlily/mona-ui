@@ -6,15 +6,23 @@ import { ButtonService } from "../services/button.service";
 @Directive({
     selector: "button[monaButton]",
     host: {
-        "[attr.disabled]": "disabled() ? '' : undefined",
+        "[attr.aria-describedby]": "ariaDescribedby()",
         "[attr.aria-disabled]": "disabled() ? true : undefined",
+        "[attr.aria-expanded]": "toggleable() ? selected() : undefined",
+        "[attr.aria-haspopup]": "false",
+        "[attr.aria-label]": "ariaLabel()",
+        "[attr.aria-labelledby]": "ariaLabelledby()",
+        "[attr.aria-pressed]": "toggleable() ? selected() : undefined",
         "[attr.aria-selected]": "selected() ? true : undefined",
+        "[attr.disabled]": "disabled() ? '' : undefined",
+        "[attr.role]": "'button'",
         "[attr.tabindex]": "tabindex()",
+        "[attr.type]": "'button'",
         "[class.mona-button]": "true",
         "[class.mona-disabled]": "disabled()",
-        "[class.mona-selected]": "selected()",
         "[class.mona-flat]": "flat()",
-        "[class.mona-primary]": "primary()"
+        "[class.mona-primary]": "primary()",
+        "[class.mona-selected]": "selected()"
     },
     standalone: true
 })
@@ -22,7 +30,9 @@ export class ButtonDirective implements OnInit {
     readonly #buttonService = inject(ButtonService, { host: true, optional: true });
     readonly #destroyRef: DestroyRef = inject(DestroyRef);
     readonly #hostElementRef: ElementRef<HTMLButtonElement> = inject(ElementRef);
-
+    public ariaLabel = input<string>("");
+    public ariaLabelledby = input<string>("");
+    public ariaDescribedby = input<string>("");
     public disabled = model<boolean>(false);
     public flat = input(false);
     public primary = input(false);
@@ -72,6 +82,9 @@ export class ButtonDirective implements OnInit {
                 takeWhile(() => this.toggleable())
             )
             .subscribe(() => {
+                if (this.disabled()) {
+                    return;
+                }
                 if (this.#buttonService) {
                     this.#buttonService.buttonClick$.next(this);
                 } else {
